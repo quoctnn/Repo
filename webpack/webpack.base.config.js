@@ -1,7 +1,7 @@
 var path = require("path");
 
 module.exports = {
-    entry: path.resolve(__dirname, '../src/index.tsx'),
+    entry: path.resolve(__dirname, '../src/components/Main/app.tsx'),
     output: {
         filename: "bundle.js",
         path: path.resolve(__dirname, '../dist/'),
@@ -18,7 +18,7 @@ module.exports = {
     module: {
         rules: [
             // All files with a '.ts' or '.tsx' extension will be handled by 'awesome-typescript-loader'.
-            { test: /\.tsx?$/, loader: "awesome-typescript-loader" },
+            //{ test: /\.tsx?$/, loader: "ts-loader" },
 
             // All output '.js' files will have any sourcemaps re-processed by 'source-map-loader'.
             { enforce: "pre", test: /\.js$/, loader: "source-map-loader" }

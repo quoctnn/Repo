@@ -14,27 +14,38 @@ try {
     //localDomain = "alesund-dev.intra.work";
 }
 
-// config.entry = {
-//     main: [
-//         'webpack-dev-server/client?http://' + localDomain + ':3000',
-//         'webpack/hot/only-dev-server',
-//         '/src/index.tsx'
-//     ]
-// }
+config.entry = {
+    main: [
+        'webpack-dev-server/client?http://' + localDomain + ':3000',
+        'webpack/hot/only-dev-server',
+        path.resolve(__dirname, '../src/components/Main/app.tsx'),
+    ]
+}
 
 config.output.publicPath = 'http://' + localDomain + ':3000/assets/bundles/';
 
 config.plugins = [
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NoEmitOnErrorsPlugin(),
-     new BundleTracker({filename: 'webpack/webpack-stats-dev.json'}),
-     new webpack.LoaderOptionsPlugin({
-         debug: true
-       })
+    new BundleTracker({filename: 'webpack/webpack-stats-dev.json'}),
+    new webpack.LoaderOptionsPlugin({
+        debug: true
+        }),
 ];
 config.module.rules.unshift(
-//      { test: /\.tsx?$/, loader: "awesome-typescript-loader" }
-     {test: /\.jsx?$/, exclude: /node_modules/, loader: 'react-hot-loader/webpack'}
+    {
+        test: /\.tsx?$/,
+        use: [
+            {
+                loader: 'babel-loader',
+                options: {
+                    babelrc: false,
+                    plugins: ['react-hot-loader/babel'],
+                }
+            },
+            'ts-loader',
+        ],
+        exclude: /node_modules/}
 );
 config.output.path = path.resolve(__dirname, '../bundles/dev/');
 
