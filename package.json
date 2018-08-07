@@ -1,0 +1,58 @@
+{
+  "name": "intrasocial",
+  "version": "0.1.0",
+  "description": "intraSocial client (Typescript)",
+  "main": "index.js",
+  "scripts": {
+    "build-production": "webpack --config webpack/webpack.prod.config.js --progress --colors",
+    "watch": "node webpack/watch_server.js",
+    "test": "webpack-dev-server --content-base ./dist --hot --inline --colors --port 3000 --open",
+    "storybook": "NODE_PATH=. start-storybook -p 9001 -c .storybook"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/intrahouse/intrasocial-client.git"
+  },
+  "keywords": [
+    "intraSocial",
+    "typescript",
+    "client",
+    "javascript",
+    "webpack",
+    "react",
+    "redux"
+  ],
+  "author": "Frank Godo, Jan Leslie Aamaas",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/intrahouse/intrasocial-client/issues"
+  },
+  "homepage": "https://github.com/intrahouse/intrasocial-client#readme",
+  "dependencies": {
+    "@types/react": "^16.4.8",
+    "@types/react-dom": "^16.0.7",
+    "emoji-mart": "^2.7.0",
+    "react": "^16.4.2",
+    "react-dom": "^16.4.2",
+    "webpack-merge": "^4.1.4"
+  },
+  "devDependencies": {
+    "@storybook/react": "^3.4.10",
+    "awesome-typescript-loader": "^5.2.0",
+    "mini-css-extract-plugin": "^0.4.1",
+    "moment": "^2.22.2",
+    "moment-timezone": "^0.5.21",
+    "react-hot-loader": "^4.3.4",
+    "react-intl": "^2.4.0",
+    "react-redux": "^5.0.7",
+    "redux-persist": "^5.10.0",
+    "source-map-loader": "^0.2.3",
+    "tslint": "^5.11.0",
+    "typescript": "^3.0.1",
+    "uglify-es": "^3.3.9",
+    "webpack": "^4.16.5",
+    "webpack-bundle-tracker": "^0.3.0",
+    "webpack-cli": "^3.1.0",
+    "webpack-dev-server": "^3.1.5"
+  }
+}
