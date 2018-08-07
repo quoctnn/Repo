@@ -18,7 +18,7 @@ config.entry = {
     main: [
         'webpack-dev-server/client?http://' + localDomain + ':3000',
         'webpack/hot/only-dev-server',
-        path.resolve(__dirname, '../src/components/Main/app.tsx'),
+        path.resolve(__dirname, '../src/main/App.tsx'),
     ]
 }
 
@@ -31,6 +31,11 @@ config.plugins = [
     new webpack.LoaderOptionsPlugin({
         debug: true
         }),
+    new webpack.DefinePlugin({
+        'process.env': {
+            'NODE_ENV': JSON.stringify('development')
+        }
+    }),
 ];
 config.module.rules.unshift(
     {
@@ -45,7 +50,9 @@ config.module.rules.unshift(
             },
             'ts-loader',
         ],
-        exclude: /node_modules/}
+        exclude: /node_modules/},
+        {test: /\.scss$/, use: [{ loader: "style-loader" }, { loader: "css-loader"}, { loader: "sass-loader" }]},
+            
 );
 config.output.path = path.resolve(__dirname, '../bundles/dev/');
 

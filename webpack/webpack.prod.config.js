@@ -49,5 +49,12 @@ module.exports = merge(config, {
             }
         }),
         ]
+    }, 
+    module : {
+        rules: [
+            // All files with a '.ts' or '.tsx' extension will be handled by 'awesome-typescript-loader'.
+            { test: /\.tsx?$/, loader: "ts-loader" }
+
+        ]
     }
 });
