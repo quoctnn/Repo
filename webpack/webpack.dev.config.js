@@ -1,6 +1,7 @@
 var path = require("path");
 var webpack = require('webpack');
 var BundleTracker = require('webpack-bundle-tracker');
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 var config = require('./webpack.base.config.js');
 
 var localDomain;
@@ -36,6 +37,10 @@ config.plugins = [
             'NODE_ENV': JSON.stringify('development')
         }
     }),
+    new MiniCssExtractPlugin({
+        filename: "[name].css",
+        chunkFilename: "[id].css"
+    })
 ];
 config.module.rules.unshift(
     {
@@ -51,8 +56,17 @@ config.module.rules.unshift(
             'ts-loader',
         ],
         exclude: /node_modules/},
-        {test: /\.scss$/, use: [{ loader: "style-loader" }, { loader: "css-loader"}, { loader: "sass-loader" }]},
-            
+        {test: /\.scss$/, use: [
+            {
+                loader: MiniCssExtractPlugin.loader,
+                options: {
+                  // you can specify a publicPath here
+                  // by default it use publicPath in webpackOptions.output
+                  publicPath: '../'
+                }
+              },
+              "css-loader"
+        ]},
 );
 config.output.path = path.resolve(__dirname, '../bundles/dev/');
 

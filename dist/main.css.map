@@ -1,0 +1,1 @@
+{"version":3,"file":"main.css","sources":["webpack:///./src/components/dev/DevTool.scss"],"sourcesContent":["#dev-tool\n{\n    background: red;\n}"],"mappings":"AAAA;AACA;AACA;AACA;","sourceRoot":""}

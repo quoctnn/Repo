@@ -49,11 +49,22 @@ module.exports = merge(config, {
             }
         }),
         ]
-    }, 
+    },
     module : {
         rules: [
             // All files with a '.ts' or '.tsx' extension will be handled by 'awesome-typescript-loader'.
-            { test: /\.tsx?$/, loader: "ts-loader" }
+            { test: /\.tsx?$/, loader: "ts-loader" },
+            {test: /\.scss$/, use: [
+                {
+                    loader: MiniCssExtractPlugin.loader,
+                    options: {
+                      // you can specify a publicPath here
+                      // by default it use publicPath in webpackOptions.output
+                      publicPath: '../'
+                    }
+                  },
+                  "css-loader"
+            ]},
 
         ]
     }
