@@ -7,7 +7,10 @@ import { Community } from "../views/community/Community";
 import { Group } from '../views/group/Group';
 import { error404 } from '../views/error/error404';
 import {Settings} from "../utilities/Settings"
+
 let { DevTool } = Settings.dev_mode ? require('../components/dev/DevTool') : "";
+
+require("./Main.scss");
 
 export interface Props {
 }
@@ -15,7 +18,6 @@ export class Main extends React.Component<Props, {}> {
   render() {
 
     return (
-      <div id="app-root">
         <div id="main-content">
           <div className="content-block">
             <div className="container">
@@ -31,13 +33,12 @@ export class Main extends React.Component<Props, {}> {
               </Router>
             </div>
           </div>
+            <div id="navigation-content" className="navigation">
+                <LeftNavigation />
+                <TopNavigation />
+            </div>
+            {Settings.dev_mode && <DevTool />}
         </div>
-        <div id="navigation-content" className="navigation">
-            <LeftNavigation />
-            <TopNavigation />
-        </div>
-        {Settings.dev_mode && <DevTool />}
-      </div>
     );
   }
 }

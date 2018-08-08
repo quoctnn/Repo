@@ -51,7 +51,7 @@ config.module.rules.unshift(
             'ts-loader',
         ],
         exclude: /node_modules/},
-        {test: /\.scss$/, use: [{ loader: "style-loader" }, { loader: "css-loader"}, { loader: "sass-loader" }]},
+        {test: /\.scss$/, use: [ { loader: "css-loader"}]},
             
 );
 config.output.path = path.resolve(__dirname, '../bundles/dev/');

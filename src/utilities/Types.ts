@@ -1,0 +1,3 @@
+export const Types = {
+	SET_BACKEND_ENDPOINT: 'SET_BACKEND_ENDPOINT',
+}
