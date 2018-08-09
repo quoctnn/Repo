@@ -1,20 +1,22 @@
 'use strict';
 import { Settings } from "../utilities/Settings";
 import store from '../main/App';
+import { ApiEndpoint, LoginType} from '../reducers/debug';
 
 var isProduction = Settings.isProduction;
 export type SuccessCallback = (data: any, status:string, request:JQuery.jqXHR) => void;
 export type ErrorCallback = (request:JQuery.jqXHR, status:string, error:string) => void;
 export class AjaxRequest
 {
-    static setupWithToken(token:string)
+    static setup(endpoint:ApiEndpoint, accessTokenOverride:string)
     {
-        console.log("setupWithToken", token)
-        if(token)
+        console.log("AjaxRequest.setup", accessTokenOverride)
+        if(accessTokenOverride || (endpoint.loginType == LoginType.API && endpoint.token))
         {
+            let token = accessTokenOverride || endpoint.token
             $.ajaxSetup({
                 beforeSend: function (xhr, settings) {
-                    xhr.setRequestHeader("x-csrftoken", token);
+                    xhr.setRequestHeader("Authorization", "Token " + token);
                 }
             });
         }
@@ -72,7 +74,7 @@ export class AjaxRequest
     private static applyEndpointDomain(url:string)
     {
         let state = store.getState().debug
-        return state.availableApiEndpoints[state.apiEndpoint] + url
+        return state.availableApiEndpoints[state.apiEndpoint].endpoint + url
     }
     private static ajaxCall(method, url, data, success:SuccessCallback, error:ErrorCallback) 
     {
