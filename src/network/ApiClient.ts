@@ -30,7 +30,7 @@ export default class ApiClient
     }
     static sessionLogin(email:string, password:string,callback:ApiRequestCallback)
     {
-        AjaxRequest.post(Constants.urlsRoute.login,`login=${email}&password=${password}&next=/`, (data, status, request) => {
+        AjaxRequest.postHtml(Constants.urlsRoute.login,`login=${email}&password=${password}&next=/`, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
             callback(null, status, error)

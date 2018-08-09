@@ -29,6 +29,10 @@ export class AjaxRequest
     {
         return AjaxRequest.ajaxCall("POST", url, data, success, error);
     }
+    static postHtml(url:string, data, success:SuccessCallback, error:ErrorCallback)
+    {
+        return AjaxRequest.ajaxCallHtml("POST", url, data, success, error);
+    }
     static put(url, data, success:SuccessCallback, error:ErrorCallback)
     {
         return AjaxRequest.ajaxCall("PUT", url, data, success, error);
@@ -66,6 +70,7 @@ export class AjaxRequest
             cache: false,
             type: type,
             data: JSON.stringify(json),
+            xhrFields: { withCredentials: true },
             contentType: "application/json; charset=utf-8",
             success: success.bind(this),
             error: error.bind(this)
@@ -86,10 +91,31 @@ export class AjaxRequest
         if (typeof  error === 'undefined') {
             error = defaultErrorCallback;
         }
-    
         return $.ajax({
             url: url,
             dataType: 'json',
+            cache: false,
+            type: method,
+            traditional: true,
+            xhrFields: { withCredentials: true },
+            data: data,
+            success: success.bind(this),
+            error: error.bind(this)
+        });
+    }
+    private static ajaxCallHtml(method, url, data, success:SuccessCallback, error:ErrorCallback) 
+    {
+        url = AjaxRequest.applyEndpointDomain(url)
+        if (typeof  success === 'undefined') {
+            success = defaultCallback;
+        }
+    
+        if (typeof  error === 'undefined') {
+            error = defaultErrorCallback;
+        }
+        return $.ajax({
+            url: url,
+            dataType: 'html',
             cache: false,
             type: method,
             traditional: true,

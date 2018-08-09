@@ -47,6 +47,7 @@ class Signin extends React.Component<Props & InjectedIntlProps, {}> {
     loginSessionCallback(data:any, status:string, error:string)
     {
         console.log(data, status, error)
+        this.props.history.push('/')
         if(error)
         {
             toast.error(<ErrorToast message={error} />, { hideProgressBar: true })
@@ -80,10 +81,10 @@ class Signin extends React.Component<Props & InjectedIntlProps, {}> {
                         <p className="lead">{Intl.translate(this.props.intl, "Enter your email address and password")}</p>
                         <Form>
                             <FormGroup>
-                                <Input innerRef={(input) => { this.emailInput = input }} placeholder={Intl.translate(this.props.intl, "Email")} />
+                                <Input name="email" innerRef={(input) => { this.emailInput = input }} value="leslie@intrahouse.com" placeholder={Intl.translate(this.props.intl, "Email")} />
                             </FormGroup>
                             <FormGroup>
-                                <Input innerRef={(input) => { this.passwordInput = input }} type="password" placeholder={Intl.translate(this.props.intl, "Password")} />
+                                <Input name="password" innerRef={(input) => { this.passwordInput = input }} type="password" placeholder={Intl.translate(this.props.intl, "Password")} />
                             </FormGroup>
                             <FormGroup>
                                 <Button color="info" onClick={this.doSignin}>{Intl.translate(this.props.intl, "Sign in")}</Button>
