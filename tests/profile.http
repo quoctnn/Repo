@@ -1,0 +1,6 @@
+### GET PROFILE INFO
+
+GET http://alesund-dev.intra.work:8000/api/v1/profile/me/ HTTP/1.1
+Authorization: Token {{token}}
+
+### GET
