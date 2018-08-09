@@ -1,10 +1,12 @@
 var translations = {
     "es": {
-        "search.placeholder": "Search...",
+        "search.placeholder": "Buscar ...",
     },
-
     "no": {
-        "search.placeholder": "Søk...",
+        "search.placeholder": "Søk ...",
+    },
+    "en" : {
+        "search.placeholder": "Search ..."
     }
 }
 

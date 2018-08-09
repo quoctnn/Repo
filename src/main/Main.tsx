@@ -1,14 +1,13 @@
 import * as React from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
-import { NewsFeed } from "../views/newsfeed/NewsFeed";
+import NewsFeed from "../views/newsfeed/NewsFeed";
 import { LeftNavigation } from '../components/navigation/LeftNavigation';
 import { TopNavigation } from '../components/navigation/TopNavigation';
 import { Community } from "../views/community/Community";
 import { Group } from '../views/group/Group';
 import { error404 } from '../views/error/error404';
 import {Settings} from "../utilities/Settings"
-
-let { DevTool } = Settings.dev_mode ? require('../components/dev/DevTool') : "";
+import DevTool from "../components/dev/DevTool";
 
 require("./Main.scss");
 
@@ -37,7 +36,7 @@ export class Main extends React.Component<Props, {}> {
                 <LeftNavigation />
                 <TopNavigation />
             </div>
-            {Settings.dev_mode && <DevTool />}
+            {!Settings.isProduction && <DevTool /> }
         </div>
     );
   }

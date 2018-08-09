@@ -1,5 +1,7 @@
+
+import * as ReactIntl from "react-intl";
 declare global {
-    interface Window { app: any; }
+    interface Window { app: any; ReactIntlLocaleData:Array<any>, Intl:any}
     interface Navigator { browserLanguage: string; }
 }
 export default class Intl {
@@ -39,5 +41,9 @@ export default class Intl {
     static getCurrentLocalePrefix() 
     { 
         return Intl.getCurrentLocale().slice(0, 2);
+    }
+    static translate(intl:ReactIntl.InjectedIntl, key:string) 
+    { 
+        return intl.formatMessage({id:key, defaultMessage:key})
     }
 }

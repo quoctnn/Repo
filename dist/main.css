@@ -1,6 +1,53 @@
 #dev-tool
 {
-    background: red;
+    position: absolute;
+    bottom: 10px;
+    right:10px;
+}
+@charset "UTF-8";
+
+/* Fonts */
+$font-family-default: 'Roboto:700,400,500,300', sans-serif !default;
+$font-size-default: 14px !default;
+
+/* Colors */
+$feed-form-options-bg: #f5f5f5 !default;
+$body-background: #eeeeee !default;
+$border-color-default: #cccccc !default;
+
+$default-color: #fff !default;
+$primary-color: #428bca !default;
+$info-color: #5bc0de !default;
+$danger-color: #d9534f !default;
+$success-color: #5cb85c !default;
+$warning-color: #f0ad4e !default;
+
+$navbar-background: #428bca !default;
+
+/* Status Type colors */
+$status-videos-color: #B71C1C !default;
+$status-text-color: #337AB7 !default;
+$status-attachments-color: #FF5722 !default;
+$status-audios-color: #FFCA28 !default;
+$status-photos-color: #029555 !default;
+$status-link-color: #2196F3 !default;
+$status-multimedia-color: #7B1FA2 !default;
+$status-events-color: #FF9933 !default;
+
+/* Backgrounds transparent */
+$bg-trans-blue-light: rgba(0, 54, 144, 0.75) !default;
+$bg-trans-blue-dark: rgba(1, 0, 54, 0.9) !default;
+$bg-trans-black: rgba(0, 0, 0, 0.5) !default;
+$bg-trans-black-light: rgba(0, 0, 0, 0.25) !default;
+
+/* NAV */
+$nav-foreground-color:black;
+$nav-background-color:white;
+$nav-border-color:#DFE0DF;
+$highlight-color: #428bca !default;
+
+#main-content
+{
 }
 
 /*# sourceMappingURL=main.css.map*/
