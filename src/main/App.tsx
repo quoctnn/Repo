@@ -10,7 +10,7 @@ import storageSession from 'redux-persist/lib/storage/session'
 import { PersistGate } from 'redux-persist/integration/react'
 import { Main } from "./Main";
 import AutoIntlProvider from "../components/intl/AutoIntlProvider";
-import {Types} from "../utilities/Types"
+import { Types } from '../utilities/Types';
 import { AjaxRequest } from '../network/AjaxRequest';
 
 const persistConfig = {
@@ -24,18 +24,24 @@ const logger = store => next => action => {
     console.log('NEXT STATE => ', store.getState())
     return result
 }
+const updateAutorization = () =>
+{
+    let dState = store.getState().debug
+    AjaxRequest.setup(dState.availableApiEndpoints[dState.apiEndpoint], dState.accessToken)
+}
 const accessTokenMiddleware = store => next => action => {
-    if(action.type == Types.SET_ACCESS_TOKEN)
+    let result = next(action)
+    if(action.type == Types.SET_ACCESS_TOKEN_OVERRIDE || action.type == Types.SET_AUTORIZATION_DATA || action.type == Types.SET_API_ENDPOINT)
     {
-        AjaxRequest.setupWithToken(action.accessToken)
+        updateAutorization()
     }
-    return next(action)
+    return result
 }
 const store = createStore(persistedReducer, applyMiddleware(logger, accessTokenMiddleware))
 const persistor = persistStore(store, {}, () => 
 { 
     //rehydrate complete
-    AjaxRequest.setupWithToken(store.getState().debug.accessToken)
+    updateAutorization()
 })
 ReactDOM.render(
     <Provider store={store}>

@@ -1,5 +1,6 @@
 export default  {
     apiRoute: {
+        login:"/api/v1/auth/oup/login/",
         // Purchases
         invoiceListUrl: '/api/v1/invoice/',
         getInvoiceItem: (id) => {
@@ -134,6 +135,7 @@ export default  {
     },
 
     urlsRoute: {
+        login:"/accounts/login/",
         profileList: '/profiles/',
         myProfile: '/profile/me/',
         myGroups: '/group/member/',

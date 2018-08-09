@@ -1,4 +1,51 @@
 @import "Config";
+.flex{display: flex}
+.flex-grow{ flex-grow: 1;} 
+.flex-shrink{ flex-shrink: 1;}
+.align-center{ align-items: center;}
+.transition
+{
+    position : relative; 
+    -webkit-transition : 300ms ease-in-out all;
+     -o-transition : 300ms ease-in-out all;
+    -moz-transition : 300ms ease-in-out all;
+    transition : 300ms ease-in-out all;
+    -webkit-backface-visibility : hidden;
+    -moz-backface-visibility : hidden;
+    backface-visibility : hidden;
+}
 #main-content
 {
+    #navigation-content
+    {
+        #left-navigation
+        {
+            border-right: 1px solid #DFE0DF;
+            transition: transform 0.3s ease-in-out all;
+            z-index: 999;
+            position: fixed;
+            top: $top-navigation-height;
+            left: 0;
+            bottom: 0;
+            width: $left-navigation-min-width;
+            overflow-x: hidden;
+        }
+        #top-navigation
+        {
+            z-index: 999;
+            height: $top-navigation-height;
+            position: fixed;
+            right: 0;
+            left: 0;
+            top: 0;
+        }
+        
+    }
+    #content-block
+    {
+        margin-left: $left-navigation-min-width;
+        margin-top: $top-navigation-height;
+        height:calc(100% - #{$top-navigation-height});
+        padding: 5px;
+    }
 }

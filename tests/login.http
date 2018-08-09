@@ -1,19 +1,5 @@
 
 ### LOGIN WITH USERNAME AND PASSWORD
-### TEST SESSIONID COOKIE
-
-GET http://alesund-dev.intra.work:8000/profile/me/ HTTP/1.1
-Connection: keep-alive
-Cache-Control: max-age=0
-Origin: http://alesund-dev.intra.work:8000
-Upgrade-Insecure-Requests: 1
-Content-Type: application/x-www-form-urlencoded
-User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.84 Safari/537.36
-Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8
-Referer: http://alesund-dev.intra.work:8000/accounts/login/?next=/select-community/
-Accept-Encoding: gzip, deflate
-Accept-Language: en-US,en;q=0.9,nb;q=0.8,es;q=0.7
-Cookie: "sessionid=iwj6dh5byhoz3ftywg1utz8p92ppaoh0;"
 
 POST http://alesund-dev.intra.work:8000/accounts/login/ HTTP/1.1
 Connection: keep-alive

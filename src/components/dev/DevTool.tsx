@@ -1,26 +1,24 @@
 import * as React from "react";
 import { connect } from 'react-redux'
 import * as Actions from "../../actions/Actions" 
+import { ApiEndpoint } from '../../reducers/debug';
 require("./DevTool.scss");
-
 
 export interface Props {
     language?:number,
     availableLanguages?:Array<string>,
     setLanguage?:(index:number) => void,
     apiEndpoint?:number,
-    availableApiEndpoints?:Array<string>,
+    availableApiEndpoints?:Array<ApiEndpoint>,
     setApiEndpoint?:(index:number) => void,
     accessToken?:string,
-    setAccessToken:(accessToken:string) => void
+    setAccessTokenOverride:(accessToken:string) => void
 }
 
 class DevTool extends React.Component<Props, {}> {
-    accessTokenInput: React.RefObject<HTMLInputElement>
     state:{accessToken:string}
     constructor(props) {
         super(props);
-        this.accessTokenInput = React.createRef()
         this.state = {accessToken:this.props.accessToken}
     }
     renderLanguageSelector()
@@ -45,12 +43,12 @@ class DevTool extends React.Component<Props, {}> {
         return (
             <div className="dropdown">
                 <button className="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    {this.props.availableApiEndpoints[this.props.apiEndpoint]}
+                    {this.props.availableApiEndpoints[this.props.apiEndpoint].endpoint}
                 </button>
 
                 <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
                     {this.props.availableApiEndpoints.map((endpoint, index) => {
-                        return <a key={index} onClick={() => { this.props.setApiEndpoint(index) }} className="dropdown-item" href="#">{endpoint}</a>
+                        return <a key={index} onClick={() => { this.props.setApiEndpoint(index) }} className="dropdown-item" href="#">{endpoint.endpoint}</a>
                     }) }
                 </div>
             </div>
@@ -59,9 +57,9 @@ class DevTool extends React.Component<Props, {}> {
     renderAccessTokenInput()
     {
         return (<div className="input-group">
-                    <input ref={this.accessTokenInput} value={this.state.accessToken} onChange={(e) => {this.setState({accessToken:e.target.value})}}  type="text" className="form-control" placeholder="token" />
+                    <input value={this.state.accessToken} onChange={(e) => {this.setState({accessToken:e.target.value})}}  type="text" className="form-control" placeholder="token" />
                     <div className="input-group-append">
-                        <button onClick={() => {this.props.setAccessToken(this.state.accessToken)}} className="btn btn-outline-secondary" type="button">Save</button>
+                        <button onClick={() => {this.props.setAccessTokenOverride(this.state.accessToken)}} className="btn btn-outline-secondary" type="button">Save</button>
                     </div>
                 </div>)
     }
@@ -124,8 +122,8 @@ const mapDispatchToProps = (dispatch) => {
         setApiEndpoint:(index) => {
             dispatch(Actions.setApiEndpoint(index))
         },
-        setAccessToken:(accessToken) => {
-            dispatch(Actions.setAccessToken(accessToken))
+        setAccessTokenOverride:(accessToken) => {
+            dispatch(Actions.setAccessTokenOverride(accessToken))
         }
         
     }
