@@ -43,7 +43,7 @@ class Signin extends React.Component<Props & InjectedIntlProps, {}> {
             this.props.history.push('/')
 
         }
-    } 
+    }
     loginSessionCallback(data:any, status:string, error:string)
     {
         console.log(data, status, error)
@@ -58,7 +58,7 @@ class Signin extends React.Component<Props & InjectedIntlProps, {}> {
             this.props.setAuthorizationData(data.token, null)
             this.props.history.push('/')
         }
-    } 
+    }
     doSignin(e)
     {
         e.preventDefault()
@@ -81,7 +81,7 @@ class Signin extends React.Component<Props & InjectedIntlProps, {}> {
                         <p className="lead">{Intl.translate(this.props.intl, "Enter your email address and password")}</p>
                         <Form>
                             <FormGroup>
-                                <Input name="email" innerRef={(input) => { this.emailInput = input }} value="leslie@intrahouse.com" placeholder={Intl.translate(this.props.intl, "Email")} />
+                                <Input name="email" innerRef={(input) => { this.emailInput = input }} placeholder={Intl.translate(this.props.intl, "Email")} />
                             </FormGroup>
                             <FormGroup>
                                 <Input name="password" innerRef={(input) => { this.passwordInput = input }} type="password" placeholder={Intl.translate(this.props.intl, "Password")} />
@@ -92,15 +92,15 @@ class Signin extends React.Component<Props & InjectedIntlProps, {}> {
                         </Form>
                     </div>
                 </div>
-                
+
             </div>
-            
+
         );
     }
 }
 const mapStateToProps = (state) => {
     return {
-        apiEndpoint:state.debug.apiEndpoint, 
+        apiEndpoint:state.debug.apiEndpoint,
         availableApiEndpoints:state.debug.availableApiEndpoints,
     };
 }
@@ -109,7 +109,7 @@ const mapDispatchToProps = (dispatch) => {
         setAuthorizationData:(token:string, cookie:string) => {
             dispatch(Actions.setAuthorizationData(token, cookie))
         }
-        
+
     }
 }
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(injectIntl(Signin)));
