@@ -48,7 +48,7 @@ class Signin extends React.Component<Props & InjectedIntlProps, {}> {
                 }
             })
         }
-    } 
+    }
     doSignin(e)
     {
         e.preventDefault()
@@ -82,15 +82,15 @@ class Signin extends React.Component<Props & InjectedIntlProps, {}> {
                         </Form>
                     </div>
                 </div>
-                
+
             </div>
-            
+
         );
     }
 }
 const mapStateToProps = (state) => {
     return {
-        apiEndpoint:state.debug.apiEndpoint, 
+        apiEndpoint:state.debug.apiEndpoint,
         availableApiEndpoints:state.debug.availableApiEndpoints,
     };
 }
@@ -102,7 +102,7 @@ const mapDispatchToProps = (dispatch) => {
         setProfile:(profile:object) => {
             dispatch(Actions.setProfile(profile))
         }
-        
+
     }
 }
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(injectIntl(Signin)));

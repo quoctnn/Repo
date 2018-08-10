@@ -53,6 +53,7 @@
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.3",
     "babel-loader": "^7.1.5",
+    "electron": "^2.0.7",
     "mini-css-extract-plugin": "^0.4.1",
     "moment-timezone": "^0.5.21",
     "react-hot-loader": "^4.3.4",
