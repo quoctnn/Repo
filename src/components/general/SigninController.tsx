@@ -8,6 +8,7 @@ import { AjaxRequest } from '../../network/AjaxRequest';
 import { ApiEndpoint } from '../../reducers/debug';
 import { toast } from 'react-toastify';
 import { ErrorToast } from '../../components/general/Toast';
+import { Routes } from '../../utilities/Routes';
 
 export interface Props {
     profile?:any,
@@ -62,7 +63,7 @@ class SigninController extends React.Component<Props, {}> {
         if(this.props.profile)
         {
             this.props.setProfile(null)
-            this.props.history.push('/signin')
+            this.props.history.push(Routes.SIGNIN)
         }
     }
     updateAutorization()
@@ -75,13 +76,12 @@ class SigninController extends React.Component<Props, {}> {
             this.props.setProfile(data)
             if(data) 
             {
-                //ok
-                this.props.history.push('/')
+                this.props.history.push(Routes.ROOT)
             }
             else if(error)
             {
                 this.props.setProfile(null)
-                this.props.history.push('/signin')
+                this.props.history.push(Routes.SIGNIN)
                 toast.error(<ErrorToast message={error} />, { hideProgressBar: true })
             }
         })

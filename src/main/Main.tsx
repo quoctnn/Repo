@@ -1,3 +1,4 @@
+import { Routes } from '../utilities/Routes';
 import SigninController from '../components/general/SigninController';
 import * as React from 'react';
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
@@ -29,12 +30,12 @@ export class Main extends React.Component<Props, {}> {
                   <div className="container">
                       <div>
                         <Switch>
-                          <Route path="/signin" component={Signin} />
-                          <Route path="/profile/update" component={ProfileUpdate} />
+                          <Route path={Routes.SIGNIN} component={Signin} />
+                          <Route path={Routes.PROFILE_UPDATE} component={ProfileUpdate} />
                           <Route path="/community/:communityname/:groupname" component={Group} />
                           <Route path="/community/:communityname" component={Community} />
-                          <Route path="/" exact={true} component={NewsFeed} />
-                          <Route path="*" component={error404} />
+                          <Route path={Routes.ROOT} exact={true} component={NewsFeed} />
+                          <Route path={Routes.ANY} component={error404} />
                         </Switch>
                       </div>
                   </div>

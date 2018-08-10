@@ -6,6 +6,7 @@ var translations = {
         "Enter your email address and password": "Enter your email address and password",
         "Email":"Email",
         "Password":"Password",
+        "Sign out":"Sign out",
     },
     "no": {
         "search.placeholder": "Søk ...",
@@ -14,6 +15,7 @@ var translations = {
         "Enter your email address and password": "Fyll inn epost og passord",
         "Email":"Epost",
         "Password":"Passord",
+        "Sign out":"Logg ut",
     },
     "en" : {
         "search.placeholder": "Search ...",
@@ -22,6 +24,7 @@ var translations = {
         "Enter your email address and password": "Enter your email address and password",
         "Email":"Email",
         "Password":"Password",
+        "Sign out":"Sign out",
     }
 }
 

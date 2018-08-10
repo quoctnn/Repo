@@ -6,6 +6,7 @@ import { connect } from 'react-redux'
 import { Button} from 'reactstrap';
 import * as Actions from "../../actions/Actions"
 import { History} from 'history'
+import { Routes } from '../../utilities/Routes';
 require("./ProfileStatus.scss");
 
 export interface Props {
@@ -22,16 +23,16 @@ class ProfileStatus extends React.Component<Props & InjectedIntlProps, {}> {
             <div id="profile-status">
                 {!this.props.profile && 
                     <div className="">
-                        <Link className="btn btn-outline-secondary" to="/signin">{Intl.translate(this.props.intl, "Sign in")}</Link>
+                        <Link className="btn btn-outline-secondary" to={Routes.SIGNIN}>{Intl.translate(this.props.intl, "Sign in")}</Link>
                     </div>
                 }
                 {this.props.profile && 
                     <div className="flex align-center">
                         <div className="">
-                        <Link className="btn btn-outline-secondary" to="/profile/update">{this.props.profile.first_name}</Link>
+                        <Link className="btn btn-outline-secondary" to={Routes.PROFILE_UPDATE}>{this.props.profile.first_name}</Link>
                         </div>
                         <div className="margin-left-sm">
-                            <Button onClick={() => {this.props.signOut(); this.props.history.push('/') }} outline color="secondary">{Intl.translate(this.props.intl, "Sign out")}</Button>
+                            <Button onClick={() => {this.props.signOut(); this.props.history.push(Routes.ROOT) }} outline color="secondary">{Intl.translate(this.props.intl, "Sign out")}</Button>
                         </div>
                     </div>
                 }
