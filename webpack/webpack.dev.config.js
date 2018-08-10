@@ -57,6 +57,7 @@ config.module.rules.unshift(
         ],
         exclude: /node_modules/},
         {test: /\.(s*)css$/, use: [{ loader: "style-loader" }, { loader: "css-loader"}, { loader: "sass-loader" }]},
+        
 );
 config.output.path = path.resolve(__dirname, '../bundles/dev/');
 

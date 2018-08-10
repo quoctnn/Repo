@@ -1,4 +1,5 @@
-import * as React from "react";
+import SigninController from '../components/general/SigninController';
+import * as React from 'react';
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import NewsFeed from "../views/newsfeed/NewsFeed";
 import { LeftNavigation } from '../components/navigation/LeftNavigation';
@@ -14,6 +15,7 @@ import ProfileUpdate from "../views/profile/ProfileUpdate";
 
 require("react-toastify/dist/ReactToastify.css");
 require("./Main.scss");
+  
 export interface Props {
 }
 export class Main extends React.Component<Props, {}> {
@@ -42,6 +44,7 @@ export class Main extends React.Component<Props, {}> {
                     <TopNavigation />
                 </div>
               {!Settings.isProduction && <DevTool /> }
+              <SigninController />
             </div>
           </Router>
     );

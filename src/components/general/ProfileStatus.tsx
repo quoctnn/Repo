@@ -11,6 +11,7 @@ require("./ProfileStatus.scss");
 export interface Props {
     profile?:any,
     signOut:() => void,
+    history:History,
 }
 
 class ProfileStatus extends React.Component<Props & InjectedIntlProps, {}> {
@@ -27,10 +28,10 @@ class ProfileStatus extends React.Component<Props & InjectedIntlProps, {}> {
                 {this.props.profile && 
                     <div className="flex align-center">
                         <div className="">
-                            {this.props.profile.first_name}
+                        <Link className="btn btn-outline-secondary" to="/profile/update">{this.props.profile.first_name}</Link>
                         </div>
                         <div className="margin-left-sm">
-                            <Button onClick={() => {this.props.signOut() }} outline color="secondary">{Intl.translate(this.props.intl, "Sign out")}</Button>
+                            <Button onClick={() => {this.props.signOut(); this.props.history.push('/') }} outline color="secondary">{Intl.translate(this.props.intl, "Sign out")}</Button>
                         </div>
                     </div>
                 }

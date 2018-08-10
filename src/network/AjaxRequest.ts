@@ -1,7 +1,8 @@
 'use strict';
 import { Settings } from "../utilities/Settings";
 import store from '../main/App';
-import { ApiEndpoint, LoginType} from '../reducers/debug';
+import { ApiEndpoint} from '../reducers/debug';
+var $ = require("jquery")
 
 var isProduction = Settings.isProduction;
 export type SuccessCallback = (data: any, status:string, request:JQuery.jqXHR) => void;

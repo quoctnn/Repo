@@ -40,13 +40,6 @@ class Signin extends React.Component<Props & InjectedIntlProps, {}> {
         if(data.token)
         {
             this.props.setAuthorizationData(data.token)
-            ApiClient.getMyProfile( (data, status, error) => {
-                if(data)
-                {
-                    this.props.setProfile(data)
-                    this.props.history.push('/')
-                }
-            })
         }
     }
     doSignin(e)

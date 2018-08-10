@@ -23,8 +23,7 @@ const debug = (state = INITIAL_STATE, action) => {
         case Types.SET_ACCESS_TOKEN_OVERRIDE:
             return { ...state, accessToken: action.accessToken}
         case Types.SET_AUTORIZATION_DATA:
-            var s = { ...state}
-            s.availableApiEndpoints[s.apiEndpoint].token = action.token
+            var s = { ...state, availableApiEndpoints: state.availableApiEndpoints.map( (content, i) => i === state.apiEndpoint ? {...content, token: action.token} : content )}
             return s
         default:
             return state;

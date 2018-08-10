@@ -1,5 +1,7 @@
 
 import 'bootstrap/dist/css/bootstrap.css';
+import "@fortawesome/fontawesome-free/css/fontawesome.min.css"
+import "@fortawesome/fontawesome-free/css/solid.min.css"
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import appReducers from '../reducers'
@@ -10,8 +12,9 @@ import storageSession from 'redux-persist/lib/storage/session'
 import { PersistGate } from 'redux-persist/integration/react'
 import { Main } from "./Main";
 import AutoIntlProvider from "../components/intl/AutoIntlProvider";
-import { Types } from '../utilities/Types';
-import { AjaxRequest } from '../network/AjaxRequest';
+require('jquery/dist/jquery');
+require('popper.js/dist/umd/popper');
+require('bootstrap/dist/js/bootstrap');
 
 const persistConfig = {
     key: 'root',
@@ -24,24 +27,10 @@ const logger = store => next => action => {
     console.log('NEXT STATE => ', store.getState())
     return result
 }
-const updateAutorization = () =>
-{
-    let dState = store.getState().debug
-    AjaxRequest.setup(dState.availableApiEndpoints[dState.apiEndpoint], dState.accessToken)
-}
-const accessTokenMiddleware = store => next => action => {
-    let result = next(action)
-    if(action.type == Types.SET_ACCESS_TOKEN_OVERRIDE || action.type == Types.SET_AUTORIZATION_DATA || action.type == Types.SET_API_ENDPOINT)
-    {
-        updateAutorization()
-    }
-    return result
-}
-const store = createStore(persistedReducer, applyMiddleware(logger, accessTokenMiddleware))
+const store = createStore(persistedReducer, applyMiddleware(logger))
 const persistor = persistStore(store, {}, () => 
 { 
     //rehydrate complete
-    updateAutorization()
 })
 ReactDOM.render(
     <Provider store={store}>
