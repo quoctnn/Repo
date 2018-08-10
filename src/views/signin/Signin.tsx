@@ -15,10 +15,11 @@ require("./Signin.scss");
 
 
 export interface Props {
-    setAuthorizationData:(token:string, cookie:string) => void,
+    setAuthorizationData:(token:string) => void,
     history:History,
     apiEndpoint?:number,
     availableApiEndpoints?:Array<ApiEndpoint>,
+    setProfile:(profile:object) => void,
 }
 class Signin extends React.Component<Props & InjectedIntlProps, {}> {
 
@@ -27,10 +28,9 @@ class Signin extends React.Component<Props & InjectedIntlProps, {}> {
     constructor(props) {
         super(props);
         this.doSignin = this.doSignin.bind(this)
-        this.loginApiCallback = this.loginApiCallback.bind(this)
-        this.loginSessionCallback = this.loginSessionCallback.bind(this)
+        this.loginCallback = this.loginCallback.bind(this)
     }
-    loginApiCallback(data:any, status:string, error:string)
+    loginCallback(data:any, status:string, error:string)
     {
         if(error)
         {
@@ -39,24 +39,14 @@ class Signin extends React.Component<Props & InjectedIntlProps, {}> {
         }
         if(data.token)
         {
-            this.props.setAuthorizationData(data.token, null)
-            this.props.history.push('/')
-
-        }
-    } 
-    loginSessionCallback(data:any, status:string, error:string)
-    {
-        console.log(data, status, error)
-        this.props.history.push('/')
-        if(error)
-        {
-            toast.error(<ErrorToast message={error} />, { hideProgressBar: true })
-            return
-        }
-        if(false)
-        {
-            this.props.setAuthorizationData(data.token, null)
-            this.props.history.push('/')
+            this.props.setAuthorizationData(data.token)
+            ApiClient.getMyProfile( (data, status, error) => {
+                if(data)
+                {
+                    this.props.setProfile(data)
+                    this.props.history.push('/')
+                }
+            })
         }
     } 
     doSignin(e)
@@ -65,11 +55,11 @@ class Signin extends React.Component<Props & InjectedIntlProps, {}> {
         let endpoint = this.props.availableApiEndpoints[this.props.apiEndpoint]
         if(endpoint.loginType == LoginType.API)
         {
-            ApiClient.apiLogin(this.emailInput.value, this.passwordInput.value, this.loginApiCallback)
+            ApiClient.apiLogin(this.emailInput.value, this.passwordInput.value, this.loginCallback)
         }
-        else(endpoint.loginType == LoginType.SESSION)
+        else if(endpoint.loginType == LoginType.NATIVE)
         {
-            ApiClient.sessionLogin(this.emailInput.value, this.passwordInput.value, this.loginSessionCallback)
+            ApiClient.nativeLogin(this.emailInput.value, this.passwordInput.value, this.loginCallback)
         }
     }
     render() {
@@ -81,7 +71,7 @@ class Signin extends React.Component<Props & InjectedIntlProps, {}> {
                         <p className="lead">{Intl.translate(this.props.intl, "Enter your email address and password")}</p>
                         <Form>
                             <FormGroup>
-                                <Input name="email" innerRef={(input) => { this.emailInput = input }} value="leslie@intrahouse.com" placeholder={Intl.translate(this.props.intl, "Email")} />
+                                <Input name="email" innerRef={(input) => { this.emailInput = input }} defaultValue="leslie@intrahouse.com" placeholder={Intl.translate(this.props.intl, "Email")} />
                             </FormGroup>
                             <FormGroup>
                                 <Input name="password" innerRef={(input) => { this.passwordInput = input }} type="password" placeholder={Intl.translate(this.props.intl, "Password")} />
@@ -106,8 +96,11 @@ const mapStateToProps = (state) => {
 }
 const mapDispatchToProps = (dispatch) => {
     return {
-        setAuthorizationData:(token:string, cookie:string) => {
-            dispatch(Actions.setAuthorizationData(token, cookie))
+        setAuthorizationData:(token:string) => {
+            dispatch(Actions.setAuthorizationData(token))
+        },
+        setProfile:(profile:object) => {
+            dispatch(Actions.setProfile(profile))
         }
         
     }

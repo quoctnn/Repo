@@ -36,4 +36,12 @@ export default class ApiClient
             callback(null, status, error)
         })
     }
+    static nativeLogin(email:string, password:string,callback:ApiRequestCallback)
+    {
+        AjaxRequest.post(Constants.apiRoute.nativeLogin,`username=${email}&password=${password}`, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
 }

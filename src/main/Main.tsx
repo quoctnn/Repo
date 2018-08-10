@@ -10,10 +10,10 @@ import {Settings} from "../utilities/Settings"
 import DevTool from "../components/dev/DevTool";
 import Signin from "../views/signin/Signin";
 import { ToastContainer } from 'react-toastify';
+import ProfileUpdate from "../views/profile/ProfileUpdate";
 
 require("react-toastify/dist/ReactToastify.css");
 require("./Main.scss");
-
 export interface Props {
 }
 export class Main extends React.Component<Props, {}> {
@@ -28,8 +28,9 @@ export class Main extends React.Component<Props, {}> {
                       <div>
                         <Switch>
                           <Route path="/signin" component={Signin} />
-                          <Route path="/:communityname/:groupname" component={Group} />
-                          <Route path="/:communityname" component={Community} />
+                          <Route path="/profile/update" component={ProfileUpdate} />
+                          <Route path="/community/:communityname/:groupname" component={Group} />
+                          <Route path="/community/:communityname" component={Community} />
                           <Route path="/" exact={true} component={NewsFeed} />
                           <Route path="*" component={error404} />
                         </Switch>

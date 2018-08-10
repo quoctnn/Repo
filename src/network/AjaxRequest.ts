@@ -11,15 +11,16 @@ export class AjaxRequest
     static setup(endpoint:ApiEndpoint, accessTokenOverride:string)
     {
         console.log("AjaxRequest.setup", accessTokenOverride)
-        if(accessTokenOverride || (endpoint.loginType == LoginType.API && endpoint.token))
-        {
-            let token = accessTokenOverride || endpoint.token
-            $.ajaxSetup({
-                beforeSend: function (xhr, settings) {
+        let token = accessTokenOverride || endpoint.token
+        $.ajaxSetup({
+            beforeSend: function (xhr, settings) {
+                if(token)
+                {
                     xhr.setRequestHeader("Authorization", "Token " + token);
                 }
-            });
-        }
+            }
+        });
+        
     }
     static get(url:string, success:SuccessCallback, error:ErrorCallback)
     {
@@ -70,7 +71,6 @@ export class AjaxRequest
             cache: false,
             type: type,
             data: JSON.stringify(json),
-            xhrFields: { withCredentials: true },
             contentType: "application/json; charset=utf-8",
             success: success.bind(this),
             error: error.bind(this)
@@ -97,7 +97,6 @@ export class AjaxRequest
             cache: false,
             type: method,
             traditional: true,
-            xhrFields: { withCredentials: true },
             data: data,
             success: success.bind(this),
             error: error.bind(this)

@@ -1,17 +1,16 @@
 import {Types} from "../utilities/Types"
 export enum LoginType {
     API = 1,
-    SESSION
+    NATIVE
 }
 export interface ApiEndpoint {
     endpoint: string,
     loginType: LoginType,
     token: string,
-    cookie: string,
 }
 const availableApiEndpoints:ApiEndpoint[] = [
-    {endpoint:"https://dev.intra.work",loginType:LoginType.API, token: null, cookie:null},
-    {endpoint:"http://alesund-dev.intra.work:8000", loginType:LoginType.SESSION, token: null, cookie:null}
+    {endpoint:"https://dev.intra.work",loginType:LoginType.API, token: null},
+    {endpoint:"http://alesund-dev.intra.work:8000", loginType:LoginType.NATIVE, token: null}
 ]
 
 
@@ -26,7 +25,6 @@ const debug = (state = INITIAL_STATE, action) => {
         case Types.SET_AUTORIZATION_DATA:
             var s = { ...state}
             s.availableApiEndpoints[s.apiEndpoint].token = action.token
-            s.availableApiEndpoints[s.apiEndpoint].cookie = action.cookie
             return s
         default:
             return state;
