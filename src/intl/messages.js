@@ -7,6 +7,11 @@ var translations = {
         "Email":"Email",
         "Password":"Password",
         "Sign out":"Sign out",
+        "Language":"Language",
+        "Api Endpoint":"Api Endpoint",
+        "Access Token":"Access Token",
+        "Developer Tool":"Developer Tool",
+        "Save":"Save",
     },
     "no": {
         "search.placeholder": "Søk ...",
@@ -16,6 +21,11 @@ var translations = {
         "Email":"Epost",
         "Password":"Passord",
         "Sign out":"Logg ut",
+        "Language":"Språk",
+        "Api Endpoint":"Api Endpoint",
+        "Access Token":"Tilgangstoken",
+        "Developer Tool":"Utviklerverktøy",
+        "Save":"Lagre",
     },
     "en" : {
         "search.placeholder": "Search ...",
@@ -25,6 +35,11 @@ var translations = {
         "Email":"Email",
         "Password":"Password",
         "Sign out":"Sign out",
+        "Language":"Language",
+        "Api Endpoint":"Api Endpoint",
+        "Access Token":"Access Token",
+        "Developer Tool":"Developer Tool",
+        "Save":"Save",
     }
 }
 

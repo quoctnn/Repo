@@ -2,10 +2,12 @@ import * as React from "react";
 import { connect } from 'react-redux'
 import * as Actions from "../../actions/Actions" 
 import { ApiEndpoint } from '../../reducers/debug';
+import {injectIntl, InjectedIntlProps, FormattedMessage} from "react-intl";
+import Intl from "../../utilities/Intl"
 require("./DevTool.scss");
 
 export interface Props {
-    language?:number,
+    language:number,
     availableLanguages?:Array<string>,
     setLanguage?:(index:number) => void,
     apiEndpoint?:number,
@@ -15,11 +17,11 @@ export interface Props {
     setAccessTokenOverride:(accessToken:string) => void
 }
 
-class DevTool extends React.Component<Props, {}> {
-    state:{accessToken:string}
+class DevTool extends React.Component<Props & InjectedIntlProps, {}> {
+    state:{accessToken:string, language:number}
     constructor(props) {
         super(props);
-        this.state = {accessToken:this.props.accessToken}
+        this.state = {accessToken:this.props.accessToken, language:this.props.language}
     }
     renderLanguageSelector()
     {
@@ -32,7 +34,7 @@ class DevTool extends React.Component<Props, {}> {
 
                 <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
                     {this.props.availableLanguages.map((lang, index) => {
-                        return <a key={index} onClick={() => { this.props.setLanguage(index) }} className="dropdown-item" href="#">{lang}</a>
+                        return <a key={index} onClick={() => { this.props.setLanguage(index); this.setState({language:index}) }} className="dropdown-item" href="#">{lang}</a>
                     }) }
                 </div>
             </div>
@@ -59,21 +61,21 @@ class DevTool extends React.Component<Props, {}> {
         return (<div className="input-group">
                     <input value={this.state.accessToken} onChange={(e) => {this.setState({accessToken:e.target.value})}}  type="text" className="form-control" placeholder="token" />
                     <div className="input-group-append">
-                        <button onClick={() => {this.props.setAccessTokenOverride(this.state.accessToken)}} className="btn btn-outline-secondary" type="button">Save</button>
+                        <button onClick={() => {this.props.setAccessTokenOverride(this.state.accessToken)}} className="btn btn-outline-secondary" type="button">{Intl.translate(this.props.intl, "Save")}</button>
                     </div>
                 </div>)
     }
     render() {
         return(
             <div id="dev-tool">
-                <button type="button" className="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+                <button id="dev-tool-button" type="button" className="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
                     <i className="fas fa-cog" />
                 </button>
                 <div className="modal fade" id="exampleModal" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                 <div className="modal-dialog" role="document">
                     <div className="modal-content">
                         <div className="modal-header">
-                            <h5 className="modal-title" id="exampleModalLabel">Dev Tool</h5>
+                            <h5 className="modal-title" id="exampleModalLabel">{Intl.translate(this.props.intl, "Developer Tool")}</h5>
                             <button type="button" className="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                             </button>
@@ -82,15 +84,15 @@ class DevTool extends React.Component<Props, {}> {
                         <table id="table" className="table table-hover">
                             <tbody>
                                 <tr>
-                                    <td data-field="key" className="key">Language</td>
+                                    <td data-field="key" className="key"><FormattedMessage id="Language" /></td>
                                     <td data-field="value">{this.renderLanguageSelector()}</td>
                                 </tr>
                                 <tr>
-                                    <td data-field="key" className="key">Api Endpoint</td>
+                                    <td data-field="key" className="key">{Intl.translate(this.props.intl, "Api Endpoint")}</td>
                                     <td data-field="value">{this.renderEndpointSelector()}</td>
                                 </tr>
                                 <tr>
-                                    <td data-field="key" className="key">Access Token</td>
+                                    <td data-field="key" className="key">{Intl.translate(this.props.intl, "Access Token")}</td>
                                     <td data-field="value">{this.renderAccessTokenInput()}</td>
                                 </tr>
                             </tbody>
@@ -128,4 +130,4 @@ const mapDispatchToProps = (dispatch) => {
         
     }
 }
-export default connect(mapStateToProps, mapDispatchToProps)(DevTool);
+export default connect(mapStateToProps, mapDispatchToProps)(injectIntl(DevTool));

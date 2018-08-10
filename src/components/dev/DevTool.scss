@@ -1,6 +1,10 @@
 #dev-tool
 {
     position: absolute;
-    bottom: 10px;
-    right:10px;
+    #dev-tool-button
+    {
+        position: fixed;
+        bottom: 10px;
+        right:10px;
+    }
 }

@@ -1,3 +1,4 @@
+import WebSocket from '../components/general/WebSocket';
 import { Routes } from '../utilities/Routes';
 import SigninController from '../components/general/SigninController';
 import * as React from 'react';
@@ -16,7 +17,7 @@ import ProfileUpdate from "../views/profile/ProfileUpdate";
 
 require("react-toastify/dist/ReactToastify.css");
 require("./Main.scss");
-  
+
 export interface Props {
 }
 export class Main extends React.Component<Props, {}> {
@@ -46,6 +47,7 @@ export class Main extends React.Component<Props, {}> {
                 </div>
               {!Settings.isProduction && <DevTool /> }
               <SigninController />
+              <WebSocket />
             </div>
           </Router>
     );
