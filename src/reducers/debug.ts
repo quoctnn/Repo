@@ -9,14 +9,14 @@ export interface ApiEndpoint {
     token: string,
 }
 const availableApiEndpoints:ApiEndpoint[] = [
+    {endpoint:"http://alesund-dev.intra.work:8000", loginType:LoginType.NATIVE, token: null},
     {endpoint:"https://dev.intra.work",loginType:LoginType.API, token: null},
-    {endpoint:"http://alesund-dev.intra.work:8000", loginType:LoginType.NATIVE, token: null}
 ]
 
 
 const INITIAL_STATE = { apiEndpoint: 0, availableApiEndpoints: availableApiEndpoints, accessToken:""}
 const debug = (state = INITIAL_STATE, action) => {
-    switch(action.type) 
+    switch(action.type)
     {
         case Types.SET_API_ENDPOINT:
             return { ...state, apiEndpoint: action.apiEndpoint}
