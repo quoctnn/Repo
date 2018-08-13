@@ -17,7 +17,7 @@ const availableApiEndpoints:ApiEndpoint[] = [
 
 const INITIAL_STATE = { apiEndpoint: 0, availableApiEndpoints: availableApiEndpoints, accessToken:""}
 const debug = (state = INITIAL_STATE, action) => {
-    switch(action.type) 
+    switch(action.type)
     {
         case Types.SET_API_ENDPOINT:
             return { ...state, apiEndpoint: action.apiEndpoint}

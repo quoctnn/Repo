@@ -9,7 +9,6 @@ export interface Props {
     maxReconnect: 5,
     apiEndpoint?:number,
     availableApiEndpoints?:Array<ApiEndpoint>,
-    signedIn:boolean
 }
 class ChannelEventStream extends React.Component<Props, {}> {
     stream: any
@@ -65,7 +64,6 @@ const mapStateToProps = (state) => {
     return {
         apiEndpoint:state.debug.apiEndpoint, 
         availableApiEndpoints:state.debug.availableApiEndpoints,
-        signedIn:state.settings.signedIn
     };
 }
 export default connect(mapStateToProps, null)(ChannelEventStream);
