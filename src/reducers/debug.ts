@@ -7,10 +7,11 @@ export interface ApiEndpoint {
     endpoint: string,
     loginType: LoginType,
     token: string,
+    websocket:string
 }
 const availableApiEndpoints:ApiEndpoint[] = [
-    {endpoint:"https://dev.intra.work",loginType:LoginType.API, token: null},
-    {endpoint:"http://alesund-dev.intra.work:8000", loginType:LoginType.NATIVE, token: null}
+    {endpoint:"https://dev.intra.work",loginType:LoginType.API, token: null, websocket:null},
+    {endpoint:"http://alesund-dev.intra.work:8000", loginType:LoginType.NATIVE, token: null, websocket:"ws://alesund-dev.intra.work:8000/socket/"}
 ]
 
 

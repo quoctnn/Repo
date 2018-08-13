@@ -10,7 +10,7 @@ import { Provider } from 'react-redux'
 import { persistStore, persistReducer } from 'redux-persist'
 import storageSession from 'redux-persist/lib/storage/session'
 import { PersistGate } from 'redux-persist/integration/react'
-import { Main } from "./Main";
+import Main from "./Main";
 import AutoIntlProvider from "../components/intl/AutoIntlProvider";
 require('jquery/dist/jquery');
 require('popper.js/dist/umd/popper');

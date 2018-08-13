@@ -17,9 +17,11 @@ export interface Props {
     availableApiEndpoints?:Array<ApiEndpoint>,
     history:History,
     updated:number,
+    signedIn:boolean,
 
     signOut:() => void,
     setProfile:(profile:object) => void,
+    setSignedIn:(signedIn:boolean) => void
 }
 
 class SigninController extends React.Component<Props, {}> {
@@ -63,6 +65,7 @@ class SigninController extends React.Component<Props, {}> {
         if(this.props.profile)
         {
             this.props.setProfile(null)
+            this.props.setSignedIn(false)
             this.props.history.push(Routes.SIGNIN)
         }
     }
@@ -73,14 +76,16 @@ class SigninController extends React.Component<Props, {}> {
     fetchProfile()
     {
         ApiClient.getMyProfile( (data, status, error) => {
-            this.props.setProfile(data)
             if(data) 
             {
+                this.props.setProfile(data)
+                this.props.setSignedIn(true)
                 this.props.history.push(Routes.ROOT)
             }
             else if(error)
             {
                 this.props.setProfile(null)
+                this.props.setSignedIn(false)
                 this.props.history.push(Routes.SIGNIN)
                 toast.error(<ErrorToast message={error} />, { hideProgressBar: true })
             }
@@ -90,6 +95,7 @@ class SigninController extends React.Component<Props, {}> {
     {
         return(
             <div id="signin-controller">
+                {this.props.children}
             </div>
         );
     }
@@ -101,7 +107,8 @@ const mapStateToProps = (state) => {
         apiEndpoint:state.debug.apiEndpoint, 
         accessToken:state.debug.accessToken,
         availableApiEndpoints:state.debug.availableApiEndpoints,
-        updated:state.debug.updated
+        updated:state.debug.updated,
+        signedIn:state.settings.signedIn
     };
 }
 const mapDispatchToProps = (dispatch) => {
@@ -112,7 +119,10 @@ const mapDispatchToProps = (dispatch) => {
         },
         setProfile:(profile:object) => {
             dispatch(Actions.setProfile(profile))
-        }
+        },
+        setSignedIn:(signedIn:boolean) => {
+            dispatch(Actions.setSignedIn(signedIn))
+        },
     }
 }
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(SigninController));

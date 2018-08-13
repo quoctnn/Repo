@@ -20,6 +20,10 @@ export const setLanguage = (index:number) => ({
     type: Types.SET_LANGUAGE,
     language: index
 })
+export const setSignedIn = (signedIn:boolean) => ({
+    type: Types.SET_SIGNED_IN,
+    signedIn: signedIn
+})
 //profile
 
 export interface UpdateProfileAction {

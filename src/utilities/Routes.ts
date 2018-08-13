@@ -3,5 +3,4 @@ export enum Routes {
     ROOT = "/",
     PROFILE_UPDATE = "/profile/update",
     SIGNIN = "/signin",
-    WEBSOCKET = "/socket/"
 }

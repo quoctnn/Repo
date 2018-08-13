@@ -122,9 +122,13 @@ const mapDispatchToProps = (dispatch) => {
             dispatch(Actions.setLanguage(index))
         },
         setApiEndpoint:(index) => {
+            dispatch(Actions.setProfile(null))
+            dispatch(Actions.setSignedIn(false))
             dispatch(Actions.setApiEndpoint(index))
         },
         setAccessTokenOverride:(accessToken) => {
+            dispatch(Actions.setProfile(null))
+            dispatch(Actions.setSignedIn(false))
             dispatch(Actions.setAccessTokenOverride(accessToken))
         }
         
