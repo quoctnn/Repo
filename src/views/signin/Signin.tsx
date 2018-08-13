@@ -1,4 +1,5 @@
-import * as React from "react";
+import { getDomainName } from '../../utilities/Utilities';
+import * as React from 'react';
 import {injectIntl, InjectedIntlProps} from "react-intl";
 import Intl from "../../utilities/Intl"
 import ApiClient from '../../network/ApiClient';
@@ -6,10 +7,11 @@ import { Button, Input , Form , FormGroup} from 'reactstrap';
 import { toast } from 'react-toastify';
 import { ErrorToast } from '../../components/general/Toast';
 import { connect } from 'react-redux'
-import * as Actions from "../../actions/Actions"
+import * as Actions from '../../actions/Actions';
 import { withRouter} from 'react-router-dom'
 import { History} from 'history'
 import { ApiEndpoint, LoginType } from '../../reducers/debug';
+import debug from '../../reducers/debug';
 
 require("./Signin.scss");
 
@@ -40,6 +42,11 @@ class Signin extends React.Component<Props & InjectedIntlProps, {}> {
         if(data.token)
         {
             this.props.setAuthorizationData(data.token)
+            let endpoint = this.props.availableApiEndpoints[this.props.apiEndpoint]
+            let domain = getDomainName(endpoint.endpoint)
+            let cookie = "sessionid=" + data.session_id + ";domain=."+ domain + ";path=/";
+            debugger
+            document.cookie = cookie
         }
     }
     doSignin(e)

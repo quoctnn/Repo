@@ -4,8 +4,8 @@ import * as Actions from "../../actions/Actions"
 import { ApiEndpoint } from '../../reducers/debug';
 import {injectIntl, InjectedIntlProps, FormattedMessage} from "react-intl";
 import Intl from "../../utilities/Intl"
+import { sendOnWebsocket } from '../general/ChannelEventStream';
 require("./DevTool.scss");
-
 export interface Props {
     language:number,
     availableLanguages?:Array<string>,
@@ -15,13 +15,14 @@ export interface Props {
     setApiEndpoint?:(index:number) => void,
     accessToken?:string,
     setAccessTokenOverride:(accessToken:string) => void
+    sendOnWebsocket:(data:string) => void
 }
 
 class DevTool extends React.Component<Props & InjectedIntlProps, {}> {
-    state:{accessToken:string, language:number}
+    state:{accessToken:string, language:number, websocketData:string}
     constructor(props) {
         super(props);
-        this.state = {accessToken:this.props.accessToken, language:this.props.language}
+        this.state = {accessToken:this.props.accessToken, language:this.props.language, websocketData:""}
     }
     renderLanguageSelector()
     {
@@ -55,6 +56,15 @@ class DevTool extends React.Component<Props & InjectedIntlProps, {}> {
                 </div>
             </div>
         )
+    }
+    renderSendOnWebSocket()
+    {
+        return (<div className="input-group">
+                    <input value={this.state.websocketData} onChange={(e) => {this.setState({websocketData:e.target.value})}}  type="text" className="form-control" placeholder="data" />
+                    <div className="input-group-append">
+                        <button onClick={() => {this.props.sendOnWebsocket(this.state.websocketData)}} className="btn btn-outline-secondary" type="button">{Intl.translate(this.props.intl, "Send")}</button>
+                    </div>
+                </div>)
     }
     renderAccessTokenInput()
     {
@@ -95,6 +105,10 @@ class DevTool extends React.Component<Props & InjectedIntlProps, {}> {
                                     <td data-field="key" className="key">{Intl.translate(this.props.intl, "Access Token")}</td>
                                     <td data-field="value">{this.renderAccessTokenInput()}</td>
                                 </tr>
+                                <tr>
+                                    <td data-field="key" className="key">{Intl.translate(this.props.intl, "Send WebSocket")}</td>
+                                    <td data-field="value">{this.renderSendOnWebSocket()}</td>
+                                </tr>
                             </tbody>
                         </table>
                         </div>
@@ -130,6 +144,10 @@ const mapDispatchToProps = (dispatch) => {
             dispatch(Actions.setProfile(null))
             dispatch(Actions.setSignedIn(false))
             dispatch(Actions.setAccessTokenOverride(accessToken))
+        },
+        sendOnWebsocket:(data:string) => 
+        {
+            sendOnWebsocket(data)
         }
         
     }

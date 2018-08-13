@@ -46,7 +46,7 @@ class LeftNavigation extends React.Component<Props, {}> {
             console.log(this.state.data)
             return (<ul>{
                 this.state.data.results.map( (item, index) => {
-                    return (<li key={index}><Avatar image={item.avatar} /></li>)
+                    return (<li key={index}><Avatar borderWidth={2} borderColor="red" image={item.avatar} /></li>)
                 })
             }</ul>)
         }
