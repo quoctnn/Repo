@@ -4,8 +4,6 @@ import { connect } from 'react-redux'
 import { ApiEndpoint } from '../../reducers/debug';
 
 export interface Props {
-    name: 'something',
-    maxReconnect: 5,
     apiEndpoint?:number,
     availableApiEndpoints?:Array<ApiEndpoint>,
 }
@@ -17,7 +15,6 @@ enum WebsocketState {
 }
 var publicStream: WebSocket = null
 export const sendOnWebsocket = (data:any) => {
-    debugger
     if(publicStream && publicStream.readyState == WebsocketState.OPEN)
         publicStream.send(data)
 }
@@ -36,7 +33,10 @@ class ChannelEventStream extends React.Component<Props, {}> {
     authorize()
     {
         if(this.canSend())
+        {
+            console.log("Sending Authorization on WebSocket")
             this.stream.send(JSON.stringify( {authorization:{token:this.state.token}}))
+        }
     }
     canSend()
     {
@@ -47,19 +47,19 @@ class ChannelEventStream extends React.Component<Props, {}> {
         this.closeStream()
         if(this.state.endpoint && this.state.token)
         {   
-            console.log("Setting up ChannelEventStream")
+            console.log("Setting up WebSocket")
             this.stream  = new WebSocket(this.state.endpoint);
             publicStream = this.stream
             this.stream.onopen = () => {
-                console.log('open')
+                console.log("WebSocket OPEN")
                 this.authorize()
                 //this.stream.send(JSON.stringify( { request:"initial_state" }));
             }
             this.stream.onmessage = (e) => {
-                console.log('message', JSON.parse(e.data));
+                console.log('Message received on WebSocket', JSON.parse(e.data));
             }
             this.stream.onclose = () => {
-                console.log('close');
+                console.log("WebSocket CLOSED");
             }
         }
     }
@@ -76,7 +76,7 @@ class ChannelEventStream extends React.Component<Props, {}> {
     {
         if(this.stream)
         {
-            console.log("Closing ChannelEventStream")
+            console.log("Closing WebSocket")
             this.stream.close()
             this.stream = null
             publicStream = null

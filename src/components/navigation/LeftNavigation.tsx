@@ -1,8 +1,8 @@
 import * as React from "react";
 import { connect } from 'react-redux'
 import ApiClient, { ListOrdering } from '../../network/ApiClient';
-import {injectIntl, InjectedIntlProps} from "react-intl";
-import { Avatar } from '../general/Avatar';
+import {injectIntl} from "react-intl";
+import { CommunityTreeItem } from '../general/CommunityTreeItem';
 require("./LeftNavigation.scss");
 
 export interface Props {
@@ -13,15 +13,18 @@ export interface State {
     limit:number,
     offset:number,
     loading:boolean,
-    hasReceivedResult:boolean
+    hasReceivedResult:boolean,
+    collapsedState:boolean[]
 }
 class LeftNavigation extends React.Component<Props, {}> {
     state:State
     constructor(props) {
         super(props);
-        this.state = { data:null, limit:30, offset:0, loading:false, hasReceivedResult:false  }
+        this.state = { data:null, limit:30, offset:0, loading:false, hasReceivedResult:false, collapsedState:[]  }
         this.fetchDataCallback = this.fetchDataCallback.bind(this)
         this.fetchData = this.fetchData.bind(this)
+        this.handleClick = this.handleClick.bind(this)
+        
     }
     componentDidMount()
     {
@@ -29,7 +32,7 @@ class LeftNavigation extends React.Component<Props, {}> {
     }
     fetchDataCallback(data:any, status:string, error:string)
     {
-        this.setState({ data : data, hasReceivedResult:true, loading:false })
+        this.setState({ data : data, hasReceivedResult:true, loading:false, collapsedState:data.results.map(() => true) })
     }
     fetchData()
     {
@@ -39,14 +42,18 @@ class LeftNavigation extends React.Component<Props, {}> {
                 ApiClient.getCommunities(true, ListOrdering.ALPHABETICAL, this.state.limit , this.state.offset, this.fetchDataCallback)
             })
     }
+    handleClick(index:number)
+    {
+        this.state.collapsedState[index] = !this.state.collapsedState[index];
+        this.setState({collapsedState: this.state.collapsedState});
+    }
     renderData()
     {
         if(this.state.data)
         {
-            console.log(this.state.data)
             return (<ul>{
                 this.state.data.results.map( (item, index) => {
-                    return (<li key={index}><Avatar borderWidth={2} borderColor="red" image={item.avatar} /></li>)
+                    return (<li key={index}><CommunityTreeItem communityData={item} collapsed={this.state.collapsedState[index]} onClick={this.handleClick.bind(null, index)} /></li>)
                 })
             }</ul>)
         }

@@ -51,7 +51,7 @@ const mapDispatchToProps = (dispatch) => {
         signOut:() => {
             dispatch(Actions.setProfile(null))
             dispatch(Actions.setSignedIn(false))
-            dispatch(Actions.setAuthorizationData(null))
+            dispatch(Actions.setAuthorizationData(null, null))
         }
         
     }

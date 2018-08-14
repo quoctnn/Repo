@@ -1,4 +1,4 @@
-import { getDomainName } from '../../utilities/Utilities';
+
 import * as React from 'react';
 import {injectIntl, InjectedIntlProps} from "react-intl";
 import Intl from "../../utilities/Intl"
@@ -11,13 +11,12 @@ import * as Actions from '../../actions/Actions';
 import { withRouter} from 'react-router-dom'
 import { History} from 'history'
 import { ApiEndpoint, LoginType } from '../../reducers/debug';
-import debug from '../../reducers/debug';
 
 require("./Signin.scss");
 
 
 export interface Props {
-    setAuthorizationData:(token:string) => void,
+    setAuthorizationData:(token:string, sessionid:string) => void,
     history:History,
     apiEndpoint?:number,
     availableApiEndpoints?:Array<ApiEndpoint>,
@@ -41,12 +40,7 @@ class Signin extends React.Component<Props & InjectedIntlProps, {}> {
         }
         if(data.token)
         {
-            this.props.setAuthorizationData(data.token)
-            let endpoint = this.props.availableApiEndpoints[this.props.apiEndpoint]
-            let domain = getDomainName(endpoint.endpoint)
-            let cookie = "sessionid=" + data.session_id + ";domain=."+ domain + ";path=/";
-            debugger
-            document.cookie = cookie
+            this.props.setAuthorizationData(data.token, data.session_id)
         }
     }
     doSignin(e)
@@ -96,8 +90,8 @@ const mapStateToProps = (state) => {
 }
 const mapDispatchToProps = (dispatch) => {
     return {
-        setAuthorizationData:(token:string) => {
-            dispatch(Actions.setAuthorizationData(token))
+        setAuthorizationData:(token:string, sessionid:string) => {
+            dispatch(Actions.setAuthorizationData(token, sessionid))
         },
         setProfile:(profile:object) => {
             dispatch(Actions.setProfile(profile))

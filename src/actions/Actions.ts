@@ -10,9 +10,10 @@ export const setAccessTokenOverride = (accessToken:string) => ({
     type: Types.SET_ACCESS_TOKEN_OVERRIDE,
     accessToken: accessToken
 })
-export const setAuthorizationData = (token:string) => ({
+export const setAuthorizationData = (token:string, sessionid:string) => ({
     type: Types.SET_AUTORIZATION_DATA,
-    token: token
+    token: token,
+    sessionid: sessionid
 })
 
 //settings

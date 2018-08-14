@@ -9,6 +9,7 @@ import { ApiEndpoint } from '../../reducers/debug';
 import { toast } from 'react-toastify';
 import { ErrorToast } from '../../components/general/Toast';
 import { Routes } from '../../utilities/Routes';
+import { getDomainName } from '../../utilities/Utilities';
 
 export interface Props {
     profile?:any,
@@ -72,6 +73,11 @@ class SigninController extends React.Component<Props, {}> {
     updateAutorization()
     {
         AjaxRequest.setup(this.props.availableApiEndpoints[this.props.apiEndpoint], this.props.accessToken)
+        let endpoint = this.props.availableApiEndpoints[this.props.apiEndpoint]
+        let domain = getDomainName(endpoint.endpoint)
+        let cookie = "sessionid=" + endpoint.sessionid + ",domain=."+ domain + ",path=/";
+        document.cookie = cookie
+        console.log("SetCookie", cookie)
     }
     fetchProfile()
     {
@@ -115,7 +121,7 @@ const mapDispatchToProps = (dispatch) => {
     return {
         signOut:() => {
             dispatch(Actions.setProfile(null))
-            dispatch(Actions.setAuthorizationData(null))
+            dispatch(Actions.setAuthorizationData(null, null))
         },
         setProfile:(profile:object) => {
             dispatch(Actions.setProfile(profile))

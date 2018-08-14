@@ -18,7 +18,7 @@ export class Avatar extends React.Component<Props, {}> {
     render() 
     {
         return(
-            <div className="avatar" style={{backgroundImage:"url(\"" + this.props.image + "\")", borderWidth:this.props.borderWidth + "px", borderColor:this.props.borderColor, width:this.props.size + "px", height:this.props.size + "px"}}>
+            <div className="avatar" style={{backgroundImage:"url(\"" + this.props.image + "\")", borderWidth:this.props.borderWidth + "px", borderColor:this.props.borderColor, width:this.props.size + "px", height:this.props.size + "px", borderStyle:"solid"}}>
             </div>
         );
     }
