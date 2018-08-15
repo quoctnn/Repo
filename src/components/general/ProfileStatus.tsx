@@ -1,6 +1,5 @@
 import * as React from "react";
-import {injectIntl, InjectedIntlProps} from "react-intl";
-import Intl from "../../utilities/Intl"
+import { translate } from '../intl/AutoIntlProvider';
 import { withRouter, Link} from 'react-router-dom'
 import { connect } from 'react-redux'
 import { Button} from 'reactstrap';
@@ -13,9 +12,10 @@ export interface Props {
     profile?:any,
     signOut:() => void,
     history:History,
+    language:number,
 }
 
-class ProfileStatus extends React.Component<Props & InjectedIntlProps, {}> {
+class ProfileStatus extends React.Component<Props, {}> {
 
     render() 
     {
@@ -23,7 +23,7 @@ class ProfileStatus extends React.Component<Props & InjectedIntlProps, {}> {
             <div id="profile-status">
                 {!this.props.profile && 
                     <div className="">
-                        <Link className="btn btn-outline-secondary" to={Routes.SIGNIN}>{Intl.translate(this.props.intl, "Sign in")}</Link>
+                        <Link className="btn btn-outline-secondary" to={Routes.SIGNIN}>{translate("Sign in")}</Link>
                     </div>
                 }
                 {this.props.profile && 
@@ -32,7 +32,7 @@ class ProfileStatus extends React.Component<Props & InjectedIntlProps, {}> {
                         <Link className="btn btn-outline-secondary" to={Routes.PROFILE_UPDATE}>{this.props.profile.first_name}</Link>
                         </div>
                         <div className="margin-left-sm">
-                            <Button onClick={() => {this.props.signOut(); this.props.history.push(Routes.ROOT) }} outline color="secondary">{Intl.translate(this.props.intl, "Sign out")}</Button>
+                            <Button onClick={() => {this.props.signOut(); this.props.history.push(Routes.ROOT) }} outline color="secondary">{translate("Sign out")}</Button>
                         </div>
                     </div>
                 }
@@ -44,6 +44,7 @@ class ProfileStatus extends React.Component<Props & InjectedIntlProps, {}> {
 const mapStateToProps = (state) => {
     return {
         profile:state.profile, 
+        language: state.settings.language,
     };
 }
 const mapDispatchToProps = (dispatch) => {
@@ -56,4 +57,4 @@ const mapDispatchToProps = (dispatch) => {
         
     }
 }
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(injectIntl(ProfileStatus)));
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(ProfileStatus));

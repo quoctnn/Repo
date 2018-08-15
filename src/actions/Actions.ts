@@ -1,5 +1,16 @@
+import { UserProfile } from '../reducers/contacts';
 import {Types} from "../utilities/Types"
-import profile from '../reducers/profile';
+
+
+//contacts
+export const setContacts = (contacts:UserProfile[]) => ({
+    type: Types.SET_CONTACTS,
+    contacts: contacts
+})
+export const updateContact = (user:UserProfile) => ({
+    type: Types.UPDATE_CONTACT,
+    user: user
+})
 
 //debug
 export const setApiEndpoint = (index:number) => ({
@@ -29,10 +40,11 @@ export const setSignedIn = (signedIn:boolean) => ({
 
 export interface UpdateProfileAction {
     type: Types,
-    profile: any
+    profile: UserProfile
 }
-export type SetProfileAction = (profile:any) => UpdateProfileAction;
-export const setProfile:SetProfileAction = (profile:any) => ({
+
+export type SetProfileAction = (profile:UserProfile) => UpdateProfileAction;
+export const setProfile:SetProfileAction = (profile:UserProfile) => ({
     type: Types.SET_PROFILE,
     profile: profile
 })

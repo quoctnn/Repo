@@ -9,10 +9,9 @@ export type SuccessCallback = (data: any, status:string, request:JQuery.jqXHR) =
 export type ErrorCallback = (request:JQuery.jqXHR, status:string, error:string) => void;
 export class AjaxRequest
 {
-    static setup(endpoint:ApiEndpoint, accessTokenOverride:string)
+    static setup(token:string)
     {
-        console.log("AjaxRequest.setup", accessTokenOverride)
-        let token = accessTokenOverride || endpoint.token
+        console.log("AjaxRequest.setup", token)
         $.ajaxSetup({
             beforeSend: function (xhr, settings) {
                 if(token)

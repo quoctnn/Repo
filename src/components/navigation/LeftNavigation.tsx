@@ -1,12 +1,9 @@
 import * as React from "react";
-import { connect } from 'react-redux'
 import ApiClient, { ListOrdering } from '../../network/ApiClient';
-import {injectIntl} from "react-intl";
 import { CommunityTreeItem } from '../general/CommunityTreeItem';
 require("./LeftNavigation.scss");
 
 export interface Props {
-    signedIn:boolean
 }
 export interface State {
     data:any,
@@ -16,7 +13,7 @@ export interface State {
     hasReceivedResult:boolean,
     collapsedState:boolean[]
 }
-class LeftNavigation extends React.Component<Props, {}> {
+export class LeftNavigation extends React.Component<Props, {}> {
     state:State
     constructor(props) {
         super(props);
@@ -67,4 +64,3 @@ class LeftNavigation extends React.Component<Props, {}> {
         );
     }
 }
-export default injectIntl(LeftNavigation);

@@ -12,6 +12,8 @@ var translations = {
         "Access Token":"Access Token",
         "Developer Tool":"Developer Tool",
         "Save":"Save",
+        "Send WebSocket" : "Send WebSocket",
+        "Send":"Send",
     },
     "no": {
         "search.placeholder": "Søk ...",
@@ -26,6 +28,8 @@ var translations = {
         "Access Token":"Tilgangstoken",
         "Developer Tool":"Utviklerverktøy",
         "Save":"Lagre",
+        "Send WebSocket" : "Send WebSocket",
+        "Send":"Send",
     },
     "en" : {
         "search.placeholder": "Search ...",
@@ -40,6 +44,8 @@ var translations = {
         "Access Token":"Access Token",
         "Developer Tool":"Developer Tool",
         "Save":"Save",
+        "Send WebSocket" : "Send WebSocket",
+        "Send":"Send",
     }
 }
 

@@ -1,4 +1,5 @@
 import * as React from "react";
+import { Settings } from '../../utilities/Settings';
 require("./Avatar.scss");
 
 export interface Props {
@@ -17,8 +18,15 @@ export class Avatar extends React.Component<Props, {}> {
 	};
     render() 
     {
+        var imgUrl = this.props.image
+        if(imgUrl && Settings.accessToken)
+        {
+            let img = new URL(this.props.image)
+            img.searchParams.set('token', Settings.accessToken);
+            imgUrl = img.href
+        }
         return(
-            <div className="avatar" style={{backgroundImage:"url(\"" + this.props.image + "\")", borderWidth:this.props.borderWidth + "px", borderColor:this.props.borderColor, width:this.props.size + "px", height:this.props.size + "px", borderStyle:"solid"}}>
+            <div className="avatar" style={{backgroundImage:"url(\"" + imgUrl + "\")", borderWidth:this.props.borderWidth + "px", borderColor:this.props.borderColor, width:this.props.size + "px", height:this.props.size + "px", borderStyle:"solid"}}>
             </div>
         );
     }

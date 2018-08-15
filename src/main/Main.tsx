@@ -1,56 +1,64 @@
 import { Routes } from '../utilities/Routes';
-import SigninController from '../components/general/SigninController';
 import * as React from 'react';
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import NewsFeed from "../views/newsfeed/NewsFeed";
-import LeftNavigation from '../components/navigation/LeftNavigation';
 import TopNavigation from '../components/navigation/TopNavigation';
 import { Community } from "../views/community/Community";
 import { Group } from '../views/group/Group';
 import { error404 } from '../views/error/error404';
-import {Settings} from "../utilities/Settings"
-import DevTool from "../components/dev/DevTool";
 import Signin from "../views/signin/Signin";
 import { ToastContainer } from 'react-toastify';
 import ProfileUpdate from "../views/profile/ProfileUpdate";
-import ChannelEventStream from '../components/general/ChannelEventStream';
 import { connect } from 'react-redux'
-
+import { CollapsiblePanel, ArrowDirectionCollapsed } from '../components/general/CollapsiblePanel';
+import DevTool from '../components/dev/DevTool';
+import { Settings } from '../utilities/Settings';
+import { List } from '../components/general/List';
+import { UserProfile } from '../reducers/contacts';
+import { Avatar } from '../components/general/Avatar';
+import { LeftNavigation } from '../components/navigation/LeftNavigation';
+import BootLoader from './BootLoader';
+import ChannelEventStream from "../components/general/ChannelEventStream";
 require("react-toastify/dist/ReactToastify.css");
 require("./Main.scss");
 
 export interface Props {
-  signedIn:boolean
+  signedIn:boolean,
+  contacts:UserProfile[]
 }
 class Main extends React.Component<Props, {}> {
   render() {
-
     return (
           <Router ref="router">
             <div id="main-content">
                 <ToastContainer />
-                <SigninController>
-                  <div id="content-block">
-                    <div className="container">
-                        <div>
-                          <Switch>
-                            <Route path={Routes.SIGNIN} component={Signin} />
-                            <Route path={Routes.PROFILE_UPDATE} component={ProfileUpdate} />
-                            <Route path="/community/:communityname/:groupname" component={Group} />
-                            <Route path="/community/:communityname" component={Community} />
-                            <Route path={Routes.ROOT} exact={true} component={NewsFeed} />
-                            <Route path={Routes.ANY} component={error404} />
-                          </Switch>
+                  <ChannelEventStream />
+                    <div id="content-block">
+                        <div className="container">
+                            <div>
+                              <Switch>
+                                {!Settings.isProduction && <Route path={Routes.DEVELOPER_TOOL} component={DevTool} /> }
+                                <Route path={Routes.SIGNIN} component={Signin} />
+                                <Route path={Routes.PROFILE_UPDATE} component={ProfileUpdate} />
+                                <Route path="/community/:communityname/:groupname" component={Group} />
+                                <Route path="/community/:communityname" component={Community} />
+                                <Route path={Routes.ROOT} exact={true} component={NewsFeed} />
+                                <Route path={Routes.ANY} component={error404} />
+                              </Switch>
+                            </div>
                         </div>
                     </div>
-                  </div>
-                  <div id="navigation-content" className="navigation">
-                      {this.props.signedIn && <LeftNavigation />}
-                      <TopNavigation />
-                  </div>
-                  {this.props.signedIn && <ChannelEventStream />}
-                </SigninController>
-              {!Settings.isProduction && <DevTool /> }
+                    <div id="navigation-content" className="navigation">
+                        <LeftNavigation />
+                        <TopNavigation />
+                        {this.props.signedIn && 
+                        <CollapsiblePanel id="right-navigation" arrowDirectionCollapsed={ArrowDirectionCollapsed.LEFT}>
+                            <List>{this.props.contacts.map((contact, index) => {
+                                return (<li key={index}><Avatar image={contact.avatar} borderColor="green" borderWidth={2} /></li>)
+                            } )}</List>
+                        </CollapsiblePanel>
+                        }
+                    </div>
             </div>
           </Router>
     );
@@ -58,7 +66,8 @@ class Main extends React.Component<Props, {}> {
 }
 const mapStateToProps = (state) => {
   return {
-      signedIn:state.settings.signedIn
+      signedIn:state.auth.signedIn,
+      contacts:state.contacts.contactsArray
   };
 }
 export default connect(mapStateToProps, null)(Main);

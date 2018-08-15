@@ -1,7 +1,5 @@
-
 import * as React from 'react';
-import {injectIntl, InjectedIntlProps} from "react-intl";
-import Intl from "../../utilities/Intl"
+import { translate } from '../../components/intl/AutoIntlProvider';
 import ApiClient from '../../network/ApiClient';
 import { Button, Input , Form , FormGroup} from 'reactstrap';
 import { toast } from 'react-toastify';
@@ -20,9 +18,9 @@ export interface Props {
     history:History,
     apiEndpoint?:number,
     availableApiEndpoints?:Array<ApiEndpoint>,
-    setProfile:(profile:object) => void,
+    language:number,
 }
-class Signin extends React.Component<Props & InjectedIntlProps, {}> {
+class Signin extends React.Component<Props, {}> {
 
     emailInput: HTMLInputElement
     passwordInput: HTMLInputElement
@@ -59,19 +57,19 @@ class Signin extends React.Component<Props & InjectedIntlProps, {}> {
     render() {
         return(
             <div id="sign-in">
-                <div className="jumbotron jumbotron-fluid">
+                <div className="jumbotron">
                     <div className="container">
-                        <h1 className="display-4">{Intl.translate(this.props.intl, "Sign in to intra.work")}</h1>
-                        <p className="lead">{Intl.translate(this.props.intl, "Enter your email address and password")}</p>
+                        <h1 className="display-4">{translate("Sign in to intra.work")}</h1>
+                        <p className="lead">{translate("Enter your email address and password")}</p>
                         <Form>
                             <FormGroup>
-                                <Input name="email" innerRef={(input) => { this.emailInput = input }} defaultValue="leslie@intrahouse.com" placeholder={Intl.translate(this.props.intl, "Email")} />
+                                <Input type="text" autoComplete="username" name="email" innerRef={(input) => { this.emailInput = input }} defaultValue="leslie@intrahouse.com" placeholder={translate("Email")} />
                             </FormGroup>
                             <FormGroup>
-                                <Input name="password" innerRef={(input) => { this.passwordInput = input }} type="password" placeholder={Intl.translate(this.props.intl, "Password")} />
+                                <Input autoComplete="current-password" name="password" innerRef={(input) => { this.passwordInput = input }} type="password" placeholder={translate("Password")} />
                             </FormGroup>
                             <FormGroup>
-                                <Button color="info" onClick={this.doSignin}>{Intl.translate(this.props.intl, "Sign in")}</Button>
+                                <Button color="info" onClick={this.doSignin}>{translate("Sign in")}</Button>
                             </FormGroup>
                         </Form>
                     </div>
@@ -86,17 +84,14 @@ const mapStateToProps = (state) => {
     return {
         apiEndpoint:state.debug.apiEndpoint,
         availableApiEndpoints:state.debug.availableApiEndpoints,
+        language: state.settings.language,
     };
 }
 const mapDispatchToProps = (dispatch) => {
     return {
         setAuthorizationData:(token:string, sessionid:string) => {
             dispatch(Actions.setAuthorizationData(token, sessionid))
-        },
-        setProfile:(profile:object) => {
-            dispatch(Actions.setProfile(profile))
         }
-
     }
 }
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(injectIntl(Signin)));
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Signin));

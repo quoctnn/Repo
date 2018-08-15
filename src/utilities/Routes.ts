@@ -3,4 +3,5 @@ export enum Routes {
     ROOT = "/",
     PROFILE_UPDATE = "/profile/update",
     SIGNIN = "/signin",
+    DEVELOPER_TOOL = "/developer-tool",
 }

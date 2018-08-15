@@ -1,4 +1,8 @@
 @import "Config";
+::-webkit-scrollbar { width: 5px;}
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {background: #888;border-radius:50vw;}
+::-webkit-scrollbar-thumb:hover {background: #555; }
 .flex{display: flex}
 .flex-grow{ flex-grow: 1;} 
 .flex-shrink{ flex-shrink: 1;}
@@ -126,6 +130,28 @@ ul,li{margin:0; padding: 0;}
             left: 0;
             top: 0;
         }
+        #right-navigation
+        {
+            padding: 0;
+            width:$right-navigation-min-width;
+            border-left: 1px solid #DFE0DF;
+            z-index: 999;
+            position: fixed !important;
+            top: $top-navigation-height;
+            right: 0;
+            bottom: 0;
+            overflow-x: hidden;
+            li
+            {
+                display: inline-flex;
+                padding: 5px 5px 0 5px;
+            }
+            
+        }
+        #right-navigation.open
+        {
+            width:$right-navigation-max-width;
+        }
         
     }
     #content-block
@@ -134,5 +160,6 @@ ul,li{margin:0; padding: 0;}
         margin-top: $top-navigation-height;
         height:calc(100% - #{$top-navigation-height});
         padding: 5px;
+        margin-right: $right-navigation-min-width;
     }
 }

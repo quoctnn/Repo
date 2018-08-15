@@ -1,6 +1,6 @@
 import * as React from "react";
 import {injectIntl, InjectedIntlProps} from "react-intl";
-import Intl from "../../utilities/Intl"
+import { translate } from '../../components/intl/AutoIntlProvider';
 import ApiClient from '../../network/ApiClient';
 import { Button } from 'reactstrap';
 
@@ -15,7 +15,7 @@ class NewsFeed extends React.Component<Props & InjectedIntlProps, {}> {
     render() {
         return(
             <div id="news-feed">
-                {Intl.translate(this.props.intl, "search.placeholder")}
+                {translate("search.placeholder")}
                 <Button onClick={() => {ApiClient.getMyProfile(this.requestCallback)}}>Request</Button>
             </div>
             
