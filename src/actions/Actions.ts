@@ -1,7 +1,17 @@
 import { UserProfile } from '../reducers/contacts';
 import {Types} from "../utilities/Types"
+import { Community } from '../reducers/communities';
 
 
+//communities
+export const setCommunities = (communities:Community[]) => ({
+    type: Types.SET_COMMUNITIES,
+    communities: communities
+})
+export const updateCommunity = (community:Community) => ({
+    type: Types.UPDATE_COMMUNITY,
+    community: community
+})
 //contacts
 export const setContacts = (contacts:UserProfile[]) => ({
     type: Types.SET_CONTACTS,
@@ -11,7 +21,6 @@ export const updateContact = (user:UserProfile) => ({
     type: Types.UPDATE_CONTACT,
     user: user
 })
-
 //debug
 export const setApiEndpoint = (index:number) => ({
     type: Types.SET_API_ENDPOINT,

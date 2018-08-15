@@ -5,4 +5,27 @@
     background-repeat: no-repeat;
     background-position: 50%;
     height: 100%;
+    .avatar-state
+    {
+        border-radius: 50%;
+        width: 12px;
+        height: 12px;
+        border:2px solid white;
+    }
+    .avatar-state.green
+    {
+        background-color: green;
+    }
+    .avatar-state.orange
+    {
+        background-color: orange;
+    }
+    .avatar-state.red
+    {
+        background-color: red;
+    }
+    .avatar-state.gray
+    {
+        background-color: gray;
+    }
 }

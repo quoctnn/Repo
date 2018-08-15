@@ -14,10 +14,9 @@ import { CollapsiblePanel, ArrowDirectionCollapsed } from '../components/general
 import DevTool from '../components/dev/DevTool';
 import { Settings } from '../utilities/Settings';
 import { List } from '../components/general/List';
-import { UserProfile } from '../reducers/contacts';
+import { UserProfile, avatarStateColorForUserProfile } from '../reducers/contacts';
 import { Avatar } from '../components/general/Avatar';
-import { LeftNavigation } from '../components/navigation/LeftNavigation';
-import BootLoader from './BootLoader';
+import LeftNavigation from '../components/navigation/LeftNavigation';
 import ChannelEventStream from "../components/general/ChannelEventStream";
 require("react-toastify/dist/ReactToastify.css");
 require("./Main.scss");
@@ -54,7 +53,7 @@ class Main extends React.Component<Props, {}> {
                         {this.props.signedIn && 
                         <CollapsiblePanel id="right-navigation" arrowDirectionCollapsed={ArrowDirectionCollapsed.LEFT}>
                             <List>{this.props.contacts.map((contact, index) => {
-                                return (<li key={index}><Avatar image={contact.avatar} borderColor="green" borderWidth={2} /></li>)
+                                return (<li key={index}><Avatar image={contact.avatar} borderColor="green" borderWidth={2} stateColor={avatarStateColorForUserProfile(contact)} /></li>)
                             } )}</List>
                         </CollapsiblePanel>
                         }

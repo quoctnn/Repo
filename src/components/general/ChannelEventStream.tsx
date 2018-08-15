@@ -6,13 +6,17 @@ import * as Actions from "../../actions/Actions"
 import { UserProfile } from '../../reducers/contacts';
 import { Settings } from "../../utilities/Settings";
 import { AjaxRequest } from '../../network/AjaxRequest';
+import { Community } from '../../reducers/communities';
 
 export interface Props {
     apiEndpoint?:number,
     availableApiEndpoints?:Array<ApiEndpoint>,
     setContacts:(contacts:UserProfile[]) => void,
     setProfile:(profile:UserProfile) => void,
+    updateContact:(contact:UserProfile) => void,
     setSignedIn:(signedIn:boolean) => void,
+    setCommunities: (communities:Community[]) => void,
+    updateCommunity:(community:Community) => void,
     accessToken?:string,
     signedIn:boolean
 }
@@ -57,8 +61,14 @@ class ChannelEventStream extends React.Component<Props, {}> {
     processStateResponse(state:any)
     {
         this.props.setContacts(state.contacts || [])
+        this.props.setCommunities(state.communities || [])
         this.props.setProfile(state.user || null)
         this.props.setSignedIn(state.user != null)
+    }
+    processUserUpdateResponse(user:UserProfile)
+    {
+        this.props.updateContact(user)
+        console.log(user)
     }
     connectStream()
     {
@@ -75,12 +85,13 @@ class ChannelEventStream extends React.Component<Props, {}> {
             }
             this.stream.onmessage = (e) => {
                 let data = JSON.parse(e.data)
+                console.log('Message received on WebSocket', data );
                 switch(data.type)
                 {
                     case "state" : this.processStateResponse(data.data); break;
+                    case "user.update" : this.processUserUpdateResponse(data.data); break;
                     default:console.log("NO HANDLER FOR TYPE " + data.type);
                 }
-                console.log('Message received on WebSocket', data );
 
             }
             this.stream.onclose = () => {
@@ -144,23 +155,32 @@ class ChannelEventStream extends React.Component<Props, {}> {
 }
 const mapStateToProps = (state) => {
     return {
-        apiEndpoint:state.debug.apiEndpoint, 
         availableApiEndpoints:state.debug.availableApiEndpoints,
         rehydrated:state._persist.rehydrated,
         accessToken:state.debug.accessToken,
-        signedIn:state.auth.signedIn
+        signedIn:state.auth.signedIn,
+        apiEndpoint:state.debug.apiEndpoint
     };
 }
 const mapDispatchToProps = (dispatch) => {
     return {
-        setContacts: (contacts:UserProfile[]) => {
-            dispatch(Actions.setContacts(contacts));
-        },
         setProfile: (profile:UserProfile) => {
             dispatch(Actions.setProfile(profile));
         },
         setSignedIn:(signedIn:boolean) => {
             dispatch(Actions.setSignedIn(signedIn))
+        },
+        setContacts: (contacts:UserProfile[]) => {
+            dispatch(Actions.setContacts(contacts));
+        },
+        updateContact:(contact:UserProfile) => {
+            dispatch(Actions.updateContact(contact))
+        },
+        setCommunities: (communities:Community[]) => {
+            dispatch(Actions.setCommunities(communities));
+        },
+        updateCommunity:(community:Community) => {
+            dispatch(Actions.updateCommunity(community))
         },
     };
 };

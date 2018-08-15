@@ -1,4 +1,6 @@
+import { AvatarStateColor } from '../components/general/Avatar';
 import {Types} from "../utilities/Types"
+
 export enum LoginType {
     API = 1,
     NATIVE
@@ -19,16 +21,23 @@ export interface UserProfile {
 }
 export enum UserStatus
 {
-    USER_ACTIVE = "active",
-    USER_AWAY = "away",
-    USER_UNAVAILABLE = "unavailable",
-    USER_DO_NOT_DISTURB = "dnd",
-    USER_VACATION = "vacation",
-    USER_INVISIBLE = "invisible"
-
-    
+    USER_ACTIVE = "active",//green
+    USER_AWAY = "away", //orange
+    USER_UNAVAILABLE = "unavailable", //nothing
+    USER_DO_NOT_DISTURB = "dnd", //red
+    USER_VACATION = "vacation",//gray
+    USER_INVISIBLE = "invisible"//nothing
 }
-
+export const avatarStateColorForUserProfile = (userProfile:UserProfile) => {
+    switch(userProfile.user_status)
+    {
+        case UserStatus.USER_ACTIVE: return AvatarStateColor.GREEN;
+        case UserStatus.USER_AWAY: return AvatarStateColor.ORANGE;
+        case UserStatus.USER_DO_NOT_DISTURB: return AvatarStateColor.RED;
+        case UserStatus.USER_VACATION: return AvatarStateColor.GRAY;
+        default: return AvatarStateColor.NONE
+    }
+}
 const contactsArray:UserProfile[] = [
 ]
 
@@ -40,7 +49,16 @@ const contacts = (state = INITIAL_STATE, action) => {
         case Types.SET_CONTACTS:
             return { ...state, contactsArray: action.contacts}
         case Types.UPDATE_CONTACT:
-            return { ...state, contactsArray: state.contactsArray.map( (content) => content.id === action.user.id ? action.user : content )}
+            let hasContact = state.contactsArray.find((c) => {
+                return c.id == action.user.id
+            })
+            if(hasContact)
+            {
+                return { ...state, contactsArray: state.contactsArray.map( (content) => content.id === action.user.id ? action.user : content )}
+            }
+            let s = { ...state, contactsArray: state.contactsArray.map((c) => c)}
+            s.contactsArray.push(action.user)
+            return s
         default:
             return state;
     }

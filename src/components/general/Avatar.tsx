@@ -6,15 +6,24 @@ export interface Props {
     size?:number
     borderWidth?:number,
     borderColor?:string,
-    image:string
+    image:string,
+    stateColor?:AvatarStateColor
 }
-
+export enum AvatarStateColor
+{
+    GREEN = "green",
+    ORANGE = "orange",
+    RED = "red", 
+    GRAY = "gray",
+    NONE = "none",
+}
 export class Avatar extends React.Component<Props, {}> {
     static defaultProps:Props = {
         size:50,
         borderWidth:0,
         borderColor:"none",
-        image:null
+        image:null,
+        stateColor:AvatarStateColor.NONE
 	};
     render() 
     {
@@ -27,6 +36,7 @@ export class Avatar extends React.Component<Props, {}> {
         }
         return(
             <div className="avatar" style={{backgroundImage:"url(\"" + imgUrl + "\")", borderWidth:this.props.borderWidth + "px", borderColor:this.props.borderColor, width:this.props.size + "px", height:this.props.size + "px", borderStyle:"solid"}}>
+                {this.props.stateColor != AvatarStateColor.NONE && <div className={"avatar-state " + this.props.stateColor}></div>}
             </div>
         );
     }

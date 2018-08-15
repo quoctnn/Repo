@@ -1,5 +1,4 @@
 import * as React from "react";
-import {injectIntl, InjectedIntlProps} from "react-intl";
 import { translate } from '../../components/intl/AutoIntlProvider';
 import ApiClient from '../../network/ApiClient';
 import { Button } from 'reactstrap';
@@ -7,7 +6,7 @@ import { Button } from 'reactstrap';
 export interface Props {
 }
 
-class NewsFeed extends React.Component<Props & InjectedIntlProps, {}> {
+export default class NewsFeed extends React.Component<Props, {}> {
     requestCallback(data:any, status:string, error:string)
     {
         console.log(data, status, error)
@@ -22,4 +21,3 @@ class NewsFeed extends React.Component<Props & InjectedIntlProps, {}> {
         );
     }
 }
-export default injectIntl(NewsFeed);
