@@ -7,6 +7,7 @@ import { UserProfile, UserStatus } from '../../reducers/profileStore';
 import { Settings } from "../../utilities/Settings";
 import { AjaxRequest } from '../../network/AjaxRequest';
 import { Community } from '../../reducers/communityStore';
+import profile from '../../reducers/profile';
 
 export interface Props {
     apiEndpoint?:number,
@@ -19,10 +20,12 @@ export interface Props {
     storeCommunities: (communities:Community[]) => void,
     storeCommunity:(community:Community) => void,
     setContactListCache:(contacts:number[]) => void,
+    setAwayTimeout:(timeout:number) => void,
     
     accessToken?:string,
     signedIn:boolean,
-    profile:UserProfile
+    profile:UserProfile,
+    awayTimeout:number
 }
 enum WebsocketState {
     CONNECTING = 0,
@@ -45,10 +48,12 @@ export const sendUserStatus = (status:UserStatus) =>
 class ChannelEventStream extends React.Component<Props, {}> {
     stream: WebSocket
     lastUserActivity:Date
+    lastUserActivityTimer:NodeJS.Timer
     state:{token:string, endpoint:string}
     constructor(props) {
         super(props);
         this.state = {token:null, endpoint:null}
+
         this.closeStream = this.closeStream.bind(this)
         this.connectStream = this.connectStream.bind(this)
         this.connectStream = this.connectStream.bind(this)
@@ -58,9 +63,13 @@ class ChannelEventStream extends React.Component<Props, {}> {
         this.getCurrentToken = this.getCurrentToken.bind(this)
         this.checkState = this.checkState.bind(this)
         this.processStatusChangeResponse = this.processStatusChangeResponse.bind(this)
-        this.handleUserActivity = this.handleUserActivity.bind(this)
-        this.lastUserActivity = new Date()
+        this.resetUserActivity = this.resetUserActivity.bind(this)
+        this.lastUserActivityTimerExpired = this.lastUserActivityTimerExpired.bind(this)
+        this.clearUserActivityTimer = this.clearUserActivityTimer.bind(this)
+        this.startTimer = this.startTimer.bind(this)
         
+        this.lastUserActivity = new Date()
+        this.lastUserActivityTimer = null
     }
     authorize()
     {
@@ -96,6 +105,8 @@ class ChannelEventStream extends React.Component<Props, {}> {
         this.props.storeCommunities(state.communities || [])
         this.props.setProfile(state.user || null)
         this.props.setSignedIn(state.user != null)
+        if(state.away_timeout && Number.isInteger(state.away_timeout))
+            this.props.setAwayTimeout(state.away_timeout)
     }
     processUserUpdateResponse(user:UserProfile)
     {
@@ -136,25 +147,99 @@ class ChannelEventStream extends React.Component<Props, {}> {
             }
         }
     }
-    handleUserActivity()
+    lastUserActivityTimerExpired()
     {
+        this.clearUserActivityTimer()
+        sendUserStatus(UserStatus.USER_AWAY)
+    }
+    clearUserActivityTimer()
+    {
+        if(this.lastUserActivityTimer)
+        {
+            console.log("clear timer")
+            clearTimeout(this.lastUserActivityTimer)
+            this.lastUserActivityTimer = null
+        }
+    }
+    resetUserActivity()
+    {
+        if(this.props.profile)
+        {
+            if(this.props.profile.user_status == UserStatus.USER_AWAY)
+            {
+                sendUserStatus(UserStatus.USER_ACTIVE)
+                this.startTimer()
+            }
+            else if(this.props.profile.user_status == UserStatus.USER_ACTIVE)
+            {
+                this.startTimer()
+            }
+        }
+    }
+    startTimer()
+    {
+        this.clearUserActivityTimer()
         this.lastUserActivity = new Date()
+        this.lastUserActivityTimer = setTimeout(this.lastUserActivityTimerExpired, this.props.awayTimeout * 1000)
+        console.log("Setting up timeout to " + this.props.awayTimeout)
+    }
+    removeActivityHandlers()
+    {
+        document.removeEventListener('mousedown', this.resetUserActivity);
+        window.removeEventListener("focus", this.resetUserActivity)
+        console.log("removing activity handlers")
+    }
+    addActivityHandlers()
+    {
+        console.log("adding activity handlers")
+        document.addEventListener('mousedown', this.resetUserActivity);
+        window.addEventListener("focus", this.resetUserActivity)
     }
     componentDidMount()
     {
-        document.addEventListener('mousedown', this.handleUserActivity);
-        window.addEventListener("focus", this.handleUserActivity)
+        this.resetUserActivity()
         this.checkState()
     }
     componentWillUnmount()
     {
-        document.removeEventListener('mousedown', this.handleUserActivity);
-        window.removeEventListener("focus", this.handleUserActivity)
         this.closeStream()
     }
-    componentDidUpdate()
+    componentDidUpdate(prevProps:Props)
     {
         this.checkState()
+        if(!prevProps.profile && this.props.profile) // just signed in
+        {
+            if(this.props.profile.user_status == UserStatus.USER_ACTIVE)
+            {
+                this.addActivityHandlers()
+                this.startTimer()
+            }
+        }
+        else if(this.props.profile) // profile updated
+        {
+            if(this.props.profile.user_status != prevProps.profile.user_status)//status changed
+            {
+                if(this.props.profile.user_status == UserStatus.USER_ACTIVE)
+                {
+                    this.addActivityHandlers()
+                    this.startTimer()
+                }
+                else if(this.props.profile.user_status == UserStatus.USER_AWAY)
+                {
+                    this.clearUserActivityTimer()
+                }
+                else 
+                {
+                    this.removeActivityHandlers()
+                    this.clearUserActivityTimer()
+                }
+            }
+        }
+        else if(!this.props.profile)  // signed out
+        {
+            this.removeActivityHandlers()
+            this.clearUserActivityTimer()
+        }
     }
     checkState()
     {
@@ -205,7 +290,8 @@ const mapStateToProps = (state) => {
         accessToken:state.debug.accessToken,
         signedIn:state.auth.signedIn,
         apiEndpoint:state.debug.apiEndpoint,
-        profile:state.profile
+        profile:state.profile,
+        awayTimeout:state.settings.awayTimeout
     };
 }
 const mapDispatchToProps = (dispatch) => {
@@ -230,6 +316,9 @@ const mapDispatchToProps = (dispatch) => {
         },
         setContactListCache:(contacts:number[]) => {
             dispatch(Actions.setContactListCache(contacts))
+        },
+        setAwayTimeout:(timeout:number) => {
+            dispatch(Actions.setAwayTimeout(timeout))
         },
     };
 };

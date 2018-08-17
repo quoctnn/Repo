@@ -94,6 +94,10 @@ export const setSignedIn = (signedIn:boolean) => ({
     type: Types.SET_SIGNED_IN,
     signedIn: signedIn
 })
+export const setAwayTimeout = (timeout:number) => ({
+    type: Types.SET_AWAY_TIMEOUT,
+    timeout: timeout
+})
 //profile
 
 export interface UpdateProfileAction {
