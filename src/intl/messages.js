@@ -14,6 +14,10 @@ var translations = {
         "Save":"Save",
         "Send WebSocket" : "Send WebSocket",
         "Send":"Send",
+        "Groups":"Groups",
+        "Projects":"Projects",
+        "Events":"Events",
+        "Load More":"Load More",
     },
     "no": {
         "search.placeholder": "Søk ...",
@@ -30,6 +34,10 @@ var translations = {
         "Save":"Lagre",
         "Send WebSocket" : "Send WebSocket",
         "Send":"Send",
+        "Groups":"Grupper",
+        "Projects":"Prosjekter",
+        "Events":"Arrangementer",
+        "Load More":"Last flere",
     },
     "en" : {
         "search.placeholder": "Search ...",
@@ -46,6 +54,10 @@ var translations = {
         "Save":"Save",
         "Send WebSocket" : "Send WebSocket",
         "Send":"Send",
+        "Groups":"Groups",
+        "Projects":"Projects",
+        "Events":"Events",
+        "Load More":"Load More",
     }
 }
 

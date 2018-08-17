@@ -58,4 +58,13 @@ export default class ApiClient
             callback(null, status, error)
         })
     }
+    static getGroups(community:number, limit:number, offset:number,callback:ApiRequestCallback)
+    {
+        let url = Constants.apiRoute.groupsUrl + "?limit=" + limit + "&offset=" + offset + "&community=" + community;
+        AjaxRequest.get(url, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
 }

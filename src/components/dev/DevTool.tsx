@@ -130,7 +130,11 @@ const mapDispatchToProps = (dispatch) => {
         setApiEndpoint:(index) => {
             dispatch(Actions.setProfile(null))
             dispatch(Actions.setSignedIn(false))
+            dispatch(Actions.resetCommunityStore())
+            dispatch(Actions.resetGroupStore())
+            dispatch(Actions.resetCommunityGroupsCache())
             dispatch(Actions.setApiEndpoint(index))
+            dispatch(Actions.resetProfileStore());
         },
         setAccessTokenOverride:(accessToken) => {
             dispatch(Actions.setProfile(null))

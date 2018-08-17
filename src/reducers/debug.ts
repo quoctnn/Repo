@@ -12,7 +12,8 @@ export interface ApiEndpoint {
 }
 const availableApiEndpoints:ApiEndpoint[] = [
     {endpoint:"https://dev.intra.work",loginType:LoginType.API, token: null,sessionid:null, websocket:null},
-    {endpoint:"http://alesund-dev.intra.work:8000", loginType:LoginType.NATIVE, token: null,sessionid:null, websocket:"ws://alesund-dev.intra.work:8000/socket/"}
+    {endpoint:"http://alesund-dev.intra.work:8000", loginType:LoginType.NATIVE, token: null,sessionid:null, websocket:"ws://alesund-dev.intra.work:8000/socket/"},
+    {endpoint:"http://192.168.15.13:8000", loginType:LoginType.NATIVE, token: null,sessionid:null, websocket:"ws://192.168.15.13:8000/socket/"}
 ]
 
 

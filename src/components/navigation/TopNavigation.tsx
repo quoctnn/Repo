@@ -4,11 +4,14 @@ import ProfileStatus from "../general/ProfileStatus";
 import {Settings} from "../../utilities/Settings"
 import { DevToolTrigger } from '../dev/DevToolTrigger';
 import { Link} from 'react-router-dom'
+import UserStatusSelector from '../general/UserStatusSelector';
+import { connect } from 'react-redux'
 require("./TopNavigation.scss");
 export interface Props {
+    signedIn:boolean
 }
 
-export default class TopNavigation extends React.Component<Props, {}> {
+class TopNavigation extends React.Component<Props, {}> {
     render() {
         return(
             <div id="top-navigation" className="flex align-center">
@@ -16,9 +19,16 @@ export default class TopNavigation extends React.Component<Props, {}> {
                 <div className="flex-grow flex-shrink"></div>
                 <div className="flex">
                     {!Settings.isProduction && <DevToolTrigger /> }
+                    {this.props.signedIn && <UserStatusSelector /> }
                     <ProfileStatus />
                 </div>
             </div>
         );
     }
 }
+const mapStateToProps = (state) => {
+    return {
+        signedIn:state.auth.signedIn,
+    };
+  }
+  export default connect(mapStateToProps, null)(TopNavigation);

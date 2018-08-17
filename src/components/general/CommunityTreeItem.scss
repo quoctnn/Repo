@@ -1,0 +1,20 @@
+.community-tree-item
+{
+    .community-name
+    {
+        display: block;
+        flex-grow: 1;
+        margin-left: 10px;
+    }
+    .avatar
+    {
+        flex-shrink: 0;
+    }
+}
+body.left-menu-open 
+{
+    .community-name
+    {
+        display: block;
+    }
+}

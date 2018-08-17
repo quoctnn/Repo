@@ -1,4 +1,5 @@
-import * as React from "react";
+import { appendTokenToUrl } from '../../utilities/Utilities';
+import * as React from 'react';
 import { Settings } from '../../utilities/Settings';
 require("./Avatar.scss");
 
@@ -7,7 +8,7 @@ export interface Props {
     borderWidth?:number,
     borderColor?:string,
     image:string,
-    stateColor?:AvatarStateColor
+    stateColor?:AvatarStateColor,
 }
 export enum AvatarStateColor
 {
@@ -17,25 +18,21 @@ export enum AvatarStateColor
     GRAY = "gray",
     NONE = "none",
 }
-export class Avatar extends React.Component<Props, {}> {
+export class Avatar extends React.Component<Props & React.HTMLAttributes<HTMLElement>, {}> {
     static defaultProps:Props = {
         size:50,
         borderWidth:0,
         borderColor:"none",
         image:null,
-        stateColor:AvatarStateColor.NONE
+        stateColor:AvatarStateColor.NONE,
+        
 	};
     render() 
     {
-        var imgUrl = this.props.image
-        if(imgUrl && Settings.accessToken)
-        {
-            let img = new URL(this.props.image)
-            img.searchParams.set('token', Settings.accessToken);
-            imgUrl = img.href
-        }
+        var imgUrl = appendTokenToUrl(this.props.image)
         return(
-            <div className="avatar" style={{backgroundImage:"url(\"" + imgUrl + "\")", borderWidth:this.props.borderWidth + "px", borderColor:this.props.borderColor, width:this.props.size + "px", height:this.props.size + "px", borderStyle:"solid"}}>
+            
+            <div onClick={this.props.onClick} className="avatar" style={{backgroundImage:"url(\"" + imgUrl + "\")", borderWidth:this.props.borderWidth + "px", borderColor:this.props.borderColor, width:this.props.size + "px", height:this.props.size + "px", borderStyle:"solid"}}>
                 {this.props.stateColor != AvatarStateColor.NONE && <div className={"avatar-state " + this.props.stateColor}></div>}
             </div>
         );

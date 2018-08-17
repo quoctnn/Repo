@@ -69,7 +69,7 @@ class Signin extends React.Component<Props, {}> {
                                 <Input autoComplete="current-password" name="password" innerRef={(input) => { this.passwordInput = input }} type="password" placeholder={translate("Password")} />
                             </FormGroup>
                             <FormGroup>
-                                <Button color="info" onClick={this.doSignin}>{translate("Sign in")}</Button>
+                                <Button type="submit" color="info" onClick={this.doSignin}>{translate("Sign in")}</Button>
                             </FormGroup>
                         </Form>
                     </div>

@@ -2,11 +2,14 @@ import { combineReducers } from 'redux'
 import debug from './debug';
 import settings from './settings';
 import profile from './profile';
-import contacts from './contacts';
 import auth from './auth';
-import communities from './communities';
+import groupStore from './groupStore';
+import groupListCache from './groupListCache';
+import communityStore from './communityStore';
+import profileStore from './profileStore';
+import contactListCache from './contactListCache';
 
 const appReducers = combineReducers({
-  debug, settings, profile, contacts, auth, communities
+  debug, settings, profile, auth, profileStore, communityStore, groupStore, groupListCache, contactListCache
 })
 export default appReducers

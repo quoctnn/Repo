@@ -1,9 +1,12 @@
 @import "../../main/Config";
 #left-navigation
 {
-    ul{width:100%;}
-    .avatar
+    ul
     {
-        margin: 5px auto;
+        width:100%;
+        li
+        {
+            padding: 5px 5px 0 5px;
+        }
     }
 }

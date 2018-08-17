@@ -19,6 +19,7 @@ export const translate = (key:any) => {
     let messages = private_messages
     if(key in messages)
         return messages[key]
+    console.error("'" + key + "'" + " is missing from translations")
     return key
 }
 class AutoIntlProvider extends React.Component<Props, {}> {

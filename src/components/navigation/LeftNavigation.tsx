@@ -1,27 +1,62 @@
 import * as React from "react";
-import ApiClient, { ListOrdering } from '../../network/ApiClient';
-import { CommunityTreeItem } from '../general/CommunityTreeItem';
+import CommunityTreeItem from '../general/CommunityTreeItem';
 import { connect } from 'react-redux'
-import { Community } from '../../reducers/communities';
+import { Community } from '../../reducers/communityStore';
 require("./LeftNavigation.scss");
 
 export interface Props {
     communities:Community[]
 }
 export interface State {
-    collapsedState:boolean[]
+    collapsedState:boolean[],
+    open:boolean
 }
 class LeftNavigation extends React.Component<Props, {}> {
     state:State
+    static leftMenuOpen = "left-menu-open"
+    static defaultProps:Props = {
+        communities:[],
+	};
     constructor(props) {
         super(props);
-        this.state = { collapsedState:[]  }
+        this.state = { collapsedState:[], open: false  }
         this.handleClick = this.handleClick.bind(this)
+        this.updateBody = this.updateBody.bind(this)
+    }
+    componentWillUnmount()
+    {
+        document.body.classList.remove(LeftNavigation.leftMenuOpen)
+    }
+    componentDidMount()
+    {
+        this.setState({ collapsedState:this.props.communities.map(() => true) }, this.updateBody)
+    }
+    componentDidUpdate(prevProps:Props)
+    {
+        if(this.props.communities.length != prevProps.communities.length)
+        {
+            this.setState({ collapsedState:this.props.communities.map(() => true) , open: false }, this.updateBody)
+        }
+    }
+    updateBody()
+    {
+        let open = this.state.open
+        if(open)
+        {
+            if(!document.body.classList.contains(LeftNavigation.leftMenuOpen))
+                document.body.classList.add(LeftNavigation.leftMenuOpen)
+        }
+        else 
+        {
+            if(document.body.classList.contains(LeftNavigation.leftMenuOpen))
+                document.body.classList.remove(LeftNavigation.leftMenuOpen)
+        }
     }
     handleClick(index:number)
     {
-        this.state.collapsedState[index] = !this.state.collapsedState[index];
-        this.setState({collapsedState: this.state.collapsedState});
+        let collapsedState = this.state.collapsedState
+        collapsedState[index] = !collapsedState[index];
+        this.setState({collapsedState: collapsedState, open: collapsedState.filter((cs) => !cs).length > 0 }, this.updateBody);
     }
     renderData()
     {
@@ -37,7 +72,7 @@ class LeftNavigation extends React.Component<Props, {}> {
     }
     render() {
         return(
-            <div id="left-navigation" className="flex">
+            <div id="left-navigation" className="flex transition">
                 {this.renderData()}
             </div>
         );
@@ -45,7 +80,7 @@ class LeftNavigation extends React.Component<Props, {}> {
 }
 const mapStateToProps = (state) => {
     return {
-        communities:state.communities.communitiesArray, 
+        communities:state.communityStore.communities, 
     };
 }
 export default connect(mapStateToProps, null)(LeftNavigation);

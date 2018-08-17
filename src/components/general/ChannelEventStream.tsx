@@ -3,22 +3,26 @@ import * as React from "react";
 import { connect } from 'react-redux'
 import { ApiEndpoint } from '../../reducers/debug';
 import * as Actions from "../../actions/Actions" 
-import { UserProfile } from '../../reducers/contacts';
+import { UserProfile, UserStatus } from '../../reducers/profileStore';
 import { Settings } from "../../utilities/Settings";
 import { AjaxRequest } from '../../network/AjaxRequest';
-import { Community } from '../../reducers/communities';
+import { Community } from '../../reducers/communityStore';
 
 export interface Props {
     apiEndpoint?:number,
     availableApiEndpoints?:Array<ApiEndpoint>,
-    setContacts:(contacts:UserProfile[]) => void,
     setProfile:(profile:UserProfile) => void,
-    updateContact:(contact:UserProfile) => void,
     setSignedIn:(signedIn:boolean) => void,
-    setCommunities: (communities:Community[]) => void,
-    updateCommunity:(community:Community) => void,
+
+    storeProfiles:(profiles:UserProfile[]) => void,
+    storeProfile:(profile:UserProfile) => void,
+    storeCommunities: (communities:Community[]) => void,
+    storeCommunity:(community:Community) => void,
+    setContactListCache:(contacts:number[]) => void,
+    
     accessToken?:string,
-    signedIn:boolean
+    signedIn:boolean,
+    profile:UserProfile
 }
 enum WebsocketState {
     CONNECTING = 0,
@@ -27,12 +31,20 @@ enum WebsocketState {
     CLOSED
 }
 var publicStream: WebSocket = null
-export const sendOnWebsocket = (data:any) => {
+export const sendOnWebsocket = (data:string) => {
     if(publicStream && publicStream.readyState == WebsocketState.OPEN)
+    {
+        console.log("Sending Websocket", data)
         publicStream.send(data)
+    }
+}
+export const sendUserStatus = (status:UserStatus) => 
+{
+    sendOnWebsocket(JSON.stringify({type:"user.update", data: {status: status}}))
 }
 class ChannelEventStream extends React.Component<Props, {}> {
     stream: WebSocket
+    lastUserActivity:Date
     state:{token:string, endpoint:string}
     constructor(props) {
         super(props);
@@ -45,13 +57,31 @@ class ChannelEventStream extends React.Component<Props, {}> {
         this.processStateResponse = this.processStateResponse.bind(this)
         this.getCurrentToken = this.getCurrentToken.bind(this)
         this.checkState = this.checkState.bind(this)
+        this.processStatusChangeResponse = this.processStatusChangeResponse.bind(this)
+        this.handleUserActivity = this.handleUserActivity.bind(this)
+        this.lastUserActivity = new Date()
+        
     }
     authorize()
     {
         if(this.canSend())
         {
-            console.log("Sending Authorization on WebSocket", this.state.token)
-            this.stream.send(JSON.stringify( {authorization:{token:this.state.token}}))
+            let data = {type:"authorization", data:{token:this.state.token}}
+            console.log("Sending Authorization on WebSocket", data)
+            this.stream.send(JSON.stringify( data ))
+        }
+    }
+    sendUserLastSeen()
+    {
+        if(this.canSend())
+        {
+            let endTime = new Date()
+            var timeDiff = endTime.getTime() - this.lastUserActivity.getTime()
+            timeDiff = timeDiff / 1000
+            var seconds = Math.round(timeDiff)
+            let data = {type: "user.last_seen", data: {seconds: seconds}}
+            console.log("Sending User Last Seen on WebSocket", data)
+            this.stream.send(JSON.stringify( data ))
         }
     }
     canSend()
@@ -60,15 +90,23 @@ class ChannelEventStream extends React.Component<Props, {}> {
     }
     processStateResponse(state:any)
     {
-        this.props.setContacts(state.contacts || [])
-        this.props.setCommunities(state.communities || [])
+        let contacts:UserProfile[] = state.contacts || []
+        this.props.storeProfiles(contacts)
+        this.props.setContactListCache(contacts.map(i => i.id))
+        this.props.storeCommunities(state.communities || [])
         this.props.setProfile(state.user || null)
         this.props.setSignedIn(state.user != null)
     }
     processUserUpdateResponse(user:UserProfile)
     {
-        this.props.updateContact(user)
-        console.log(user)
+        this.props.storeProfile(user)
+    }
+    processStatusChangeResponse(data:any)
+    {
+        let p = Object.assign({}, this.props.profile)//clone
+        p.user_status = data.status
+        this.props.setProfile(p)
+        this.sendUserLastSeen()
     }
     connectStream()
     {
@@ -81,7 +119,6 @@ class ChannelEventStream extends React.Component<Props, {}> {
             this.stream.onopen = () => {
                 console.log("WebSocket OPEN")
                 this.authorize()
-                //this.stream.send(JSON.stringify( { request:"initial_state" }));
             }
             this.stream.onmessage = (e) => {
                 let data = JSON.parse(e.data)
@@ -90,18 +127,30 @@ class ChannelEventStream extends React.Component<Props, {}> {
                 {
                     case "state" : this.processStateResponse(data.data); break;
                     case "user.update" : this.processUserUpdateResponse(data.data); break;
+                    case "client.status_change" : this.processStatusChangeResponse(data.data); break;
                     default:console.log("NO HANDLER FOR TYPE " + data.type);
                 }
-
             }
             this.stream.onclose = () => {
                 console.log("WebSocket CLOSED");
             }
         }
     }
+    handleUserActivity()
+    {
+        this.lastUserActivity = new Date()
+    }
     componentDidMount()
     {
+        document.addEventListener('mousedown', this.handleUserActivity);
+        window.addEventListener("focus", this.handleUserActivity)
         this.checkState()
+    }
+    componentWillUnmount()
+    {
+        document.removeEventListener('mousedown', this.handleUserActivity);
+        window.removeEventListener("focus", this.handleUserActivity)
+        this.closeStream()
     }
     componentDidUpdate()
     {
@@ -134,10 +183,6 @@ class ChannelEventStream extends React.Component<Props, {}> {
     {
         return this.props.accessToken || this.props.availableApiEndpoints[this.props.apiEndpoint].token
     }
-    componentWillUnmount()
-    {
-        this.closeStream()
-    }
     closeStream()
     {
         if(this.stream)
@@ -159,7 +204,8 @@ const mapStateToProps = (state) => {
         rehydrated:state._persist.rehydrated,
         accessToken:state.debug.accessToken,
         signedIn:state.auth.signedIn,
-        apiEndpoint:state.debug.apiEndpoint
+        apiEndpoint:state.debug.apiEndpoint,
+        profile:state.profile
     };
 }
 const mapDispatchToProps = (dispatch) => {
@@ -170,17 +216,20 @@ const mapDispatchToProps = (dispatch) => {
         setSignedIn:(signedIn:boolean) => {
             dispatch(Actions.setSignedIn(signedIn))
         },
-        setContacts: (contacts:UserProfile[]) => {
-            dispatch(Actions.setContacts(contacts));
+        storeProfiles: (profiles:UserProfile[]) => {
+            dispatch(Actions.storeProfiles(profiles));
         },
-        updateContact:(contact:UserProfile) => {
-            dispatch(Actions.updateContact(contact))
+        storeProfile:(contact:UserProfile) => {
+            dispatch(Actions.storeProfile(contact))
         },
-        setCommunities: (communities:Community[]) => {
-            dispatch(Actions.setCommunities(communities));
+        storeCommunities: (communities:Community[]) => {
+            dispatch(Actions.storeCommunities(communities));
         },
-        updateCommunity:(community:Community) => {
-            dispatch(Actions.updateCommunity(community))
+        storeCommunity:(community:Community) => {
+            dispatch(Actions.storeCommunity(community))
+        },
+        setContactListCache:(contacts:number[]) => {
+            dispatch(Actions.setContactListCache(contacts))
         },
     };
 };
