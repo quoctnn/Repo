@@ -1,12 +1,12 @@
-var webpack = require("webpack");
-const merge = require("webpack-merge");
-var BundleTracker = require("webpack-bundle-tracker");
-var config = require("./webpack.base.config.js");
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const UglifyJsPlugin = require("uglifyjs-webpack-plugin");
+var webpack = require('webpack');
+const merge = require('webpack-merge');
+var BundleTracker = require('webpack-bundle-tracker');
+var config = require('./webpack.base.config.js');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
 config.module.rules.unshift(
-  { test: /\.tsx?$/, loader: "ts-loader" },
+  { test: /\.tsx?$/, loader: 'ts-loader' },
   {
     test: /\.(s*)css$/,
     use: [
@@ -15,23 +15,36 @@ config.module.rules.unshift(
         options: {
           // you can specify a publicPath here
           // by default it use publicPath in webpackOptions.output
-          publicPath: "../"
+          publicPath: '../'
         }
       },
-      "css-loader"
+      'css-loader',
+      'sass-loader'
+    ]
+  },
+  {
+    test: /\.(woff(2)?|ttf|eot|svg)(\?v=\d+\.\d+\.\d+)?$/,
+    use: [
+      {
+        loader: 'file-loader',
+        options: {
+          name: '[name].[ext]',
+          outputPath: 'dist/'
+        }
+      }
     ]
   }
 );
 
 module.exports = merge(config, {
-  mode: "production",
+  mode: 'production',
   plugins: [
-    new BundleTracker({ filename: "webpack/webpack-stats-prod.json" }),
+    new BundleTracker({ filename: 'webpack/webpack-stats-prod.json' }),
 
     // removes a lot of debugging code in React
     new webpack.DefinePlugin({
-      "process.env": {
-        NODE_ENV: JSON.stringify("production")
+      'process.env': {
+        NODE_ENV: JSON.stringify('production')
       }
     }),
 
@@ -45,15 +58,15 @@ module.exports = merge(config, {
     // Add sourceMappingURL directive without generating source maps.
     new webpack.SourceMapDevToolPlugin({
       test: /.jsx?$/,
-      filename: "[name]-[hash].js.map",
-      append: "//# sourceMappingURL=[url]"
+      filename: '[name]-[hash].js.map',
+      append: '//# sourceMappingURL=[url]'
     }),
     new MiniCssExtractPlugin({
-      filename: "[name].css",
-      chunkFilename: "[id].css"
+      filename: '[name].css',
+      chunkFilename: '[id].css'
     })
   ],
-  devtool: "cheap-module-source-map",
+  devtool: 'cheap-module-source-map',
   optimization: {
     minimizer: [
       new UglifyJsPlugin({
