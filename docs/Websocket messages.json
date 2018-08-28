@@ -1,0 +1,99 @@
+{
+  "Websocket messages": {
+    "Authorization": [
+      {
+        "To websocket": [
+          {
+            "data": {
+              "token": "4e2783d6d5aba53d9899ecfbe809e0f00d4c023f"
+            },
+            "type": "authorization"
+          }
+        ]
+      },
+      {
+        "From websocket": [
+          {
+            "data": {
+              "anonymous": false,
+              "channel_name": "specific.bxIeRWsZ!YjkovrnbIWqR",
+              "communities": [
+                "CommunityObjects"
+              ],
+              "contacts": [
+                "UserObjects"
+              ],
+              "groups": [
+                "ChannelGroupObjects"
+              ],
+              "staff": true,
+              "superuser": true,
+              "user": "UserObject"
+            },
+            "type": "state"
+          }
+        ]
+      }
+    ],
+    "Chat": [
+      {
+        "To websocket": [
+          {
+            "data": {
+              "conversation": 13,
+              "text": "This is sent via websocket"
+            },
+            "type": "conversation.message"
+          },
+          {
+            "data": {
+              "conversation": 13
+            },
+            "type": "conversation.typing"
+          }
+        ]
+      },
+      {
+        "From websocket": [
+          {
+            "data": "MessageObject",
+            "type": "conversation.message"
+          },
+          {
+            "data": {
+              "conversation": 13,
+              "user": 1
+            },
+            "type": "conversation.typing"
+          }
+        ]
+      }
+    ],
+    "User/Profile": [
+      {
+        "To websocket": [
+          {
+            "data": {
+              "status": "dnd"
+            },
+            "type": "user.update"
+          },
+          {
+            "data": {
+              "seconds": 200
+            },
+            "type": "user.last_seen"
+          }
+        ]
+      },
+      {
+        "From websocket": [
+          {
+            "data": "UserObject",
+            "type": "user.update"
+          }
+        ]
+      }
+    ]
+  }
+}
