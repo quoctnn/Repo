@@ -17,15 +17,9 @@
             "data": {
               "anonymous": false,
               "channel_name": "specific.bxIeRWsZ!YjkovrnbIWqR",
-              "communities": [
-                "CommunityObjects"
-              ],
-              "contacts": [
-                "UserObjects"
-              ],
-              "groups": [
-                "ChannelGroupObjects"
-              ],
+              "communities": ["CommunityObjects"],
+              "contacts": ["UserObjects"],
+              "groups": ["ChannelGroupObjects"],
               "staff": true,
               "superuser": true,
               "user": "UserObject"
@@ -58,6 +52,10 @@
           {
             "data": "MessageObject",
             "type": "conversation.message"
+          },
+          {
+            "data": "ConversationObject",
+            "type": "conversation.new"
           },
           {
             "data": {
