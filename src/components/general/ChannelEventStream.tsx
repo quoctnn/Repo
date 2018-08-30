@@ -7,7 +7,10 @@ import { UserProfile, UserStatus } from '../../reducers/profileStore';
 import { Settings } from "../../utilities/Settings";
 import { AjaxRequest } from '../../network/AjaxRequest';
 import { Community } from '../../reducers/communityStore';
-import profile from '../../reducers/profile';
+import { RootReducer } from '../../reducers/index';
+
+import { toast } from 'react-toastify';
+import { ErrorToast } from '../../components/general/Toast';
 
 export interface Props {
     apiEndpoint?:number,
@@ -142,7 +145,9 @@ class ChannelEventStream extends React.Component<Props, {}> {
                     default:console.log("NO HANDLER FOR TYPE " + data.type);
                 }
             }
-            this.stream.onclose = () => {
+            this.stream.onclose = (event) => {
+                if(!event.wasClean)
+                    toast.error(<ErrorToast message="WebSocket closed, please refresh browser" />, { hideProgressBar: true })
                 console.log("WebSocket CLOSED");
             }
         }
@@ -283,7 +288,7 @@ class ChannelEventStream extends React.Component<Props, {}> {
         return (null)
     }
 }
-const mapStateToProps = (state) => {
+const mapStateToProps = (state:RootReducer) => {
     return {
         availableApiEndpoints:state.debug.availableApiEndpoints,
         rehydrated:state._persist.rehydrated,

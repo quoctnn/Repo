@@ -1,0 +1,9 @@
+.message-list {
+    overflow-y: scroll;
+    -webkit-overflow-scrolling:touch;
+    padding-bottom: 5px;
+    margin: 0;
+    width: 100%;
+    flex-grow: 1;
+    border:1px solid gray;
+  }

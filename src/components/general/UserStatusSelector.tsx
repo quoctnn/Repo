@@ -4,6 +4,7 @@ import { UserProfile, UserStatus } from '../../reducers/profileStore';
 import { sendUserStatus } from './ChannelEventStream';
 import { type } from 'os';
 import profile from '../../reducers/profile';
+import { RootReducer } from '../../reducers/index';
 require("./UserStatusSelector.scss");
 
 export interface Props {
@@ -54,7 +55,7 @@ class UserStatusSelector extends React.Component<Props, {}> {
     }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = (state:RootReducer) => {
     return {
         profile: state.profile,
         language:state.settings.language

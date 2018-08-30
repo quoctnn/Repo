@@ -7,6 +7,7 @@ import * as Actions from "../../actions/Actions"
 import { History} from 'history'
 import { Routes } from '../../utilities/Routes';
 import { UserProfile } from '../../reducers/profileStore';
+import { RootReducer } from '../../reducers/index';
 require("./ProfileStatus.scss");
 
 export interface Props {
@@ -42,7 +43,7 @@ class ProfileStatus extends React.Component<Props, {}> {
     }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = (state:RootReducer) => {
     return {
         profile:state.profile, 
         language: state.settings.language,

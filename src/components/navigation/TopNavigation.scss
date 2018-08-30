@@ -1,7 +1,10 @@
 @import "../../main/Config";
 #top-navigation 
 {
-    background: $nav-background-color;
-    border-bottom:1px solid $nav-border-color;
+    border:0;
+    @include var(background, nav-background-color);
+    @include var(border-bottom-width, nav-border-width);
+    @include var(border-bottom-color, nav-border-color);
+    border-style: solid;
     padding: 8px;
 }

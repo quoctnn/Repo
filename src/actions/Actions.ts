@@ -2,6 +2,7 @@ import {Types} from "../utilities/Types"
 import { Group } from '../reducers/groupStore';
 import { Community } from '../reducers/communityStore';
 import { UserProfile } from '../reducers/profileStore';
+import { Conversation } from '../reducers/conversationStore';
 //profileStore
 export const storeProfiles = (profiles:UserProfile[]) => ({
     type: Types.PROFILESTORE_ADD_PROFILES,
@@ -13,6 +14,19 @@ export const storeProfile = (profile:UserProfile) => ({
 })
 export const resetProfileStore = () => ({
     type: Types.PROFILESTORE_RESET,
+})
+
+//conversationStore
+export const storeConversations = (conversations:Conversation[]) => ({
+    type: Types.CONVERSATIONSTORE_ADD_CONVERSATIONS,
+    conversations: conversations,
+})
+export const storeConversation = (conversation:Conversation) => ({
+    type: Types.CONVERSATIONSTORE_ADD_CONVERSATION,
+    conversation: conversation,
+})
+export const resetConversationStore = () => ({
+    type: Types.RESET_CONVERSATION_LIST_CACHE,
 })
 
 //communityStore
@@ -54,6 +68,20 @@ export const resetContactListCache = () => ({
     type: Types.RESET_CONTACT_LIST_CACHE,
 })
 
+//conversationListCache
+export const setConversationListCache = (conversations:number[], total:number) => ({
+    type: Types.SET_CONVERSATION_LIST_CACHE,
+    conversations: conversations,
+    total:total
+})
+export const appendConversationListCache = (conversations:number[]) => ({
+    type: Types.APPEND_CONVERSATION_LIST_CACHE,
+    conversations: conversations,
+})
+export const resetConversationListCache = () => ({
+    type: Types.RESET_CONVERSATION_LIST_CACHE
+})
+
 //groupListCache
 export const setCommunityGroupsCache = (community:number, groups:number[], total:number) => ({
     type: Types.SET_COMMUNITY_GROUPS_CACHE,
@@ -89,6 +117,10 @@ export const setAuthorizationData = (token:string, sessionid:string) => ({
 export const setLanguage = (index:number) => ({
     type: Types.SET_LANGUAGE,
     language: index
+})
+export const setTheme = (index:number) => ({
+    type: Types.SET_THEME,
+    theme: index
 })
 export const setSignedIn = (signedIn:boolean) => ({
     type: Types.SET_SIGNED_IN,

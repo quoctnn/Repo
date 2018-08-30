@@ -10,8 +10,8 @@ try {
   localDomain = require("./local.domain");
 } catch (e) {
     // Not local domain specified, shared on localhost
-    //localDomain = "192.168.15.27";
-    localDomain = "localhost";
+    localDomain = "192.168.15.26";
+    //localDomain = "localhost";
     //localDomain = "alesund-dev.intra.work";
 }
 

@@ -3,6 +3,7 @@ import { Avatar } from '../general/Avatar';
 import { translate } from '../intl/AutoIntlProvider';
 import GroupList from './GroupList'; 
 import { connect } from 'react-redux'
+import { RootReducer } from "../../reducers";
 require("./CommunityTreeItem.scss");
 export interface Props {
     communityData:any,
@@ -75,7 +76,7 @@ class CommunityTreeItem extends React.Component<Props, {}> {
         );
     }
 }
-const mapStateToProps = (state) => {
+const mapStateToProps = (state:RootReducer) => {
     return {
         language: state.settings.language,
     };

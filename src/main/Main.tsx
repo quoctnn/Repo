@@ -16,6 +16,9 @@ import { Settings } from '../utilities/Settings';
 import LeftNavigation from '../components/navigation/LeftNavigation';
 import ChannelEventStream from "../components/general/ChannelEventStream";
 import RightNavigation from '../components/navigation/RightNavigation';
+import { RootReducer } from '../reducers/index';
+import Conversations from '../views/chat/Conversations';
+import ConversationView from '../views/chat/ConversationView';
 require("react-toastify/dist/ReactToastify.css");
 require("./Main.scss");
 
@@ -43,6 +46,8 @@ class Main extends React.Component<Props, {}> {
                                 <Route path={Routes.SIGNIN} component={Signin} />
                                 <Route path={Routes.PROFILES + ":slug"} component={Profile} />
                                 <Route path={Routes.PROFILE_UPDATE} component={ProfileUpdate} />
+                                <Route path={Routes.CONVERSATIONS} component={Conversations} />
+                                <Route path={Routes.CONVERSATION + ":conversationid"} component={ConversationView} />
                                 <Route path={Routes.COMMUNITY + ":communityid/:groupname"} component={GroupView} />
                                 <Route path={Routes.COMMUNITY + ":communityname"} component={Community} />
                                 <Route path={Routes.ROOT} exact={true} component={NewsFeed} />
@@ -52,8 +57,8 @@ class Main extends React.Component<Props, {}> {
                         </div>
                     </div>
                     <div id="navigation-content" className="navigation">
-                        <LeftNavigation />
                         <TopNavigation />
+                        <LeftNavigation />
                         {this.props.signedIn && <RightNavigation /> }
                     </div>
             </div>
@@ -61,7 +66,7 @@ class Main extends React.Component<Props, {}> {
     );
   }
 }
-const mapStateToProps = (state) => {
+const mapStateToProps = (state:RootReducer) => {
   return {
       signedIn:state.auth.signedIn,
   };

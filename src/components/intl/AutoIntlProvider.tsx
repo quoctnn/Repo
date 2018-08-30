@@ -6,13 +6,12 @@ import { connect, State } from 'react-redux'
 import * as en from 'react-intl/locale-data/en';
 import * as es from 'react-intl/locale-data/es';
 import * as no from 'react-intl/locale-data/no';
-
+import { availableLanguages } from '../../reducers/settings';
+import { RootReducer } from "../../reducers";
 addLocaleData([...en, ...es, ...no]);
 
 export interface Props {
     language: string,
-    availableLanguages?: Array<string>,
-
 }
 var private_messages = null
 export const translate = (key:any) => {
@@ -25,16 +24,16 @@ export const translate = (key:any) => {
 class AutoIntlProvider extends React.Component<Props, {}> {
     componentWillMount()
     {
-        let lang = this.props.availableLanguages[this.props.language]
+        let lang = availableLanguages[this.props.language]
         private_messages = messages[lang]
     }
     componentWillUpdate(nextProps, nextState)
     {
-        let lang = nextProps.availableLanguages[nextProps.language]
+        let lang = availableLanguages[nextProps.language]
         private_messages = messages[lang]
     }
     render() {
-        let lang = this.props.availableLanguages[this.props.language]
+        let lang = availableLanguages[this.props.language]
         return(
             <IntlProvider locale={lang} messages={messages[lang]}>
                 {this.props.children}
@@ -44,12 +43,10 @@ class AutoIntlProvider extends React.Component<Props, {}> {
 }
 interface StateFromProps {
     language: string;
-    availableLanguages: string[];
 }
-const mapStateToProps = (state:State) => {
+const mapStateToProps = (state:RootReducer) => {
     return {
         language:state.settings.language,
-        availableLanguages:state.settings.availableLanguages
     };
 }
   

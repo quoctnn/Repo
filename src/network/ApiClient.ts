@@ -67,4 +67,22 @@ export default class ApiClient
             callback(null, status, error)
         })
     }
+    static getConversations(limit:number, offset:number,callback:ApiRequestCallback)
+    {
+        let url = Constants.apiRoute.conversations + "?limit=" + limit + "&offset=" + offset;
+        AjaxRequest.get(url, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
+    static getConversationMessages(conversationId:number, limit:number, offset:number,callback:ApiRequestCallback)
+    {
+        let url = Constants.apiRoute.conversationMessagesUrl(conversationId) + "?limit=" + limit + "&offset=" + offset;
+        AjaxRequest.get(url, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
 }

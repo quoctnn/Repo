@@ -1,47 +1,112 @@
 @charset "UTF-8";
+//let hasRootSupport = window.CSS && window.CSS.supports && window.CSS.supports('--a', 0) 
+//root = document.querySelector(':root')
+//root.className = currentTheme
 
-/* Fonts */
-$font-family-default: 'Roboto:700,400,500,300', sans-serif !default;
-$font-size-default: 14px !default;
 
-/* Colors */
-$feed-form-options-bg: #f5f5f5 !default;
-$body-background: #eeeeee !default;
-$border-color-default: #cccccc !default;
+//DEFAULT
+$root: (
+    font-family-default: 'Roboto:700,400,500,300, sans-serif',
+    font-size-default: 14px,
 
-$default-color: #fff !default;
-$primary-color: #428bca !default;
-$info-color: #5bc0de !default;
-$danger-color: #d9534f !default;
-$success-color: #5cb85c !default;
-$warning-color: #f0ad4e !default;
+    /* Colors */
+    feed-form-options-bg: #f5f5f5,
+    body-background: #eeeeee,
+    border-color-default: #cccccc,
 
-$navbar-background: #428bca !default;
+    default-color: #fff,
+    primary-color: #428bca,
+    info-color: #5bc0de,
+    danger-color: #d9534f,
+    success-color: #5cb85c,
+    warning-color: #f0ad4e,
 
-/* Status Type colors */
-$status-videos-color: #B71C1C !default;
-$status-text-color: #337AB7 !default;
-$status-attachments-color: #FF5722 !default;
-$status-audios-color: #FFCA28 !default;
-$status-photos-color: #029555 !default;
-$status-link-color: #2196F3 !default;
-$status-multimedia-color: #7B1FA2 !default;
-$status-events-color: #FF9933 !default;
+    navbar-background: #428bca,
 
-/* Backgrounds transparent */
-$bg-trans-blue-light: rgba(0, 54, 144, 0.75) !default;
-$bg-trans-blue-dark: rgba(1, 0, 54, 0.9) !default;
-$bg-trans-black: rgba(0, 0, 0, 0.5) !default;
-$bg-trans-black-light: rgba(0, 0, 0, 0.25) !default;
+    /* Status Type colors */
+    status-videos-color: #B71C1C,
+    status-text-color: #337AB7,
+    status-attachments-color: #FF5722,
+    status-audios-color: #FFCA28,
+    status-photos-color: #029555,
+    status-link-color: #2196F3,
+    status-multimedia-color: #7B1FA2,
+    status-events-color: #FF9933,
 
-/* NAV */
-$nav-foreground-color:black;
-$nav-background-color:white;
-$nav-border-color:#DFE0DF;
-$highlight-color: #428bca !default;
-$top-navigation-height:60px;
-$left-navigation-min-width:60px;
-$left-navigation-max-width:270px;
+    /* Backgrounds transparent */
+    bg-trans-blue-light: rgba(0, 54, 144, 0.75),
+    bg-trans-blue-dark: rgba(1, 0, 54, 0.9),
+    bg-trans-black: rgba(0, 0, 0, 0.5),
+    bg-trans-black-light: rgba(0, 0, 0, 0.25),
 
-$right-navigation-min-width:60px;
-$right-navigation-max-width:240px;
+    /* NAV */
+    nav-foreground-color:black,
+    nav-background-color:white,
+    nav-border-color:#DFE0DF,
+    nav-border-width:1px,
+    top-navigation-height:60px,
+    left-navigation-min-width:60px,
+    left-navigation-max-width:270px,
+
+    right-navigation-min-width:60px,
+    right-navigation-max-width:240px,
+);
+@mixin var($property, $varName) {
+    #{$property}: map-get($root, $varName);
+    #{$property}: var(--#{$varName}, map-get($root, $varName));
+}
+:root{
+    /* Fonts */
+    --font-family-default: 'Roboto:700,400,500,300', sans-serif;
+    --font-size-default: 14px;
+
+    /* Colors */
+    --feed-form-options-bg: #f5f5f5;
+    --body-background: #eeeeee;
+    --border-color-default: #cccccc;
+
+    --default-color: #fff;
+    --primary-color: #428bca;
+    --info-color: #5bc0de;
+    --danger-color: #d9534f;
+    --success-color: #5cb85c;
+    --warning-color: #f0ad4e;
+
+    --navbar-background: #428bca;
+
+    /* Status Type colors */
+    --status-videos-color: #B71C1C;
+    --status-text-color: #337AB7;
+    --status-attachments-color: #FF5722;
+    --status-audios-color: #FFCA28;
+    --status-photos-color: #029555;
+    --status-link-color: #2196F3;
+    --status-multimedia-color: #7B1FA2;
+    --status-events-color: #FF9933;
+
+    /* Backgrounds transparent */
+    --bg-trans-blue-light: rgba(0, 54, 144, 0.75);
+    --bg-trans-blue-dark: rgba(1, 0, 54, 0.9);
+    --bg-trans-black: rgba(0, 0, 0, 0.5);
+    --bg-trans-black-light: rgba(0, 0, 0, 0.25);
+
+    /* NAV */
+    --nav-foreground-color:black;
+    --nav-background-color:white;
+    --nav-border-color: #DFE0DF;
+    --nav-border-width:1px;
+
+    --top-navigation-height:60px;
+    --left-navigation-min-width:60px;
+    --left-navigation-max-width:270px;
+    --right-navigation-min-width:60px;
+    --right-navigation-max-width:240px;
+}
+:root.light {
+    --left-navigation-min-width:160px;
+}
+:root.dark {
+    --nav-background-color:black;
+    --nav-border-color:red;
+    --nav-border-width:5px;
+}

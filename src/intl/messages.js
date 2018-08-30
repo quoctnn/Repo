@@ -18,6 +18,7 @@ var translations = {
         "Projects":"Projects",
         "Events":"Events",
         "Load More":"Load More",
+        "Theme":"Theme",
     },
     "no": {
         "search.placeholder": "Søk ...",
@@ -38,6 +39,7 @@ var translations = {
         "Projects":"Prosjekter",
         "Events":"Arrangementer",
         "Load More":"Last flere",
+        "Theme":"Tema",
     },
     "en" : {
         "search.placeholder": "Search ...",
@@ -58,6 +60,7 @@ var translations = {
         "Projects":"Projects",
         "Events":"Events",
         "Load More":"Load More",
+        "Theme":"Theme",
     }
 }
 

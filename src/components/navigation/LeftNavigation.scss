@@ -1,6 +1,11 @@
 @import "../../main/Config";
 #left-navigation
 {
+    border:0;
+    @include var(background, nav-background-color);
+    @include var(border-right-width, nav-border-width);
+    @include var(border-right-color, nav-border-color);
+    border-style: solid;
     ul
     {
         width:100%;

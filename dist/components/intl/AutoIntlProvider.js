@@ -15,7 +15,7 @@ class AutoIntlProvider extends React.Component {
 }
 const mapStateToProps = (state) => {
     return {
-        language: state.settings.language
+        language: state.session.settings.language
     };
 };
 exports.default = react_redux_1.connect(mapStateToProps, null)(AutoIntlProvider);

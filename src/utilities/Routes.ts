@@ -6,4 +6,7 @@ export enum Routes {
     DEVELOPER_TOOL = "/developer-tool",
     PROFILES = "/profiles/",
     COMMUNITY = "/community/",
+    CONVERSATIONS = "/conversations/",
+    CONVERSATION = "/conversation/",
+    SEARCH = "/search/"
 }

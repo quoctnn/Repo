@@ -7,6 +7,7 @@
 .flex-grow{ flex-grow: 1;} 
 .flex-shrink{ flex-shrink: 1;}
 .align-center{ align-items: center;}
+.full-height{flex-grow: 1; display: flex; flex-direction: column; height: 100%;}
 
 .padding-xs { padding: .25em; }
 .padding-sm { padding: .5em; }
@@ -111,20 +112,21 @@ ul,li{margin:0; padding: 0;}
     {
         #left-navigation
         {
-            border-right: 1px solid #DFE0DF;
             transition: transform 0.3s ease-in-out all;
-            z-index: 999;
+            z-index: 1062;
             position: fixed;
-            top: $top-navigation-height;
+            @include var(top, top-navigation-height);
+            margin-top:-#{map-get($root, nav-border-width)};
+            margin-top: calc(-1 * var(--nav-border-width, #{map-get($root, nav-border-width)}));
             left: 0;
             bottom: 0;
-            width: $left-navigation-min-width;
+            @include var(width, left-navigation-min-width);
             overflow-x: hidden;
         }
         #top-navigation
         {
             z-index: 1061;
-            height: $top-navigation-height;
+            @include var(height, top-navigation-height);
             position: fixed;
             right: 0;
             left: 0;
@@ -133,11 +135,11 @@ ul,li{margin:0; padding: 0;}
         #right-navigation
         {
             padding: 0;
-            width:$right-navigation-min-width;
+            @include var(width, right-navigation-min-width);
             border-left: 1px solid #DFE0DF;
             z-index: 999;
             position: fixed !important;
-            top: $top-navigation-height;
+            @include var(top, top-navigation-height);
             right: 0;
             bottom: 0;
             overflow-x: hidden;
@@ -153,17 +155,16 @@ ul,li{margin:0; padding: 0;}
         }
         #right-navigation.open
         {
-            width:$right-navigation-max-width;
+            @include var(width, right-navigation-max-width);
         }
         
     }
     #content-block
     {
-        margin-left: $left-navigation-min-width;
-        margin-top: $top-navigation-height;
-        height:calc(100% - #{$top-navigation-height});
+        @include var(margin-left, left-navigation-min-width);
+        @include var(margin-top, top-navigation-height);
         padding: 5px;
-        margin-right: $right-navigation-min-width;
+        @include var(margin-right, right-navigation-min-width);
     }
 }
 body.left-menu-open
@@ -172,18 +173,35 @@ body.left-menu-open
     {
         #content-block
         {
-            margin-left: $left-navigation-max-width;
+            @include var(margin-left, left-navigation-max-width);
         }
         #navigation-content
         {
             #left-navigation
             {
-                width: $left-navigation-max-width;
+                @include var(width, left-navigation-max-width);
             }
         }
         
     }
-    
+}
+body.full-page
+{
+    #main-content
+    {
+        #content-block
+        {
+            height:calc(100vh - #{map-get($root, top-navigation-height)});
+            height: calc(100vh - var(--top-navigation-height, #{map-get($root, top-navigation-height)}));
+            > .container, > .container>div
+            {
+                flex-grow: 1;
+                display: flex;
+                flex-direction: column;
+                height: 100%;
+            }
+        }
+    }
 }
 .profile-popover
 {

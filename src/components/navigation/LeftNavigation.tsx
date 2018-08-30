@@ -2,6 +2,7 @@ import * as React from "react";
 import CommunityTreeItem from '../general/CommunityTreeItem';
 import { connect } from 'react-redux'
 import { Community } from '../../reducers/communityStore';
+import { RootReducer } from "../../reducers";
 require("./LeftNavigation.scss");
 
 export interface Props {
@@ -78,7 +79,7 @@ class LeftNavigation extends React.Component<Props, {}> {
         );
     }
 }
-const mapStateToProps = (state) => {
+const mapStateToProps = (state:RootReducer) => {
     return {
         communities:state.communityStore.communities, 
     };

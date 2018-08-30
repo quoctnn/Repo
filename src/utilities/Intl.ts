@@ -1,9 +1,13 @@
 
 import * as ReactIntl from "react-intl";
 declare global {
-    interface Window { app: any; ReactIntlLocaleData:Array<any>, Intl:any}
+    interface Window { app: any; ReactIntlLocaleData:Array<any>, Intl:any, CSS:CSS}
     interface Navigator { browserLanguage: string; }
+    interface String {
+        hashCode(): number;
+    }
 }
+
 export default class Intl {
     static getCurrentLocale() 
     { 

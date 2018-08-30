@@ -3,36 +3,59 @@ import '@fortawesome/fontawesome-free/css/fontawesome.min.css';
 import '@fortawesome/fontawesome-free/css/solid.min.css';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import appReducers from '../reducers'
 import { createStore,applyMiddleware } from 'redux'
 import { Provider } from 'react-redux'
-import { persistStore, persistReducer, createTransform, PersistConfig } from 'redux-persist'
-import storageSession from 'redux-persist/lib/storage/session'
+import { persistStore } from 'redux-persist'
 import { PersistGate } from 'redux-persist/integration/react'
 import Main from "./Main";
 import AutoIntlProvider from "../components/intl/AutoIntlProvider";
+import { Types } from '../utilities/Types';
+import { availableThemes } from '../reducers/settings';
+import { Settings } from '../utilities/Settings';
+import appReducer from '../reducers/index';
+import { RootReducer } from '../reducers/index';
 require('jquery/dist/jquery');
 require('popper.js/dist/umd/popper');
 require('bootstrap/dist/js/bootstrap');
+require("../utilities/Extensions")
 
-const persistConfig:PersistConfig = {
-    key: 'root',
-    storage:storageSession,
-    blacklist: ['auth']
-}
-const persistedReducer = persistReducer(persistConfig, appReducers)
+
+
 const logger = store => next => action => {
     console.log("DISPATCHING => ", action)
     let result = next(action)
     console.log('NEXT STATE => ', store.getState())
     return result
 }
-
-const store = createStore(persistedReducer, applyMiddleware(logger))
-var storeLoaded = false
+const applyTheme = (themeString) => {
+    let theme = availableThemes[themeString]
+    let selector = theme.selector
+    let root = document.querySelector(":root")
+    root.className = selector
+}
+const themeSwitcher = store => next => action => {
+    let result = next(action)
+    if (action.type === Types.SET_THEME) 
+    {
+        let state = store.getState() as RootReducer
+        applyTheme(state.settings.theme)
+    }
+    return result
+}
+var middleWares = [logger]
+if(Settings.supportsTheming)
+{
+    middleWares.push(themeSwitcher)
+}
+const store = createStore(appReducer, applyMiddleware(...middleWares))
 const persistor = persistStore(store, {}, () => 
 { 
     //rehydrate complete
+    if(Settings.supportsTheming)
+    {
+        let themeString = store.getState().settings.theme
+        applyTheme(themeString)
+    }
 })
 ReactDOM.render(
         <Provider store={store}>
@@ -46,3 +69,4 @@ ReactDOM.render(
 );
 export default store
 
+  

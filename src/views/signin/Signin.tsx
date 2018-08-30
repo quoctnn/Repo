@@ -9,6 +9,7 @@ import * as Actions from '../../actions/Actions';
 import { withRouter} from 'react-router-dom'
 import { History} from 'history'
 import { ApiEndpoint, LoginType } from '../../reducers/debug';
+import { RootReducer } from '../../reducers/index';
 
 require("./Signin.scss");
 
@@ -31,9 +32,9 @@ class Signin extends React.Component<Props, {}> {
     }
     loginCallback(data:any, status:string, error:string)
     {
-        if(error)
+        if(error || status == "error")
         {
-            toast.error(<ErrorToast message={error} />, { hideProgressBar: true })
+            toast.error(<ErrorToast message={error || "Could not sign in"} />, { hideProgressBar: true })
             return
         }
         if(data.token)
@@ -80,7 +81,7 @@ class Signin extends React.Component<Props, {}> {
         );
     }
 }
-const mapStateToProps = (state) => {
+const mapStateToProps = (state:RootReducer) => {
     return {
         apiEndpoint:state.debug.apiEndpoint,
         availableApiEndpoints:state.debug.availableApiEndpoints,

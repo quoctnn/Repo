@@ -6,6 +6,7 @@ import { Routes } from "../../utilities/Routes";
 import { Avatar } from "../general/Avatar";
 import { Link } from "react-router-dom";
 import { List } from "../general/List";
+import { RootReducer } from "../../reducers";
 require("./RightNavigation.scss");
 export interface Props {
     profiles:UserProfile[],
@@ -65,7 +66,7 @@ class RightNavigation extends React.Component<Props, {}> {
         );
     }
 }
-const mapStateToProps = (state) => {
+const mapStateToProps = (state:RootReducer) => {
     return {
         profiles:state.profileStore.profiles,
         contacts:state.contactListCache.contacts

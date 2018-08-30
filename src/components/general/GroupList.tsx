@@ -9,6 +9,7 @@ import { translate } from '../intl/AutoIntlProvider';
 import { Link } from 'react-router-dom';
 import { Routes } from '../../utilities/Routes';
 import { Group } from '../../reducers/groupStore';
+import { RootReducer } from '../../reducers';
 export interface Props {
     community_id:number,
     pageSize?:number,
@@ -140,7 +141,7 @@ class GroupList extends React.Component<Props, {}> {
     }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = (state:RootReducer) => {
     return {
         groupsData: state.groupListCache.groups,
         groupStore:state.groupStore.groups

@@ -38,8 +38,8 @@ class DevTool extends React.Component {
 }
 const mapStateToProps = (state) => {
     return {
-        language: state.settings.language,
-        availableLanguages: state.settings.availableLanguages
+        language: state.session.settings.language,
+        availableLanguages: state.session.settings.availableLanguages
     };
 };
 const mapDispatchToProps = (dispatch) => {

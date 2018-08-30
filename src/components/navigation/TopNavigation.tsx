@@ -6,6 +6,7 @@ import { DevToolTrigger } from '../dev/DevToolTrigger';
 import { Link} from 'react-router-dom'
 import UserStatusSelector from '../general/UserStatusSelector';
 import { connect } from 'react-redux'
+import { RootReducer } from '../../reducers/index';
 require("./TopNavigation.scss");
 export interface Props {
     signedIn:boolean
@@ -15,7 +16,10 @@ class TopNavigation extends React.Component<Props, {}> {
     render() {
         return(
             <div id="top-navigation" className="flex align-center">
-                <div className=""><Link className="btn btn-primary margin-right-sm" to={Routes.ROOT}><i className="fas fa-home" /></Link></div>
+                <div className="">
+                    <Link className="btn btn-primary margin-right-sm" to={Routes.ROOT}><i className="fas fa-home" /></Link>
+                    <Link className="btn btn-primary margin-right-sm" to={Routes.CONVERSATIONS}><i className="fas fa-comments" /></Link>
+                </div>
                 <div className="flex-grow flex-shrink"></div>
                 <div className="flex">
                     {!Settings.isProduction && <DevToolTrigger /> }
@@ -26,7 +30,7 @@ class TopNavigation extends React.Component<Props, {}> {
         );
     }
 }
-const mapStateToProps = (state) => {
+const mapStateToProps = (state:RootReducer) => {
     return {
         signedIn:state.auth.signedIn,
     };

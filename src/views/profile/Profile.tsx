@@ -2,6 +2,7 @@ import * as React from "react";
 import { connect } from 'react-redux'
 import { UserProfile } from '../../reducers/profileStore';
 import { CoverImage } from '../../components/general/CoverImage';
+import { RootReducer } from '../../reducers/index';
 require("./Profile.scss");
 
 export interface Props {
@@ -39,7 +40,7 @@ class Profile extends React.Component<Props, {}> {
         );
     }
 }
-const mapStateToProps = (state) => {
+const mapStateToProps = (state:RootReducer) => {
     return {
         profiles:state.profileStore.profiles, 
         profile:state.profile

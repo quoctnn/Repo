@@ -6,6 +6,7 @@ import { Card, CardImg, CardText, CardBody,
     CardTitle, CardSubtitle, Button } from 'reactstrap';
 import { Link } from "react-router-dom";
 import { Routes } from "../../utilities/Routes";
+import { RootReducer } from "../../reducers";
 require("./SimpleUserProfile.scss");
 
 export interface Props {
@@ -39,9 +40,9 @@ class SimpleUserProfile extends React.Component<Props, {}> {
     }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = (state:RootReducer) => {
     return {
         language: state.settings.language,
     };
 }
-export default connect(mapStateToProps, null)(SimpleUserProfile);
+export default connect(mapStateToProps, null)(SimpleUserProfile); 

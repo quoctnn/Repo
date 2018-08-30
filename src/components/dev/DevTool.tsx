@@ -4,25 +4,46 @@ import { connect } from 'react-redux'
 import * as Actions from '../../actions/Actions'; 
 import { ApiEndpoint } from '../../reducers/debug';
 import { sendOnWebsocket } from '../general/ChannelEventStream';
-import { Button, Input , Form , FormGroup, Label} from 'reactstrap';
+import {  Form } from 'reactstrap';
+import { availableLanguages, availableThemes } from '../../reducers/settings';
+import { RootReducer } from '../../reducers';
+import debug from '../../reducers/debug';
 require("./DevTool.scss");
 export interface Props {
     language:number,
-    availableLanguages?:Array<string>,
+    theme:number,
     setLanguage?:(index:number) => void,
     apiEndpoint?:number,
     availableApiEndpoints?:Array<ApiEndpoint>,
     setApiEndpoint?:(index:number) => void,
     accessToken?:string,
     setAccessTokenOverride:(accessToken:string) => void
-    sendOnWebsocket:(data:string) => void
+    sendOnWebsocket:(data:string) => void,
+    setTheme?:(index:number) => void,
 }
 
 class DevTool extends React.PureComponent<Props, {}> {
-    state:{accessToken:string, language:number, websocketData:string}
+    state:{accessToken:string, websocketData:string}
     constructor(props) {
         super(props);
-        this.state = {accessToken:this.props.accessToken, language:this.props.language, websocketData:""}
+        this.state = {accessToken:this.props.accessToken, websocketData:""}
+    }
+    renderThemeSelector()
+    {
+        return (
+            
+            <div className="dropdown">
+                <button className="btn btn-secondary dropdown-toggle text-truncate" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    {availableThemes[this.props.theme].name}
+                </button>
+
+                <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    {availableThemes.map((theme, index) => {
+                        return <a key={index} onClick={() => { this.props.setTheme(index); }} className="dropdown-item" href="#">{theme.name}</a>
+                    }) }
+                </div>
+            </div>
+        )
     }
     renderLanguageSelector()
     {
@@ -30,12 +51,12 @@ class DevTool extends React.PureComponent<Props, {}> {
             
             <div className="dropdown">
                 <button className="btn btn-secondary dropdown-toggle text-truncate" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    {this.props.availableLanguages[this.props.language]}
+                    {availableLanguages[this.props.language]}
                 </button>
 
                 <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                    {this.props.availableLanguages.map((lang, index) => {
-                        return <a key={index} onClick={() => { this.props.setLanguage(index); this.setState({language:index}) }} className="dropdown-item" href="#">{lang}</a>
+                    {availableLanguages.map((lang, index) => {
+                        return <a key={index} onClick={() => { this.props.setLanguage(index);}} className="dropdown-item" href="#">{lang}</a>
                     }) }
                 </div>
             </div>
@@ -83,6 +104,12 @@ class DevTool extends React.PureComponent<Props, {}> {
                     <div>
                         <Form>
                             <div className="form-group row">
+                                <label htmlFor="lang" className="col-sm-3 col-form-label">{translate("Theme")}</label>
+                                <div className="col-sm-9" id="lang">
+                                    {this.renderThemeSelector()}
+                                </div>
+                            </div>
+                            <div className="form-group row">
                                 <label htmlFor="lang" className="col-sm-3 col-form-label">{translate("Language")}</label>
                                 <div className="col-sm-9" id="lang">
                                     {this.renderLanguageSelector()}
@@ -113,19 +140,23 @@ class DevTool extends React.PureComponent<Props, {}> {
         );
     }
 }
-const mapStateToProps = (state) => {
+
+const mapStateToProps = (state:RootReducer) => {
     return {
         language: state.settings.language,
-        availableLanguages: state.settings.availableLanguages,
         apiEndpoint:state.debug.apiEndpoint, 
         availableApiEndpoints:state.debug.availableApiEndpoints,
-        accessToken:state.debug.accessToken
+        accessToken:state.debug.accessToken,
+        theme:state.settings.theme
     };
 }
 const mapDispatchToProps = (dispatch) => {
     return {
         setLanguage:(index) => {
             dispatch(Actions.setLanguage(index))
+        },
+        setTheme:(index) => {
+            dispatch(Actions.setTheme(index))
         },
         setApiEndpoint:(index) => {
             dispatch(Actions.setProfile(null))

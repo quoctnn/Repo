@@ -2,6 +2,7 @@ import * as React from "react";
 import { connect } from 'react-redux'
 import { CoverImage } from '../../components/general/CoverImage';
 import { Group } from "../../reducers/groupStore";
+import { RootReducer } from "../../reducers";
 require("./Group.scss");
 export interface Props {
     match:any,
@@ -36,7 +37,7 @@ class GroupView extends React.Component<Props, {}> {
         );
     }
 }
-const mapStateToProps = (state) => {
+const mapStateToProps = (state:RootReducer) => {
     return {
         groupsData: state.groupStore.groups,
     };
