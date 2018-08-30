@@ -1,7 +1,7 @@
 import * as React from "react";
 import { tz, utc } from "moment-timezone";
 import { Message } from '../../reducers/conversationStore';
-import ScrollPosition from '../../utilities/Utilities';
+import {ScrollPosition} from '../../utilities/Utilities';
 import { UserProfile } from '../../reducers/profileStore';
 import { ChatMessage, MessagePosition } from './ChatMessage';
 import { DayLine } from './DayLine';
@@ -11,7 +11,7 @@ let timezone = tz.guess()
 export interface Props {
     messages:Message[],
     current_user:UserProfile,
-    chatDidScrollToTop:() => void
+    chatDidScrollToTop:() => void,
 }
 export class ChatMessageList extends React.Component<Props, {}> {
     SCROLL_POSITION:any
@@ -93,6 +93,7 @@ export class ChatMessageList extends React.Component<Props, {}> {
             lastDay = currentDate;
         }
         return (
+
             <ul onScroll={this.onChatScroll} className="list-unstyled message-list" ref={this.listRef}>
                 {components}
             </ul>

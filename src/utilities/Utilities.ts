@@ -75,7 +75,7 @@ export function rawMarkup(text, mentions:any[]) {
  * 
  * http://kirbysayshi.com/2013/08/19/maintaining-scroll-position-knockoutjs-list.html
  */
-export default function ScrollPosition(node:HTMLElement) {
+export function ScrollPosition(node:HTMLElement) {
     this.node = node;
     this.previousScrollHeightMinusTop = 0;
     this.readyFor = 'up';
@@ -94,4 +94,17 @@ ScrollPosition.prototype.restore = function () {
 ScrollPosition.prototype.prepareFor = function (direction) {
     this.readyFor = direction || 'up';
     this.previousScrollHeightMinusTop = this.node.scrollHeight - this.node.scrollTop;
+}
+
+
+export function ProtectNavigation(enabled) {
+    if (enabled) {
+        window.onbeforeunload = function(e) {
+            let dialogText = "Navigating away will remove your typed text, are you sure?";
+            e.returnValue = dialogText;
+            return dialogText;
+        }
+    } else {
+        window.onbeforeunload = null
+    }
 }

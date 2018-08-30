@@ -12,6 +12,14 @@ import { RootReducer } from '../../reducers/index';
 import { toast } from 'react-toastify';
 import { ErrorToast } from '../../components/general/Toast';
 
+export enum SocketMessageType
+{
+    STATE = "state",
+    USER_UPDATE = "user.update",
+    CLIENT_STATUS_CHANGE = "client.status_change",
+    CONVERSATION_TYPING = "conversation.typing"
+}
+
 export interface Props {
     apiEndpoint?:number,
     availableApiEndpoints?:Array<ApiEndpoint>,
@@ -46,13 +54,27 @@ export const sendOnWebsocket = (data:string) => {
 }
 export const sendUserStatus = (status:UserStatus) => 
 {
-    sendOnWebsocket(JSON.stringify({type:"user.update", data: {status: status}}))
+    sendOnWebsocket(JSON.stringify({type:SocketMessageType.USER_UPDATE, data: {status: status}}))
+}
+export const sendTypingInConversation = (conversation:number) => 
+{
+    sendOnWebsocket(JSON.stringify({type:SocketMessageType.CONVERSATION_TYPING, data: {conversation: conversation}}))
+}
+
+export const addSocketEventListener = (type:SocketMessageType, listener:EventListenerOrEventListenerObject) => 
+{
+    document.getElementById("socket").addEventListener(type, listener)
+}
+export const removeSocketEventListener = (type:SocketMessageType, listener:EventListenerOrEventListenerObject) => 
+{
+    document.getElementById("socket").removeEventListener(type, listener)
 }
 class ChannelEventStream extends React.Component<Props, {}> {
     stream: WebSocket
     lastUserActivity:Date
     lastUserActivityTimer:NodeJS.Timer
     state:{token:string, endpoint:string}
+    private socketRef = React.createRef<HTMLDivElement>()
     constructor(props) {
         super(props);
         this.state = {token:null, endpoint:null}
@@ -122,6 +144,11 @@ class ChannelEventStream extends React.Component<Props, {}> {
         this.props.setProfile(p)
         this.sendUserLastSeen()
     }
+    processTypingInConversation(data:any)
+    {
+        var event = new CustomEvent(SocketMessageType.CONVERSATION_TYPING,{detail:data} )
+        this.socketRef.current.dispatchEvent(event)
+    }
     connectStream()
     {
         this.closeStream()
@@ -139,9 +166,10 @@ class ChannelEventStream extends React.Component<Props, {}> {
                 console.log('Message received on WebSocket', data );
                 switch(data.type)
                 {
-                    case "state" : this.processStateResponse(data.data); break;
-                    case "user.update" : this.processUserUpdateResponse(data.data); break;
-                    case "client.status_change" : this.processStatusChangeResponse(data.data); break;
+                    case SocketMessageType.STATE : this.processStateResponse(data.data); break;
+                    case SocketMessageType.USER_UPDATE : this.processUserUpdateResponse(data.data); break;
+                    case SocketMessageType.CLIENT_STATUS_CHANGE : this.processStatusChangeResponse(data.data); break;
+                    case SocketMessageType.CONVERSATION_TYPING : this.processTypingInConversation(data.data); break;
                     default:console.log("NO HANDLER FOR TYPE " + data.type);
                 }
             }
@@ -285,7 +313,7 @@ class ChannelEventStream extends React.Component<Props, {}> {
     }
     render() 
     {
-        return (null)
+        return (<div id="socket" ref={this.socketRef}></div>)
     }
 }
 const mapStateToProps = (state:RootReducer) => {

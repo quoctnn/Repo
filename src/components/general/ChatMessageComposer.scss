@@ -1,0 +1,42 @@
+.chat-message-composer
+{
+    width: 100%;
+    background: #e7e7e7;
+    padding: 8px;
+    z-index: 999;
+    form
+    {
+        display: flex;
+    }
+    > input 
+    {
+        width: 87%;
+        position: relative;
+        float: left;
+    }
+    .btn-submit:focus,
+    .btn-submit:active,
+    .btn-submit:visited,
+    .btn-submit:hover {
+        outline: 0 !important;
+    }
+
+    .btn-submit::-moz-focus-inner {
+        border: 0
+    }
+    .btn-submit > .fa {
+        font-size: 1em;
+        font-weight: bold;
+        color: gray;
+        padding: 0 1px;
+    }
+
+    .input-wrap {
+        position: relative;
+        flex-grow: 1;
+    }
+
+    .button-wrap {
+        position: relative;
+    }
+}

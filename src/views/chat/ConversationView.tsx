@@ -8,6 +8,8 @@ import ApiClient from '../../network/ApiClient';
 import LoadingSpinner from '../../components/general/LoadingSpinner';
 import { toast } from 'react-toastify';
 import { ErrorToast } from '../../components/general/Toast';
+import { ChatMessageComposer } from '../../components/general/ChatMessageComposer';
+import { sendTypingInConversation, addSocketEventListener, SocketMessageType, removeSocketEventListener } from '../../components/general/ChannelEventStream';
 require("./ConversationView.scss");
 
 export interface Props {
@@ -20,12 +22,16 @@ export interface State {
     loading:boolean,
     offset:number,
     pageSize:number,
-    total:number
+    total:number,
+    someoneIsTyping:boolean
 }
+
 class ConversationView extends React.Component<Props, {}> {
 
     static fullPage = "full-page"
-    added = false
+    bodyClassAdded = false
+    clearSomeoneIsTypingInterval = 900
+    clearSomeoneIsTypingTimer:NodeJS.Timer = null
     state:State
     constructor(props) {
         super(props)
@@ -34,16 +40,43 @@ class ConversationView extends React.Component<Props, {}> {
             offset:0,
             loading: true,
             total:0,
-            pageSize:this.calculatePageSize(100)
+            pageSize:this.calculatePageSize(100),
+            someoneIsTyping:false
         }
         this.onMessagesReceived = this.onMessagesReceived.bind(this)
         this.loadMessagesFromServer = this.loadMessagesFromServer.bind(this)
         this.chatDidScrollToTop = this.chatDidScrollToTop.bind(this)
-
+        this.onDidType = this.onDidType.bind(this)
+        this.onChatMessageSubmit = this.onChatMessageSubmit.bind(this)
+        this.isTypingHandler = this.isTypingHandler.bind(this)
+        this.setSomeoneIsTypingCleanup = this.setSomeoneIsTypingCleanup.bind(this)
+        
     }
     componentDidMount()
     {
         this.loadMessagesFromServer()
+        addSocketEventListener(SocketMessageType.CONVERSATION_TYPING, this.isTypingHandler)
+    }
+    setSomeoneIsTypingCleanup()
+    {
+        if(this.clearSomeoneIsTypingTimer)
+        {
+            clearTimeout(this.clearSomeoneIsTypingTimer)
+        }
+        this.clearSomeoneIsTypingTimer = setTimeout(() => 
+        {
+            this.setState({someoneIsTyping:false})
+
+        }, this.clearSomeoneIsTypingInterval)
+    }
+    isTypingHandler(event:CustomEvent)
+    {
+        let conversation = event.detail.conversation
+        let user = event.detail.user
+        if(conversation == this.getConversation().id && user != this.props.profile.id)
+        {
+            this.setState({someoneIsTyping:true}, this.setSomeoneIsTypingCleanup)
+        }
     }
     calculatePageSize(elementMinHeight:number)
     {
@@ -51,14 +84,15 @@ class ConversationView extends React.Component<Props, {}> {
     }
     componentWillUnmount()
     {
-        if(this.added)
+        if(this.bodyClassAdded)
             document.body.classList.remove(ConversationView.fullPage)
+        removeSocketEventListener(SocketMessageType.CONVERSATION_TYPING, this.isTypingHandler)
     }
     componentWillMount()
     {
         if(!document.body.classList.contains(ConversationView.fullPage))
         {
-            this.added = true
+            this.bodyClassAdded = true
             document.body.classList.add(ConversationView.fullPage)
         }
     }
@@ -66,7 +100,7 @@ class ConversationView extends React.Component<Props, {}> {
     {
         let currentConversation = this.getConversation()
         let nextConversation = this.getConversation(nextProps)
-        if(currentConversation && nextConversation && currentConversation.updated_at == nextConversation.updated_at && nextState.data == this.state.data)
+        if(currentConversation && nextConversation && currentConversation.updated_at == nextConversation.updated_at && nextState.data == this.state.data && nextState.someoneIsTyping == this.state.someoneIsTyping)
             return false 
         return true
     }
@@ -107,6 +141,23 @@ class ConversationView extends React.Component<Props, {}> {
             return (<LoadingSpinner/>)
         }
     }
+    onChatMessageSubmit(text:string)
+    {
+        console.log("Send message:" , text)
+    }
+    onDidType()
+    {
+        let conversation = this.getConversation()
+        sendTypingInConversation(conversation.id)
+    }
+    renderSomeoneIsTyping()
+    {
+        if(this.state.someoneIsTyping)
+        {
+            return <div className="is-typing-container">{"Someone is typing...."}</div>
+        }
+        return null
+    }
     render() {
         let conversation = this.getConversation()
         let messages = this.state.data
@@ -115,6 +166,8 @@ class ConversationView extends React.Component<Props, {}> {
                 {conversation && <div>{conversation.title || "No title"}</div>}
                 {this.renderLoading()}
                 <ChatMessageList chatDidScrollToTop={this.chatDidScrollToTop} messages={messages} current_user={this.props.profile} />
+                {this.renderSomeoneIsTyping()}
+                <ChatMessageComposer onSubmit={this.onChatMessageSubmit} onDidType={this.onDidType} />
             </div>
             
         );
