@@ -2,6 +2,13 @@
 {
     .is-typing-container
     {
-        
+        padding: 5px;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        > *
+        {
+            margin-right: 5px;
+        }
     }
 }

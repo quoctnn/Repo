@@ -2,8 +2,6 @@ import * as React from 'react';
 import { connect } from 'react-redux'
 import { UserProfile, UserStatus } from '../../reducers/profileStore';
 import { sendUserStatus } from './ChannelEventStream';
-import { type } from 'os';
-import profile from '../../reducers/profile';
 import { RootReducer } from '../../reducers/index';
 require("./UserStatusSelector.scss");
 

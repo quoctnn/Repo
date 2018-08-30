@@ -10,12 +10,15 @@ import { toast } from 'react-toastify';
 import { ErrorToast } from '../../components/general/Toast';
 import { ChatMessageComposer } from '../../components/general/ChatMessageComposer';
 import { sendTypingInConversation, addSocketEventListener, SocketMessageType, removeSocketEventListener } from '../../components/general/ChannelEventStream';
+import { Settings } from '../../utilities/Settings';
+import { TypingIndicator } from '../../components/general/TypingIndicator';
+import { Avatar } from '../../components/general/Avatar';
 require("./ConversationView.scss");
-
 export interface Props {
     match:any,
     conversations:Conversation[],
-    profile:UserProfile
+    profile:UserProfile,
+    profiles:UserProfile[]
 }
 export interface State {
     data:Message[],
@@ -23,14 +26,13 @@ export interface State {
     offset:number,
     pageSize:number,
     total:number,
-    someoneIsTyping:boolean
+    isTyping:object,
 }
 
 class ConversationView extends React.Component<Props, {}> {
 
     static fullPage = "full-page"
     bodyClassAdded = false
-    clearSomeoneIsTypingInterval = 900
     clearSomeoneIsTypingTimer:NodeJS.Timer = null
     state:State
     constructor(props) {
@@ -41,7 +43,7 @@ class ConversationView extends React.Component<Props, {}> {
             loading: true,
             total:0,
             pageSize:this.calculatePageSize(100),
-            someoneIsTyping:false
+            isTyping:{}
         }
         this.onMessagesReceived = this.onMessagesReceived.bind(this)
         this.loadMessagesFromServer = this.loadMessagesFromServer.bind(this)
@@ -49,7 +51,6 @@ class ConversationView extends React.Component<Props, {}> {
         this.onDidType = this.onDidType.bind(this)
         this.onChatMessageSubmit = this.onChatMessageSubmit.bind(this)
         this.isTypingHandler = this.isTypingHandler.bind(this)
-        this.setSomeoneIsTypingCleanup = this.setSomeoneIsTypingCleanup.bind(this)
         
     }
     componentDidMount()
@@ -57,26 +58,23 @@ class ConversationView extends React.Component<Props, {}> {
         this.loadMessagesFromServer()
         addSocketEventListener(SocketMessageType.CONVERSATION_TYPING, this.isTypingHandler)
     }
-    setSomeoneIsTypingCleanup()
-    {
-        if(this.clearSomeoneIsTypingTimer)
-        {
-            clearTimeout(this.clearSomeoneIsTypingTimer)
-        }
-        this.clearSomeoneIsTypingTimer = setTimeout(() => 
-        {
-            this.setState({someoneIsTyping:false})
-
-        }, this.clearSomeoneIsTypingInterval)
-    }
     isTypingHandler(event:CustomEvent)
     {
-        let conversation = event.detail.conversation
         let user = event.detail.user
-        if(conversation == this.getConversation().id && user != this.props.profile.id)
+        let it = this.state.isTyping
+        let oldUserTimer = it[user]
+        if(oldUserTimer)
         {
-            this.setState({someoneIsTyping:true}, this.setSomeoneIsTypingCleanup)
+            clearTimeout(oldUserTimer)
         }
+        it[user] = setTimeout(() => 
+        {
+            let it = this.state.isTyping
+            delete it[user]
+            this.setState({isTyping:it})
+
+        }, Settings.clearSomeoneIsTypingInterval)
+        this.setState({isTyping:it})
     }
     calculatePageSize(elementMinHeight:number)
     {
@@ -100,7 +98,7 @@ class ConversationView extends React.Component<Props, {}> {
     {
         let currentConversation = this.getConversation()
         let nextConversation = this.getConversation(nextProps)
-        if(currentConversation && nextConversation && currentConversation.updated_at == nextConversation.updated_at && nextState.data == this.state.data && nextState.someoneIsTyping == this.state.someoneIsTyping)
+        if(currentConversation && nextConversation && currentConversation.updated_at == nextConversation.updated_at && nextState.data == this.state.data && nextState.isTyping == this.state.isTyping)
             return false 
         return true
     }
@@ -152,9 +150,17 @@ class ConversationView extends React.Component<Props, {}> {
     }
     renderSomeoneIsTyping()
     {
-        if(this.state.someoneIsTyping)
+        let keys = Object.keys(this.state.isTyping).map(n => parseInt(n))
+        if(keys.length > 0)
         {
-            return <div className="is-typing-container">{"Someone is typing...."}</div>
+            return <div className="is-typing-container">
+            {keys.map(id => {
+                let avatar = this.props.profiles.find(p => p.id == id).avatar
+                return (<Avatar image={avatar} size={24}/>)
+
+            })}
+            <TypingIndicator />
+            </div>
         }
         return null
     }
@@ -176,7 +182,8 @@ class ConversationView extends React.Component<Props, {}> {
 const mapStateToProps = (state:RootReducer) => {
     return {
         conversations:state.conversationStore.conversations,
-        profile:state.profile
+        profile:state.profile,
+        profiles:state.profileStore.profiles
     };
 }
 export default connect(mapStateToProps, null)(ConversationView);

@@ -13,7 +13,7 @@ interface State
 }
 export class ChatMessageComposer extends React.Component<Props,{}> {
     state:State
-    throttleTime = 200
+    throttleTime = 1000
     canPublish = true
     private inputRef = React.createRef<HTMLInputElement>()
     constructor(props) {

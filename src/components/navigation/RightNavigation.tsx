@@ -7,6 +7,9 @@ import { Avatar } from "../general/Avatar";
 import { Link } from "react-router-dom";
 import { List } from "../general/List";
 import { RootReducer } from "../../reducers";
+import { addSocketEventListener, SocketMessageType, removeSocketEventListener } from '../general/ChannelEventStream';
+import { TypingIndicator } from '../general/TypingIndicator';
+import { Settings } from '../../utilities/Settings';
 require("./RightNavigation.scss");
 export interface Props {
     profiles:UserProfile[],
@@ -14,16 +17,44 @@ export interface Props {
 }
 export interface State {
     contacts:UserProfile[],
+    isTyping:any
 }
 class RightNavigation extends React.Component<Props, {}> {
     state:State
     constructor(props) {
         super(props);
-        this.state = {contacts:[]}
+        this.state = {contacts:[], isTyping:{}}
+        this.isTypingHandler = this.isTypingHandler.bind(this)
     }
     componentWillMount()
     {
         this.checkUpdate()
+    }
+    componentDidMount()
+    {
+        addSocketEventListener(SocketMessageType.CONVERSATION_TYPING, this.isTypingHandler)
+    }
+    componentWillUnmount()
+    {
+        removeSocketEventListener(SocketMessageType.CONVERSATION_TYPING, this.isTypingHandler)
+    }
+    isTypingHandler(event:CustomEvent)
+    {
+        let user = event.detail.user
+        let it = this.state.isTyping
+        let oldUserTimer = it[user]
+        if(oldUserTimer)
+        {
+            clearTimeout(oldUserTimer)
+        }
+        it[user] = setTimeout(() => 
+        {
+            let it = this.state.isTyping
+            delete it[user]
+            this.setState({isTyping:it})
+
+        }, Settings.clearSomeoneIsTypingInterval)
+        this.setState({isTyping:it})
     }
     componentDidUpdate()
     {
@@ -50,6 +81,7 @@ class RightNavigation extends React.Component<Props, {}> {
             this.setState({contacts: newContacts})
     }
     render() {
+        
         return(
             <div id="right-navigation" className="flex transition">
                 <CollapsiblePanel id="right-navigation" arrowDirectionCollapsed={ArrowDirectionCollapsed.LEFT}>
@@ -57,7 +89,9 @@ class RightNavigation extends React.Component<Props, {}> {
                         return (
                         <li className="avatar-profile" key={index}>
                             <Link to={Routes.PROFILES + contact.slug_name}>
-                            <Avatar image={contact.avatar} borderColor="green" borderWidth={2} stateColor={avatarStateColorForUserProfile(contact)} />
+                                <Avatar image={contact.avatar} borderColor="green" borderWidth={2} stateColor={avatarStateColorForUserProfile(contact)}>
+                                {this.state.isTyping[contact.id] && <div className="typing-indicator-container"><TypingIndicator /></div>}
+                                </Avatar>
                             </Link>
                         </li>)
                     } )}</List>

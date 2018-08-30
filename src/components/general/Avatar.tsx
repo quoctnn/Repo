@@ -33,6 +33,7 @@ export class Avatar extends React.Component<Props & React.HTMLAttributes<HTMLEle
         return(
             
             <div onClick={this.props.onClick} className="avatar" style={{backgroundImage:"url(\"" + imgUrl + "\")", borderWidth:this.props.borderWidth + "px", borderColor:this.props.borderColor, width:this.props.size + "px", height:this.props.size + "px", borderStyle:"solid"}}>
+                {this.props.children}
                 {this.props.stateColor != AvatarStateColor.NONE && <div className={"avatar-state " + this.props.stateColor}></div>}
             </div>
         );

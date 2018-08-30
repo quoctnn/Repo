@@ -1,0 +1,25 @@
+#right-navigation
+{
+    .avatar-profile
+    {
+        .typing-indicator:after,.typing-indicator:before
+        {
+            display: none;
+
+        }
+        .typing-indicator
+        {
+            padding: 5px;
+            margin-top: 0;
+        }
+        .typing-indicator-container
+        {
+            position: absolute;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+        }
+    }
+}
