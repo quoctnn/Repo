@@ -1,46 +1,31 @@
-$leftColor: #eeeeee !default;
-$rightColor: #dedede !default;
+$leftColor: #4FA7CF !default;
+$rightColor: #F1F1F4 !default;
 .chat-message
 {
     word-wrap: break-word;
     border-radius: 10px;
-    padding: 10px;
-    margin: 10px auto;
-    width: 90%;
+    padding: 4px 10px;
+    margin: 5px auto;
+    max-width: 90%;
     position: relative;
     > .body 
     {
         display: block;
         margin-bottom: 3px;
     }
-    > .time 
-    {
-        position: absolute;
-        z-index: 2;
-        bottom: 3px;
-        font-size: 0.8em;
-    }
 }
 .chat-message.left {
     background-color: $leftColor;
-    color: #333;
+    color: white;
     text-align: left;
-    > .time 
-    {
-        right: 5px;
-        color: #333;
-    }
+    margin-left: 15px;
 }
   
 .chat-message.right 
 {
     background-color: $rightColor;
     text-align: right;
-    > .time 
-    {
-        left: 5px;
-        color: #333;
-    }
+    margin-right: 15px;
 }
 .chat-message:after {
     content: '';

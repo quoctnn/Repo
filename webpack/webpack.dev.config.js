@@ -11,6 +11,7 @@ try {
 } catch (e) {
     // Not local domain specified, shared on localhost
     localDomain = "192.168.15.26";
+    //localDomain = "10.0.1.56"
     //localDomain = "localhost";
     //localDomain = "alesund-dev.intra.work";
 }

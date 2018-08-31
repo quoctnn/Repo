@@ -27,8 +27,8 @@ const logger = store => next => action => {
     console.log('NEXT STATE => ', store.getState())
     return result
 }
-const applyTheme = (themeString) => {
-    let theme = availableThemes[themeString]
+const applyTheme = (themeIndex:number) => {
+    let theme = availableThemes[themeIndex]
     let selector = theme.selector
     let root = document.querySelector(":root")
     root.className = selector
@@ -53,8 +53,8 @@ const persistor = persistStore(store, {}, () =>
     //rehydrate complete
     if(Settings.supportsTheming)
     {
-        let themeString = store.getState().settings.theme
-        applyTheme(themeString)
+        let themeIndex = store.getState().settings.theme || 0
+        applyTheme(themeIndex)
     }
 })
 ReactDOM.render(

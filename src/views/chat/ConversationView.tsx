@@ -9,10 +9,11 @@ import LoadingSpinner from '../../components/general/LoadingSpinner';
 import { toast } from 'react-toastify';
 import { ErrorToast } from '../../components/general/Toast';
 import { ChatMessageComposer } from '../../components/general/ChatMessageComposer';
-import { sendTypingInConversation, addSocketEventListener, SocketMessageType, removeSocketEventListener } from '../../components/general/ChannelEventStream';
+import { sendTypingInConversation, addSocketEventListener, SocketMessageType, removeSocketEventListener, sendMessageToConversation } from '../../components/general/ChannelEventStream';
 import { Settings } from '../../utilities/Settings';
 import { TypingIndicator } from '../../components/general/TypingIndicator';
 import { Avatar } from '../../components/general/Avatar';
+import { cloneDictKeys } from '../../utilities/Utilities';
 require("./ConversationView.scss");
 export interface Props {
     match:any,
@@ -51,17 +52,38 @@ class ConversationView extends React.Component<Props, {}> {
         this.onDidType = this.onDidType.bind(this)
         this.onChatMessageSubmit = this.onChatMessageSubmit.bind(this)
         this.isTypingHandler = this.isTypingHandler.bind(this)
+        this.incomingMessageHandler = this.incomingMessageHandler.bind(this)
+        this.removeUserFromIsTypingData = this.removeUserFromIsTypingData.bind(this)
         
     }
     componentDidMount()
     {
         this.loadMessagesFromServer()
         addSocketEventListener(SocketMessageType.CONVERSATION_TYPING, this.isTypingHandler)
+        addSocketEventListener(SocketMessageType.CONVERSATION_MESSAGE, this.incomingMessageHandler)
+    }
+    incomingMessageHandler(event:CustomEvent)
+    {
+        let message = event.detail as Message
+        let conversation = this.getConversation()
+        if(conversation.id != message.conversation)
+        {
+            return
+        }
+        let messages = this.state.data.map(m => m)
+        messages.unshift(message)
+        let it = this.removeUserFromIsTypingData(message.user.id)
+        this.setState({data:messages, total:this.state.total + 1, offset:this.state.offset + 1, isTyping:it })
     }
     isTypingHandler(event:CustomEvent)
     {
-        let user = event.detail.user
-        let it = this.state.isTyping
+        let user = event.detail.user  
+        if(user == this.props.profile.id)
+        {
+            return
+        }
+        let st = this.state.isTyping
+        let it = cloneDictKeys(st)
         let oldUserTimer = it[user]
         if(oldUserTimer)
         {
@@ -69,12 +91,18 @@ class ConversationView extends React.Component<Props, {}> {
         }
         it[user] = setTimeout(() => 
         {
-            let it = this.state.isTyping
-            delete it[user]
+            let it = this.removeUserFromIsTypingData(user)
             this.setState({isTyping:it})
 
         }, Settings.clearSomeoneIsTypingInterval)
         this.setState({isTyping:it})
+    }
+    removeUserFromIsTypingData(user:number)
+    {
+        let st = this.state.isTyping
+        let it = cloneDictKeys(st)
+        delete it[user]
+        return it
     }
     calculatePageSize(elementMinHeight:number)
     {
@@ -85,6 +113,7 @@ class ConversationView extends React.Component<Props, {}> {
         if(this.bodyClassAdded)
             document.body.classList.remove(ConversationView.fullPage)
         removeSocketEventListener(SocketMessageType.CONVERSATION_TYPING, this.isTypingHandler)
+        removeSocketEventListener(SocketMessageType.CONVERSATION_MESSAGE, this.incomingMessageHandler)
     }
     componentWillMount()
     {
@@ -94,12 +123,17 @@ class ConversationView extends React.Component<Props, {}> {
             document.body.classList.add(ConversationView.fullPage)
         }
     }
+    isTypingDictEqual(a, b)
+    {
+        return JSON.stringify(Object.keys(a).sort()) === JSON.stringify(Object.keys(b).sort())
+    }
     shouldComponentUpdate(nextProps:Props, nextState:State)
     {
         let currentConversation = this.getConversation()
         let nextConversation = this.getConversation(nextProps)
-        if(currentConversation && nextConversation && currentConversation.updated_at == nextConversation.updated_at && nextState.data == this.state.data && nextState.isTyping == this.state.isTyping)
-            return false 
+        if(currentConversation && nextConversation && currentConversation.updated_at == nextConversation.updated_at && nextState.data == this.state.data && 
+            this.isTypingDictEqual(nextState.isTyping, this.state.isTyping))
+            return false
         return true
     }
     getConversation(props?:Props)
@@ -120,7 +154,6 @@ class ConversationView extends React.Component<Props, {}> {
         let newData = data.results || []
         let oldData = this.state.data.concat(newData)
         this.setState({data:oldData, loading:false, total:data.count, offset:oldData.length })
-        console.log("onMessagesReceived", oldData)
     }
     loadMessagesFromServer()
     {
@@ -141,7 +174,23 @@ class ConversationView extends React.Component<Props, {}> {
     }
     onChatMessageSubmit(text:string)
     {
-        console.log("Send message:" , text)
+        let conversation = this.getConversation()
+        sendMessageToConversation(conversation.id, text)
+    }
+    getChatMessagePreview(text):Message {
+        let now = Date.now()
+        let conversation = this.getConversation()
+        let ds = new Date().toUTCString()
+        return {
+            id: now,
+            text: text,
+            user: this.props.profile,
+            created_at: ds,
+            conversation:conversation.id,
+            attachment:null,
+            updated_at:ds,
+            read_by:[],
+        }
     }
     onDidType()
     {
@@ -153,14 +202,14 @@ class ConversationView extends React.Component<Props, {}> {
         let keys = Object.keys(this.state.isTyping).map(n => parseInt(n))
         if(keys.length > 0)
         {
-            return <div className="is-typing-container">
-            {keys.map(id => {
+            return <li className="is-typing-container">
+            {keys.map((id, index) => {
                 let avatar = this.props.profiles.find(p => p.id == id).avatar
-                return (<Avatar image={avatar} size={24}/>)
+                return (<Avatar key={index} image={avatar} size={24}/>)
 
             })}
             <TypingIndicator />
-            </div>
+            </li>
         }
         return null
     }
@@ -171,8 +220,9 @@ class ConversationView extends React.Component<Props, {}> {
             <div id="conversation-view" className="full-height">
                 {conversation && <div>{conversation.title || "No title"}</div>}
                 {this.renderLoading()}
-                <ChatMessageList chatDidScrollToTop={this.chatDidScrollToTop} messages={messages} current_user={this.props.profile} />
-                {this.renderSomeoneIsTyping()}
+                <ChatMessageList chatDidScrollToTop={this.chatDidScrollToTop} messages={messages} current_user={this.props.profile} >
+                    {this.renderSomeoneIsTyping()}
+                </ChatMessageList>
                 <ChatMessageComposer onSubmit={this.onChatMessageSubmit} onDidType={this.onDidType} />
             </div>
             

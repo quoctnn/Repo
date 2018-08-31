@@ -4,7 +4,7 @@ import { UserProfile } from './profileStore';
 
 export class Message 
 {
-    id:string
+    id:number
     user:UserProfile
     conversation:number
     text:string

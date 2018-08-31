@@ -6,8 +6,6 @@ import { toast } from 'react-toastify';
 import { ErrorToast } from '../../components/general/Toast';
 import { connect } from 'react-redux'
 import * as Actions from '../../actions/Actions';
-import { withRouter} from 'react-router-dom'
-import { History} from 'history'
 import { ApiEndpoint, LoginType } from '../../reducers/debug';
 import { RootReducer } from '../../reducers/index';
 
@@ -16,7 +14,6 @@ require("./Signin.scss");
 
 export interface Props {
     setAuthorizationData:(token:string, sessionid:string) => void,
-    history:History,
     apiEndpoint?:number,
     availableApiEndpoints?:Array<ApiEndpoint>,
     language:number,
@@ -95,4 +92,4 @@ const mapDispatchToProps = (dispatch) => {
         }
     }
 }
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Signin));
+export default connect(mapStateToProps, mapDispatchToProps)(Signin);

@@ -2,10 +2,11 @@
 {
     .is-typing-container
     {
-        padding: 5px;
+        padding: 5px 5px 5px 15px;
         display: flex;
         flex-direction: row;
         align-items: center;
+        flex-shrink: 0;
         > *
         {
             margin-right: 5px;

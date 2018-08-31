@@ -108,3 +108,12 @@ export function ProtectNavigation(enabled) {
         window.onbeforeunload = null
     }
 }
+export function cloneDictKeys(dict)
+{
+    let keys = Object.keys(dict)
+    let newDict = {}
+    keys.forEach(key => {
+        newDict[key] = dict[key]
+    })
+    return newDict
+}

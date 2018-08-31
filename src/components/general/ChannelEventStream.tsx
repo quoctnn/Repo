@@ -17,7 +17,8 @@ export enum SocketMessageType
     STATE = "state",
     USER_UPDATE = "user.update",
     CLIENT_STATUS_CHANGE = "client.status_change",
-    CONVERSATION_TYPING = "conversation.typing"
+    CONVERSATION_TYPING = "conversation.typing",
+    CONVERSATION_MESSAGE = "conversation.message"
 }
 
 export interface Props {
@@ -60,7 +61,10 @@ export const sendTypingInConversation = (conversation:number) =>
 {
     sendOnWebsocket(JSON.stringify({type:SocketMessageType.CONVERSATION_TYPING, data: {conversation: conversation}}))
 }
-
+export const sendMessageToConversation = (conversation:number, text:string) => 
+{
+    sendOnWebsocket(JSON.stringify({type:SocketMessageType.CONVERSATION_MESSAGE, data: {conversation: conversation, text:text}}))
+}
 export const addSocketEventListener = (type:SocketMessageType, listener:EventListenerOrEventListenerObject) => 
 {
     document.getElementById("socket").addEventListener(type, listener)
@@ -149,6 +153,11 @@ class ChannelEventStream extends React.Component<Props, {}> {
         var event = new CustomEvent(SocketMessageType.CONVERSATION_TYPING,{detail:data} )
         this.socketRef.current.dispatchEvent(event)
     }
+    processIncomingConversationMessage(data:any)
+    {
+        var event = new CustomEvent(SocketMessageType.CONVERSATION_MESSAGE,{detail:data} )
+        this.socketRef.current.dispatchEvent(event)
+    }
     connectStream()
     {
         this.closeStream()
@@ -170,6 +179,7 @@ class ChannelEventStream extends React.Component<Props, {}> {
                     case SocketMessageType.USER_UPDATE : this.processUserUpdateResponse(data.data); break;
                     case SocketMessageType.CLIENT_STATUS_CHANGE : this.processStatusChangeResponse(data.data); break;
                     case SocketMessageType.CONVERSATION_TYPING : this.processTypingInConversation(data.data); break;
+                    case SocketMessageType.CONVERSATION_MESSAGE : this.processIncomingConversationMessage(data.data); break;
                     default:console.log("NO HANDLER FOR TYPE " + data.type);
                 }
             }

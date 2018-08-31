@@ -10,10 +10,12 @@ import { RootReducer } from "../../reducers";
 import { addSocketEventListener, SocketMessageType, removeSocketEventListener } from '../general/ChannelEventStream';
 import { TypingIndicator } from '../general/TypingIndicator';
 import { Settings } from '../../utilities/Settings';
+import { cloneDictKeys } from '../../utilities/Utilities';
 require("./RightNavigation.scss");
 export interface Props {
     profiles:UserProfile[],
-    contacts:number[]
+    contacts:number[],
+    profile:UserProfile
 }
 export interface State {
     contacts:UserProfile[],
@@ -40,8 +42,13 @@ class RightNavigation extends React.Component<Props, {}> {
     }
     isTypingHandler(event:CustomEvent)
     {
-        let user = event.detail.user
-        let it = this.state.isTyping
+        let user = event.detail.user  
+        if(user == this.props.profile.id)
+        {
+            return
+        }
+        let st = this.state.isTyping
+        let it = cloneDictKeys(st)
         let oldUserTimer = it[user]
         if(oldUserTimer)
         {
@@ -49,7 +56,8 @@ class RightNavigation extends React.Component<Props, {}> {
         }
         it[user] = setTimeout(() => 
         {
-            let it = this.state.isTyping
+            let st = this.state.isTyping
+            let it = cloneDictKeys(st)
             delete it[user]
             this.setState({isTyping:it})
 
@@ -103,7 +111,8 @@ class RightNavigation extends React.Component<Props, {}> {
 const mapStateToProps = (state:RootReducer) => {
     return {
         profiles:state.profileStore.profiles,
-        contacts:state.contactListCache.contacts
+        contacts:state.contactListCache.contacts,
+        profile:state.profile,
     };
 }
 export default connect(mapStateToProps, null)(RightNavigation);

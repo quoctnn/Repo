@@ -1,0 +1,27 @@
+.chat-time
+{
+    .chat-time-inner
+    {
+        display: flex;
+        font-size: 12px
+    }
+}
+.chat-time.left {
+    .chat-time-inner
+    {
+        text-align: left;
+        flex-direction: row;
+        margin:0 5px 0 15px;
+    }
+}
+  
+.chat-time.right 
+{
+    .chat-time-inner
+    {
+        text-align: right;
+        flex-direction: row-reverse;
+        margin:0 15px 0 5px;
+    }
+    
+}
