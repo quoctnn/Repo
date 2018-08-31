@@ -56,7 +56,7 @@ export class ChatMessageList extends React.Component<Props, {}> {
     }
     listUpdateAfterInitialRender(prevProps, currentProps:Props) {
         return prevProps.messages.length != 0 &&
-            (prevProps.messages.length < currentProps.messages.length && prevProps.children != this.props.children)  
+            (prevProps.messages.length < currentProps.messages.length)  
     }
     scrollListToBottom() {
         this.listRef.current.scrollTop = this.listRef.current.scrollHeight
