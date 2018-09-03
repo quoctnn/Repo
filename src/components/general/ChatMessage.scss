@@ -5,20 +5,23 @@ $rightColor: #F1F1F4 !default;
     word-wrap: break-word;
     border-radius: 10px;
     padding: 4px 10px;
-    margin: 5px auto;
-    max-width: 90%;
+    margin: 2px auto;
+    max-width: calc(90% - 40px);
     position: relative;
     > .body 
     {
         display: block;
-        margin-bottom: 3px;
     }
+}
+.chat-message:last-child
+{
+    margin-bottom: 5px;
 }
 .chat-message.left {
     background-color: $leftColor;
     color: white;
     text-align: left;
-    margin-left: 15px;
+    margin-left: 40px;
 }
   
 .chat-message.right 
@@ -27,25 +30,7 @@ $rightColor: #F1F1F4 !default;
     text-align: right;
     margin-right: 15px;
 }
-.chat-message:after {
-    content: '';
-    position: absolute;
-    border-style: solid;
-    width: 0;
-    z-index: 1;
-    margin-top: -5px;
-}
-.chat-message.left:after 
+.chat-message.temp 
 {
-    border-width: 10px 12px 1px 0;
-    border-color: transparent $leftColor;
-    display: block;
-    left: -9px;
-    top: 56%;
-}
-.chat-message.right:after {
-    border-width: 12px 0 1px 10px;
-    border-color: transparent $rightColor;
-    right: -9px;
-    top: 56%;
+    border:1px solid red;
 }

@@ -14,12 +14,15 @@ import { Settings } from '../../utilities/Settings';
 import { TypingIndicator } from '../../components/general/TypingIndicator';
 import { Avatar } from '../../components/general/Avatar';
 import { cloneDictKeys } from '../../utilities/Utilities';
+import * as Actions from '../../actions/Actions'; 
+
 require("./ConversationView.scss");
 export interface Props {
     match:any,
     conversations:Conversation[],
     profile:UserProfile,
-    profiles:UserProfile[]
+    profiles:UserProfile[],
+    queueAddChatMessage:(message:Message) => void,
 }
 export interface State {
     data:Message[],
@@ -54,7 +57,7 @@ class ConversationView extends React.Component<Props, {}> {
         this.isTypingHandler = this.isTypingHandler.bind(this)
         this.incomingMessageHandler = this.incomingMessageHandler.bind(this)
         this.removeUserFromIsTypingData = this.removeUserFromIsTypingData.bind(this)
-        
+        this.appendMessage = this.appendMessage.bind(this)
     }
     componentDidMount()
     {
@@ -70,10 +73,23 @@ class ConversationView extends React.Component<Props, {}> {
         {
             return
         }
-        let messages = this.state.data.map(m => m)
-        messages.unshift(message)
-        let it = this.removeUserFromIsTypingData(message.user.id)
-        this.setState({data:messages, total:this.state.total + 1, offset:this.state.offset + 1, isTyping:it })
+
+        let uid = message.uid
+        var replaced = false
+        let messages = this.state.data.map(m => {
+            if(m.uid && m.uid == uid && m.pending)
+            {
+                replaced = true
+                return message
+            }
+            return m
+        })
+        if(!replaced)
+            messages.unshift(message)
+
+        let it = this.removeUserFromIsTypingData(message.user)
+        let increment =  replaced ? 0 : 1
+        this.setState({data:messages, total:this.state.total + increment, offset:this.state.offset + increment, isTyping:it })
     }
     isTypingHandler(event:CustomEvent)
     {
@@ -131,7 +147,7 @@ class ConversationView extends React.Component<Props, {}> {
     {
         let currentConversation = this.getConversation()
         let nextConversation = this.getConversation(nextProps)
-        if(currentConversation && nextConversation && currentConversation.updated_at == nextConversation.updated_at && nextState.data == this.state.data && 
+        if(nextState.loading == this.state.loading && currentConversation && nextConversation && currentConversation.updated_at == nextConversation.updated_at && nextState.data == this.state.data && 
             this.isTypingDictEqual(nextState.isTyping, this.state.isTyping))
             return false
         return true
@@ -149,6 +165,7 @@ class ConversationView extends React.Component<Props, {}> {
         if(error || status == "error" || !data.results)
         {
             toast.error(<ErrorToast message={error || "Error retrieving messages"} />, { hideProgressBar: true })
+            this.setState({loading:false})
             return
         }
         let newData = data.results || []
@@ -175,16 +192,28 @@ class ConversationView extends React.Component<Props, {}> {
     onChatMessageSubmit(text:string)
     {
         let conversation = this.getConversation()
-        sendMessageToConversation(conversation.id, text)
+        let tempId = `${conversation.id}_${this.props.profile.id}_${Date.now()}`
+        let tempMessage = this.getChatMessagePreview(text, tempId)
+        this.appendMessage(tempMessage)
+        this.props.queueAddChatMessage(tempMessage)
+        sendMessageToConversation(conversation.id, text,tempId)
     }
-    getChatMessagePreview(text):Message {
+    appendMessage(message:Message)
+    {
+        let messages = this.state.data.map(m => m)
+        messages.unshift(message)
+        this.setState({data:messages, total:this.state.total + 1, offset:this.state.offset + 1})
+    }
+    getChatMessagePreview(text:string, uid:string):Message {
         let now = Date.now()
         let conversation = this.getConversation()
         let ds = new Date().toUTCString()
         return {
             id: now,
+            uid:uid,
+            pending:true,
             text: text,
-            user: this.props.profile,
+            user: this.props.profile.id,
             created_at: ds,
             conversation:conversation.id,
             attachment:null,
@@ -236,4 +265,11 @@ const mapStateToProps = (state:RootReducer) => {
         profiles:state.profileStore.profiles
     };
 }
-export default connect(mapStateToProps, null)(ConversationView);
+const mapDispatchToProps = (dispatch) => {
+    return {
+        queueAddChatMessage:(message:Message) => {
+            dispatch(Actions.queueAddChatMessage(message))
+        }
+    }
+}
+export default connect(mapStateToProps, mapDispatchToProps)(ConversationView);

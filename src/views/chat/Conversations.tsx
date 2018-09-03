@@ -9,6 +9,8 @@ import { Link } from 'react-router-dom';
 import { Routes } from '../../utilities/Routes';
 import { RootReducer } from '../../reducers';
 import { Conversation } from '../../reducers/conversationStore';
+import { toast } from 'react-toastify';
+import { ErrorToast } from '../../components/general/Toast';
 export interface Props {
     pageSize?:number,
     conversationData:number[],
@@ -91,6 +93,12 @@ class Conversations extends React.Component<Props, {}> {
     }
     responseFromServer(data:any, status:string, error:string)
     {
+        if(error || status == "error" || !data.results)
+        {
+            toast.error(<ErrorToast message={error || "Error retrieving conversations"} />, { hideProgressBar: true })
+            this.setState({loading:false, hasLoaded:false})
+            return
+        }
         this.setState({loading:false, hasLoaded:true}, () => {
             if(this.state.data && this.state.data.length > 0)
                 this.props.appendConversations(data.results)
@@ -121,7 +129,7 @@ class Conversations extends React.Component<Props, {}> {
         }
         else if(this.state.data.length == 0)
         {
-            return (<li>+ NO GROUPS AVAILABLE</li>)
+            return (<li>NO CONVERSATIONS AVAILABLE</li>)
         }
     }
     render()

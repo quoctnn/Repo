@@ -5,7 +5,9 @@ import { UserProfile } from './profileStore';
 export class Message 
 {
     id:number
-    user:UserProfile
+    pending?:boolean
+    uid:string
+    user:number
     conversation:number
     text:string
     attachment:any

@@ -17,7 +17,7 @@ export class ChatMessage extends React.Component<Props, {}> {
     }
     render() {
         let msg = this.props.data
-        let msgClass = 'chat-message ' + this.props.direction
+        let msgClass = 'chat-message ' + this.props.direction + (msg.pending ? " temp" : "")
         return (
             <li className={msgClass}>
                 <span className="body" dangerouslySetInnerHTML={rawMarkup(msg.text, [])}></span>

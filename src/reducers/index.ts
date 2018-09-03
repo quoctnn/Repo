@@ -14,6 +14,7 @@ import { persistReducer, PersistConfig } from 'redux-persist'
 import { ApiEndpoint } from './debug';
 import conversationListCache from './conversationListCache';
 import conversationStore from './conversationStore';
+import queue from './queue';
 
 const rootPersistConfig = {
   key: 'root',
@@ -28,7 +29,7 @@ const debugConfig = {
 
 const rootReducer = combineReducers({
   //debug: persistReducer(debugConfig, debug),
-  settings, profile, auth, profileStore, communityStore, groupStore, groupListCache, contactListCache, debug, conversationListCache, conversationStore
+  settings, profile, auth, profileStore, communityStore, groupStore, groupListCache, contactListCache, debug, conversationListCache, conversationStore, queue
 })
 
 export default persistReducer(rootPersistConfig, rootReducer)
@@ -45,6 +46,7 @@ export interface RootReducer
       contactListCache: any;
       conversationListCache:any;
       conversationStore:any;
+      queue:any;
   debug: {accessToken:string, apiEndpoint:number, availableApiEndpoints:ApiEndpoint[] };
   _persist:any
 }

@@ -124,7 +124,7 @@ export default  {
         },
         fileUploadUrl: '/api/v1/file-upload/',
         conversationMessagesUrl: (id) => {
-            return `/api/v1/conversation/${id}/messages/`
+            return `/api/v2/conversation/${id}/messages/`
         },
         conversations: '/api/v1/conversation/',
         composeMessageUrl: '/api/v1/conversation/compose/',

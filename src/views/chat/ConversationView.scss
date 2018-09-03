@@ -2,6 +2,9 @@
 {
     .is-typing-container
     {
+        position: sticky;
+        background: white;
+        bottom: 0px;
         padding: 5px 5px 5px 15px;
         display: flex;
         flex-direction: row;

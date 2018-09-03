@@ -8,9 +8,12 @@ import { Settings } from "../../utilities/Settings";
 import { AjaxRequest } from '../../network/AjaxRequest';
 import { Community } from '../../reducers/communityStore';
 import { RootReducer } from '../../reducers/index';
+import ReconnectingWebSocket from 'reconnecting-websocket';
 
 import { toast } from 'react-toastify';
 import { ErrorToast } from '../../components/general/Toast';
+import { Queue } from '../../reducers/queue';
+import { Message } from '../../reducers/conversationStore';
 
 export enum SocketMessageType
 {
@@ -37,7 +40,10 @@ export interface Props {
     accessToken?:string,
     signedIn:boolean,
     profile:UserProfile,
-    awayTimeout:number
+    awayTimeout:number,
+
+    queue:Queue,
+    queueRemoveChatMessage:(message:Message) => void
 }
 enum WebsocketState {
     CONNECTING = 0,
@@ -45,7 +51,7 @@ enum WebsocketState {
     CLOSING,
     CLOSED
 }
-var publicStream: WebSocket = null
+var publicStream: ReconnectingWebSocket = null
 export const sendOnWebsocket = (data:string) => {
     if(publicStream && publicStream.readyState == WebsocketState.OPEN)
     {
@@ -61,9 +67,9 @@ export const sendTypingInConversation = (conversation:number) =>
 {
     sendOnWebsocket(JSON.stringify({type:SocketMessageType.CONVERSATION_TYPING, data: {conversation: conversation}}))
 }
-export const sendMessageToConversation = (conversation:number, text:string) => 
+export const sendMessageToConversation = (conversation:number, text:string, uid:string) => 
 {
-    sendOnWebsocket(JSON.stringify({type:SocketMessageType.CONVERSATION_MESSAGE, data: {conversation: conversation, text:text}}))
+    sendOnWebsocket(JSON.stringify({type:SocketMessageType.CONVERSATION_MESSAGE, data: {conversation: conversation, text:text, uid:uid}}))
 }
 export const addSocketEventListener = (type:SocketMessageType, listener:EventListenerOrEventListenerObject) => 
 {
@@ -73,8 +79,12 @@ export const removeSocketEventListener = (type:SocketMessageType, listener:Event
 {
     document.getElementById("socket").removeEventListener(type, listener)
 }
+const socket_options = {
+    connectionTimeout: 4000,
+    maxRetries: 10
+};
 class ChannelEventStream extends React.Component<Props, {}> {
-    stream: WebSocket
+    stream: ReconnectingWebSocket
     lastUserActivity:Date
     lastUserActivityTimer:NodeJS.Timer
     state:{token:string, endpoint:string}
@@ -96,6 +106,7 @@ class ChannelEventStream extends React.Component<Props, {}> {
         this.lastUserActivityTimerExpired = this.lastUserActivityTimerExpired.bind(this)
         this.clearUserActivityTimer = this.clearUserActivityTimer.bind(this)
         this.startTimer = this.startTimer.bind(this)
+        this.processTempQueue = this.processTempQueue.bind(this)
         
         this.lastUserActivity = new Date()
         this.lastUserActivityTimer = null
@@ -134,6 +145,7 @@ class ChannelEventStream extends React.Component<Props, {}> {
         this.props.storeCommunities(state.communities || [])
         this.props.setProfile(state.user || null)
         this.props.setSignedIn(state.user != null)
+        this.processTempQueue()
         if(state.away_timeout && Number.isInteger(state.away_timeout))
             this.props.setAwayTimeout(state.away_timeout)
     }
@@ -156,7 +168,21 @@ class ChannelEventStream extends React.Component<Props, {}> {
     processIncomingConversationMessage(data:any)
     {
         var event = new CustomEvent(SocketMessageType.CONVERSATION_MESSAGE,{detail:data} )
+        this.props.queueRemoveChatMessage(data as Message)
         this.socketRef.current.dispatchEvent(event)
+    }
+    processTempQueue()
+    {
+        if(this.canSend())
+        {
+            if(this.props.queue.chatMessages.length > 0)
+            {
+                this.props.queue.chatMessages.forEach(m => {
+                    sendMessageToConversation(m.conversation, m.text, m.uid)
+                })
+            }
+        }
+        
     }
     connectStream()
     {
@@ -164,15 +190,16 @@ class ChannelEventStream extends React.Component<Props, {}> {
         if(this.state.endpoint)
         {   
             console.log("Setting up WebSocket")
-            this.stream  = new WebSocket(this.state.endpoint);
+            this.stream  = new ReconnectingWebSocket(this.state.endpoint, [], socket_options);
             publicStream = this.stream
             this.stream.onopen = () => {
                 console.log("WebSocket OPEN")
                 this.authorize()
+
             }
             this.stream.onmessage = (e) => {
                 let data = JSON.parse(e.data)
-                console.log('Message received on WebSocket', data );
+                console.log('Message received on WebSocket', data);
                 switch(data.type)
                 {
                     case SocketMessageType.STATE : this.processStateResponse(data.data); break;
@@ -187,6 +214,8 @@ class ChannelEventStream extends React.Component<Props, {}> {
                 if(!event.wasClean)
                     toast.error(<ErrorToast message="WebSocket closed, please refresh browser" />, { hideProgressBar: true })
                 console.log("WebSocket CLOSED");
+                if ((this.stream as any)._shouldReconnect) 
+                    (this.stream as any)._connect()
             }
         }
     }
@@ -334,7 +363,8 @@ const mapStateToProps = (state:RootReducer) => {
         signedIn:state.auth.signedIn,
         apiEndpoint:state.debug.apiEndpoint,
         profile:state.profile,
-        awayTimeout:state.settings.awayTimeout
+        awayTimeout:state.settings.awayTimeout,
+        queue:state.queue
     };
 }
 const mapDispatchToProps = (dispatch) => {
@@ -363,6 +393,9 @@ const mapDispatchToProps = (dispatch) => {
         setAwayTimeout:(timeout:number) => {
             dispatch(Actions.setAwayTimeout(timeout))
         },
+        queueRemoveChatMessage:(message:Message) => {
+            dispatch(Actions.queueRemoveChatMessage(message))
+        }
     };
 };
 export default connect(mapStateToProps, mapDispatchToProps)(ChannelEventStream);

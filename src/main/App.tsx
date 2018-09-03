@@ -14,6 +14,7 @@ import { availableThemes } from '../reducers/settings';
 import { Settings } from '../utilities/Settings';
 import appReducer from '../reducers/index';
 import { RootReducer } from '../reducers/index';
+import { UserProfile } from '../reducers/profileStore';
 require('jquery/dist/jquery');
 require('popper.js/dist/umd/popper');
 require('bootstrap/dist/js/bootstrap');
@@ -48,6 +49,16 @@ if(Settings.supportsTheming)
     middleWares.push(themeSwitcher)
 }
 const store = createStore(appReducer, applyMiddleware(...middleWares))
+
+export const getProfileById = (id:number):UserProfile => 
+{
+    let s = store.getState()
+    if(s.profile.id == id)
+        return s.profile
+    return  s.profileStore.profiles.find(p => p.id == id)
+}
+
+
 const persistor = persistStore(store, {}, () => 
 { 
     //rehydrate complete

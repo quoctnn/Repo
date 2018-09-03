@@ -1,14 +1,14 @@
-import * as React from "react";
-import { tz, utc } from "moment-timezone";
+import { getProfileById } from '../../main/App';
+import * as React from 'react';
+import * as moment from 'moment-timezone';
 import { Message } from '../../reducers/conversationStore';
 import {ScrollPosition} from '../../utilities/Utilities';
 import { UserProfile } from '../../reducers/profileStore';
 import { ChatMessage, MessagePosition } from './ChatMessage';
 import { DayLine } from './DayLine';
 import { ChatMessageUser } from './ChatMessageUser';
-import { ChatMessageTime } from './ChatMessageTime';
 require("./ChatMessageList.scss");
-let timezone = tz.guess()
+let timezone = moment.tz.guess()
 
 export interface Props {
     messages:Message[],
@@ -63,7 +63,7 @@ export class ChatMessageList extends React.Component<Props, {}> {
     }
     getDirection(message:Message):MessagePosition {
         let userId = this.props.current_user.id;
-        return (message.user.id == userId) ? MessagePosition.RIGHT : MessagePosition.LEFT
+        return (message.user == userId) ? MessagePosition.RIGHT : MessagePosition.LEFT
     }
     onChatScroll(event)
     {
@@ -73,44 +73,48 @@ export class ChatMessageList extends React.Component<Props, {}> {
     }
     render() {
         let components = [];
-        let lastUser = null, lastDay = null;
+        let lastUserId = null, lastDay = null;
         let messages = this.props.messages
         let messageTimeDist = 5;
         for (let i = messages.length - 1; i >= 0; i--) {
             let message = messages[i]
-            let currentDate = utc(message.created_at).tz(timezone);
+            let currentDate = moment.utc(message.created_at).tz(timezone);
             let showUserName = false;
             let showTime = false
+            let isMessageFromCurrentUser = message.user == this.props.current_user.id
 
             if (!currentDate.isSame(lastDay, 'day')) // not same day as last message
             {
                 components.push(
                     <DayLine key={i + "dayline"} date={message.created_at}/>
                 )
-                if(message.user.id != this.props.current_user.id)//if not message from current user
+                if(message.user != this.props.current_user.id)//if not message from current user
                     showUserName = true;
                 showTime = true;
             }
-            if (lastUser && lastUser.id != message.user.id) //switching user
+            if (lastUserId && lastUserId != message.user) //switching user
             {
-                if(message.user.id != this.props.current_user.id) //if not message from current user
+                if(!isMessageFromCurrentUser) //if not message from current user
                     showUserName = true;
                 showTime = true
             }
-            if(lastUser && lastUser.id == this.props.current_user.id && currentDate.diff(lastDay, "minutes") > messageTimeDist)
+            if(lastUserId && lastUserId == this.props.current_user.id && currentDate.diff(lastDay, "minutes") > messageTimeDist)
             {
                 showTime = true
             }
-            if(showUserName)
-            {
-                components.push(
-                    <ChatMessageUser key={i + "user"} user={message.user} direction={this.getDirection(message)} />
-                )
-            }
             if(showTime)
             {
+                var str = moment(message.created_at).tz(timezone).format("LT");
+                var avatar = null
+                if(!isMessageFromCurrentUser)
+                {
+                    let user = getProfileById(message.user)
+                    str = `${user.first_name}, ${str}` 
+                    avatar = user.avatar
+                }
+
                 components.push(
-                    <ChatMessageTime key={i + "time"} data={message} direction={this.getDirection(message)}/>
+                    <ChatMessageUser key={i + "user"} avatar={avatar} text={str} direction={this.getDirection(message)} />
                 )
             }
             components.push(
@@ -118,7 +122,7 @@ export class ChatMessageList extends React.Component<Props, {}> {
                          key={message.id}
                          direction={this.getDirection(message)}/>
             )
-            lastUser = message.user;
+            lastUserId = message.user;
             lastDay = currentDate;
         }
         return (

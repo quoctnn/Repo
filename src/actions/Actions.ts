@@ -2,7 +2,18 @@ import {Types} from "../utilities/Types"
 import { Group } from '../reducers/groupStore';
 import { Community } from '../reducers/communityStore';
 import { UserProfile } from '../reducers/profileStore';
-import { Conversation } from '../reducers/conversationStore';
+import { Conversation, Message } from '../reducers/conversationStore';
+
+//queue
+export const queueAddChatMessage = (message:Message) => ({
+    type: Types.QUEUE_ADD_CHAT_MESSAGE,
+    message: message,
+})
+export const queueRemoveChatMessage = (message:Message) => ({
+    type: Types.QUEUE_REMOVE_CHAT_MESSAGE,
+    message: message,
+})
+
 //profileStore
 export const storeProfiles = (profiles:UserProfile[]) => ({
     type: Types.PROFILESTORE_ADD_PROFILES,

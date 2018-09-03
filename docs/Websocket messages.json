@@ -35,7 +35,8 @@
           {
             "data": {
               "conversation": 13,
-              "text": "This is sent via websocket"
+              "text": "This is sent via websocket",
+              "uid":"14_5_1232453546456"
             },
             "type": "conversation.message"
           },
