@@ -79,4 +79,16 @@ ReactDOM.render(
 export default store
 
 
-  
+function onUpdateReady() {  
+    if (window.applicationCache.status == window.applicationCache.UPDATEREADY) 
+    { 
+        if (confirm('A new version of intraWork is available. Do you want to update now?')) 
+        {
+            window.location.reload() 
+        }
+    } 
+}
+window.applicationCache.addEventListener("updateready", onUpdateReady);
+if(window.applicationCache.status === window.applicationCache.UPDATEREADY) {
+    onUpdateReady();
+}

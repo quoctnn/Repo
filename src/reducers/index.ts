@@ -14,32 +14,24 @@ import { ApiEndpoint } from './debug';
 import conversationListCache from './conversationListCache';
 import conversationStore from './conversationStore';
 import queue from './queue';
+import { test } from './test';
 
 
-const setTransform = createTransform(
-  
-  (inboundState, key) => {
-    console.log("test")
-    debugger
-    return { ...inboundState};
-  },
-  (outboundState, key) => {
-    debugger
-    console.log("test")
-    if(window.applicationCache.status === window.applicationCache.UPDATEREADY)
-    {
-      debugger
-      return { debug:outboundState}
-    }
-    return { ...outboundState}
-  },
-  { whitelist: [] }
-);
 const rootPersistConfig:PersistConfig = {
   key: 'root',
   storage: storageLocal,
   blacklist: ['auth'],
-  transforms:[setTransform]
+  debug:true,
+  stateReconciler:(inboundState, originalState, 
+    reducedState) => 
+  {
+    console.log("window.applicationCache.status", window.applicationCache.status) 
+    if(window.applicationCache.status === window.applicationCache.UPDATEREADY)
+    {
+        return {...originalState, debug:inboundState.debug }
+    }
+    return  { ...reducedState, debug:inboundState.debug } 
+  }
 }
 
 const rootReducer = combineReducers({
@@ -47,7 +39,6 @@ const rootReducer = combineReducers({
   settings, profile, auth, profileStore, communityStore, groupStore, groupListCache, contactListCache, debug, conversationListCache, conversationStore, queue
 })
 export default persistReducer(rootPersistConfig, rootReducer)
-
 export interface RootReducer
 {
   settings: any;
@@ -61,6 +52,7 @@ export interface RootReducer
       conversationListCache:any;
       conversationStore:any;
       queue:any;
+      test:any;
   debug: {accessToken:string, apiEndpoint:number, availableApiEndpoints:ApiEndpoint[] };
   _persist:any
 }
