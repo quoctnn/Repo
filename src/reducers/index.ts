@@ -36,7 +36,7 @@ const rootPersistConfig:PersistConfig = {
 
 const rootReducer = combineReducers({
   //debug: persistReducer(debugConfig, debug), 
-  settings, profile, auth, profileStore, communityStore, groupStore, groupListCache, contactListCache, debug, conversationListCache, conversationStore, queue
+  settings, profile, auth, profileStore, communityStore, groupStore, groupListCache, contactListCache, debug, conversationListCache, conversationStore, queue 
 })
 export default persistReducer(rootPersistConfig, rootReducer)
 export interface RootReducer
@@ -52,7 +52,6 @@ export interface RootReducer
       conversationListCache:any;
       conversationStore:any;
       queue:any;
-      test:any;
   debug: {accessToken:string, apiEndpoint:number, availableApiEndpoints:ApiEndpoint[] };
   _persist:any
 }
