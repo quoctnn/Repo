@@ -5,7 +5,7 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { createStore,applyMiddleware } from 'redux'
 import { Provider } from 'react-redux'
-import { persistStore } from 'redux-persist'
+import { persistStore , createTransform } from 'redux-persist'
 import { PersistGate } from 'redux-persist/integration/react'
 import Main from "./Main";
 import AutoIntlProvider from "../components/intl/AutoIntlProvider";
@@ -57,9 +57,7 @@ export const getProfileById = (id:number):UserProfile =>
         return s.profile
     return  s.profileStore.byId[id]
 }
-
-
-const persistor = persistStore(store, {}, () => 
+const persistor = persistStore(store, { }, () => 
 { 
     //rehydrate complete
     if(Settings.supportsTheming)
@@ -79,5 +77,6 @@ ReactDOM.render(
     document.getElementById("app-root")
 );
 export default store
+
 
   

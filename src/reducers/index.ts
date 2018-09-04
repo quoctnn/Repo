@@ -1,4 +1,4 @@
-import { combineReducers, Reducer } from 'redux'
+import { combineReducers } from 'redux'
 import debug from './debug';
 import settings from './settings';
 import profile from './profile';
@@ -8,30 +8,44 @@ import groupListCache from './groupListCache';
 import communityStore from './communityStore';
 import { profileStore, UserProfile } from './profileStore';
 import contactListCache from './contactListCache';
-import storageSession from 'redux-persist/lib/storage/session'
 import storageLocal from 'redux-persist/lib/storage'
-import { persistReducer, PersistConfig } from 'redux-persist'
+import { persistReducer, createTransform, PersistConfig } from 'redux-persist';
 import { ApiEndpoint } from './debug';
 import conversationListCache from './conversationListCache';
 import conversationStore from './conversationStore';
 import queue from './queue';
 
-const rootPersistConfig = {
+
+const setTransform = createTransform(
+  
+  (inboundState, key) => {
+    console.log("test")
+    debugger
+    return { ...inboundState};
+  },
+  (outboundState, key) => {
+    debugger
+    console.log("test")
+    if(window.applicationCache.status === window.applicationCache.UPDATEREADY)
+    {
+      debugger
+      return { debug:outboundState}
+    }
+    return { ...outboundState}
+  },
+  { whitelist: [] }
+);
+const rootPersistConfig:PersistConfig = {
   key: 'root',
   storage: storageLocal,
-  blacklist: ['auth']
-}
-
-const debugConfig = {
-  key: 'debug',
-  storage: storageSession,
+  blacklist: ['auth'],
+  transforms:[setTransform]
 }
 
 const rootReducer = combineReducers({
-  //debug: persistReducer(debugConfig, debug),
+  //debug: persistReducer(debugConfig, debug), 
   settings, profile, auth, profileStore, communityStore, groupStore, groupListCache, contactListCache, debug, conversationListCache, conversationStore, queue
 })
-
 export default persistReducer(rootPersistConfig, rootReducer)
 
 export interface RootReducer

@@ -136,7 +136,7 @@ class Conversations extends React.Component<Props, {}> {
     render()
     {
         let conversations = this.state.data || []
-        return (<FullPageComponent>
+        return (<FullPageComponent> 
                     <div id="conversations-view" className="full-height">
                     <h3>{translate("Conversations")}</h3>
                     <ul className="group-list vertical-scroll">
