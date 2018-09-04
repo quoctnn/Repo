@@ -1,0 +1,22 @@
+@import "../../main/Config";
+.conversation-item:first-child
+{
+    margin-top: 6px;
+}
+.conversation-item
+{
+    padding: 10px 10px 10px!important;
+    border-style: solid;
+    @include var(border-color, border-color-default);
+    @include var(border-width, border-width-default);
+    border-radius: 6px;
+    margin-bottom: 6px;
+    a
+    {
+        text-decoration: none;
+    }
+    .title
+    {
+        @include var(color, title-color);
+    }
+}

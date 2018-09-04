@@ -13,7 +13,7 @@ import { Settings } from '../../utilities/Settings';
 import { cloneDictKeys } from '../../utilities/Utilities';
 require("./RightNavigation.scss");
 export interface Props {
-    profiles:UserProfile[],
+    profiles:{number:UserProfile},
     contacts:number[],
     profile:UserProfile
 }
@@ -73,7 +73,7 @@ class RightNavigation extends React.Component<Props, {}> {
         let newContacts:UserProfile[] = []
         this.props.contacts.forEach((id) => 
         {
-            let f = this.props.profiles.find( i => i.id == id)
+            let f = this.props.profiles[id]
             if(f)
             newContacts.push(f)
         })
@@ -110,7 +110,7 @@ class RightNavigation extends React.Component<Props, {}> {
 }
 const mapStateToProps = (state:RootReducer) => {
     return {
-        profiles:state.profileStore.profiles,
+        profiles:state.profileStore.byId,
         contacts:state.contactListCache.contacts,
         profile:state.profile,
     };

@@ -1,10 +1,11 @@
+@import "../../main/Config";
 .message-list {
-    overflow-y: scroll;
-    -webkit-overflow-scrolling:touch;
     margin: 0;
     width: 100%;
     flex-grow: 1;
-    border:1px solid gray;
+    border-style:solid;
+    @include var(border-color, border-color-default);
+    @include var(border-width, border-width-default);
     display: flex;
     flex-direction: column;
   }

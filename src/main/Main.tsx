@@ -40,7 +40,7 @@ class Main extends React.Component<Props, {}> {
                   <ChannelEventStream />
                     <div id="content-block" className="transition">
                         <div className="container">
-                            <div>
+                            <div className="row">
                               <Switch>
                                 {!Settings.isProduction && <Route path={Routes.DEVELOPER_TOOL} component={DevTool} /> }
                                 <Route path={Routes.SIGNIN} component={Signin} />

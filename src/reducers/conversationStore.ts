@@ -19,7 +19,7 @@ export class Conversation
 {
     id:number
     title:string
-    users:UserProfile[]
+    users:number[]
     archived_by: number[]
     last_message:Message
     read_by:any[]
@@ -28,7 +28,7 @@ export class Conversation
     updated_at:Date
     constructor(id:number,
         title:string,
-        users:UserProfile[],
+        users:number[],
         archived_by: number[],
         last_message:Message,
         read_by:any[],

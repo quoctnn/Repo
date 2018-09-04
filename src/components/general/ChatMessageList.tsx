@@ -7,13 +7,17 @@ import { UserProfile } from '../../reducers/profileStore';
 import { ChatMessage, MessagePosition } from './ChatMessage';
 import { DayLine } from './DayLine';
 import { ChatMessageUser } from './ChatMessageUser';
+import LoadingSpinner from './LoadingSpinner';
 require("./ChatMessageList.scss");
 let timezone = moment.tz.guess()
-
+React
 export interface Props {
     messages:Message[],
     current_user:UserProfile,
     chatDidScrollToTop:() => void,
+    loading:boolean,
+    children?:React.ReactNode
+    conversation:number
 }
 export class ChatMessageList extends React.Component<Props, {}> {
     SCROLL_POSITION:any = null
@@ -30,23 +34,23 @@ export class ChatMessageList extends React.Component<Props, {}> {
         this.SCROLL_POSITION = new ScrollPosition(document.querySelector('.message-list'))
     }
 
-    shouldComponentUpdate(nextProps, nextState) {
-        return nextProps.messages != this.props.messages || nextProps.children != this.props.children ;
+    shouldComponentUpdate(nextProps:Props, nextState) {
+        return nextProps.messages != this.props.messages || nextProps.children != this.props.children || nextProps.loading != this.props.loading || nextProps.conversation != this.props.conversation;
     }
 
-    componentWillUpdate(nextProps, nextState) {
+    componentWillUpdate(nextProps:Props, nextState) {
         if (this.listUpdateAfterInitialRender(this.props, nextProps)) {
             this.SCROLL_POSITION.prepareFor('up')
         }
         this.wasAtBottomBeforeUpdate = this.listRef.current.scrollTop + this.listRef.current.offsetHeight >= this.listRef.current.scrollHeight - this.scrollToBottomThreshold 
     }
 
-    componentDidUpdate(prevProps, prevState) {
+    componentDidUpdate(prevProps:Props, prevState) {
         if (this.listUpdateAfterInitialRender(prevProps, this.props)) {
             this.SCROLL_POSITION.restore()
         } else if (prevProps.messages.length == 0 && this.props.messages.length > 0) {
             this.scrollListToBottom()
-        } else if (prevProps.messages.length > 0 && prevProps.messages[prevProps.messages.length - 1].id != this.props.messages[this.props.messages.length - 1].id) {
+        } else if (prevProps.messages.length > 0 && this.props.messages.length > 0 && prevProps.messages[prevProps.messages.length - 1].id != this.props.messages[this.props.messages.length - 1].id) {
             this.scrollListToBottom()
         } else if (this.wasAtBottomBeforeUpdate)
         {
@@ -54,7 +58,7 @@ export class ChatMessageList extends React.Component<Props, {}> {
         }
         
     }
-    listUpdateAfterInitialRender(prevProps, currentProps:Props) {
+    listUpdateAfterInitialRender(prevProps:Props, currentProps:Props) {
         return prevProps.messages.length != 0 &&
             (prevProps.messages.length < currentProps.messages.length)  
     }
@@ -71,6 +75,12 @@ export class ChatMessageList extends React.Component<Props, {}> {
             this.props.chatDidScrollToTop()
         }
     }
+
+    renderLoading() {
+        if (this.props.loading) {
+            return (<li><LoadingSpinner/></li>)
+        }
+    }
     render() {
         let components = [];
         let lastUserId = null, lastDay = null;
@@ -79,7 +89,6 @@ export class ChatMessageList extends React.Component<Props, {}> {
         for (let i = messages.length - 1; i >= 0; i--) {
             let message = messages[i]
             let currentDate = moment.utc(message.created_at).tz(timezone);
-            let showUserName = false;
             let showTime = false
             let isMessageFromCurrentUser = message.user == this.props.current_user.id
 
@@ -88,14 +97,10 @@ export class ChatMessageList extends React.Component<Props, {}> {
                 components.push(
                     <DayLine key={i + "dayline"} date={message.created_at}/>
                 )
-                if(message.user != this.props.current_user.id)//if not message from current user
-                    showUserName = true;
                 showTime = true;
             }
             if (lastUserId && lastUserId != message.user) //switching user
             {
-                if(!isMessageFromCurrentUser) //if not message from current user
-                    showUserName = true;
                 showTime = true
             }
             if(lastUserId && lastUserId == this.props.current_user.id && currentDate.diff(lastDay, "minutes") > messageTimeDist)
@@ -127,7 +132,8 @@ export class ChatMessageList extends React.Component<Props, {}> {
         }
         return (
 
-            <ul onScroll={this.onChatScroll} className="list-unstyled message-list" ref={this.listRef}>
+            <ul onScroll={this.onChatScroll} className="list-unstyled message-list vertical-scroll full-height" ref={this.listRef}>
+                {this.renderLoading()}
                 {components}
                 {this.props.children}
             </ul>

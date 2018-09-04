@@ -11,6 +11,7 @@ $rightColor: #F1F1F4 !default;
     > .body 
     {
         display: block;
+
     }
 }
 .chat-message:last-child
@@ -22,6 +23,12 @@ $rightColor: #F1F1F4 !default;
     color: white;
     text-align: left;
     margin-left: 40px;
+    > .body a
+    {
+        color: white;
+        text-decoration: underline;
+        
+    }
 }
   
 .chat-message.right 
@@ -29,6 +36,11 @@ $rightColor: #F1F1F4 !default;
     background-color: $rightColor;
     text-align: right;
     margin-right: 15px;
+    > .body a
+    {
+        color: #4FA7CF;
+        
+    }
 }
 .chat-message.temp 
 {

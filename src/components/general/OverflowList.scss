@@ -1,0 +1,28 @@
+.overflow-list
+{
+    display: flex;
+
+    flex-direction: row-reverse;
+    align-items: center;
+    margin-left: 10px;
+    justify-content: flex-end;
+    > li:not(.count-container)
+    {
+        margin-left: -10px;
+        overflow: hidden;
+        display: flex;
+        flex-shrink: 0;
+    }
+}
+.count-container
+{
+    background: #DFE0DF;
+    color: #7D7D7D;
+    padding: 5px 10px;
+    .count
+    {
+        align-items: center;
+        height: 100%;
+        display: flex;
+    }
+}

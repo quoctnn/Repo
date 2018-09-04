@@ -17,6 +17,14 @@ export default class ApiClient
             callback(null, status, error)
         })
     }
+    static getProfileBySlug(slug:string, callback:ApiRequestCallback) 
+    {
+        AjaxRequest.get(Constants.apiRoute.profilesUrl + "?slug_name=" + encodeURIComponent( slug ), (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
     static getMyProfile(callback:ApiRequestCallback) 
     {
         AjaxRequest.get(Constants.apiRoute.myProfileUrl, (data, status, request) => {

@@ -30,7 +30,7 @@ class GroupView extends React.Component<Props, {}> {
         let slug = this.props.match.params.groupname
         let group = this.getGroup(community,slug)
         return(
-            <div id="group-view">
+            <div id="group-view" className="col-sm">
                 {group && this.renderGroup(group)}
                 {!group && <div>NO GROUP</div>}
             </div>

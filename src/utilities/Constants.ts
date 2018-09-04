@@ -126,7 +126,7 @@ export default  {
         conversationMessagesUrl: (id) => {
             return `/api/v2/conversation/${id}/messages/`
         },
-        conversations: '/api/v1/conversation/',
+        conversations: '/api/v2/conversation/',
         composeMessageUrl: '/api/v1/conversation/compose/',
 
         //report

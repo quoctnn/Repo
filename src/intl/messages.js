@@ -19,6 +19,7 @@ var translations = {
         "Events":"Events",
         "Load More":"Load More",
         "Theme":"Theme",
+        "Conversations":"Conversations",
     },
     "no": {
         "search.placeholder": "Søk ...",
@@ -40,6 +41,7 @@ var translations = {
         "Events":"Arrangementer",
         "Load More":"Last flere",
         "Theme":"Tema",
+        "Conversations":"Samtaler",
     },
     "en" : {
         "search.placeholder": "Search ...",
@@ -61,6 +63,7 @@ var translations = {
         "Events":"Events",
         "Load More":"Load More",
         "Theme":"Theme",
+        "Conversations":"Conversations",
     }
 }
 

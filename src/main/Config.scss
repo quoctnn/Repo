@@ -13,6 +13,7 @@ $root: (
     feed-form-options-bg: #f5f5f5,
     body-background: #eeeeee,
     border-color-default: #cccccc,
+    title-color:#7D7D7D,
 
     default-color: #fff,
     primary-color: #428bca,
@@ -39,6 +40,10 @@ $root: (
     bg-trans-black: rgba(0, 0, 0, 0.5),
     bg-trans-black-light: rgba(0, 0, 0, 0.25),
 
+
+    /* SIZES*/
+    border-width-default: 1px,
+
     /* NAV */
     nav-foreground-color:black,
     nav-background-color:white,
@@ -64,6 +69,7 @@ $root: (
     --feed-form-options-bg: #f5f5f5;
     --body-background: #eeeeee;
     --border-color-default: #cccccc;
+    --title-color:#7D7D7D;
 
     --default-color: #fff;
     --primary-color: #428bca;
@@ -90,6 +96,9 @@ $root: (
     --bg-trans-black: rgba(0, 0, 0, 0.5);
     --bg-trans-black-light: rgba(0, 0, 0, 0.25);
 
+    /* SIZES*/
+    --border-width-default: 1px;
+
     /* NAV */
     --nav-foreground-color:black;
     --nav-background-color:white;
@@ -109,4 +118,6 @@ $root: (
     --nav-background-color:black;
     --nav-border-color:red;
     --nav-border-width:5px;
+    --border-width-default: 5px;
+    --border-color-default: green;
 }

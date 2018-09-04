@@ -1,5 +1,8 @@
 import {Types} from "../utilities/Types"
 import { AvatarStateColor } from '../components/general/Avatar';
+import { combineReducers } from 'redux'
+import { RootReducer } from './index';
+import ApiClient from '../network/ApiClient';
 
 export interface UserProfile {
     absolute_url: string,
@@ -38,54 +41,94 @@ export const avatarStateColorForUserProfile = (userProfile:UserProfile) => {
         default: return AvatarStateColor.NONE
     }
 }
-const profilesArray:UserProfile[] = []
-
-const INITIAL_STATE = { profiles: profilesArray}
-const profileStore = (state = INITIAL_STATE, action) => {
-    switch(action.type)
+const addProfiles = (state, action) => {
+    let profiles = action.profiles as UserProfile[]
+    let newState = {  ...state }
+    profiles.forEach(p => {
+        let id = p.id
+        let oldProfile = state[id]
+        if(!oldProfile || new Date(oldProfile.updated_at) < new Date(p.updated_at)) // update
+        {
+            newState[p.id] = p
+        }
+    })
+    return newState
+}
+const addProfile = (state, action) => {
+    
+    let profile = action.profile as UserProfile
+    let id = profile.id
+    let oldProfile = state[id]
+    if(!oldProfile || new Date(oldProfile.updated_at) < new Date(profile.updated_at)) // update
     {
-        case Types.PROFILESTORE_ADD_PROFILES:
-            {
-                if(action.profiles.length == 0)
-                    return state;
-                const combinedArrays:UserProfile[] = [...state.profiles, ...action.profiles].sort((a:UserProfile, b:UserProfile) => {
-                    return a.id - b.id
-                })
-                const finalArray = combinedArrays.reduce((prev, cur, index, array) => {
-       
-                    let toReturn
-                    const lastObj = prev[prev.length - 1]
-                    if(lastObj.id !== cur.id){
-                      toReturn = prev.concat(cur)
-                    } 
-                    else if (new Date(lastObj.updated_at) < new Date(cur.updated_at))
-                    {
-                      prev.splice((prev.length - 1), 1, cur)
-                      toReturn = prev
-                    }
-                    else {
-                     toReturn = prev
-                    }
-            
-                    return toReturn
-                  }, [combinedArrays[0]])
-                return { profiles: finalArray }
-            }
-        case Types.PROFILESTORE_ADD_PROFILE:
-            let hasProfile = state.profiles.find((c) => {
-                return c.id == action.profile.id
-            })
-            if(hasProfile)
-            {
-                return { ...state, profiles: state.profiles.map( (content) => content.id === action.profile.id ? action.profile : content )}
-            }
-            let s = { ...state, profiles: state.profiles.map((c) => c)}
-            s.profiles.push(action.profile)
-            return s
-        case Types.PROFILESTORE_RESET:
-            return {profiles:[]}
-        default:
-            return state;
+        return {
+            ...state,
+            [profile.id] : profile
+        };
+    }
+    return state
+}
+​const resetProfiles = (state, action) => {
+    
+    return {};
+}
+export const profilesById = (state = {}, action) => 
+{
+    switch(action.type) {
+        case Types.PROFILESTORE_ADD_PROFILES: return addProfiles(state, action);
+        case Types.PROFILESTORE_ADD_PROFILE : return addProfile(state, action);
+        case Types.PROFILESTORE_RESET: return resetProfiles(state, action)
+        default : return state;
     }
 }
-export default profileStore
+///////////////////////
+const addProfileIds = (state:number[], action) => {
+    
+    let profiles = action.profiles as UserProfile[]
+    let newState = [...state]
+    profiles.forEach(p => {
+        let id = p.id
+        if(state.indexOf(id) == -1)
+        {
+            newState.push(id)
+        }
+    })
+    return newState
+}
+const addProfileId = (state:number[], action) => {
+    
+    let id = action.profile.id
+    if(state.indexOf(id) == -1)
+    {
+        return [...state, id]
+    }
+    return state
+}
+​​const resetProfileIds = (state, action) => {
+    
+    return []
+}
+export const allProfiles = (state:number[] = [], action) => 
+{
+    switch(action.type) {
+        case Types.PROFILESTORE_ADD_PROFILES: return addProfileIds(state, action);
+        case Types.PROFILESTORE_ADD_PROFILE : return addProfileId(state, action);
+        case Types.PROFILESTORE_RESET: return resetProfileIds(state, action)
+        default : return state;
+    }
+}
+​
+export const profileStore = combineReducers({
+    byId : profilesById,
+    allIds : allProfiles
+});
+
+export const getProfileIdBySlugName = (slug:string, state:RootReducer) => 
+{
+    let ids = state.profileStore.allIds
+    return ids.find((k) => 
+    {
+        let p = state.profileStore.byId[k] as UserProfile
+        return p.slug_name == slug
+    })
+}

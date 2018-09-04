@@ -6,7 +6,7 @@ import auth from './auth';
 import groupStore from './groupStore';
 import groupListCache from './groupListCache';
 import communityStore from './communityStore';
-import profileStore from './profileStore';
+import { profileStore, UserProfile } from './profileStore';
 import contactListCache from './contactListCache';
 import storageSession from 'redux-persist/lib/storage/session'
 import storageLocal from 'redux-persist/lib/storage'
@@ -37,9 +37,9 @@ export default persistReducer(rootPersistConfig, rootReducer)
 export interface RootReducer
 {
   settings: any;
-      profile: any;
+      profile: UserProfile;
       auth: any;
-      profileStore: any;
+      profileStore: { byId:{number:UserProfile}, allIds:number[]};
       communityStore: any;
       groupStore: any;
       groupListCache: any;

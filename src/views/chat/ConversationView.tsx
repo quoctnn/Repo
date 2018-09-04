@@ -1,3 +1,4 @@
+import Conversations from './Conversations';
 import { Conversation, Message } from '../../reducers/conversationStore';
 import * as React from 'react';
 import { connect } from 'react-redux'
@@ -5,7 +6,6 @@ import { RootReducer } from '../../reducers/index';
 import { ChatMessageList } from '../../components/general/ChatMessageList';
 import { UserProfile } from '../../reducers/profileStore';
 import ApiClient from '../../network/ApiClient';
-import LoadingSpinner from '../../components/general/LoadingSpinner';
 import { toast } from 'react-toastify';
 import { ErrorToast } from '../../components/general/Toast';
 import { ChatMessageComposer } from '../../components/general/ChatMessageComposer';
@@ -15,13 +15,15 @@ import { TypingIndicator } from '../../components/general/TypingIndicator';
 import { Avatar } from '../../components/general/Avatar';
 import { cloneDictKeys } from '../../utilities/Utilities';
 import * as Actions from '../../actions/Actions'; 
+import { FullPageComponent } from '../../components/general/FullPageComponent';
+import { getConversationTitle } from '../../utilities/ConversationUtilities';
+import { getProfileById } from '../../main/App';
 
 require("./ConversationView.scss");
 export interface Props {
     match:any,
     conversations:Conversation[],
     profile:UserProfile,
-    profiles:UserProfile[],
     queueAddChatMessage:(message:Message) => void,
 }
 export interface State {
@@ -35,8 +37,6 @@ export interface State {
 
 class ConversationView extends React.Component<Props, {}> {
 
-    static fullPage = "full-page"
-    bodyClassAdded = false
     clearSomeoneIsTypingTimer:NodeJS.Timer = null
     state:State
     constructor(props) {
@@ -124,20 +124,22 @@ class ConversationView extends React.Component<Props, {}> {
     {
         return Math.ceil( screen.height * 3 / elementMinHeight / 10) * 10
     }
+    componentWillUpdate(nextProps:Props, nextState)
+    {
+        let currentConversation = this.getConversation()
+        let nextConversation = this.getConversation(nextProps)
+        if(currentConversation.id != nextConversation.id)
+        {
+            this.setState({ data:[], offset:0, total:0, loading:true}, this.loadMessagesFromServer)
+        }
+    }
     componentWillUnmount()
     {
-        if(this.bodyClassAdded)
-            document.body.classList.remove(ConversationView.fullPage)
         removeSocketEventListener(SocketMessageType.CONVERSATION_TYPING, this.isTypingHandler)
         removeSocketEventListener(SocketMessageType.CONVERSATION_MESSAGE, this.incomingMessageHandler)
     }
     componentWillMount()
     {
-        if(!document.body.classList.contains(ConversationView.fullPage))
-        {
-            this.bodyClassAdded = true
-            document.body.classList.add(ConversationView.fullPage)
-        }
     }
     isTypingDictEqual(a, b)
     {
@@ -147,7 +149,7 @@ class ConversationView extends React.Component<Props, {}> {
     {
         let currentConversation = this.getConversation()
         let nextConversation = this.getConversation(nextProps)
-        if(nextState.loading == this.state.loading && currentConversation && nextConversation && currentConversation.updated_at == nextConversation.updated_at && nextState.data == this.state.data && 
+        if(nextState.loading == this.state.loading && currentConversation && nextConversation && currentConversation.id == nextConversation.id && currentConversation.updated_at == nextConversation.updated_at && nextState.data == this.state.data && 
             this.isTypingDictEqual(nextState.isTyping, this.state.isTyping))
             return false
         return true
@@ -182,11 +184,6 @@ class ConversationView extends React.Component<Props, {}> {
         if(this.state.total > this.state.data.length && !this.state.loading)
         {
             this.setState({loading:true}, this.loadMessagesFromServer)
-        }
-    }
-    renderLoading() {
-        if (this.state.loading) {
-            return (<LoadingSpinner/>)
         }
     }
     onChatMessageSubmit(text:string)
@@ -233,7 +230,7 @@ class ConversationView extends React.Component<Props, {}> {
         {
             return <li className="is-typing-container">
             {keys.map((id, index) => {
-                let avatar = this.props.profiles.find(p => p.id == id).avatar
+                let avatar = getProfileById(id).avatar
                 return (<Avatar key={index} image={avatar} size={24}/>)
 
             })}
@@ -245,24 +242,30 @@ class ConversationView extends React.Component<Props, {}> {
     render() {
         let conversation = this.getConversation()
         let messages = this.state.data
+        let me = this.props.profile.id
         return(
-            <div id="conversation-view" className="full-height">
-                {conversation && <div>{conversation.title || "No title"}</div>}
-                {this.renderLoading()}
-                <ChatMessageList chatDidScrollToTop={this.chatDidScrollToTop} messages={messages} current_user={this.props.profile} >
-                    {this.renderSomeoneIsTyping()}
-                </ChatMessageList>
-                <ChatMessageComposer onSubmit={this.onChatMessageSubmit} onDidType={this.onDidType} />
-            </div>
-            
+            <FullPageComponent>
+                <div className="d-none d-sm-block col-lg-4 col-md-4 col-sm-5">
+                    <Conversations />
+                </div>
+                <div className="col-lg-8 col-md-8 col-sm-7 col-xs-12">
+                    <div id="conversation-view" className="full-height">
+                        {conversation && <h3><span className="text-truncate d-block">{getConversationTitle(conversation, me)}</span></h3>}
+                            <ChatMessageList conversation={conversation.id} loading={this.state.loading} chatDidScrollToTop={this.chatDidScrollToTop} messages={messages} current_user={this.props.profile} >
+                                {this.renderSomeoneIsTyping()}
+                            </ChatMessageList>
+                        <ChatMessageComposer onSubmit={this.onChatMessageSubmit} onDidType={this.onDidType} />
+                    </div>
+                </div>
+               
+              </FullPageComponent>
         );
     }
 }
 const mapStateToProps = (state:RootReducer) => {
     return {
         conversations:state.conversationStore.conversations,
-        profile:state.profile,
-        profiles:state.profileStore.profiles
+        profile:state.profile
     };
 }
 const mapDispatchToProps = (dispatch) => {

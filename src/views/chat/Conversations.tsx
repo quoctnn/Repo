@@ -5,12 +5,12 @@ import ApiClient from '../../network/ApiClient';
 import LoadingSpinner from '../../components/general/LoadingSpinner';
 import { Button } from 'reactstrap';
 import { translate } from '../../components/intl/AutoIntlProvider';
-import { Link } from 'react-router-dom';
-import { Routes } from '../../utilities/Routes';
 import { RootReducer } from '../../reducers';
 import { Conversation } from '../../reducers/conversationStore';
 import { toast } from 'react-toastify';
 import { ErrorToast } from '../../components/general/Toast';
+import ConversationItem from '../../components/general/ConversationItem';
+import { FullPageComponent } from '../../components/general/FullPageComponent';
 export interface Props {
     pageSize?:number,
     conversationData:number[],
@@ -132,20 +132,22 @@ class Conversations extends React.Component<Props, {}> {
             return (<li>NO CONVERSATIONS AVAILABLE</li>)
         }
     }
+    
     render()
     {
         let conversations = this.state.data || []
-        return (<div id="conversation-view">
-                <ul className="group-list">
-                    {conversations.map((g, index) => {
-                        return (<li className="text-truncate" key={index}>
-                            <Link to={Routes.CONVERSATION + g.id}>{g.title || "no title"}</Link>
-                            </li>)
-                    }) }
-                    {this.renderLoadMore()}
-                    {this.renderLoading()}
-                </ul>
-                </div>)
+        return (<FullPageComponent>
+                    <div id="conversations-view" className="full-height">
+                    <h3>{translate("Conversations")}</h3>
+                    <ul className="group-list vertical-scroll">
+                        {conversations.map((c, index) => {
+                            return (<ConversationItem key={index} conversation={c} />)
+                        }) }
+                        {this.renderLoadMore()}
+                        {this.renderLoading()}
+                    </ul>
+                    </div>
+                </FullPageComponent>)
     }
 }
 

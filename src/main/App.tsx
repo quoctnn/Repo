@@ -55,7 +55,7 @@ export const getProfileById = (id:number):UserProfile =>
     let s = store.getState()
     if(s.profile.id == id)
         return s.profile
-    return  s.profileStore.profiles.find(p => p.id == id)
+    return  s.profileStore.byId[id]
 }
 
 

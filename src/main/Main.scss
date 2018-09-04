@@ -7,7 +7,9 @@
 .flex-grow{ flex-grow: 1;} 
 .flex-shrink{ flex-shrink: 1;}
 .align-center{ align-items: center;}
-.full-height{flex-grow: 1; display: flex; flex-direction: column; height: 100%;}
+.vertical-scroll{overflow-y: auto;
+    -webkit-overflow-scrolling: touch;}
+.full-height{flex-grow: 1; display: flex; flex-direction: column;height: 100%;}
 
 .padding-xs { padding: .25em; }
 .padding-sm { padding: .5em; }
@@ -142,7 +144,6 @@ ul,li{margin:0; padding: 0;}
             @include var(top, top-navigation-height);
             right: 0;
             bottom: 0;
-            overflow-x: hidden;
             li
             {
                 display: inline-flex;
@@ -163,8 +164,8 @@ ul,li{margin:0; padding: 0;}
     {
         @include var(margin-left, left-navigation-min-width);
         @include var(margin-top, top-navigation-height);
-        padding: 5px;
         @include var(margin-right, right-navigation-min-width);
+        padding: 0 5px;
     }
 }
 body.left-menu-open
@@ -193,11 +194,14 @@ body.full-page
         {
             height:calc(100vh - #{map-get($root, top-navigation-height)});
             height: calc(100vh - var(--top-navigation-height, #{map-get($root, top-navigation-height)}));
+            @supports (-webkit-overflow-scrolling: touch) {
+                @media all and (orientation:portrait) {
+                    height:calc(100vh - #{map-get($root, top-navigation-height)} - 80px);
+                    height: calc(100vh - var(--top-navigation-height, #{map-get($root, top-navigation-height)}) - 80px);
+                  }
+            }
             > .container, > .container>div
             {
-                flex-grow: 1;
-                display: flex;
-                flex-direction: column;
                 height: 100%;
             }
         }

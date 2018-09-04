@@ -168,7 +168,9 @@ class ChannelEventStream extends React.Component<Props, {}> {
     processIncomingConversationMessage(data:any)
     {
         var event = new CustomEvent(SocketMessageType.CONVERSATION_MESSAGE,{detail:data} )
-        this.props.queueRemoveChatMessage(data as Message)
+        let message = data as Message
+        if(message.user == this.props.profile.id)
+            this.props.queueRemoveChatMessage(message)
         this.socketRef.current.dispatchEvent(event)
     }
     processTempQueue()
