@@ -24,7 +24,7 @@ config.entry = {
   ]
 };
 
-config.output.publicPath = 'http://' + localDomain + ':3000/assets/bundles/';
+config.output.publicPath = 'http://' + localDomain + ':3000/';
 
 config.plugins = [
   new webpack.HotModuleReplacementPlugin(),
@@ -43,28 +43,15 @@ config.plugins = [
     chunkFilename: '[id].css'
   }),
   new OfflinePlugin({
-    appshell: '/',
-    autoUpdate: 1000 * 60 * 2,
-    cacheMaps: [
-      {
-        match: function(requestUrl) {
-          return new URL('/', location);
-        },
-        requestTypes: ['navigate']
-      }
-    ],
+    appShell: '/',
+    ServiceWorker: {
+      events: true
+    },
     externals: [
       '/',
       '/node_modules/react-dom/umd/react-dom.development.js',
       '/node_modules/react/umd/react.development.js'
-    ],
-    AppCache: {
-      FALLBACK: { '/': '/index.html' }
-    },
-    ServiceWorker: {
-      events: true,
-      navigateFallbackURL: '/'
-    }
+    ]
   })
 ];
 config.module.rules.unshift(

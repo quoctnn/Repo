@@ -9,8 +9,7 @@ new WebpackDevServer(webpack(config), {
   historyApiFallback: true,
   disableHostCheck: true,
   headers: {
-    'Access-Control-Allow-Origin': '*',
-    'Cache-Control': 'max-age=3600'
+    'Access-Control-Allow-Origin': '*'
   }
 }).listen(3000, '0.0.0.0', function(err, result) {
   if (err) {

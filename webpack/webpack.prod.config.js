@@ -67,27 +67,14 @@ module.exports = merge(config, {
     }),
     new OfflinePlugin({
       publicPath: '/dist/',
-      appshell: '/',
-      autoUpdate: 1000 * 60 * 2,
-      cacheMaps: [
-        {
-          match: function(requestUrl) {
-            return new URL('/', location);
-          },
-          requestTypes: ['navigate']
-        }
-      ],
+      appShell: '/',
       externals: [
-        '/index.html',
+        '/',
         '/node_modules/react-dom/umd/react-dom.development.js',
         '/node_modules/react/umd/react.development.js'
       ],
-      AppCache: {
-        FALLBACK: { '/': '/index.html' }
-      },
       ServiceWorker: {
-        events: true,
-        navigateFallbackURL: '/'
+        events: true
       }
     })
   ],

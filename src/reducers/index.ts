@@ -22,21 +22,21 @@ const rootPersistConfig:PersistConfig = {
   storage: storageLocal,
   blacklist: ['auth'],
   debug:true,
-  stateReconciler:(inboundState, originalState, 
-    reducedState) => 
+  stateReconciler:(inboundState, originalState,
+    reducedState) =>
   {
-    console.log("window.applicationCache.status", window.applicationCache.status) 
+    console.log("window.applicationCache.status", window.applicationCache.status)
     if(window.applicationCache.status === window.applicationCache.UPDATEREADY)
     {
         return {...originalState, debug:inboundState.debug }
     }
-    return  { ...reducedState, debug:inboundState.debug } 
+    return  { ...inboundState, debug:inboundState.debug, auth:originalState.auth }
   }
 }
 
 const rootReducer = combineReducers({
-  //debug: persistReducer(debugConfig, debug), 
-  settings, profile, auth, profileStore, communityStore, groupStore, groupListCache, contactListCache, debug, conversationListCache, conversationStore, queue 
+  //debug: persistReducer(debugConfig, debug),
+  settings, profile, auth, profileStore, communityStore, groupStore, groupListCache, contactListCache, debug, conversationListCache, conversationStore, queue
 })
 export default persistReducer(rootPersistConfig, rootReducer)
 export interface RootReducer
