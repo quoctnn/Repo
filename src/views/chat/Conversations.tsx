@@ -123,6 +123,7 @@ class Conversations extends React.Component<Props, {}> {
     {
         if(this.state.loading)
             return null
+    
         if(this.props.total > this.state.data.length)
         {
             return (<li key="load-more"><Button onClick={() => this.loadFromServer()}>{translate("Load More")}</Button></li>)
@@ -137,8 +138,8 @@ class Conversations extends React.Component<Props, {}> {
     {
         let conversations = this.state.data || []
         return (<FullPageComponent> 
-                    <div id="conversations-view" className="full-height">
-                    <h3>{translate("Conversations")}</h3>
+                    <div id="conversations-view" className="full-height col-sm">
+                    <h3><span className="text-truncate d-block">{translate("Conversations")}</span></h3>
                     <ul className="group-list vertical-scroll">
                         {conversations.map((c, index) => {
                             return (<ConversationItem key={index} conversation={c} />)

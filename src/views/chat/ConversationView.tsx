@@ -69,7 +69,7 @@ class ConversationView extends React.Component<Props, {}> {
     {
         let message = event.detail as Message
         let conversation = this.getConversation()
-        if(conversation.id != message.conversation)
+        if(!conversation || conversation.id != message.conversation)
         {
             return
         }
@@ -128,7 +128,7 @@ class ConversationView extends React.Component<Props, {}> {
     {
         let currentConversation = this.getConversation()
         let nextConversation = this.getConversation(nextProps)
-        if(currentConversation.id != nextConversation.id)
+        if(currentConversation && nextConversation && currentConversation.id != nextConversation.id)
         {
             this.setState({ data:[], offset:0, total:0, loading:true}, this.loadMessagesFromServer)
         }
@@ -177,6 +177,8 @@ class ConversationView extends React.Component<Props, {}> {
     loadMessagesFromServer()
     {
         let conversation = this.getConversation()
+        if(!conversation)
+            return
         ApiClient.getConversationMessages(conversation.id,this.state.pageSize,  this.state.offset, this.onMessagesReceived )
     }
     chatDidScrollToTop()
@@ -189,8 +191,10 @@ class ConversationView extends React.Component<Props, {}> {
     onChatMessageSubmit(text:string)
     {
         let conversation = this.getConversation()
+        if(!conversation)
+            return
         let tempId = `${conversation.id}_${this.props.profile.id}_${Date.now()}`
-        let tempMessage = this.getChatMessagePreview(text, tempId)
+        let tempMessage = this.getChatMessagePreview(text, tempId, conversation)
         this.appendMessage(tempMessage)
         this.props.queueAddChatMessage(tempMessage)
         sendMessageToConversation(conversation.id, text,tempId)
@@ -201,9 +205,8 @@ class ConversationView extends React.Component<Props, {}> {
         messages.unshift(message)
         this.setState({data:messages, total:this.state.total + 1, offset:this.state.offset + 1})
     }
-    getChatMessagePreview(text:string, uid:string):Message {
+    getChatMessagePreview(text:string, uid:string, conversation:Conversation):Message {
         let now = Date.now()
-        let conversation = this.getConversation()
         let ds = new Date().toUTCString()
         return {
             id: now,
@@ -221,6 +224,8 @@ class ConversationView extends React.Component<Props, {}> {
     onDidType()
     {
         let conversation = this.getConversation()
+        if(!conversation)
+            return
         sendTypingInConversation(conversation.id)
     }
     renderSomeoneIsTyping()
@@ -240,9 +245,14 @@ class ConversationView extends React.Component<Props, {}> {
         return null
     }
     render() {
+        let me = this.props.profile
         let conversation = this.getConversation()
+        if(!me || !conversation)
+        {
+            return null
+        }
+        let myId = me.id
         let messages = this.state.data
-        let me = this.props.profile.id
         return(
             <FullPageComponent>
                 <div className="d-none d-sm-block col-lg-4 col-md-4 col-sm-5">
@@ -250,7 +260,7 @@ class ConversationView extends React.Component<Props, {}> {
                 </div>
                 <div className="col-lg-8 col-md-8 col-sm-7 col-xs-12">
                     <div id="conversation-view" className="full-height">
-                        {conversation && <h3><span className="text-truncate d-block">{getConversationTitle(conversation, me)}</span></h3>}
+                        {conversation && <h3><span className="text-truncate d-block">{getConversationTitle(conversation, myId)}</span></h3>}
                             <ChatMessageList conversation={conversation.id} loading={this.state.loading} chatDidScrollToTop={this.chatDidScrollToTop} messages={messages} current_user={this.props.profile} >
                                 {this.renderSomeoneIsTyping()}
                             </ChatMessageList>
@@ -265,7 +275,8 @@ class ConversationView extends React.Component<Props, {}> {
 const mapStateToProps = (state:RootReducer) => {
     return {
         conversations:state.conversationStore.conversations,
-        profile:state.profile
+        profile:state.profile,
+        signedIn:state.auth.signedIn
     };
 }
 const mapDispatchToProps = (dispatch) => {

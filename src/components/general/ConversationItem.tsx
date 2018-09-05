@@ -20,13 +20,18 @@ class ConversationItem extends React.Component<Props, {}> {
         super(props);
     }
     shouldComponentUpdate(nextProps:Props, nextState) {
-        return false
+        return nextProps.profile != this.props.profile
     }
     render() {
+        let me = this.props.profile
+        if(!me)
+        {
+            return null
+        }
         let conversation = this.props.conversation
-        let me = this.props.profile.id
-        let title = getConversationTitle(this.props.conversation, me)
-        let users = conversation.users.filter(i => i != me)
+        let myId = this.props.profile.id
+        let title = getConversationTitle(this.props.conversation, myId)
+        let users = conversation.users.filter(i => i != myId)
         return (
             <li className="conversation-item">
                 <Link to={Routes.CONVERSATION + conversation.id}>
