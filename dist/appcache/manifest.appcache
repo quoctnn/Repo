@@ -1,0 +1,18 @@
+CACHE MANIFEST
+#ver:2018-9-5 10:31:01
+#plugin:5.0.5
+
+CACHE:
+../fa-solid-900.eot
+../fa-solid-900.woff2
+../fa-solid-900.woff
+../fa-solid-900.ttf
+../fa-solid-900.svg
+../main.css
+../bundle.js
+
+NETWORK:
+*
+
+FALLBACK:
+/ /electron.html

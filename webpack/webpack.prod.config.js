@@ -4,6 +4,7 @@ var BundleTracker = require('webpack-bundle-tracker');
 var config = require('./webpack.base.config.js');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+const OfflinePlugin = require('offline-plugin');
 
 config.module.rules.unshift(
   { test: /\.tsx?$/, loader: 'ts-loader' },
@@ -29,7 +30,7 @@ config.module.rules.unshift(
         loader: 'file-loader',
         options: {
           name: '[name].[ext]',
-          outputPath: 'dist/'
+          outputPath: '.'
         }
       }
     ]
@@ -64,6 +65,35 @@ module.exports = merge(config, {
     new MiniCssExtractPlugin({
       filename: '[name].css',
       chunkFilename: '[id].css'
+    }),
+    new OfflinePlugin({
+      appshell: '/',
+      autoUpdate: 1000 * 60 * 2,
+      caches: {
+        main: [':rest:'],
+        additional: [':externals:'],
+        optional: []
+      },
+      cacheMaps: [
+        {
+          match: function(requestUrl) {
+            return new URL('/', location);
+          },
+          requestTypes: ['navigate']
+        }
+      ],
+      externals: [
+        '/',
+        '/node_modules/react-dom/umd/react-dom.development.js',
+        '/node_modules/react/umd/react.development.js'
+      ],
+      AppCache: {
+        FALLBACK: { '/': '/index.html' }
+      },
+      ServiceWorker: {
+        events: true,
+        navigateFallbackURL: '/'
+      }
     })
   ],
   devtool: 'cheap-module-source-map',
