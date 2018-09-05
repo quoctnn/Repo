@@ -18,7 +18,7 @@ import { RootReducer } from '../reducers/index';
 import { UserProfile } from '../reducers/profileStore';
 import { PaginatorAction } from '../reducers/createPaginator';
 import ApiClient from '../network/ApiClient';
-import ChannelEventStream from "../components/general/ChannelEventStream";
+import ChannelEventStream from "../components/general/ChannelEventStream"; 
 import * as Actions from "../actions/Actions" 
 require('jquery/dist/jquery');
 require('popper.js/dist/umd/popper');
@@ -28,7 +28,7 @@ require('../utilities/Extensions');
 OfflinePluginRuntime.install();
 
 
-const loggingMiddleware = store => next => action => {
+const loggingMiddleware = store => next => action => { 
     console.log("DISPATCHING => ", action)
     let result = next(action)
     console.log('NEXT STATE => ', store.getState())
@@ -96,10 +96,8 @@ const persistor = persistStore(store, { }, () =>
     { 
         if (confirm('A new version of intraWork is available. Do you want to update now?')) 
         {
-            //clear data 
             store.dispatch(Actions.resetPagedData())
-            debugger  
-            // window.location.reload() 
+            window.location.reload() 
         }
     } 
 })
