@@ -93,4 +93,13 @@ export default class ApiClient
             callback(null, status, error)
         })
     }
+    static getPage(endpoint:string, page:number, pageSize:number,callback:ApiRequestCallback)
+    {
+        let url = endpoint + "?limit=" + pageSize + "&offset=" + (pageSize * page);
+        AjaxRequest.get(url, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
 }

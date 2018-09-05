@@ -3,9 +3,9 @@ import '@fortawesome/fontawesome-free/css/fontawesome.min.css';
 import '@fortawesome/fontawesome-free/css/solid.min.css';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { createStore,applyMiddleware } from 'redux'
-import { Provider } from 'react-redux'
-import { persistStore , createTransform } from 'redux-persist'
+import { applyMiddleware, createStore, Store } from 'redux';
+import { Provider, AnyAction } from 'react-redux'
+import { persistStore } from 'redux-persist'
 import { PersistGate } from 'redux-persist/integration/react'
 import Main from "./Main";
 import AutoIntlProvider from "../components/intl/AutoIntlProvider";
@@ -15,14 +15,17 @@ import { Settings } from '../utilities/Settings';
 import appReducer from '../reducers/index';
 import { RootReducer } from '../reducers/index';
 import { UserProfile } from '../reducers/profileStore';
+import { PaginatorAction } from '../reducers/createPaginator';
+import ApiClient from '../network/ApiClient';
+import ChannelEventStream from "../components/general/ChannelEventStream";
+import * as Actions from "../actions/Actions" 
 require('jquery/dist/jquery');
 require('popper.js/dist/umd/popper');
 require('bootstrap/dist/js/bootstrap');
 require("../utilities/Extensions")
 
 
-
-const logger = store => next => action => {
+const loggingMiddleware = store => next => action => {
     console.log("DISPATCHING => ", action)
     let result = next(action)
     console.log('NEXT STATE => ', store.getState())
@@ -34,7 +37,7 @@ const applyTheme = (themeIndex:number) => {
     let root = document.querySelector(":root")
     root.className = selector
 }
-const themeSwitcher = store => next => action => {
+const themeSwitcherMiddleware = store => next => action => {
     let result = next(action)
     if (action.type === Types.SET_THEME) 
     {
@@ -43,10 +46,31 @@ const themeSwitcher = store => next => action => {
     }
     return result
 }
-var middleWares = [logger]
+const paginationMiddleware = store => next => action => {
+    let result = next(action)
+    if (action.type === Types.REQUEST_PAGE) 
+    {
+        let a = action as PaginatorAction
+        ApiClient.getPage(a.meta.endpoint,a.payload.page , a.meta.pageSize, (data, status, error) => {
+
+            let receivePageAction = (  page:number, results:any[], total:number):PaginatorAction => ({
+                type:  Types.RECEIVE_PAGE,
+                payload: {
+                    page,
+                    results,
+                    total:total
+                },
+                meta: a.meta
+            })
+            store.dispatch(receivePageAction(a.payload.page, data.results || [], data.count || 0))
+        })
+    }
+    return result
+}
+var middleWares = [loggingMiddleware, paginationMiddleware]
 if(Settings.supportsTheming)
 {
-    middleWares.push(themeSwitcher)
+    middleWares.push(themeSwitcherMiddleware)
 }
 const store = createStore(appReducer, applyMiddleware(...middleWares))
 
@@ -65,30 +89,29 @@ const persistor = persistStore(store, { }, () =>
         let themeIndex = store.getState().settings.theme || 0
         applyTheme(themeIndex)
     }
-})
-ReactDOM.render(
-        <Provider store={store}>
-            <PersistGate loading={null} persistor={persistor}>
-                <AutoIntlProvider>
-                    <Main/>
-                </AutoIntlProvider>
-            </PersistGate>
-        </Provider>,
-    document.getElementById("app-root")
-);
-export default store
-
-
-function onUpdateReady() {  
     if (window.applicationCache.status == window.applicationCache.UPDATEREADY) 
     { 
         if (confirm('A new version of intraWork is available. Do you want to update now?')) 
         {
-            window.location.reload() 
+            //clear data 
+            store.dispatch(Actions.resetPagedData())
+            debugger  
+            // window.location.reload() 
         }
     } 
-}
-window.applicationCache.addEventListener("updateready", onUpdateReady);
-if(window.applicationCache.status === window.applicationCache.UPDATEREADY) {
-    onUpdateReady();
-}
+})
+
+ReactDOM.render(
+        <Provider store={store}>
+            <>
+                <ChannelEventStream />
+                <PersistGate loading={null} persistor={persistor}>
+                    <AutoIntlProvider>
+                        <Main/>
+                    </AutoIntlProvider>
+                </PersistGate>
+            </>
+        </Provider>,
+    document.getElementById("app-root")
+);
+export default store 

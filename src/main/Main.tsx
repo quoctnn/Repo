@@ -14,7 +14,6 @@ import { connect } from 'react-redux'
 import DevTool from '../components/dev/DevTool';
 import { Settings } from '../utilities/Settings';
 import LeftNavigation from '../components/navigation/LeftNavigation';
-import ChannelEventStream from "../components/general/ChannelEventStream";
 import RightNavigation from '../components/navigation/RightNavigation';
 import { RootReducer } from '../reducers/index';
 import Conversations from '../views/chat/Conversations';
@@ -37,7 +36,6 @@ class Main extends React.Component<Props, {}> {
           <Router ref="router">
             <div id="main-content">
                 <ToastContainer />
-                  <ChannelEventStream />
                     <div id="content-block" className="transition">
                         <div className="container">
                             <div className="row">

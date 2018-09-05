@@ -3,6 +3,15 @@ import { Group } from '../reducers/groupStore';
 import { Community } from '../reducers/communityStore';
 import { UserProfile } from '../reducers/profileStore';
 import { Conversation, Message } from '../reducers/conversationStore';
+import { conversationPaginator } from '../reducers/conversations';
+//paging
+export const resetPagedData = () => ({
+    type: Types.RESET_PAGED_DATA,
+})
+
+//conversations
+export const requestConversationPage = conversationPaginator.requestPage
+
 
 //queue
 export const queueAddChatMessage = (message:Message) => ({

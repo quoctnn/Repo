@@ -9,12 +9,13 @@ import communityStore from './communityStore';
 import { profileStore, UserProfile } from './profileStore';
 import contactListCache from './contactListCache';
 import storageLocal from 'redux-persist/lib/storage'
-import { persistReducer, createTransform, PersistConfig } from 'redux-persist';
+import { persistReducer, PersistConfig } from 'redux-persist';
 import { ApiEndpoint } from './debug';
 import conversationListCache from './conversationListCache';
 import conversationStore from './conversationStore';
 import queue from './queue';
-import { test } from './test';
+import { conversations } from './conversations';
+import { Conversation } from './conversationStore';
 
 
 const rootPersistConfig:PersistConfig = {
@@ -22,7 +23,7 @@ const rootPersistConfig:PersistConfig = {
   storage: storageLocal,
   blacklist: ['auth'],
   debug:true,
-  stateReconciler:(inboundState, originalState, 
+  /* stateReconciler:(inboundState, originalState, 
     reducedState) => 
   {
     console.log("window.applicationCache.status", window.applicationCache.status) 
@@ -30,13 +31,13 @@ const rootPersistConfig:PersistConfig = {
     {
         return {...originalState, debug:inboundState.debug }
     }
-    return  { ...reducedState, debug:inboundState.debug } 
-  }
-}
+    return  { ...inboundState, debug:inboundState.debug, auth:originalState.auth } 
+  } */
+} 
 
 const rootReducer = combineReducers({
   //debug: persistReducer(debugConfig, debug), 
-  settings, profile, auth, profileStore, communityStore, groupStore, groupListCache, contactListCache, debug, conversationListCache, conversationStore, queue 
+  settings, profile, auth, profileStore, communityStore, groupStore, groupListCache, contactListCache, debug, conversationListCache, conversationStore, queue, conversations
 })
 export default persistReducer(rootPersistConfig, rootReducer)
 export interface RootReducer
@@ -52,6 +53,7 @@ export interface RootReducer
       conversationListCache:any;
       conversationStore:any;
       queue:any;
+      conversations:{items:Conversation[], pagination:{currentPage:number, pages:{number:{fetching:boolean, ids:number[]}}}};
   debug: {accessToken:string, apiEndpoint:number, availableApiEndpoints:ApiEndpoint[] };
   _persist:any
 }

@@ -1,134 +1,75 @@
 import * as React from 'react';
 import * as Actions from "../../actions/Actions" 
 import { connect } from 'react-redux'
-import ApiClient from '../../network/ApiClient';
 import LoadingSpinner from '../../components/general/LoadingSpinner';
 import { Button } from 'reactstrap';
 import { translate } from '../../components/intl/AutoIntlProvider';
 import { RootReducer } from '../../reducers';
 import { Conversation } from '../../reducers/conversationStore';
-import { toast } from 'react-toastify';
-import { ErrorToast } from '../../components/general/Toast';
 import ConversationItem from '../../components/general/ConversationItem';
 import { FullPageComponent } from '../../components/general/FullPageComponent';
+import { PaginationUtilities } from '../../utilities/PaginationUtilities';
 export interface Props {
-    pageSize?:number,
-    conversationData:number[],
-    setConversations:( conversations:Conversation[], total:number) => void,
-    appendConversations:( conversations:Conversation[]) => void,
-    conversationStore:Conversation[],
-    total:number
+    total:number,
+    page:number,
+    isFetching:boolean,
+    items:Conversation[],
+    requestConversationPage?:(page:number) => void
 }
 export interface State {
-    loading:boolean,
-    data:Conversation[],
-    offset:number,
-    hasLoaded:boolean,
-    hash:number
 }
-class Conversations extends React.Component<Props, {}> {
+class Conversations extends React.Component<Props, {}> {     
     state:State
     static defaultProps:Props = {
-        pageSize:3,
         total:0,
-        conversationData:[],
-        setConversations:null,
-        appendConversations:null,
-        conversationStore:[]
-        
+        isFetching:false,
+        page:-1,
+        items:[]
     }
     constructor(props) {
         super(props);
         this.state = {
-            loading:false, 
-            data:[],
-            offset:0,
-            hasLoaded:false,
-            hash:-1
+
         }
-        this.responseFromServer = this.responseFromServer.bind(this)
-        this.checkUpdate = this.checkUpdate.bind(this)
-        this.loadFromServer = this.loadFromServer.bind(this)
+        this.loadFirstData = this.loadFirstData.bind(this)
         this.renderLoadMore = this.renderLoadMore.bind(this)
+        this.loadNextPageData = this.loadNextPageData.bind(this) 
     }
-    //load current data
-    //load new data 
-        // check if newer?
-        // if newer?
-            //reload 
-    
     componentWillMount()
     {
-        this.resetConversationCache()
-    }
-    resetConversationCache()
-    {
-        this.props.setConversations([], 0)
+        this.loadFirstData()
     }
     componentDidMount()
     {
-        this.loadFromServer()//load first page
     }
     componentDidUpdate(prevProps:Props, prevState:State)
     {
-        this.checkUpdate()
     }
-    
-    checkUpdate()
+    loadFirstData()
     {
-        let result:Conversation[] = []
-        let prevHash = this.state.hash
-        this.props.conversationData.forEach((id) => 
-        {
-            let f = this.props.conversationStore.find( i => i.id == id)
-            if(f)
-                result.push(f)
-        })
-        let hash = (result.map(i => i.updated_at).join(",") || "0").hashCode()
-        if(prevHash != hash)
-        {
-            console.log("Loading new conversations", result.length)
-            this.setState({ data: result, offset: result.length, hash:hash})
-        }
+        if(this.props.total == 0 || this.props.page == -1)
+            this.props.requestConversationPage(0)
     }
-    responseFromServer(data:any, status:string, error:string)
+    loadNextPageData()
     {
-        if(error || status == "error" || !data.results)
-        {
-            toast.error(<ErrorToast message={error || "Error retrieving conversations"} />, { hideProgressBar: true })
-            this.setState({loading:false, hasLoaded:false})
-            return
-        }
-        this.setState({loading:false, hasLoaded:true}, () => {
-            if(this.state.data && this.state.data.length > 0)
-                this.props.appendConversations(data.results)
-            else 
-                this.props.setConversations(data.results, data.count)
-        })
-    }
-    loadFromServer()
-    {
-        this.setState({loading:true}, () => {
-
-            console.log("Loading conversations from server","offset:"+ this.state.offset)
-            ApiClient.getConversations(this.props.pageSize, this.state.offset, this.responseFromServer)
-        })
+        if(this.props.total > this.props.items.length)
+            this.props.requestConversationPage(this.props.page + 1)
     }
     renderLoading() {
-        if (this.state.loading) {
+        if (this.props.isFetching) {
             return (<li key="loading"><LoadingSpinner/></li>)
         }
     }
     renderLoadMore()
     {
-        if(this.state.loading)
+        if(this.props.isFetching)
             return null
     
-        if(this.props.total > this.state.data.length)
+        if(this.props.total > this.props.items.length)
         {
-            return (<li key="load-more"><Button onClick={() => this.loadFromServer()}>{translate("Load More")}</Button></li>)
+            return (<li key="load-more"><Button onClick={() => this.loadNextPageData()}>{translate("Load More")}</Button></li>)
         }
-        else if(this.state.data.length == 0)
+        else if(this.props.items.length == 0)
         {
             return (<li>NO CONVERSATIONS AVAILABLE</li>)
         }
@@ -136,7 +77,8 @@ class Conversations extends React.Component<Props, {}> {
     
     render()
     {
-        let conversations = this.state.data || []
+        let conversations = this.props.items
+        
         return (<FullPageComponent> 
                     <div id="conversations-view" className="full-height col-sm">
                     <h3><span className="text-truncate d-block">{translate("Conversations")}</span></h3>
@@ -153,21 +95,24 @@ class Conversations extends React.Component<Props, {}> {
 }
 
 const mapStateToProps = (state:RootReducer) => {
+    const pagination = state.conversations.pagination
+    const allItems = state.conversations.items
+    const isFetching = PaginationUtilities.isCurrentPageFetching(pagination)
+    const items = PaginationUtilities.getAllResults(allItems , pagination)
+    const currentPageResults = PaginationUtilities.getCurrentPageResults(allItems, pagination)
+    const page = currentPageResults.length > 0 ? PaginationUtilities.getCurrentPageNumber(pagination) : -1
+    const total = PaginationUtilities.getCurrentTotalResultsCount(pagination)
     return {
-        conversationData: state.conversationListCache.conversations,
-        conversationStore:state.conversationStore.conversations,
-        total:state.conversationListCache.total
-    };
+        page,
+        isFetching,
+        items,
+        total
+    }
 }
 const mapDispatchToProps = (dispatch) => {
     return {
-        setConversations:(conversations:Conversation[], total:number) => {
-            dispatch(Actions.setConversationListCache(conversations.map(g => g.id), total))
-            dispatch(Actions.storeConversations(conversations))
-        },
-        appendConversations:(conversations:Conversation[]) => {
-            dispatch(Actions.appendConversationListCache(conversations.map(g => g.id)))
-            dispatch(Actions.storeConversations(conversations))
+        requestConversationPage:(page:number) => {
+            dispatch(Actions.requestConversationPage(page))
         }
     }
 }
