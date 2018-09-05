@@ -84,6 +84,14 @@ export const getProfileById = (id:number):UserProfile =>
         return s.profile
     return  s.profileStore.byId[id]
 }
+const resetCachedDataAndReload = () => 
+{
+    if (confirm('A new version of intraWork is available. Do you want to update now?')) 
+    {
+        store.dispatch(Actions.resetPagedData())
+        window.location.reload() 
+    }
+}
 const persistor = persistStore(store, { }, () => 
 { 
     //rehydrate complete
@@ -94,14 +102,9 @@ const persistor = persistStore(store, { }, () =>
     }
     if (window.applicationCache.status == window.applicationCache.UPDATEREADY) 
     { 
-        if (confirm('A new version of intraWork is available. Do you want to update now?')) 
-        {
-            store.dispatch(Actions.resetPagedData())
-            window.location.reload() 
-        }
+        resetCachedDataAndReload()
     } 
 })
-
 ReactDOM.render(
         <Provider store={store}>
             <>
