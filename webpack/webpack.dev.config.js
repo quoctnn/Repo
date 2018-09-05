@@ -1,20 +1,19 @@
 var path = require('path');
 var webpack = require('webpack');
 var BundleTracker = require('webpack-bundle-tracker');
-var AppCachePlugin = require('appcache-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-
+var OfflinePlugin = require('offline-plugin');
 var config = require('./webpack.base.config.js');
 var localDomain;
 
 try {
   localDomain = require('./local.domain');
 } catch (e) {
-    // Not local domain specified, shared on localhost
-    //localDomain = "192.168.15.26";
-    //localDomain = "10.0.1.56"
-    localDomain = "localhost";
-    //localDomain = "alesund-dev.intra.work";
+  // Not local domain specified, shared on localhost
+  //localDomain = "192.168.15.26";
+  //localDomain = "10.0.1.56"
+  localDomain = 'localhost';
+  //localDomain = "alesund-dev.intra.work";
 }
 
 config.entry = {
@@ -25,20 +24,9 @@ config.entry = {
   ]
 };
 
-config.output.publicPath = 'http://' + localDomain + ':3000/assets/bundles/';
+config.output.publicPath = 'http://' + localDomain + ':3000/';
 
 config.plugins = [
-  new AppCachePlugin({
-    cache: [
-      '/node_modules/react-dom/umd/react-dom.development.js',
-      '/node_modules/react/umd/react.development.js'
-    ],
-    network: ['*'],
-    //fallback: ['failwhale.jpg'],
-    settings: ['prefer-online'],
-    //exclude: ['file.txt', /.*\.js$/],  // Exclude file.txt and all .js files
-    output: 'intrasocial.appcache'
-  }),
   new webpack.HotModuleReplacementPlugin(),
   new webpack.NoEmitOnErrorsPlugin(),
   new BundleTracker({ filename: 'webpack/webpack-stats-dev.json' }),
@@ -53,6 +41,17 @@ config.plugins = [
   new MiniCssExtractPlugin({
     filename: '[name].css',
     chunkFilename: '[id].css'
+  }),
+  new OfflinePlugin({
+    appShell: '/',
+    ServiceWorker: {
+      events: true
+    },
+    externals: [
+      '/',
+      '/node_modules/react-dom/umd/react-dom.development.js',
+      '/node_modules/react/umd/react.development.js'
+    ]
   })
 ];
 config.module.rules.unshift(

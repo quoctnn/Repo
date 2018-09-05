@@ -26,7 +26,7 @@ const rootPersistConfig:PersistConfig = {
   /* stateReconciler:(inboundState, originalState, 
     reducedState) => 
   {
-    console.log("window.applicationCache.status", window.applicationCache.status) 
+    console.log("window.applicationCache.status", window.applicationCache.status)
     if(window.applicationCache.status === window.applicationCache.UPDATEREADY)
     {
         return {...originalState, debug:inboundState.debug }

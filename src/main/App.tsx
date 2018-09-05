@@ -3,12 +3,13 @@ import '@fortawesome/fontawesome-free/css/fontawesome.min.css';
 import '@fortawesome/fontawesome-free/css/solid.min.css';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { applyMiddleware, createStore, Store } from 'redux';
-import { Provider, AnyAction } from 'react-redux'
-import { persistStore } from 'redux-persist'
-import { PersistGate } from 'redux-persist/integration/react'
-import Main from "./Main";
-import AutoIntlProvider from "../components/intl/AutoIntlProvider";
+import * as OfflinePluginRuntime from 'offline-plugin/runtime';
+import { createStore, applyMiddleware } from 'redux';
+import { Provider } from 'react-redux';
+import { persistStore, createTransform } from 'redux-persist';
+import { PersistGate } from 'redux-persist/integration/react';
+import Main from './Main';
+import AutoIntlProvider from '../components/intl/AutoIntlProvider';
 import { Types } from '../utilities/Types';
 import { availableThemes } from '../reducers/settings';
 import { Settings } from '../utilities/Settings';
@@ -22,7 +23,9 @@ import * as Actions from "../actions/Actions"
 require('jquery/dist/jquery');
 require('popper.js/dist/umd/popper');
 require('bootstrap/dist/js/bootstrap');
-require("../utilities/Extensions")
+require('../utilities/Extensions');
+
+OfflinePluginRuntime.install();
 
 
 const loggingMiddleware = store => next => action => {
@@ -72,7 +75,7 @@ if(Settings.supportsTheming)
 {
     middleWares.push(themeSwitcherMiddleware)
 }
-const store = createStore(appReducer, applyMiddleware(...middleWares))
+const store = createStore(appReducer, applyMiddleware(...middleWares));
 
 export const getProfileById = (id:number):UserProfile => 
 {

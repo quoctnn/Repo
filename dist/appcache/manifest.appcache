@@ -1,0 +1,21 @@
+CACHE MANIFEST
+#ver:2018-9-5 12:25:32
+#plugin:5.0.5
+
+CACHE:
+/dist/fa-solid-900.eot
+/dist/fa-solid-900.woff2
+/dist/fa-solid-900.woff
+/dist/fa-solid-900.ttf
+/dist/fa-solid-900.svg
+/dist/main.css
+/dist/bundle.js
+/
+/node_modules/react-dom/umd/react-dom.development.js
+/node_modules/react/umd/react.development.js
+
+NETWORK:
+*
+
+FALLBACK:
+/ /index.html
