@@ -14,9 +14,7 @@ config.module.rules.unshift(
       {
         loader: MiniCssExtractPlugin.loader,
         options: {
-          // you can specify a publicPath here
-          // by default it use publicPath in webpackOptions.output
-          publicPath: '../'
+          publicPath: '/dist/'
         }
       },
       'css-loader',
@@ -30,7 +28,8 @@ config.module.rules.unshift(
         loader: 'file-loader',
         options: {
           name: '[name].[ext]',
-          outputPath: '.'
+          outputPath: '.',
+          publicPath: '/dist/'
         }
       }
     ]
@@ -67,13 +66,9 @@ module.exports = merge(config, {
       chunkFilename: '[id].css'
     }),
     new OfflinePlugin({
+      publicPath: '/dist/',
       appshell: '/',
       autoUpdate: 1000 * 60 * 2,
-      caches: {
-        main: [':rest:'],
-        additional: [':externals:'],
-        optional: []
-      },
       cacheMaps: [
         {
           match: function(requestUrl) {
@@ -83,7 +78,7 @@ module.exports = merge(config, {
         }
       ],
       externals: [
-        '/',
+        '/index.html',
         '/node_modules/react-dom/umd/react-dom.development.js',
         '/node_modules/react/umd/react.development.js'
       ],

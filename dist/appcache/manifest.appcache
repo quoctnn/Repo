@@ -1,18 +1,21 @@
 CACHE MANIFEST
-#ver:2018-9-5 10:31:01
+#ver:2018-9-5 11:20:16
 #plugin:5.0.5
 
 CACHE:
-../fa-solid-900.eot
-../fa-solid-900.woff2
-../fa-solid-900.woff
-../fa-solid-900.ttf
-../fa-solid-900.svg
-../main.css
-../bundle.js
+/dist/fa-solid-900.eot
+/dist/fa-solid-900.woff2
+/dist/fa-solid-900.woff
+/dist/fa-solid-900.ttf
+/dist/fa-solid-900.svg
+/dist/main.css
+/dist/bundle.js
+/
+/node_modules/react-dom/umd/react-dom.development.js
+/node_modules/react/umd/react.development.js
 
 NETWORK:
 *
 
 FALLBACK:
-/ /electron.html
+/ /index.html

@@ -10802,8 +10802,8 @@ a.text-dark:hover, a.text-dark:focus {
   font-family: "Font Awesome 5 Free";
   font-style: normal;
   font-weight: 900;
-  src: url(../fa-solid-900.eot);
-  src: url(../fa-solid-900.eot?#iefix) format("embedded-opentype"), url(../fa-solid-900.woff2) format("woff2"), url(../fa-solid-900.woff) format("woff"), url(../fa-solid-900.ttf) format("truetype"), url(../fa-solid-900.svg#fontawesome) format("svg"); }
+  src: url(/dist/fa-solid-900.eot);
+  src: url(/dist/fa-solid-900.eot?#iefix) format("embedded-opentype"), url(/dist/fa-solid-900.woff2) format("woff2"), url(/dist/fa-solid-900.woff) format("woff"), url(/dist/fa-solid-900.ttf) format("truetype"), url(/dist/fa-solid-900.svg#fontawesome) format("svg"); }
 
 .fa, .fas {
   font-family: "Font Awesome 5 Free";
