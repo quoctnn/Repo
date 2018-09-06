@@ -4,13 +4,15 @@ import { Community } from '../reducers/communityStore';
 import { UserProfile } from '../reducers/profileStore';
 import { Conversation, Message } from '../reducers/conversationStore';
 import { conversationPaginator } from '../reducers/conversations';
+import { messagesPaginator } from '../reducers/messages';
 //paging
 export const resetPagedData = () => ({
     type: Types.RESET_PAGED_DATA,
 })
-
+//messages
+export const requestNextMessagePage = messagesPaginator.requestNextPage
 //conversations
-export const requestConversationPage = conversationPaginator.requestPage
+export const requestNextConversationPage = conversationPaginator.requestNextPage
 
 
 //queue

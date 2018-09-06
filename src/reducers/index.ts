@@ -1,3 +1,4 @@
+import { PageItem } from './createPaginator';
 import { combineReducers } from 'redux'
 import debug from './debug';
 import settings from './settings';
@@ -15,7 +16,8 @@ import conversationListCache from './conversationListCache';
 import conversationStore from './conversationStore';
 import queue from './queue';
 import { conversations } from './conversations';
-import { Conversation } from './conversationStore';
+import { Conversation, Message } from './conversationStore';
+import { messages } from './messages';
 
 
 const rootPersistConfig:PersistConfig = {
@@ -37,7 +39,7 @@ const rootPersistConfig:PersistConfig = {
 
 const rootReducer = combineReducers({
   //debug: persistReducer(debugConfig, debug), 
-  settings, profile, auth, profileStore, communityStore, groupStore, groupListCache, contactListCache, debug, conversationListCache, conversationStore, queue, conversations
+  settings, profile, auth, profileStore, communityStore, groupStore, groupListCache, contactListCache, debug, conversationListCache, conversationStore, queue, conversations, messages
 })
 export default persistReducer(rootPersistConfig, rootReducer)
 export interface RootReducer
@@ -53,7 +55,8 @@ export interface RootReducer
       conversationListCache:any;
       conversationStore:any;
       queue:any;
-      conversations:{items:Conversation[], pagination:{currentPage:number, pages:{number:{fetching:boolean, ids:number[]}}}};
+      conversations:{items:Conversation[], pagination:{totalCount:number, fetching:boolean, ids:number[]}};
+      messages:{items:Message[], conversations:PageItem}
   debug: {accessToken:string, apiEndpoint:number, availableApiEndpoints:ApiEndpoint[] };
   _persist:any
 }

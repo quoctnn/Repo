@@ -6,7 +6,7 @@ import * as ReactDOM from 'react-dom';
 import * as OfflinePluginRuntime from 'offline-plugin/runtime';
 import { createStore, applyMiddleware } from 'redux';
 import { Provider } from 'react-redux';
-import { persistStore, createTransform } from 'redux-persist';
+import { persistStore } from 'redux-persist';
 import { PersistGate } from 'redux-persist/integration/react';
 import Main from './Main';
 import AutoIntlProvider from '../components/intl/AutoIntlProvider';
@@ -16,7 +16,7 @@ import { Settings } from '../utilities/Settings';
 import appReducer from '../reducers/index';
 import { RootReducer } from '../reducers/index';
 import { UserProfile } from '../reducers/profileStore';
-import { PaginatorAction } from '../reducers/createPaginator';
+import { PaginatorAction, MultiPaginatorAction } from '../reducers/createPaginator';
 import ApiClient from '../network/ApiClient';
 import ChannelEventStream from '../components/general/ChannelEventStream';
 import * as Actions from '../actions/Actions';
@@ -57,27 +57,40 @@ const themeSwitcherMiddleware = store => next => action => {
 const paginationMiddleware = store => next => action => {
   let result = next(action);
   if (action.type === Types.REQUEST_PAGE) {
-    let a = action as PaginatorAction;
-    ApiClient.getPage(
-      a.meta.endpoint,
-      a.payload.page,
-      a.meta.pageSize,
-      (data, status, error) => {
-        let receivePageAction = (
-          page: number,
-          results: any[],
-          total: number
-        ): PaginatorAction => ({
-          type: Types.RECEIVE_PAGE,
-          payload: {
-            page,
-            results,
-            total: total
-          },
-          meta: a.meta
+    var endpoint:string = null
+    var limit:number = 0
+    var offset:number = 0
+    if ("pagingId" in action.payload)
+    {
+
+      let a = action as MultiPaginatorAction;
+      endpoint = a.meta.endpoint(a.payload.pagingId)
+      limit = a.meta.pageSize
+      offset = a.payload.offset
+    }
+    else 
+    {
+      let a = action as PaginatorAction;
+      endpoint = a.meta.endpoint
+      limit = a.meta.pageSize
+      offset = a.payload.offset
+    }
+    ApiClient.getPage(endpoint , limit, offset,  (data, status, error) => {
+        let receivePageAction = ( offset: number, results: any[], total: number, error:string): PaginatorAction => 
+        ({
+            type: Types.RECEIVE_PAGE,
+            payload: { ...action.payload,
+                offset,
+                results,
+                total,
+                error
+            },
+            meta: action.meta
         });
+        let results = data ? data.results || [] : []
+        let count = data ? data.count || 0 : 0
         store.dispatch(
-          receivePageAction(a.payload.page, data.results || [], data.count || 0)
+            receivePageAction(action.payload.offset, results, count, error)
         );
       }
     );
@@ -89,6 +102,7 @@ if (Settings.supportsTheming) {
   middleWares.push(themeSwitcherMiddleware);
 }
 const store = createStore(appReducer, applyMiddleware(...middleWares));
+window.store = store 
 
 export const getProfileById = (id: number): UserProfile => {
   let s = store.getState();

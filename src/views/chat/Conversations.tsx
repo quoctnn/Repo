@@ -11,10 +11,10 @@ import { FullPageComponent } from '../../components/general/FullPageComponent';
 import { PaginationUtilities } from '../../utilities/PaginationUtilities';
 export interface Props {
     total:number,
-    page:number,
     isFetching:boolean,
     items:Conversation[],
-    requestConversationPage?:(page:number) => void
+    requestNextConversationPage?:(page:number) => void,
+    offset:number
 }
 export interface State {
 }
@@ -23,8 +23,8 @@ class Conversations extends React.Component<Props, {}> {
     static defaultProps:Props = {
         total:0,
         isFetching:false,
-        page:-1,
-        items:[]
+        items:[],
+        offset:0
     }
     constructor(props) {
         super(props);
@@ -47,13 +47,13 @@ class Conversations extends React.Component<Props, {}> {
     }
     loadFirstData()
     {
-        if(this.props.total == 0 || this.props.page == -1)
-            this.props.requestConversationPage(0)
+        if(this.props.total == 0 || this.props.offset == 0 && !this.props.isFetching)
+            this.props.requestNextConversationPage(0)
     }
     loadNextPageData()
     {
-        if(this.props.total > this.props.items.length)
-            this.props.requestConversationPage(this.props.page + 1)
+        if(this.props.total > this.props.offset && !this.props.isFetching)
+            this.props.requestNextConversationPage(this.props.offset)
     }
     renderLoading() {
         if (this.props.isFetching) {
@@ -97,22 +97,21 @@ class Conversations extends React.Component<Props, {}> {
 const mapStateToProps = (state:RootReducer) => {
     const pagination = state.conversations.pagination
     const allItems = state.conversations.items
-    const isFetching = PaginationUtilities.isCurrentPageFetching(pagination)
-    const items = PaginationUtilities.getAllResults(allItems , pagination)
-    const currentPageResults = PaginationUtilities.getCurrentPageResults(allItems, pagination)
-    const page = currentPageResults.length > 0 ? PaginationUtilities.getCurrentPageNumber(pagination) : -1
-    const total = PaginationUtilities.getCurrentTotalResultsCount(pagination)
+    const isFetching = pagination.fetching
+    const items = PaginationUtilities.getCurrentPageResults(allItems, pagination)
+    const total = pagination.totalCount
+    const offset = items.length
     return {
-        page,
         isFetching,
         items,
-        total
+        total,
+        offset
     }
 }
 const mapDispatchToProps = (dispatch) => {
     return {
-        requestConversationPage:(page:number) => {
-            dispatch(Actions.requestConversationPage(page))
+        requestNextConversationPage:(page:number) => {
+            dispatch(Actions.requestNextConversationPage(page))
         }
     }
 }
