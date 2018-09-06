@@ -10,9 +10,12 @@ import { RootReducer } from '../../reducers/index';
 import ReconnectingWebSocket from 'reconnecting-websocket';
 
 import { toast } from 'react-toastify';
-import { ErrorToast } from '../../components/general/Toast';
+import { ErrorToast, InfoToast } from '../../components/general/Toast';
 import { Queue } from '../../reducers/queue';
 import { Message } from '../../reducers/conversationStore';
+import { Routes } from '../../utilities/Routes';
+import { History } from 'history';
+import { translate } from '../intl/AutoIntlProvider';
 
 export enum SocketMessageType {
   STATE = 'state',
@@ -39,6 +42,8 @@ export interface Props {
   signedIn: boolean;
   profile: UserProfile;
   awayTimeout: number;
+  contacts: UserProfile[];
+  history: History;
 
   queue: Queue;
   queueRemoveChatMessage: (message: Message) => void;
@@ -84,6 +89,7 @@ export const sendMessageToConversation = (
     })
   );
 };
+
 export const addSocketEventListener = (
   type: SocketMessageType,
   listener: EventListenerOrEventListenerObject
@@ -128,6 +134,8 @@ class ChannelEventStream extends React.Component<Props, {}> {
     this.clearUserActivityTimer = this.clearUserActivityTimer.bind(this);
     this.startTimer = this.startTimer.bind(this);
     this.processTempQueue = this.processTempQueue.bind(this);
+
+    this.sendMessageNotification = this.sendMessageNotification.bind(this);
 
     this.lastUserActivity = new Date();
     this.lastUserActivityTimer = null;
@@ -177,6 +185,38 @@ class ChannelEventStream extends React.Component<Props, {}> {
       this.props.setProfile(p);
     }
   }
+  sendMessageNotification(message: Message) {
+    let uri = Routes.CONVERSATION + message.conversation;
+    if (document.hasFocus()) {
+      // If tab is focused
+      let user: UserProfile = this.props.contacts['byId'][message.user];
+      // Show the toast if the user is not viewing that conversation
+      if (user && window.location.pathname != uri) {
+        toast.info(
+          <InfoToast message={user.first_name + ': ' + message.text} />
+        );
+      }
+    } else if (
+      'Notification' in window &&
+      Notification.permission === 'granted'
+    ) {
+      // If window is not active and notifications are enabled
+      if (Notification.permission === 'granted') {
+        let user: UserProfile = this.props.contacts['byId'][message.user];
+        if (user) {
+          var options = {
+            body: user.first_name + ': ' + message.text
+          };
+          var notification = (new Notification(
+            translate('New Message'),
+            options
+          ).onclick = function(event) {
+            window.open(uri);
+          });
+        }
+      }
+    }
+  }
   processTypingInConversation(data: any) {
     var event = new CustomEvent(SocketMessageType.CONVERSATION_TYPING, {
       detail: data
@@ -188,8 +228,11 @@ class ChannelEventStream extends React.Component<Props, {}> {
       detail: data
     });
     let message = data as Message;
-    if (message.user == this.props.profile.id)
+    if (message.user == this.props.profile.id) {
       this.props.queueRemoveChatMessage(message);
+    } else {
+      this.sendMessageNotification(message);
+    }
     this.socketRef.current.dispatchEvent(event);
   }
   processTempQueue() {
@@ -371,6 +414,7 @@ const mapStateToProps = (state: RootReducer) => {
     signedIn: state.auth.signedIn,
     apiEndpoint: state.debug.apiEndpoint,
     profile: state.profile,
+    contacts: state.profileStore,
     awayTimeout: state.settings.awayTimeout,
     queue: state.queue
   };
