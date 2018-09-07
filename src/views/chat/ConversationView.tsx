@@ -211,7 +211,7 @@ class ConversationView extends React.Component<Props, {}> {
         return(
             <FullPageComponent>
                 <div className="d-none d-sm-block col-lg-4 col-md-4 col-sm-5">
-                    <Conversations />
+                    <Conversations preventShowTyingInChatId={conversation.id} />
                 </div>
                 <div className="col-lg-8 col-md-8 col-sm-7 col-xs-12">
                     <div id="conversation-view" className="card full-height">

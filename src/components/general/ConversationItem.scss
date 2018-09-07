@@ -21,4 +21,16 @@
     {
         @include var(color, title-color);
     }
+    .is-typing-container
+    {
+        bottom: 0px;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        flex-shrink: 0;
+        > *
+        {
+            margin-right: 5px;
+        }
+    }
 }
