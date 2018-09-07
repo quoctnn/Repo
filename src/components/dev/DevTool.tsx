@@ -7,7 +7,6 @@ import { sendOnWebsocket } from '../general/ChannelEventStream';
 import {  Form } from 'reactstrap';
 import { availableLanguages, availableThemes } from '../../reducers/settings';
 import { RootReducer } from '../../reducers';
-import debug from '../../reducers/debug';
 require("./DevTool.scss");
 export interface Props {
     language:number,

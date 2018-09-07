@@ -13,7 +13,7 @@ export interface CachePage
    fetching:boolean,
    error:string
 }
-export const defaultPage = {ids:[], totalCount:0, fetching:false, error:null}
+export const defaultPage:CachePage = {ids:[], totalCount:0, fetching:false, error:null}
 export const createPaginator = (key:string, endpoint:string, itemIdKey:string, pageSize:number) =>
 {
     const requestNextPage = ( offset:number):PaginatorAction => ({
@@ -38,8 +38,15 @@ export const createPaginator = (key:string, endpoint:string, itemIdKey:string, p
           return page
       }
     }
-    const onlyForEndpoint = (reducer) => (state = {}, action:PaginatorAction = {}) =>
-      typeof action.meta == 'undefined' ? action.type == Types.RESET_PAGED_DATA ? reducer(state, action) : state : (action.meta.key == key ? reducer(state, action) : state)
+    const onlyForEndpoint = (reducer) => (state = {}, action:any = {}) =>
+    {
+        if((action.meta && action.meta.key == key) || action.type == Types.RESET_PAGED_DATA || action.type == Types.INSERT_ITEM_TO_PAGE)
+        {
+            return reducer(state, action)
+        }
+        return state
+    }
+    
   
     const itemsReducer = (items = {}, action:PaginatorAction = {}) => { 
       switch (action.type) {
@@ -72,6 +79,12 @@ export interface MultiPaginatorAction
     type?:string
     payload?:{pagingId:string,offset:number, results?:any[], total?:number, error:string}
     meta?:{endpoint:(id:string) => string, key:string, itemIdKey:string, pageSize:number}
+}
+export interface InsertItemAction
+{
+  type?: string,
+  item?:any,
+  pagingId?:string
 }
 export type PageItem = { [page: string]: CachePage }
 export const createMultiPaginator = (key:string, endpoint:(id:string) => string, itemIdKey:string, pageSize:number) =>
@@ -108,18 +121,39 @@ export const createMultiPaginator = (key:string, endpoint:(id:string) => string,
             }
           }
         }
+        case Types.INSERT_ITEM_TO_PAGE:
+        {
+          let a = action as InsertItemAction
+          let p = pages[a.pagingId] || defaultPage
+          p.ids.unshift(a.item[itemIdKey])
+          p.fetching = false
+          p.totalCount = p.totalCount + 1
+          p.error = null
+          return {
+            ...pages,
+            [a.pagingId]: {
+              ...p
+            }
+          }
+        }
         case Types.RESET_PAGED_DATA: 
           return {}
         default:
           return pages
       }
     }
-    const onlyForEndpoint = (reducer) => (state = {}, action:MultiPaginatorAction = {}) =>
-      typeof action.meta == 'undefined' ? action.type == Types.RESET_PAGED_DATA ? reducer(state, action) : state : (action.meta.key == key ? reducer(state, action) : state)
-  
+    const onlyForEndpoint = (reducer) => (state = {}, action:any = {}) =>
+    {
+        if((action.meta && action.meta.key == key) || action.type == Types.RESET_PAGED_DATA || action.type == Types.INSERT_ITEM_TO_PAGE)
+        {
+            return reducer(state, action)
+        }
+        return state
+    }
     const itemsReducer = (items = {}, action:MultiPaginatorAction = {}) => { 
       switch (action.type) {
         case Types.RECEIVE_PAGE:
+        {
           let _items = {}
           for (let item of action.payload.results) {  
             _items = {
@@ -131,8 +165,14 @@ export const createMultiPaginator = (key:string, endpoint:(id:string) => string,
             ...items,
             ..._items
           }
+        }
         case Types.RESET_PAGED_DATA:
           return {}
+        case Types.INSERT_ITEM_TO_PAGE:
+        {
+          let a = action as InsertItemAction
+          return {...items,[a.item[itemIdKey]]: a.item}
+        }
         default:
           return items
       }

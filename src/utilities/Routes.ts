@@ -8,5 +8,6 @@ export enum Routes {
     COMMUNITY = "/community/",
     CONVERSATIONS = "/conversations/",
     CONVERSATION = "/conversation/",
-    SEARCH = "/search/"
+    SEARCH = "/search/",
+    UPDATE_TOOL = "/app-update"
 }

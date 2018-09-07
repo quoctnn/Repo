@@ -5,12 +5,18 @@ import { UserProfile } from '../reducers/profileStore';
 import { Conversation, Message } from '../reducers/conversationStore';
 import { conversationPaginator } from '../reducers/conversations';
 import { messagesPaginator } from '../reducers/messages';
+import { InsertItemAction } from '../reducers/createPaginator';
 //paging
 export const resetPagedData = () => ({
     type: Types.RESET_PAGED_DATA,
 })
 //messages
 export const requestNextMessagePage = messagesPaginator.requestNextPage
+export const insertChatMessage = (pagingId:string, message:Message):InsertItemAction => ({
+    type: Types.INSERT_ITEM_TO_PAGE,
+    item:message,
+    pagingId
+})
 //conversations
 export const requestNextConversationPage = conversationPaginator.requestNextPage
 

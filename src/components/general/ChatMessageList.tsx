@@ -31,6 +31,9 @@ export class ChatMessageList extends React.Component<Props, {}> {
     }
 
     componentDidMount() {
+        if (this.props.messages.length > 0) {
+            this.scrollListToBottom()
+        }
         this.SCROLL_POSITION = new ScrollPosition(document.querySelector('.message-list'))
     }
 

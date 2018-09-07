@@ -1,30 +1,33 @@
 import * as React from "react";
+import { uniqueId } from '../../utilities/Utilities';
 
 export interface Props {
 }
+
 export class FullPageComponent extends React.Component<Props,{}> {
 
-    static fullPage = "full-page"
+    static fullPage = "full-page-"
     bodyClassAdded = false
+    className = FullPageComponent.fullPage + uniqueId()
     componentWillUnmount()
     {
         if(this.bodyClassAdded)
-            document.body.classList.remove(FullPageComponent.fullPage)
+            document.body.classList.remove(this.className)
     }
     componentWillUpdate()
     {
-        if(!this.bodyClassAdded && !document.body.classList.contains(FullPageComponent.fullPage))
+        if(!this.bodyClassAdded && !document.body.classList.contains(this.className))
         {
             this.bodyClassAdded = true
-            document.body.classList.add(FullPageComponent.fullPage)
+            document.body.classList.add(this.className)
         }
     }
     componentWillMount()
     {
-        if(!document.body.classList.contains(FullPageComponent.fullPage))
+        if(!document.body.classList.contains(this.className))
         {
             this.bodyClassAdded = true
-            document.body.classList.add(FullPageComponent.fullPage)
+            document.body.classList.add(this.className)
         }
     }
     render()

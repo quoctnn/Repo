@@ -1,5 +1,9 @@
 #conversation-view
 {
+    .card-body
+    {
+        padding: 0;
+    }
     .is-typing-container
     {
         position: -webkit-sticky;

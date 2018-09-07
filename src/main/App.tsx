@@ -3,7 +3,6 @@ import '@fortawesome/fontawesome-free/css/fontawesome.min.css';
 import '@fortawesome/fontawesome-free/css/solid.min.css';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import * as OfflinePluginRuntime from 'offline-plugin/runtime';
 import { createStore, applyMiddleware } from 'redux';
 import { Provider } from 'react-redux';
 import { persistStore } from 'redux-persist';
@@ -24,15 +23,6 @@ require('jquery/dist/jquery');
 require('popper.js/dist/umd/popper');
 require('bootstrap/dist/js/bootstrap');
 require('../utilities/Extensions');
-
-OfflinePluginRuntime.install({
-  onUpdateReady: () => {
-    OfflinePluginRuntime.applyUpdate();
-  },
-  onUpdated: () => {
-    resetCachedDataAndReload();
-  }
-});
 
 const loggingMiddleware = store => next => action => {
   console.log('DISPATCHING => ', action);
@@ -109,24 +99,12 @@ export const getProfileById = (id: number): UserProfile => {
   if (s.profile.id == id) return s.profile;
   return s.profileStore.byId[id];
 };
-const resetCachedDataAndReload = () => {
-  if (
-    confirm(
-      'A new version of intraWork is available. Do you want to update now?'
-    )
-  ) {
-    store.dispatch(Actions.resetPagedData());
-    window.location.reload();
-  }
-};
+
 const persistor = persistStore(store, {}, () => {
   //rehydrate complete
   if (Settings.supportsTheming) {
     let themeIndex = store.getState().settings.theme || 0;
     applyTheme(themeIndex);
-  }
-  if (window.applicationCache.status == window.applicationCache.UPDATEREADY) {
-    resetCachedDataAndReload();
   }
 });
 ReactDOM.render(

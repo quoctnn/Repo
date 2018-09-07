@@ -1,3 +1,4 @@
+import UpdateWatcher from '../components/general/UpdateWatcher';
 import Profile from '../views/profile/Profile';
 import { Routes } from '../utilities/Routes';
 import * as React from 'react';
@@ -18,6 +19,7 @@ import RightNavigation from '../components/navigation/RightNavigation';
 import { RootReducer } from '../reducers/index';
 import Conversations from '../views/chat/Conversations';
 import ConversationView from '../views/chat/ConversationView';
+import UpdateTool from '../components/update/UpdateTool';
 require("react-toastify/dist/ReactToastify.css");
 require("./Main.scss");
 
@@ -35,6 +37,7 @@ class Main extends React.Component<Props, {}> {
     return (
           <Router ref="router">
             <div id="main-content">
+                <UpdateWatcher />
                 <ToastContainer />
                     <div id="content-block" className="transition">
                         <div className="container">
@@ -49,6 +52,7 @@ class Main extends React.Component<Props, {}> {
                                 <Route path={Routes.COMMUNITY + ":communityid/:groupname"} component={GroupView} />
                                 <Route path={Routes.COMMUNITY + ":communityname"} component={Community} />
                                 <Route path={Routes.ROOT} exact={true} component={NewsFeed} />
+                                <Route path={Routes.UPDATE_TOOL} exact={true} component={UpdateTool} />
                                 <Route path={Routes.ANY} component={error404} />
                               </Switch>
                             </div>

@@ -117,3 +117,10 @@ export function cloneDictKeys(dict)
     })
     return newDict
 }
+export const nullOrUndefined = (any) => 
+{
+    return any === null || any === undefined
+}
+export const uniqueId = () =>  {
+    return Math.random().toString(36).substr(2, 16);
+}

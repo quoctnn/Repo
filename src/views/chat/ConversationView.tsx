@@ -5,20 +5,19 @@ import { connect } from 'react-redux'
 import { RootReducer } from '../../reducers/index';
 import { ChatMessageList } from '../../components/general/ChatMessageList';
 import { UserProfile } from '../../reducers/profileStore';
-import { toast } from 'react-toastify';
-import { ErrorToast } from '../../components/general/Toast';
 import { ChatMessageComposer } from '../../components/general/ChatMessageComposer';
 import { sendTypingInConversation, addSocketEventListener, SocketMessageType, removeSocketEventListener, sendMessageToConversation } from '../../components/general/ChannelEventStream';
 import { Settings } from '../../utilities/Settings';
 import { TypingIndicator } from '../../components/general/TypingIndicator';
 import { Avatar } from '../../components/general/Avatar';
-import { cloneDictKeys } from '../../utilities/Utilities';
+import { cloneDictKeys, nullOrUndefined } from '../../utilities/Utilities';
 import * as Actions from '../../actions/Actions'; 
 import { FullPageComponent } from '../../components/general/FullPageComponent';
 import { getConversationTitle } from '../../utilities/ConversationUtilities';
 import { getProfileById } from '../../main/App';
 import { defaultPage } from '../../reducers/createPaginator';
 import { PaginationUtilities } from '../../utilities/PaginationUtilities';
+import { QueueUtilities } from '../../utilities/QueueUtilities';
 
 require("./ConversationView.scss");
 export interface Props {
@@ -27,12 +26,14 @@ export interface Props {
     profile:UserProfile,
     queueAddChatMessage:(message:Message) => void,
     requestNextMessagePage:(conversation:number, offset:number) => void
+    insertChatMessage:(conversation:number, message:Message) => void
     isFetching:boolean,
     total:number,
     offset:number,
     items:Message[],
     conversationId:number,
-    error:string
+    error:string,
+    queuedMessages:Message[]
 }
 export interface State {
     isTyping:object,
@@ -51,14 +52,12 @@ class ConversationView extends React.Component<Props, {}> {
         }
         this.loadFirstData = this.loadFirstData.bind(this)
         this.loadNextPageData = this.loadNextPageData.bind(this) 
-        this.onMessagesReceived = this.onMessagesReceived.bind(this)
         this.chatDidScrollToTop = this.chatDidScrollToTop.bind(this)
         this.onDidType = this.onDidType.bind(this)
         this.onChatMessageSubmit = this.onChatMessageSubmit.bind(this)
         this.isTypingHandler = this.isTypingHandler.bind(this)
         this.incomingMessageHandler = this.incomingMessageHandler.bind(this)
         this.removeUserFromIsTypingData = this.removeUserFromIsTypingData.bind(this)
-        this.appendMessage = this.appendMessage.bind(this)
     }
     componentDidMount()
     {
@@ -68,28 +67,10 @@ class ConversationView extends React.Component<Props, {}> {
     incomingMessageHandler(event:CustomEvent)
     {
         let message = event.detail as Message
-        let conversation = this.props.conversation
-        if(!conversation || conversation.id != message.conversation)
-        {
-            return
-        }
-
-        let uid = message.uid
-        var replaced = false
-        let messages = this.props.items.map(m => {
-            if(m.uid && m.uid == uid && m.pending)
-            {
-                replaced = true
-                return message
-            }
-            return m
-        })
-        if(!replaced)
-            messages.unshift(message)
-
+        let conversation = this.props.conversationId
+        this.props.insertChatMessage(conversation, message)
         let it = this.removeUserFromIsTypingData(message.user)
-        let increment =  replaced ? 0 : 1
-        this.setState({data:messages, total:this.props.total + increment, offset:this.props.offset + increment, isTyping:it })
+        this.setState({isTyping:it })
     }
     isTypingHandler(event:CustomEvent)
     {
@@ -150,21 +131,9 @@ class ConversationView extends React.Component<Props, {}> {
             return false
         return true
     }
-    onMessagesReceived(data, status:string, error:string)
-    {
-        if(error || status == "error" || !data.results)
-        {
-            toast.error(<ErrorToast message={error || "Error retrieving messages"} />, { hideProgressBar: true })
-            this.setState({loading:false})
-            return
-        }
-        let newData = data.results || []
-        let oldData = this.props.items.concat(newData)
-        this.setState({data:oldData, loading:false, total:data.count, offset:oldData.length })
-    }
     loadFirstData(ignoreError = false)
     {
-        let hasError = ignoreError ? false : this.props.error
+        let hasError = ignoreError ? false : !nullOrUndefined( this.props.error )
         if((this.props.total == 0 || this.props.offset == 0) && !this.props.isFetching && !hasError)
             this.props.requestNextMessagePage(this.props.conversationId, 0)
     }
@@ -184,15 +153,9 @@ class ConversationView extends React.Component<Props, {}> {
             return
         let tempId = `${conversation.id}_${this.props.profile.id}_${Date.now()}`
         let tempMessage = this.getChatMessagePreview(text, tempId, conversation)
-        this.appendMessage(tempMessage)
         this.props.queueAddChatMessage(tempMessage)
+        //
         sendMessageToConversation(conversation.id, text,tempId)
-    }
-    appendMessage(message:Message)
-    {
-        let messages = this.props.items.map(m => m)
-        messages.unshift(message)
-        this.setState({data:messages, total:this.props.total + 1, offset:this.props.offset + 1})
     }
     getChatMessagePreview(text:string, uid:string, conversation:Conversation):Message {
         let now = Date.now()
@@ -241,18 +204,22 @@ class ConversationView extends React.Component<Props, {}> {
             return null
         }
         let myId = me.id
-        let messages = this.props.items
+        let messages = this.props.queuedMessages.concat(this.props.items)
         return(
             <FullPageComponent>
                 <div className="d-none d-sm-block col-lg-4 col-md-4 col-sm-5">
                     <Conversations />
                 </div>
                 <div className="col-lg-8 col-md-8 col-sm-7 col-xs-12">
-                    <div id="conversation-view" className="full-height">
-                        {conversation && <h3><span className="text-truncate d-block">{getConversationTitle(conversation, myId)}</span></h3>}
+                    <div id="conversation-view" className="card full-height">
+                        <div className="card-header grey">
+                            {conversation && <span className="text-truncate d-block">{getConversationTitle(conversation, myId)}</span>}
+                        </div>
+                        <div className="card-body full-height">
                             <ChatMessageList conversation={conversation.id} loading={this.props.isFetching} chatDidScrollToTop={this.chatDidScrollToTop} messages={messages} current_user={this.props.profile} >
                                 {this.renderSomeoneIsTyping()}
                             </ChatMessageList>
+                        </div>
                         <ChatMessageComposer onSubmit={this.onChatMessageSubmit} onDidType={this.onDidType} />
                     </div>
                 </div>
@@ -270,6 +237,7 @@ const mapStateToProps = (state:RootReducer, ownProps:Props) => {
     const total = pagination.totalCount
     const error = pagination.error
     const offset = items.length
+    const queuedMessages = QueueUtilities.getQueuedMessageForConversation(id, state.queue.chatMessages)
     return {
         error,
         conversationId:id,
@@ -280,6 +248,7 @@ const mapStateToProps = (state:RootReducer, ownProps:Props) => {
         conversation:state.conversations.items[id],
         profile:state.profile,
         signedIn:state.auth.signedIn,
+        queuedMessages
     };
 }
 const mapDispatchToProps = (dispatch) => {
@@ -289,6 +258,9 @@ const mapDispatchToProps = (dispatch) => {
         },
         requestNextMessagePage:(conversation:number, offset:number) => {
             dispatch(Actions.requestNextMessagePage(conversation.toString(), offset))
+        },
+        insertChatMessage:(conversation:number, message:Message) => {
+            dispatch(Actions.insertChatMessage(conversation.toString(), message))
         }
     }
 }

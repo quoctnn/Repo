@@ -1,4 +1,4 @@
-import { PageItem } from './createPaginator';
+import { PageItem, CachePage } from './createPaginator';
 import { combineReducers } from 'redux'
 import debug from './debug';
 import settings from './settings';
@@ -54,8 +54,8 @@ export interface RootReducer
       contactListCache: any;
       conversationListCache:any;
       conversationStore:any;
-      queue:any;
-      conversations:{items:Conversation[], pagination:{totalCount:number, fetching:boolean, ids:number[]}};
+      queue:{chatMessages:Message[]};
+      conversations:{items:Conversation[], pagination:CachePage};
       messages:{items:Message[], conversations:PageItem}
   debug: {accessToken:string, apiEndpoint:number, availableApiEndpoints:ApiEndpoint[] };
   _persist:any

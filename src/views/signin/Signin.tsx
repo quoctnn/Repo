@@ -72,9 +72,7 @@ class Signin extends React.Component<Props, {}> {
                         </Form>
                     </div>
                 </div>
-
             </div>
-
         );
     }
 }

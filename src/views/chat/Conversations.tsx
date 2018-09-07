@@ -2,20 +2,23 @@ import * as React from 'react';
 import * as Actions from "../../actions/Actions" 
 import { connect } from 'react-redux'
 import LoadingSpinner from '../../components/general/LoadingSpinner';
-import { Button } from 'reactstrap';
 import { translate } from '../../components/intl/AutoIntlProvider';
 import { RootReducer } from '../../reducers';
 import { Conversation } from '../../reducers/conversationStore';
 import ConversationItem from '../../components/general/ConversationItem';
 import { FullPageComponent } from '../../components/general/FullPageComponent';
 import { PaginationUtilities } from '../../utilities/PaginationUtilities';
+import { nullOrUndefined } from '../../utilities/Utilities';
+require("./Conversations.scss");
 export interface Props {
     total:number,
     isFetching:boolean,
     items:Conversation[],
     requestNextConversationPage?:(page:number) => void,
-    offset:number
+    offset:number,
+    error:string
 }
+
 export interface State {
 }
 class Conversations extends React.Component<Props, {}> {     
@@ -24,7 +27,8 @@ class Conversations extends React.Component<Props, {}> {
         total:0,
         isFetching:false,
         items:[],
-        offset:0
+        offset:0,
+        error:null
     }
     constructor(props) {
         super(props);
@@ -32,8 +36,8 @@ class Conversations extends React.Component<Props, {}> {
 
         }
         this.loadFirstData = this.loadFirstData.bind(this)
-        this.renderLoadMore = this.renderLoadMore.bind(this)
         this.loadNextPageData = this.loadNextPageData.bind(this) 
+        this.onScroll = this.onScroll.bind(this) 
     }
     componentWillMount()
     {
@@ -45,14 +49,15 @@ class Conversations extends React.Component<Props, {}> {
     componentDidUpdate(prevProps:Props, prevState:State)
     {
     }
-    loadFirstData()
+    loadFirstData(ignoreError = false)
     {
-        if(this.props.total == 0 || this.props.offset == 0 && !this.props.isFetching)
+        let hasError = ignoreError ? false : !nullOrUndefined( this.props.error )
+        if((this.props.total == 0 || this.props.offset == 0) && !this.props.isFetching && !hasError)
             this.props.requestNextConversationPage(0)
     }
     loadNextPageData()
     {
-        if(this.props.total > this.props.offset && !this.props.isFetching)
+        if(this.props.total > this.props.offset && !this.props.isFetching && nullOrUndefined( this.props.error ))
             this.props.requestNextConversationPage(this.props.offset)
     }
     renderLoading() {
@@ -60,35 +65,31 @@ class Conversations extends React.Component<Props, {}> {
             return (<li key="loading"><LoadingSpinner/></li>)
         }
     }
-    renderLoadMore()
+    onScroll(event:React.UIEvent<HTMLUListElement>)
     {
-        if(this.props.isFetching)
-            return null
-    
-        if(this.props.total > this.props.items.length)
+        let isAtBottom = event.currentTarget.scrollTop + event.currentTarget.offsetHeight >= event.currentTarget.scrollHeight
+        if(isAtBottom)
         {
-            return (<li key="load-more"><Button onClick={() => this.loadNextPageData()}>{translate("Load More")}</Button></li>)
-        }
-        else if(this.props.items.length == 0)
-        {
-            return (<li>NO CONVERSATIONS AVAILABLE</li>)
+            this.loadNextPageData()
         }
     }
-    
     render()
     {
         let conversations = this.props.items
         
         return (<FullPageComponent> 
-                    <div id="conversations-view" className="full-height col-sm">
-                    <h3><span className="text-truncate d-block">{translate("Conversations")}</span></h3>
-                    <ul className="group-list vertical-scroll">
-                        {conversations.map((c, index) => {
-                            return (<ConversationItem key={index} conversation={c} />)
-                        }) }
-                        {this.renderLoadMore()}
-                        {this.renderLoading()}
-                    </ul>
+                    <div id="conversations-view" className="card full-height col-sm">
+                        <div className="card-header grey">
+                            <span className="text-truncate d-block">{translate("Conversations")}</span>
+                        </div>
+                        <div className="card-body full-height">
+                            <ul onScroll={this.onScroll} className="group-list vertical-scroll">
+                                {conversations.map((c, index) => {
+                                    return (<ConversationItem key={index} conversation={c} />)
+                                }) }
+                                {this.renderLoading()}
+                            </ul>
+                        </div>
                     </div>
                 </FullPageComponent>)
     }
@@ -101,11 +102,13 @@ const mapStateToProps = (state:RootReducer) => {
     const items = PaginationUtilities.getCurrentPageResults(allItems, pagination)
     const total = pagination.totalCount
     const offset = items.length
+    const error = pagination.error
     return {
         isFetching,
         items,
         total,
-        offset
+        offset,
+        error
     }
 }
 const mapDispatchToProps = (dispatch) => {

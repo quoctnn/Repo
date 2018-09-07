@@ -9,3 +9,4 @@ String.prototype.hashCode = function() {
     }
     return hash;
   };
+  

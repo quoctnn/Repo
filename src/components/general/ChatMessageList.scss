@@ -3,9 +3,6 @@
     margin: 0;
     width: 100%;
     flex-grow: 1;
-    border-style:solid;
-    @include var(border-color, border-color-default);
-    @include var(border-width, border-width-default);
     display: flex;
     flex-direction: column;
   }

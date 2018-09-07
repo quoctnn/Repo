@@ -11,6 +11,8 @@
     @include var(border-width, border-width-default);
     border-radius: 6px;
     margin-bottom: 6px;
+    margin-left: 6px;
+    margin-right: 6px;
     a
     {
         text-decoration: none;

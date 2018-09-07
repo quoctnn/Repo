@@ -165,7 +165,7 @@ ul,li{margin:0; padding: 0;}
         @include var(margin-left, left-navigation-min-width);
         @include var(margin-top, top-navigation-height);
         @include var(margin-right, right-navigation-min-width);
-        padding: 0 5px;
+        padding: 5px;
     }
 }
 body.left-menu-open
@@ -186,7 +186,7 @@ body.left-menu-open
         
     }
 }
-body.full-page
+body[class^="full-page-"], body[class*=" full-page-"]
 {
     #main-content
     {
