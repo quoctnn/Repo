@@ -1,5 +1,5 @@
 @import "Config";
-::-webkit-scrollbar { width: 5px;}
+::-webkit-scrollbar { width: 5px;  height: 5px;}
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb {background: #888;border-radius:50vw;}
 ::-webkit-scrollbar-thumb:hover {background: #555; }

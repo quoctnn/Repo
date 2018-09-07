@@ -15,9 +15,10 @@ import * as Actions from '../../actions/Actions';
 import { FullPageComponent } from '../../components/general/FullPageComponent';
 import { getConversationTitle } from '../../utilities/ConversationUtilities';
 import { getProfileById } from '../../main/App';
-import { defaultPage } from '../../reducers/createPaginator';
+import { getDefaultCachePage } from '../../reducers/createPaginator';
 import { PaginationUtilities } from '../../utilities/PaginationUtilities';
 import { QueueUtilities } from '../../utilities/QueueUtilities';
+import { messageReducerPageSize } from '../../reducers/messages';
 
 require("./ConversationView.scss");
 export interface Props {
@@ -26,14 +27,14 @@ export interface Props {
     profile:UserProfile,
     queueAddChatMessage:(message:Message) => void,
     requestNextMessagePage:(conversation:number, offset:number) => void
-    insertChatMessage:(conversation:number, message:Message) => void
     isFetching:boolean,
     total:number,
     offset:number,
     items:Message[],
     conversationId:number,
     error:string,
-    queuedMessages:Message[]
+    queuedMessages:Message[],
+    last_fetched:number
 }
 export interface State {
     isTyping:object,
@@ -70,7 +71,6 @@ class ConversationView extends React.Component<Props, {}> {
         let conversation = this.props.conversationId
         if(message.conversation == conversation)
         {
-            this.props.insertChatMessage(conversation, message)
             let it = this.removeUserFromIsTypingData(message.user)
             this.setState({isTyping:it })
         }
@@ -137,8 +137,13 @@ class ConversationView extends React.Component<Props, {}> {
     loadFirstData(ignoreError = false)
     {
         let hasError = ignoreError ? false : !nullOrUndefined( this.props.error )
-        if((this.props.total == 0 || this.props.offset == 0) && !this.props.isFetching && !hasError)
-            this.props.requestNextMessagePage(this.props.conversationId, 0)
+        if(this.props.isFetching || hasError)
+        {
+            return
+        }
+        let pageSize = messageReducerPageSize
+        if(this.props.total == 0 || this.props.offset == 0 ||  (!this.props.last_fetched && this.props.offset <= pageSize))
+            this.props.requestNextMessagePage(this.props.conversationId, this.props.offset)
     }
     loadNextPageData()
     {
@@ -211,7 +216,7 @@ class ConversationView extends React.Component<Props, {}> {
         return(
             <FullPageComponent>
                 <div className="d-none d-sm-block col-lg-4 col-md-4 col-sm-5">
-                    <Conversations preventShowTyingInChatId={conversation.id} />
+                    <Conversations preventShowTyingInChatId={conversation.id} activeConversation={this.props.conversationId} />
                 </div>
                 <div className="col-lg-8 col-md-8 col-sm-7 col-xs-12">
                     <div id="conversation-view" className="card full-height">
@@ -233,7 +238,7 @@ class ConversationView extends React.Component<Props, {}> {
 }
 const mapStateToProps = (state:RootReducer, ownProps:Props) => {
     let id = ownProps.match.params.conversationid
-    const pagination = state.messages.conversations[id] || defaultPage
+    const pagination = state.messages.conversations[id] || getDefaultCachePage()
     const allItems = state.messages.items
     const isFetching = pagination.fetching
     const items = PaginationUtilities.getCurrentPageResults(allItems, pagination)
@@ -241,6 +246,7 @@ const mapStateToProps = (state:RootReducer, ownProps:Props) => {
     const error = pagination.error
     const offset = items.length
     const queuedMessages = QueueUtilities.getQueuedMessageForConversation(id, state.queue.chatMessages)
+    const last_fetched = pagination.last_fetch
     return {
         error,
         conversationId:id,
@@ -251,7 +257,8 @@ const mapStateToProps = (state:RootReducer, ownProps:Props) => {
         conversation:state.conversations.items[id],
         profile:state.profile,
         signedIn:state.auth.signedIn,
-        queuedMessages
+        queuedMessages,
+        last_fetched
     };
 }
 const mapDispatchToProps = (dispatch) => {
@@ -262,9 +269,6 @@ const mapDispatchToProps = (dispatch) => {
         requestNextMessagePage:(conversation:number, offset:number) => {
             dispatch(Actions.requestNextMessagePage(conversation.toString(), offset))
         },
-        insertChatMessage:(conversation:number, message:Message) => {
-            dispatch(Actions.insertChatMessage(conversation.toString(), message))
-        }
     }
 }
 export default connect(mapStateToProps, mapDispatchToProps)(ConversationView);

@@ -12,15 +12,19 @@ import { getConversationTitle } from '../../utilities/ConversationUtilities';
 require("./ConversationItem.scss");
 export interface Props {
     conversation:Conversation,
-    profile:UserProfile
+    profile:UserProfile,
+    children?: React.ReactNode,
+    className?:string
+    isActive:boolean
+
 }
 class ConversationItem extends React.Component<Props, {}> {
     static maxVisibleAvatars = 5
     constructor(props) {
         super(props);
     }
-    shouldComponentUpdate(nextProps, nextState) {
-        return nextProps.profile != this.props.profile || this.props.children != nextProps.children
+    shouldComponentUpdate(nextProps:Props, nextState) {
+        return nextProps.isActive != this.props.isActive || nextProps.className != this.props.className || nextProps.conversation != this.props.conversation ||  nextProps.profile != this.props.profile || this.props.children != nextProps.children
     }
     render() {
         let me = this.props.profile
@@ -33,7 +37,7 @@ class ConversationItem extends React.Component<Props, {}> {
         let title = getConversationTitle(this.props.conversation, myId)
         let users = conversation.users.filter(i => i != myId)
         return (
-            <li className="conversation-item">
+            <li className={"conversation-item" + (this.props.isActive ? " active" : "") + (this.props.className ? " " + this.props.className:"") }>
                 <Link to={Routes.CONVERSATION + conversation.id}>
                     <h6 className="title text-truncate">{title}</h6>
                     <div className="conversation-item-body d-flex">

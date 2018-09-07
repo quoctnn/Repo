@@ -15,11 +15,8 @@
     margin-right: 6px;
     a
     {
-        text-decoration: none;
-    }
-    .title
-    {
         @include var(color, title-color);
+        text-decoration: none;
     }
     .is-typing-container
     {
@@ -33,4 +30,12 @@
             margin-right: 5px;
         }
     }
+}
+.conversation-item.active
+{
+   background-color: #337ab7;
+   > a
+   {
+        color: #fff;
+   }
 }
