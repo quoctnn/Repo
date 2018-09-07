@@ -11,4 +11,4 @@ const conversationItemReducer = (state = {}, action) => {
             return conversationPaginator.itemsReducer(state, action);
     }
 }
-export const conversations = combineReducers({ items:conversationItemReducer, pagination: conversationPaginator.paginationReducer })
+export const conversations = combineReducers({ items:conversationItemReducer, pagination: conversationPaginator.paginationReducer })  

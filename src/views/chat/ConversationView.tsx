@@ -68,14 +68,17 @@ class ConversationView extends React.Component<Props, {}> {
     {
         let message = event.detail as Message
         let conversation = this.props.conversationId
-        this.props.insertChatMessage(conversation, message)
-        let it = this.removeUserFromIsTypingData(message.user)
-        this.setState({isTyping:it })
+        if(message.conversation == conversation)
+        {
+            this.props.insertChatMessage(conversation, message)
+            let it = this.removeUserFromIsTypingData(message.user)
+            this.setState({isTyping:it })
+        }
     }
     isTypingHandler(event:CustomEvent)
     {
-        let user = event.detail.user  
-        if(user == this.props.profile.id)
+        let user = event.detail.user
+        if(user == this.props.profile.id || event.detail.conversation != this.props.conversationId)
         {
             return
         }
