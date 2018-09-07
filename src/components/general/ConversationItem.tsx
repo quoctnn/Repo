@@ -19,8 +19,8 @@ class ConversationItem extends React.Component<Props, {}> {
     constructor(props) {
         super(props);
     }
-    shouldComponentUpdate(nextProps:Props, nextState) {
-        return nextProps.profile != this.props.profile
+    shouldComponentUpdate(nextProps, nextState) {
+        return nextProps.profile != this.props.profile || this.props.children != nextProps.children
     }
     render() {
         let me = this.props.profile
@@ -36,13 +36,17 @@ class ConversationItem extends React.Component<Props, {}> {
             <li className="conversation-item">
                 <Link to={Routes.CONVERSATION + conversation.id}>
                     <h6 className="title text-truncate">{title}</h6>
-                    <OverflowList count={conversation.users.length} size={26}>
-                        {users.slice(0, ConversationItem.maxVisibleAvatars).map((uid, index) => {
-                            let p = getProfileById(uid)
-                            let avatar = (p && p.avatar) || null
-                            return <li key={index}><Avatar image={avatar} size={26} borderColor="white" borderWidth={2}  /></li>
-                        })}
-                    </OverflowList>
+                    <div className="conversation-item-body d-flex">
+                        <OverflowList count={conversation.users.length} size={26}>
+                            {users.slice(0, ConversationItem.maxVisibleAvatars).map((uid, index) => {
+                                let p = getProfileById(uid)
+                                let avatar = (p && p.avatar) || null
+                                return <li key={index}><Avatar image={avatar} size={26} borderColor="white" borderWidth={2}  /></li>
+                            })}
+                        </OverflowList>
+                        <div className="flex-grow"></div>
+                        {this.props.children}
+                    </div>
                 </Link>
                 
             </li>
