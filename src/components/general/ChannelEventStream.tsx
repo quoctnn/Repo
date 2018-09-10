@@ -205,7 +205,8 @@ class ChannelEventStream extends React.Component<Props, {}> {
         let user: UserProfile = this.props.contacts['byId'][message.user];
         if (user) {
           var options = {
-            body: user.first_name + ': ' + message.text
+            body: user.first_name + ': ' + message.text,
+            tag: 'conversation_' + message.conversation
           };
           var notification = (new Notification(
             translate('New Message'),
