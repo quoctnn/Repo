@@ -47,7 +47,7 @@ export interface RootReducer
   settings: any;
       profile: UserProfile;
       auth: any;
-      profileStore: { byId:{number:UserProfile}, allIds:number[]};
+      profileStore: { byId:{[id:number]:UserProfile}, allIds:number[]};
       communityStore: any;
       groupStore: any;
       groupListCache: any;

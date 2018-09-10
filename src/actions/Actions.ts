@@ -18,12 +18,18 @@ export const insertChatMessage = (pagingId:string, message:Message):InsertItemAc
     item:message,
     pagingId
 })
+export const resetMessages = () => ({
+    type: Types.RESET_MESSAGES
+})
 //conversations
 export const requestNextConversationPage = conversationPaginator.requestNextPage
 export const insertConversation = (conversation:Conversation):InsertItemAction => ({
     type: Types.INSERT_ITEM_TO_PAGE,
     item:conversation,
     meta:{key:conversationReducerKey}
+})
+export const resetConversations = () => ({
+    type: Types.RESET_CONVERSATIONS
 })
 
 //queue

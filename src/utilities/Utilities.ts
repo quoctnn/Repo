@@ -124,3 +124,20 @@ export const nullOrUndefined = (any) =>
 export const uniqueId = () =>  {
     return Math.random().toString(36).substr(2, 16);
 }
+export const filterArray = (array, text) => {
+    var filteredArray = null;
+    filteredArray = array.filter(object => {
+        const query = text.toLowerCase();
+        return object.toLowerCase().startsWith(query);
+    }); 
+    return filteredArray;
+}
+  
+  
+export const normalizeIndex = (selectedIndex, max) => {
+    let index = selectedIndex % max;
+    if (index < 0) {
+    index += max;
+    }
+    return index;
+}

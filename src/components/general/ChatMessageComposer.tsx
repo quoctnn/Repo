@@ -1,6 +1,8 @@
 
 import * as React from "react";
 import { ProtectNavigation } from '../../utilities/Utilities';
+import AutocompleteEditor from "../input/AutocompleteEditor";
+import MentionEditor from "../input/MentionEditor";
 require("./ChatMessageComposer.scss");
 export interface Props
 {
@@ -73,6 +75,8 @@ export class ChatMessageComposer extends React.Component<Props,{}> {
                                 autoComplete="off"
                                 maxLength={2048}
                                 className="form-control"/>
+                            <MentionEditor /> 
+                            <AutocompleteEditor />
                         </div>
                         <div className="button-wrap">
                             <button className="btn btn-submit btn-default">
