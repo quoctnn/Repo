@@ -197,6 +197,7 @@ class DevTool extends React.PureComponent<Props, {}> {
   }
   renderEnablePush() {
     // Check if push is available and not already set to granted
+    // and check if browser has blocked this domain from using notifications
     let disabled = !('Notification' in window);
     let blocked = false;
     if (!disabled) {

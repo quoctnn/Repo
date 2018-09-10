@@ -3,7 +3,10 @@ import { Group } from '../reducers/groupStore';
 import { Community } from '../reducers/communityStore';
 import { UserProfile } from '../reducers/profileStore';
 import { Conversation, Message } from '../reducers/conversationStore';
-import { conversationPaginator, conversationReducerKey } from '../reducers/conversations';
+import {
+  conversationPaginator,
+  conversationReducerKey
+} from '../reducers/conversations';
 import { messagesPaginator, messageReducerKey } from '../reducers/messages';
 import { InsertItemAction } from '../reducers/createPaginator';
 //paging
