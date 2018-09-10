@@ -24,8 +24,8 @@ export class Conversation
     last_message:Message
     read_by:any[]
     absolute_url:string
-    created_at:Date
-    updated_at:Date
+    created_at:string
+    updated_at:string
     constructor(id:number,
         title:string,
         users:number[],
@@ -33,8 +33,8 @@ export class Conversation
         last_message:Message,
         read_by:any[],
         absolute_url:string,
-        created_at:Date,
-        updated_at:Date)
+        created_at:string,
+        updated_at:string)
     {
         this.id = id
         this.title = title

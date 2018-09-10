@@ -15,6 +15,9 @@ import { Settings } from '../../utilities/Settings';
 import { TypingIndicator } from '../../components/general/TypingIndicator';
 import { Avatar } from '../../components/general/Avatar';
 import { getProfileById } from '../../main/App';
+import { conversationReducerPageSize } from '../../reducers/conversations';
+import * as moment from 'moment-timezone';
+let timezone = moment.tz.guess()
 
 require("./Conversations.scss");
 export interface Props {
@@ -25,7 +28,10 @@ export interface Props {
     offset:number,
     error:string,
     profile:UserProfile,
-    preventShowTyingInChatId:number
+    preventShowTyingInChatId:number,
+    last_fetched:number,
+    className?:string,
+    activeConversation?:number
 }
 type IsTypingStore = {[conversation:number]:{[user:number]:NodeJS.Timer}}
 export interface State {
@@ -40,7 +46,8 @@ class Conversations extends React.Component<Props, {}> {
         offset:0,
         error:null,
         profile:null,
-        preventShowTyingInChatId:null
+        preventShowTyingInChatId:null,
+        last_fetched:null
     }
     constructor(props) {
         super(props);
@@ -109,14 +116,16 @@ class Conversations extends React.Component<Props, {}> {
         }
         return it
     }
-    componentDidUpdate(prevProps:Props, prevState:State)
-    {
-    }
     loadFirstData(ignoreError = false)
     {
         let hasError = ignoreError ? false : !nullOrUndefined( this.props.error )
-        if((this.props.total == 0 || this.props.offset == 0) && !this.props.isFetching && !hasError)
-            this.props.requestNextConversationPage(0)
+        if(this.props.isFetching || hasError)
+        {
+            return
+        }
+        let pageSize = conversationReducerPageSize
+        if(this.props.total == 0 || this.props.offset == 0 || (!this.props.last_fetched && this.props.offset <= pageSize))
+            this.props.requestNextConversationPage(this.props.offset) 
     }
     loadNextPageData()
     {
@@ -128,7 +137,6 @@ class Conversations extends React.Component<Props, {}> {
             return (<li key="loading"><LoadingSpinner/></li>)
         }
     }
-    
     onScroll(event:React.UIEvent<HTMLUListElement>)
     {
         let isAtBottom = event.currentTarget.scrollTop + event.currentTarget.offsetHeight >= event.currentTarget.scrollHeight
@@ -154,19 +162,28 @@ class Conversations extends React.Component<Props, {}> {
         }
         return null
     }
+    timeAgo(time:string):boolean
+    {
+        let date = moment.utc(time).tz(timezone);
+        return moment().diff(date, "minutes") < 1
+    }
+    conversationItemClassName(c:Conversation)
+    {
+        return (this.timeAgo(c.updated_at) ? "highlight-insert": "")
+    }
     render()
     {
         let conversations = this.props.items
         
         return (<FullPageComponent> 
-                    <div id="conversations-view" className="card full-height col-sm">
+                    <div id="conversations-view" className={"card full-height col-sm" + (this.props.className ? " " + this.props.className : "")}>
                         <div className="card-header grey">
                             <span className="text-truncate d-block">{translate("Conversations")}</span>
                         </div>
                         <div className="card-body full-height">
                             <ul onScroll={this.onScroll} className="group-list vertical-scroll">
                                 {conversations.map((c, index) => {
-                                    return (<ConversationItem key={index} conversation={c}>
+                                    return (<ConversationItem isActive={c.id == this.props.activeConversation} className={this.conversationItemClassName(c) } key={index} conversation={c}>
                                                {this.renderSomeoneIsTyping(c.id)} 
                                             </ConversationItem>)
                                 }) }
@@ -177,7 +194,6 @@ class Conversations extends React.Component<Props, {}> {
                 </FullPageComponent>)
     }
 }
-
 const mapStateToProps = (state:RootReducer) => {
     const pagination = state.conversations.pagination
     const allItems = state.conversations.items
@@ -186,13 +202,15 @@ const mapStateToProps = (state:RootReducer) => {
     const total = pagination.totalCount
     const offset = items.length
     const error = pagination.error
+    const last_fetched = pagination.last_fetch
     return {
         isFetching,
         items,
         total,
         offset,
         error,
-        profile:state.profile
+        profile:state.profile,
+        last_fetched
     }
 }
 const mapDispatchToProps = (dispatch) => {

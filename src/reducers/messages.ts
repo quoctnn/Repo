@@ -4,12 +4,9 @@ import { createMultiPaginator } from './createPaginator';
 import { combineReducers } from 'redux';
 import { Types } from '../utilities/Types';
 
-export const messagesPaginator = createMultiPaginator(
-  'messages',
-  Constants.apiRoute.conversationMessagesUrl,
-  'id',
-  PaginationUtilities.calculatePageSize(40)
-);
+export const messageReducerKey = "messages"
+export const messageReducerPageSize = PaginationUtilities.calculatePageSize(40)
+export const messagesPaginator = createMultiPaginator(messageReducerKey, Constants.apiRoute.conversationMessagesUrl, "id", messageReducerPageSize)
 const messagesItemReducer = (state = {}, action) => {
   switch (action.type) {
     case Types.RESET_MESSAGES: {

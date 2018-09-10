@@ -12,17 +12,18 @@ import ReconnectingWebSocket from 'reconnecting-websocket';
 import { toast } from 'react-toastify';
 import { ErrorToast, InfoToast } from '../../components/general/Toast';
 import { Queue } from '../../reducers/queue';
-import { Message } from '../../reducers/conversationStore';
+import { Message, Conversation } from '../../reducers/conversationStore';
 import { Routes } from '../../utilities/Routes';
 import { History } from 'history';
 import { translate } from '../intl/AutoIntlProvider';
 
 export enum SocketMessageType {
-  STATE = 'state',
-  USER_UPDATE = 'user.update',
-  CLIENT_STATUS_CHANGE = 'client.status_change',
-  CONVERSATION_TYPING = 'conversation.typing',
-  CONVERSATION_MESSAGE = 'conversation.message'
+  STATE = "state",
+  USER_UPDATE = "user.update",
+  CLIENT_STATUS_CHANGE = "client.status_change",
+  CONVERSATION_TYPING = "conversation.typing",
+  CONVERSATION_MESSAGE = "conversation.message",
+  CONVERSATION_NEW = "conversation.new"
 }
 
 export interface Props {
@@ -30,6 +31,8 @@ export interface Props {
   availableApiEndpoints?: Array<ApiEndpoint>;
   setProfile: (profile: UserProfile) => void;
   setSignedIn: (signedIn: boolean) => void;
+  insertChatMessage:(conversation:number, message:Message) => void
+  insertConversation:(conversation:Conversation) => void
 
   storeProfiles: (profiles: UserProfile[]) => void;
   storeProfile: (profile: UserProfile) => void;
@@ -234,7 +237,13 @@ class ChannelEventStream extends React.Component<Props, {}> {
     } else {
       this.sendMessageNotification(message);
     }
+    this.props.insertChatMessage(message.conversation, message)
     this.socketRef.current.dispatchEvent(event);
+  }
+  processIncomingNewConversation(data:any) 
+  {
+    let conversation = data as Conversation;
+    this.props.insertConversation(conversation)
   }
   processTempQueue() {
     if (this.canSend()) {
@@ -277,6 +286,9 @@ class ChannelEventStream extends React.Component<Props, {}> {
             break;
           case SocketMessageType.CONVERSATION_MESSAGE:
             this.processIncomingConversationMessage(data.data);
+            break;
+          case SocketMessageType.CONVERSATION_NEW:
+            this.processIncomingNewConversation(data.data);
             break;
           default:
             console.log('NO HANDLER FOR TYPE ' + data.type);
@@ -448,6 +460,12 @@ const mapDispatchToProps = dispatch => {
     },
     queueRemoveChatMessage: (message: Message) => {
       dispatch(Actions.queueRemoveChatMessage(message));
+    },
+    insertChatMessage:(conversation:number, message:Message) => {
+        dispatch(Actions.insertChatMessage(conversation.toString(), message))
+    },
+    insertConversation:(conversation:Conversation) => {
+      dispatch(Actions.insertConversation(conversation))
     }
   };
 };

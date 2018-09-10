@@ -3,33 +3,28 @@ import { Group } from '../reducers/groupStore';
 import { Community } from '../reducers/communityStore';
 import { UserProfile } from '../reducers/profileStore';
 import { Conversation, Message } from '../reducers/conversationStore';
-import { conversationPaginator } from '../reducers/conversations';
-import { messagesPaginator } from '../reducers/messages';
+import { conversationPaginator, conversationReducerKey } from '../reducers/conversations';
+import { messagesPaginator, messageReducerKey } from '../reducers/messages';
 import { InsertItemAction } from '../reducers/createPaginator';
 //paging
 export const resetPagedData = () => ({
   type: Types.RESET_PAGED_DATA
 });
 //messages
-export const requestNextMessagePage = messagesPaginator.requestNextPage;
-export const insertChatMessage = (
-  pagingId: string,
-  message: Message
-): InsertItemAction => ({
-  type: Types.INSERT_ITEM_TO_PAGE,
-  item: message,
-  pagingId
-});
-export const resetMessages = () => ({
-  type: Types.RESET_MESSAGES
-});
-
+export const requestNextMessagePage = messagesPaginator.requestNextPage
+export const insertChatMessage = (pagingId:string, message:Message):InsertItemAction => ({
+    type: Types.INSERT_ITEM_TO_PAGE,
+    meta:{key:messageReducerKey},
+    item:message,
+    pagingId
+})
 //conversations
-export const requestNextConversationPage =
-  conversationPaginator.requestNextPage;
-export const resetConversations = () => ({
-  type: Types.RESET_CONVERSATIONS
-});
+export const requestNextConversationPage = conversationPaginator.requestNextPage
+export const insertConversation = (conversation:Conversation):InsertItemAction => ({
+    type: Types.INSERT_ITEM_TO_PAGE,
+    item:conversation,
+    meta:{key:conversationReducerKey}
+})
 
 //queue
 export const queueAddChatMessage = (message: Message) => ({

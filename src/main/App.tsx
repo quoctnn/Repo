@@ -66,7 +66,7 @@ const paginationMiddleware = store => next => action => {
       offset = a.payload.offset
     }
     ApiClient.getPage(endpoint , limit, offset,  (data, status, error) => {
-        let receivePageAction = ( offset: number, results: any[], total: number, error:string): PaginatorAction => 
+        let receivePageAction = ( offset: number, results: any[], total: number, error:string): PaginatorAction =>
         ({
             type: Types.RECEIVE_PAGE,
             payload: { ...action.payload,

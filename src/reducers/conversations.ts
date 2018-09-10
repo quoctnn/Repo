@@ -4,12 +4,9 @@ import { combineReducers } from 'redux';
 import { PaginationUtilities } from '../utilities/PaginationUtilities';
 import { Types } from '../utilities/Types';
 
-export const conversationPaginator = createPaginator(
-  'conversations',
-  Constants.apiRoute.conversations,
-  'id',
-  PaginationUtilities.calculatePageSize(75)
-);
+export const conversationReducerKey = "conversations"
+export const conversationReducerPageSize = PaginationUtilities.calculatePageSize(75)
+export const conversationPaginator = createPaginator(conversationReducerKey, Constants.apiRoute.conversations, "id", conversationReducerPageSize)
 const conversationItemReducer = (state = {}, action) => {
   switch (action.type) {
     case Types.RESET_CONVERSATIONS: {
