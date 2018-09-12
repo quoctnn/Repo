@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import LoadingSpinner from '../../components/general/LoadingSpinner';
 import { translate } from '../../components/intl/AutoIntlProvider';
 import { RootReducer } from '../../reducers';
-import { Conversation } from '../../reducers/conversationStore';
+import { Conversation } from '../../reducers/conversations';
 import ConversationItem from '../../components/general/ConversationItem';
 import { FullPageComponent } from '../../components/general/FullPageComponent';
 import { PaginationUtilities } from '../../utilities/PaginationUtilities';

@@ -8,7 +8,8 @@
     "build-client": "electron .",
     "watch": "node webpack/watch_server.js",
     "test": "webpack-dev-server --content-base ./dist --hot --inline --colors --port 3000 --open",
-    "storybook": "NODE_PATH=. start-storybook -p 9001 -c .storybook"
+    "storybook": "NODE_PATH=. start-storybook -p 9001 -c .storybook",
+    "prepare": "patch-package"
   },
   "repository": {
     "type": "git",
@@ -41,6 +42,7 @@
     "bootstrap": "^4.1.3",
     "css-loader": "^1.0.0",
     "draft-js": "^0.10.5",
+    "draft-js-emoji-plugin": "^2.1.1",
     "draft-js-mention-plugin": "^3.1.2",
     "draft-js-plugins-editor": "^2.1.1",
     "emoji-mart": "^2.7.0",
@@ -50,6 +52,7 @@
     "popper": "^1.0.1",
     "react": "^16.4.2",
     "react-dom": "^16.4.2",
+    "react-process-string": "^1.2.0",
     "react-router-dom": "^4.3.1",
     "react-toastify": "^4.1.0",
     "reactstrap": "^6.3.1",
@@ -69,6 +72,7 @@
     "mini-css-extract-plugin": "^0.4.1",
     "moment-timezone": "^0.5.21",
     "offline-plugin": "^5.0.5",
+    "patch-package": "^5.1.1",
     "react-hot-loader": "^4.3.4",
     "react-intl": "^2.4.0",
     "react-redux": "^5.0.7",

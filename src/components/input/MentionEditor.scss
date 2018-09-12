@@ -45,6 +45,7 @@ mention {
   .mentionSuggestionsEntryContainerRight {
     width: 100%;
     padding-left: 8px;
+    max-width:0;
   }
   
   .mentionSuggestionsEntry {
@@ -83,3 +84,50 @@ mention {
     height: 30px;
     border-radius: 50%;
   }
+.emoji-backdrop
+{
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 999;
+}
+.emoji-picker-container {
+  position: absolute;
+  right: -12px;
+  z-index: 20000;
+}
+.emojiSelectPopover
+{
+  position: relative !important;
+}
+.context-positioning-element
+{
+    z-index: 2000;
+}
+.modal-open
+{
+  .context-positioning-element
+  {
+      z-index: 20000;
+  }
+  .emoji-backdrop
+  {
+      z-index: 1999;
+  }
+}
+.emojiButton
+{
+  border: 0;
+  background: 0;
+}
+.DraftEditor-root
+{
+  word-break: break-all;
+}
+.DraftEditor-editorContainer
+{
+  overflow-y: auto;
+  max-height: 200px;
+}

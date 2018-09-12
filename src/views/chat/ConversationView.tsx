@@ -1,5 +1,5 @@
 import Conversations from './Conversations';
-import { Conversation, Message } from '../../reducers/conversationStore';
+import { Conversation, Message } from '../../reducers/conversations';
 import * as React from 'react';
 import { connect } from 'react-redux'
 import { RootReducer } from '../../reducers/index';
@@ -10,7 +10,7 @@ import { sendTypingInConversation, addSocketEventListener, SocketMessageType, re
 import { Settings } from '../../utilities/Settings';
 import { TypingIndicator } from '../../components/general/TypingIndicator';
 import { Avatar } from '../../components/general/Avatar';
-import { cloneDictKeys, nullOrUndefined } from '../../utilities/Utilities';
+import { cloneDictKeys, nullOrUndefined, appendTokenToUrl } from '../../utilities/Utilities';
 import * as Actions from '../../actions/Actions'; 
 import { FullPageComponent } from '../../components/general/FullPageComponent';
 import { getConversationTitle } from '../../utilities/ConversationUtilities';
@@ -19,6 +19,7 @@ import { getDefaultCachePage } from '../../reducers/createPaginator';
 import { PaginationUtilities } from '../../utilities/PaginationUtilities';
 import { QueueUtilities } from '../../utilities/QueueUtilities';
 import { messageReducerPageSize } from '../../reducers/messages';
+import { Mention } from '../../components/input/MentionEditor';
 
 require("./ConversationView.scss");
 export interface Props {
@@ -34,7 +35,8 @@ export interface Props {
     conversationId:number,
     error:string,
     queuedMessages:Message[],
-    last_fetched:number
+    last_fetched:number,
+    mentions:Mention[]
 }
 export interface State {
     isTyping:object,
@@ -154,18 +156,18 @@ class ConversationView extends React.Component<Props, {}> {
     {
         this.loadNextPageData()
     }
-    onChatMessageSubmit(text:string)
+    onChatMessageSubmit(text:string, mentions:number[])
     {
         let conversation = this.props.conversation
         if(!conversation)
             return
         let tempId = `${conversation.id}_${this.props.profile.id}_${Date.now()}`
-        let tempMessage = this.getChatMessagePreview(text, tempId, conversation)
+        let tempMessage = this.getChatMessagePreview(text, tempId, mentions, conversation)
         this.props.queueAddChatMessage(tempMessage)
         //
-        sendMessageToConversation(conversation.id, text,tempId)
+        sendMessageToConversation(conversation.id, text,tempId, mentions)
     }
-    getChatMessagePreview(text:string, uid:string, conversation:Conversation):Message {
+    getChatMessagePreview(text:string, uid:string, mentions:number[], conversation:Conversation):Message {
         let now = Date.now()
         let ds = new Date().toUTCString()
         return {
@@ -179,6 +181,7 @@ class ConversationView extends React.Component<Props, {}> {
             attachment:null,
             updated_at:ds,
             read_by:[],
+            mentions:mentions
         }
     }
     onDidType()
@@ -228,7 +231,7 @@ class ConversationView extends React.Component<Props, {}> {
                                 {this.renderSomeoneIsTyping()}
                             </ChatMessageList>
                         </div>
-                        <ChatMessageComposer onSubmit={this.onChatMessageSubmit} onDidType={this.onDidType} />
+                        <ChatMessageComposer mentions={this.props.mentions} onSubmit={this.onChatMessageSubmit} onDidType={this.onDidType} />
                     </div>
                 </div>
                
@@ -247,6 +250,16 @@ const mapStateToProps = (state:RootReducer, ownProps:Props) => {
     const offset = items.length
     const queuedMessages = QueueUtilities.getQueuedMessageForConversation(id, state.queue.chatMessages)
     const last_fetched = pagination.last_fetch
+    const conversation = state.conversations.items[id]
+    const mentions = conversation.users.map(u => {
+        let p = getProfileById(u)
+        return new Mention(
+            p.first_name + " " + p.last_name,
+            p.username,
+            appendTokenToUrl(p.avatar),
+            p.id
+          )
+    })
     return {
         error,
         conversationId:id,
@@ -254,11 +267,12 @@ const mapStateToProps = (state:RootReducer, ownProps:Props) => {
         total,
         offset,
         items,
-        conversation:state.conversations.items[id],
+        conversation:conversation,
         profile:state.profile,
         signedIn:state.auth.signedIn,
         queuedMessages,
-        last_fetched
+        last_fetched,
+        mentions
     };
 }
 const mapDispatchToProps = (dispatch) => {

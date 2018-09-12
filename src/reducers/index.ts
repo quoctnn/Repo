@@ -1,3 +1,4 @@
+import { embedlyStore, EmbedlyItem } from './embedlyStore';
 import { PageItem, CachePage } from './createPaginator';
 import { combineReducers } from 'redux'
 import debug from './debug';
@@ -13,10 +14,9 @@ import storageLocal from 'redux-persist/lib/storage'
 import { persistReducer, PersistConfig } from 'redux-persist';
 import { ApiEndpoint } from './debug';
 import conversationListCache from './conversationListCache';
-import conversationStore from './conversationStore';
 import queue from './queue';
 import { conversations } from './conversations';
-import { Conversation, Message } from './conversationStore';
+import { Conversation, Message } from './conversations';
 import { messages } from './messages';
 
 
@@ -25,21 +25,12 @@ const rootPersistConfig:PersistConfig = {
   storage: storageLocal,
   blacklist: ['auth'],
   debug:true,
-  /* stateReconciler:(inboundState, originalState, 
-    reducedState) => 
-  {
-    console.log("window.applicationCache.status", window.applicationCache.status)
-    if(window.applicationCache.status === window.applicationCache.UPDATEREADY)
-    {
-        return {...originalState, debug:inboundState.debug }
-    }
-    return  { ...inboundState, debug:inboundState.debug, auth:originalState.auth } 
-  } */
 } 
 
 const rootReducer = combineReducers({
   //debug: persistReducer(debugConfig, debug), 
-  settings, profile, auth, profileStore, communityStore, groupStore, groupListCache, contactListCache, debug, conversationListCache, conversationStore, queue, conversations, messages
+  settings, profile, auth, profileStore, communityStore, groupStore, groupListCache, contactListCache, debug,
+   conversationListCache, queue, conversations, messages, embedlyStore
 })
 export default persistReducer(rootPersistConfig, rootReducer)
 export interface RootReducer
@@ -53,10 +44,10 @@ export interface RootReducer
       groupListCache: any;
       contactListCache: any;
       conversationListCache:any;
-      conversationStore:any;
       queue:{chatMessages:Message[]};
       conversations:{items:Conversation[], pagination:CachePage};
       messages:{items:Message[], conversations:PageItem}
-  debug: {accessToken:string, apiEndpoint:number, availableApiEndpoints:ApiEndpoint[] };
+      embedlyStore:{byId:{[id:string]:EmbedlyItem}, allIds:string[], queuedIds:string[]}
+    debug: {accessToken:string, apiEndpoint:number, availableApiEndpoints:ApiEndpoint[] };
   _persist:any
 }

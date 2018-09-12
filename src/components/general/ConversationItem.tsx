@@ -1,6 +1,6 @@
 import { Avatar } from './Avatar';
 import * as React from 'react';
-import { Conversation } from '../../reducers/conversationStore';
+import { Conversation } from '../../reducers/conversations';
 import { Link } from 'react-router-dom';
 import { Routes } from '../../utilities/Routes';
 import { getProfileById } from '../../main/App';

@@ -1,10 +1,12 @@
-import { Entity, Modifier, Editor, EditorState } from "draft-js";
+import { EditorState } from "draft-js";
 import * as React from "react"
-import AutoCompleteEditor from "./autocomplete"
+import AutoComplete from "./AutoComplete"
 import * as triggers from "./triggers"
 import { normalizeIndex, filterArray } from '../../utilities/Utilities'
 import SuggestionList from './SuggestionList';
 import addSuggestion from './addSuggestions';
+import { InsertState } from './AutoComplete';
+import { AutocompleteState } from './Suggestions';
 
 require('./AutoCompleteInput.scss')
 export const persons = [
@@ -35,7 +37,7 @@ export default class AutoCompleteInput extends React.Component<Props, any> {
   onChange: any;
   state: State;
   onAutocompleteChange: any;
-  onInsert: any;
+  onInsert: (insertState:InsertState) => EditorState;
   onSuggestionItemClick: any;
   constructor(props) {
     super(props);
@@ -60,8 +62,9 @@ export default class AutoCompleteInput extends React.Component<Props, any> {
         insertState.selectedIndex,
         filteredArrayTemp.length
       );
-      insertState.text = insertState.trigger + filteredArrayTemp[index];
-      //return addSuggestion(insertState);
+      let text = insertState.trigger + filteredArrayTemp[index];
+      let state = {} as AutocompleteState
+      return addSuggestion(insertState.editorState, state, text);
     };
     this.onSuggestionItemClick = (e) => {
         if(this.props.onSuggestionClick)
@@ -98,7 +101,7 @@ export default class AutoCompleteInput extends React.Component<Props, any> {
         {" "}
         {this.renderAutocomplete()}{" "}
         <div className="autocomplete-editor">
-          <AutoCompleteEditor
+          <AutoComplete
             editorState={this.state.editorState}
             onChange={this.onChange}
             onAutocompleteChange={this.onAutocompleteChange}

@@ -11,5 +11,5 @@ export const Settings:ISettings = {
     accessToken:null,
     searchEnabled:true,
     supportsTheming: window.CSS && window.CSS.supports && window.CSS.supports("(--foo: red)"),
-    clearSomeoneIsTypingInterval: 4000
+    clearSomeoneIsTypingInterval: 4000,
 }

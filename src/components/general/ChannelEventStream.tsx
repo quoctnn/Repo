@@ -12,7 +12,7 @@ import ReconnectingWebSocket from 'reconnecting-websocket';
 import { toast } from 'react-toastify';
 import { ErrorToast, InfoToast } from '../../components/general/Toast';
 import { Queue } from '../../reducers/queue';
-import { Message, Conversation } from '../../reducers/conversationStore';
+import { Message, Conversation } from '../../reducers/conversations';
 import { Routes } from '../../utilities/Routes';
 import { History } from 'history';
 import { translate } from '../intl/AutoIntlProvider';
@@ -83,12 +83,13 @@ export const sendTypingInConversation = (conversation: number) => {
 export const sendMessageToConversation = (
   conversation: number,
   text: string,
-  uid: string
+  uid: string,
+  mentions:number[]
 ) => {
   sendOnWebsocket(
     JSON.stringify({
       type: SocketMessageType.CONVERSATION_MESSAGE,
-      data: { conversation: conversation, text: text, uid: uid }
+      data: { conversation: conversation, text: text, uid: uid, mentions }
     })
   );
 };
@@ -249,7 +250,7 @@ class ChannelEventStream extends React.Component<Props, {}> {
     if (this.canSend()) {
       if (this.props.queue.chatMessages.length > 0) {
         this.props.queue.chatMessages.forEach(m => {
-          sendMessageToConversation(m.conversation, m.text, m.uid);
+          sendMessageToConversation(m.conversation, m.text, m.uid, m.mentions);
         });
       }
     }

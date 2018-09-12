@@ -1,4 +1,4 @@
-import { Conversation } from '../reducers/conversationStore';
+import { Conversation } from '../reducers/conversations';
 import { getProfileById } from '../main/App';
 export const getConversationTitle = (conversation: Conversation, me:number) => 
 {

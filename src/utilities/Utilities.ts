@@ -1,5 +1,6 @@
 import { Settings } from './Settings';
 import { UserProfile } from '../reducers/profileStore';
+import { Link} from 'react-router-dom'
 import { Routes } from './Routes';
 export const getDomainName = (url:string) =>  {
     var url_parts = url.split("/")
@@ -29,6 +30,7 @@ export const URL_WWW_REGEX = /(^(\b|\s+)(www)\.[\S]+(\b|$))/gim
 export const HASHTAG_REGEX = /(?:#)(\w(?:(?:\w|(?:\.(?!\.))){0,28}(?:\w))?)/ig
 export const HASHTAG_REGEX_WITH_HIGHLIGHT = /(?:#)((?:\w|(?:<em>))(?:(?:(?:\w|(?:<\/em>))|(?:\.(?!\.))){0,28}(?:(?:\w|(?:<\/em>))))?)/ig
 export const TAG_REGEX = /(<([^>]+)>)/ig
+export const IS_ONLY_LINK_REGEX = /^(\b(https?|ftp):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])$/i
 export const truncate = (text, maxChars) => {
     return text.length > (maxChars - 3) ? text.substring(0, maxChars - 3) + '...' : text;
 }
@@ -60,8 +62,9 @@ export function rawMarkup(text, mentions:any[]) {
 
     // Replace mentions (@username) with user first name
     if (mentions !== undefined) {
-        mentions.map(function (user) {
-            let el = `<a href="${user.absolute_url}" data-toggle="tooltip" title="${userFullName(user)}">${user.first_name}</a>`
+        mentions.map(function (user) 
+        {
+            let el = `<a href="${Routes.PROFILES + user.slug_name}" data-toggle="tooltip" title="${userFullName(user)}">${user.first_name + " " + user.last_name}</a>`
             // let elementHTML = "<a href=" + user.absolute_url + ">" + user.first_name + "</a>";
             let regexExpression = new RegExp("@" + user.username, 'g');
             markup = markup.replace(regexExpression, el);

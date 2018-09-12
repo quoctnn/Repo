@@ -13,6 +13,11 @@ $rightColor: #F1F1F4 !default;
         display: block;
 
     }
+    
+}
+.chat-message.single-embed
+{
+    width: calc(90% - 40px);
 }
 .chat-message:last-child
 {

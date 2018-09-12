@@ -2,13 +2,34 @@ import { Types } from '../utilities/Types';
 import { Group } from '../reducers/groupStore';
 import { Community } from '../reducers/communityStore';
 import { UserProfile } from '../reducers/profileStore';
-import { Conversation, Message } from '../reducers/conversationStore';
-import {
-  conversationPaginator,
-  conversationReducerKey
-} from '../reducers/conversations';
+import { Conversation, Message } from '../reducers/conversations';
+import { conversationPaginator, conversationReducerKey } from '../reducers/conversations';
 import { messagesPaginator, messageReducerKey } from '../reducers/messages';
 import { InsertItemAction } from '../reducers/createPaginator';
+import { EmbedlyItem } from '../reducers/embedlyStore';
+
+//embedly
+export const requestEmbedlyData = (urls:string[]) => ({
+  type: Types.REQUEST_EMBEDLY_DATA,
+  urls,
+});
+export const embedlyStoreAddPages = (pages:EmbedlyItem[]) => ({
+  type: Types.EMBEDLYSTORE_ADD_PAGES,
+  pages
+});
+export const embedlyStoreAddPagesToQueue = (ids:string[]) => ({
+  type: Types.EMBEDLYSTORE_ADD_PAGES_TO_QUEUE,
+  ids
+});
+export const embedlyStoreRemovePagesFromQueue = (ids:string[]) => ({
+  type: Types.EMBEDLYSTORE_REMOVE_PAGES_FROM_QUEUE,
+  ids
+});
+export const resetEmbedlyStore = () => ({
+  type: Types.EMBEDLYSTORE_RESET,
+});
+
+
 //paging
 export const resetPagedData = () => ({
   type: Types.RESET_PAGED_DATA
@@ -56,19 +77,6 @@ export const storeProfile = (profile: UserProfile) => ({
 });
 export const resetProfileStore = () => ({
   type: Types.PROFILESTORE_RESET
-});
-
-//conversationStore
-export const storeConversations = (conversations: Conversation[]) => ({
-  type: Types.CONVERSATIONSTORE_ADD_CONVERSATIONS,
-  conversations: conversations
-});
-export const storeConversation = (conversation: Conversation) => ({
-  type: Types.CONVERSATIONSTORE_ADD_CONVERSATION,
-  conversation: conversation
-});
-export const resetConversationStore = () => ({
-  type: Types.RESET_CONVERSATION_LIST_CACHE
 });
 
 //communityStore

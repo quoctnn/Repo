@@ -172,5 +172,8 @@ export default  {
         user: 'img/default-user.png',
         group: 'img/default-widget.jpg',
         event: 'img/default-widget.jpg'
-    }
+    },
+
+    embedlyApiKey:"a0c58531bc5a480f8272ed5b2bb8d889",
+    embedlyApiEndpoint: "https://api-cdn.embed.ly/1/card-details?card=1&native=true&scheme=https"
 };

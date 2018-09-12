@@ -1,4 +1,4 @@
-import { Message } from '../reducers/conversationStore';
+import { Message } from '../reducers/conversations';
 export class QueueUtilities {
 static getQueuedMessageForConversation = (conversationId:number, allQueuedChatMessages:Message[]):Message[] => 
     {

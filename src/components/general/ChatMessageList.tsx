@@ -1,7 +1,7 @@
 import { getProfileById } from '../../main/App';
 import * as React from 'react';
 import * as moment from 'moment-timezone';
-import { Message } from '../../reducers/conversationStore';
+import { Message } from '../../reducers/conversations';
 import {ScrollPosition} from '../../utilities/Utilities';
 import { UserProfile } from '../../reducers/profileStore';
 import { ChatMessage, MessagePosition } from './ChatMessage';
@@ -42,6 +42,7 @@ export class ChatMessageList extends React.Component<Props, {}> {
     }
 
     componentWillUpdate(nextProps:Props, nextState) {
+        console.log("ChatMessageList will update")
         if (this.listUpdateAfterInitialRender(this.props, nextProps)) {
             this.SCROLL_POSITION.prepareFor('up')
         }

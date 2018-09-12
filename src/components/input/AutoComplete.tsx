@@ -13,7 +13,7 @@ export interface Props {
   editorState:EditorState
   onInsert?:(state: InsertState) => EditorState
 }
-interface InsertState 
+export interface InsertState 
 {
   editorState: EditorState;
   start: number;

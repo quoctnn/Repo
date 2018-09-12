@@ -5,6 +5,7 @@ declare global {
     interface Navigator { browserLanguage: string; }
     interface String {
         hashCode(): number;
+        splice(idx:number, rem:number, str:string):string;
     }
 }
 

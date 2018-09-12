@@ -2,7 +2,6 @@ import {Types} from "../utilities/Types"
 import { AvatarStateColor } from '../components/general/Avatar';
 import { combineReducers } from 'redux'
 import { RootReducer } from './index';
-import ApiClient from '../network/ApiClient';
 
 export interface UserProfile {
     absolute_url: string,

@@ -18,7 +18,7 @@ export const getDefaultCachePage = ():CachePage =>
 {
   return {ids:[], totalCount:0, fetching:false, error:null, last_fetch:null}
 }
-export const createPaginator = (key:string, endpoint:string, itemIdKey:string, pageSize:number) =>
+export const createPaginator = (key:string, endpoint:string, itemIdKey:string, pageSize?:number) =>
 {
     const requestNextPage = ( offset:number):PaginatorAction => ({
       type: Types.REQUEST_PAGE,

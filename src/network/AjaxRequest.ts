@@ -10,12 +10,13 @@ export type ErrorCallback = (request:JQuery.jqXHR, status:string, error:string) 
 
 export class AjaxRequest
 {
+    static sendAuthorization:boolean = true
     static setup(token:string)
     {
         console.log("AjaxRequest.setup", token)
         $.ajaxSetup({
             beforeSend: function (xhr, settings) {
-                if(token)
+                if(AjaxRequest.sendAuthorization && token)
                 {
                     xhr.setRequestHeader("Authorization", "Token " + token);
                 }
@@ -65,7 +66,6 @@ export class AjaxRequest
         if (typeof  error === 'undefined') {
             error = defaultErrorCallback;
         }
-    
         return $.ajax({
             url: url,
             dataType: 'json',
@@ -79,6 +79,10 @@ export class AjaxRequest
     }
     private static applyEndpointDomain(url:string)
     {
+        if (url.indexOf('://') > 0 || url.indexOf('//') === 0 ) 
+        {
+            return url
+        }
         let state = store.getState().debug
         return state.availableApiEndpoints[state.apiEndpoint].endpoint + url
     }
@@ -121,7 +125,7 @@ export class AjaxRequest
             traditional: true,
             data: data,
             success: success.bind(this),
-            error: error.bind(this)
+            error: error.bind(this),
         });
     }
 }

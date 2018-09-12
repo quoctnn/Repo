@@ -1,5 +1,5 @@
 import {Types} from "../utilities/Types"
-import { Message } from './conversationStore';
+import { Message } from './conversations';
 
 export interface Queue 
 {

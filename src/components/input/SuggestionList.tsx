@@ -21,9 +21,9 @@ export default class SuggestionList extends React.Component<Props, any>{
     } = suggestionsState;
 
     const style = {
-        position: 'absolute' as PositionProperty,
-        left,
-        top
+        position: 'relative' as PositionProperty,
+        //left,
+        //top
     }
     if (!array) {
       return null;

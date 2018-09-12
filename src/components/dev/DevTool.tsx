@@ -7,6 +7,7 @@ import { sendOnWebsocket } from '../general/ChannelEventStream';
 import { Form } from 'reactstrap';
 import { availableLanguages, availableThemes } from '../../reducers/settings';
 import { RootReducer } from '../../reducers';
+import { resetEmbedlyStore } from '../../actions/Actions';
 require('./DevTool.scss');
 export interface Props {
   language: number;
@@ -328,6 +329,7 @@ const mapDispatchToProps = dispatch => {
       dispatch(Actions.resetConversations());
       dispatch(Actions.resetMessages());
       dispatch(Actions.resetPagedData());
+      dispatch(Actions.resetEmbedlyStore());
     },
     sendOnWebsocket: (data: string) => {
       sendOnWebsocket(data);

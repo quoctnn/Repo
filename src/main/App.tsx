@@ -19,6 +19,7 @@ import { PaginatorAction, MultiPaginatorAction } from '../reducers/createPaginat
 import ApiClient from '../network/ApiClient';
 import ChannelEventStream from '../components/general/ChannelEventStream';
 import * as Actions from '../actions/Actions';
+import { embedlyMiddleware } from '../reducers/embedlyStore';
 require('jquery/dist/jquery');
 require('popper.js/dist/umd/popper');
 require('bootstrap/dist/js/bootstrap');
@@ -87,7 +88,7 @@ const paginationMiddleware = store => next => action => {
   }
   return result;
 };
-var middleWares = [loggingMiddleware, paginationMiddleware];
+var middleWares = [loggingMiddleware, paginationMiddleware, embedlyMiddleware];
 if (Settings.supportsTheming) {
   middleWares.push(themeSwitcherMiddleware);
 }
@@ -98,6 +99,16 @@ export const getProfileById = (id: number): UserProfile => {
   let s = store.getState();
   if (s.profile.id == id) return s.profile;
   return s.profileStore.byId[id];
+};
+export const getProfileByUsername = (name: string): UserProfile => {
+  let s = store.getState();
+  if (s.profile.username == name) return s.profile;
+  let keys = Object.keys( s.profileStore.byId);
+  let k = keys.find(k => s.profileStore.byId[k].username == name)
+  if(k)
+  {
+    return s.profileStore.byId[k]
+  }
 };
 
 const persistor = persistStore(store, {}, () => {
