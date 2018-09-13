@@ -183,7 +183,7 @@ class Conversations extends React.Component<Props, {}> {
                         <div className="card-body full-height">
                             <ul onScroll={this.onScroll} className="group-list vertical-scroll">
                                 {conversations.map((c, index) => {
-                                    return (<ConversationItem isActive={c.id == this.props.activeConversation} className={this.conversationItemClassName(c) } key={index} conversation={c}>
+                                    return (<ConversationItem isActive={c.id == this.props.activeConversation} className={this.conversationItemClassName(c) } key={c.id} conversation={c}>
                                                {this.renderSomeoneIsTyping(c.id)} 
                                             </ConversationItem>)
                                 }) }

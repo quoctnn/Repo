@@ -24,7 +24,7 @@ class ConversationItem extends React.Component<Props, {}> {
         super(props);
     }
     shouldComponentUpdate(nextProps:Props, nextState) {
-        return nextProps.isActive != this.props.isActive || nextProps.className != this.props.className || nextProps.conversation != this.props.conversation ||  nextProps.profile != this.props.profile || this.props.children != nextProps.children
+        return nextProps.isActive != this.props.isActive || nextProps.className != this.props.className || nextProps.conversation != this.props.conversation || nextProps.conversation.unread_messages.length != this.props.conversation.unread_messages.length || nextProps.profile != this.props.profile || this.props.children != nextProps.children
     }
     render() {
         let me = this.props.profile
@@ -39,7 +39,12 @@ class ConversationItem extends React.Component<Props, {}> {
         return (
             <li className={"conversation-item" + (this.props.isActive ? " active" : "") + (this.props.className ? " " + this.props.className:"") }>
                 <Link to={Routes.CONVERSATION + conversation.id}>
-                    <h6 className="title text-truncate">{title}</h6>
+                    <h6 className="title text-truncate">{title}
+                        {
+                            conversation.unread_messages.length > 0 && 
+                            <div className="notification-badge bg-success text-white">{conversation.unread_messages.length}</div>
+                        }
+                    </h6>
                     <div className="conversation-item-body d-flex">
                         <OverflowList count={conversation.users.length} size={26}>
                             {users.slice(0, ConversationItem.maxVisibleAvatars).map((uid, index) => {
@@ -52,7 +57,6 @@ class ConversationItem extends React.Component<Props, {}> {
                         {this.props.children}
                     </div>
                 </Link>
-                
             </li>
         )
     }

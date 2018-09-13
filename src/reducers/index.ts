@@ -13,7 +13,6 @@ import contactListCache from './contactListCache';
 import storageLocal from 'redux-persist/lib/storage'
 import { persistReducer, PersistConfig } from 'redux-persist';
 import { ApiEndpoint } from './debug';
-import conversationListCache from './conversationListCache';
 import queue from './queue';
 import { conversations } from './conversations';
 import { Conversation, Message } from './conversations';
@@ -30,7 +29,7 @@ const rootPersistConfig:PersistConfig = {
 const rootReducer = combineReducers({
   //debug: persistReducer(debugConfig, debug), 
   settings, profile, auth, profileStore, communityStore, groupStore, groupListCache, contactListCache, debug,
-   conversationListCache, queue, conversations, messages, embedlyStore
+   queue, conversations, messages, embedlyStore
 })
 export default persistReducer(rootPersistConfig, rootReducer)
 export interface RootReducer
@@ -43,11 +42,10 @@ export interface RootReducer
       groupStore: any;
       groupListCache: any;
       contactListCache: any;
-      conversationListCache:any;
       queue:{chatMessages:Message[]};
-      conversations:{items:Conversation[], pagination:CachePage};
+      conversations:{items:{[id:number]:Conversation}, pagination:CachePage};
       messages:{items:Message[], conversations:PageItem}
-      embedlyStore:{byId:{[id:string]:EmbedlyItem}, allIds:string[], queuedIds:string[]}
+      embedlyStore:{byId:{[id:string]:EmbedlyItem}, allIds:string[], queuedIds:{[id:string]:boolean}}
     debug: {accessToken:string, apiEndpoint:number, availableApiEndpoints:ApiEndpoint[] };
   _persist:any
 }

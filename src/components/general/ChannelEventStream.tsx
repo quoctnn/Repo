@@ -16,6 +16,7 @@ import { Message, Conversation } from '../../reducers/conversations';
 import { Routes } from '../../utilities/Routes';
 import { History } from 'history';
 import { translate } from '../intl/AutoIntlProvider';
+import { sortConversations } from '../../main/App';
 
 export enum SocketMessageType {
   STATE = "state",
@@ -40,6 +41,7 @@ export interface Props {
   storeCommunity: (community: Community) => void;
   setContactListCache: (contacts: number[]) => void;
   setAwayTimeout: (timeout: number) => void;
+  updateConversationUnreadMessages:(conversation:number, unread_messages:number[]) => void
 
   accessToken?: string;
   signedIn: boolean;
@@ -128,6 +130,7 @@ class ChannelEventStream extends React.Component<Props, {}> {
     this.processStateResponse = this.processStateResponse.bind(this);
     this.getCurrentToken = this.getCurrentToken.bind(this);
     this.checkState = this.checkState.bind(this);
+    
     this.processStatusChangeResponse = this.processStatusChangeResponse.bind(
       this
     );
@@ -228,7 +231,7 @@ class ChannelEventStream extends React.Component<Props, {}> {
     });
     this.socketRef.current.dispatchEvent(event);
   }
-  processIncomingConversationMessage(data: any) {
+  processIncomingConversationMessage(data: any, unread_messages:number[]) {
     var event = new CustomEvent(SocketMessageType.CONVERSATION_MESSAGE, {
       detail: data
     });
@@ -238,7 +241,10 @@ class ChannelEventStream extends React.Component<Props, {}> {
     } else {
       this.sendMessageNotification(message);
     }
+    //ensureConversationExists(message.conversation)
     this.props.insertChatMessage(message.conversation, message)
+    this.props.updateConversationUnreadMessages(message.conversation, unread_messages)
+    sortConversations()
     this.socketRef.current.dispatchEvent(event);
   }
   processIncomingNewConversation(data:any) 
@@ -286,7 +292,7 @@ class ChannelEventStream extends React.Component<Props, {}> {
             this.processTypingInConversation(data.data);
             break;
           case SocketMessageType.CONVERSATION_MESSAGE:
-            this.processIncomingConversationMessage(data.data);
+            this.processIncomingConversationMessage(data.data, data.unread_messages);
             break;
           case SocketMessageType.CONVERSATION_NEW:
             this.processIncomingNewConversation(data.data);
@@ -430,7 +436,8 @@ const mapStateToProps = (state: RootReducer) => {
     profile: state.profile,
     contacts: state.profileStore,
     awayTimeout: state.settings.awayTimeout,
-    queue: state.queue
+    queue: state.queue,
+    conversations:state.conversations.items
   };
 };
 const mapDispatchToProps = dispatch => {
@@ -467,6 +474,9 @@ const mapDispatchToProps = dispatch => {
     },
     insertConversation:(conversation:Conversation) => {
       dispatch(Actions.insertConversation(conversation))
+    },
+    updateConversationUnreadMessages:(conversation:number, unread_messages:number[]) => {
+      dispatch(Actions.updateConversationUnreadMessages(conversation, unread_messages))
     }
   };
 };

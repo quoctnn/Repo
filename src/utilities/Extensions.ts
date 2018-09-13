@@ -12,4 +12,10 @@ String.prototype.hashCode = function() {
 String.prototype.splice = function(idx, rem, str) {
     return this.slice(0, idx) + str + this.slice(idx + Math.abs(rem));
 };
+Array.prototype.move = function(oldIndex, newIndex) {
+  if (newIndex >= this.length) {
+      newIndex = this.length - 1;
+  }
+  this.splice(newIndex, 0, this.splice(oldIndex, 1)[0]);
+}
   

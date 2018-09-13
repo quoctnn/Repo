@@ -9,9 +9,6 @@ export const messageReducerPageSize = PaginationUtilities.calculatePageSize(40)
 export const messagesPaginator = createMultiPaginator(messageReducerKey, Constants.apiRoute.conversationMessagesUrl, "id", messageReducerPageSize)
 const messagesItemReducer = (state = {}, action) => {
   switch (action.type) {
-    case Types.RESET_MESSAGES: {
-      return {};
-    }
     default:
       return messagesPaginator.itemsReducer(state, action);
   }

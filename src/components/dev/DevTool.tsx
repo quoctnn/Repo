@@ -326,8 +326,6 @@ const mapDispatchToProps = dispatch => {
       dispatch(Actions.setAccessTokenOverride(accessToken));
     },
     clearDataStore: () => {
-      dispatch(Actions.resetConversations());
-      dispatch(Actions.resetMessages());
       dispatch(Actions.resetPagedData());
       dispatch(Actions.resetEmbedlyStore());
     },

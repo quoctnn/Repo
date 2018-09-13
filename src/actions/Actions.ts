@@ -42,19 +42,21 @@ export const insertChatMessage = (pagingId:string, message:Message):InsertItemAc
     item:message,
     pagingId
 })
-export const resetMessages = () => ({
-    type: Types.RESET_MESSAGES
-})
 //conversations
+export const setSortedConversationIds = conversationPaginator.setSortedIds
 export const requestNextConversationPage = conversationPaginator.requestNextPage
 export const insertConversation = (conversation:Conversation):InsertItemAction => ({
     type: Types.INSERT_ITEM_TO_PAGE,
     item:conversation,
     meta:{key:conversationReducerKey}
 })
-export const resetConversations = () => ({
-    type: Types.RESET_CONVERSATIONS
-})
+export const updateConversationUnreadMessages = (conversation:number, unread_messages:number[]) => (
+  {
+    type: Types.UPDATE_CONVERSATION_UNREAD_MESSAGES,
+    conversation,
+    unread_messages
+  }
+)
 
 //queue
 export const queueAddChatMessage = (message: Message) => ({
@@ -116,23 +118,6 @@ export const appendContactListCache = (contacts: number[]) => ({
 });
 export const resetContactListCache = () => ({
   type: Types.RESET_CONTACT_LIST_CACHE
-});
-
-//conversationListCache
-export const setConversationListCache = (
-  conversations: number[],
-  total: number
-) => ({
-  type: Types.SET_CONVERSATION_LIST_CACHE,
-  conversations: conversations,
-  total: total
-});
-export const appendConversationListCache = (conversations: number[]) => ({
-  type: Types.APPEND_CONVERSATION_LIST_CACHE,
-  conversations: conversations
-});
-export const resetConversationListCache = () => ({
-  type: Types.RESET_CONVERSATION_LIST_CACHE
 });
 
 //groupListCache

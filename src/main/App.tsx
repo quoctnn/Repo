@@ -3,7 +3,7 @@ import '@fortawesome/fontawesome-free/css/fontawesome.min.css';
 import '@fortawesome/fontawesome-free/css/solid.min.css';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { createStore, applyMiddleware } from 'redux';
+import { createStore, applyMiddleware, AnyAction } from 'redux';
 import { Provider } from 'react-redux';
 import { persistStore } from 'redux-persist';
 import { PersistGate } from 'redux-persist/integration/react';
@@ -18,8 +18,8 @@ import { UserProfile } from '../reducers/profileStore';
 import { PaginatorAction, MultiPaginatorAction } from '../reducers/createPaginator';
 import ApiClient from '../network/ApiClient';
 import ChannelEventStream from '../components/general/ChannelEventStream';
-import * as Actions from '../actions/Actions';
 import { embedlyMiddleware } from '../reducers/embedlyStore';
+import * as Actions from '../actions/Actions';
 require('jquery/dist/jquery');
 require('popper.js/dist/umd/popper');
 require('bootstrap/dist/js/bootstrap');
@@ -95,6 +95,16 @@ if (Settings.supportsTheming) {
 const store = createStore(appReducer, applyMiddleware(...middleWares));
 window.store = store 
 
+
+export const sortConversations = () => 
+{
+  let state = store.getState() as RootReducer
+  let conversations = Object.keys(state.conversations.items).map(k => state.conversations.items[k])
+  let sortedIds = conversations.sort((a,b) => {
+    return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
+  }).map(c => c.id)
+  store.dispatch(Actions.setSortedConversationIds(sortedIds))
+}
 export const getProfileById = (id: number): UserProfile => {
   let s = store.getState();
   if (s.profile.id == id) return s.profile;

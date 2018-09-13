@@ -7,6 +7,11 @@ declare global {
         hashCode(): number;
         splice(idx:number, rem:number, str:string):string;
     }
+    interface Array<T> 
+    {
+        move(oldIndex, newIndex) : void
+    }
+
 }
 
 export default class Intl {

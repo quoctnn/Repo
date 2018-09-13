@@ -1,9 +1,9 @@
-import { combineReducers } from 'redux'
+import { combineReducers, AnyAction } from 'redux';
 import { Types } from '../utilities/Types'
-export interface PaginatorAction
+export interface PaginatorAction extends AnyAction
 {
-    type?:string
-    payload?:{offset:number, results?:any[], total?:number, error:string}
+    type:string
+    payload?:{offset?:number, results?:any[], total?:number, error:string, sorted?:number[]}
     meta?:{endpoint:string, key:string, itemIdKey:string, pageSize:number}
 }
 export interface CachePage
@@ -25,7 +25,13 @@ export const createPaginator = (key:string, endpoint:string, itemIdKey:string, p
       payload: { offset, error:null},
       meta: { endpoint, key, itemIdKey , pageSize }
     })
-    const page = (page:CachePage = getDefaultCachePage(), action:PaginatorAction = {}):CachePage => {
+    const setSortedIds = ( sorted:number[]):PaginatorAction => ({
+      type: Types.SET_SORTED_PAGE_IDS,
+      payload: { error:null, sorted},
+      meta: { endpoint, key, itemIdKey , pageSize }
+    })
+    
+    const page = (page:CachePage = getDefaultCachePage(), action:PaginatorAction):CachePage => {
       switch (action.type) {
         case Types.REQUEST_PAGE:
           return { ...page, fetching:true }
@@ -47,13 +53,19 @@ export const createPaginator = (key:string, endpoint:string, itemIdKey:string, p
             p.error = null
             return p
           }
+          case Types.SET_SORTED_PAGE_IDS:
+          {
+            let p = { ...page}
+            p.ids = action.payload.sorted
+            return p
+          }
         case Types.RESET_PAGED_DATA: 
           return getDefaultCachePage()
         default:
           return page
       }
     }
-    const onlyForEndpoint = (reducer) => (state = {}, action:any = {}) =>
+    const onlyForEndpoint = (reducer) => (state = {}, action:any) =>
     {
         if((action.meta && action.meta.key == key) || action.type == Types.RESET_PAGED_DATA)
         {
@@ -63,7 +75,7 @@ export const createPaginator = (key:string, endpoint:string, itemIdKey:string, p
     }
     
   
-    const itemsReducer = (items = {}, action:PaginatorAction = {}) => { 
+    const itemsReducer = (items = {}, action:PaginatorAction) => { 
       switch (action.type) {
         case Types.RECEIVE_PAGE:
           let _items = {}
@@ -91,7 +103,8 @@ export const createPaginator = (key:string, endpoint:string, itemIdKey:string, p
     return {
       paginationReducer : onlyForEndpoint( page ),
       itemsReducer: onlyForEndpoint(itemsReducer),
-      requestNextPage
+      requestNextPage,
+      setSortedIds
     }
   }
 export interface MultiPaginatorAction

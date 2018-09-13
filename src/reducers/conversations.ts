@@ -3,14 +3,27 @@ import { createPaginator } from './createPaginator';
 import { combineReducers } from 'redux';
 import { PaginationUtilities } from '../utilities/PaginationUtilities';
 import { Types } from '../utilities/Types';
+import * as moment from 'moment-timezone';
+let timezone = moment.tz.guess()
+
 
 export const conversationReducerKey = "conversations"
-export const conversationReducerPageSize = PaginationUtilities.calculatePageSize(75)
+export const conversationReducerPageSize = PaginationUtilities.calculatePageSize(1575)
 export const conversationPaginator = createPaginator(conversationReducerKey, Constants.apiRoute.conversations, "id", conversationReducerPageSize)
 const conversationItemReducer = (state = {}, action) => {
   switch (action.type) {
-    case Types.RESET_CONVERSATIONS: {
-      return {};
+    case Types.UPDATE_CONVERSATION_UNREAD_MESSAGES:
+    {
+      let o = state[action.conversation]
+      if(o)
+      {
+        let c = Object.assign({}, o) as Conversation
+        c.unread_messages = action.unread_messages.map(m => m)
+        console.log(moment().format())
+        c.updated_at = moment().tz(timezone).utc().format()
+        return { ...state, [action.conversation]: c}
+      }
+      return state
     }
     default:
       return conversationPaginator.itemsReducer(state, action);
@@ -47,6 +60,7 @@ export class Conversation
     absolute_url:string
     created_at:string
     updated_at:string
+    unread_messages:number[]
     constructor(id:number,
         title:string,
         users:number[],
