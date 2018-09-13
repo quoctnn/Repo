@@ -62,6 +62,9 @@ export const sendOnWebsocket = (data: string) => {
 export const canSendOnWebsocket = () => {
   return publicStream && publicStream.readyState == WebsocketState.OPEN
 };
+export const getStream = () => {
+  return publicStream;
+}
 export const sendUserStatus = (status: UserStatus) => {
   sendOnWebsocket(
     JSON.stringify({
@@ -104,7 +107,7 @@ class ChannelEventStream extends React.Component<Props, {}> {
     this.processStateResponse = this.processStateResponse.bind(this);
     this.getCurrentToken = this.getCurrentToken.bind(this);
     this.checkState = this.checkState.bind(this);
-    
+
     this.processStatusChangeResponse = this.processStatusChangeResponse.bind(
       this
     );
@@ -163,7 +166,6 @@ class ChannelEventStream extends React.Component<Props, {}> {
       this.props.setProfile(p);
     }
   }
-  
   connectStream() {
     this.closeStream();
     if (this.state.endpoint) {

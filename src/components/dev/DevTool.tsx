@@ -3,11 +3,12 @@ import * as React from 'react';
 import { connect } from 'react-redux';
 import * as Actions from '../../actions/Actions';
 import { ApiEndpoint } from '../../reducers/debug';
-import { sendOnWebsocket } from '../general/ChannelEventStream';
+import { sendOnWebsocket, getStream } from '../general/ChannelEventStream';
 import { Form } from 'reactstrap';
 import { availableLanguages, availableThemes } from '../../reducers/settings';
 import { RootState } from '../../reducers';
 import { resetEmbedlyStore } from '../../actions/Actions';
+import ReconnectingWebSocket from 'reconnecting-websocket';
 require('./DevTool.scss');
 export interface Props {
   language: number;
@@ -19,16 +20,24 @@ export interface Props {
   accessToken?: string;
   setAccessTokenOverride: (accessToken: string) => void;
   sendOnWebsocket: (data: string) => void;
+  disableWebsocket: (state: boolean) => void;
   setTheme?: (index: number) => void;
   clearDataStore: () => void;
   enablePushNotifications: () => void;
 }
 
 class DevTool extends React.PureComponent<Props, {}> {
-  state: { accessToken: string; websocketData: string };
+  stream: ReconnectingWebSocket;
+  state: { accessToken: string; websocketData: string; websocketDisabled: boolean};
   constructor(props) {
     super(props);
-    this.state = { accessToken: this.props.accessToken, websocketData: '' };
+    this.stream = getStream();
+    this.state = { accessToken: this.props.accessToken, websocketData: '', websocketDisabled: false };
+  }
+  componentDidMount() {
+    if (this.stream.readyState > 1) {
+      this.setState({websocketDisabled: true})
+    }
   }
   renderThemeSelector() {
     return (
@@ -196,6 +205,30 @@ class DevTool extends React.PureComponent<Props, {}> {
       </div>
     );
   }
+  disableWebsocket(state: boolean) {
+    if (state) {
+      this.stream.close()
+    } else {
+      this.stream.reconnect()
+    }
+    this.setState({websocketDisabled: state});
+  }
+  renderDisableWebsocketButton() {
+    return (
+      <div className="input-group">
+        <button
+          onClick={() => {
+              this.disableWebsocket(!this.state.websocketDisabled)
+            }
+          }
+          className="btn btn-outline-secondary"
+          type="button"
+        >
+          {this.state.websocketDisabled && translate('Enable') || translate('Disable')}
+        </button>
+      </div>
+    );
+  }
   renderEnablePush() {
     // Check if push is available and not already set to granted
     // and check if browser has blocked this domain from using notifications
@@ -284,6 +317,14 @@ class DevTool extends React.PureComponent<Props, {}> {
                 </label>
                 <div className="col-sm-9" id="allowPush">
                   {this.renderEnablePush()}
+                </div>
+              </div>
+              <div className="form-group row">
+                <label htmlFor="disableWebsocket" className="col-sm-3 col-form-label">
+                  {translate('Websocket')}
+                </label>
+                <div className="col-sm-9" id="disableWebsocket">
+                  {this.renderDisableWebsocketButton()}
                 </div>
               </div>
             </Form>
