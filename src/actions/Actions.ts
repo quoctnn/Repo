@@ -40,12 +40,13 @@ export const insertChatMessage = (pagingId:string, message:Message):InsertItemAc
     type: Types.INSERT_ITEM_TO_PAGE,
     meta:{key:messageReducerKey},
     item:message,
+    isNew:true,
     pagingId
 })
 //conversations
 export const setSortedConversationIds = conversationPaginator.setSortedIds
 export const requestNextConversationPage = conversationPaginator.requestNextPage
-export const insertConversation = (conversation:Conversation):InsertItemAction => ({
+export const insertConversation = (conversation:Conversation, isNew:boolean):InsertItemAction => ({
     type: Types.INSERT_ITEM_TO_PAGE,
     item:conversation,
     meta:{key:conversationReducerKey}

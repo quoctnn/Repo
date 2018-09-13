@@ -2,11 +2,11 @@ import Conversations from './Conversations';
 import { Conversation, Message } from '../../reducers/conversations';
 import * as React from 'react';
 import { connect } from 'react-redux'
-import { RootReducer } from '../../reducers/index';
+import { RootState } from '../../reducers/index';
 import { ChatMessageList } from '../../components/general/ChatMessageList';
 import { UserProfile } from '../../reducers/profileStore';
 import { ChatMessageComposer } from '../../components/general/ChatMessageComposer';
-import { sendTypingInConversation, addSocketEventListener, SocketMessageType, removeSocketEventListener, sendMessageToConversation } from '../../components/general/ChannelEventStream';
+import { addSocketEventListener, SocketMessageType, removeSocketEventListener } from '../../components/general/ChannelEventStream';
 import { Settings } from '../../utilities/Settings';
 import { TypingIndicator } from '../../components/general/TypingIndicator';
 import { Avatar } from '../../components/general/Avatar';
@@ -20,6 +20,7 @@ import { PaginationUtilities } from '../../utilities/PaginationUtilities';
 import { QueueUtilities } from '../../utilities/QueueUtilities';
 import { messageReducerPageSize } from '../../reducers/messages';
 import { Mention } from '../../components/input/MentionEditor';
+import { ConversationManager } from '../../main/managers/ConversationManager';
 
 require("./ConversationView.scss");
 export interface Props {
@@ -66,10 +67,11 @@ class ConversationView extends React.Component<Props, {}> {
     {
         addSocketEventListener(SocketMessageType.CONVERSATION_TYPING, this.isTypingHandler)
         addSocketEventListener(SocketMessageType.CONVERSATION_MESSAGE, this.incomingMessageHandler)
+        ConversationManager.ensureConversationExists(this.props.conversationId, () => {})
     }
     incomingMessageHandler(event:CustomEvent)
     {
-        let message = event.detail as Message
+        let message = event.detail.data as Message
         let conversation = this.props.conversationId
         if(message.conversation == conversation)
         {
@@ -79,8 +81,8 @@ class ConversationView extends React.Component<Props, {}> {
     }
     isTypingHandler(event:CustomEvent)
     {
-        let user = event.detail.user
-        if(user == this.props.profile.id || event.detail.conversation != this.props.conversationId)
+        let user = event.detail.data.user
+        if(user == this.props.profile.id || event.detail.data.conversation != this.props.conversationId)
         {
             return
         }
@@ -144,7 +146,7 @@ class ConversationView extends React.Component<Props, {}> {
             return
         }
         let pageSize = messageReducerPageSize
-        if(this.props.total == 0 || this.props.offset == 0 ||  (!this.props.last_fetched && this.props.offset <= pageSize))
+        if(!this.props.last_fetched && (this.props.total == 0 || this.props.offset == 0 || this.props.offset <= pageSize) )
             this.props.requestNextMessagePage(this.props.conversationId, this.props.offset)
     }
     loadNextPageData()
@@ -164,8 +166,7 @@ class ConversationView extends React.Component<Props, {}> {
         let tempId = `${conversation.id}_${this.props.profile.id}_${Date.now()}`
         let tempMessage = this.getChatMessagePreview(text, tempId, mentions, conversation)
         this.props.queueAddChatMessage(tempMessage)
-        //
-        sendMessageToConversation(conversation.id, text,tempId, mentions)
+        ConversationManager.sendMessageToConversation(conversation.id, text,tempId, mentions)
     }
     getChatMessagePreview(text:string, uid:string, mentions:number[], conversation:Conversation):Message {
         let now = Date.now()
@@ -189,7 +190,7 @@ class ConversationView extends React.Component<Props, {}> {
         let conversation = this.props.conversation
         if(!conversation)
             return
-        sendTypingInConversation(conversation.id)
+        ConversationManager.sendTypingInConversation(conversation.id)
     }
     renderSomeoneIsTyping()
     {
@@ -239,7 +240,7 @@ class ConversationView extends React.Component<Props, {}> {
         );
     }
 }
-const mapStateToProps = (state:RootReducer, ownProps:Props) => {
+const mapStateToProps = (state:RootState, ownProps:Props) => {
     let id = ownProps.match.params.conversationid
     const pagination = state.messages.conversations[id] || getDefaultCachePage()
     const allItems = state.messages.items
@@ -251,15 +252,15 @@ const mapStateToProps = (state:RootReducer, ownProps:Props) => {
     const queuedMessages = QueueUtilities.getQueuedMessageForConversation(id, state.queue.chatMessages)
     const last_fetched = pagination.last_fetch
     const conversation = state.conversations.items[id]
-    const mentions = conversation.users.map(u => {
+    const mentions = conversation ? conversation.users.map(u => {
         let p = getProfileById(u)
-        return new Mention(
+        return p ? new Mention(
             p.first_name + " " + p.last_name,
             p.username,
             appendTokenToUrl(p.avatar),
             p.id
-          )
-    })
+          ) : null
+    }).filter(n => n != null) : []
     return {
         error,
         conversationId:id,

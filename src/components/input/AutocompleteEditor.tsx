@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import Suggestions from "./Suggestions";
 import { AutocompleteState, Suggestion } from './Suggestions';
 import addSuggestion from './addSuggestions';
-import { RootReducer } from '../../reducers/index';
+import { RootState } from '../../reducers/index';
 import { UserProfile } from '../../reducers/profileStore';
 require('./AutocompleteEditor.scss');
 interface Props
@@ -126,7 +126,7 @@ class AutocompleteEditor extends React.Component<Props,{}> {
       }
   }
   
-  const mapStateToProps = (state:RootReducer) => {
+  const mapStateToProps = (state:RootState) => {
     const keys = Object.keys( state.profileStore.byId ).map(k => parseInt(k))
     const profiles = keys.map(k => state.profileStore.byId[k])
     return {

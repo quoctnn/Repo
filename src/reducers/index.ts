@@ -32,7 +32,7 @@ const rootReducer = combineReducers({
    queue, conversations, messages, embedlyStore
 })
 export default persistReducer(rootPersistConfig, rootReducer)
-export interface RootReducer
+export interface RootState
 {
   settings: any;
       profile: UserProfile;

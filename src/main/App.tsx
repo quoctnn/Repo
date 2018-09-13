@@ -3,7 +3,7 @@ import '@fortawesome/fontawesome-free/css/fontawesome.min.css';
 import '@fortawesome/fontawesome-free/css/solid.min.css';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { createStore, applyMiddleware, AnyAction } from 'redux';
+import { AnyAction, applyMiddleware, createStore, Store } from 'redux';
 import { Provider } from 'react-redux';
 import { persistStore } from 'redux-persist';
 import { PersistGate } from 'redux-persist/integration/react';
@@ -13,13 +13,14 @@ import { Types } from '../utilities/Types';
 import { availableThemes } from '../reducers/settings';
 import { Settings } from '../utilities/Settings';
 import appReducer from '../reducers/index';
-import { RootReducer } from '../reducers/index';
+import { RootState } from '../reducers/index';
 import { UserProfile } from '../reducers/profileStore';
 import { PaginatorAction, MultiPaginatorAction } from '../reducers/createPaginator';
 import ApiClient from '../network/ApiClient';
 import ChannelEventStream from '../components/general/ChannelEventStream';
 import { embedlyMiddleware } from '../reducers/embedlyStore';
 import * as Actions from '../actions/Actions';
+import { ConversationManager } from './managers/ConversationManager';
 require('jquery/dist/jquery');
 require('popper.js/dist/umd/popper');
 require('bootstrap/dist/js/bootstrap');
@@ -40,7 +41,7 @@ const applyTheme = (themeIndex: number) => {
 const themeSwitcherMiddleware = store => next => action => {
   let result = next(action);
   if (action.type === Types.SET_THEME) {
-    let state = store.getState() as RootReducer;
+    let state = store.getState() as RootState;
     applyTheme(state.settings.theme);
   }
   return result;
@@ -94,17 +95,11 @@ if (Settings.supportsTheming) {
 }
 const store = createStore(appReducer, applyMiddleware(...middleWares));
 window.store = store 
+window.socket = document.createElement("div")
+//managers
+ConversationManager.setup()
 
 
-export const sortConversations = () => 
-{
-  let state = store.getState() as RootReducer
-  let conversations = Object.keys(state.conversations.items).map(k => state.conversations.items[k])
-  let sortedIds = conversations.sort((a,b) => {
-    return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
-  }).map(c => c.id)
-  store.dispatch(Actions.setSortedConversationIds(sortedIds))
-}
 export const getProfileById = (id: number): UserProfile => {
   let s = store.getState();
   if (s.profile.id == id) return s.profile;

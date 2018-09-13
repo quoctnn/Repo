@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import { Routes } from '../../utilities/Routes';
 import { getProfileById } from '../../main/App';
 import { OverflowList } from './OverflowList';
-import { RootReducer } from '../../reducers';
+import { RootState } from '../../reducers';
 import { connect } from 'react-redux'
 import { UserProfile } from '../../reducers/profileStore';
 import { getConversationTitle } from '../../utilities/ConversationUtilities';
@@ -61,7 +61,7 @@ class ConversationItem extends React.Component<Props, {}> {
         )
     }
 }
-const mapStateToProps = (state:RootReducer) => {
+const mapStateToProps = (state:RootState) => {
     return {
         profile:state.profile
     };

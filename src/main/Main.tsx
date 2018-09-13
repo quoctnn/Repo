@@ -16,7 +16,7 @@ import DevTool from '../components/dev/DevTool';
 import { Settings } from '../utilities/Settings';
 import LeftNavigation from '../components/navigation/LeftNavigation';
 import RightNavigation from '../components/navigation/RightNavigation';
-import { RootReducer } from '../reducers/index';
+import { RootState } from '../reducers/index';
 import Conversations from '../views/chat/Conversations';
 import ConversationView from '../views/chat/ConversationView';
 import UpdateTool from '../components/update/UpdateTool';
@@ -68,7 +68,7 @@ class Main extends React.Component<Props, {}> {
     );
   }
 }
-const mapStateToProps = (state:RootReducer) => {
+const mapStateToProps = (state:RootState) => {
   return {
       signedIn:state.auth.signedIn,
   };

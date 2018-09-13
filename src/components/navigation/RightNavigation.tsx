@@ -6,7 +6,7 @@ import { Routes } from "../../utilities/Routes";
 import { Avatar } from "../general/Avatar";
 import { Link } from "react-router-dom";
 import { List } from "../general/List";
-import { RootReducer } from "../../reducers";
+import { RootState } from "../../reducers";
 import { addSocketEventListener, SocketMessageType, removeSocketEventListener } from '../general/ChannelEventStream';
 import { TypingIndicator } from '../general/TypingIndicator';
 import { Settings } from '../../utilities/Settings';
@@ -42,7 +42,7 @@ class RightNavigation extends React.Component<Props, {}> {
     }
     isTypingHandler(event:CustomEvent)
     {
-        let user = event.detail.user  
+        let user = event.detail.data.user  
         if(user == this.props.profile.id)
         {
             return
@@ -108,7 +108,7 @@ class RightNavigation extends React.Component<Props, {}> {
         );
     }
 }
-const mapStateToProps = (state:RootReducer) => {
+const mapStateToProps = (state:RootState) => {
     return {
         profiles:state.profileStore.byId,
         contacts:state.contactListCache.contacts,
