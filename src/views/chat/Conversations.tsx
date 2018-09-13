@@ -3,7 +3,7 @@ import * as Actions from "../../actions/Actions"
 import { connect } from 'react-redux'
 import LoadingSpinner from '../../components/general/LoadingSpinner';
 import { translate } from '../../components/intl/AutoIntlProvider';
-import { RootReducer } from '../../reducers';
+import { RootState } from '../../reducers';
 import { Conversation } from '../../reducers/conversations';
 import ConversationItem from '../../components/general/ConversationItem';
 import { FullPageComponent } from '../../components/general/FullPageComponent';
@@ -75,8 +75,8 @@ class Conversations extends React.Component<Props, {}> {
     }
     isTypingHandler(event:CustomEvent)
     {
-        let user = event.detail.user
-        let conversation = event.detail.conversation
+        let user = event.detail.data.user
+        let conversation = event.detail.data.conversation
         if((this.props.preventShowTyingInChatId && this.props.preventShowTyingInChatId == conversation) || user == this.props.profile.id || !this.props.items.find(i => i.id == conversation))
         {
             return
@@ -194,7 +194,7 @@ class Conversations extends React.Component<Props, {}> {
                 </FullPageComponent>)
     }
 }
-const mapStateToProps = (state:RootReducer) => {
+const mapStateToProps = (state:RootState) => {
     const pagination = state.conversations.pagination
     const allItems = state.conversations.items
     const isFetching = pagination.fetching

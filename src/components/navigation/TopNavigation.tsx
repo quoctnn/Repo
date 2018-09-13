@@ -6,7 +6,7 @@ import { DevToolTrigger } from '../dev/DevToolTrigger';
 import { Link} from 'react-router-dom'
 import UserStatusSelector from '../general/UserStatusSelector';
 import { connect } from 'react-redux'
-import { RootReducer } from '../../reducers/index';
+import { RootState } from '../../reducers/index';
 require("./TopNavigation.scss");
 export interface Props {
     signedIn:boolean
@@ -30,7 +30,7 @@ class TopNavigation extends React.Component<Props, {}> {
         );
     }
 }
-const mapStateToProps = (state:RootReducer) => {
+const mapStateToProps = (state:RootState) => {
     return {
         signedIn:state.auth.signedIn,
     };

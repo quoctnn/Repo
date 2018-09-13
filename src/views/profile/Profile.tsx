@@ -2,7 +2,7 @@ import * as React from "react";
 import { connect } from 'react-redux'
 import { UserProfile, getProfileIdBySlugName } from '../../reducers/profileStore';
 import { CoverImage } from '../../components/general/CoverImage';
-import { RootReducer } from '../../reducers/index';
+import { RootState } from '../../reducers/index';
 import ApiClient from '../../network/ApiClient';
 import * as Actions from '../../actions/Actions'; 
 import LoadingSpinner from '../../components/general/LoadingSpinner';
@@ -81,7 +81,7 @@ class Profile extends React.Component<Props, {}>
         );
     }
 }
-const mapStateToProps = (state:RootReducer, ownProps:Props) => {
+const mapStateToProps = (state:RootState, ownProps:Props) => {
     let slug = ownProps.match.params.slug
     let isMe = state.profile && state.profile.slug_name == slug || false
     if(isMe)

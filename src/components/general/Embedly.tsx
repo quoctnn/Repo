@@ -1,7 +1,7 @@
 import * as React from "react";
 import { connect } from 'react-redux'
 import * as Actions from "../../actions/Actions" 
-import { RootReducer } from '../../reducers/index';
+import { RootState } from '../../reducers/index';
 import { EmbedlyItem } from '../../reducers/embedlyStore';
 import { nullOrUndefined } from '../../utilities/Utilities';
 require("./Embedly.scss");
@@ -73,7 +73,7 @@ class Embedly extends React.Component<Props, {}> {
     );
   }
 }
-const mapStateToProps = (state:RootReducer, ownProps:Props) => {
+const mapStateToProps = (state:RootState, ownProps:Props) => {
     const page = state.embedlyStore.byId[ownProps.url]
     const isLoading = !nullOrUndefined( state.embedlyStore.queuedIds[ownProps.url] )
     return {

@@ -6,17 +6,14 @@ import { UserProfile, UserStatus } from '../../reducers/profileStore';
 import { Settings } from '../../utilities/Settings';
 import { AjaxRequest } from '../../network/AjaxRequest';
 import { Community } from '../../reducers/communityStore';
-import { RootReducer } from '../../reducers/index';
+import { RootState } from '../../reducers/index';
 import ReconnectingWebSocket from 'reconnecting-websocket';
 
 import { toast } from 'react-toastify';
-import { ErrorToast, InfoToast } from '../../components/general/Toast';
+import { ErrorToast } from '../../components/general/Toast';
 import { Queue } from '../../reducers/queue';
-import { Message, Conversation } from '../../reducers/conversations';
-import { Routes } from '../../utilities/Routes';
 import { History } from 'history';
-import { translate } from '../intl/AutoIntlProvider';
-import { sortConversations } from '../../main/App';
+import { ConversationManager } from '../../main/managers/ConversationManager';
 
 export enum SocketMessageType {
   STATE = "state",
@@ -32,8 +29,6 @@ export interface Props {
   availableApiEndpoints?: Array<ApiEndpoint>;
   setProfile: (profile: UserProfile) => void;
   setSignedIn: (signedIn: boolean) => void;
-  insertChatMessage:(conversation:number, message:Message) => void
-  insertConversation:(conversation:Conversation) => void
 
   storeProfiles: (profiles: UserProfile[]) => void;
   storeProfile: (profile: UserProfile) => void;
@@ -41,7 +36,6 @@ export interface Props {
   storeCommunity: (community: Community) => void;
   setContactListCache: (contacts: number[]) => void;
   setAwayTimeout: (timeout: number) => void;
-  updateConversationUnreadMessages:(conversation:number, unread_messages:number[]) => void
 
   accessToken?: string;
   signedIn: boolean;
@@ -51,7 +45,6 @@ export interface Props {
   history: History;
 
   queue: Queue;
-  queueRemoveChatMessage: (message: Message) => void;
 }
 enum WebsocketState {
   CONNECTING = 0,
@@ -61,10 +54,13 @@ enum WebsocketState {
 }
 var publicStream: ReconnectingWebSocket = null;
 export const sendOnWebsocket = (data: string) => {
-  if (publicStream && publicStream.readyState == WebsocketState.OPEN) {
+  if (canSendOnWebsocket()) {
     console.log('Sending Websocket', data);
     publicStream.send(data);
   }
+};
+export const canSendOnWebsocket = () => {
+  return publicStream && publicStream.readyState == WebsocketState.OPEN
 };
 export const getStream = () => {
   return publicStream;
@@ -77,39 +73,18 @@ export const sendUserStatus = (status: UserStatus) => {
     })
   );
 };
-export const sendTypingInConversation = (conversation: number) => {
-  sendOnWebsocket(
-    JSON.stringify({
-      type: SocketMessageType.CONVERSATION_TYPING,
-      data: { conversation: conversation }
-    })
-  );
-};
-export const sendMessageToConversation = (
-  conversation: number,
-  text: string,
-  uid: string,
-  mentions:number[]
-) => {
-  sendOnWebsocket(
-    JSON.stringify({
-      type: SocketMessageType.CONVERSATION_MESSAGE,
-      data: { conversation: conversation, text: text, uid: uid, mentions }
-    })
-  );
-};
 
 export const addSocketEventListener = (
   type: SocketMessageType,
   listener: EventListenerOrEventListenerObject
 ) => {
-  document.getElementById('socket').addEventListener(type, listener);
+  window.socket.addEventListener(type, listener);
 };
 export const removeSocketEventListener = (
   type: SocketMessageType,
   listener: EventListenerOrEventListenerObject
 ) => {
-  document.getElementById('socket').removeEventListener(type, listener);
+  window.socket.removeEventListener(type, listener);
 };
 const socket_options = {
   connectionTimeout: 4000,
@@ -120,7 +95,6 @@ class ChannelEventStream extends React.Component<Props, {}> {
   lastUserActivity: Date;
   lastUserActivityTimer: NodeJS.Timer;
   state: { token: string; endpoint: string };
-  private socketRef = React.createRef<HTMLDivElement>();
   constructor(props) {
     super(props);
     this.state = { token: null, endpoint: null };
@@ -143,9 +117,6 @@ class ChannelEventStream extends React.Component<Props, {}> {
     );
     this.clearUserActivityTimer = this.clearUserActivityTimer.bind(this);
     this.startTimer = this.startTimer.bind(this);
-    this.processTempQueue = this.processTempQueue.bind(this);
-
-    this.sendMessageNotification = this.sendMessageNotification.bind(this);
 
     this.lastUserActivity = new Date();
     this.lastUserActivityTimer = null;
@@ -178,7 +149,7 @@ class ChannelEventStream extends React.Component<Props, {}> {
     this.props.storeCommunities(state.communities || []);
     this.props.setProfile(state.user || null);
     this.props.setSignedIn(state.user != null);
-    this.processTempQueue();
+    ConversationManager.processTempQueue()
     if (state.away_timeout && Number.isInteger(state.away_timeout))
       this.props.setAwayTimeout(state.away_timeout);
   }
@@ -193,75 +164,6 @@ class ChannelEventStream extends React.Component<Props, {}> {
       let p = Object.assign({}, this.props.profile); //clone
       p.user_status = data.status;
       this.props.setProfile(p);
-    }
-  }
-  sendMessageNotification(message: Message) {
-    let uri = Routes.CONVERSATION + message.conversation;
-    if (document.hasFocus()) {
-      // If tab is focused
-      let user: UserProfile = this.props.contacts['byId'][message.user];
-      // Show the toast if the user is not viewing that conversation
-      if (user && window.location.pathname != uri) {
-        toast.info(
-          <InfoToast message={user.first_name + ': ' + message.text} />
-        );
-      }
-    } else if (
-      'Notification' in window &&
-      Notification.permission === 'granted'
-    ) {
-      // If window is not active and notifications are enabled
-      if (Notification.permission === 'granted') {
-        let user: UserProfile = this.props.contacts['byId'][message.user];
-        if (user) {
-          var options = {
-            body: user.first_name + ': ' + message.text,
-            tag: 'conversation_' + message.conversation
-          };
-          var notification = (new Notification(
-            translate('New Message'),
-            options
-          ).onclick = function(event) {
-            window.open(uri);
-          });
-        }
-      }
-    }
-  }
-  processTypingInConversation(data: any) {
-    var event = new CustomEvent(SocketMessageType.CONVERSATION_TYPING, {
-      detail: data
-    });
-    this.socketRef.current.dispatchEvent(event);
-  }
-  processIncomingConversationMessage(data: any, unread_messages:number[]) {
-    var event = new CustomEvent(SocketMessageType.CONVERSATION_MESSAGE, {
-      detail: data
-    });
-    let message = data as Message;
-    if (message.user == this.props.profile.id) {
-      this.props.queueRemoveChatMessage(message);
-    } else {
-      this.sendMessageNotification(message);
-    }
-    //ensureConversationExists(message.conversation)
-    this.props.insertChatMessage(message.conversation, message)
-    this.props.updateConversationUnreadMessages(message.conversation, unread_messages)
-    sortConversations()
-    this.socketRef.current.dispatchEvent(event);
-  }
-  processIncomingNewConversation(data:any)
-  {
-    let conversation = data as Conversation;
-    this.props.insertConversation(conversation)
-  }
-  processTempQueue() {
-    if (this.canSend()) {
-      if (this.props.queue.chatMessages.length > 0) {
-        this.props.queue.chatMessages.forEach(m => {
-          sendMessageToConversation(m.conversation, m.text, m.uid, m.mentions);
-        });
-      }
     }
   }
   connectStream() {
@@ -291,17 +193,13 @@ class ChannelEventStream extends React.Component<Props, {}> {
           case SocketMessageType.CLIENT_STATUS_CHANGE:
             this.processStatusChangeResponse(data.data);
             break;
-          case SocketMessageType.CONVERSATION_TYPING:
-            this.processTypingInConversation(data.data);
-            break;
-          case SocketMessageType.CONVERSATION_MESSAGE:
-            this.processIncomingConversationMessage(data.data, data.unread_messages);
-            break;
-          case SocketMessageType.CONVERSATION_NEW:
-            this.processIncomingNewConversation(data.data);
-            break;
           default:
-            console.log('NO HANDLER FOR TYPE ' + data.type);
+            {
+              var event = new CustomEvent(data.type, {
+                detail: data
+              });
+              window.socket.dispatchEvent(event);
+            }
         }
       };
       this.stream.onclose = event => {
@@ -426,10 +324,10 @@ class ChannelEventStream extends React.Component<Props, {}> {
     }
   }
   render() {
-    return <div id="socket" ref={this.socketRef} />;
+    return null;
   }
 }
-const mapStateToProps = (state: RootReducer) => {
+const mapStateToProps = (state: RootState) => {
   return {
     availableApiEndpoints: state.debug.availableApiEndpoints,
     rehydrated: state._persist.rehydrated,
@@ -440,7 +338,6 @@ const mapStateToProps = (state: RootReducer) => {
     contacts: state.profileStore,
     awayTimeout: state.settings.awayTimeout,
     queue: state.queue,
-    conversations:state.conversations.items
   };
 };
 const mapDispatchToProps = dispatch => {
@@ -469,18 +366,6 @@ const mapDispatchToProps = dispatch => {
     setAwayTimeout: (timeout: number) => {
       dispatch(Actions.setAwayTimeout(timeout));
     },
-    queueRemoveChatMessage: (message: Message) => {
-      dispatch(Actions.queueRemoveChatMessage(message));
-    },
-    insertChatMessage:(conversation:number, message:Message) => {
-        dispatch(Actions.insertChatMessage(conversation.toString(), message))
-    },
-    insertConversation:(conversation:Conversation) => {
-      dispatch(Actions.insertConversation(conversation))
-    },
-    updateConversationUnreadMessages:(conversation:number, unread_messages:number[]) => {
-      dispatch(Actions.updateConversationUnreadMessages(conversation, unread_messages))
-    }
   };
 };
 export default connect(

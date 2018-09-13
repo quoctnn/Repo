@@ -7,7 +7,7 @@ import * as en from 'react-intl/locale-data/en';
 import * as es from 'react-intl/locale-data/es';
 import * as no from 'react-intl/locale-data/no';
 import { availableLanguages } from '../../reducers/settings';
-import { RootReducer } from "../../reducers";
+import { RootState } from "../../reducers";
 addLocaleData([...en, ...es, ...no]);
 
 export interface Props {
@@ -44,7 +44,7 @@ class AutoIntlProvider extends React.Component<Props, {}> {
 interface StateFromProps {
     language: string;
 }
-const mapStateToProps = (state:RootReducer) => {
+const mapStateToProps = (state:RootState) => {
     return {
         language:state.settings.language,
     };

@@ -1,7 +1,7 @@
 import {Types} from "../utilities/Types"
 import { AvatarStateColor } from '../components/general/Avatar';
 import { combineReducers } from 'redux'
-import { RootReducer } from './index';
+import { RootState } from './index';
 
 export interface UserProfile {
     absolute_url: string,
@@ -122,7 +122,7 @@ export const profileStore = combineReducers({
     allIds : allProfiles
 });
 
-export const getProfileIdBySlugName = (slug:string, state:RootReducer) => 
+export const getProfileIdBySlugName = (slug:string, state:RootState) => 
 {
     let ids = state.profileStore.allIds
     return ids.find((k) => 

@@ -7,7 +7,7 @@ import { ErrorToast } from '../../components/general/Toast';
 import { connect } from 'react-redux'
 import * as Actions from '../../actions/Actions';
 import { ApiEndpoint, LoginType } from '../../reducers/debug';
-import { RootReducer } from '../../reducers/index';
+import { RootState } from '../../reducers/index';
 
 require("./Signin.scss");
 
@@ -76,7 +76,7 @@ class Signin extends React.Component<Props, {}> {
         );
     }
 }
-const mapStateToProps = (state:RootReducer) => {
+const mapStateToProps = (state:RootState) => {
     return {
         apiEndpoint:state.debug.apiEndpoint,
         availableApiEndpoints:state.debug.availableApiEndpoints,

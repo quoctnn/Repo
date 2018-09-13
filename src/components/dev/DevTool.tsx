@@ -6,7 +6,7 @@ import { ApiEndpoint } from '../../reducers/debug';
 import { sendOnWebsocket, getStream } from '../general/ChannelEventStream';
 import { Form } from 'reactstrap';
 import { availableLanguages, availableThemes } from '../../reducers/settings';
-import { RootReducer } from '../../reducers';
+import { RootState } from '../../reducers';
 import { resetEmbedlyStore } from '../../actions/Actions';
 import ReconnectingWebSocket from 'reconnecting-websocket';
 require('./DevTool.scss');
@@ -335,7 +335,7 @@ class DevTool extends React.PureComponent<Props, {}> {
   }
 }
 
-const mapStateToProps = (state: RootReducer) => {
+const mapStateToProps = (state: RootState) => {
   return {
     language: state.settings.language,
     apiEndpoint: state.debug.apiEndpoint,

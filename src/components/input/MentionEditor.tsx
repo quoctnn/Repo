@@ -9,7 +9,7 @@ import createMentionPlugin, {
   defaultSuggestionsFilter
 } from "draft-js-mention-plugin";
 import { connect } from "react-redux";
-import { RootReducer } from "../../reducers/index";
+import { RootState } from "../../reducers/index";
 import { appendTokenToUrl } from "../../utilities/Utilities";
 import createEmojiPlugin from "draft-js-emoji-plugin";
 import emojiPositionSuggestions from "./emojiPositionSuggestion";

@@ -2,7 +2,7 @@ import * as React from 'react';
 import { connect } from 'react-redux'
 import { UserProfile, UserStatus } from '../../reducers/profileStore';
 import { sendUserStatus } from './ChannelEventStream';
-import { RootReducer } from '../../reducers/index';
+import { RootState } from '../../reducers/index';
 require("./UserStatusSelector.scss");
 
 export interface Props {
@@ -53,7 +53,7 @@ class UserStatusSelector extends React.Component<Props, {}> {
     }
 }
 
-const mapStateToProps = (state:RootReducer) => {
+const mapStateToProps = (state:RootState) => {
     return {
         profile: state.profile,
         language:state.settings.language
