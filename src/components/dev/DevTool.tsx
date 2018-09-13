@@ -261,69 +261,69 @@ class DevTool extends React.PureComponent<Props, {}> {
           <div>
             <Form>
               <div className="form-group row">
-                <label htmlFor="lang" className="col-sm-3 col-form-label">
+                <label htmlFor="lang" className="col-sm-4 col-form-label">
                   {translate('Theme')}
                 </label>
-                <div className="col-sm-9" id="lang">
+                <div className="col-sm-8" id="lang">
                   {this.renderThemeSelector()}
                 </div>
               </div>
               <div className="form-group row">
-                <label htmlFor="lang" className="col-sm-3 col-form-label">
+                <label htmlFor="lang" className="col-sm-4 col-form-label">
                   {translate('Language')}
                 </label>
-                <div className="col-sm-9" id="lang">
+                <div className="col-sm-8" id="lang">
                   {this.renderLanguageSelector()}
                 </div>
               </div>
               <div className="form-group row">
-                <label htmlFor="api" className="col-sm-3 col-form-label">
+                <label htmlFor="api" className="col-sm-4 col-form-label">
                   {translate('Api Endpoint')}
                 </label>
-                <div className="col-sm-9" id="api">
+                <div className="col-sm-8" id="api">
                   {this.renderEndpointSelector()}
                 </div>
               </div>
               <div className="form-group row">
                 <label
                   htmlFor="accessToken"
-                  className="col-sm-3 col-form-label"
+                  className="col-sm-4 col-form-label"
                 >
                   {translate('Access Token')}
                 </label>
-                <div className="col-sm-9" id="accessToken">
+                <div className="col-sm-8" id="accessToken">
                   {this.renderAccessTokenInput()}
                 </div>
               </div>
               <div className="form-group row">
-                <label htmlFor="sendSocket" className="col-sm-3 col-form-label">
+                <label htmlFor="sendSocket" className="col-sm-4 col-form-label">
                   {translate('Send WebSocket')}
                 </label>
-                <div className="col-sm-9" id="sendSocket">
+                <div className="col-sm-8" id="sendSocket">
                   {this.renderSendOnWebSocket()}
                 </div>
               </div>
               <div className="form-group row">
-                <label htmlFor="clearStore" className="col-sm-3 col-form-label">
+                <label htmlFor="clearStore" className="col-sm-4 col-form-label">
                   {translate('Local Storage')}
                 </label>
-                <div className="col-sm-9" id="clearStore">
+                <div className="col-sm-8" id="clearStore">
                   {this.renderClearStoreButton()}
                 </div>
               </div>
               <div className="form-group row">
-                <label htmlFor="allowPush" className="col-sm-3 col-form-label">
+                <label htmlFor="allowPush" className="col-sm-4 col-form-label">
                   {translate('Enable Push Notifications')}
                 </label>
-                <div className="col-sm-9" id="allowPush">
+                <div className="col-sm-8" id="allowPush">
                   {this.renderEnablePush()}
                 </div>
               </div>
               <div className="form-group row">
-                <label htmlFor="disableWebsocket" className="col-sm-3 col-form-label">
+                <label htmlFor="disableWebsocket" className="col-sm-4 col-form-label">
                   {translate('Websocket')}
                 </label>
-                <div className="col-sm-9" id="disableWebsocket">
+                <div className="col-sm-8" id="disableWebsocket">
                   {this.renderDisableWebsocketButton()}
                 </div>
               </div>
