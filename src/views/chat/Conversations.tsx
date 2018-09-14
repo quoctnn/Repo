@@ -185,7 +185,6 @@ class Conversations extends React.Component<Props, {}> {
                             <div className="flex-shrink-0">
                                 <Link className="btn btn-primary rounded-circle flex-shrink-0" to={Routes.CONVERSATION_CREATE}><i className="fas fa-plus"></i></Link>
                             </div>
-                            
                         </div>
                         <div className="card-body full-height">
                             <ul onScroll={this.onScroll} className="group-list vertical-scroll">

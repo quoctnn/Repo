@@ -40,8 +40,9 @@ export interface Props {
     mentions:Mention[]
 }
 export interface State {
-    isTyping:object,
-    loading:boolean,
+    isTyping:object
+    loading:boolean
+    fullScreen:boolean
 }
 
 class ConversationView extends React.Component<Props, {}> {
@@ -53,6 +54,7 @@ class ConversationView extends React.Component<Props, {}> {
         this.state = {
             isTyping:{},
             loading:false,
+            fullScreen:false
         }
         this.loadFirstData = this.loadFirstData.bind(this)
         this.loadNextPageData = this.loadNextPageData.bind(this) 
@@ -133,7 +135,7 @@ class ConversationView extends React.Component<Props, {}> {
     {
         let currentConversation = this.props.conversation
         let nextConversation = nextProps.conversation
-        if(nextProps.isFetching == this.props.isFetching && currentConversation && nextConversation && currentConversation.id == nextConversation.id && currentConversation.updated_at == nextConversation.updated_at && nextProps.items == this.props.items && 
+        if(nextState.fullScreen == this.state.fullScreen && nextProps.isFetching == this.props.isFetching && currentConversation && nextConversation && currentConversation.id == nextConversation.id && currentConversation.updated_at == nextConversation.updated_at && nextProps.items == this.props.items && 
             this.isTypingDictEqual(nextState.isTyping, this.state.isTyping))
             return false
         return true
@@ -208,6 +210,9 @@ class ConversationView extends React.Component<Props, {}> {
         }
         return null
     }
+    resizeButtonClick = (e) => {
+        this.setState({fullScreen:!this.state.fullScreen})
+    }
     render() {
         let me = this.props.profile
         let conversation = this.props.conversation
@@ -222,10 +227,13 @@ class ConversationView extends React.Component<Props, {}> {
                 <div className="d-none d-sm-block col-lg-4 col-md-4 col-sm-5">
                     <Conversations preventShowTyingInChatId={conversation.id} activeConversation={this.props.conversationId} />
                 </div>
-                <div className="col-lg-8 col-md-8 col-sm-7 col-xs-12">
+                <div className={"col-lg-8 col-md-8 col-sm-7 col-xs-12" + (this.state.fullScreen ? " full-screen" : "")}>
                     <div id="conversation-view" className="card full-height">
-                        <div className="card-header grey">
-                            {conversation && <span className="text-truncate d-block">{getConversationTitle(conversation, myId)}</span>}
+                        <div className="card-header grey d-flex align-items-center">
+                            {conversation && <span className="text-truncate d-block flex-grow-1">{getConversationTitle(conversation, myId)}</span>}
+                            <div className="flex-shrink-0">
+                                <button className="btn flex-shrink-0" onClick={this.resizeButtonClick} ><i className="fas fa-expand"></i></button>
+                            </div>
                         </div>
                         <div className="card-body full-height">
                             <ChatMessageList conversation={conversation.id} loading={this.props.isFetching} chatDidScrollToTop={this.chatDidScrollToTop} messages={messages} current_user={this.props.profile} >
