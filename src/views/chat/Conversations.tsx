@@ -17,6 +17,9 @@ import { Avatar } from '../../components/general/Avatar';
 import { getProfileById } from '../../main/App';
 import { conversationReducerPageSize } from '../../reducers/conversations';
 import * as moment from 'moment-timezone';
+import { Button} from 'reactstrap';
+import { Link } from 'react-router-dom';
+import { Routes } from '../../utilities/Routes';
 let timezone = moment.tz.guess()
 
 require("./Conversations.scss");
@@ -177,8 +180,12 @@ class Conversations extends React.Component<Props, {}> {
         
         return (<FullPageComponent> 
                     <div id="conversations-view" className={"card full-height col-sm" + (this.props.className ? " " + this.props.className : "")}>
-                        <div className="card-header grey">
-                            <span className="text-truncate d-block">{translate("Conversations")}</span>
+                        <div className="card-header grey d-flex align-items-center">
+                            <span className="text-truncate d-block flex-grow-1">{translate("Conversations")}</span>
+                            <div className="flex-shrink-0">
+                                <Link className="btn btn-primary rounded-circle flex-shrink-0" to={Routes.CONVERSATION_CREATE}><i className="fas fa-plus"></i></Link>
+                            </div>
+                            
                         </div>
                         <div className="card-body full-height">
                             <ul onScroll={this.onScroll} className="group-list vertical-scroll">

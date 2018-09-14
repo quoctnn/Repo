@@ -146,8 +146,8 @@ export class ChatMessageComposer extends React.Component<Props,{}> {
                             <MentionEditor mentions={this.props.mentions} editorState={this.state.editorState} ref={this.inputRef} onChange={this.onChange}/> 
                         </div>
                         <div className="button-wrap d-flex flex-column-reverse">
-                            <button className="btn btn-submit btn-default align-items-end">
-                                Send
+                            <button className="btn btn-submit btn-default align-items-end btn-primary message-send-button">
+                                <i className="fas fa-location-arrow" />
                             </button>
                         </div>
                     </div>

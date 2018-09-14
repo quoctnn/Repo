@@ -8,7 +8,7 @@ let timezone = moment.tz.guess()
 
 
 export const conversationReducerKey = "conversations"
-export const conversationReducerPageSize = PaginationUtilities.calculatePageSize(1575)
+export const conversationReducerPageSize = PaginationUtilities.calculatePageSize(75)
 export const conversationPaginator = createPaginator(conversationReducerKey, Constants.apiRoute.conversations, "id", conversationReducerPageSize)
 const conversationItemReducer = (state = {}, action) => {
   switch (action.type) {

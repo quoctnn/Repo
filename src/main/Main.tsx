@@ -20,6 +20,7 @@ import { RootState } from '../reducers/index';
 import Conversations from '../views/chat/Conversations';
 import ConversationView from '../views/chat/ConversationView';
 import UpdateTool from '../components/update/UpdateTool';
+import CreateConversation from '../views/chat/CreateConversation';
 require("react-toastify/dist/ReactToastify.css");
 require("./Main.scss");
 
@@ -44,11 +45,15 @@ class Main extends React.Component<Props, {}> {
                             <div className="row">
                               <Switch>
                                 {!Settings.isProduction && <Route path={Routes.DEVELOPER_TOOL} component={DevTool} /> }
+                                create/
                                 <Route path={Routes.SIGNIN} component={Signin} />
                                 <Route path={Routes.PROFILES + ":slug"} component={Profile} />
                                 <Route path={Routes.PROFILE_UPDATE} component={ProfileUpdate} />
+                                {/* CONVERSATIONS */}
+                                <Route path={Routes.CONVERSATION_CREATE} component={CreateConversation} />
                                 <Route path={Routes.CONVERSATIONS} component={Conversations} />
                                 <Route path={Routes.CONVERSATION + ":conversationid"} component={ConversationView} />
+
                                 <Route path={Routes.COMMUNITY + ":communityid/:groupname"} component={GroupView} />
                                 <Route path={Routes.COMMUNITY + ":communityname"} component={Community} />
                                 <Route path={Routes.ROOT} exact={true} component={NewsFeed} />

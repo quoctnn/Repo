@@ -39,7 +39,8 @@ class ConversationItem extends React.Component<Props, {}> {
         return (
             <li className={"conversation-item" + (this.props.isActive ? " active" : "") + (this.props.className ? " " + this.props.className:"") }>
                 <Link to={Routes.CONVERSATION + conversation.id}>
-                    <h6 className="title text-truncate">{title}
+                    <h6 className="title">
+                        <span className="text-truncate">{title}</span>
                         {
                             conversation.unread_messages.length > 0 && 
                             <div className="notification-badge bg-success text-white">{conversation.unread_messages.length}</div>

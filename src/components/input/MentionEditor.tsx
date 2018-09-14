@@ -88,7 +88,7 @@ const positionSuggestions = ({ state, props }) => {
     position: "relative",
     padding: "0",
     boxShadow: "none",
-    margin: "0.375rem -0.75rem",
+    margin: "0.5rem 0.5rem -0.5rem -0.5rem",
     marginBottom: "-0.375rem",
 
     maxWidth: "initial",
@@ -193,7 +193,7 @@ export default class MentionEditor extends React.Component<Props, {}> {
       var bodyRect = document.documentElement.getBoundingClientRect();
       let offset = buttonRect.top + buttonRect.height - bodyRect.top;
       let up = offset > 360 && buttonRect.y >= windowHeight / 2;
-      let tranform = up ? "translate(0, calc(-100% - 45px))" : "none";
+      let tranform = up ? "translate(0, calc(-100% - 55px))" : "none";
       ReactDOM.render(
         <div className="emoji-picker-container" style={{ transform: tranform }}>
           <EmojiSelect isOpen={this.state.emojiSelectOpen} />
@@ -272,19 +272,21 @@ export default class MentionEditor extends React.Component<Props, {}> {
       <div ref={this.container} className="mention-editor" onClick={this.focus}>
           <div>
             <div className="d-flex">
-              <div className="flex-grow-1">
-                <Editor
-                  editorState={this.props.editorState}
-                  onChange={this.onChange}
-                  plugins={plugins}
-                  ref={this.editor}
-                />
-                <EmojiSuggestions />
+              <div className="flex-grow-1 editor-container">
+                <div className="">
+                    <Editor
+                      editorState={this.props.editorState}
+                      onChange={this.onChange}
+                      plugins={plugins}
+                      ref={this.editor}
+                    />
+                    <EmojiSuggestions />
+                </div>
               </div>
               <div className="d-flex align-items-end">
                 <button
                   ref={this.emojiButton}
-                  className="emojiButton"
+                  className="emojiButton editor-button btn btn-default"
                   onMouseUp={this.onButtonMouseUp}
                   type="button" >
                   <i className="fas fa-smile fa-lg"></i>

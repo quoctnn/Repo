@@ -39,7 +39,7 @@ class ConversationManagerSingleton
             let state = this.getStore().getState()
             if (state.queue.chatMessages.length > 0) 
             {
-                state.queue.chatMessages.forEach(m => {
+                state.queue.chatMessages.reverse().forEach(m => {
                     this.sendMessageToConversation(m.conversation, m.text, m.uid, m.mentions);
                 });
             }
