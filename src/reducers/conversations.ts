@@ -12,19 +12,6 @@ export const conversationReducerPageSize = PaginationUtilities.calculatePageSize
 export const conversationPaginator = createPaginator(conversationReducerKey, Constants.apiRoute.conversations, "id", conversationReducerPageSize)
 const conversationItemReducer = (state = {}, action) => {
   switch (action.type) {
-    case Types.UPDATE_CONVERSATION_UNREAD_MESSAGES:
-    {
-      let o = state[action.conversation]
-      if(o)
-      {
-        let c = Object.assign({}, o) as Conversation
-        c.unread_messages = action.unread_messages.map(m => m)
-        console.log(moment().format())
-        c.updated_at = moment().tz(timezone).utc().format()
-        return { ...state, [action.conversation]: c}
-      }
-      return state
-    }
     default:
       return conversationPaginator.itemsReducer(state, action);
   }

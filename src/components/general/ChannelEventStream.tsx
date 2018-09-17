@@ -21,7 +21,8 @@ export enum SocketMessageType {
   CLIENT_STATUS_CHANGE = "client.status_change",
   CONVERSATION_TYPING = "conversation.typing",
   CONVERSATION_MESSAGE = "conversation.message",
-  CONVERSATION_NEW = "conversation.new"
+  CONVERSATION_NEW = "conversation.new",
+  CONVERSATION_UPDATE = "conversation.update"
 }
 
 export interface Props {

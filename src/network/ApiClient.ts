@@ -102,6 +102,15 @@ export default class ApiClient
             callback(null, status, error)
         })
     }
+    static markConversationAsRead(conversationId:number, callback:ApiRequestCallback)
+    {
+        let url = Constants.apiRoute.conversationMarkAsReadUrl(conversationId)
+        AjaxRequest.get(url, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
     static getPage(endpoint:string, limit:number, offset:number,callback:ApiRequestCallback)
     {
         let url = endpoint + "?limit=" + limit + "&offset=" + offset;

@@ -95,13 +95,13 @@ class RightNavigation extends React.Component<Props, {}> {
                 <CollapsiblePanel id="right-navigation" arrowDirectionCollapsed={ArrowDirectionCollapsed.LEFT}>
                     <List>{this.state.contacts.map((contact, index) => {
                         return (
-                        <li className="avatar-profile" key={index}>
+                        <div className="avatar-profile" key={index}>
                             <Link to={Routes.PROFILES + contact.slug_name}>
                                 <Avatar image={contact.avatar} borderColor="green" borderWidth={2} stateColor={avatarStateColorForUserProfile(contact)}>
                                 {this.state.isTyping[contact.id] && <div className="typing-indicator-container"><TypingIndicator /></div>}
                                 </Avatar>
                             </Link>
-                        </li>)
+                        </div>)
                     } )}</List>
                 </CollapsiblePanel>
             </div>

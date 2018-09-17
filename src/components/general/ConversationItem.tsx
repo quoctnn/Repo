@@ -36,8 +36,9 @@ class ConversationItem extends React.Component<Props, {}> {
         let myId = this.props.profile.id
         let title = getConversationTitle(this.props.conversation, myId)
         let users = conversation.users.filter(i => i != myId)
+        
         return (
-            <li className={"conversation-item" + (this.props.isActive ? " active" : "") + (this.props.className ? " " + this.props.className:"") }>
+            <div className={"conversation-item" + (this.props.isActive ? " active" : "") + (this.props.className ? " " + this.props.className:"") }>
                 <Link to={Routes.CONVERSATION + conversation.id}>
                     <h6 className="title">
                         <span className="text-truncate">{title}</span>
@@ -58,7 +59,7 @@ class ConversationItem extends React.Component<Props, {}> {
                         {this.props.children}
                     </div>
                 </Link>
-            </li>
+            </div>
         )
     }
 }

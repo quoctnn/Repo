@@ -17,9 +17,9 @@ import { Avatar } from '../../components/general/Avatar';
 import { getProfileById } from '../../main/App';
 import { conversationReducerPageSize } from '../../reducers/conversations';
 import * as moment from 'moment-timezone';
-import { Button} from 'reactstrap';
 import { Link } from 'react-router-dom';
 import { Routes } from '../../utilities/Routes';
+import { List } from '../../components/general/List';
 let timezone = moment.tz.guess()
 
 require("./Conversations.scss");
@@ -137,7 +137,7 @@ class Conversations extends React.Component<Props, {}> {
     }
     renderLoading() {
         if (this.props.isFetching) {
-            return (<li key="loading"><LoadingSpinner/></li>)
+            return (<LoadingSpinner key="loading"/>)
         }
     }
     onScroll(event:React.UIEvent<HTMLUListElement>)
@@ -187,14 +187,14 @@ class Conversations extends React.Component<Props, {}> {
                             </div>
                         </div>
                         <div className="card-body full-height">
-                            <ul onScroll={this.onScroll} className="group-list vertical-scroll">
+                            <List onScroll={this.onScroll} className="group-list vertical-scroll">
                                 {conversations.map((c, index) => {
-                                    return (<ConversationItem isActive={c.id == this.props.activeConversation} className={this.conversationItemClassName(c) } key={c.id} conversation={c}>
+                                    return (<ConversationItem isActive={c.id == this.props.activeConversation} className={this.conversationItemClassName(c) } list-key={c.id} key={c.id} conversation={c}>
                                                {this.renderSomeoneIsTyping(c.id)} 
                                             </ConversationItem>)
                                 }) }
                                 {this.renderLoading()}
-                            </ul>
+                            </List>
                         </div>
                     </div>
                 </FullPageComponent>)

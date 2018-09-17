@@ -11,7 +11,6 @@ import { InfoToast } from '../../components/general/Toast';
 import * as React from 'react';
 import { getProfileById } from '../App';
 import ApiClient from '../../network/ApiClient';
-import debug from '../../reducers/debug';
 class ConversationManagerSingleton 
 {
     constructor()
@@ -20,6 +19,7 @@ class ConversationManagerSingleton
         this.getStore = this.getStore.bind(this)
         this.processIncomingNewConversation = this.processIncomingNewConversation.bind(this)
         this.processIncomingConversationMessage = this.processIncomingConversationMessage.bind(this)
+        this.processIncomingUpdateConversation = this.processIncomingUpdateConversation.bind(this)
         this.sendMessageNotification = this.sendMessageNotification.bind(this)
         this.sortConversations = this.sortConversations.bind(this)
         this.sendMessageNotification = this.sendMessageNotification.bind(this)
@@ -31,6 +31,7 @@ class ConversationManagerSingleton
     {
         addSocketEventListener(SocketMessageType.CONVERSATION_NEW, this.processIncomingNewConversation)
         addSocketEventListener(SocketMessageType.CONVERSATION_MESSAGE, this.processIncomingConversationMessage)
+        addSocketEventListener(SocketMessageType.CONVERSATION_UPDATE, this.processIncomingUpdateConversation)
     }
     processTempQueue() 
     {
@@ -45,6 +46,11 @@ class ConversationManagerSingleton
             }
         }
     }
+    private processIncomingUpdateConversation(event:CustomEvent)
+    {
+        let conversation = event.detail.data as Conversation
+        this.getStore().dispatch(Actions.insertConversation(conversation, false))
+    }
     private processIncomingNewConversation(event:CustomEvent)
     {
         let conversation = event.detail.data as Conversation
@@ -54,7 +60,6 @@ class ConversationManagerSingleton
     {
         let store = this.getStore()
         let message = event.detail.data as Message
-        let unread_messages = event.detail.unread_messages as number[]
         if (message.user == store.getState().profile.id) 
         {
             store.dispatch(Actions.queueRemoveChatMessage(message))
@@ -63,9 +68,8 @@ class ConversationManagerSingleton
             store.dispatch(Actions.queueRemoveChatMessage(message))
             this.sendMessageNotification(message);
         }
-        this.ensureConversationExists(message.conversation, () => {
+        this.ensureConversationExists(message.conversation, () => { 
             store.dispatch(Actions.insertChatMessage(message.conversation.toString(), message))
-            store.dispatch(Actions.updateConversationUnreadMessages(message.conversation, unread_messages))
             this.sortConversations()
         })
         
@@ -93,6 +97,12 @@ class ConversationManagerSingleton
             completion()
         }
 
+    }
+    markConversationAsRead(conversationId:number, completion:() => void)
+    {
+        ApiClient.markConversationAsRead(conversationId, (data, status, error) => {
+            completion()
+        })
     }
     sendTypingInConversation(conversation: number)
     {

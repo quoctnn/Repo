@@ -47,8 +47,9 @@ export const createPaginator = (key:string, endpoint:string, itemIdKey:string, p
           {
             let a = action as InsertItemAction
             let p = { ...page}
-            p.ids = p.ids.map(id => id)
-            p.ids.unshift(a.item[itemIdKey])
+            let newId = a.item[itemIdKey]
+            p.ids = p.ids.map(id => id).filter(id => id != newId)
+            p.ids.unshift(newId)
             p.fetching = false
             if(a.isNew)
               p.totalCount = p.totalCount + 1
@@ -163,7 +164,9 @@ export const createMultiPaginator = (key:string, endpoint:(id:string) => string,
         {
           let a = action as InsertItemAction
           let p = pages[a.pagingId] || getDefaultCachePage()
-          p.ids.unshift(a.item[itemIdKey])
+          let newId = a.item[itemIdKey]
+          p.ids = p.ids.filter(id => id != newId)
+          p.ids.unshift(newId)
           p.fetching = false
           if(a.isNew)
             p.totalCount = p.totalCount + 1

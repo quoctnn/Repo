@@ -51,13 +51,6 @@ export const insertConversation = (conversation:Conversation, isNew:boolean):Ins
     item:conversation,
     meta:{key:conversationReducerKey}
 })
-export const updateConversationUnreadMessages = (conversation:number, unread_messages:number[]) => (
-  {
-    type: Types.UPDATE_CONVERSATION_UNREAD_MESSAGES,
-    conversation,
-    unread_messages
-  }
-)
 
 //queue
 export const queueAddChatMessage = (message: Message) => ({

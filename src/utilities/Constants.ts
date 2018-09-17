@@ -126,6 +126,9 @@ export default  {
         conversationMessagesUrl: (id) => {
             return `/api/v2/conversation/${id}/messages/`
         },
+        conversationMarkAsReadUrl: (id) => {
+            return `/api/v2/conversation/${id}/mark_read/`
+        },
         conversation: (id:number) => {
             return `/api/v2/conversation/${id}/`
         },

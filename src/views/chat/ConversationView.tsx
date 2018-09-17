@@ -64,6 +64,8 @@ class ConversationView extends React.Component<Props, {}> {
         this.isTypingHandler = this.isTypingHandler.bind(this)
         this.incomingMessageHandler = this.incomingMessageHandler.bind(this)
         this.removeUserFromIsTypingData = this.removeUserFromIsTypingData.bind(this)
+        this.markConversationAsRead = this.markConversationAsRead.bind(this)
+        
     }
     componentDidMount()
     {
@@ -122,10 +124,18 @@ class ConversationView extends React.Component<Props, {}> {
     componentWillMount()
     {
         this.loadFirstData(true)
+        this.markConversationAsRead(true)
     }
-    componentDidUpdate(prevProps:Props, prevState)
+    componentDidUpdate(prevProps:Props, prevState) 
     {
-        this.loadFirstData(this.props.conversationId != prevProps.conversationId)
+        let isNewConversation = this.props.conversationId != prevProps.conversationId
+        this.loadFirstData(isNewConversation)
+        this.markConversationAsRead(isNewConversation)
+    }
+    markConversationAsRead(isNewConversation:boolean)
+    {
+        if(isNewConversation && this.props.conversationId)
+            ConversationManager.markConversationAsRead(this.props.conversationId, () => {})
     }
     isTypingDictEqual(a, b)
     {
