@@ -25,13 +25,13 @@ const availableApiEndpoints: ApiEndpoint[] = [
     sessionid: null,
     websocket: 'ws://192.168.15.13:8000/socket/'
   },
-  {
-    endpoint: 'https://dev.intra.work',
-    loginType: LoginType.API,
-    token: null,
-    sessionid: null,
-    websocket: null
-  }
+  // {
+  //   endpoint: 'https://dev.intra.work',
+  //   loginType: LoginType.API,
+  //   token: null,
+  //   sessionid: null,
+  //   websocket: null
+  // }
 ];
 
 const INITIAL_STATE = {

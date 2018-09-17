@@ -17,16 +17,16 @@ class UpdateTool extends React.PureComponent<Props, {}> {
     }
     updateApplication()
     {
-        this.props.resetPagedData()
-        window.location.reload()
+        this.props.resetPagedData();
+        this.props.history.goBack();
     }
     render() {
         return(
             <div id="update-tool">
                 <div className="jumbotron">
                     <div className="container">
-                        <h1 className="display-4">{translate("intra.work update")}</h1>
-                        <p className="lead">{translate("A new version of intra.work is available. Do you want to update now?")}</p>
+                        <h1 className="display-4">{translate("New update")}</h1>
+                        <p className="lead">{translate("A new version is available. Do you want to update now?")}</p>
                         <Form>
                             <FormGroup>
                                 <Button className="margin-right-sm" onClick={this.updateApplication}>{translate("Update now")}</Button>
@@ -44,7 +44,7 @@ const mapDispatchToProps = (dispatch) => {
         resetPagedData:() => {
             dispatch(Actions.resetPagedData())
         }
-        
+
     }
 }
 export default connect(null, mapDispatchToProps)(UpdateTool);

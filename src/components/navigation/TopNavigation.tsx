@@ -7,19 +7,31 @@ import { Link} from 'react-router-dom'
 import UserStatusSelector from '../general/UserStatusSelector';
 import { connect } from 'react-redux'
 import { RootState } from '../../reducers/index';
+import { ApiEndpoint } from '../../reducers/debug';
 require("./TopNavigation.scss");
 export interface Props {
-    signedIn:boolean
+    signedIn:boolean;
+    apiEndpoint?:number;
+    availableApiEndpoints?:Array<ApiEndpoint>
 }
 
 class TopNavigation extends React.Component<Props, {}> {
     render() {
+        var endpoint = ""
+        if (this.props.availableApiEndpoints && this.props.apiEndpoint != null) {
+            endpoint = this.props.availableApiEndpoints[this.props.apiEndpoint].endpoint
+            endpoint = endpoint.replace(/(^\w+:|)\/\//, '');
+            endpoint = endpoint.replace(/(:\d+$)/, '');
+        }
         return(
             <div id="top-navigation" className="flex align-center">
-                <div className="">
+                <div className="flex-shrink-0">
                     <Link className="btn btn-primary margin-right-sm" to={Routes.ROOT}><i className="fas fa-home" /></Link>
                     <Link className="btn btn-primary margin-right-sm" to={Routes.CONVERSATIONS}><i className="fas fa-comments" /></Link>
                 </div>
+                { endpoint &&
+                    <div className="text-truncate align-center lead">{endpoint}</div>
+                }
                 <div className="flex-grow flex-shrink"></div>
                 <div className="flex">
                     {!Settings.isProduction && <DevToolTrigger /> }
@@ -33,6 +45,8 @@ class TopNavigation extends React.Component<Props, {}> {
 const mapStateToProps = (state:RootState) => {
     return {
         signedIn:state.auth.signedIn,
+        apiEndpoint: state.debug.apiEndpoint,
+        availableApiEndpoints: state.debug.availableApiEndpoints,
     };
   }
   export default connect(mapStateToProps, null)(TopNavigation);

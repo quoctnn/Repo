@@ -2,6 +2,7 @@ import * as React from 'react';
 import { translate } from '../../components/intl/AutoIntlProvider';
 import ApiClient from '../../network/ApiClient';
 import { Button, Input , Form , FormGroup} from 'reactstrap';
+import { History} from 'history'
 import { toast } from 'react-toastify';
 import { ErrorToast } from '../../components/general/Toast';
 import { connect } from 'react-redux'
@@ -17,6 +18,7 @@ export interface Props {
     apiEndpoint?:number,
     availableApiEndpoints?:Array<ApiEndpoint>,
     language:number,
+    history:History,
 }
 class Signin extends React.Component<Props, {}> {
 
@@ -38,6 +40,7 @@ class Signin extends React.Component<Props, {}> {
         {
             this.props.setAuthorizationData(data.token, data.session_id)
         }
+        this.props.history.push('/')
     }
     doSignin(e)
     {
@@ -45,19 +48,23 @@ class Signin extends React.Component<Props, {}> {
         let endpoint = this.props.availableApiEndpoints[this.props.apiEndpoint]
         if(endpoint.loginType == LoginType.API)
         {
-            ApiClient.apiLogin(this.emailInput.value, this.passwordInput.value, this.loginCallback)
+           ApiClient.apiLogin(this.emailInput.value, this.passwordInput.value, this.loginCallback)
         }
         else if(endpoint.loginType == LoginType.NATIVE)
         {
             ApiClient.nativeLogin(this.emailInput.value, this.passwordInput.value, this.loginCallback)
+
         }
     }
     render() {
+        let endpoint = this.props.availableApiEndpoints[this.props.apiEndpoint].endpoint
+        endpoint = endpoint.replace(/(^\w+:|)\/\//, '');
+        endpoint = endpoint.replace(/(:\d+$)/, '');
         return(
             <div id="sign-in">
                 <div className="jumbotron">
                     <div className="container">
-                        <h1 className="display-4">{translate("Sign in to intra.work")}</h1>
+                        <h2 >{translate("Sign in to") + " " + endpoint}</h2>
                         <p className="lead">{translate("Enter your email address and password")}</p>
                         <Form>
                             <FormGroup>

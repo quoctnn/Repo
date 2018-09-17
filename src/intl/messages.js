@@ -2,7 +2,7 @@ var translations = {
   es: {
     'search.placeholder': 'Buscar ...',
     'Sign in': 'Sign in',
-    'Sign in to intra.work': 'Sign in to intra.work',
+    'Sign in to': 'Sign in to',
     'Enter your email address and password':
       'Enter your email address and password',
     Email: 'Email',
@@ -21,12 +21,18 @@ var translations = {
     'Load More': 'Load More',
     Theme: 'Theme',
     Conversations: 'Conversations',
-    'New Message': 'New Message'
+    'New Message': 'New Message',
+    'Local Storage': 'Local Storage',
+    Clear: 'Clear',
+    'Enable Push Notifications': 'Enable Push Notifications',
+    'Enable': 'Enable',
+    'Websocket': 'Websocket',
+    'Disable': 'Disable'
   },
   no: {
     'search.placeholder': 'Søk ...',
     'Sign in': 'Logg inn',
-    'Sign in to intra.work': 'Logg på intra.work',
+    'Sign in to': 'Logg på',
     'Enter your email address and password': 'Fyll inn epost og passord',
     Email: 'Epost',
     Password: 'Passord',
@@ -44,12 +50,18 @@ var translations = {
     'Load More': 'Last flere',
     Theme: 'Tema',
     Conversations: 'Samtaler',
-    'New Message': 'Ny Melding'
+    'New Message': 'Ny Melding',
+    'Local Storage': 'Lagring',
+    Clear: 'Tøm',
+    'Enable Push Notifications': 'Aktivèr Push Notifikasjoner',
+    'Enable': 'Aktivèr',
+    'Websocket': 'Websocket',
+    'Disable': 'Deaktivèr'
   },
   en: {
     'search.placeholder': 'Search ...',
     'Sign in': 'Sign in',
-    'Sign in to intra.work': 'Sign in to intra.work',
+    'Sign in to': 'Sign in to',
     'Enter your email address and password':
       'Enter your email address and password',
     Email: 'Email',
@@ -68,7 +80,13 @@ var translations = {
     'Load More': 'Load More',
     Theme: 'Theme',
     Conversations: 'Conversations',
-    'New Message': 'New Message'
+    'New Message': 'New Message',
+    'Local Storage': 'Local Storage',
+    Clear: 'Clear',
+    'Enable Push Notifications': 'Enable Push Notifications',
+    'Enable': 'Enable',
+    'Websocket': 'Websocket',
+    'Disable': 'Disable'
   }
 };
 
