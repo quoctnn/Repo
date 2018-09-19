@@ -98,6 +98,7 @@ interface Props {
   mentions: Mention[];
   editorState: EditorState;
   onChange?: (editorState: EditorState) => void;
+  filesAdded?:(files:File[]) => void
 }
 interface State {
   suggestions: Mention[]
@@ -114,6 +115,7 @@ export default class MentionEditor extends React.Component<Props, {}> {
   observer:MutationObserver
   private emojiButton = React.createRef<HTMLButtonElement>();
   private container = React.createRef<HTMLDivElement>();
+  private fileUploader = React.createRef<HTMLInputElement>();
   constructor(props) {
     super(props);
 
@@ -125,7 +127,9 @@ export default class MentionEditor extends React.Component<Props, {}> {
       emojiSelectOpen: false,
       search:""
     };
-    this.onButtonMouseUp = this.onButtonMouseUp.bind(this);
+    this.onEmojiButtonMouseUp = this.onEmojiButtonMouseUp.bind(this);
+    this.uploadFileChanged = this.uploadFileChanged.bind(this);
+    
     this.rootElement = null;
     this.positioningElement = null;
     this.observer = null;
@@ -162,7 +166,7 @@ export default class MentionEditor extends React.Component<Props, {}> {
     e.nativeEvent.stopImmediatePropagation();
     this.editor.current.focus();
   }
-  onButtonMouseUp(e) {
+  onEmojiButtonMouseUp(e) {
     this.toggleEmojiPanel(e)
   }
   handleRootClick = (e) => 
@@ -261,6 +265,17 @@ export default class MentionEditor extends React.Component<Props, {}> {
     })
     
   }
+  uploadFileChanged(event)
+  {
+     let filesList = this.fileUploader.current.files
+     let files = []
+     for (var i = 0; i < filesList.length; i++) 
+     {
+        let file = filesList.item(i)
+        files.push(file)
+      }
+      this.props.filesAdded(files)
+  }
   render() {
     const { MentionSuggestions } = this.mentionPlugin;
     const plugins = [emojiPlugin, this.mentionPlugin];
@@ -284,10 +299,16 @@ export default class MentionEditor extends React.Component<Props, {}> {
                 <button
                   ref={this.emojiButton}
                   className="emojiButton editor-button btn btn-default"
-                  onMouseUp={this.onButtonMouseUp}
+                  onMouseUp={this.onEmojiButtonMouseUp}
                   type="button" >
                   <i className="fas fa-smile fa-lg"></i>
                 </button>
+                {this.props.filesAdded && <button
+                  className="upload-button editor-button btn btn-default"
+                  type="button" >
+                  <i className="fas fa-paperclip fa-lg"></i>
+                  <input ref={this.fileUploader} multiple={true} accept="*" className="form-control" type="file" onChange={this.uploadFileChanged} />
+                </button>}
               </div>
           </div>
         </div>
@@ -302,4 +323,3 @@ export default class MentionEditor extends React.Component<Props, {}> {
     );
   }
 }
-

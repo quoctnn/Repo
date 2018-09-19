@@ -62,6 +62,7 @@ export interface Props
     onSubmit:(text:string, mentions:number[]) => void,
     onDidType:() => void
     mentions:Mention[]
+    filesAdded?:(files:File[]) => void
 }
 interface State
 {
@@ -143,7 +144,7 @@ export class ChatMessageComposer extends React.Component<Props,{}> {
                     <div className="input-group">
                         <div className="input-wrap"
                             onFocus={this.fixFoucusInput}>
-                            <MentionEditor mentions={this.props.mentions} editorState={this.state.editorState} ref={this.inputRef} onChange={this.onChange}/> 
+                            <MentionEditor filesAdded={this.props.filesAdded} mentions={this.props.mentions} editorState={this.state.editorState} ref={this.inputRef} onChange={this.onChange}/> 
                         </div>
                         <div className="button-wrap d-flex flex-column-reverse">
                             <button className="btn btn-submit btn-default align-items-end btn-primary message-send-button">

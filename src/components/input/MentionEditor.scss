@@ -129,6 +129,20 @@ mention {
      @include var(color, primary-color);
    }
    padding: 0;
+   input[type="file"]
+   {
+      bottom: 0;
+      cursor: inherit;
+      margin: 0;
+      opacity: 0;
+      padding: 0;
+      position: absolute;
+      right: 0;
+   }
+}
+.upload-button
+{
+  position: relative;
 }
 .DraftEditor-root
 {

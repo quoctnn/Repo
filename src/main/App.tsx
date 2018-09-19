@@ -20,8 +20,8 @@ import { PaginatorAction, MultiPaginatorAction } from '../reducers/createPaginat
 import ApiClient from '../network/ApiClient';
 import ChannelEventStream from '../components/general/ChannelEventStream';
 import { embedlyMiddleware } from '../reducers/embedlyStore';
-import * as Actions from '../actions/Actions';
 import { ConversationManager } from './managers/ConversationManager';
+import { messageQueueMiddleware } from '../reducers/queue';
 require('jquery/dist/jquery');
 require('popper.js/dist/umd/popper');
 require('bootstrap/dist/js/bootstrap');
@@ -90,7 +90,7 @@ const paginationMiddleware = store => next => action => {
   }
   return result;
 };
-var middleWares = [loggingMiddleware, paginationMiddleware, embedlyMiddleware];
+var middleWares = [loggingMiddleware, paginationMiddleware, embedlyMiddleware, messageQueueMiddleware];
 if (Settings.supportsTheming) {
   middleWares.push(themeSwitcherMiddleware);
 }

@@ -4,6 +4,7 @@ import { combineReducers } from 'redux';
 import { PaginationUtilities } from '../utilities/PaginationUtilities';
 import { Types } from '../utilities/Types';
 import * as moment from 'moment-timezone';
+import { FileUploader } from '../network/ApiClient';
 let timezone = moment.tz.guess()
 
 
@@ -20,7 +21,11 @@ export const conversations = combineReducers({
   items: conversationItemReducer,
   pagination: conversationPaginator.paginationReducer
 });
-
+export interface FileUpload 
+{
+    file:File
+    progress:number
+}
 
 export class Message 
 {
@@ -35,6 +40,23 @@ export class Message
     updated_at:string
     read_by:number[]
     mentions:number[]
+    files?:UploadedFile[]
+    tempFile?:FileUpload
+}
+export interface UploadedFile 
+{
+    id:number
+    user:number
+    filename:string 
+    file:string
+    type:string
+    extension:string
+    image:string
+    image_width:number
+    image_height:number
+    thumbnail:string
+    size:number
+    created_at:string
 }
 export class Conversation
 {

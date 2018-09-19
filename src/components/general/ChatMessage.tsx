@@ -2,7 +2,7 @@ import * as React from "react";
 import { Message } from '../../reducers/conversations';
 import { getProfileById } from '../../main/App';
 import { Link } from 'react-router-dom';
-import { URL_REGEX, truncate, uniqueId, IS_ONLY_LINK_REGEX } from '../../utilities/Utilities';
+import { URL_REGEX, truncate, uniqueId, IS_ONLY_LINK_REGEX, nullOrUndefined } from '../../utilities/Utilities';
 import { Routes } from '../../utilities/Routes';
 import Embedly from './Embedly';
 const processString = require('react-process-string');
@@ -17,15 +17,30 @@ export interface Props {
     direction:MessagePosition,
 }
 export class ChatMessage extends React.Component<Props, {}> {
-    shouldComponentUpdate(nextProps:Props, nextState) {
-        return false
+    shouldComponentUpdate(nextProps:Props, nextState) 
+    {
+        let n = nextProps.data.tempFile
+        let o = this.props.data.tempFile
+        if((n && !o ) || !n && o)
+            return true
+        if(!n && !o)
+            return false
+        return n.progress != o.progress
     }
     render() {
         var processed:any = null
         let msg = this.props.data
         var config = []
         let res = IS_ONLY_LINK_REGEX.test(msg.text)
-        if(res)
+        if(msg.tempFile && msg.tempFile.file)
+        {
+            processed = "Uploading (" + msg.tempFile.progress + ")"   
+        }
+        else if(msg.files && msg.files.length > 0)
+        {
+            processed = msg.files[0].file  
+        }
+        else if(res)
         {
             processed = <Embedly key={uniqueId()} url={msg.text} />
         }

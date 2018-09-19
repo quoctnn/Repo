@@ -1,5 +1,9 @@
 import Constants from "../utilities/Constants";
 import {AjaxRequest} from "./AjaxRequest";
+var $ = require("jquery")
+import store from '../main/App';
+import { UploadedFile } from '../reducers/conversations';
+import { addLocaleData } from 'react-intl';
 
 export type ApiRequestCallback = (data: any, status:string, error:string) => void;
 export enum ListOrdering {
@@ -132,5 +136,59 @@ export default class ApiClient
         }, (request, status, error) => {
             callback(null, status, error)
         })
+    }
+}
+export class FileUploader 
+{
+    file:File
+    progress:(percent:number) => void
+    constructor(file:File, progress:(percent:number) => void)
+    {
+        this.file = file
+        this.progress = progress
+        this.doUpload = this.doUpload.bind(this)
+        this.progressHandling = this.progressHandling.bind(this)
+    }
+    doUpload(completion:(file:UploadedFile) => void)
+    {
+        let state = store.getState().debug
+        let url = state.availableApiEndpoints[state.apiEndpoint].endpoint + Constants.apiRoute.fileUploadUrl
+        const data = new FormData();
+        data.append("file", this.file);
+        data.append("filename", this.file.name);
+        $.ajax({
+            type: "POST",
+            url: url,
+            xhr: () =>  {
+                var myXhr = $.ajaxSettings.xhr();
+                if (myXhr.upload) {
+                    myXhr.upload.addEventListener('progress', this.progressHandling, false);
+                }
+                return myXhr;
+            },
+            success: function (data:{files:UploadedFile[]}) {
+                completion(data.files[0])
+            },
+            error: function (error) {
+                
+                completion(null)
+            },
+            async: true,
+            data: data,
+            cache: false,
+            contentType: false,
+            processData: false,
+            timeout: 60000
+        })
+    }
+    progressHandling(event)
+    {
+        var percent = 0;
+        var position = event.loaded || event.position;
+        var total = event.total;
+        if (event.lengthComputable) {
+            percent = Math.ceil(position / total * 100);
+        }
+        this.progress(percent)
     }
 }

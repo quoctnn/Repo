@@ -28,6 +28,10 @@ export class AjaxRequest
     {
         return AjaxRequest.ajaxCall("GET", url, null, success, error);
     }
+    static postNoProcess(url:string, data, success:SuccessCallback, error:ErrorCallback)
+    {
+        return AjaxRequest.ajaxCallNoProcess("POST", url, data, success, error);
+    }
     static post(url:string, data, success:SuccessCallback, error:ErrorCallback)
     {
         return AjaxRequest.ajaxCall("POST", url, data, success, error);
@@ -85,6 +89,28 @@ export class AjaxRequest
         }
         let state = store.getState().debug
         return state.availableApiEndpoints[state.apiEndpoint].endpoint + url
+    }
+    private static ajaxCallNoProcess(method, url, data, success:SuccessCallback, error:ErrorCallback) 
+    {
+        url = AjaxRequest.applyEndpointDomain(url)
+        if (typeof  success === 'undefined') {
+            success = defaultCallback;
+        }
+    
+        if (typeof  error === 'undefined') {
+            error = defaultErrorCallback;
+        }
+        return $.ajax({
+            url: url,
+            cache: false,
+            type: method,
+            traditional: true,
+            data: data,
+            processData: false,
+            contentType: false,
+            success: success.bind(this),
+            error: error.bind(this)
+        });
     }
     private static ajaxCall(method, url, data, success:SuccessCallback, error:ErrorCallback) 
     {

@@ -41,7 +41,7 @@ class ConversationManagerSingleton
             if (state.queue.chatMessages.length > 0) 
             {
                 state.queue.chatMessages.reverse().forEach(m => {
-                    this.sendMessageToConversation(m.conversation, m.text, m.uid, m.mentions);
+                    this.sendMessage(m);
                 });
             }
         }
@@ -117,14 +117,10 @@ class ConversationManagerSingleton
           })
         );
     }
-    sendMessageToConversation( conversation: number, text: string, uid: string, mentions:number[])
+    sendMessage(message:Message)
     {
-        sendOnWebsocket(
-            JSON.stringify({
-            type: SocketMessageType.CONVERSATION_MESSAGE,
-            data: { conversation: conversation, text: text, uid: uid, mentions }
-            })
-        )
+        let store = this.getStore()
+        store.dispatch(Actions.queueAddChatMessage(message))
     }
     private sortConversations()
     {

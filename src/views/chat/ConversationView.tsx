@@ -1,5 +1,5 @@
 import Conversations from './Conversations';
-import { Conversation, Message } from '../../reducers/conversations';
+import { Conversation, Message, UploadedFile } from '../../reducers/conversations';
 import * as React from 'react';
 import { connect } from 'react-redux'
 import { RootState } from '../../reducers/index';
@@ -27,7 +27,6 @@ export interface Props {
     match:any,
     conversation:Conversation,
     profile:UserProfile,
-    queueAddChatMessage:(message:Message) => void,
     requestNextMessagePage:(conversation:number, offset:number) => void
     isFetching:boolean,
     total:number,
@@ -37,7 +36,8 @@ export interface Props {
     error:string,
     queuedMessages:Message[],
     last_fetched:number,
-    mentions:Mention[]
+    mentions:Mention[],
+    
 }
 export interface State {
     isTyping:object
@@ -54,7 +54,7 @@ class ConversationView extends React.Component<Props, {}> {
         this.state = {
             isTyping:{},
             loading:false,
-            fullScreen:false
+            fullScreen:false,
         }
         this.loadFirstData = this.loadFirstData.bind(this)
         this.loadNextPageData = this.loadNextPageData.bind(this) 
@@ -65,6 +65,7 @@ class ConversationView extends React.Component<Props, {}> {
         this.incomingMessageHandler = this.incomingMessageHandler.bind(this)
         this.removeUserFromIsTypingData = this.removeUserFromIsTypingData.bind(this)
         this.markConversationAsRead = this.markConversationAsRead.bind(this)
+        this.filesAdded = this.filesAdded.bind(this)
         
     }
     componentDidMount()
@@ -177,13 +178,13 @@ class ConversationView extends React.Component<Props, {}> {
         if(!conversation)
             return
         let tempId = `${conversation.id}_${this.props.profile.id}_${Date.now()}`
-        let tempMessage = this.getChatMessagePreview(text, tempId, mentions, conversation)
-        this.props.queueAddChatMessage(tempMessage)
-        ConversationManager.sendMessageToConversation(conversation.id, text,tempId, mentions)
+        let tempMessage = this.getChatMessagePreview(text, null, tempId, mentions, conversation)
+        ConversationManager.sendMessage(tempMessage)
     }
-    getChatMessagePreview(text:string, uid:string, mentions:number[], conversation:Conversation):Message {
+    getChatMessagePreview(text:string,file:File, uid:string, mentions:number[], conversation:Conversation):Message {
         let now = Date.now()
         let ds = new Date().toUTCString()
+        let tempFile = nullOrUndefined(file) ? null : {file,progress:0}
         return {
             id: now,
             uid:uid,
@@ -195,7 +196,8 @@ class ConversationView extends React.Component<Props, {}> {
             attachment:null,
             updated_at:ds,
             read_by:[],
-            mentions:mentions
+            mentions:mentions,
+            tempFile
         }
     }
     onDidType()
@@ -224,6 +226,18 @@ class ConversationView extends React.Component<Props, {}> {
     resizeButtonClick = (e) => {
         this.setState({fullScreen:!this.state.fullScreen})
     }
+    filesAdded(files:File[])
+    {
+        let conversation = this.props.conversation
+        if(!conversation)
+            return
+        files.forEach(f => {
+            
+            let tempId = `${conversation.id}_${this.props.profile.id}_${Date.now()}`
+            let tempMessage = this.getChatMessagePreview("", f, tempId, [], conversation)
+            ConversationManager.sendMessage(tempMessage)
+        })
+    }
     render() {
         let me = this.props.profile
         let conversation = this.props.conversation
@@ -251,7 +265,7 @@ class ConversationView extends React.Component<Props, {}> {
                                 {this.renderSomeoneIsTyping()}
                             </ChatMessageList>
                         </div>
-                        <ChatMessageComposer mentions={this.props.mentions} onSubmit={this.onChatMessageSubmit} onDidType={this.onDidType} />
+                        <ChatMessageComposer filesAdded={this.filesAdded} mentions={this.props.mentions} onSubmit={this.onChatMessageSubmit} onDidType={this.onDidType} />
                     </div>
                 </div>
                
@@ -297,9 +311,6 @@ const mapStateToProps = (state:RootState, ownProps:Props) => {
 }
 const mapDispatchToProps = (dispatch) => {
     return {
-        queueAddChatMessage:(message:Message) => {
-            dispatch(Actions.queueAddChatMessage(message))
-        },
         requestNextMessagePage:(conversation:number, offset:number) => {
             dispatch(Actions.requestNextMessagePage(conversation.toString(), offset))
         },

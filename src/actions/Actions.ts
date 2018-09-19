@@ -57,6 +57,10 @@ export const queueAddChatMessage = (message: Message) => ({
   type: Types.QUEUE_ADD_CHAT_MESSAGE,
   message: message
 });
+export const queueUpdateChatMessage = (message: Message) => ({
+  type: Types.QUEUE_UPDATE_CHAT_MESSAGE,
+  message: message
+});
 export const queueRemoveChatMessage = (message: Message) => ({
   type: Types.QUEUE_REMOVE_CHAT_MESSAGE,
   message: message
