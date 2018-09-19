@@ -5,10 +5,15 @@ import { sendUserStatus } from './ChannelEventStream';
 import { RootState } from '../../reducers/index';
 require("./UserStatusSelector.scss");
 
-export interface Props {
+export interface OwnProps 
+{
+}
+interface ReduxStateProps 
+{
     profile:UserProfile,
     language:number,
 }
+type Props = ReduxStateProps & OwnProps
 const getEnumValues = (_enum:any) => 
 {
     return Object.keys(_enum).map(k => _enum[k])
@@ -53,10 +58,10 @@ class UserStatusSelector extends React.Component<Props, {}> {
     }
 }
 
-const mapStateToProps = (state:RootState) => {
+const mapStateToProps = (state:RootState, ownProps: OwnProps):ReduxStateProps => {
     return {
         profile: state.profile,
         language:state.settings.language
-    };
+    }
 }
-export default connect(mapStateToProps, null)(UserStatusSelector);
+export default connect<ReduxStateProps, void, OwnProps>(mapStateToProps, null)(UserStatusSelector);

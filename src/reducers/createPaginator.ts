@@ -37,7 +37,7 @@ export const createPaginator = (key:string, endpoint:string, itemIdKey:string, p
           return { ...page, fetching:true }
         case Types.RECEIVE_PAGE:
           return { ...page, 
-            ids: (page.ids || []).concat(action.payload.results.map(item => item[action.meta.itemIdKey])),
+            ids: (page.ids || []).concat(action.payload.results.map(item => item[action.meta.itemIdKey])).distinct(),
             fetching:false,
             totalCount: action.payload.total || page.totalCount,
             error:action.payload.error,
@@ -48,10 +48,11 @@ export const createPaginator = (key:string, endpoint:string, itemIdKey:string, p
             let a = action as InsertItemAction
             let p = { ...page}
             let newId = a.item[itemIdKey]
+            let didExist = p.ids.findIndex(id => id == newId) != -1
             p.ids = p.ids.map(id => id).filter(id => id != newId)
             p.ids.unshift(newId)
             p.fetching = false
-            if(a.isNew)
+            if(a.isNew && !didExist)
               p.totalCount = p.totalCount + 1
             p.error = null
             return p
@@ -153,7 +154,7 @@ export const createMultiPaginator = (key:string, endpoint:(id:string) => string,
             [action.payload.pagingId]: {
               ...p,
               fetching: false,
-              ids:p.ids.concat(action.payload.results.map(item => item[action.meta.itemIdKey])),
+              ids:p.ids.concat(action.payload.results.map(item => item[action.meta.itemIdKey])).distinct(),
               totalCount: action.payload.total || p.totalCount,
               error:action.payload.error,
               last_fetch:Date.now()
@@ -165,10 +166,11 @@ export const createMultiPaginator = (key:string, endpoint:(id:string) => string,
           let a = action as InsertItemAction
           let p = pages[a.pagingId] || getDefaultCachePage()
           let newId = a.item[itemIdKey]
+          let didExist = p.ids.findIndex(id => id == newId) != -1
           p.ids = p.ids.filter(id => id != newId)
           p.ids.unshift(newId)
           p.fetching = false
-          if(a.isNew)
+          if(a.isNew && !didExist)
             p.totalCount = p.totalCount + 1
           p.error = null
           return {

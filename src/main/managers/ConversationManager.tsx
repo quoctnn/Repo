@@ -46,6 +46,10 @@ class ConversationManagerSingleton
             }
         }
     }
+    setConversation(conversation:Conversation, isNew:boolean)
+    {
+        this.getStore().dispatch(Actions.insertConversation(conversation, isNew))
+    }
     private processIncomingUpdateConversation(event:CustomEvent)
     {
         let conversation = event.detail.data as Conversation

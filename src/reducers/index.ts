@@ -42,7 +42,7 @@ export interface RootState
       groupStore: any;
       groupListCache: any;
       contactListCache: any;
-      queue:{chatMessages:Message[]};
+      queue:{chatMessages:Message[], statusMessages:Message[]};
       conversations:{items:{[id:number]:Conversation}, pagination:CachePage};
       messages:{items:Message[], conversations:PageItem}
       embedlyStore:{byId:{[id:string]:EmbedlyItem}, allIds:string[], queuedIds:{[id:string]:boolean}}

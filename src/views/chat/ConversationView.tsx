@@ -80,6 +80,7 @@ class ConversationView extends React.Component<Props, {}> {
         if(message.conversation == conversation)
         {
             let it = this.removeUserFromIsTypingData(message.user)
+            ConversationManager.markConversationAsRead(conversation, () => {})
             this.setState({isTyping:it })
         }
     }

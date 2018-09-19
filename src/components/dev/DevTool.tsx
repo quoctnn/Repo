@@ -1,15 +1,15 @@
-import { translate } from '../intl/AutoIntlProvider';
-import * as React from 'react';
-import { connect } from 'react-redux';
-import * as Actions from '../../actions/Actions';
-import { ApiEndpoint } from '../../reducers/debug';
-import { sendOnWebsocket, getStream } from '../general/ChannelEventStream';
-import { Form } from 'reactstrap';
-import { availableLanguages, availableThemes } from '../../reducers/settings';
-import { RootState } from '../../reducers';
-import { resetEmbedlyStore } from '../../actions/Actions';
-import ReconnectingWebSocket from 'reconnecting-websocket';
-require('./DevTool.scss');
+import { translate } from "../intl/AutoIntlProvider";
+import * as React from "react";
+import { connect } from "react-redux";
+import * as Actions from "../../actions/Actions";
+import { ApiEndpoint } from "../../reducers/debug";
+import { sendOnWebsocket, getStream } from "../general/ChannelEventStream";
+import { Form } from "reactstrap";
+import { availableLanguages, availableThemes } from "../../reducers/settings";
+import { RootState } from "../../reducers";
+import { resetEmbedlyStore } from "../../actions/Actions";
+import ReconnectingWebSocket from "reconnecting-websocket";
+require("./DevTool.scss");
 export interface Props {
   language: number;
   theme: number;
@@ -28,15 +28,23 @@ export interface Props {
 
 class DevTool extends React.PureComponent<Props, {}> {
   stream: ReconnectingWebSocket;
-  state: { accessToken: string; websocketData: string; websocketDisabled: boolean};
+  state: {
+    accessToken: string;
+    websocketData: string;
+    websocketDisabled: boolean;
+  };
   constructor(props) {
     super(props);
     this.stream = getStream();
-    this.state = { accessToken: this.props.accessToken, websocketData: '', websocketDisabled: false };
+    this.state = {
+      accessToken: this.props.accessToken,
+      websocketData: "",
+      websocketDisabled: false
+    };
   }
   componentDidMount() {
     if (this.stream.readyState > 1) {
-      this.setState({websocketDisabled: true})
+      this.setState({ websocketDisabled: true });
     }
   }
   renderThemeSelector() {
@@ -158,7 +166,7 @@ class DevTool extends React.PureComponent<Props, {}> {
             className="btn btn-outline-secondary"
             type="button"
           >
-            {translate('Send')}
+            {translate("Send")}
           </button>
         </div>
       </div>
@@ -184,7 +192,7 @@ class DevTool extends React.PureComponent<Props, {}> {
             className="btn btn-outline-secondary"
             type="button"
           >
-            {translate('Save')}
+            {translate("Save")}
           </button>
         </div>
       </div>
@@ -200,31 +208,31 @@ class DevTool extends React.PureComponent<Props, {}> {
           className="btn btn-outline-secondary"
           type="button"
         >
-          {translate('Clear')}
+          {translate("Clear")}
         </button>
       </div>
     );
   }
   disableWebsocket(state: boolean) {
     if (state) {
-      this.stream.close()
+      this.stream.close();
     } else {
-      this.stream.reconnect()
+      this.stream.reconnect();
     }
-    this.setState({websocketDisabled: state});
+    this.setState({ websocketDisabled: state });
   }
   renderDisableWebsocketButton() {
     return (
       <div className="input-group">
         <button
           onClick={() => {
-              this.disableWebsocket(!this.state.websocketDisabled)
-            }
-          }
+            this.disableWebsocket(!this.state.websocketDisabled);
+          }}
           className="btn btn-outline-secondary"
           type="button"
         >
-          {this.state.websocketDisabled && translate('Enable') || translate('Disable')}
+          {(this.state.websocketDisabled && translate("Enable")) ||
+            translate("Disable")}
         </button>
       </div>
     );
@@ -232,11 +240,11 @@ class DevTool extends React.PureComponent<Props, {}> {
   renderEnablePush() {
     // Check if push is available and not already set to granted
     // and check if browser has blocked this domain from using notifications
-    let disabled = !('Notification' in window);
+    let disabled = !("Notification" in window);
     let blocked = false;
     if (!disabled) {
-      disabled = Notification.permission === 'granted';
-      blocked = Notification.permission === 'denied';
+      disabled = Notification.permission === "granted";
+      blocked = Notification.permission === "denied";
     }
     return (
       <div className="input-group">
@@ -248,7 +256,7 @@ class DevTool extends React.PureComponent<Props, {}> {
           type="button"
           disabled={disabled || blocked}
         >
-          {(!blocked && translate('Enable')) || translate('Blocked by browser')}
+          {(!blocked && translate("Enable")) || translate("Blocked by browser")}
         </button>
       </div>
     );
@@ -257,12 +265,12 @@ class DevTool extends React.PureComponent<Props, {}> {
     return (
       <div id="dev-tool">
         <div className="jumbotron">
-          <h1 className="display-4">{translate('Developer Tool')}</h1>
+          <h1 className="display-4">{translate("Developer Tool")}</h1>
           <div>
             <Form>
               <div className="form-group row">
                 <label htmlFor="lang" className="col-sm-4 col-form-label">
-                  {translate('Theme')}
+                  {translate("Theme")}
                 </label>
                 <div className="col-sm-8" id="lang">
                   {this.renderThemeSelector()}
@@ -270,7 +278,7 @@ class DevTool extends React.PureComponent<Props, {}> {
               </div>
               <div className="form-group row">
                 <label htmlFor="lang" className="col-sm-4 col-form-label">
-                  {translate('Language')}
+                  {translate("Language")}
                 </label>
                 <div className="col-sm-8" id="lang">
                   {this.renderLanguageSelector()}
@@ -278,7 +286,7 @@ class DevTool extends React.PureComponent<Props, {}> {
               </div>
               <div className="form-group row">
                 <label htmlFor="api" className="col-sm-4 col-form-label">
-                  {translate('Api Endpoint')}
+                  {translate("Api Endpoint")}
                 </label>
                 <div className="col-sm-8" id="api">
                   {this.renderEndpointSelector()}
@@ -289,7 +297,7 @@ class DevTool extends React.PureComponent<Props, {}> {
                   htmlFor="accessToken"
                   className="col-sm-4 col-form-label"
                 >
-                  {translate('Access Token')}
+                  {translate("Access Token")}
                 </label>
                 <div className="col-sm-8" id="accessToken">
                   {this.renderAccessTokenInput()}
@@ -297,7 +305,7 @@ class DevTool extends React.PureComponent<Props, {}> {
               </div>
               <div className="form-group row">
                 <label htmlFor="sendSocket" className="col-sm-4 col-form-label">
-                  {translate('Send WebSocket')}
+                  {translate("Send WebSocket")}
                 </label>
                 <div className="col-sm-8" id="sendSocket">
                   {this.renderSendOnWebSocket()}
@@ -305,7 +313,7 @@ class DevTool extends React.PureComponent<Props, {}> {
               </div>
               <div className="form-group row">
                 <label htmlFor="clearStore" className="col-sm-4 col-form-label">
-                  {translate('Local Storage')}
+                  {translate("Local Storage")}
                 </label>
                 <div className="col-sm-8" id="clearStore">
                   {this.renderClearStoreButton()}
@@ -313,15 +321,18 @@ class DevTool extends React.PureComponent<Props, {}> {
               </div>
               <div className="form-group row">
                 <label htmlFor="allowPush" className="col-sm-4 col-form-label">
-                  {translate('Enable Push Notifications')}
+                  {translate("Enable Push Notifications")}
                 </label>
                 <div className="col-sm-8" id="allowPush">
                   {this.renderEnablePush()}
                 </div>
               </div>
               <div className="form-group row">
-                <label htmlFor="disableWebsocket" className="col-sm-4 col-form-label">
-                  {translate('Websocket')}
+                <label
+                  htmlFor="disableWebsocket"
+                  className="col-sm-4 col-form-label"
+                >
+                  {translate("Websocket")}
                 </label>
                 <div className="col-sm-8" id="disableWebsocket">
                   {this.renderDisableWebsocketButton()}

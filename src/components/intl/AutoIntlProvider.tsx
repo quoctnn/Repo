@@ -1,7 +1,7 @@
 import * as React from "react";
 import {IntlProvider, addLocaleData} from "react-intl";
 import messages from "../../intl/messages";
-import { connect, State } from 'react-redux'
+import { connect } from 'react-redux'
 
 import * as en from 'react-intl/locale-data/en';
 import * as es from 'react-intl/locale-data/es';

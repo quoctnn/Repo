@@ -110,7 +110,6 @@ export class List extends React.Component<Props, {}> {
       }
     render() 
     {
-        console.log(this.state)
         return(
             <ul {...this.props}  className={"list" + (this.props.className ? " " + this.props.className : "") } >
                 { React.Children.map(this.props.children, (c:any, i)  => {

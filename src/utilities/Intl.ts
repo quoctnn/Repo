@@ -10,6 +10,7 @@ declare global {
     interface Array<T> 
     {
         move(oldIndex, newIndex) : void
+        distinct() : T[]
     }
 
 }

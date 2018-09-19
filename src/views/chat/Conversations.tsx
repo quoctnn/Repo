@@ -23,24 +23,34 @@ import { List } from '../../components/general/List';
 let timezone = moment.tz.guess()
 
 require("./Conversations.scss");
-export interface Props {
+
+export interface OwnProps 
+{
+    activeConversation?:number
+    preventShowTyingInChatId:number,
+    className?:string,
+}
+interface ReduxStateProps 
+{
     total:number,
     isFetching:boolean,
     items:Conversation[],
-    requestNextConversationPage?:(page:number) => void,
     offset:number,
     error:string,
     profile:UserProfile,
-    preventShowTyingInChatId:number,
     last_fetched:number,
-    className?:string,
-    activeConversation?:number
 }
+interface ReduxDispatchProps 
+{
+    requestNextConversationPage?:(page:number) => void,
+}
+type Props = ReduxStateProps & ReduxDispatchProps & OwnProps
 type IsTypingStore = {[conversation:number]:{[user:number]:NodeJS.Timer}}
-export interface State {
+
+interface State {
     isTyping:IsTypingStore,
 }
-class Conversations extends React.Component<Props, {}> {     
+class Conversations extends React.Component<Props, State> {     
     state:State
     static defaultProps:Props = {
         total:0,
@@ -200,7 +210,7 @@ class Conversations extends React.Component<Props, {}> {
                 </FullPageComponent>)
     }
 }
-const mapStateToProps = (state:RootState) => {
+const mapStateToProps = (state:RootState, ownProps: OwnProps):ReduxStateProps => {
     const pagination = state.conversations.pagination
     const allItems = state.conversations.items
     const isFetching = pagination.fetching
@@ -219,11 +229,11 @@ const mapStateToProps = (state:RootState) => {
         last_fetched
     }
 }
-const mapDispatchToProps = (dispatch) => {
+const mapDispatchToProps = (dispatch:any, ownProps: OwnProps):ReduxDispatchProps => {
     return {
         requestNextConversationPage:(page:number) => {
             dispatch(Actions.requestNextConversationPage(page))
         }
     }
 }
-export default connect(mapStateToProps, mapDispatchToProps)(Conversations);
+export default connect<ReduxStateProps, ReduxDispatchProps, OwnProps>(mapStateToProps, mapDispatchToProps)(Conversations);

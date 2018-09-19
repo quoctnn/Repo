@@ -4,13 +4,21 @@ import * as Actions from "../../actions/Actions"
 import { RootState } from '../../reducers/index';
 import { EmbedlyItem } from '../../reducers/embedlyStore';
 import { nullOrUndefined } from '../../utilities/Utilities';
+import {Dispatch} from 'redux'
 require("./Embedly.scss");
-interface Props {
-  url: string;
-  requestEmbedlyData:(urls:string[]) => void
+export interface OwnProps {
+  url: string
+}
+interface ReduxStateProps 
+{
   page:EmbedlyItem
   isLoading:boolean
 }
+interface ReduxDispatchProps 
+{
+  requestEmbedlyData:(urls:string[]) => void
+}
+type Props = ReduxStateProps & ReduxDispatchProps & OwnProps
 interface State {
   provider_url: string;
   description: string;
@@ -23,7 +31,7 @@ interface State {
   type: string;
   thumbnail_height: number;
 }
-class Embedly extends React.Component<Props, {}> {
+class Embedly extends React.Component<Props, State> {
   state: State;
   constructor(props) {
     super(props);
@@ -73,20 +81,20 @@ class Embedly extends React.Component<Props, {}> {
     );
   }
 }
-const mapStateToProps = (state:RootState, ownProps:Props) => {
-    const page = state.embedlyStore.byId[ownProps.url]
+const mapStateToProps = (state:RootState, ownProps: OwnProps):ReduxStateProps => {
+  const page = state.embedlyStore.byId[ownProps.url]
     const isLoading = !nullOrUndefined( state.embedlyStore.queuedIds[ownProps.url] )
     return {
         page,
         isLoading
     };
 }
-const mapDispatchToProps = (dispatch) => {
+const mapDispatchToProps = (dispatch:any, ownProps: OwnProps):ReduxDispatchProps => {
     return {
-        requestEmbedlyData:(urls:string[]) => {
-            dispatch(Actions.requestEmbedlyData(urls))
-        }
-        
-    }
+      requestEmbedlyData:(urls:string[]) => {
+          dispatch(Actions.requestEmbedlyData(urls))
+      }
+  }
 }
-export default connect(mapStateToProps, mapDispatchToProps)(Embedly);
+export default connect<ReduxStateProps, ReduxDispatchProps, OwnProps>(mapStateToProps, mapDispatchToProps)(Embedly);
+

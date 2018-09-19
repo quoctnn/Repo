@@ -9,6 +9,19 @@ export enum ListOrdering {
 }
 export default class ApiClient
 {
+    static createConversation(title:string, users:number[], callback:ApiRequestCallback) 
+    {
+        let d:any = {users}
+        if(title)
+        {
+            d.title = title
+        }
+        AjaxRequest.postJSON(Constants.apiRoute.conversations, d, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
     static getProfile(id:number, callback:ApiRequestCallback) 
     {
         AjaxRequest.get(Constants.apiRoute.profileUrl(id), (data, status, request) => {

@@ -12,7 +12,6 @@ import ReconnectingWebSocket from 'reconnecting-websocket';
 import { toast } from 'react-toastify';
 import { ErrorToast } from '../../components/general/Toast';
 import { Queue } from '../../reducers/queue';
-import { History } from 'history';
 import { ConversationManager } from '../../main/managers/ConversationManager';
 
 export enum SocketMessageType {
@@ -25,28 +24,6 @@ export enum SocketMessageType {
   CONVERSATION_UPDATE = "conversation.update"
 }
 
-export interface Props {
-  apiEndpoint?: number;
-  availableApiEndpoints?: Array<ApiEndpoint>;
-  setProfile: (profile: UserProfile) => void;
-  setSignedIn: (signedIn: boolean) => void;
-
-  storeProfiles: (profiles: UserProfile[]) => void;
-  storeProfile: (profile: UserProfile) => void;
-  storeCommunities: (communities: Community[]) => void;
-  storeCommunity: (community: Community) => void;
-  setContactListCache: (contacts: number[]) => void;
-  setAwayTimeout: (timeout: number) => void;
-
-  accessToken?: string;
-  signedIn: boolean;
-  profile: UserProfile;
-  awayTimeout: number;
-  contacts: UserProfile[];
-  history: History;
-
-  queue: Queue;
-}
 enum WebsocketState {
   CONNECTING = 0,
   OPEN,
@@ -91,11 +68,43 @@ const socket_options = {
   connectionTimeout: 4000,
   maxRetries: 10
 };
-class ChannelEventStream extends React.Component<Props, {}> {
+
+export interface OwnProps 
+{
+}
+interface ReduxStateProps 
+{  
+  apiEndpoint?: number;
+  availableApiEndpoints?: Array<ApiEndpoint>;
+  rehydrated:any
+  accessToken?: string;
+  signedIn: boolean;
+  profile: UserProfile;
+  awayTimeout: number;
+  queue: Queue;
+}
+interface ReduxDispatchProps 
+{
+  setProfile: (profile: UserProfile) => void;
+  setSignedIn: (signedIn: boolean) => void;
+  storeProfiles: (profiles: UserProfile[]) => void;
+  storeProfile: (profile: UserProfile) => void;
+  storeCommunities: (communities: Community[]) => void;
+  storeCommunity: (community: Community) => void;
+  setContactListCache: (contacts: number[]) => void;
+  setAwayTimeout: (timeout: number) => void;
+}
+interface State 
+{
+  token: string
+  endpoint: string
+}
+type Props = ReduxStateProps & ReduxDispatchProps & OwnProps
+class ChannelEventStream extends React.Component<Props, State> {
   stream: ReconnectingWebSocket;
   lastUserActivity: Date;
   lastUserActivityTimer: NodeJS.Timer;
-  state: { token: string; endpoint: string };
+  state: State
   constructor(props) {
     super(props);
     this.state = { token: null, endpoint: null };
@@ -328,7 +337,8 @@ class ChannelEventStream extends React.Component<Props, {}> {
     return null;
   }
 }
-const mapStateToProps = (state: RootState) => {
+
+const mapStateToProps = (state:RootState, ownProps: OwnProps):ReduxStateProps => {
   return {
     availableApiEndpoints: state.debug.availableApiEndpoints,
     rehydrated: state._persist.rehydrated,
@@ -336,12 +346,11 @@ const mapStateToProps = (state: RootState) => {
     signedIn: state.auth.signedIn,
     apiEndpoint: state.debug.apiEndpoint,
     profile: state.profile,
-    contacts: state.profileStore,
     awayTimeout: state.settings.awayTimeout,
     queue: state.queue,
-  };
-};
-const mapDispatchToProps = dispatch => {
+  }
+}
+const mapDispatchToProps = (dispatch:any, ownProps: OwnProps):ReduxDispatchProps => {
   return {
     setProfile: (profile: UserProfile) => {
       dispatch(Actions.setProfile(profile));
@@ -367,9 +376,6 @@ const mapDispatchToProps = dispatch => {
     setAwayTimeout: (timeout: number) => {
       dispatch(Actions.setAwayTimeout(timeout));
     },
-  };
-};
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(ChannelEventStream);
+  }
+}
+export default connect<ReduxStateProps, ReduxDispatchProps, OwnProps>(mapStateToProps, mapDispatchToProps)(ChannelEventStream);

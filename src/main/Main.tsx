@@ -24,11 +24,22 @@ import CreateConversation from '../views/chat/CreateConversation';
 require("react-toastify/dist/ReactToastify.css");
 require("./Main.scss");
 
-export interface Props {
-  signedIn:boolean,
-}
 interface State {
 }
+export interface OwnProps 
+{
+}
+interface ReduxStateProps 
+{
+  signedIn:boolean
+}
+interface ReduxDispatchProps 
+{
+}
+interface State 
+{
+}
+type Props = ReduxStateProps & ReduxDispatchProps & OwnProps
 class Main extends React.Component<Props, {}> {
   state:State
   constructor(props) {
@@ -38,7 +49,7 @@ class Main extends React.Component<Props, {}> {
     return (
           <Router ref="router">
             <div id="main-content">
-                <UpdateWatcher />
+              <UpdateWatcher />
                 <ToastContainer />
                     <div id="content-block" className="transition">
                         <div className="container">
@@ -73,9 +84,9 @@ class Main extends React.Component<Props, {}> {
     );
   }
 }
-const mapStateToProps = (state:RootState) => {
+const mapStateToProps = (state:RootState, ownProps: OwnProps):ReduxStateProps => {
   return {
-      signedIn:state.auth.signedIn,
-  };
+    signedIn:state.auth.signedIn,
+  }
 }
-export default connect(mapStateToProps, null)(Main);
+export default connect<ReduxStateProps, void, OwnProps>(mapStateToProps, null)(Main)

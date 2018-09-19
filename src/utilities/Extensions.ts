@@ -18,4 +18,6 @@ Array.prototype.move = function(oldIndex, newIndex) {
   }
   this.splice(newIndex, 0, this.splice(oldIndex, 1)[0]);
 }
-  
+Array.prototype.distinct = function() {
+  return Array.from(new Set(this))
+}

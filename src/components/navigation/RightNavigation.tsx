@@ -11,16 +11,22 @@ import { addSocketEventListener, SocketMessageType, removeSocketEventListener } 
 import { TypingIndicator } from '../general/TypingIndicator';
 import { Settings } from '../../utilities/Settings';
 import { cloneDictKeys } from '../../utilities/Utilities';
-require("./RightNavigation.scss");
-export interface Props {
-    profiles:{number:UserProfile},
-    contacts:number[],
-    profile:UserProfile
-}
-export interface State {
+require("./RightNavigation.scss")
+interface State {
     contacts:UserProfile[],
     isTyping:any
 }
+
+export interface OwnProps 
+{
+}
+interface ReduxStateProps 
+{
+    profiles:{[id:number]:UserProfile}
+    contacts:number[]
+    profile:UserProfile
+}
+type Props = ReduxStateProps & OwnProps
 class RightNavigation extends React.Component<Props, {}> {
     state:State
     constructor(props) {
@@ -108,11 +114,12 @@ class RightNavigation extends React.Component<Props, {}> {
         );
     }
 }
-const mapStateToProps = (state:RootState) => {
+
+const mapStateToProps = (state:RootState, ownProps: OwnProps):ReduxStateProps => {
     return {
         profiles:state.profileStore.byId,
         contacts:state.contactListCache.contacts,
         profile:state.profile,
-    };
+    }
 }
-export default connect(mapStateToProps, null)(RightNavigation);
+export default connect<ReduxStateProps, void, OwnProps>(mapStateToProps, null)(RightNavigation);

@@ -10,15 +10,21 @@ import { connect } from 'react-redux'
 import { UserProfile } from '../../reducers/profileStore';
 import { getConversationTitle } from '../../utilities/ConversationUtilities';
 require("./ConversationItem.scss");
-export interface Props {
-    conversation:Conversation,
-    profile:UserProfile,
-    children?: React.ReactNode,
+export interface OwnProps {
+    conversation:Conversation
+    children?: React.ReactNode
     className?:string
     isActive:boolean
-
 }
-class ConversationItem extends React.Component<Props, {}> {
+interface ReduxStateProps 
+{
+    profile:UserProfile
+}
+interface State 
+{
+}
+type Props = ReduxStateProps & OwnProps
+class ConversationItem extends React.Component<Props, State> {
     static maxVisibleAvatars = 5
     constructor(props) {
         super(props);
@@ -63,9 +69,10 @@ class ConversationItem extends React.Component<Props, {}> {
         )
     }
 }
-const mapStateToProps = (state:RootState) => {
+
+const mapStateToProps = (state:RootState, ownProps: OwnProps):ReduxStateProps => {
     return {
         profile:state.profile
-    };
+    }
 }
-export default connect(mapStateToProps, null)(ConversationItem);
+export default connect<ReduxStateProps, {}, OwnProps>(mapStateToProps, null)(ConversationItem);

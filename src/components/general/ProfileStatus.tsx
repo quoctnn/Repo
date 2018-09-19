@@ -4,20 +4,34 @@ import { withRouter, Link} from 'react-router-dom'
 import { connect } from 'react-redux'
 import { Button} from 'reactstrap';
 import * as Actions from "../../actions/Actions"
-import { History} from 'history'
 import { Routes } from '../../utilities/Routes';
 import { UserProfile } from '../../reducers/profileStore';
 import { RootState } from '../../reducers/index';
 require("./ProfileStatus.scss");
 
-export interface Props {
-    profile?:UserProfile,
-    signOut:() => void,
-    history:History,
+export interface OwnProps 
+{
+}
+interface RouteProps 
+{
+    history:any
+    location: any
+    match:any
+}
+interface ReduxStateProps 
+{
+    profile:UserProfile,
     language:number,
 }
-
-class ProfileStatus extends React.Component<Props, {}> {
+interface ReduxDispatchProps 
+{
+    signOut:() => void,
+}
+interface State 
+{
+}
+type Props = ReduxStateProps & ReduxDispatchProps & OwnProps & RouteProps
+class ProfileStatus extends React.Component<Props, State> {
 
     render() 
     {
@@ -42,14 +56,13 @@ class ProfileStatus extends React.Component<Props, {}> {
         );
     }
 }
-
-const mapStateToProps = (state:RootState) => {
+const mapStateToProps = (state:RootState, ownProps: OwnProps):ReduxStateProps => {
     return {
         profile:state.profile, 
         language: state.settings.language,
-    };
+    }
 }
-const mapDispatchToProps = (dispatch) => {
+const mapDispatchToProps = (dispatch:any, ownProps: OwnProps):ReduxDispatchProps => {
     return {
         signOut:() => {
             dispatch(Actions.setProfile(null))
@@ -64,4 +77,4 @@ const mapDispatchToProps = (dispatch) => {
         
     }
 }
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(ProfileStatus));
+export default withRouter<RouteProps>(connect<ReduxStateProps, ReduxDispatchProps, OwnProps>(mapStateToProps, mapDispatchToProps)(ProfileStatus));

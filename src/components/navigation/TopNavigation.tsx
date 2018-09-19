@@ -9,12 +9,17 @@ import { connect } from 'react-redux'
 import { RootState } from '../../reducers/index';
 import { ApiEndpoint } from '../../reducers/debug';
 require("./TopNavigation.scss");
-export interface Props {
-    signedIn:boolean;
-    apiEndpoint?:number;
+export interface OwnProps
+{
+
+}
+interface ReduxStateProps {
+    signedIn:boolean
+    apiEndpoint?:number
     availableApiEndpoints?:Array<ApiEndpoint>
 }
 
+type Props = ReduxStateProps & OwnProps
 class TopNavigation extends React.Component<Props, {}> {
     render() {
         var endpoint = ""
@@ -42,11 +47,11 @@ class TopNavigation extends React.Component<Props, {}> {
         );
     }
 }
-const mapStateToProps = (state:RootState) => {
+const mapStateToProps = (state:RootState, ownProps: OwnProps):ReduxStateProps => {
     return {
         signedIn:state.auth.signedIn,
         apiEndpoint: state.debug.apiEndpoint,
         availableApiEndpoints: state.debug.availableApiEndpoints,
-    };
+    }
   }
-  export default connect(mapStateToProps, null)(TopNavigation);
+  export default connect<ReduxStateProps, void, OwnProps>(mapStateToProps, null)(TopNavigation);

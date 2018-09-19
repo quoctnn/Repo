@@ -1,4 +1,37 @@
 #create-conversation
 {
-    
+    .member-list
+    {
+        > *
+        {
+            margin: 8px;
+            width: 80px;
+            display: inline-block;
+            .avatar 
+            {
+                margin: 0 auto;
+            }
+            .member-name
+            {
+                text-align: center;
+            }
+            .remove-button
+            {
+                padding: 0;
+                width: 24px;
+                height: 24px;
+            }
+        }
+    }
+    .submit-button 
+    {
+        .spinner
+        {
+            margin: 0;
+            > div 
+            {
+                background-color:white;
+            }
+        }
+    }
 }
