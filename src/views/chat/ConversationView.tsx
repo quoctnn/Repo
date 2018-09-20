@@ -22,7 +22,10 @@ import { messageReducerPageSize } from '../../reducers/messages';
 import { Mention } from '../../components/input/MentionEditor';
 import { ConversationManager } from '../../main/managers/ConversationManager';
 
-require("./ConversationView.scss");
+require("./ConversationView.scss")
+
+const reducer = (accumulator, currentValue) => accumulator + currentValue;
+const uidToNumber = (uid) => uid.split("_").map(n => parseInt(n)).reduce(reducer)
 export interface Props {
     match:any,
     conversation:Conversation,
@@ -43,18 +46,22 @@ export interface State {
     isTyping:object
     loading:boolean
     fullScreen:boolean
+    renderDropZone:boolean
 }
 
 class ConversationView extends React.Component<Props, {}> {
     static maxRetries = 3
     clearSomeoneIsTypingTimer:NodeJS.Timer = null
     state:State
+    dragCount:number = 0
+    private dropTarget = React.createRef<HTMLDivElement>();
     constructor(props) {
         super(props)
         this.state = {
             isTyping:{},
             loading:false,
             fullScreen:false,
+            renderDropZone:false,
         }
         this.loadFirstData = this.loadFirstData.bind(this)
         this.loadNextPageData = this.loadNextPageData.bind(this) 
@@ -66,6 +73,11 @@ class ConversationView extends React.Component<Props, {}> {
         this.removeUserFromIsTypingData = this.removeUserFromIsTypingData.bind(this)
         this.markConversationAsRead = this.markConversationAsRead.bind(this)
         this.filesAdded = this.filesAdded.bind(this)
+        this.onDragOver = this.onDragOver.bind(this)
+        this.onDrop = this.onDrop.bind(this)
+        this.onDragLeave = this.onDragLeave.bind(this)
+        this.onDragEnter = this.onDragEnter.bind(this)
+        
         
     }
     componentDidMount()
@@ -147,7 +159,7 @@ class ConversationView extends React.Component<Props, {}> {
     {
         let currentConversation = this.props.conversation
         let nextConversation = nextProps.conversation
-        if(nextState.fullScreen == this.state.fullScreen && nextProps.isFetching == this.props.isFetching && currentConversation && nextConversation && currentConversation.id == nextConversation.id && currentConversation.updated_at == nextConversation.updated_at && nextProps.items == this.props.items && 
+        if(nextState.renderDropZone == this.state.renderDropZone && nextState.fullScreen == this.state.fullScreen && nextProps.isFetching == this.props.isFetching && currentConversation && nextConversation && currentConversation.id == nextConversation.id && currentConversation.updated_at == nextConversation.updated_at && nextProps.items == this.props.items && 
             this.isTypingDictEqual(nextState.isTyping, this.state.isTyping))
             return false
         return true
@@ -178,14 +190,16 @@ class ConversationView extends React.Component<Props, {}> {
         if(!conversation)
             return
         let tempId = `${conversation.id}_${this.props.profile.id}_${Date.now()}`
-        let tempMessage = this.getChatMessagePreview(text, null, tempId, mentions, conversation)
-        ConversationManager.sendMessage(tempMessage)
+        this.getChatMessagePreview(text, null, tempId, mentions, conversation, (message) => {
+            ConversationManager.sendMessage(message)
+        })
     }
-    getChatMessagePreview(text:string,file:File, uid:string, mentions:number[], conversation:Conversation):Message {
+    
+    getChatMessagePreview(text:string,file:File, uid:string, mentions:number[], conversation:Conversation, completion:(message:Message) => void) {
         let now = Date.now()
         let ds = new Date().toUTCString()
-        let tempFile = nullOrUndefined(file) ? null : {file,progress:0}
-        return {
+        let tempFile = nullOrUndefined(file) ? null: {file:file, progress:0, name:file.name, size:file.size, type:file.type, error:null}
+        let message = {
             id: now,
             uid:uid,
             pending:true,
@@ -199,6 +213,7 @@ class ConversationView extends React.Component<Props, {}> {
             mentions:mentions,
             tempFile
         }
+        completion(message)
     }
     onDidType()
     {
@@ -234,9 +249,80 @@ class ConversationView extends React.Component<Props, {}> {
         files.forEach(f => {
             
             let tempId = `${conversation.id}_${this.props.profile.id}_${Date.now()}`
-            let tempMessage = this.getChatMessagePreview("", f, tempId, [], conversation)
-            ConversationManager.sendMessage(tempMessage)
+            this.getChatMessagePreview("", f, tempId, [], conversation, (message) => {
+                ConversationManager.sendMessage(message)
+            })
         })
+    }
+    onDragOver(event)
+    {
+        event.preventDefault()
+        try 
+        {
+            event.dataTransfer.dropEffect = "copy"
+        } 
+        catch (err) { }
+    }
+    onDrop(event)
+    {
+        event.preventDefault()
+        let files = []
+        if (event.dataTransfer.items) 
+        {
+            for (var i = 0; i < event.dataTransfer.items.length; i++) 
+            {
+                if (event.dataTransfer.items[i].kind === 'file') 
+                {
+                    var file = event.dataTransfer.items[i].getAsFile()
+                    files.push(file)
+                }
+            }
+        } 
+        else 
+        {
+            for (var i = 0; i < event.dataTransfer.files.length; i++) 
+            {
+                let file = event.dataTransfer.files[i]
+                files.push(file)
+            }
+        }
+        this.removeDragData(event)
+        this.dragCount = 0
+        this.setState({renderDropZone:false})
+        if(files.length > 0)
+            this.filesAdded(files)
+    }
+    removeDragData(event) 
+    {
+        if (event.dataTransfer.items) 
+        {
+            event.dataTransfer.items.clear()
+        } 
+        else 
+        {
+            event.dataTransfer.clearData()
+        }
+    }
+    onDragLeave(event)
+    {
+        event.preventDefault()
+        this.dragCount -= 1
+        if(this.dragCount == 0 && this.state.renderDropZone)
+        {
+            this.setState({renderDropZone:false})
+        }
+        console.log("onDragLeave", this.dragCount)
+    }
+    onDragEnter(event)
+    {
+        event.preventDefault()
+        console.log(event.target.classList)
+        this.dragCount += 1
+        if(this.dragCount > 0 && !this.state.renderDropZone)
+        {
+            this.setState({renderDropZone:true})
+        }
+        console.log("onDragEnter", this.dragCount)
     }
     render() {
         let me = this.props.profile
@@ -246,7 +332,8 @@ class ConversationView extends React.Component<Props, {}> {
             return null
         }
         let myId = me.id
-        let messages = this.props.queuedMessages.concat(this.props.items)
+        let messages = this.props.queuedMessages.concat(this.props.items).sort((a,b) => uidToNumber(b.uid) - uidToNumber(a.uid))
+
         return(
             <FullPageComponent>
                 <div className="d-none d-sm-block col-lg-4 col-md-4 col-sm-5">
@@ -260,7 +347,7 @@ class ConversationView extends React.Component<Props, {}> {
                                 <button className="btn flex-shrink-0" onClick={this.resizeButtonClick} ><i className="fas fa-expand"></i></button>
                             </div>
                         </div>
-                        <div className="card-body full-height">
+                        <div ref={this.dropTarget} className={"droptarget card-body full-height" + (this.state.renderDropZone ? " drop-zone" : "")} onDragOver={this.onDragOver} onDrop={this.onDrop} onDragLeave={this.onDragLeave} onDragEnter={this.onDragEnter}>
                             <ChatMessageList conversation={conversation.id} loading={this.props.isFetching} chatDidScrollToTop={this.chatDidScrollToTop} messages={messages} current_user={this.props.profile} >
                                 {this.renderSomeoneIsTyping()}
                             </ChatMessageList>

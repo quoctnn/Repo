@@ -1,10 +1,14 @@
 import * as React from "react";
-import { Message } from '../../reducers/conversations';
+import { Message, UploadedFile } from '../../reducers/conversations';
 import { getProfileById } from '../../main/App';
 import { Link } from 'react-router-dom';
-import { URL_REGEX, truncate, uniqueId, IS_ONLY_LINK_REGEX, nullOrUndefined } from '../../utilities/Utilities';
+import { URL_REGEX, uniqueId, IS_ONLY_LINK_REGEX, humanFileSize } from '../../utilities/Utilities';
 import { Routes } from '../../utilities/Routes';
 import Embedly from './Embedly';
+import { translate } from '../intl/AutoIntlProvider';
+import RadialProgress from './RadialProgress';
+import { ConversationManager } from '../../main/managers/ConversationManager';
+import VideoPlayer from './video/VideoPlayer';
 const processString = require('react-process-string');
 require("./ChatMessage.scss");
 
@@ -25,7 +29,50 @@ export class ChatMessage extends React.Component<Props, {}> {
             return true
         if(!n && !o)
             return false
-        return n.progress != o.progress
+        return n.progress != o.progress || n.error != o.error
+    }
+    getRemoveFailedContent(message:Message)
+    {
+        return (<div>
+            <div className="title">{message.tempFile.name}</div>
+            <div className="status">{translate("Sending failed")}</div>
+            <div className="footer"><button className="btn" onClick={() => ConversationManager.removeQueuedMessage(message)}>{translate("Remove")}</button></div>
+        </div>)
+    }
+    getUploadingContent(message:Message)
+    {
+        return (<div>
+            <div className="title">{message.tempFile.name}</div>
+            <div className="status">{ humanFileSize( message.tempFile.size ) + " " + translate("Sending...")}</div>
+            <div className="footer"><RadialProgress percent={message.tempFile.progress} size={40} strokeWidth={5} /></div>
+        </div>)
+    }
+    getRetryUploadingContent(message:Message)
+    {
+        return (<div>
+            <div className="title">{message.tempFile.name}</div>
+            <div className="status">{ humanFileSize( message.tempFile.size ) + " " + translate("Sending failed")}</div>
+            <div className="footer"><button className="btn" onClick={() => ConversationManager.retryQueuedMessage(message)}>{translate("Retry")}</button></div>
+        </div>)
+    }
+    getTryingToCreateContent(message:Message)
+    {
+        return (<div>
+            <div className="title">{message.tempFile.name}</div>
+            <div className="status">{translate("File uploaded. Creating message...") }</div>            
+            <div className="footer">
+                <button className="btn" onClick={() => ConversationManager.retryQueuedMessage(message)}>{translate("Retry")}</button>
+                <button className="btn" onClick={() => ConversationManager.removeQueuedMessage(message)}>{translate("Remove")}</button>
+            </div>
+        </div>)
+    }
+    getFileRepresentation(file:UploadedFile)
+    {
+        if(VideoPlayer.canPlay(file.file))
+        {
+            return (<VideoPlayer link={file.file} key={file.id}/>)
+        }
+        return (file.file)
     }
     render() {
         var processed:any = null
@@ -34,11 +81,33 @@ export class ChatMessage extends React.Component<Props, {}> {
         let res = IS_ONLY_LINK_REGEX.test(msg.text)
         if(msg.tempFile && msg.tempFile.file)
         {
-            processed = "Uploading (" + msg.tempFile.progress + ")"   
+            if(msg.tempFile.file instanceof File)
+            {
+                if(msg.tempFile.error)
+                {
+                    processed = this.getRetryUploadingContent(msg)
+                }
+                else 
+                {
+                    processed = this.getUploadingContent(msg)
+                }
+            }
+            else 
+            {
+                if(msg.tempFile.fileId)
+                {
+                    processed = this.getTryingToCreateContent(msg)
+                }
+                else 
+                {
+                    processed = this.getRemoveFailedContent(msg)
+                }
+            }
+            
         }
         else if(msg.files && msg.files.length > 0)
         {
-            processed = msg.files[0].file  
+            processed = this.getFileRepresentation(msg.files[0])  
         }
         else if(res)
         {

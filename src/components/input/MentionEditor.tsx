@@ -11,6 +11,7 @@ import createMentionPlugin, {
 import createEmojiPlugin from "draft-js-emoji-plugin";
 import emojiPositionSuggestions from "./emojiPositionSuggestion";
 import {defaultTheme} from 'draft-js-emoji-plugin'
+import { Settings } from '../../utilities/Settings';
 require("./MentionEditor.scss");
 
 
@@ -274,6 +275,7 @@ export default class MentionEditor extends React.Component<Props, {}> {
         let file = filesList.item(i)
         files.push(file)
       }
+      this.fileUploader.current.value = ""
       this.props.filesAdded(files)
   }
   render() {
@@ -307,7 +309,7 @@ export default class MentionEditor extends React.Component<Props, {}> {
                   className="upload-button editor-button btn btn-default"
                   type="button" >
                   <i className="fas fa-paperclip fa-lg"></i>
-                  <input ref={this.fileUploader} multiple={true} accept="*" className="form-control" type="file" onChange={this.uploadFileChanged} />
+                  <input ref={this.fileUploader} accept={Settings.allowedTypesFileUpload} multiple={true} className="form-control" type="file" onChange={this.uploadFileChanged} />
                 </button>}
               </div>
           </div>

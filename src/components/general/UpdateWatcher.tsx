@@ -20,14 +20,14 @@ class UpdateWatcher extends React.Component<Props, {}> {
   {
       OfflinePluginRuntime.install({
         onUpdateReady: () => {
-          OfflinePluginRuntime.applyUpdate();
+          //OfflinePluginRuntime.applyUpdate();
         },
         onUpdated: () => {
           //this.resetCachedDataAndReload();
         }
       })
       if(window.applicationCache.status == window.applicationCache.UPDATEREADY) {
-          this.resetCachedDataAndReload();
+          //this.resetCachedDataAndReload();
       }
   }
   resetCachedDataAndReload()

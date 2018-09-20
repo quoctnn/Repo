@@ -53,6 +53,13 @@ export const insertConversation = (conversation:Conversation, isNew:boolean):Ins
 })
 
 //queue
+export const queueProcessChatMessage = (message: Message) => ({
+  type: Types.QUEUE_PROCESS_CHAT_MESSAGE,
+  message
+});
+export const queueProcessNextChatMessage = () => ({
+  type: Types.QUEUE_PROCESS_NEXT_CHAT_MESSAGE,
+});
 export const queueAddChatMessage = (message: Message) => ({
   type: Types.QUEUE_ADD_CHAT_MESSAGE,
   message: message
@@ -65,6 +72,10 @@ export const queueRemoveChatMessage = (message: Message) => ({
   type: Types.QUEUE_REMOVE_CHAT_MESSAGE,
   message: message
 });
+export const resetQueueData = () => ({
+  type: Types.QUEUE_RESET_DATA,
+});
+
 
 //profileStore
 export const storeProfiles = (profiles: UserProfile[]) => ({

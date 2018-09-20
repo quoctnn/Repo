@@ -54,6 +54,7 @@
     "popper": "^1.0.1",
     "react": "^16.4.2",
     "react-dom": "^16.4.2",
+    "react-html5video": "^2.5.1",
     "react-process-string": "^1.2.0",
     "react-router-dom": "^4.3.1",
     "react-toastify": "^4.1.0",

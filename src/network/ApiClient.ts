@@ -140,9 +140,9 @@ export default class ApiClient
 }
 export class FileUploader 
 {
-    file:File
+    file:Blob
     progress:(percent:number) => void
-    constructor(file:File, progress:(percent:number) => void)
+    constructor(file:Blob, progress:(percent:number) => void)
     {
         this.file = file
         this.progress = progress
@@ -154,8 +154,7 @@ export class FileUploader
         let state = store.getState().debug
         let url = state.availableApiEndpoints[state.apiEndpoint].endpoint + Constants.apiRoute.fileUploadUrl
         const data = new FormData();
-        data.append("file", this.file);
-        data.append("filename", this.file.name);
+        data.append("file", this.file)
         $.ajax({
             type: "POST",
             url: url,
@@ -170,7 +169,6 @@ export class FileUploader
                 completion(data.files[0])
             },
             error: function (error) {
-                
                 completion(null)
             },
             async: true,

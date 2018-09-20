@@ -37,18 +37,25 @@ class ConversationManagerSingleton
     {
         if (canSendOnWebsocket) 
         {
-            let state = this.getStore().getState()
-            if (state.queue.chatMessages.length > 0) 
-            {
-                state.queue.chatMessages.reverse().forEach(m => {
-                    this.sendMessage(m);
-                });
-            }
+            this.getStore().dispatch(Actions.queueProcessNextChatMessage())
         }
     }
     setConversation(conversation:Conversation, isNew:boolean)
     {
         this.getStore().dispatch(Actions.insertConversation(conversation, isNew))
+    }
+    removeQueuedMessage(message:Message)
+    {
+        this.getStore().dispatch(Actions.queueRemoveChatMessage(message))
+    }
+    retryQueuedMessage(message:Message)
+    {
+        let m = Object.assign({}, message)
+        m.tempFile = Object.assign({}, m.tempFile)
+        m.tempFile.progress = 0
+        m.tempFile.error = null
+        this.getStore().dispatch(Actions.queueUpdateChatMessage(m))
+        this.getStore().dispatch(Actions.queueProcessChatMessage(m))
     }
     private processIncomingUpdateConversation(event:CustomEvent)
     {

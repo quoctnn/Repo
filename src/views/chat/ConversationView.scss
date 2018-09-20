@@ -1,3 +1,4 @@
+@import "../../main/Config";
 #conversation-view
 {
     .card-body
@@ -21,5 +22,11 @@
         {
             margin-right: 5px;
         }
+    }
+    .drop-zone
+    {
+        border-width: 2px;
+        border-style: dashed;
+        @include var(border-color, border-color-default);
     }
 }

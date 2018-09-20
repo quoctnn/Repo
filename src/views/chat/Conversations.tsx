@@ -76,7 +76,7 @@ class Conversations extends React.Component<Props, State> {
     }
     componentWillMount()
     {
-        this.loadFirstData()
+        this.loadFirstData(true)
     }
     componentDidMount()
     {

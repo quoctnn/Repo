@@ -2,10 +2,6 @@ import Constants from '../utilities/Constants';
 import { createPaginator } from './createPaginator';
 import { combineReducers } from 'redux';
 import { PaginationUtilities } from '../utilities/PaginationUtilities';
-import { Types } from '../utilities/Types';
-import * as moment from 'moment-timezone';
-import { FileUploader } from '../network/ApiClient';
-let timezone = moment.tz.guess()
 
 
 export const conversationReducerKey = "conversations"
@@ -25,6 +21,11 @@ export interface FileUpload
 {
     file:File
     progress:number
+    name:string
+    size:number
+    type:string
+    error:string
+    fileId?:number
 }
 
 export class Message 

@@ -380,6 +380,7 @@ const mapDispatchToProps = dispatch => {
     clearDataStore: () => {
       dispatch(Actions.resetPagedData());
       dispatch(Actions.resetEmbedlyStore());
+      dispatch(Actions.resetQueueData());
     },
     sendOnWebsocket: (data: string) => {
       sendOnWebsocket(data);
