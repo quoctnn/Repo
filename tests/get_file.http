@@ -1,0 +1,27 @@
+### GET FILE WITH SESSIONID
+
+GET http://alesund-dev.intra.work:8000/media/users/10/uploads/0a77143e.celebration-app-ios.mov HTTP/1.1
+Connection: keep-alive
+Upgrade-Insecure-Requests: 1
+Accept-Encoding: identity;q=1, *;q=0
+chrome-proxy: frfr
+Range: bytes=0-3000
+Referer: http://alesund-dev.intra.work:8000/
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8
+Accept-Language: nb,en-US;q=0.9,en;q=0.8,es;q=0.7
+Cookie: sessionid=3c4jxznszvwd72i6rpccmayr3oe966ce;
+
+### GET FILE WITH TOKEN
+
+GET http://alesund-dev.intra.work:8000/media/users/10/uploads/0a77143e.celebration-app-ios.mov?token={{token}} HTTP/1.1
+Connection: keep-alive
+Upgrade-Insecure-Requests: 1
+Accept-Encoding: identity;q=1, *;q=0
+chrome-proxy: frfr
+Range: bytes=0-3000
+Referer: http://alesund-dev.intra.work:8000/
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8
+Accept-Language: nb,en-US;q=0.9,en;q=0.8,es;q=0.7
+
