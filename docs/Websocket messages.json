@@ -93,6 +93,39 @@
           }
         ]
       }
+    ],
+    "Status": [
+      {
+        "To websocket": []
+      },
+      {
+        "From websocket": [
+          {
+            "data": "StatusObject",
+            "status_id": 1,
+            "type": "status.new"
+          },
+          {
+            "data": "StatusObject",
+            "status_id": 1,
+            "type": "status.update"
+          }
+
+        ]
+      }
+    ],
+    "Recent Activity": [
+      {
+        "To websocket": []
+      },
+      {
+        "From websocket": [
+          {
+            "data": "NotificatonObject",
+            "type": "notification.new"
+          }
+        ]
+      }
     ]
   }
 }
