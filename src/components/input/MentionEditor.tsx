@@ -12,16 +12,13 @@ import createEmojiPlugin from "draft-js-emoji-plugin";
 import emojiPositionSuggestions from "./emojiPositionSuggestion";
 import {defaultTheme} from 'draft-js-emoji-plugin'
 import { Settings } from '../../utilities/Settings';
+import { UserProfile } from '../../reducers/profileStore';
+import { appendTokenToUrl } from '../../utilities/Utilities';
 require("./MentionEditor.scss");
 
 
 let theme = {...defaultTheme, emojiSelectPopover:"emojiSelectPopover " + defaultTheme.emojiSelectPopover}
-const emojiPlugin = createEmojiPlugin({
-  positionSuggestions: emojiPositionSuggestions,
-  useNativeArt: true,
-  theme:theme
-});
-const { EmojiSuggestions, EmojiSelect } = emojiPlugin;
+
 export class Mention {
   name: string;
   key: string;
@@ -32,6 +29,13 @@ export class Mention {
     this.avatar = avatar;
     this.key = key;
     this.id = id;
+  }
+  static fromUser(user:UserProfile)
+  {
+    return new Mention(user.first_name + " " + user.last_name,
+    user.username,
+    appendTokenToUrl(user.avatar || user.avatar_thumbnail),
+    user.id)
   }
 }
 interface EntryProps {
@@ -96,10 +100,11 @@ const positionSuggestions = ({ state, props }) => {
 };
 
 interface Props {
-  mentions: Mention[];
   editorState: EditorState;
   onChange?: (editorState: EditorState) => void;
   filesAdded?:(files:File[]) => void
+  mentionSearch:(search:string, completion:(mentions:Mention[]) => void) => void
+  onHandleUploadClick?:(event) => void
 }
 interface State {
   suggestions: Mention[]
@@ -114,6 +119,12 @@ export default class MentionEditor extends React.Component<Props, {}> {
   rootElement: any;
   positioningElement: any;
   observer:MutationObserver
+  emojiPlugin = createEmojiPlugin({
+    positionSuggestions: emojiPositionSuggestions,
+    useNativeArt: true,
+    theme:theme
+  });
+
   private emojiButton = React.createRef<HTMLButtonElement>();
   private container = React.createRef<HTMLDivElement>();
   private fileUploader = React.createRef<HTMLInputElement>();
@@ -143,18 +154,18 @@ export default class MentionEditor extends React.Component<Props, {}> {
       this.props.onChange(editorState);
     }
   }
-  componentDidUpdate(prevProps:Props)
+  componentDidUpdate(prevProps:Props, prevState:State)
   {
-    if(this.props.mentions != prevProps.mentions)
-    {
+    if(prevState.search != this.state.search)
         this.onSearchChange({value:this.state.search})
-    }
   }
   onSearchChange = ({ value }) => {
-    this.setState({
-      suggestions: defaultSuggestionsFilter(value, this.props.mentions),
-      search:value
-    });
+    this.props.mentionSearch(value, (mentions) => {
+      this.setState({
+        suggestions: defaultSuggestionsFilter(value, mentions),
+        search:value
+      });
+    })
   }
 
   onAddMention = mention => {
@@ -175,6 +186,8 @@ export default class MentionEditor extends React.Component<Props, {}> {
       this.toggleEmojiPanel(e)
   }
   addBackDrop = () => {
+
+    const { EmojiSelect } = this.emojiPlugin;
     if (!this.rootElement) {
       var p = document.createElement("div");
       p.className = "emoji-backdrop";
@@ -280,8 +293,8 @@ export default class MentionEditor extends React.Component<Props, {}> {
   }
   render() {
     const { MentionSuggestions } = this.mentionPlugin;
-    const plugins = [emojiPlugin, this.mentionPlugin];
-
+    const plugins = [this.emojiPlugin, this.mentionPlugin];
+    const { EmojiSuggestions } = this.emojiPlugin;
     return (
       <div ref={this.container} className="mention-editor" onClick={this.focus}>
           <div>
@@ -305,11 +318,11 @@ export default class MentionEditor extends React.Component<Props, {}> {
                   type="button" >
                   <i className="fas fa-smile fa-lg"></i>
                 </button>
-                {this.props.filesAdded && <button
+                {(this.props.filesAdded || this.props.onHandleUploadClick) && <button
                   className="upload-button editor-button btn btn-default"
-                  type="button" >
+                  type="button" onClick={this.props.onHandleUploadClick} >
                   <i className="fas fa-paperclip fa-lg"></i>
-                  <input ref={this.fileUploader} accept={Settings.allowedTypesFileUpload} multiple={true} className="form-control" type="file" onChange={this.uploadFileChanged} />
+                  {this.props.filesAdded && <input ref={this.fileUploader} accept={Settings.allowedTypesFileUpload} multiple={true} className="form-control" type="file" onChange={this.uploadFileChanged} /> }
                 </button>}
               </div>
           </div>

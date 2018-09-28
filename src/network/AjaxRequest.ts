@@ -1,6 +1,7 @@
 'use strict';
 import { Settings } from "../utilities/Settings";
 import store from '../main/App';
+import { StoreManager } from '../main/managers/StoreManager';
 var $ = require("jquery")
 
 var isProduction = Settings.isProduction;
@@ -62,7 +63,7 @@ export class AjaxRequest
     }
     private static ajaxCallJSON(type:string, url:string, json:any, success:SuccessCallback, error:ErrorCallback) 
     {
-        url = AjaxRequest.applyEndpointDomain(url)
+        url = StoreManager.applyEndpointDomain(url)
         if (typeof  success === 'undefined') {
             success = defaultCallback;
         }
@@ -81,18 +82,10 @@ export class AjaxRequest
             error: error.bind(this)
         });
     }
-    private static applyEndpointDomain(url:string)
-    {
-        if (url.indexOf('://') > 0 || url.indexOf('//') === 0 ) 
-        {
-            return url
-        }
-        let state = store.getState().debug
-        return state.availableApiEndpoints[state.apiEndpoint].endpoint + url
-    }
+    
     private static ajaxCallNoProcess(method, url, data, success:SuccessCallback, error:ErrorCallback) 
     {
-        url = AjaxRequest.applyEndpointDomain(url)
+        url = StoreManager.applyEndpointDomain(url)
         if (typeof  success === 'undefined') {
             success = defaultCallback;
         }
@@ -114,7 +107,7 @@ export class AjaxRequest
     }
     private static ajaxCall(method, url, data, success:SuccessCallback, error:ErrorCallback) 
     {
-        url = AjaxRequest.applyEndpointDomain(url)
+        url = StoreManager.applyEndpointDomain(url)
         if (typeof  success === 'undefined') {
             success = defaultCallback;
         }
@@ -135,7 +128,7 @@ export class AjaxRequest
     }
     private static ajaxCallHtml(method, url, data, success:SuccessCallback, error:ErrorCallback) 
     {
-        url = AjaxRequest.applyEndpointDomain(url)
+        url = StoreManager.applyEndpointDomain(url)
         if (typeof  success === 'undefined') {
             success = defaultCallback;
         }

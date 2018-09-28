@@ -17,6 +17,7 @@ import queue from './queue';
 import { conversations } from './conversations';
 import { Conversation, Message } from './conversations';
 import { messages } from './messages';
+import { statuses, Status } from './statuses';
 
 
 const rootPersistConfig:PersistConfig = {
@@ -25,11 +26,10 @@ const rootPersistConfig:PersistConfig = {
   blacklist: ['auth'],
   debug:true,
 } 
-
 const rootReducer = combineReducers({
   //debug: persistReducer(debugConfig, debug), 
   settings, profile, auth, profileStore, communityStore, groupStore, groupListCache, contactListCache, debug,
-   queue, conversations, messages, embedlyStore
+   queue, conversations, messages, embedlyStore, statuses
 })
 export default persistReducer(rootPersistConfig, rootReducer)
 export interface RootState
@@ -42,10 +42,11 @@ export interface RootState
       groupStore: any;
       groupListCache: any;
       contactListCache: any;
-      queue:{chatMessages:Message[], statusMessages:Message[]};
+      queue:{chatMessages:Message[], statusMessages:Status[]};
       conversations:{items:{[id:number]:Conversation}, pagination:CachePage};
       messages:{items:Message[], conversations:PageItem}
-      embedlyStore:{byId:{[id:string]:EmbedlyItem}, allIds:string[], queuedIds:{[id:string]:boolean}}
+      embedlyStore:{byId:{[id:string]:EmbedlyItem}, allIds:string[], queuedIds:{[id:string]:boolean}},
+      statuses:{items:Status[], feed:PageItem}
     debug: {accessToken:string, apiEndpoint:number, availableApiEndpoints:ApiEndpoint[] };
   _persist:any
 }

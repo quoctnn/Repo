@@ -13,6 +13,9 @@ import { toast } from 'react-toastify';
 import { ErrorToast } from '../../components/general/Toast';
 import { Queue } from '../../reducers/queue';
 import { ConversationManager } from '../../main/managers/ConversationManager';
+import { StatusManager } from '../../main/managers/StatusManager';
+import { ProfileManager } from '../../main/managers/ProfileManager';
+import { uniqueId, nullOrUndefined } from '../../utilities/Utilities';
 
 export enum SocketMessageType {
   STATE = "state",
@@ -21,7 +24,9 @@ export enum SocketMessageType {
   CONVERSATION_TYPING = "conversation.typing",
   CONVERSATION_MESSAGE = "conversation.message",
   CONVERSATION_NEW = "conversation.new",
-  CONVERSATION_UPDATE = "conversation.update"
+  CONVERSATION_UPDATE = "conversation.update",
+  STATUS_NEW = "status.new",
+  STATUS_UPDATE = "status.update",
 }
 
 enum WebsocketState {
@@ -68,7 +73,51 @@ const socket_options = {
   connectionTimeout: 4000,
   maxRetries: 10
 };
-
+class EventQueueLock 
+{
+    popCallback:(object) => void = null
+    didChangeLockStatus:(locked:boolean) => void = null
+    private eventQueue = []
+    eventStreamLocks:{[id:string]:string} = {}
+    constructor()
+    {
+      this.lock = this.lock.bind(this)
+      this.unlock = this.unlock.bind(this)
+      this.lockCount = this.lockCount.bind(this)
+      this.popEvent = this.popEvent.bind(this)
+    }
+    lock()
+    {
+      let id = uniqueId()  
+      if(this.didChangeLockStatus && this.lockCount() == 0)
+      {
+        this.didChangeLockStatus(true)
+      }
+      this.eventStreamLocks[id] = id
+      return id
+    }
+    unlock(id:string)
+    {
+      delete this.eventStreamLocks[id]
+      if(this.didChangeLockStatus && this.lockCount() == 0)
+      {
+        this.didChangeLockStatus(false)
+      }
+    }
+    lockCount()
+    {
+      return Object.keys(this.eventStreamLocks).length
+    }
+    popEvent()
+    {
+      return this.eventQueue.pop()
+    }
+    queueEvent(object)
+    {
+      this.eventQueue.unshift(object)
+    }
+}
+export const EventLock = new EventQueueLock()
 export interface OwnProps 
 {
 }
@@ -105,6 +154,7 @@ class ChannelEventStream extends React.Component<Props, State> {
   lastUserActivity: Date;
   lastUserActivityTimer: NodeJS.Timer;
   state: State
+  queueEvents = false
   constructor(props) {
     super(props);
     this.state = { token: null, endpoint: null };
@@ -115,7 +165,6 @@ class ChannelEventStream extends React.Component<Props, State> {
     this.canSend = this.canSend.bind(this);
     this.authorize = this.authorize.bind(this);
     this.processStateResponse = this.processStateResponse.bind(this);
-    this.getCurrentToken = this.getCurrentToken.bind(this);
     this.checkState = this.checkState.bind(this);
 
     this.processStatusChangeResponse = this.processStatusChangeResponse.bind(
@@ -127,9 +176,27 @@ class ChannelEventStream extends React.Component<Props, State> {
     );
     this.clearUserActivityTimer = this.clearUserActivityTimer.bind(this);
     this.startTimer = this.startTimer.bind(this);
+    this.handleEventQueuePop = this.handleEventQueuePop.bind(this)
+    this.handleEventQueueLockStatusChanged = this.handleEventQueueLockStatusChanged.bind(this)
+    this.playEvent = this.playEvent.bind(this)
 
     this.lastUserActivity = new Date();
     this.lastUserActivityTimer = null;
+    EventLock.popCallback = this.handleEventQueuePop
+    EventLock.didChangeLockStatus = this.handleEventQueueLockStatusChanged
+  }
+  handleEventQueuePop(event)
+  {
+    this.playEvent(event)
+  }
+  handleEventQueueLockStatusChanged(locked:boolean)
+  {
+    this.queueEvents = locked
+    var event = null
+    while(!this.queueEvents && !nullOrUndefined(event = EventLock.popEvent()))
+    {
+      this.playEvent(event)
+    } 
   }
   authorize() {
     if (this.canSend()) {
@@ -160,6 +227,7 @@ class ChannelEventStream extends React.Component<Props, State> {
     this.props.setProfile(state.user || null);
     this.props.setSignedIn(state.user != null);
     ConversationManager.processTempQueue()
+    StatusManager.processTempQueue()
     if (state.away_timeout && Number.isInteger(state.away_timeout))
       this.props.setAwayTimeout(state.away_timeout);
   }
@@ -174,6 +242,29 @@ class ChannelEventStream extends React.Component<Props, State> {
       let p = Object.assign({}, this.props.profile); //clone
       p.user_status = data.status;
       this.props.setProfile(p);
+    }
+  }
+  playEvent(event)
+  {
+    console.log('Message received on WebSocket', event);
+    switch (event.type) 
+    {
+      case SocketMessageType.STATE:
+        this.processStateResponse(event.data);
+        break;
+      case SocketMessageType.USER_UPDATE:
+        this.processUserUpdateResponse(event.data);
+        break;
+      case SocketMessageType.CLIENT_STATUS_CHANGE:
+        this.processStatusChangeResponse(event.data);
+        break;
+      default:
+        {
+          var e = new CustomEvent(event.type, {
+            detail: event
+          });
+          window.socket.dispatchEvent(e);
+        }
     }
   }
   connectStream() {
@@ -192,25 +283,13 @@ class ChannelEventStream extends React.Component<Props, State> {
       };
       this.stream.onmessage = e => {
         let data = JSON.parse(e.data);
-        console.log('Message received on WebSocket', data);
-        switch (data.type) {
-          case SocketMessageType.STATE:
-            this.processStateResponse(data.data);
-            break;
-          case SocketMessageType.USER_UPDATE:
-            this.processUserUpdateResponse(data.data);
-            break;
-          case SocketMessageType.CLIENT_STATUS_CHANGE:
-            this.processStatusChangeResponse(data.data);
-            break;
-          default:
-            {
-              var event = new CustomEvent(data.type, {
-                detail: data
-              });
-              window.socket.dispatchEvent(event);
-            }
+        if(this.queueEvents)
+        {
+            EventLock.queueEvent(data)
+            console.log("queue event", data.type)
+            return
         }
+        this.playEvent(data)
       };
       this.stream.onclose = event => {
         if (!event.wasClean)
@@ -230,7 +309,7 @@ class ChannelEventStream extends React.Component<Props, State> {
   }
   clearUserActivityTimer() {
     if (this.lastUserActivityTimer) {
-      console.log('clear timer');
+      //console.log('clear timer');
       clearTimeout(this.lastUserActivityTimer);
       this.lastUserActivityTimer = null;
     }
@@ -252,15 +331,15 @@ class ChannelEventStream extends React.Component<Props, State> {
       this.lastUserActivityTimerExpired,
       this.props.awayTimeout * 1000
     );
-    console.log('Setting up timeout to ' + this.props.awayTimeout);
+    //console.log('Setting up timeout to ' + this.props.awayTimeout);
   }
   removeActivityHandlers() {
     document.removeEventListener('mousedown', this.resetUserActivity);
     window.removeEventListener('focus', this.resetUserActivity);
-    console.log('removing activity handlers');
+    //console.log('removing activity handlers');
   }
   addActivityHandlers() {
-    console.log('adding activity handlers');
+    //console.log('adding activity handlers');
     document.addEventListener('mousedown', this.resetUserActivity);
     window.addEventListener('focus', this.resetUserActivity);
   }
@@ -301,7 +380,7 @@ class ChannelEventStream extends React.Component<Props, State> {
   }
   checkState() {
     var update = {};
-    let token = this.getCurrentToken();
+    let token = ProfileManager.getAuthorizationToken()
     let endpoint = this.props.availableApiEndpoints[this.props.apiEndpoint]
       .websocket;
     var updateFunc: () => void = null;
@@ -318,12 +397,6 @@ class ChannelEventStream extends React.Component<Props, State> {
     if (updateFunc) {
       this.setState(update, updateFunc);
     }
-  }
-  getCurrentToken() {
-    return (
-      this.props.accessToken ||
-      this.props.availableApiEndpoints[this.props.apiEndpoint].token
-    );
   }
   closeStream() {
     if (this.stream) {

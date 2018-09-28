@@ -7,7 +7,6 @@ import { sendOnWebsocket, getStream } from "../general/ChannelEventStream";
 import { Form } from "reactstrap";
 import { availableLanguages, availableThemes } from "../../reducers/settings";
 import { RootState } from "../../reducers";
-import { resetEmbedlyStore } from "../../actions/Actions";
 import ReconnectingWebSocket from "reconnecting-websocket";
 require("./DevTool.scss");
 export interface Props {

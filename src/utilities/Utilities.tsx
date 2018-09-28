@@ -1,7 +1,10 @@
 import { Settings } from './Settings';
 import { UserProfile } from '../reducers/profileStore';
+import Embedly from '../components/general/Embedly';
 import { Link} from 'react-router-dom'
+const processString = require('react-process-string');
 import { Routes } from './Routes';
+import * as React from 'react';
 export const getDomainName = (url:string) =>  {
     var url_parts = url.split("/")
     var domain_name_parts = url_parts[2].split(":")
@@ -31,10 +34,44 @@ export const HASHTAG_REGEX = /(?:#)(\w(?:(?:\w|(?:\.(?!\.))){0,28}(?:\w))?)/ig
 export const HASHTAG_REGEX_WITH_HIGHLIGHT = /(?:#)((?:\w|(?:<em>))(?:(?:(?:\w|(?:<\/em>))|(?:\.(?!\.))){0,28}(?:(?:\w|(?:<\/em>))))?)/ig
 export const TAG_REGEX = /(<([^>]+)>)/ig
 export const IS_ONLY_LINK_REGEX = /^(\b(https?|ftp):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])$/i
+export const LINEBREAK_REGEX = /\r?\n|\r/g
 export const truncate = (text, maxChars) => {
     return text.length > (maxChars - 3) ? text.substring(0, maxChars - 3) + '...' : text;
 }
-
+export function getTextContent(text:string, mentions:UserProfile[])
+{
+    var processed:any = null
+    var config = []
+    let embedlyArr:{[id:string]:any} = {}
+    let k = {
+        regex: URL_REGEX,
+        fn: (key, result) => 
+        {
+            embedlyArr[result[0]] = <Embedly key={uniqueId()} url={result[0]} />
+            return (<a key={uniqueId()} href={result[0]} target="_blank"  data-toggle="tooltip" title={result[0]}>{result[0]}</a>)
+        }
+    }
+    config.push(k)
+    let breaks = {
+        regex: LINEBREAK_REGEX,
+        fn: (key, result) => 
+        {
+            return (<br key={uniqueId()} />)
+        }
+    }
+    config.push(breaks)
+    let mentionSearch = mentions.map(user => {
+        return {
+            regex:new RegExp("@" + user.username, 'g'),
+            fn: (key, result) => {
+                return <Link key={key} to={Routes.PROFILES + user.slug_name }>{user.first_name + " " + user.last_name}</Link>;
+            }
+        }
+    }).filter(o => o)
+    config = config.concat(mentionSearch)
+    processed = processString(config)(text);
+    return processed
+}
 export function rawMarkup(text, mentions:any[]) {
     var markup = text
     if (Settings.searchEnabled) {

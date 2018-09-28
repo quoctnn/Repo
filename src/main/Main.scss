@@ -7,7 +7,11 @@
 .flex-grow{ flex-grow: 1;} 
 .flex-shrink{ flex-shrink: 1;}
 .align-center{ align-items: center;}
-
+.img-responsive{
+    display: block;
+    max-width: 100%;
+    height: auto;
+}
 .flex-truncate-container 
 {
   min-width: 0;
@@ -190,6 +194,16 @@ ul,li{margin:0; padding: 0;}
         @include var(margin-top, top-navigation-height);
         @include var(margin-right, right-navigation-min-width);
         padding: 5px;
+        > .container
+        {
+            > .row 
+            {
+                > *
+                {
+                    padding: 0;
+                }
+            }
+        }
     }
 }
 body.left-menu-open

@@ -10,7 +10,6 @@ import { ChatMessageUser } from './ChatMessageUser';
 import LoadingSpinner from './LoadingSpinner';
 require("./ChatMessageList.scss");
 let timezone = moment.tz.guess()
-React
 export interface Props {
     messages:Message[],
     current_user:UserProfile,

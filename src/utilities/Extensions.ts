@@ -1,4 +1,7 @@
 
+
+import * as Immutable from "immutable";
+import { nullOrUndefined } from "./Utilities";
 String.prototype.hashCode = function() {
     var hash = 0, i, chr;
     if (this.length === 0) return hash;
@@ -12,6 +15,7 @@ String.prototype.hashCode = function() {
 String.prototype.splice = function(idx, rem, str) {
     return this.slice(0, idx) + str + this.slice(idx + Math.abs(rem));
 };
+
 Array.prototype.move = function(oldIndex, newIndex) {
   if (newIndex >= this.length) {
       newIndex = this.length - 1;
@@ -20,4 +24,10 @@ Array.prototype.move = function(oldIndex, newIndex) {
 }
 Array.prototype.distinct = function() {
   return Array.from(new Set(this))
+}
+Array.prototype.contains = function<T>(element:T): boolean {
+  return this.indexOf(element) >= 0
+}
+Array.prototype.cloneArray = function() {
+  return nullOrUndefined(this) ? this : Immutable.fromJS(this).toJS()
 }

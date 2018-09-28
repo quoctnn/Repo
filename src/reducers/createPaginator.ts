@@ -1,5 +1,6 @@
 import { combineReducers, AnyAction } from 'redux';
 import { Types } from '../utilities/Types'
+import { Status } from './statuses';
 export interface PaginatorAction extends AnyAction
 {
     type:string
@@ -123,7 +124,7 @@ export interface InsertItemAction
   item?:any
   pagingId?:string
   isNew?:boolean
-  meta:{key:string}
+  meta:{key:string, itemIdKey?:string}
 }
 export type PageItem = { [page: string]: CachePage }
 export const createMultiPaginator = (key:string, endpoint:(id:string) => string, itemIdKey:string, pageSize:number) =>
@@ -225,5 +226,183 @@ export const createMultiPaginator = (key:string, endpoint:(id:string) => string,
       paginationReducer : onlyForEndpoint( pages ),
       itemsReducer: onlyForEndpoint(itemsReducer),
       requestNextPage
+    }
+  }
+
+
+  //////////////
+export const statusMultiPaginator = (key:string, endpoint:(id:string) => string, itemIdKey:string, pageSize:number) =>
+{
+  /*
+    key:{
+      feed:
+      {
+        feedKey:{
+            totalCount:number
+            last_fetch:number
+            ids:[number]
+            fetching:boolean
+            error:string
+        }
+      }
+      items:{[id:number]:Status}
+    }
+    */
+    const flattenList = (statusList:Status[]):Status[] => 
+    {
+      return statusList.reduce((flat, i) => {
+        if (i.children && i.children.length > 0) 
+        {
+          let children = i.children
+          i.children_ids = children.map(i => i.id)
+          i.children = []
+          return flat.concat(flattenList(children)).concat(i)
+        }
+        return flat.concat(i)
+      }, []);
+    }
+    const requestNextStatusPage = ( pagingId:string, offset:number):MultiPaginatorAction => ({
+      type: Types.REQUEST_PAGE,
+      payload: { pagingId, offset, error:null},
+      meta: { endpoint, key, itemIdKey , pageSize }
+    })
+    const insertStatus = (pagingId:string, status:Status, isNew:boolean):InsertItemAction => ({
+      type: Types.INSERT_ITEM_TO_PAGE,
+      meta:{key, itemIdKey},
+      item:status,
+      isNew:isNew,
+      pagingId
+    })
+    const pages = (pages:PageItem = {}, action:MultiPaginatorAction = {}) => {
+      switch (action.type) {
+        case Types.REQUEST_PAGE:
+        {
+          let p = pages[action.payload.pagingId] || getDefaultCachePage()
+          return {
+            ...pages,
+            [action.payload.pagingId]: {
+              ...p,
+              fetching: true
+            }
+          }
+        }
+        case Types.RECEIVE_PAGE: 
+        {
+          let p = pages[action.payload.pagingId] || getDefaultCachePage()
+          return {
+            ...pages,
+            [action.payload.pagingId]: {
+              ...p,
+              fetching: false,
+              ids:p.ids.concat(action.payload.results.map(item => item[action.meta.itemIdKey])).distinct(),
+              totalCount: action.payload.total || p.totalCount,
+              error:action.payload.error,
+              last_fetch:Date.now()
+            }
+          }
+        }
+        case Types.INSERT_ITEM_TO_PAGE:
+        {
+          let a = action as InsertItemAction
+          let p = pages[a.pagingId] || getDefaultCachePage()
+          let status = a.item as Status
+          if(status.parent != null)
+            return pages
+          let newId = a.item[itemIdKey]
+          let exist = p.ids.findIndex(id => id == newId) != -1
+          if(exist)
+            return pages 
+          p.ids = p.ids.filter(id => id != newId)
+          p.ids.unshift(newId)
+          p.fetching = false
+          if(a.isNew)
+            p.totalCount = p.totalCount + 1
+          p.error = null
+          return {
+            ...pages,
+            [a.pagingId]: {
+              ...p
+            }
+          }
+        }
+        case Types.RESET_PAGED_DATA: 
+          return {}
+        default:
+          return pages
+      }
+    }
+    const onlyForEndpoint = (reducer) => (state = {}, action:any = {}) =>
+    {
+        if((action.meta && action.meta.key == key) || action.type == Types.RESET_PAGED_DATA)
+        {
+            return reducer(state, action)
+        }
+        return state
+    }
+    const itemsReducer = (items = {}, action:MultiPaginatorAction = {}) => { 
+      switch (action.type) {
+        case Types.RECEIVE_PAGE:
+        {
+          let _items = {}
+          let res = flattenList(action.payload.results)
+          for (let item of res) {  
+            _items = {
+              ..._items,
+              [item[action.meta.itemIdKey]]: item
+            }
+          }
+          return {
+            ...items,
+            ..._items
+          }
+        }
+        case Types.RESET_PAGED_DATA:
+          return {}
+        case Types.INSERT_ITEM_TO_PAGE:
+        {
+          let _items = {}
+          let a = action as InsertItemAction
+          let status = a.item as Status
+          let res = flattenList([status])
+          for (let item of res) {  
+            _items = {
+              ..._items,
+              [item[action.meta.itemIdKey]]: item
+            }
+          }
+          let keys = Object.keys(_items)
+          keys.forEach(k => 
+            {
+              let item = _items[k]
+              if(item.parent)
+              {
+                let p = items[item.parent] as Status
+                if(p)
+                {
+                  let arr = p.children_ids || [] 
+                  let exists = arr.findIndex(id => id == item.id) != -1
+                  if(!exists)
+                  {
+                    arr.unshift(item.id)
+                    p.children_ids = arr
+                    _items[p.id] = p
+                  }
+                }
+              }
+            })
+          return {
+            ...items,
+            ..._items
+          }
+        }
+        default:
+          return items
+      }
+    }
+    return {
+      paginationReducer : onlyForEndpoint( pages ),
+      itemsReducer: onlyForEndpoint(itemsReducer),
+      requestNextStatusPage,
+      insertStatus
     }
   }

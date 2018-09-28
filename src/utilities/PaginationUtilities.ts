@@ -1,3 +1,4 @@
+import debug from '../reducers/debug';
 export class PaginationUtilities {
         
     static getCurrentPageNumber = (pagination) => {
@@ -5,7 +6,7 @@ export class PaginationUtilities {
             return pagination.currentPage
         return 0
     }
-    static getResults = (items, ids ) => {
+    static getResults = (items, ids:number[] ) => {
         let arr = items || {}
         let values = []
         ids.forEach(k => {

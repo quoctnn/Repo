@@ -82,7 +82,7 @@ class SelectUsersDialog extends React.Component<Props, State> {
     {
         return(
             <div >
-                <Modal id="select-users-dialog" zIndex={1070} isOpen={this.props.visible} className="full-height">
+                <Modal toggle={this.props.didCancel} id="select-users-dialog" zIndex={1070} isOpen={this.props.visible} className="full-height">
                     {
                         this.props.title && 
                         <ModalHeader>

@@ -21,7 +21,10 @@ import ApiClient from '../network/ApiClient';
 import ChannelEventStream from '../components/general/ChannelEventStream';
 import { embedlyMiddleware } from '../reducers/embedlyStore';
 import { ConversationManager } from './managers/ConversationManager';
-import { messageQueueMiddleware } from '../reducers/queue';
+import { queueMiddleware } from '../reducers/queue';
+import { ProfileManager } from './managers/ProfileManager';
+import { StatusManager } from './managers/StatusManager';
+import { StoreManager } from './managers/StoreManager';
 require('jquery/dist/jquery');
 require('popper.js/dist/umd/popper');
 require('bootstrap/dist/js/bootstrap');
@@ -90,7 +93,7 @@ const paginationMiddleware = store => next => action => {
   }
   return result;
 };
-var middleWares = [loggingMiddleware, paginationMiddleware, embedlyMiddleware, messageQueueMiddleware];
+var middleWares = [loggingMiddleware, paginationMiddleware, embedlyMiddleware, queueMiddleware];
 if (Settings.supportsTheming) {
   middleWares.push(themeSwitcherMiddleware);
 }
@@ -99,6 +102,9 @@ window.store = store
 window.socket = document.createElement("div")
 //managers
 ConversationManager.setup()
+ProfileManager.setup()
+StatusManager.setup()
+StoreManager.setup()
 
 
 export const getProfileById = (id: number): UserProfile => {

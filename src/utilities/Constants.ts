@@ -27,8 +27,8 @@ export default  {
         // Community URLs
         myCommunitiesUrl: '/api/v1/community/as-member/',
         invitedCommunitiesUrl: '/api/v1/community/invitations/',
-        communityMembersUrl: (id) => {
-            return `/api/v1/community/${id}/members/`
+        communityMembersUrl: (id:number) => {
+            return `/api/v2/community/${id}/members/`
         },
         communityFilesUrl: (id) => {
             return `/api/v1/community/${id}/files/`
@@ -107,6 +107,7 @@ export default  {
         notificationMarkReadUrl: '/api/v1/notification/update-as-read/',
         notificationMarkAllReadUrl: '/api/v1/notification/mark-all-as-read/',
 
+        newsfeed:'/api/v2/newsfeed/',
         // Conversation Notification URLs
         convNotificationUrl: '/api/v1/notification_conv/',
         convNotificationLastActivityTimeUrl: '/api/v1/notification_conv/last-activity-time/',
@@ -115,12 +116,15 @@ export default  {
         convNotificationMarkAllReadUrl: '/api/v1/notification_conv/mark-all-as-read/',
 
         // Other
-        postUrl: '/api/v1/status/',
+        postUrl: '/api/v2/status/',
         postUpdateUrl: (id) => {
             return `/api/v1/status/${id}/`
         },
-        postLike: (id) => {
+        postLike: (id:number) => {
             return `/api/v1/status/${id}/like/`
+        },
+        postReaction: (id:number) => {
+            return `/api/v2/status/${id}/react/`
         },
         fileUploadUrl: '/api/v1/file-upload/',
         conversationMessagesUrl: (id) => {
@@ -175,11 +179,13 @@ export default  {
     },
 
     defaultImg: {
-        user: 'img/default-user.png',
-        group: 'img/default-widget.jpg',
-        event: 'img/default-widget.jpg'
+        user: "img/default-user.png",
+        group: "img/default-widget.jpg",
+        event: "img/default-widget.jpg", 
+        docs: "img/docs_logo.png",
+        sendDark:"img/icon-send-dark.png"
     },
-
+    staticUrl:"/static/",
     embedlyApiKey:"a0c58531bc5a480f8272ed5b2bb8d889",
     embedlyApiEndpoint: "https://api-cdn.embed.ly/1/card-details?card=1&native=true&scheme=https"
 };

@@ -2,7 +2,6 @@ import { PaginationUtilities } from '../utilities/PaginationUtilities';
 import Constants from '../utilities/Constants';
 import { createMultiPaginator } from './createPaginator';
 import { combineReducers } from 'redux';
-import { Types } from '../utilities/Types';
 
 export const messageReducerKey = "messages"
 export const messageReducerPageSize = PaginationUtilities.calculatePageSize(40)

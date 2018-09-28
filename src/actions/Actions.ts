@@ -7,6 +7,7 @@ import { conversationPaginator, conversationReducerKey } from '../reducers/conve
 import { messagesPaginator, messageReducerKey } from '../reducers/messages';
 import { InsertItemAction } from '../reducers/createPaginator';
 import { EmbedlyItem } from '../reducers/embedlyStore';
+import { statusesPaginator, Status, statusReducerKey } from '../reducers/statuses';
 
 //embedly
 export const requestEmbedlyData = (urls:string[]) => ({
@@ -34,6 +35,11 @@ export const resetEmbedlyStore = () => ({
 export const resetPagedData = () => ({
   type: Types.RESET_PAGED_DATA
 });
+//newsfeed
+export const requestNextStatusPage = statusesPaginator.requestNextStatusPage
+export const insertStatus = statusesPaginator.insertStatus
+
+
 //messages
 export const requestNextMessagePage = messagesPaginator.requestNextPage
 export const insertChatMessage = (pagingId:string, message:Message):InsertItemAction => ({
@@ -52,7 +58,24 @@ export const insertConversation = (conversation:Conversation, isNew:boolean):Ins
     meta:{key:conversationReducerKey}
 })
 
-//queue
+//queue status
+
+export const queueAddStatus = (status: Status) => ({
+  type: Types.QUEUE_ADD_STATUS,
+  status
+});
+export const queueRemoveStatus = (status: Status) => ({
+  type: Types.QUEUE_REMOVE_STATUS,
+  status
+});
+export const queueProcessNextStatus = () => ({
+  type: Types.QUEUE_PROCESS_NEXT_STATUS,
+});
+export const queueProcessStatus = (status: Status) => ({
+  type: Types.QUEUE_PROCESS_STATUS,
+  status
+});
+//queue message
 export const queueProcessChatMessage = (message: Message) => ({
   type: Types.QUEUE_PROCESS_CHAT_MESSAGE,
   message
@@ -72,6 +95,7 @@ export const queueRemoveChatMessage = (message: Message) => ({
   type: Types.QUEUE_REMOVE_CHAT_MESSAGE,
   message: message
 });
+//queue general
 export const resetQueueData = () => ({
   type: Types.QUEUE_RESET_DATA,
 });

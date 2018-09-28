@@ -1,15 +1,18 @@
 import {Types} from "../utilities/Types"
 import { Message, UploadedFile } from './conversations';
-import { sendOnWebsocket, SocketMessageType } from '../components/general/ChannelEventStream';
+import { sendOnWebsocket, SocketMessageType, EventLock } from '../components/general/ChannelEventStream';
 import { FileUploader } from '../network/ApiClient';
 import * as Actions from '../actions/Actions';
 import { RootState } from './index';
+import { Status, StatusContextKeys } from './statuses';
+import ApiClient from '../network/ApiClient';
 
 var messageQueueWorking = false
+var statusQueueWorking = false
 export interface Queue 
 {
     chatMessages:Message[]
-    statusMessages:Message[]
+    statusMessages:Status[]
 }
 const INITIAL_STATE:Queue = { chatMessages: [], statusMessages:[]}
 const queue = (state = INITIAL_STATE, action) => {
@@ -21,10 +24,6 @@ const queue = (state = INITIAL_STATE, action) => {
             return { ...state, chatMessages:state.chatMessages.filter(m => {
                 return m.uid != action.message.uid
             })}
-        case Types.QUEUE_REMOVE_CHAT_MESSAGE:
-            return { ...state, chatMessages:state.chatMessages.filter(m => {
-                return m.uid != action.message.uid
-            })}
         case Types.QUEUE_UPDATE_CHAT_MESSAGE:
             return { ...state, chatMessages:state.chatMessages.map(m => {
                 if (m.uid == action.message.uid)
@@ -32,6 +31,13 @@ const queue = (state = INITIAL_STATE, action) => {
                 return m
             }) 
         }
+        case Types.QUEUE_ADD_STATUS:
+            return { ...state, statusMessages: [action.status].concat( state.statusMessages)}
+        case Types.QUEUE_REMOVE_STATUS:
+            return { ...state, statusMessages:state.statusMessages.filter(s => {
+                return s.uid != action.status.uid
+            })}
+
         case Types.QUEUE_RESET_DATA:
             return { chatMessages: [], statusMessages:[]}
         default:
@@ -98,15 +104,39 @@ const processMessage = (store, message:Message) =>
         messageQueueWorking = false
     }
 }
-export const messageQueueMiddleware = store => next => action => {
+const processStatus = (store, status:Status) => 
+{
+    if(statusQueueWorking)
+        return
+    statusQueueWorking = true
+    let lock = EventLock.lock()
+    ApiClient.createStatus(status , (newStatus, reqStatus, error) => {
+        if(newStatus)
+        {
+            store.dispatch(Actions.queueRemoveStatus(status))
+            store.dispatch(Actions.insertStatus(StatusContextKeys.NEWSFEED, newStatus, true))
+        }
+        EventLock.unlock(lock)
+        statusQueueWorking = false
+    })
+}
+export const queueMiddleware = store => next => action => {
     let result = next(action);
     if (action.type === Types.QUEUE_ADD_CHAT_MESSAGE) {
         processMessage(store, action.message)
+    }
+    else if (action.type === Types.QUEUE_ADD_STATUS) {
+        processStatus(store, action.status)
     }
     else if(action.type === Types.QUEUE_REMOVE_CHAT_MESSAGE)
     {
         messageQueueWorking = false
         store.dispatch(Actions.queueProcessNextChatMessage())
+    }
+    else if(action.type === Types.QUEUE_REMOVE_STATUS)
+    {
+        statusQueueWorking = false
+        store.dispatch(Actions.queueProcessNextStatus())
     }
     else if(action.type === Types.QUEUE_PROCESS_NEXT_CHAT_MESSAGE)
     {
@@ -124,6 +154,22 @@ export const messageQueueMiddleware = store => next => action => {
             }
         }
     }
+    else if(action.type === Types.QUEUE_PROCESS_NEXT_STATUS)
+    {
+        let queue = store.getState() as RootState
+        if(queue.queue.statusMessages.length > 0)
+        {
+            for(var i = 0; i < queue.queue.statusMessages.length; i++)
+            {
+                var status = queue.queue.statusMessages[i]
+                //if(!message.tempFile || message.tempFile.file && ((message.tempFile.file instanceof File && !message.tempFile.error) || message.tempFile.fileId) )
+                {
+                    processStatus(store, status)
+                    break;
+                }
+            }
+        }
+    }
     else if(action.type === Types.QUEUE_PROCESS_CHAT_MESSAGE)
     {
         let m = action.message as Message
@@ -132,6 +178,17 @@ export const messageQueueMiddleware = store => next => action => {
         if( index > -1)
         {
             processMessage(store, queue.queue.chatMessages[index])
+        }
+        
+    }
+    else if(action.type === Types.QUEUE_PROCESS_STATUS)
+    {
+        let s = action.status as Status
+        let queue = store.getState() as RootState
+        let index = queue.queue.statusMessages.findIndex(st => st.uid == s.uid)
+        if( index > -1)
+        {
+            processStatus(store, queue.queue.statusMessages[index])
         }
         
     }

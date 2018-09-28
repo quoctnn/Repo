@@ -2,7 +2,7 @@ import * as React from "react";
 import { Message, UploadedFile } from '../../reducers/conversations';
 import { getProfileById } from '../../main/App';
 import { Link } from 'react-router-dom';
-import { URL_REGEX, uniqueId, IS_ONLY_LINK_REGEX, humanFileSize } from '../../utilities/Utilities';
+import { URL_REGEX, uniqueId, IS_ONLY_LINK_REGEX, humanFileSize, appendTokenToUrl } from '../../utilities/Utilities';
 import { Routes } from '../../utilities/Routes';
 import Embedly from './Embedly';
 import { translate } from '../intl/AutoIntlProvider';
@@ -10,6 +10,8 @@ import RadialProgress from './RadialProgress';
 import { ConversationManager } from '../../main/managers/ConversationManager';
 import VideoPlayer from './video/VideoPlayer';
 const processString = require('react-process-string');
+import store from '../../main/App';
+import { GalleryImage, ImageGallery } from './gallery/ImageGallery';
 require("./ChatMessage.scss");
 
 export enum MessagePosition
@@ -21,6 +23,7 @@ export interface Props {
     direction:MessagePosition,
 }
 export class ChatMessage extends React.Component<Props, {}> {
+    urlPrefix = store.getState().debug.availableApiEndpoints[store.getState().debug.apiEndpoint].endpoint
     shouldComponentUpdate(nextProps:Props, nextState) 
     {
         let n = nextProps.data.tempFile
@@ -66,13 +69,69 @@ export class ChatMessage extends React.Component<Props, {}> {
             </div>
         </div>)
     }
-    getFileRepresentation(file:UploadedFile)
+    renderDocument(file:UploadedFile)
+    {
+        let iconClass = "document " + file.extension
+        let url = appendTokenToUrl( file.file )
+        return (
+            <div className={iconClass} key={file.id}>
+                <a href={url} target="_blank">
+                    <i className="fa file-icon"></i>
+                    {file.filename}
+                </a>
+            </div>
+        )
+    }
+    getThumbnailContent(item:GalleryImage) {
+        return <img src={item.thumbnail} className="img-responsive"/>;
+    }
+    getImagesInPhotoswipeFormat(photos:UploadedFile[]):GalleryImage[] 
+    {
+        if (photos.length === 1) {
+            // When showing just one image, show the full size:
+            let i = appendTokenToUrl( photos[0].image )
+            return [{
+                src: i, thumbnail: i,
+                w: photos[0].image_width, h: photos[0].image_height,id: photos[0].id
+            }];
+        } else {
+            return photos.map((item) => {
+                let i = appendTokenToUrl( item.image )
+                return {
+                    src: i, thumbnail: i,
+                    w: item.image_width, h: item.image_height, id: item.id
+                };
+            })
+        }
+    }
+    renderImage(file:UploadedFile)
+    {
+        return <ImageGallery items={this.getImagesInPhotoswipeFormat([file])} thumbnailContent={this.getThumbnailContent}/>
+    }
+    renderVideo(file:UploadedFile)
     {
         if(VideoPlayer.canPlay(file.file))
         {
             return (<VideoPlayer link={file.file} key={file.id}/>)
         }
-        return (file.file)
+        return null
+    }
+    getFileRepresentation(file:UploadedFile)
+    {
+        var data = null
+        switch(file.type)
+        {
+            case "document": data = this.renderDocument(file);break;
+            case "audio":
+            case "video": data = this.renderVideo(file);break;
+            case "image": data = this.renderImage(file);break;
+            default: break;
+        }
+        if(!data)
+        {
+            data = file.file
+        }
+        return data
     }
     render() {
         var processed:any = null
@@ -125,8 +184,8 @@ export class ChatMessage extends React.Component<Props, {}> {
                 }
             }
             config.push(k)
-            let metions = msg.mentions || []
-            let mentionSearch = metions.map(m => {
+            let mentions = msg.mentions || []
+            let mentionSearch = mentions.map(m => {
                 let user = getProfileById(m)
                 if(!user)
                     return null

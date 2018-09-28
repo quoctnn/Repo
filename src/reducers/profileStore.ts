@@ -12,7 +12,7 @@ export interface UserProfile {
     first_name: string,
     id: number,
     last_name: string,
-    relationship: any,
+    relationship: string[],
     username: string,
     uuid:string,
     user_status:UserStatus,

@@ -11,6 +11,8 @@ declare global {
     {
         move(oldIndex, newIndex) : void
         distinct() : T[]
+        contains(element): boolean
+        cloneArray(): T[];
     }
 
 }

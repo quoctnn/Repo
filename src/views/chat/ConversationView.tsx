@@ -26,11 +26,11 @@ require("./ConversationView.scss")
 
 const reducer = (accumulator, currentValue) => accumulator + currentValue;
 const uidToNumber = (uid) => uid.split("_").map(n => parseInt(n)).reduce(reducer)
-export interface Props {
+const messageToUid = (message:Message) => message.conversation + "_" + message.user + "_" + new Date(message.updated_at).getTime()
+export interface OwnProps {
     match:any,
     conversation:Conversation,
     profile:UserProfile,
-    requestNextMessagePage:(conversation:number, offset:number) => void
     isFetching:boolean,
     total:number,
     offset:number,
@@ -39,9 +39,19 @@ export interface Props {
     error:string,
     queuedMessages:Message[],
     last_fetched:number,
-    mentions:Mention[],
+    content:string
+    mentions:Mention[]
     
 }
+export interface ReduxProps 
+{
+    availableMentions:Mention[]
+}
+interface ReduxDispatchProps
+{
+    requestNextMessagePage:(conversation:number, offset:number) => void
+}
+type Props = ReduxDispatchProps & OwnProps & ReduxProps
 export interface State {
     isTyping:object
     loading:boolean
@@ -49,10 +59,9 @@ export interface State {
     renderDropZone:boolean
 }
 
-class ConversationView extends React.Component<Props, {}> {
+class ConversationView extends React.Component<Props, State> {
     static maxRetries = 3
     clearSomeoneIsTypingTimer:NodeJS.Timer = null
-    state:State
     dragCount:number = 0
     private dropTarget = React.createRef<HTMLDivElement>();
     constructor(props) {
@@ -77,6 +86,7 @@ class ConversationView extends React.Component<Props, {}> {
         this.onDrop = this.onDrop.bind(this)
         this.onDragLeave = this.onDragLeave.bind(this)
         this.onDragEnter = this.onDragEnter.bind(this)
+        this.handleMentionSearch = this.handleMentionSearch.bind(this)
         
         
     }
@@ -324,6 +334,10 @@ class ConversationView extends React.Component<Props, {}> {
         }
         console.log("onDragEnter", this.dragCount)
     }
+    handleMentionSearch(search:string, completion:(mentions:Mention[]) => void)
+    {
+        completion(this.props.availableMentions)
+    }
     render() {
         let me = this.props.profile
         let conversation = this.props.conversation
@@ -332,14 +346,14 @@ class ConversationView extends React.Component<Props, {}> {
             return null
         }
         let myId = me.id
-        let messages = this.props.queuedMessages.concat(this.props.items).sort((a,b) => uidToNumber(b.uid) - uidToNumber(a.uid))
+        let messages = this.props.queuedMessages.concat(this.props.items).sort((a,b) => uidToNumber(b.uid || messageToUid(b)) - uidToNumber(a.uid || messageToUid(a)))
 
         return(
             <FullPageComponent>
                 <div className="d-none d-sm-block col-lg-4 col-md-4 col-sm-5">
                     <Conversations preventShowTyingInChatId={conversation.id} activeConversation={this.props.conversationId} />
                 </div>
-                <div className={"col-lg-8 col-md-8 col-sm-7 col-xs-12" + (this.state.fullScreen ? " full-screen" : "")}>
+                <div className={"col-lg-8 col-md-8 col-sm-7" + (this.state.fullScreen ? " full-screen" : "")}>
                     <div id="conversation-view" className="card full-height">
                         <div className="card-header grey d-flex align-items-center">
                             {conversation && <span className="text-truncate d-block flex-grow-1">{getConversationTitle(conversation, myId)}</span>}
@@ -352,7 +366,7 @@ class ConversationView extends React.Component<Props, {}> {
                                 {this.renderSomeoneIsTyping()}
                             </ChatMessageList>
                         </div>
-                        <ChatMessageComposer filesAdded={this.filesAdded} mentions={this.props.mentions} onSubmit={this.onChatMessageSubmit} onDidType={this.onDidType} />
+                        <ChatMessageComposer mentionSearch={this.handleMentionSearch} content={this.props.content} mentions={this.props.mentions} filesAdded={this.filesAdded} onSubmit={this.onChatMessageSubmit} onDidType={this.onDidType} />
                     </div>
                 </div>
                
@@ -372,14 +386,9 @@ const mapStateToProps = (state:RootState, ownProps:Props) => {
     const queuedMessages = QueueUtilities.getQueuedMessageForConversation(id, state.queue.chatMessages)
     const last_fetched = pagination.last_fetch
     const conversation = state.conversations.items[id]
-    const mentions = conversation ? conversation.users.map(u => {
+    const availableMentions = conversation ? conversation.users.map(u => {
         let p = getProfileById(u)
-        return p ? new Mention(
-            p.first_name + " " + p.last_name,
-            p.username,
-            appendTokenToUrl(p.avatar),
-            p.id
-          ) : null
+        return p ? Mention.fromUser(p) : null
     }).filter(n => n != null) : []
     return {
         error,
@@ -393,7 +402,7 @@ const mapStateToProps = (state:RootState, ownProps:Props) => {
         signedIn:state.auth.signedIn,
         queuedMessages,
         last_fetched,
-        mentions
+        availableMentions:availableMentions
     };
 }
 const mapDispatchToProps = (dispatch) => {
@@ -403,4 +412,4 @@ const mapDispatchToProps = (dispatch) => {
         },
     }
 }
-export default connect(mapStateToProps, mapDispatchToProps)(ConversationView);
+export default connect<{}, ReduxDispatchProps, OwnProps>(mapStateToProps, mapDispatchToProps)(ConversationView);

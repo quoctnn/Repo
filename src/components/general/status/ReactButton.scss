@@ -1,0 +1,25 @@
+@import "../../../main/Config";
+.btn-like {
+    cursor: pointer;
+    @include var(color, primary-color);
+  }
+
+  .btn-like:hover,
+  .btn-like.active {
+    @include var(color, success-color);
+    cursor: pointer;
+  }
+
+  .like-wrapper {
+    margin-right: 18px;
+    margin-left: 3px;
+  }
+
+  .likes-count.active {
+    @include var(color, primary-color);
+  }
+  .likes-count.active:hover,
+  .likes-count.active:focus {
+    text-decoration: underline;
+    cursor: pointer;
+  }

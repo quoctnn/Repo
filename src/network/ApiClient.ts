@@ -3,9 +3,13 @@ import {AjaxRequest} from "./AjaxRequest";
 var $ = require("jquery")
 import store from '../main/App';
 import { UploadedFile } from '../reducers/conversations';
-import { addLocaleData } from 'react-intl';
+import { UserProfile } from '../reducers/profileStore';
+import { Status } from '../reducers/statuses';
 
-export type ApiRequestCallback = (data: any, status:string, error:string) => void;
+export type ApiClientCallback = (data: any, status:string, error:string) => void;
+export type ApiClientCommunityMembersCallback = (data: UserProfile[], status:string, error:string) => void;
+export type ApiClientStatusCallback = (data: Status, status:string, error:string) => void;
+
 export enum ListOrdering {
     ALPHABETICAL = "alphabetical",
     LAST_USED = "last-used",
@@ -13,7 +17,43 @@ export enum ListOrdering {
 }
 export default class ApiClient
 {
-    static createConversation(title:string, users:number[], callback:ApiRequestCallback) 
+    static createStatus(status:Status, callback:ApiClientStatusCallback)
+    {
+        let url = Constants.apiRoute.postUrl
+        AjaxRequest.post(url,status, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
+    static getCommunityMembers(communityId:number, callback:ApiClientCommunityMembersCallback)
+    {
+        let url = Constants.apiRoute.communityMembersUrl(communityId)
+        AjaxRequest.get(url, (data, status, request) => {
+            let result = data && data.results ? data.results : []
+            callback(result, status, null)
+        }, (request, status, error) => {
+            callback([], status, error)
+        })
+    }
+    static getProfiles(profiles:number[], callback:ApiClientCallback)
+    {
+        let url = Constants.apiRoute.profilesUrl +  "?id=" + profiles.join()
+        AjaxRequest.get(url, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
+    static reactToStatus(statusId:number,reaction:string, callback:ApiClientCallback)
+    {
+        AjaxRequest.post(Constants.apiRoute.postReaction(statusId), {reaction}, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
+    static createConversation(title:string, users:number[], callback:ApiClientCallback) 
     {
         let d:any = {users}
         if(title)
@@ -26,7 +66,7 @@ export default class ApiClient
             callback(null, status, error)
         })
     }
-    static getProfile(id:number, callback:ApiRequestCallback) 
+    static getProfile(id:number, callback:ApiClientCallback) 
     {
         AjaxRequest.get(Constants.apiRoute.profileUrl(id), (data, status, request) => {
             callback(data, status, null)
@@ -34,7 +74,7 @@ export default class ApiClient
             callback(null, status, error)
         })
     }
-    static getProfileBySlug(slug:string, callback:ApiRequestCallback) 
+    static getProfileBySlug(slug:string, callback:ApiClientCallback) 
     {
         AjaxRequest.get(Constants.apiRoute.profilesUrl + "?slug_name=" + encodeURIComponent( slug ), (data, status, request) => {
             callback(data, status, null)
@@ -42,7 +82,7 @@ export default class ApiClient
             callback(null, status, error)
         })
     }
-    static getMyProfile(callback:ApiRequestCallback) 
+    static getMyProfile(callback:ApiClientCallback) 
     {
         AjaxRequest.get(Constants.apiRoute.myProfileUrl, (data, status, request) => {
             callback(data, status, null)
@@ -50,7 +90,7 @@ export default class ApiClient
             callback(null, status, error)
         })
     }
-    static apiLogin(email:string, password:string,callback:ApiRequestCallback)
+    static apiLogin(email:string, password:string,callback:ApiClientCallback)
     {
         AjaxRequest.post(Constants.apiRoute.login,`username=${email}&password=${password}`, (data, status, request) => {
             callback(data, status, null)
@@ -58,7 +98,7 @@ export default class ApiClient
             callback(null, status, error)
         })
     }
-    static sessionLogin(email:string, password:string,callback:ApiRequestCallback)
+    static sessionLogin(email:string, password:string,callback:ApiClientCallback)
     {
         AjaxRequest.postHtml(Constants.urlsRoute.login,`login=${email}&password=${password}&next=/`, (data, status, request) => {
             callback(data, status, null)
@@ -66,7 +106,7 @@ export default class ApiClient
             callback(null, status, error)
         })
     }
-    static nativeLogin(email:string, password:string,callback:ApiRequestCallback)
+    static nativeLogin(email:string, password:string,callback:ApiClientCallback)
     {
         AjaxRequest.post(Constants.apiRoute.nativeLogin,`username=${email}&password=${password}`, (data, status, request) => {
             callback(data, status, null)
@@ -74,7 +114,7 @@ export default class ApiClient
             callback(null, status, error)
         })
     }
-    static getCommunities(is_member:boolean, ordering:ListOrdering, limit:number, offset:number,callback:ApiRequestCallback)
+    static getCommunities(is_member:boolean, ordering:ListOrdering, limit:number, offset:number,callback:ApiClientCallback)
     {
         let url = Constants.apiRoute.communityList + "?limit=" + limit + "&offset=" + offset + "&is_member=" + (is_member ? "True":"False") + "&ordering=" + ordering;
         AjaxRequest.get(url, (data, status, request) => {
@@ -83,7 +123,7 @@ export default class ApiClient
             callback(null, status, error)
         })
     }
-    static getGroups(community:number, limit:number, offset:number,callback:ApiRequestCallback)
+    static getGroups(community:number, limit:number, offset:number,callback:ApiClientCallback)
     {
         let url = Constants.apiRoute.groupsUrl + "?limit=" + limit + "&offset=" + offset + "&community=" + community;
         AjaxRequest.get(url, (data, status, request) => {
@@ -92,7 +132,7 @@ export default class ApiClient
             callback(null, status, error)
         })
     }
-    static getConversations(limit:number, offset:number,callback:ApiRequestCallback)
+    static getConversations(limit:number, offset:number,callback:ApiClientCallback)
     {
         let url = Constants.apiRoute.conversations + "?limit=" + limit + "&offset=" + offset;
         AjaxRequest.get(url, (data, status, request) => {
@@ -101,7 +141,7 @@ export default class ApiClient
             callback(null, status, error)
         })
     }
-    static getConversation(id:number,callback:ApiRequestCallback)
+    static getConversation(id:number,callback:ApiClientCallback)
     {
         let url = Constants.apiRoute.conversation(id)
         AjaxRequest.get(url, (data, status, request) => {
@@ -110,7 +150,7 @@ export default class ApiClient
             callback(null, status, error)
         })
     }
-    static getConversationMessages(conversationId:number, limit:number, offset:number,callback:ApiRequestCallback)
+    static getConversationMessages(conversationId:number, limit:number, offset:number,callback:ApiClientCallback)
     {
         let url = Constants.apiRoute.conversationMessagesUrl(conversationId) + "?limit=" + limit + "&offset=" + offset;
         AjaxRequest.get(url, (data, status, request) => {
@@ -119,7 +159,7 @@ export default class ApiClient
             callback(null, status, error)
         })
     }
-    static markConversationAsRead(conversationId:number, callback:ApiRequestCallback)
+    static markConversationAsRead(conversationId:number, callback:ApiClientCallback)
     {
         let url = Constants.apiRoute.conversationMarkAsReadUrl(conversationId)
         AjaxRequest.get(url, (data, status, request) => {
@@ -128,7 +168,7 @@ export default class ApiClient
             callback(null, status, error)
         })
     }
-    static getPage(endpoint:string, limit:number, offset:number,callback:ApiRequestCallback)
+    static getPage(endpoint:string, limit:number, offset:number,callback:ApiClientCallback)
     {
         let url = endpoint + "?limit=" + limit + "&offset=" + offset;
         AjaxRequest.get(url, (data, status, request) => {

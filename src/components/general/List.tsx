@@ -7,6 +7,7 @@ export interface Props {
     className?:string,
     id?:string
     onScroll?:(event:React.UIEvent<HTMLUListElement>) => void
+    enableAnimation:boolean
 }
 export interface State {
 
@@ -17,7 +18,8 @@ export class List extends React.Component<Props, {}> {
     static defaultProps:Props = {
         className:null,
         id:null,
-        onScroll:null
+        onScroll:null,
+        enableAnimation:true,
     }
     state:State
     constructor(props) {
@@ -27,16 +29,19 @@ export class List extends React.Component<Props, {}> {
         this.animateAndTransform = this.animateAndTransform.bind(this)
     }
     componentWillReceiveProps(newProps) {
-        let items = this.getChildren() as any[]
-        if(items.length > 0) {
-            let rects = {}
-            items.forEach(child => {
-                if(!child.key) return;
-                var domNode = ReactDOM.findDOMNode(this.refs[child.key]);
-                var boundingBox = domNode.getBoundingClientRect();
-                rects[child.key] = boundingBox
-            })
-            this.setState({rects:rects})
+        if(this.props.enableAnimation)
+        {
+            let items = this.getChildren() as any[]
+            if(items.length > 0) {
+                let rects = {}
+                items.forEach(child => {
+                    if(!child.key) return;
+                    var domNode = ReactDOM.findDOMNode(this.refs[child.key]);
+                    var boundingBox = domNode.getBoundingClientRect();
+                    rects[child.key] = boundingBox
+                })
+                this.setState({rects:rects})
+            }
         }
     }
     getChildren()
@@ -49,14 +54,16 @@ export class List extends React.Component<Props, {}> {
     }
       componentDidUpdate(previousProps) 
       {
-        var doNeedAnimation = [];
-        this.getChildren().forEach((item) =>  {
-          if(this.doesNeedAnimation(item) === 0) {
-            doNeedAnimation.push(item);
-          }
-        });
-        
-        doNeedAnimation.forEach(this.animateAndTransform);
+        if(this.props.enableAnimation)
+        {
+            var doNeedAnimation = [];
+            this.getChildren().forEach((item) =>  {
+            if(this.doesNeedAnimation(item) === 0) {
+                doNeedAnimation.push(item);
+            }
+            });
+            doNeedAnimation.forEach(this.animateAndTransform);
+        }
       }
       animateAndDestroy(child, n) 
       {
@@ -111,7 +118,7 @@ export class List extends React.Component<Props, {}> {
     render() 
     {
         return(
-            <ul {...this.props}  className={"list" + (this.props.className ? " " + this.props.className : "") } >
+            <ul onScroll={this.props.onScroll} className={"list" + (this.props.className ? " " + this.props.className : "") } >
                 { React.Children.map(this.props.children, (c:any, i)  => {
                     if(!c)
                         return null

@@ -1,0 +1,118 @@
+import * as React from 'react';
+import classnames from 'classnames';
+import Comment from './Comment';
+import { translate } from '../../intl/AutoIntlProvider';
+import { Status } from '../../../reducers/statuses';
+import { ProfileManager } from '../../../main/managers/ProfileManager';
+import { UploadedFile } from '../../../reducers/conversations';
+export interface OwnProps
+{
+    data:Status[]
+    onCommentEdit:(comment: Status, files: UploadedFile[]) => void
+    onCommentDelete:(comment: Status) => void
+    canReact:boolean
+    canComment:boolean
+    canMention:boolean
+    canUpload:boolean
+    communityId:number
+}
+export interface DefaultProps
+{
+    maxComments:number 
+}
+interface State 
+{
+    showAll:boolean
+
+}
+type Props = OwnProps & DefaultProps
+export default class CommentList extends React.Component<Props, State> {
+
+    private listRef = React.createRef<HTMLUListElement>()
+    static defaultProps:DefaultProps = 
+    {
+        maxComments:3
+    }
+    constructor(props) {
+        super(props);
+        this.state = {showAll: false};
+
+        // Auto-binding
+        this.handlePrevious = this.handlePrevious.bind(this);
+        this.renderPreviousLink = this.renderPreviousLink.bind(this);
+        this.scrollListToBottom = this.scrollListToBottom.bind(this);
+    }
+
+    shouldComponentUpdate(nextProps, nextState) {
+        return (
+            nextProps.data != this.props.data ||
+            nextState.showAll != this.state.showAll
+        );
+    }
+
+    componentDidUpdate(prevProps:Props, prevState) {
+        let userClickedShowAll = !prevState.showAll && this.state.showAll;
+        let userCommentedShowingAll = this.state.showAll && prevProps.data.length < this.props.data.length;
+
+        if (userClickedShowAll || userCommentedShowingAll) {
+            this.scrollListToBottom();
+        }
+    }
+
+    scrollListToBottom() {
+        this.listRef.current.scrollTop = this.listRef.current.scrollHeight;
+    }
+
+    renderComment(comment:Status, isOwner:boolean) {
+        return (
+            <Comment
+                communityId={this.props.communityId}
+                canUpload={this.props.canUpload}
+                canReact={this.props.canReact}
+                canComment={this.props.canComment}
+                canMention={this.props.canMention}
+                isOwner={isOwner}
+                key={comment.id}
+                comment={comment}
+                onCommentEdit={this.props.onCommentEdit}
+                onCommentDelete={this.props.onCommentDelete}>
+                {comment.text}
+            </Comment>
+        );
+    }
+
+    handlePrevious(e) {
+        e.preventDefault();
+        this.setState({showAll: true});
+    }
+
+    renderPreviousLink() {
+        let data = this.props.data;
+
+        if (data && !this.state.showAll && data.length > this.props.maxComments) {
+            return (
+                <button className="btn btn-link" onClick={this.handlePrevious}>
+                    <i className="fa fa-arrow-down"/> &nbsp;
+                    {translate("Show previous")}
+                </button>
+            )
+        }
+    }
+
+    render() {
+        let data = this.props.data
+        let max = (this.state.showAll) ? data.length : this.props.maxComments;
+        let min = ((data.length - max) >= 0) ? data.length - max : 0;
+
+        let listClass = classnames('comment-list', {scrollable: this.state.showAll});
+        let authUser = ProfileManager.getAuthenticatedUser()
+        return (
+            <ul className={listClass} ref={this.listRef}>
+                <li className="text-center">{this.renderPreviousLink()}</li>
+                {data.map(r => r).reverse().slice(min, data.length).map((comment) => {
+                    return this.renderComment(comment, authUser.id == comment.owner.id);
+                })}
+            </ul>
+        );
+    }
+}
