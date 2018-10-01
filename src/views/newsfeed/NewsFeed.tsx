@@ -131,28 +131,26 @@ class NewsFeed extends React.Component<Props, {}> {
         
         return(
             <FullPageComponent> 
-                <div id="news-feed" className="full-height col-sm">
-                    <List enableAnimation={false} onScroll={this.onScroll} className="group-list vertical-scroll">
-                        {this.props.items.map((s) => {
-                            return <StatusComponent 
-                                    canMention={true}
-                                    canComment={true}
-                                    canUpload={true}
-                                    canReact={true}
-                                    isOwner={authUser.id == s.owner.id}
-                                    onStatusEdit={this.onStatusEdit}
-                                    onCommentEdit={this.onCommentEdit}
-                                    onCommentDelete={this.onCommentDelete}
-                                    onStatusDelete={this.onStatusDelete}
-                                    onCommentSubmit={this.onCommentSubmit}
-                                    addLinkToContext={true}
-                                    key={s.id} 
-                                    status={s} 
-                                    bottomOptionsEnabled={true} />
-                        }) }
-                        {this.renderLoading()}
-                    </List>
-                </div>
+                <List enableAnimation={false} onScroll={this.onScroll} className="status-list full-height col-sm group-list vertical-scroll">
+                    {this.props.items.map((s) => {
+                        return <StatusComponent 
+                                canMention={true}
+                                canComment={true}
+                                canUpload={true}
+                                canReact={true}
+                                isOwner={authUser.id == s.owner.id}
+                                onStatusEdit={this.onStatusEdit}
+                                onCommentEdit={this.onCommentEdit}
+                                onCommentDelete={this.onCommentDelete}
+                                onStatusDelete={this.onStatusDelete}
+                                onCommentSubmit={this.onCommentSubmit}
+                                addLinkToContext={true}
+                                key={s.id} 
+                                status={s} 
+                                bottomOptionsEnabled={true} />
+                    }) }
+                    {this.renderLoading()}
+                </List>
             </FullPageComponent> 
         );
     }

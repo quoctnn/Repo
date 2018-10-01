@@ -6,7 +6,7 @@ let timezone = moment.tz.guess()
 export interface Props {
     date:string,
 }
-export class DayLine extends React.Component<Props,{}> {
+export class DayLine extends React.PureComponent<Props,{}> {
     render() {
         let createdAt = moment.utc(this.props.date).tz(timezone)
         let time;

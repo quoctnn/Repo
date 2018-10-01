@@ -35,7 +35,6 @@ interface State
 export default class StatusFooter extends React.Component<Props, State> {     
     constructor(props) {
         super(props)
-
         // Auto-binding
         this.renderStats = this.renderStats.bind(this)
         this.renderCommentList = this.renderCommentList.bind(this)

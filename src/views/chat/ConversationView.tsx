@@ -59,7 +59,7 @@ export interface State {
     renderDropZone:boolean
 }
 
-class ConversationView extends React.Component<Props, State> {
+class ConversationView extends React.PureComponent<Props, State> {
     static maxRetries = 3
     clearSomeoneIsTypingTimer:NodeJS.Timer = null
     dragCount:number = 0
@@ -165,13 +165,14 @@ class ConversationView extends React.Component<Props, State> {
     {
         return JSON.stringify(Object.keys(a).sort()) === JSON.stringify(Object.keys(b).sort())
     }
-    shouldComponentUpdate(nextProps:Props, nextState:State)
+    shouldComponentUpdate3(nextProps:Props, nextState:State)
     {
         let currentConversation = this.props.conversation
         let nextConversation = nextProps.conversation
         if(nextState.renderDropZone == this.state.renderDropZone && nextState.fullScreen == this.state.fullScreen && nextProps.isFetching == this.props.isFetching && currentConversation && nextConversation && currentConversation.id == nextConversation.id && currentConversation.updated_at == nextConversation.updated_at && nextProps.items == this.props.items && 
             this.isTypingDictEqual(nextState.isTyping, this.state.isTyping))
             return false
+        let k = nextProps.items == this.props.items
         return true
     }
     loadFirstData(ignoreError = false)

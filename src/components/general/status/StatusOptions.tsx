@@ -43,6 +43,15 @@ export default class StatusOptions extends React.Component<Props, State> {
         this.renderReportDialog = this.renderReportDialog.bind(this)
 
     }
+    shouldComponentUpdate(nextProps:Props, nextState:State)
+    {
+        return nextProps.status.id != this.props.status.id || 
+                nextProps.status.updated_at != this.props.status.updated_at || 
+                nextState.showEditDialog != this.state.showEditDialog || 
+                nextState.showDeleteDialog != this.state.showDeleteDialog || 
+                nextState.showPermalinkDialog != this.state.showPermalinkDialog || 
+                nextState.showReportDialog != this.state.showReportDialog
+    }
     renderEditDialog()
     {
         return (

@@ -82,6 +82,7 @@ export interface Status extends TempStatus
     poll:any
     read:boolean
     updated_at:string
+    serialization_date:string
     extra?:string
     highlights?:{[id:string]:[string]}
 }

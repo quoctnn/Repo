@@ -98,7 +98,7 @@ export class ChatMessageList extends React.Component<Props, {}> {
             if (!currentDate.isSame(lastDay, 'day')) // not same day as last message
             {
                 components.push(
-                    <DayLine key={i + "dayline"} date={message.created_at}/>
+                    <DayLine key={message.id + "dayline"} date={message.created_at}/>
                 )
                 showTime = true;
             }
@@ -122,7 +122,7 @@ export class ChatMessageList extends React.Component<Props, {}> {
                 }
 
                 components.push(
-                    <ChatMessageUser key={i + "user"} avatar={avatar} text={str} direction={this.getDirection(message)} />
+                    <ChatMessageUser key={message.id + "user"} avatar={avatar} text={str} direction={this.getDirection(message)} />
                 )
             }
             components.push(

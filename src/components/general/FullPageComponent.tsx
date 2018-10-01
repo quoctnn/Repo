@@ -4,7 +4,7 @@ import { uniqueId } from '../../utilities/Utilities';
 export interface Props {
 }
 
-export class FullPageComponent extends React.Component<Props,{}> {
+export class FullPageComponent extends React.PureComponent<Props,{}> {
 
     static fullPage = "full-page-"
     bodyClassAdded = false

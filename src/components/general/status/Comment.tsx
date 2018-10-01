@@ -92,8 +92,7 @@ export default class Comment extends React.Component<Props, State>  {
                     owner={comment.owner}
                     created_at={comment.created_at}
                     edited_at={comment.edited_at}
-                    text={comment.text}
-                    mentions={comment.mentions}/>
+                    />
 
                 <StatusContent status={comment} embedLinks={false}/>
 
@@ -120,10 +119,14 @@ export interface CommentHeaderProps
     owner:UserProfile
     created_at:string
     edited_at:string
-    text:string
-    mentions:number[]
 }
-class CommentHeader extends React.Component<CommentHeaderProps,{}> {
+class CommentHeader extends React.Component<CommentHeaderProps,{}> 
+{
+    shouldComponentUpdate(nextProps:CommentHeaderProps, nextState)
+    {
+        return nextProps.owner.id != this.props.owner.id || 
+                nextProps.owner.updated_at != this.props.owner.updated_at
+    }
     renderEditedAt(date) {
         if (date) {
             let time = moment.utc(date).tz(timezone).date()

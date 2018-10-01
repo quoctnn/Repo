@@ -50,7 +50,7 @@ type IsTypingStore = {[conversation:number]:{[user:number]:NodeJS.Timer}}
 interface State {
     isTyping:IsTypingStore,
 }
-class Conversations extends React.Component<Props, State> {     
+class Conversations extends React.PureComponent<Props, State> {     
     state:State
     static defaultProps:Props = {
         total:0,

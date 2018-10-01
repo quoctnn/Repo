@@ -39,15 +39,24 @@ export default class StatusComponent extends React.Component<Props, State> {
     constructor(props) {
         super(props);
         this.state = {
-            reactions:{},
-            reactionsCount:0,
-            reaction:null
+            reactions:props.status.reactions || {},
+            reactionsCount:props.status.reaction_count,
+            reaction:StatusUtilities.getReaction(props.status, ProfileManager.getAuthenticatedUser())
         }
         this.handleReaction = this.handleReaction.bind(this)
     }
-    /* shouldComponentUpdate(nextProps:Props, nextState) {
-        return nextProps.status != this.props.status && nextProps.status.updated_at != this.props.status.updated_at || nextState.liked != this.state.liked  || nextProps.status.highlights !== this.props.status.highlights;
-    } */
+    shouldComponentUpdate(nextProps:Props, nextState:State) 
+    {
+        let ret = nextProps.status.id != this.props.status.id || 
+                    nextProps.status.children.length != this.props.status.children.length || 
+                    nextProps.status.updated_at != this.props.status.updated_at || 
+                    nextProps.status.serialization_date != this.props.status.serialization_date || 
+                    nextState.reaction != this.state.reaction  || 
+                    nextProps.status.highlights !== this.props.status.highlights 
+
+        //console.log("id:" + this.props.status.id, ret)
+        return ret
+    }
     componentWillReceiveProps(nextProps:Props) {
         let status = nextProps.status
         this.setState({
@@ -109,7 +118,9 @@ export default class StatusComponent extends React.Component<Props, State> {
                         owner={status.owner}
                         created_at={status.created_at}
                         edited_at={status.edited_at}
-                        status={status} addLinkToContext={this.props.addLinkToContext} contextKey={this.props.contextKey} contextId={this.props.contextId}/>
+                        status={status} addLinkToContext={this.props.addLinkToContext} 
+                        contextKey={this.props.contextKey} 
+                        contextId={this.props.contextId}/>
 
                     <StatusContent status={status} embedLinks={true}/>
 

@@ -19,7 +19,7 @@ export enum AvatarStateColor
     GRAY = "gray",
     NONE = "none",
 }
-export class Avatar extends React.Component<Props & React.HTMLAttributes<HTMLElement>, {}> {
+export class Avatar extends React.PureComponent<Props & React.HTMLAttributes<HTMLElement>, {}> {
     static defaultProps:Props = {
         size:50,
         borderWidth:0,

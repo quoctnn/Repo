@@ -37,7 +37,16 @@ export default class StatusHeader extends React.Component<Props, State> {
         this.getScopeLinkElement = this.getScopeLinkElement.bind(this);
 
     }
-
+    shouldComponentUpdate(nextProps:Props, nextState)
+    {
+        return nextProps.status.id != this.props.status.id || 
+                nextProps.status.extra != this.props.status.extra || 
+                nextProps.status.permission_set != this.props.status.permission_set || 
+                nextProps.edited_at != this.props.edited_at || 
+                nextProps.contextKey != this.props.contextKey || 
+                nextProps.contextId != this.props.contextId || 
+                nextProps.addLinkToContext != this.props.addLinkToContext
+    }
 
     getActionText() {
         if (this.props.addLinkToContext) {

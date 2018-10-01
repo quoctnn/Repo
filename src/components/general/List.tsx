@@ -14,7 +14,7 @@ export interface State {
     items:React.ReactChild[]
     rects:{[id:number]:DOMRect}
 }
-export class List extends React.Component<Props, {}> {
+export class List extends React.PureComponent<Props, {}> {
     static defaultProps:Props = {
         className:null,
         id:null,
