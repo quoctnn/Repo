@@ -138,7 +138,8 @@ export default class StatusComponent extends React.Component<Props, State> {
                         reaction={this.state.reaction}
                         reactions={this.state.reactions}
                         reactionsCount={this.state.reactionsCount}
-                        children={this.props.status.children}
+                        children={[]}
+                        //children={this.props.status.children}
                         status={status}
                         canMention={this.props.canMention}
                         canComment={this.props.canComment}

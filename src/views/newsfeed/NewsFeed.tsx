@@ -160,6 +160,8 @@ const mapStateToProps = (state:RootState, ownProps: OwnProps):ReduxStateProps =>
     const allItems = state.statuses.items
     const isFetching = pagination.fetching
     const items = PaginationUtilities.getCurrentPageResults(allItems, pagination).cloneArray()
+    const test = PaginationUtilities.getStatusPageResults(allItems, pagination)
+    debugger
     const populateList = (statusList:Status[]) => 
     {
         statusList.forEach(c => 
@@ -195,9 +197,10 @@ const mapStateToProps = (state:RootState, ownProps: OwnProps):ReduxStateProps =>
             status.children = chldrn
         }
     })
+
     return {
         isFetching,
-        items:statuses,
+        items:test,
         total,
         offset,
         error,

@@ -17,6 +17,7 @@ import ReactionStats from './ReactionStats';
 import { Avatar } from '../Avatar';
 import { Link } from 'react-router-dom';
 import { Routes } from '../../../utilities/Routes';
+import debug from '../../../reducers/debug';
 require("./Comment.scss");
 let timezone = moment.tz.guess();
 export interface Props 
@@ -195,7 +196,8 @@ export interface CommentFooterProps
     canComment:boolean
     communityId:number
 }
-class CommentFooter extends React.Component<CommentFooterProps,{}> {
+class CommentFooter extends React.Component<CommentFooterProps,{}> 
+{
     renderReactButton() {
         if (this.props.created_at !== null) {
             return (

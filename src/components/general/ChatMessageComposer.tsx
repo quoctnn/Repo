@@ -61,22 +61,7 @@ const getBlocks = (contentState:ContentState) => {
     })
     return blocks
   };
-export interface Props
-{
-    onSubmit:(text:string, mentions:number[]) => void,
-    onDidType:() => void
-    filesAdded?:(files:File[]) => void
-    communityId?:number
-    content:string
-    mentions:Mention[]
-    mentionSearch:(search:string, completion:(mentions:Mention[]) => void) => void
-    onHandleUploadClick?:(event) => void
-}
-interface State
-{
-    plainText:string
-    editorState:EditorState
-}
+
 interface DraftEntity
 {
     type:string 
@@ -143,7 +128,22 @@ const generateContentState = (content:string, mentions:Mention[]):ContentState =
     })
     return contentState
 }
-
+export interface Props
+{
+    onSubmit:(text:string, mentions:number[]) => void,
+    onDidType:() => void
+    filesAdded?:(files:File[]) => void
+    communityId?:number
+    content:string
+    mentions:Mention[]
+    mentionSearch:(search:string, completion:(mentions:Mention[]) => void) => void
+    onHandleUploadClick?:(event) => void
+}
+interface State
+{
+    plainText:string
+    editorState:EditorState
+}
 export class ChatMessageComposer extends React.Component<Props,{}> implements IEditorComponent {
     
     state:State
@@ -158,6 +158,10 @@ export class ChatMessageComposer extends React.Component<Props,{}> implements IE
         this.sendDidType = this.sendDidType.bind(this)
         this.getProcessedText = this.getProcessedText.bind(this)
         this.onChange = this.onChange.bind(this)
+    }
+    shouldComponentUpdate(nextProps:Props, nextState:State)
+    {
+        return nextState.editorState != this.state.editorState || nextProps.content != this.props.content || (nextProps.mentions || []).length != (this.props.mentions || []).length
     }
     clearEditorContent = () => {
 

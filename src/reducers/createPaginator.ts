@@ -373,7 +373,7 @@ export const statusMultiPaginator = (key:string, endpoint:(id:string) => string,
           let keys = Object.keys(_items)
           keys.forEach(k => 
             {
-              let item = _items[k]
+              let item = _items[k] as Status
               if(item.parent)
               {
                 let p = items[item.parent] as Status
@@ -381,12 +381,13 @@ export const statusMultiPaginator = (key:string, endpoint:(id:string) => string,
                 {
                   let arr = p.children_ids || [] 
                   let exists = arr.findIndex(id => id == item.id) != -1
+                  p.serialization_date = item.serialization_date
                   if(!exists)
                   {
                     arr.unshift(item.id)
                     p.children_ids = arr
-                    _items[p.id] = p
                   }
+                  _items[p.id] = p
                 }
               }
             })
