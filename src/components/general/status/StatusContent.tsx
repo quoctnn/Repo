@@ -25,7 +25,9 @@ export default class StatusContent extends React.Component<Props, State>
     shouldComponentUpdate(nextProps:Props, nextState)
     {
         return nextProps.status.id != this.props.status.id || 
-                nextProps.status.updated_at != this.props.status.updated_at
+        nextProps.status.updated_at != this.props.status.updated_at || 
+        nextProps.status.files.length != this.props.status.files.length
+
     }
     getThumbnailContent(item) {
         return <img src={item.thumbnail} className="img-responsive"/>;

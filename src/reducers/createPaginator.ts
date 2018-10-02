@@ -325,8 +325,8 @@ export const statusMultiPaginator = (key:string, endpoint:(id:string) => string,
             return pages
           let newId = a.item[itemIdKey]
           let exist = p.ids.findIndex(id => id == newId) != -1
-          if(exist)
-            return pages 
+          if(exist || !a.isNew)
+            return pages
           p.ids = p.ids.filter(id => id != newId)
           p.ids.unshift(newId)
           p.fetching = false
