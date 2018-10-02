@@ -5,9 +5,11 @@ import { translate } from '../../intl/AutoIntlProvider';
 import { Status } from '../../../reducers/statuses';
 import { ProfileManager } from '../../../main/managers/ProfileManager';
 import { UploadedFile } from '../../../reducers/conversations';
+import { NestedPageItem } from '../../../utilities/PaginationUtilities';
 export interface OwnProps
 {
-    data:Status[]
+    authorizedUserId:number
+    data:NestedPageItem[]
     onCommentEdit:(comment: Status, files: UploadedFile[]) => void
     onCommentDelete:(comment: Status) => void
     canReact:boolean
@@ -63,7 +65,7 @@ export default class CommentList extends React.Component<Props, State> {
         this.listRef.current.scrollTop = this.listRef.current.scrollHeight;
     }
 
-    renderComment(comment:Status, isOwner:boolean) {
+    renderComment(pageItem:NestedPageItem) {
         return (
             <Comment
                 communityId={this.props.communityId}
@@ -71,12 +73,11 @@ export default class CommentList extends React.Component<Props, State> {
                 canReact={this.props.canReact}
                 canComment={this.props.canComment}
                 canMention={this.props.canMention}
-                isOwner={isOwner}
-                key={comment.id}
-                comment={comment}
+                authorizedUserId={this.props.authorizedUserId}
+                key={pageItem.id}
+                pageItem={pageItem}
                 onCommentEdit={this.props.onCommentEdit}
                 onCommentDelete={this.props.onCommentDelete}>
-                {comment.text}
             </Comment>
         );
     }
@@ -110,7 +111,7 @@ export default class CommentList extends React.Component<Props, State> {
             <ul className={listClass} ref={this.listRef}>
                 <li className="text-center">{this.renderPreviousLink()}</li>
                 {data.map(r => r).reverse().slice(min, data.length).map((comment) => {
-                    return this.renderComment(comment, authUser.id == comment.owner.id);
+                    return this.renderComment(comment);
                 })}
             </ul>
         );

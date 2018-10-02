@@ -38,6 +38,7 @@ export const resetPagedData = () => ({
 //newsfeed
 export const requestNextStatusPage = statusesPaginator.requestNextStatusPage
 export const insertStatus = statusesPaginator.insertStatus
+export const setStatusReactions = statusesPaginator.setStatusReactions
 
 
 //messages

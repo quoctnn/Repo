@@ -17,35 +17,41 @@ import ReactionStats from './ReactionStats';
 import { Avatar } from '../Avatar';
 import { Link } from 'react-router-dom';
 import { Routes } from '../../../utilities/Routes';
-import debug from '../../../reducers/debug';
+import { NestedPageItem } from '../../../utilities/PaginationUtilities';
+import { RootState } from '../../../reducers/index';
+import { connect } from 'react-redux'
+import * as Actions from '../../../actions/Actions';
 require("./Comment.scss");
 let timezone = moment.tz.guess();
-export interface Props 
+export interface OwnProps 
 {
-    comment:Status
     onCommentDelete:(comment:Status) => void
     onCommentEdit:(comment:Status, files:UploadedFile[]) => void
-    isOwner:boolean
     canReact:boolean 
     canMention:boolean
     canUpload:boolean
     canComment:boolean
     communityId:number
+    authorizedUserId:number
+    pageItem:NestedPageItem
+}
+interface ReduxStateProps
+{
+    comment:Status
+}
+interface ReduxDispatchProps
+{
+    setStatusReaction:(status:Status, reactions:{ [id: string]: number[] },reaction_count:number) => void
 }
 interface State 
 {
-    reactions:{[id:string]:number[]}
-    reactionsCount:number
-    reaction:string
 }
-export default class Comment extends React.Component<Props, State>  {
+type Props = ReduxStateProps & OwnProps & ReduxDispatchProps
+class Comment extends React.Component<Props, State>  {
     constructor(props:Props) {
         super(props);
 
         this.state = {
-            reaction:StatusUtilities.getReaction(props.comment, ProfileManager.getAuthenticatedUser()),
-            reactionsCount: props.comment.reaction_count,
-            reactions:props.comment.reactions || {}
         };
 
         // Auto-binding
@@ -53,30 +59,30 @@ export default class Comment extends React.Component<Props, State>  {
         this.handleDelete = this.handleDelete.bind(this);
     }
     shouldComponentUpdate(nextProps:Props, nextState:State) {
-        return nextProps.comment != this.props.comment && nextProps.comment.updated_at != this.props.comment.updated_at || nextState.reaction != this.state.reaction;
-    }
-
-    componentWillReceiveProps(nextProps:Props) {
-        this.setState({
-            reaction:StatusUtilities.getReaction(nextProps.comment, ProfileManager.getAuthenticatedUser()),
-            reactionsCount: nextProps.comment.reaction_count,
-            reactions:nextProps.comment.reactions || {}
-        });
+        let ret =  nextProps.comment.id != this.props.comment.id || 
+                nextProps.comment.updated_at != this.props.comment.updated_at || 
+                nextProps.comment.serialization_date != this.props.comment.serialization_date ||
+                nextProps.comment.reaction_count != this.props.comment.reaction_count || 
+                nextProps.comment.reactions != this.props.comment.reactions
+        console.log("comment id:" + this.props.comment.id, ret)
+        return ret
     }
 
     handleReaction(reaction:string) {
-        let oldReaction = this.state.reaction
+
+        let oldReaction = StatusUtilities.getReaction(this.props.comment, ProfileManager.getAuthenticatedUser())
+        let rCount = this.props.comment.reaction_count
+        let r = this.props.comment.reactions || {}
         let userId = ProfileManager.getAuthenticatedUser().id
-        let {reactions, reactionsCount} = StatusUtilities.applyReaction(oldReaction, reaction, this.state.reactions, this.state.reactionsCount, userId)
-        this.setState({ reactions: reactions, reactionsCount: reactionsCount, reaction: reaction}, () => {
-            ApiClient.reactToStatus(this.props.comment.id, reaction, (data, status, error) => {  
-                if(!nullOrUndefined( error ))
-                {
-                    console.log("error sending reaction:", error)
-                    let {reactions, reactionsCount} = StatusUtilities.applyReaction(reaction, oldReaction, this.state.reactions, this.state.reactionsCount, userId)
-                    this.setState({ reactions: reactions, reactionsCount: reactionsCount, reaction: oldReaction})
-                }
-            })
+        let data = StatusUtilities.applyReaction(oldReaction, reaction, r, rCount, userId)
+        this.props.setStatusReaction(this.props.comment, data.reactions, data.reactionsCount)
+        ApiClient.reactToStatus(this.props.comment.id, reaction, (data, status, error) => {  
+            if(!nullOrUndefined( error ))
+            {
+                console.log("error sending reaction:", error)
+                let {reactions, reactionsCount} = StatusUtilities.applyReaction(reaction, oldReaction, data.reactions, data.reactionsCount, userId)
+                this.props.setStatusReaction(this.props.comment, reactions, reactionsCount)
+            }
         })
     }
 
@@ -103,18 +109,42 @@ export default class Comment extends React.Component<Props, State>  {
                     commentsCount={comment.comments_count}
                     created_at={comment.created_at}
                     reaction={StatusUtilities.getReaction(comment, ProfileManager.getAuthenticatedUser())}
-                    reactionsCount={this.state.reactionsCount}
+                    reactionsCount={this.props.comment.reaction_count}
                     reactions={comment.reactions}
                     onReaction={this.handleReaction}
                     onCommentDelete={this.handleDelete}
                     onCommentEdit={this.props.onCommentEdit}
-                    isOwner={this.props.isOwner}
+                    isOwner={this.props.comment.owner.id == this.props.authorizedUserId}
                     owner={comment.owner}
                     status={comment} canReact={this.props.canReact} canMention={this.props.canMention}/>
             </li>
         );
     }
 }
+const hasOwnPropsChanged = (nextProps:OwnProps, props:OwnProps) => 
+{
+    let ret = nextProps.pageItem.children.length != props.pageItem.children.length 
+    return ret
+}
+const mapStateToProps = (state:RootState, ownProps: OwnProps):ReduxStateProps => {
+    return {
+        comment:ownProps.pageItem.isTemporary ? state.queue.statusMessages.find(i => i.id == ownProps.pageItem.id) : state.statuses.items[ownProps.pageItem.id]
+    }
+}
+const mapDispatchToProps = (dispatch:any, ownProps: OwnProps):ReduxDispatchProps => {
+    return {
+
+        setStatusReaction:(status:Status, reactions:{ [id: string]: number[] },reaction_count:number) => {
+            dispatch(Actions.setStatusReactions(status, reactions, reaction_count));
+        }
+    }
+}
+export default connect<ReduxStateProps, ReduxDispatchProps, OwnProps>(mapStateToProps, mapDispatchToProps, null, {
+    pure: true,
+    areOwnPropsEqual: (next, prev) => {
+      return !hasOwnPropsChanged(next, prev)
+    },
+  })(Comment);
 export interface CommentHeaderProps 
 {
     owner:UserProfile

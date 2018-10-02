@@ -3,13 +3,14 @@ export interface NestedPageItem
 {
     id:number
     children:NestedPageItem[]
+    isTemporary:boolean
 }
 export class PaginationUtilities {
     
-    static getPageItem = (items:Status[], id):NestedPageItem => 
+    static getPageItem = (items:{[id:number]:Status}, id, isTemporary:boolean):NestedPageItem => 
     {
         let item = items[id]
-        return {id:id, children:(item.children_ids || []).map(c => PaginationUtilities.getPageItem(items, c))}
+        return {id:id, children:(item.children_ids || []).map(c => PaginationUtilities.getPageItem(items, c, isTemporary)), isTemporary:isTemporary}
     }
     static getCurrentPageNumber = (pagination) => {
         if (pagination) 
@@ -29,9 +30,8 @@ export class PaginationUtilities {
     static getCurrentPageResults = (items, pagination) => {
         return PaginationUtilities.getResults(items, pagination.ids || [])
     }
-    static getStatusPageResults = (items:Status[], pagination):NestedPageItem[]  => { // [{id:1, children:[{id:2, children:[]}]}]
-        let rootIds = pagination.ids as number[]
-        return rootIds.map(r => PaginationUtilities.getPageItem(items, r))
+    static getStatusPageResults = (items:{[id:number]:Status}, ids:number[], isTemporary:boolean):NestedPageItem[]  => { // [{id:1, children:[{id:2, children:[]}]}]
+        return ids.map(r => PaginationUtilities.getPageItem(items, r, isTemporary))
     }
     static getCurrentCount = (pagination):number => {
         if (pagination) 

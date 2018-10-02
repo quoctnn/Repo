@@ -46,7 +46,7 @@ export interface RootState
       conversations:{items:{[id:number]:Conversation}, pagination:CachePage};
       messages:{items:Message[], conversations:PageItem}
       embedlyStore:{byId:{[id:string]:EmbedlyItem}, allIds:string[], queuedIds:{[id:string]:boolean}},
-      statuses:{items:Status[], feed:PageItem}
+      statuses:{items:{[id:number]:Status}, feed:PageItem}
     debug: {accessToken:string, apiEndpoint:number, availableApiEndpoints:ApiEndpoint[] };
   _persist:any
 }

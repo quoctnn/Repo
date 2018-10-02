@@ -4,6 +4,7 @@ import CommentList from './CommentList';
 import StatusFooterStats from './StatusFooterStats';
 import { UploadedFile } from '../../../reducers/conversations';
 import CommentFormContainer from './CommentFormContainer';
+import { NestedPageItem } from '../../../utilities/PaginationUtilities';
 require("./StatusFooter.scss");
 
 export interface Props 
@@ -22,12 +23,13 @@ export interface Props
     status:Status
     onCommentSubmit:(comment: Status, files: UploadedFile[]) => void
     canMention:boolean
-    children:Status[]
+    children:NestedPageItem[]
     canComment:boolean
     canReact:boolean
     canUpload:boolean
     isOwner:boolean
     communityId:number
+    authorizedUserId:number
 }
 interface State 
 {
@@ -66,7 +68,7 @@ export default class StatusFooter extends React.Component<Props, State> {
 
     renderCommentList() {
         return (
-            <CommentList canComment={this.props.canComment} communityId={this.props.communityId} canUpload={this.props.canUpload} data={this.props.children} canReact={this.props.canReact}
+            <CommentList authorizedUserId={this.props.authorizedUserId} canComment={this.props.canComment} communityId={this.props.communityId} canUpload={this.props.canUpload} data={this.props.children} canReact={this.props.canReact}
                          onCommentEdit={this.props.onCommentEdit}
                          onCommentDelete={this.props.onCommentDelete} canMention={this.props.canMention}/>
         )

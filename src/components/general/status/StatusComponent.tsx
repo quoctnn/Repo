@@ -9,11 +9,14 @@ import { UploadedFile } from '../../../reducers/conversations';
 import { ProfileManager } from '../../../main/managers/ProfileManager';
 import StatusFooter from './StatusFooter';
 import { nullOrUndefined } from '../../../utilities/Utilities';
+import { NestedPageItem } from '../../../utilities/PaginationUtilities';
+import { connect } from 'react-redux'
+import { RootState } from '../../../reducers/index';
+import * as Actions from '../../../actions/Actions';
 require("./StatusComponent.scss");
 
-export interface Props 
+export interface OwnProps 
 {
-    status:Status
     bottomOptionsEnabled:boolean
     addLinkToContext:boolean
     contextKey?:string
@@ -27,44 +30,47 @@ export interface Props
     canComment:boolean
     canReact:boolean
     canUpload:boolean
-    isOwner:boolean
+    pageItem:NestedPageItem
+    authorizedUserId:number
+}
+interface ReduxStateProps
+{
+    status:Status
 }
 interface State 
 {
-    reactions:{[id:string]:number[]}
-    reactionsCount:number
-    reaction:string
 }
-export default class StatusComponent extends React.Component<Props, State> {     
+interface ReduxDispatchProps
+{
+    setStatusReaction:(status:Status, reactions:{ [id: string]: number[] },reaction_count:number) => void
+}
+type Props = ReduxStateProps & OwnProps & ReduxDispatchProps
+class StatusComponent extends React.Component<Props, State> {     
     constructor(props) {
         super(props);
         this.state = {
-            reactions:props.status.reactions || {},
-            reactionsCount:props.status.reaction_count,
-            reaction:StatusUtilities.getReaction(props.status, ProfileManager.getAuthenticatedUser())
         }
         this.handleReaction = this.handleReaction.bind(this)
     }
     shouldComponentUpdate(nextProps:Props, nextState:State) 
     {
         let ret = nextProps.status.id != this.props.status.id || 
-                    nextProps.status.children.length != this.props.status.children.length || 
                     nextProps.status.updated_at != this.props.status.updated_at || 
-                    nextProps.status.serialization_date != this.props.status.serialization_date || 
-                    nextState.reaction != this.state.reaction  || 
-                    nextProps.status.highlights !== this.props.status.highlights 
-
-        //console.log("id:" + this.props.status.id, ret)
+                    nextProps.status.serialization_date != this.props.status.serialization_date ||
+                    nextProps.pageItem.children.length != this.props.pageItem.children.length ||
+                    nextProps.status.reaction_count != this.props.status.reaction_count || 
+                    nextProps.status.reactions != this.props.status.reactions
+        console.log("status id:" + this.props.status.id, ret,(this.props.status.children_ids || []).length, (nextProps.status.children_ids|| []).length, )
         return ret
     }
-    componentWillReceiveProps(nextProps:Props) {
+   /*  componentWillReceiveProps(nextProps:Props) {
         let status = nextProps.status
         this.setState({
             reaction:StatusUtilities.getReaction(status, ProfileManager.getAuthenticatedUser()),
             reactionsCount: status.reaction_count,
             reactions: status.reactions || {}
         });
-    }
+    } */
     getTypeOfContent(status:Status)
     {
         let videos = StatusUtilities.filterStatusFileType(status, "video")
@@ -90,18 +96,19 @@ export default class StatusComponent extends React.Component<Props, State> {
         return "text";
     }
     handleReaction(reaction:string) {
-        let oldReaction = this.state.reaction
+        let oldReaction = StatusUtilities.getReaction(this.props.status, ProfileManager.getAuthenticatedUser())
+        let rCount = this.props.status.reaction_count
+        let r = this.props.status.reactions || {}
         let userId = ProfileManager.getAuthenticatedUser().id
-        let {reactions, reactionsCount} = StatusUtilities.applyReaction(oldReaction, reaction, this.state.reactions, this.state.reactionsCount, userId)
-        this.setState({ reactions: reactions, reactionsCount: reactionsCount, reaction: reaction}, () => {
-            ApiClient.reactToStatus(this.props.status.id, reaction, (data, status, error) => {  
-                if(!nullOrUndefined( error ))
-                {
-                    console.log("error sending reaction:", error)
-                    let {reactions, reactionsCount} = StatusUtilities.applyReaction(reaction, oldReaction, this.state.reactions, this.state.reactionsCount, userId)
-                    this.setState({ reactions: reactions, reactionsCount: reactionsCount, reaction: oldReaction})
-                }
-            })
+        let data = StatusUtilities.applyReaction(oldReaction, reaction, r, rCount, userId)
+        this.props.setStatusReaction(this.props.status, data.reactions, data.reactionsCount)
+        ApiClient.reactToStatus(this.props.status.id, reaction, (data, status, error) => {  
+            if(!nullOrUndefined( error ))
+            {
+                console.log("error sending reaction:", error)
+                let {reactions, reactionsCount} = StatusUtilities.applyReaction(reaction, oldReaction, data.reactions, data.reactionsCount, userId)
+                this.props.setStatusReaction(this.props.status, reactions, reactionsCount)
+            }
         })
     }
     render()
@@ -125,6 +132,7 @@ export default class StatusComponent extends React.Component<Props, State> {
                     <StatusContent status={status} embedLinks={true}/>
 
                     <StatusFooter
+                        authorizedUserId={this.props.authorizedUserId}
                         communityId={communityId}
                         bottomOptionsEnabled={this.props.bottomOptionsEnabled}
                         onCommentSubmit={this.props.onCommentSubmit}
@@ -135,17 +143,40 @@ export default class StatusComponent extends React.Component<Props, State> {
                         commentsCount={status.comments_count}
                         created_at={status.created_at}
                         onReact={this.handleReaction}
-                        reaction={this.state.reaction}
-                        reactions={this.state.reactions}
-                        reactionsCount={this.state.reactionsCount}
-                        children={[]}
-                        //children={this.props.status.children}
+                        reaction={StatusUtilities.getReaction(this.props.status, ProfileManager.getAuthenticatedUser())}
+                        reactions={this.props.status.reactions}
+                        reactionsCount={this.props.status.reaction_count}
+                        children={this.props.pageItem.children}
                         status={status}
+                        isOwner={status.owner.id == this.props.authorizedUserId}
                         canMention={this.props.canMention}
                         canComment={this.props.canComment}
                         canUpload={this.props.canUpload}
-                        canReact={this.props.canReact} 
-                        isOwner={this.props.isOwner}/>
+                        canReact={this.props.canReact}/>
                 </div>)
     }
 }
+const hasOwnPropsChanged = (nextProps:OwnProps, props:OwnProps) => 
+{
+    let ret = nextProps.pageItem.children.length != props.pageItem.children.length 
+    return ret
+}
+const mapStateToProps = (state:RootState, ownProps: OwnProps):ReduxStateProps => {
+    return {
+        status:ownProps.pageItem.isTemporary ? state.queue.statusMessages.find(i => i.id == ownProps.pageItem.id) : state.statuses.items[ownProps.pageItem.id]
+    }
+}
+const mapDispatchToProps = (dispatch:any, ownProps: OwnProps):ReduxDispatchProps => {
+    return {
+
+        setStatusReaction:(status:Status, reactions:{ [id: string]: number[] },reaction_count:number) => {
+            dispatch(Actions.setStatusReactions(status, reactions, reaction_count));
+        }
+    }
+}
+export default connect<ReduxStateProps, ReduxDispatchProps, OwnProps>(mapStateToProps, mapDispatchToProps, null, {
+    pure: true,
+    areOwnPropsEqual: (next, prev) => {
+      return !hasOwnPropsChanged(next, prev)
+    },
+  })(StatusComponent);

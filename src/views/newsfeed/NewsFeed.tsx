@@ -6,7 +6,7 @@ import { UserProfile } from '../../reducers/profileStore';
 import { UploadedFile } from '../../reducers/conversations';
 import { nullOrUndefined } from '../../utilities/Utilities';
 import { statusReducerPageSize, Status, StatusContextKeys } from '../../reducers/statuses';
-import { PaginationUtilities } from '../../utilities/PaginationUtilities';
+import { PaginationUtilities, NestedPageItem } from '../../utilities/PaginationUtilities';
 import LoadingSpinner from '../../components/general/LoadingSpinner';
 import { List } from '../../components/general/List';
 import { FullPageComponent } from '../../components/general/FullPageComponent';
@@ -15,6 +15,7 @@ import { ProfileManager } from '../../main/managers/ProfileManager';
 import { StatusManager } from '../../main/managers/StatusManager';
 import { getDefaultCachePage } from '../../reducers/createPaginator';
 import { QueueUtilities } from '../../utilities/QueueUtilities';
+import * as Immutable from 'immutable';
 require("./NewsFeed.scss");
 export interface OwnProps 
 {
@@ -23,7 +24,7 @@ interface ReduxStateProps
 {
     total:number,
     isFetching:boolean,
-    items:Status[],
+    items:NestedPageItem[],
     offset:number,
     error:string,
     profile:UserProfile,
@@ -128,7 +129,10 @@ class NewsFeed extends React.Component<Props, {}> {
     }
     render() {
         let authUser = ProfileManager.getAuthenticatedUser()
-        
+        if(!authUser)
+        {
+            return null
+        }
         return(
             <FullPageComponent> 
                 <List enableAnimation={false} onScroll={this.onScroll} className="status-list full-height col-sm group-list vertical-scroll">
@@ -138,7 +142,6 @@ class NewsFeed extends React.Component<Props, {}> {
                                 canComment={true}
                                 canUpload={true}
                                 canReact={true}
-                                isOwner={authUser.id == s.owner.id}
                                 onStatusEdit={this.onStatusEdit}
                                 onCommentEdit={this.onCommentEdit}
                                 onCommentDelete={this.onCommentDelete}
@@ -146,8 +149,8 @@ class NewsFeed extends React.Component<Props, {}> {
                                 onCommentSubmit={this.onCommentSubmit}
                                 addLinkToContext={true}
                                 key={s.id} 
-                                status={s} 
-                                bottomOptionsEnabled={true} />
+                                pageItem={s} 
+                                bottomOptionsEnabled={true} authorizedUserId={authUser.id} />
                     }) }
                     {this.renderLoading()}
                 </List>
@@ -157,11 +160,9 @@ class NewsFeed extends React.Component<Props, {}> {
 }
 const mapStateToProps = (state:RootState, ownProps: OwnProps):ReduxStateProps => {
     const pagination = state.statuses.feed[StatusContextKeys.NEWSFEED] || getDefaultCachePage()
-    const allItems = state.statuses.items
+    const allItems = Immutable.fromJS(state.statuses.items).toJS()
     const isFetching = pagination.fetching
-    const items = PaginationUtilities.getCurrentPageResults(allItems, pagination).cloneArray()
-    const test = PaginationUtilities.getStatusPageResults(allItems, pagination)
-    debugger
+    const items = PaginationUtilities.getStatusPageResults(allItems, pagination.ids, false)
     const populateList = (statusList:Status[]) => 
     {
         statusList.forEach(c => 
@@ -173,34 +174,36 @@ const mapStateToProps = (state:RootState, ownProps: OwnProps):ReduxStateProps =>
             }
         } )
     }
-    populateList(items)
     const total = pagination.totalCount
     const offset = items.length
     const queuedStatuses = QueueUtilities.getQueuedStatusesForFeed(StatusContextKeys.NEWSFEED, state.queue.statusMessages)
     const error = pagination.error
     const last_fetched = pagination.last_fetch
-    const parents:Status[] = []
+    const parents:number[] = []
     const children:Status[] = []
+    const queuedDict:{[id:number]:Status} = {}
     queuedStatuses.forEach(s => {
+        queuedDict[s.id] = s
         if(s.parent == null)
-            parents.push(s)
+            parents.push(s.id)
         else 
             children.push(s)
     })
-    const statuses = parents.concat(items).map(i => {i.children = i.children.map(j => j); return i;})
+    const parentItems = PaginationUtilities.getStatusPageResults(queuedDict, parents, true)
+    const rootItems = parentItems.concat(items)
     children.reverse().forEach(child => {
-        let status = statuses.find(p => p.id == child.parent)
-        if(status)
+        let rootItem = rootItems.find(p => p.id == child.parent)
+        if(rootItem)
         {
-            let chldrn = status.children
-            chldrn.unshift(child)
-            status.children = chldrn
+            let childItems = PaginationUtilities.getStatusPageResults(queuedDict, [child.id], true)
+            let chldrn = childItems.concat(rootItem.children)
+            rootItem.children = chldrn
         }
     })
 
     return {
         isFetching,
-        items:test,
+        items:items,
         total,
         offset,
         error,

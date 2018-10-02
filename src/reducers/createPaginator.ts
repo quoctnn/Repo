@@ -126,6 +126,14 @@ export interface InsertItemAction
   isNew?:boolean
   meta:{key:string, itemIdKey?:string}
 }
+export interface ItemMentionAction
+{
+  type?: string
+  item?:any
+  meta:{key:string, itemIdKey?:string}
+  reactions?:{ [id: string]: number[] }
+  reaction_count?:number
+}
 export type PageItem = { [page: string]: CachePage }
 export const createMultiPaginator = (key:string, endpoint:(id:string) => string, itemIdKey:string, pageSize:number) =>
 {
@@ -273,6 +281,13 @@ export const statusMultiPaginator = (key:string, endpoint:(id:string) => string,
       isNew:isNew,
       pagingId
     })
+    const setStatusReactions = (item:any, reactions:{ [id: string]: number[] },reaction_count:number):ItemMentionAction => ({
+      type: Types.SET_STATUS_REACTIONS,
+      meta:{key, itemIdKey},
+      item,
+      reactions,
+      reaction_count
+    });
     const pages = (pages:PageItem = {}, action:MultiPaginatorAction = {}) => {
       switch (action.type) {
         case Types.REQUEST_PAGE:
@@ -358,6 +373,18 @@ export const statusMultiPaginator = (key:string, endpoint:(id:string) => string,
         }
         case Types.RESET_PAGED_DATA:
           return {}
+        case Types.SET_STATUS_REACTIONS:
+        {
+          let a = action as ItemMentionAction
+          let id = a.item[a.meta.itemIdKey]
+          let status = {...items[id]} as Status
+          status.reactions = {...a.reactions}
+          status.reaction_count = a.reaction_count
+          return {
+            ...items,
+            [id]:status
+          }
+        }
         case Types.INSERT_ITEM_TO_PAGE:
         {
           let _items = {}
@@ -376,7 +403,7 @@ export const statusMultiPaginator = (key:string, endpoint:(id:string) => string,
               let item = _items[k] as Status
               if(item.parent)
               {
-                let p = items[item.parent] as Status
+                let p = Object.assign({}, items[item.parent]) as Status
                 if(p)
                 {
                   let arr = p.children_ids || [] 
@@ -386,8 +413,8 @@ export const statusMultiPaginator = (key:string, endpoint:(id:string) => string,
                   {
                     arr.unshift(item.id)
                     p.children_ids = arr
+                    _items[p.id] = p
                   }
-                  _items[p.id] = p
                 }
               }
             })
@@ -404,6 +431,7 @@ export const statusMultiPaginator = (key:string, endpoint:(id:string) => string,
       paginationReducer : onlyForEndpoint( pages ),
       itemsReducer: onlyForEndpoint(itemsReducer),
       requestNextStatusPage,
-      insertStatus
+      insertStatus,
+      setStatusReactions
     }
   }

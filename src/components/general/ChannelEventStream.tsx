@@ -184,6 +184,7 @@ class ChannelEventStream extends React.Component<Props, State> {
     this.lastUserActivityTimer = null;
     EventLock.popCallback = this.handleEventQueuePop
     EventLock.didChangeLockStatus = this.handleEventQueueLockStatusChanged
+    window["eventStream"] = this
   }
   handleEventQueuePop(event)
   {
