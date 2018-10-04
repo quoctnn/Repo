@@ -38,7 +38,7 @@ export const LINEBREAK_REGEX = /\r?\n|\r/g
 export const truncate = (text, maxChars) => {
     return text.length > (maxChars - 3) ? text.substring(0, maxChars - 3) + '...' : text;
 }
-export function getTextContent(text:string, mentions:UserProfile[])
+export function getTextContent(text:string, mentions:UserProfile[], includeEmbedlies:false)
 {
     var processed:any = null
     var config = []
@@ -47,7 +47,10 @@ export function getTextContent(text:string, mentions:UserProfile[])
         regex: URL_REGEX,
         fn: (key, result) => 
         {
-            embedlyArr[result[0]] = <Embedly key={uniqueId()} url={result[0]} />
+            if(includeEmbedlies)
+            {
+                embedlyArr[result[0]] = <Embedly key={uniqueId()} url={result[0]} />
+            }
             return (<a key={uniqueId()} href={result[0]} target="_blank"  data-toggle="tooltip" title={result[0]}>{result[0]}</a>)
         }
     }
@@ -70,6 +73,11 @@ export function getTextContent(text:string, mentions:UserProfile[])
     }).filter(o => o)
     config = config.concat(mentionSearch)
     processed = processString(config)(text);
+    let embedKeys = Object.keys(embedlyArr)
+    if(includeEmbedlies && embedKeys.length > 0)
+    {
+        processed = processed.concat( embedKeys.map(k => embedlyArr[k]) )
+    }
     return processed
 }
 export function rawMarkup(text, mentions:any[]) {

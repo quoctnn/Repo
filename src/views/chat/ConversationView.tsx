@@ -226,7 +226,7 @@ class ConversationView extends React.PureComponent<Props, State> {
         }
         completion(message)
     }
-    onDidType()
+    onDidType(unprocessedText:string)
     {
         let conversation = this.props.conversation
         if(!conversation)

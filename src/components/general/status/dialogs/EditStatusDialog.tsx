@@ -30,7 +30,6 @@ export default class EditStatusDialog extends React.Component<Props, State> {
         
         return (<StatusEditFormContainer 
             communityId={this.props.communityId}
-            onDidType={() => {}}
             canComment={this.props.canComment}
             canUpload={this.props.canUpload}
             status={this.props.status}

@@ -1,4 +1,4 @@
-import { ImageGallery, GalleryImage } from '../gallery/ImageGallery';
+import { ImageGallery, GalleryImage, GalleryItemType } from '../gallery/ImageGallery';
 import Embedly from '../Embedly';
 import * as React from 'react';
 import classNames from "classnames";
@@ -10,6 +10,8 @@ import VideoPlayer from '../video/VideoPlayer';
 import GoogleDocEmbedCard from '../GoogleDocEmbedCard';
 import { UploadedFile } from '../../../reducers/conversations';
 import { ProfileManager } from '../../../main/managers/ProfileManager';
+import { FileUtilities } from '../../../utilities/FileUtilities';
+import ContentGallery from '../gallery/ContentGallery';
 require("./StatusContent.scss");
 
 export interface Props 
@@ -22,6 +24,10 @@ interface State
 }
 export default class StatusContent extends React.Component<Props, State> 
 {     
+    constructor(props) {
+        super(props)
+        this.renderContent = this.renderContent.bind(this)
+    }
     shouldComponentUpdate(nextProps:Props, nextState)
     {
         return nextProps.status.id != this.props.status.id || 
@@ -37,18 +43,10 @@ export default class StatusContent extends React.Component<Props, State>
     {
         if (photos.length === 1) {
             // When showing just one image, show the full size:
-            let i = appendTokenToUrl( photos[0].image )
-            return [{
-                src: i, thumbnail: i,
-                w: photos[0].image_width, h: photos[0].image_height,id: photos[0].id
-            }];
+            return [new GalleryImage(photos[0])];
         } else {
             return photos.map((item) => {
-                let i = appendTokenToUrl( item.image )
-                return {
-                    src: i, thumbnail: i,
-                    w: item.image_width, h: item.image_height, id: item.id
-                };
+                return new GalleryImage(item);
             })
         }
     }
@@ -72,7 +70,7 @@ export default class StatusContent extends React.Component<Props, State>
                 <div className="col-12">
                     <p className="item-description">
                         <span className="text">
-                        {getTextContent(text, ProfileManager.getProfiles(this.props.status.mentions) )}
+                            {getTextContent(text, ProfileManager.getProfiles(this.props.status.mentions),false)}
                         </span>
                     </p>
                 </div>
@@ -87,13 +85,12 @@ export default class StatusContent extends React.Component<Props, State>
             } else if(this.props.status.link.startsWith("https://docs.google.com/")){
                 return (<GoogleDocEmbedCard url={this.props.status.link}/>);
             }
-
             return (<Embedly url={this.props.status.link}/>);
         }
     }
 
     renderFilesVideoPlayer(type) {
-        let mediaFiles = StatusUtilities.filterStatusFileType(this.props.status, type)
+        let mediaFiles = StatusUtilities.filterStatusFileType(this.props.status.files, type)
 
         if (mediaFiles.length == 0) return null;
 
@@ -113,7 +110,7 @@ export default class StatusContent extends React.Component<Props, State>
 
 
     renderDocuments() {
-        let documents = StatusUtilities.filterStatusFileType(this.props.status, "document")
+        let documents = StatusUtilities.filterStatusFileType(this.props.status.files, "document")
 
         if (documents.length == 0) return null;
 
@@ -140,14 +137,14 @@ export default class StatusContent extends React.Component<Props, State>
     }
 
     renderGallery() {
-        let imageFiles = StatusUtilities.filterStatusFileType(this.props.status, "image")
+        let imageFiles = StatusUtilities.filterStatusFileType(this.props.status.files, "image")
         let images = this.getImagesInPhotoswipeFormat(imageFiles)
 
         if (images.length == 0) return null;
 
         return (
             <div className="row">
-                <div className="col-md-12 photos">
+                <div className="col-12 photos">
                     <ImageGallery items={images}
                                    thumbnailContent={this.getThumbnailContent}/>
                     <div className="clearfix"></div>
@@ -155,13 +152,35 @@ export default class StatusContent extends React.Component<Props, State>
             </div>
         );
     }
-
+    renderContent()
+    {
+        let items = []
+        let k = this.renderLink()
+        if(k)
+        {
+            items.push(k)
+        }
+        this.props.status.files.forEach(f => {
+            items.push(FileUtilities.getFileRepresentation(f))
+        })
+        return items
+    }
     render() {
+        let links = this.props.status.link ? [this.props.status.link] : []
         return (
             <div className="panel-body">
                 {this.renderDescription()}
-                <div className="clearfix"></div>
-                { this.props.embedLinks && this.renderLink()}
+                <div className="file-list">
+                    <ContentGallery files={this.props.status.files || []} links={links} />
+                </div>
+            </div>
+        )
+    }
+    render2() {
+        return (
+            <div className="panel-body">
+                {this.renderDescription()}
+                {this.props.embedLinks && this.renderLink()}
                 {this.renderFilesVideoPlayer("video")}
                 {this.renderGallery()}
                 {this.renderFilesVideoPlayer("audio")}

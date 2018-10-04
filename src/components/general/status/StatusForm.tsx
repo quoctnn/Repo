@@ -25,14 +25,11 @@ export default class StatusForm extends StatusFormBase {
     }
 
     render() {
+        const canPost = this.canPost()
         return (
             <div className="panel panel-flat create-post-panel">
                 <div className="panel-body">
-                        {this.renderTextArea({
-                                    placeholder: this.props.textPlaceholder,
-                                    className: "textarea-create-post status-editor",
-                                    rows: 2
-                                })}
+                        {this.renderTextArea(canPost)}
                                 {this.state.showDropzone &&
                         <FilesUpload onFileAdded={this.handleFileAdded}
                                 onFileError={this.handleFileError}

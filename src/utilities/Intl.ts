@@ -14,6 +14,10 @@ declare global {
         contains(element): boolean
         cloneArray(): T[];
     }
+    interface Number 
+    {
+        mod(val:number):number
+    }
 
 }
 

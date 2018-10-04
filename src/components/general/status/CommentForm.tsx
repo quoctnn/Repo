@@ -16,12 +16,7 @@ export class CommentForm extends StatusFormBase {
     render() {
         const placeholder = translate("Write a comment")
         return (<>
-                    {this.renderTextArea({
-                        rows: 1,
-                        placeholder: placeholder,
-                        className: "textarea-create-post status-editor",
-                        showUploadButton:true
-                    })}
+                    {this.renderTextArea(this.props.canPost)}
                     {this.state.showDropzone &&
                         <FilesUpload onFileAdded={this.handleFileAdded}
                                 onFileError={this.handleFileError}

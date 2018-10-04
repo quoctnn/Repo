@@ -31,3 +31,6 @@ Array.prototype.contains = function<T>(element:T): boolean {
 Array.prototype.cloneArray = function() {
   return nullOrUndefined(this) ? this : Immutable.fromJS(this).toJS()
 }
+Number.prototype.mod = function(n) {
+  return ((this%n)+n)%n;
+};

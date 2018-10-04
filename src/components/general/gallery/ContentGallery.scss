@@ -1,0 +1,123 @@
+@import "../../../main/Config";
+.content-gallery-lightbox
+{
+    .carousel 
+    {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        .carousel-caption {
+            background: rgba(0, 0, 0, 0.35);
+            right: 0;
+            left: 0;
+            bottom: 0;
+        }
+        .carousel-control-next,
+        .carousel-control-prev
+        {
+            @include var(color, primary-color);
+        }
+        .carousel-control-next > span::after, 
+        .carousel-control-prev > span::after
+        {
+            content: "";
+            display: block;
+            width: 50px;
+            background-color: #e1e1e1;
+            height: 50px;
+            z-index: -1;
+            position: absolute;
+            border-radius: 50%;
+            margin-left: -15px;
+            margin-top: -15px;
+        }
+        .carousel-inner
+        {
+            height: 100%;
+            .carousel-item
+            {
+                height: 100%;
+            }
+        }
+    }
+    max-width: initial;
+    margin: 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    .modal-content
+    {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background-color: transparent;
+        border:0;
+        .modal-body
+        {
+            display: flex;
+            flex-direction: column;
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            flex:initial;
+            padding:0;
+        }
+    }
+}
+.fade-scale 
+{
+    transform: scale(0);
+    opacity: 0;
+    -webkit-transition: all .25s linear;
+    -o-transition: all .25s linear;
+    transition: all .25s linear;
+}
+.fade-scale.show
+{
+    opacity: 1;
+    transform: scale(1);
+}
+.slider-wrapper
+{
+    position: relative;
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-wrap: nowrap;
+    .img-responsive
+    {
+        max-height: 100%;    
+        margin: auto;
+    }
+    .gallery-item
+    {
+        position: absolute;
+        flex: 0 0 auto;
+        display: flex;
+        align-items: center;
+        align-content: center;
+        align-self: center;
+        height: 100%;
+        width: 100%;
+        
+    }
+    .gallery-item.gallerydocument > div
+    {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        display:flex;
+        justify-content: center;
+        align-items: center;
+    }
+}

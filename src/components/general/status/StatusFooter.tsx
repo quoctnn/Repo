@@ -82,7 +82,8 @@ export default class StatusFooter extends React.Component<Props, State> {
                 parentStatus={this.props.status}
                 canMention={this.props.canMention}
                 canComment={this.props.canComment}
-                onCommentSubmit={this.props.onCommentSubmit} onDidType={() => {}}/>
+                onCommentSubmit={this.props.onCommentSubmit} 
+                />
         )
     }
 

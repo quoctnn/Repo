@@ -1,10 +1,11 @@
 import { Status } from '../reducers/statuses';
 import Constants from '../utilities/Constants';
 import { UserProfile } from '../reducers/profileStore';
+import { UploadedFile } from '../reducers/conversations';
 export class StatusUtilities {
-    static filterStatusFileType = (status:Status, type:string) => 
+    static filterStatusFileType = (files:UploadedFile[], type:string) => 
     {
-        return status.files.filter((file) => {
+        return files.filter((file) => {
             return file.type == type
         })
     }

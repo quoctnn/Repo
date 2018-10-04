@@ -12,6 +12,7 @@ import VideoPlayer from './video/VideoPlayer';
 const processString = require('react-process-string');
 import store from '../../main/App';
 import { GalleryImage, ImageGallery } from './gallery/ImageGallery';
+import { FileUtilities } from '../../utilities/FileUtilities';
 require("./ChatMessage.scss");
 
 export enum MessagePosition
@@ -69,70 +70,6 @@ export class ChatMessage extends React.Component<Props, {}> {
             </div>
         </div>)
     }
-    renderDocument(file:UploadedFile)
-    {
-        let iconClass = "document " + file.extension
-        let url = appendTokenToUrl( file.file )
-        return (
-            <div className={iconClass} key={file.id}>
-                <a href={url} target="_blank">
-                    <i className="fa file-icon"></i>
-                    {file.filename}
-                </a>
-            </div>
-        )
-    }
-    getThumbnailContent(item:GalleryImage) {
-        return <img src={item.thumbnail} className="img-responsive"/>;
-    }
-    getImagesInPhotoswipeFormat(photos:UploadedFile[]):GalleryImage[] 
-    {
-        if (photos.length === 1) {
-            // When showing just one image, show the full size:
-            let i = appendTokenToUrl( photos[0].image )
-            return [{
-                src: i, thumbnail: i,
-                w: photos[0].image_width, h: photos[0].image_height,id: photos[0].id
-            }];
-        } else {
-            return photos.map((item) => {
-                let i = appendTokenToUrl( item.image )
-                return {
-                    src: i, thumbnail: i,
-                    w: item.image_width, h: item.image_height, id: item.id
-                };
-            })
-        }
-    }
-    renderImage(file:UploadedFile)
-    {
-        return <ImageGallery items={this.getImagesInPhotoswipeFormat([file])} thumbnailContent={this.getThumbnailContent}/>
-    }
-    renderVideo(file:UploadedFile)
-    {
-        if(VideoPlayer.canPlay(file.file))
-        {
-            return (<VideoPlayer link={file.file} key={file.id}/>)
-        }
-        return null
-    }
-    getFileRepresentation(file:UploadedFile)
-    {
-        var data = null
-        switch(file.type)
-        {
-            case "document": data = this.renderDocument(file);break;
-            case "audio":
-            case "video": data = this.renderVideo(file);break;
-            case "image": data = this.renderImage(file);break;
-            default: break;
-        }
-        if(!data)
-        {
-            data = file.file
-        }
-        return data
-    }
     render() {
         var processed:any = null
         let msg = this.props.data
@@ -166,7 +103,7 @@ export class ChatMessage extends React.Component<Props, {}> {
         }
         else if(msg.files && msg.files.length > 0)
         {
-            processed = this.getFileRepresentation(msg.files[0])  
+            processed = FileUtilities.getFileRepresentation(msg.files[0])  
         }
         else if(res)
         {

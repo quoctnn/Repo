@@ -55,6 +55,7 @@ export default class StatusEditFormContainer extends StatusFormContainerBase {
     }
 
     render() {
+        const canPost = this.canPost()
         return (
             <StatusEditForm
                 mentionSearch={this.handleMentionSearch}
@@ -63,8 +64,8 @@ export default class StatusEditFormContainer extends StatusFormContainerBase {
                 content={this.state.text}
                 mentions={ProfileManager.getProfiles(this.props.status.mentions).map(m => Mention.fromUser(m))}
                 files={this.props.status.files}
-                canPost={this.canPost}
-                onDidType={this.props.onDidType}
+                canPost={canPost}
+                onDidType={this.onDidType}
                 onSubmit={this.handleSubmit}
                 onFileAdded={this.handleFileAdded}
                 onFileRemoved={this.handleFileRemoved}
@@ -89,17 +90,11 @@ class StatusEditForm extends StatusForm{
         }
     }
     render() {
-        
+        const canPost = this.canPost()
         return (
             <div className="panel panel-flat create-post-panel">
                 <div className="panel-body">
-                    {this.renderTextArea({
-                                    content: this.props.content,
-                                    mentions: this.props.mentions,
-                                    placeholder: this.props.textPlaceholder,
-                                    className: "textarea-create-post status-editor",
-                                    rows: 2
-                            })}
+                    {this.renderTextArea(canPost)}
                 </div>
             </div>
         );

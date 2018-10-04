@@ -10,14 +10,14 @@ export interface OwnProps
     onSubmit:(text:string, mentions:number[]) => void
     onFileAdded:() => void
     onFileRemoved:(file:UploadedFile) => void
-    onDidType:() => void
+    onDidType:(unprocessedText:string) => void
     onFileError:() => void
     onFileUploaded?:(file:UploadedFile) => void
     onFileQueueComplete?:() => void
     onChangeMentions?:(mentions: any) => void
     communityId:number
     canMention:boolean
-    canPost:() => boolean
+    canPost:boolean
     canUpload:boolean
     files?:UploadedFile[]
     content?:string 
@@ -57,10 +57,6 @@ export default class StatusFormBase extends React.Component<Props, State> implem
         this.handleFileRemoved = this.handleFileRemoved.bind(this)
         this.handleSuggestionVisibility = this.handleSuggestionVisibility.bind(this)
         this.renderTextArea = this.renderTextArea.bind(this)
-    }
-    canPost()
-    {
-        return false
     }
     getContent() 
     {
@@ -126,13 +122,9 @@ export default class StatusFormBase extends React.Component<Props, State> implem
             return "community";
         }
     }
-    onDidType()
-    {
-        
-    }
-    renderTextArea(props) {
+    renderTextArea(canSubmit:boolean) {
         return (
-            <ChatMessageComposer onHandleUploadClick={this.handleUploadClick} ref={this.inputRef} content={this.props.content} mentionSearch={this.props.mentionSearch} mentions={this.props.mentions} communityId={this.props.communityId} onSubmit={this.handleSubmit} onDidType={this.props.onDidType} />                      
+            <ChatMessageComposer canSubmit={canSubmit} onHandleUploadClick={this.handleUploadClick} ref={this.inputRef} content={this.props.content} mentionSearch={this.props.mentionSearch} mentions={this.props.mentions} communityId={this.props.communityId} onSubmit={this.handleSubmit} onDidType={this.props.onDidType} />                      
         )
     }
    //<MentionEditor onKeyboardSubmit={this.handleSubmit} onChange={this.props.onTextChange}

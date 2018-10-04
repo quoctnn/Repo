@@ -3,11 +3,9 @@ import { Status, TempStatus } from '../../../reducers/statuses';
 import { UploadedFile } from '../../../reducers/conversations';
 import { Settings } from '../../../utilities/Settings';
 import { URL_REGEX, URL_WWW_REGEX } from '../../../utilities/Utilities';
-import { UserProfile } from '../../../reducers/profileStore';
 import { Mention } from '../../input/MentionEditor';
 import ApiClient from '../../../network/ApiClient';
 import { IEditorComponent, EditorContent } from '../ChatMessageComposer';
-import { ProfileManager } from '../../../main/managers/ProfileManager';
 
 export interface Props 
 {
@@ -20,7 +18,6 @@ export interface Props
     canMention:boolean
     canComment:boolean
     canUpload:boolean
-    onDidType:() => void
     communityId:number
 }
 interface State 
@@ -62,6 +59,7 @@ export default class StatusFormContainerBase extends React.Component<Props, Stat
         this.findPrimaryLink = this.findPrimaryLink.bind(this);
         this.clearEditor = this.clearEditor.bind(this);
         this.handleMentionSearch = this.handleMentionSearch.bind(this);
+        this.onDidType = this.onDidType.bind(this);
     }
 
     handleMentionSearch(search:string, completion:(mentions:Mention[]) => void)
@@ -154,8 +152,12 @@ export default class StatusFormContainerBase extends React.Component<Props, Stat
             return null
         }
     }
-
-    canPost() {
+    onDidType(unprocessedText:string)
+    {
+        this.setState({text: unprocessedText})
+    }
+    canPost() 
+    {
         let text = this.state.text.trim()
 
         if (this.state.uploading || text.length > Settings.commentMaxLength) {

@@ -1,6 +1,6 @@
 
 import * as React from "react";
-import { ProtectNavigation } from '../../utilities/Utilities';
+import { ProtectNavigation, nullOrUndefined } from '../../utilities/Utilities';
 import MentionEditor from "../input/MentionEditor";
 import { EditorState, ContentState, SelectionState, Modifier} from "draft-js";
 import { Mention } from '../input/MentionEditor';
@@ -131,13 +131,14 @@ const generateContentState = (content:string, mentions:Mention[]):ContentState =
 export interface Props
 {
     onSubmit:(text:string, mentions:number[]) => void,
-    onDidType:() => void
+    onDidType:(unprocessedText:string) => void
     filesAdded?:(files:File[]) => void
     communityId?:number
     content:string
     mentions:Mention[]
     mentionSearch:(search:string, completion:(mentions:Mention[]) => void) => void
     onHandleUploadClick?:(event) => void
+    canSubmit?:boolean
 }
 interface State
 {
@@ -158,10 +159,12 @@ export class ChatMessageComposer extends React.Component<Props,{}> implements IE
         this.sendDidType = this.sendDidType.bind(this)
         this.getProcessedText = this.getProcessedText.bind(this)
         this.onChange = this.onChange.bind(this)
+        this.canSubmit = this.canSubmit.bind(this)
+        
     }
     shouldComponentUpdate(nextProps:Props, nextState:State)
     {
-        return nextState.editorState != this.state.editorState || nextProps.content != this.props.content || (nextProps.mentions || []).length != (this.props.mentions || []).length
+        return nextProps.canSubmit != this.props.canSubmit || nextState.editorState != this.state.editorState || nextProps.content != this.props.content || (nextProps.mentions || []).length != (this.props.mentions || []).length
     }
     clearEditorContent = () => {
 
@@ -182,9 +185,9 @@ export class ChatMessageComposer extends React.Component<Props,{}> implements IE
     }
     sendDidType()
     {
+        this.props.onDidType(this.state.plainText)
         if(this.canPublishDidType) 
         {
-            this.props.onDidType()
             this.canPublishDidType = false
             setTimeout(() => {
               this.canPublishDidType = true
@@ -216,7 +219,14 @@ export class ChatMessageComposer extends React.Component<Props,{}> implements IE
         })
         return {text, mentions:Object.keys(mentions).map(k => parseInt(k))}
     }
+    canSubmit()
+    {
+        if( !nullOrUndefined( this.props.canSubmit) )
+            return this.props.canSubmit
+        return true
+    }
     render() {
+        const canSubmit = this.canSubmit()
         return (
             <div className="chat-message-composer">
                 <form className="clearfix" action="." onSubmit={this.handleSubmit}>
@@ -226,7 +236,7 @@ export class ChatMessageComposer extends React.Component<Props,{}> implements IE
                             <MentionEditor onHandleUploadClick={this.props.onHandleUploadClick} filesAdded={this.props.filesAdded} mentionSearch={this.props.mentionSearch} editorState={this.state.editorState} ref={this.inputRef} onChange={this.onChange}/> 
                         </div>
                         <div className="button-wrap d-flex flex-column-reverse">
-                            <button className="btn btn-submit btn-default align-items-end btn-primary message-send-button">
+                            <button disabled={!canSubmit} className="btn btn-submit btn-default align-items-end btn-primary message-send-button">
                                 <i className="fas fa-location-arrow" />
                             </button>
                         </div>

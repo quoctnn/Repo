@@ -73,10 +73,10 @@ class StatusComponent extends React.Component<Props, State> {
     } */
     getTypeOfContent(status:Status)
     {
-        let videos = StatusUtilities.filterStatusFileType(status, "video")
-        let photos = StatusUtilities.filterStatusFileType(status, "image")
-        let attachments = StatusUtilities.filterStatusFileType(status, "document")
-        let audios = StatusUtilities.filterStatusFileType(status, "audio")
+        let videos = StatusUtilities.filterStatusFileType(status.files, "video")
+        let photos = StatusUtilities.filterStatusFileType(status.files, "image")
+        let attachments = StatusUtilities.filterStatusFileType(status.files, "document")
+        let audios = StatusUtilities.filterStatusFileType(status.files, "audio")
 
         if (videos.length && !photos.length && !audios.length && !attachments.length) {
             return "videos"

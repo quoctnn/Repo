@@ -3,6 +3,8 @@ import * as ReactDOM from "react-dom";
 import * as PhotoSwipeGallery from "react-photoswipe/lib/PhotoSwipeGallery";
 import Constants from '../../../utilities/Constants';
 import { FormattedMessage } from "react-intl";
+import { UploadedFile } from '../../../reducers/conversations';
+import { appendTokenToUrl, uniqueId } from '../../../utilities/Utilities';
 require("react-photoswipe/lib/photoswipe.css");
 
 var pswpInstance = null;
@@ -11,13 +13,119 @@ function imageLoadComplete(pswp) {
     // Save the Photoswipe instance after opening an image. See getImageURLForShare
     pswpInstance = pswp
 }
-export interface GalleryImage 
+export enum GalleryItemType 
+{
+    LINK = "link",
+    IMAGE = "image",
+    DOCUMENT = "document",
+    VIDEO = "video",
+    AUDIO = "audio",
+    NONE = "none",
+}
+export const parseGalleryItemType = (value:string):GalleryItemType => {
+    switch(value)
+    {
+        case "link": return GalleryItemType.LINK
+        case "image": return GalleryItemType.IMAGE
+        case "document": return GalleryItemType.DOCUMENT
+        case "video": return GalleryItemType.VIDEO
+        case "audio": return GalleryItemType.AUDIO
+        default: return GalleryItemType.NONE
+    }
+}
+export const convertToGalleryItem = (file:UploadedFile):GalleryItem => {
+    switch(file.type)
+    {
+        case "image": return new GalleryImage(file)
+        case "document": return new GalleryDocument(file)
+        case "audio":
+        case "video": return new GalleryMedia(file)
+        default: return new GalleryLink(file.filename, file.file, file.id.toString())
+    }
+}
+export class GalleryItem 
+{
+    name:string 
+    url:string
+    id:string
+    animId:string
+    isClone:boolean
+    key:string
+    constructor(name:string,url:string, id:string)
+    {
+        this.name = name
+        this.url = url
+        this.id = id
+        this.animId = uniqueId()
+        this.isClone = false
+        this.key = this.animId
+    }
+    clone()
+    {
+        var copied = Object.assign(
+            Object.create(
+              Object.getPrototypeOf(this)
+            ),
+            this
+          );
+          copied.animId = uniqueId()
+          copied.isClone = true
+          return copied;
+    }
+    renderFull(onClick?:(event) => void)
+    {
+        return this.renderPreview(onClick)
+    }
+    renderPreview(onClick?:(event) => void):JSX.Element
+    {
+        return (<div key={this.id} onClick={onClick} className="gallery-item">
+                    <a className="" href={this.url}>{this.name}</a>
+                </div>)
+         
+    }
+}
+export class GalleryLink extends GalleryItem
+{
+    constructor(name:string,url:string, id:string)
+    {
+        super(name, url, id)
+    }
+}
+export class GalleryDocument extends GalleryItem
+{
+    constructor(file:UploadedFile)
+    {
+        super(file.filename, file.file, file.id.toString())
+    }
+}
+export class GalleryMedia extends GalleryItem
+{
+    constructor(file:UploadedFile)
+    {
+        super(file.filename, file.file, file.id.toString())
+    }
+}
+export class GalleryImage extends GalleryItem
 {
     src: string
     thumbnail: string
     w: number
     h: number
-    id:number
+    constructor(file:UploadedFile)
+    {
+        super(file.filename, file.file, file.id.toString())
+        let i = appendTokenToUrl( file.image )
+        this.src = i
+        this.thumbnail = i
+        this.w = file.image_width
+        this.h = file.image_height
+    }
+    renderPreview(onClick?: (event: any) => void )
+    {
+        return <div key={this.id} onClick={onClick} className="gallery-item gallery-image">
+                    <img src={this.src} className="img-responsive" />
+                </div>
+    }
 }
 const photoswipeOptions = {
     'shareButtons': [

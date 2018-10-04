@@ -8,16 +8,17 @@ export default class CommentFormContainer extends StatusFormContainerBase {
 
     render() {
         if ((this.props.canComment && this.props.parentStatus.can_comment) || false) {
+            const canPost = this.canPost()
             return (
                 <CommentForm
                     onFileError={this.handleFileError}
                     mentionSearch={this.handleMentionSearch}
                     ref={this.formRef}
-                    onDidType={() => {}}
+                    onDidType={this.onDidType}
                     communityId={this.props.communityId}
                     canUpload={this.props.canUpload}
                     //onTextChange={this.handleTextChange}
-                    canPost={this.canPost}
+                    canPost={canPost}
                     onSubmit={this.handleSubmit}
                     onFileAdded={this.handleFileAdded}
                     onFileRemoved={this.handleFileRemoved}
