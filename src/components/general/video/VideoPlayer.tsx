@@ -5,8 +5,8 @@ import { DefaultPlayer as Video } from 'react-html5video';
 import 'react-html5video/dist/styles.css';
 import { appendTokenToUrl } from '../../../utilities/Utilities';
 
-const VIDEO_EXTENSIONS = /\.(mp4|og[gv]|webm|MOV)$/i
-const AUDIO_EXTENSIONS = /\.(mp3|wav)$/i
+const VIDEO_EXTENSIONS = /\.(mp4|og[gv]|webm|MOV)($|\?)/i
+const AUDIO_EXTENSIONS = /\.(mp3|wav)($|\?)/i
 export interface Props 
 {
     link:string

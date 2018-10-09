@@ -124,7 +124,7 @@ export default class StatusFormBase extends React.Component<Props, State> implem
     }
     renderTextArea(canSubmit:boolean) {
         return (
-            <ChatMessageComposer canSubmit={canSubmit} onHandleUploadClick={this.handleUploadClick} ref={this.inputRef} content={this.props.content} mentionSearch={this.props.mentionSearch} mentions={this.props.mentions} communityId={this.props.communityId} onSubmit={this.handleSubmit} onDidType={this.props.onDidType} />                      
+            <ChatMessageComposer className="secondary-text" canSubmit={canSubmit} onHandleUploadClick={this.handleUploadClick} ref={this.inputRef} content={this.props.content} mentionSearch={this.props.mentionSearch} mentions={this.props.mentions} communityId={this.props.communityId} onSubmit={this.handleSubmit} onDidType={this.props.onDidType} />                      
         )
     }
    //<MentionEditor onKeyboardSubmit={this.handleSubmit} onChange={this.props.onTextChange}

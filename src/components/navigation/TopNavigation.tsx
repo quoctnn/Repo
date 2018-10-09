@@ -29,16 +29,16 @@ class TopNavigation extends React.Component<Props, {}> {
             endpoint = endpoint.replace(/(:\d+$)/, '');
         }
         return(
-            <div id="top-navigation" className="flex align-center">
+            <div id="top-navigation" className="d-flex align-items-center">
                 <div className="flex-shrink-0">
                     <Link className="btn btn-primary margin-right-sm" to={Routes.ROOT}><i className="fas fa-home" /></Link>
                     <Link className="btn btn-primary margin-right-sm" to={Routes.CONVERSATIONS}><i className="fas fa-comments" /></Link>
                 </div>
                 { endpoint &&
-                    <div className="text-truncate align-center lead">{endpoint}</div>
+                    <div className="text-truncate align-items-center lead">{endpoint}</div>
                 }
-                <div className="flex-grow flex-shrink"></div>
-                <div className="flex">
+                <div className="flex-grow-1 flex-shrink-1"></div>
+                <div className="d-flex">
                     {!Settings.isProduction && <DevToolTrigger /> }
                     {this.props.signedIn && <UserStatusSelector /> }
                     <ProfileStatus />

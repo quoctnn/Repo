@@ -1,12 +1,8 @@
 import { UploadedFile } from '../reducers/conversations';
 import { appendTokenToUrl } from './Utilities';
 import VideoPlayer from '../components/general/video/VideoPlayer';
-import { ImageGallery, GalleryImage, GalleryItemType } from '../components/general/gallery/ImageGallery';
 import React = require('react');
 export class FileUtilities {
-    static getThumbnailContent(item:GalleryImage) {
-        return <img src={item.src} className="img-responsive"/>;
-    }
     static renderDocument(file:UploadedFile)
     {
         let iconClass = "document " + file.extension
@@ -19,21 +15,6 @@ export class FileUtilities {
                 </a>
             </div>
         )
-    }
-    static getImagesInPhotoswipeFormat(photos:UploadedFile[]):GalleryImage[] 
-    {
-        if (photos.length === 1) {
-            // When showing just one image, show the full size:
-            return [new GalleryImage(photos[0])];
-        } else {
-            return photos.map((item) => {
-                return new GalleryImage(item);
-            })
-        }
-    }
-    static renderImages(files:UploadedFile[])
-    {
-        return <ImageGallery items={this.getImagesInPhotoswipeFormat(files)} thumbnailContent={this.getThumbnailContent}/>
     }
     static renderImage(file:UploadedFile) {
         let i = appendTokenToUrl( file.image )
@@ -63,6 +44,30 @@ export class FileUtilities {
             data = <>{file.file}</>
         }
         return data
+    }
+    static blobToDataURL = (blob:Blob, callback:(result:string) => void) => {
+        var reader = new FileReader();
+        reader.onload = (e) => 
+        {
+            callback(reader.result as string)
+        }
+        reader.readAsDataURL(blob);
+    }
+    static dataUrlToBlob = (dataurl:string) => 
+    {
+        let arr = dataurl.split(',')
+        let mime = arr[0].match(/:(.*?);/)[1]
+        let bstr = atob(arr[1])
+        let n = bstr.length
+        let u8arr = new Uint8Array(n)
+        while(n--){
+            u8arr[n] = bstr.charCodeAt(n)
+        }
+        return new Blob([u8arr], {type:mime})
+    }
+    static humanFileSize = (size) => {
+        var i = Math.floor( Math.log(size) / Math.log(1024) );
+        return parseFloat((size / Math.pow(1024, i) ).toFixed(2)) * 1 + ' ' + ['B', 'kB', 'MB', 'GB', 'TB'][i];
     }
 }
 

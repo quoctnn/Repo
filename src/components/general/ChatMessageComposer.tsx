@@ -139,6 +139,7 @@ export interface Props
     mentionSearch:(search:string, completion:(mentions:Mention[]) => void) => void
     onHandleUploadClick?:(event) => void
     canSubmit?:boolean
+    className?:string
 }
 interface State
 {
@@ -228,7 +229,7 @@ export class ChatMessageComposer extends React.Component<Props,{}> implements IE
     render() {
         const canSubmit = this.canSubmit()
         return (
-            <div className="chat-message-composer">
+            <div className={"chat-message-composer" + (this.props.className ? " " + this.props.className : "")}>
                 <form className="clearfix" action="." onSubmit={this.handleSubmit}>
                     <div className="input-group">
                         <div className="input-wrap"

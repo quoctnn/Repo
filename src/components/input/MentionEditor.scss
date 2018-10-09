@@ -119,15 +119,10 @@ mention {
 }
 .editor-button
 {
-   border-radius: 50%;
    width: 39px;
    height:39px;
    margin-right: 5px;
-   @include var(background, main-content-background);
-   > i 
-   { 
-     @include var(color, primary-color);
-   }
+   color:inherit;
    padding: 0;
    input[type="file"]
    {

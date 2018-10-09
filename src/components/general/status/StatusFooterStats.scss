@@ -1,0 +1,36 @@
+@import "../../../main/Config";
+.status-footer-stats
+{
+    position: relative;
+    button 
+    {
+        color:inherit;
+        outline: 0;
+        background: none;
+    }
+    button:focus 
+    {
+        outline: 0;
+        box-shadow: none;
+    }
+    
+    > div:first-child
+    {
+        padding-left: 0;
+    }
+    > * 
+    {
+        display: flex;
+        align-items: center;
+    }
+}
+.status-footer-stats:after {
+    content: "";
+    left: 0;
+    right: 0;
+    bottom: 0;
+    position: absolute;
+    @include var(background, border-color-default);
+    margin: -1px 15px;
+    height: 1px;
+  }

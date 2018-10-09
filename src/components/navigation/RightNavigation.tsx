@@ -97,7 +97,7 @@ class RightNavigation extends React.Component<Props, {}> {
     render() {
         
         return(
-            <div id="right-navigation" className="flex transition">
+            <div id="right-navigation" className="d-flex transition">
                 <CollapsiblePanel id="right-navigation" arrowDirectionCollapsed={ArrowDirectionCollapsed.LEFT}>
                     <List>{this.state.contacts.map((contact, index) => {
                         return (

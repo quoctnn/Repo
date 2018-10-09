@@ -3,10 +3,19 @@
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: #888;background:var(--blue, #888); border-radius:50vw;}
 ::-webkit-scrollbar-thumb:hover {background: #555;background:var(--blue, #555);}
-.flex{display: flex}
-.flex-grow{ flex-grow: 1;} 
-.flex-shrink{ flex-shrink: 1;}
-.align-center{ align-items: center;}
+/* Bootstrap override */
+.modal-backdrop.show {
+    opacity: 0.85;
+}
+.dropdown-toggle:after
+{
+    display: none;
+}
+.dropdown-menu 
+{
+    padding: 0;
+}
+/* Bootstrap override end*/
 .img-responsive{
     display: block;
     max-width: 100%;
@@ -135,6 +144,31 @@ ul,li{margin:0; padding: 0;}
     -webkit-backface-visibility : hidden;
     -moz-backface-visibility : hidden;
     backface-visibility : hidden;
+}
+.link-text, a
+{
+    @include var(color, link-color);
+    font-weight: 500;
+}
+.link-text:hover, a:hover
+{
+    @include var(color, link-color);
+}
+.primary-text
+{
+    @include var(color, primary-text-color);
+}
+.secondary-text
+{
+    @include var(color, secondary-text-color);
+}
+.drop-shadow-large
+{
+    box-shadow:map-get($root, drop-shadow-large);
+}
+.drop-shadow
+{
+    box-shadow:map-get($root, drop-shadow);
 }
 #main-content
 {

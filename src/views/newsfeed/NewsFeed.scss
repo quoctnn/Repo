@@ -1,4 +1,12 @@
 .status-list
 {
-    
+    padding: 10px !important;
+    > li 
+    {
+        margin-bottom: 16px;
+    }
+    > li:last-child
+    {
+        margin-bottom: 0px;
+    }
 }

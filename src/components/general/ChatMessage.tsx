@@ -2,7 +2,7 @@ import * as React from "react";
 import { Message, UploadedFile } from '../../reducers/conversations';
 import { getProfileById } from '../../main/App';
 import { Link } from 'react-router-dom';
-import { URL_REGEX, uniqueId, IS_ONLY_LINK_REGEX, humanFileSize, appendTokenToUrl } from '../../utilities/Utilities';
+import { URL_REGEX, uniqueId, IS_ONLY_LINK_REGEX } from '../../utilities/Utilities';
 import { Routes } from '../../utilities/Routes';
 import Embedly from './Embedly';
 import { translate } from '../intl/AutoIntlProvider';
@@ -11,7 +11,6 @@ import { ConversationManager } from '../../main/managers/ConversationManager';
 import VideoPlayer from './video/VideoPlayer';
 const processString = require('react-process-string');
 import store from '../../main/App';
-import { GalleryImage, ImageGallery } from './gallery/ImageGallery';
 import { FileUtilities } from '../../utilities/FileUtilities';
 require("./ChatMessage.scss");
 
@@ -47,7 +46,7 @@ export class ChatMessage extends React.Component<Props, {}> {
     {
         return (<div>
             <div className="title">{message.tempFile.name}</div>
-            <div className="status">{ humanFileSize( message.tempFile.size ) + " " + translate("Sending...")}</div>
+            <div className="status">{ FileUtilities.humanFileSize( message.tempFile.size ) + " " + translate("Sending...")}</div>
             <div className="footer"><RadialProgress percent={message.tempFile.progress} size={40} strokeWidth={5} /></div>
         </div>)
     }
@@ -55,7 +54,7 @@ export class ChatMessage extends React.Component<Props, {}> {
     {
         return (<div>
             <div className="title">{message.tempFile.name}</div>
-            <div className="status">{ humanFileSize( message.tempFile.size ) + " " + translate("Sending failed")}</div>
+            <div className="status">{ FileUtilities.humanFileSize( message.tempFile.size ) + " " + translate("Sending failed")}</div>
             <div className="footer"><button className="btn" onClick={() => ConversationManager.retryQueuedMessage(message)}>{translate("Retry")}</button></div>
         </div>)
     }

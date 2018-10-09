@@ -43,7 +43,7 @@ class ProfileStatus extends React.Component<Props, State> {
                     </div>
                 }
                 {this.props.profile && 
-                    <div className="flex align-center">
+                    <div className="d-flex align-items-center">
                         <div className="">
                         <Link className="btn btn-outline-secondary" to={Routes.PROFILES + this.props.profile.slug_name}>{this.props.profile.first_name}</Link>
                         </div>

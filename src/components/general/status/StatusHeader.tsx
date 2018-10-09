@@ -55,7 +55,7 @@ export default class StatusHeader extends React.Component<Props, State> {
             {
                 return (<span>
                             <span>{translate("replied to a ")}</span>
-                            <a className="link" href={StatusUtilities.getPermaLink(this.props.status.id)}>{translate("post")}</a> {translate("in ")}
+                            <a className="link link-text" href={StatusUtilities.getPermaLink(this.props.status.id)}>{translate("post")}</a> {translate("in ")}
                         </span>)
             }
             let contextKey = status.context_natural_key;
@@ -110,8 +110,8 @@ export default class StatusHeader extends React.Component<Props, State> {
         {
             let contextCommunity = status.community;
             if (this.props.addLinkToContext) {
-                return <span style={{whiteSpace:'pre'}}>{translate("in ")}
-                    <a className="link"
+                return <span>{translate("in ")}
+                    <a className="link link-text"
                        href={contextCommunity.absolute_url}>{contextCommunity.name}</a>
                     </span>;
             }
@@ -136,7 +136,7 @@ export default class StatusHeader extends React.Component<Props, State> {
             }
             if (contextObj.absolute_url && contextObj.name) {
                 return (
-                    <a className="link"
+                    <a className="link link-text"
                        href={contextObj.absolute_url}>{contextObj.name}</a>);
             }
             if (contextObj.name) {
@@ -187,10 +187,10 @@ export default class StatusHeader extends React.Component<Props, State> {
         let photoSrc = this.props.owner.avatar || this.props.owner.avatar_thumbnail
 
         return (
-            <div className="panel-heading info-heading">
+            <div className="panel-heading status-header">
                 <Avatar image={photoSrc} />
-                <p className="name">
-                    <Link className="user" to={Routes.PROFILES + this.props.owner.slug_name}>{fullName}</Link>
+                <p className="name secondary-text">
+                    <Link className="user link-text" to={Routes.PROFILES + this.props.owner.slug_name}>{fullName}</Link>
                     <span className="action"> {this.getActionText()} </span>
                     <span>{this.getScopeLinkElement()} </span>
                     {this.getCommunityLinkElement()}
@@ -207,7 +207,7 @@ export default class StatusHeader extends React.Component<Props, State> {
                         </span>
                     }
                     <br/>
-                    <span className="date">{this.getTimestamp()}</span>
+                    <span className="date secondary-text">{this.getTimestamp()}</span>
                     {this.renderEditedAt(this.props.edited_at)}
                 </p>
             </div>

@@ -1,10 +1,10 @@
 import 'bootstrap/dist/css/bootstrap.css';
 import '@fortawesome/fontawesome-free/css/fontawesome.min.css';
 import '@fortawesome/fontawesome-free/css/solid.min.css';
-//import '@fortawesome/fontawesome-free/css/regular.min.css';
+import '@fortawesome/fontawesome-free/css/regular.min.css';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { AnyAction, applyMiddleware, createStore, Store } from 'redux';
+import { applyMiddleware, createStore, Store } from 'redux';
 import { Provider } from 'react-redux';
 import { persistStore } from 'redux-persist';
 import { PersistGate } from 'redux-persist/integration/react';

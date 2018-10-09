@@ -1,7 +1,7 @@
 @import "../../../main/Config";
 .btn-like {
     cursor: pointer;
-    @include var(color, primary-color);
+    padding-right:0px;
   }
 
   .btn-like:hover,

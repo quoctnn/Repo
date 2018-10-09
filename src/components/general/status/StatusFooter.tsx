@@ -90,7 +90,7 @@ export default class StatusFooter extends React.Component<Props, State> {
 
     render() {
         return (
-            <div className="panel-footer item-panel-footer">
+            <div className="panel-footer status-footer">
                 {this.renderStats()}
                 {this.renderCommentList()}
                 {this.renderCommentForm()}

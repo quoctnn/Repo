@@ -117,7 +117,7 @@ class StatusComponent extends React.Component<Props, State> {
         let communityId = status.community && status.community.id ? status.community.id : null
         let statusId = "status" + status.id
         let statusType = this.getTypeOfContent(status)
-        let itemClass = classNames("status status-component", statusType) + (status.pending ? " temp" : "")
+        let itemClass = classNames("status status-component drop-shadow", statusType) + (status.pending ? " temp" : "")
         let cl = status.created_at ? "panel item-panel" : "panel item-panel temp"
         return (<div className={itemClass} id={statusId}>
                     <hr className="line"/>

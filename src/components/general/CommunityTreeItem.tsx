@@ -67,7 +67,7 @@ class CommunityTreeItem extends React.Component<Props, {}> {
     {
         return(
             <div className="community-tree-item transition">
-                <div className="flex align-center" onClick={this.props.onClick}>
+                <div className="d-flex align-items-center" onClick={this.props.onClick}>
                     <Avatar borderWidth={2} borderColor="red" image={this.props.communityData.avatar} />
                     <div className="community-name text-truncate">{this.props.communityData.name}</div>
                 </div>

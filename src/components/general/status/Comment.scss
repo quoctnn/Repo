@@ -2,3 +2,24 @@
 {
     border:1px solid red;
 }
+.comment 
+{
+    margin-top: 5px;
+    padding-top: 6px;
+    .status-content
+    {
+        margin-left: 60px;
+    }
+    .status-footer-stats
+    {
+        margin-left: 45px;
+    }
+    .status-footer-stats:after
+    {
+        margin-left:0px;
+    }
+}
+.comment.last .status-footer-stats:after
+{
+    display: none;
+}

@@ -34,6 +34,7 @@ export interface OwnProps
     communityId:number
     authorizedUserId:number
     pageItem:NestedPageItem
+    className?:string
 }
 interface ReduxStateProps
 {
@@ -92,7 +93,7 @@ class Comment extends React.Component<Props, State>  {
 
     render() {
         let comment = this.props.comment
-        let cl = "comment" + (comment.pending ? " temp" : "")
+        let cl = "comment" + (comment.pending ? " temp" : "") + (this.props.className ? " " + this.props.className : "")
         return (
             <li className={cl}>
                 <CommentHeader
@@ -162,7 +163,7 @@ class CommentHeader extends React.Component<CommentHeaderProps,{}>
         if (date) {
             let time = moment.utc(date).tz(timezone).date()
             return (
-                <span className="edited-at">
+                <span className="edited-at secondary-text">
                     {translate("edited")}{' '}
                     <FormattedDate value={time} />{' '}
                     <FormattedTime value={time} />
@@ -193,12 +194,12 @@ class CommentHeader extends React.Component<CommentHeaderProps,{}>
         let photoSrc = this.props.owner.avatar || this.props.owner.avatar_thumbnail
         return (
             <div className="row">
-                <div className="col-12 info-comment">
+                <div className="col-12 status-header">
                     <Avatar image={photoSrc} />
                     <p className="name">
-                        <Link className="user" to={Routes.PROFILES + this.props.owner.slug_name}>{fullName}</Link>
+                        <Link className="user link-text" to={Routes.PROFILES + this.props.owner.slug_name}>{fullName}</Link>
                         <br />
-                        <span className="date">{this.getTimestamp()}</span>
+                        <span className="date secondary-text">{this.getTimestamp()}</span>
                         {this.renderEditedAt(this.props.edited_at)}
                     </p>
                 </div>
@@ -247,7 +248,7 @@ class CommentFooter extends React.Component<CommentFooterProps,{}>
 
     render() {
         return (
-            <div className="row footer-stats">
+            <div className="row status-footer-stats secondary-text">
                 <div className="col-7">
                 {this.props.canReact &&
                     <span className="like-wrapper">
@@ -259,7 +260,7 @@ class CommentFooter extends React.Component<CommentFooterProps,{}>
                 }
                 </div>
 
-                <div className="col-5 text-right">
+                <div className="col-5 justify-content-end">
                     {this.renderOptionsButton()}
                 </div>
             </div>

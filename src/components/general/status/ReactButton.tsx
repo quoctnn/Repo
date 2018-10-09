@@ -27,11 +27,11 @@ export default class ReactButton extends React.Component<Props, State>
         this.props.onReact(reaction)
     }
     render() {
-        let classes = classNames("btn-like", {"active": this.props.reaction != null})
+        let classes = classNames("btn btn-like", {"active": this.props.reaction != null})
         return (
-            <span className={classes} onClick={this.toggleReaction}>
-                <i className="fas fa-thumbs-up"></i>
-            </span>
+            <button className={classes} onClick={this.toggleReaction}>
+                <i className="far fa-thumbs-up"></i>
+            </button>
         );
     }
 }

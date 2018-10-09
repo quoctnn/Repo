@@ -1,0 +1,22 @@
+@import "../../../main/Config";
+.status-options
+{
+    .dropdown-toggle
+    {
+        border:0;
+    }
+    .dropdown-menu > li > a {
+        display: block;
+        padding: 8px 20px;
+        clear: both;
+        font-weight: normal;
+        line-height: 1.42857143;
+        color: #333;
+        white-space: nowrap;
+        cursor: pointer;
+    }
+    .dropdown-menu > li > a:hover
+    {
+        @include var(background, highlight-color);
+    }
+}

@@ -67,7 +67,7 @@ class Embedly extends React.Component<Props, State> {
       <a className="embedly embedly-card" href={page.url} target="_blank">
         <div className="embedly__image">
           <img
-            className="image"
+            className="img-responsive image"
             src={page.thumbnail_url}
             alt={page.title}
           />

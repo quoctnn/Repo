@@ -61,7 +61,7 @@ class ConversationItem extends React.Component<Props, State> {
                                 return <li key={index}><Avatar image={avatar} size={26} borderColor="white" borderWidth={2}  /></li>
                             })}
                         </OverflowList>
-                        <div className="flex-grow"></div>
+                        <div className="flex-grow-1"></div>
                         {this.props.children}
                     </div>
                 </Link>

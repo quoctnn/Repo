@@ -1,4 +1,63 @@
+@import "../../../main/Config";
+@mixin status-color($color) {
+    > hr.line {
+        display: none;
+        @include var(border-color, $color);
+        border-style:solid;
+        border-width: 1px;
+        margin: -8px -8px 5px -8px;
+    }
+  }
 .status.temp 
 {
     border:1px solid red;
+}
+.status
+{
+    background: white;
+    border-radius: 8px;
+    padding: 8px;
+    border-width:1px;
+    border-style:solid;
+    .editor-container
+    {
+      @include var(color, primary-text-color);
+    }
+    @include var(border-color, border-color-default);
+    > hr 
+    {
+        border-top-left-radius: 4px;
+        border-top-right-radius: 4px;
+    }
+    &.text {
+        @include status-color(status-text-color);
+      }
+  
+      &.videos {
+        @include status-color(status-videos-color);
+      }
+  
+      &.multimedia {
+        @include status-color(status-multimedia-color);
+      }
+  
+      &.photos {
+        @include status-color(status-photos-color);
+      }
+  
+      &.audios {
+        @include status-color(status-audios-color);
+      }
+  
+      &.attachments {
+        @include status-color(status-attachments-color);
+      }
+  
+      &.links {
+        @include status-color(status-link-color);
+      }
+  
+      &.event {
+        @include status-color(status-events-color);
+      }
 }

@@ -1,16 +1,7 @@
-import { ImageGallery, GalleryImage, GalleryItemType } from '../gallery/ImageGallery';
-import Embedly from '../Embedly';
 import * as React from 'react';
-import classNames from "classnames";
-import Constants from "../../../utilities/Constants";
-import { StatusUtilities } from '../../../utilities/StatusUtilities';
 import { Status } from '../../../reducers/statuses';
-import { appendTokenToUrl, getTextContent } from '../../../utilities/Utilities';
-import VideoPlayer from '../video/VideoPlayer';
-import GoogleDocEmbedCard from '../GoogleDocEmbedCard';
-import { UploadedFile } from '../../../reducers/conversations';
+import { getTextContent } from '../../../utilities/Utilities';
 import { ProfileManager } from '../../../main/managers/ProfileManager';
-import { FileUtilities } from '../../../utilities/FileUtilities';
 import ContentGallery from '../gallery/ContentGallery';
 require("./StatusContent.scss");
 
@@ -26,7 +17,6 @@ export default class StatusContent extends React.Component<Props, State>
 {     
     constructor(props) {
         super(props)
-        this.renderContent = this.renderContent.bind(this)
     }
     shouldComponentUpdate(nextProps:Props, nextState)
     {
@@ -34,21 +24,6 @@ export default class StatusContent extends React.Component<Props, State>
         nextProps.status.updated_at != this.props.status.updated_at || 
         nextProps.status.files.length != this.props.status.files.length
 
-    }
-    getThumbnailContent(item) {
-        return <img src={item.thumbnail} className="img-responsive"/>;
-    }
-
-    getImagesInPhotoswipeFormat(photos:UploadedFile[]):GalleryImage[] 
-    {
-        if (photos.length === 1) {
-            // When showing just one image, show the full size:
-            return [new GalleryImage(photos[0])];
-        } else {
-            return photos.map((item) => {
-                return new GalleryImage(item);
-            })
-        }
     }
     getTextForField(field)
     {
@@ -67,124 +42,22 @@ export default class StatusContent extends React.Component<Props, State>
         let text = this.getTextForField("text")
         if (text) {
             return (
-                <div className="col-12">
-                    <p className="item-description">
-                        <span className="text">
-                            {getTextContent(text, ProfileManager.getProfiles(this.props.status.mentions),false)}
-                        </span>
-                    </p>
+                <div className="item-description">
+                    <span className="text">
+                        {getTextContent(text, ProfileManager.getProfiles(this.props.status.mentions),false)}
+                    </span>
                 </div>
             )
         }
     }
-
-    renderLink() {
-        if (this.props.status.link) {
-            if (VideoPlayer.canPlay(this.props.status.link)) {
-                return (<VideoPlayer link={this.props.status.link}/>);
-            } else if(this.props.status.link.startsWith("https://docs.google.com/")){
-                return (<GoogleDocEmbedCard url={this.props.status.link}/>);
-            }
-            return (<Embedly url={this.props.status.link}/>);
-        }
-    }
-
-    renderFilesVideoPlayer(type) {
-        let mediaFiles = StatusUtilities.filterStatusFileType(this.props.status.files, type)
-
-        if (mediaFiles.length == 0) return null;
-
-        return (
-            <div>
-                {
-                    mediaFiles.map(function (item) {
-                        if (VideoPlayer.canPlay(item.file)) {
-                            return (
-                                <VideoPlayer link={item.file} key={item.id}/>)
-                        }
-                    })
-                }
-            </div>
-        );
-    }
-
-
-    renderDocuments() {
-        let documents = StatusUtilities.filterStatusFileType(this.props.status.files, "document")
-
-        if (documents.length == 0) return null;
-
-        return (
-            <div className="status-documents">
-                {
-                    documents.map(function (item) {
-                        let iconClass = classNames("col-6 col-sm-4 document", item.extension)
-                        let url = Constants.urlsRoute.openUploadedFile(item.id)
-                        return (
-                            <div className={iconClass} key={item.id}>
-                                <a href={url} target="_blank">
-                                    <h4>
-                                        <i className="fa fa-2x file-icon"></i>
-                                        {item.filename}
-                                    </h4>
-                                </a>
-                            </div>
-                        )
-                    })
-                }
-            </div>
-        );
-    }
-
-    renderGallery() {
-        let imageFiles = StatusUtilities.filterStatusFileType(this.props.status.files, "image")
-        let images = this.getImagesInPhotoswipeFormat(imageFiles)
-
-        if (images.length == 0) return null;
-
-        return (
-            <div className="row">
-                <div className="col-12 photos">
-                    <ImageGallery items={images}
-                                   thumbnailContent={this.getThumbnailContent}/>
-                    <div className="clearfix"></div>
-                </div>
-            </div>
-        );
-    }
-    renderContent()
-    {
-        let items = []
-        let k = this.renderLink()
-        if(k)
-        {
-            items.push(k)
-        }
-        this.props.status.files.forEach(f => {
-            items.push(FileUtilities.getFileRepresentation(f))
-        })
-        return items
-    }
     render() {
         let links = this.props.status.link ? [this.props.status.link] : []
         return (
-            <div className="panel-body">
+            <div className="panel-body status-content primary-text">
                 {this.renderDescription()}
                 <div className="file-list">
                     <ContentGallery files={this.props.status.files || []} links={links} />
                 </div>
-            </div>
-        )
-    }
-    render2() {
-        return (
-            <div className="panel-body">
-                {this.renderDescription()}
-                {this.props.embedLinks && this.renderLink()}
-                {this.renderFilesVideoPlayer("video")}
-                {this.renderGallery()}
-                {this.renderFilesVideoPlayer("audio")}
-                {this.renderDocuments()}
             </div>
         )
     }

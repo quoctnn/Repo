@@ -51,7 +51,7 @@ export function getTextContent(text:string, mentions:UserProfile[], includeEmbed
             {
                 embedlyArr[result[0]] = <Embedly key={uniqueId()} url={result[0]} />
             }
-            return (<a key={uniqueId()} href={result[0]} target="_blank"  data-toggle="tooltip" title={result[0]}>{result[0]}</a>)
+            return (<a key={uniqueId()} href={result[0]} target="_blank"  data-toggle="tooltip" title={result[0]}>{truncate(result[0], 50 )}</a>)
         }
     }
     config.push(k)
@@ -188,28 +188,4 @@ export const normalizeIndex = (selectedIndex, max) => {
     index += max;
     }
     return index;
-}
-export const blobToDataURL = (blob:Blob, callback:(result:string) => void) => {
-    var reader = new FileReader();
-    reader.onload = (e) => 
-    {
-        callback(reader.result as string)
-    }
-    reader.readAsDataURL(blob);
-}
-export const dataUrlToBlob = (dataurl:string) => 
-{
-    let arr = dataurl.split(',')
-    let mime = arr[0].match(/:(.*?);/)[1]
-    let bstr = atob(arr[1])
-    let n = bstr.length
-    let u8arr = new Uint8Array(n)
-    while(n--){
-        u8arr[n] = bstr.charCodeAt(n)
-    }
-    return new Blob([u8arr], {type:mime})
-}
-export const humanFileSize = (size) => {
-    var i = Math.floor( Math.log(size) / Math.log(1024) );
-    return parseFloat((size / Math.pow(1024, i) ).toFixed(2)) * 1 + ' ' + ['B', 'kB', 'MB', 'GB', 'TB'][i];
 }

@@ -316,12 +316,12 @@ export default class MentionEditor extends React.Component<Props, {}> {
                   className="emojiButton editor-button btn btn-default"
                   onMouseUp={this.onEmojiButtonMouseUp}
                   type="button" >
-                  <i className="fas fa-smile fa-lg"></i>
+                  <i className="far fa-smile fa-lg"></i>
                 </button>
                 {(this.props.filesAdded || this.props.onHandleUploadClick) && <button
                   className="upload-button editor-button btn btn-default"
                   type="button" onClick={this.props.onHandleUploadClick} >
-                  <i className="fas fa-paperclip fa-lg"></i>
+                  <i className="fa fa-paperclip fa-lg"></i>
                   {this.props.filesAdded && <input ref={this.fileUploader} accept={Settings.allowedTypesFileUpload} multiple={true} className="form-control" type="file" onChange={this.uploadFileChanged} /> }
                 </button>}
               </div>

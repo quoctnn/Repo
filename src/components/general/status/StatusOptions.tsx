@@ -111,11 +111,11 @@ export default class StatusOptions extends React.Component<Props, State> {
     render()
     {
         return (
-            <span>
+            <span className="status-options">
                 <span className="dropdown dropdown-options">
-                    <span className="dropdown-toggle" data-toggle="dropdown">
+                    <button className="btn dropdown-toggle" data-toggle="dropdown" data-boundary="body">
                         <i className="fa fa-ellipsis-h btn-options"></i>
-                    </span>
+                    </button>
                     <ul className="dropdown-menu dropdown-menu-right">
                         {this.props.isOwner && this.props.canComment &&
                             <li>

@@ -1,0 +1,13 @@
+.status-header
+{
+    display: flex;
+    .avatar 
+    {
+        margin-right: 10px;
+        flex-shrink: 0;
+    }
+    .name
+    {
+        margin: 0;
+    }
+}

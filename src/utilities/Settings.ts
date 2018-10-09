@@ -7,7 +7,8 @@ export interface ISettings
     clearSomeoneIsTypingInterval:number
     allowedTypesFileUpload:string
     commentMaxLength: number
-    maxFileSize: number,
+    maxFileSize: number
+    maxStatusPreviewItems: number
 }
 export const Settings:ISettings = {
     isProduction : process.env.NODE_ENV === "production",
@@ -21,4 +22,5 @@ export const Settings:ISettings = {
     ".css,.html,.php,.c,.cpp,.h,.hpp," + // Code
     ".dxf,.ai,.psd,.eps,.ps,.svg,.ttf,",
     commentMaxLength: 5000,
+    maxStatusPreviewItems:5,
 }

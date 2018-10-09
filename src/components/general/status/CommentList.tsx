@@ -65,9 +65,10 @@ export default class CommentList extends React.Component<Props, State> {
         this.listRef.current.scrollTop = this.listRef.current.scrollHeight;
     }
 
-    renderComment(pageItem:NestedPageItem) {
+    renderComment(pageItem:NestedPageItem, className) {
         return (
             <Comment
+                className={className}
                 communityId={this.props.communityId}
                 canUpload={this.props.canUpload}
                 canReact={this.props.canReact}
@@ -92,7 +93,7 @@ export default class CommentList extends React.Component<Props, State> {
 
         if (data && !this.state.showAll && data.length > this.props.maxComments) {
             return (
-                <button className="btn btn-link" onClick={this.handlePrevious}>
+                <button className="btn btn-link link-text" onClick={this.handlePrevious}>
                     <i className="fa fa-arrow-down"/> &nbsp;
                     {translate("Show previous")}
                 </button>
@@ -104,14 +105,14 @@ export default class CommentList extends React.Component<Props, State> {
         let data = this.props.data
         let max = (this.state.showAll) ? data.length : this.props.maxComments;
         let min = ((data.length - max) >= 0) ? data.length - max : 0;
-
+        let items = data.map(r => r).reverse().slice(min, data.length)
         let listClass = classnames('comment-list', {scrollable: this.state.showAll});
         let authUser = ProfileManager.getAuthenticatedUser()
         return (
             <ul className={listClass} ref={this.listRef}>
                 <li className="text-center">{this.renderPreviousLink()}</li>
-                {data.map(r => r).reverse().slice(min, data.length).map((comment) => {
-                    return this.renderComment(comment);
+                {items.map((comment, i) => {
+                    return this.renderComment(comment, items.length - 1 == i ? "last": null);
                 })}
             </ul>
         );
