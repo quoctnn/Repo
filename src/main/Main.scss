@@ -133,7 +133,10 @@
 .margin-left-xl { margin-left: 3em; }
 li{list-style-type: none;}
 ul,li{margin:0; padding: 0;}
-
+body 
+{
+    @include var(background-color, body-background);
+}
 .transition
 {
     position : relative; 

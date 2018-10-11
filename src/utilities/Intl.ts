@@ -1,7 +1,8 @@
 
 import * as ReactIntl from "react-intl";
 declare global {
-    interface Window { app: any; ReactIntlLocaleData:Array<any>, Intl:any, CSS:CSS, store:any, socket:HTMLDivElement}
+    interface DocumentTouch {}
+    interface Window { app: any; ReactIntlLocaleData:Array<any>, Intl:any, CSS:CSS, store:any, socket:HTMLDivElement, DocumentTouch:DocumentTouch}
     interface Navigator { browserLanguage: string; }
     interface String {
         hashCode(): number;

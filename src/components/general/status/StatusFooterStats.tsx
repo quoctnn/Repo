@@ -61,7 +61,7 @@ export default class StatusFooterStats extends React.Component<Props, State> {
             <div className="row status-footer-stats secondary-text">
                 <div className="col-7">
                     {this.props.canReact && 
-                        <span className="like-wrapper">
+                        <span className="reaction-wrapper">
                             {this.renderLikeButton()}
 
                             <ReactionStats reactions={this.props.reactions}
@@ -77,7 +77,7 @@ export default class StatusFooterStats extends React.Component<Props, State> {
                     {/* Check if status is a task comment to display comment icon */}
                     { this.props.canComment &&
                         <span>
-                            <i className="far fa-comment"></i> {this.props.commentsCount}
+                            <i className="far fa-comment"></i><span className="comment-count">{this.props.commentsCount}</span>
                         </span>
                     }
 

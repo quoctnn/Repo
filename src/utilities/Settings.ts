@@ -1,3 +1,18 @@
+const isTouchDevice = () => 
+{
+    const w = window as any
+    var prefixes = ' -webkit- -moz- -o- -ms- '.split(' ');
+    var mq = function(query) {
+      return window.matchMedia(query).matches;
+    }
+    if (('ontouchstart' in w) || w.DocumentTouch) {
+        return true;
+      }
+    // include the 'heartz' as a way to have a non matching MQ to help terminate the join
+    // https://git.io/vznFH
+    var query = ['(', prefixes.join('touch-enabled),('), 'heartz', ')'].join('');
+    return mq(query);
+  }
 export interface ISettings 
 {
     isProduction:boolean,
@@ -9,6 +24,7 @@ export interface ISettings
     commentMaxLength: number
     maxFileSize: number
     maxStatusPreviewItems: number
+    isTouchDevice:boolean
 }
 export const Settings:ISettings = {
     isProduction : process.env.NODE_ENV === "production",
@@ -23,4 +39,5 @@ export const Settings:ISettings = {
     ".dxf,.ai,.psd,.eps,.ps,.svg,.ttf,",
     commentMaxLength: 5000,
     maxStatusPreviewItems:5,
+    isTouchDevice:isTouchDevice()
 }

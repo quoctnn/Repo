@@ -6,11 +6,13 @@ import { userFullName } from '../../utilities/Utilities';
 import { Avatar } from './Avatar';
 import { Link } from 'react-router-dom';
 import { Routes } from '../../utilities/Routes';
+import { StatusReaction } from './status/ReactButton';
 export interface Props 
 {
     itemClass:string
     showRelationship?:boolean
     profile:UserProfile
+    reaction?:string
 }
 export default class ProfileItem extends React.Component<Props,{}> {
     renderFriends() {
@@ -69,13 +71,15 @@ export default class ProfileItem extends React.Component<Props,{}> {
     render() {
         let user = this.props.profile;
         let itemClasses = classNames(this.props.itemClass, "profile-item")
-
+        const reaction = StatusReaction.parseStatusReaction(this.props.reaction)
         return (
             <div className={itemClasses}>
                 <Link to={Routes.PROFILES + user.slug_name}>
                     <div className="wrapper">
                     <div className="col-xs-4">
-                        <Avatar className="img-responsive" image={user.avatar || user.avatar_thumbnail} />
+                        <Avatar className="img-responsive" image={user.avatar || user.avatar_thumbnail} >
+                            <StatusReaction.Component large={false} reaction={reaction}></StatusReaction.Component>
+                        </Avatar>
                     </div>
                     <div className="col-xs-8">
                         <h4 className="name">

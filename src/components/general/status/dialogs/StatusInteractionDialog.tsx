@@ -4,6 +4,7 @@ import { translate } from '../../../intl/AutoIntlProvider';
 import LoadingSpinner from '../../LoadingSpinner';
 import ProfileItem from '../../ProfileItem';
 import { ModalBody, Modal, ModalHeader, ModalFooter, Button } from 'reactstrap';
+import { StatusUtilities } from '../../../../utilities/StatusUtilities';
 require("./StatusInteractionDialog.scss");
 export interface InteractionDialogProps
 {
@@ -41,7 +42,7 @@ export class StatusInteractionDialog extends React.Component<InteractionDialogPr
                             return (
                                 <ProfileItem key={user.id}
                                                 itemClass="col-6 col-lg-4"
-                                                profile={user}/>
+                                                profile={user} reaction={StatusUtilities.getReaction(this.props.reactions,user)}/>
                             )
                         })
                         }

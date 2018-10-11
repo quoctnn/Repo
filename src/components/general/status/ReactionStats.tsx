@@ -66,7 +66,7 @@ export default class ReactionStats extends React.Component<ReactionStatsProps,Re
         return (
             <>
                 <button className={classes} onClick={this.handleShowReactions}>
-                    <span className="link-text">{this.props.reactionsCount}</span>
+                    <span>{this.props.reactionsCount}</span>
                 </button>
                 {this.renderReactionsModal()}
             </>

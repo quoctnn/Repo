@@ -261,7 +261,7 @@
         }
     }
 }
-.fade-scale 
+.fade-scale .carousel-item.active > .gallery-item
 {
     transform: scale(0);
     opacity: 0;
@@ -269,7 +269,7 @@
     -o-transition: all .25s linear;
     transition: all .25s linear;
 }
-.fade-scale.show
+.show.fade-scale .carousel-item.active > .gallery-item
 {
     opacity: 1;
     transform: scale(1);

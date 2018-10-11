@@ -71,7 +71,7 @@ class Comment extends React.Component<Props, State>  {
 
     handleReaction(reaction:string) {
 
-        let oldReaction = StatusUtilities.getReaction(this.props.comment, ProfileManager.getAuthenticatedUser())
+        let oldReaction = StatusUtilities.getStatusReaction(this.props.comment, ProfileManager.getAuthenticatedUser())
         let rCount = this.props.comment.reaction_count
         let r = this.props.comment.reactions || {}
         let userId = ProfileManager.getAuthenticatedUser().id
@@ -109,7 +109,7 @@ class Comment extends React.Component<Props, State>  {
                     canComment={this.props.canComment}
                     commentsCount={comment.comments_count}
                     created_at={comment.created_at}
-                    reaction={StatusUtilities.getReaction(comment, ProfileManager.getAuthenticatedUser())}
+                    reaction={StatusUtilities.getStatusReaction(comment, ProfileManager.getAuthenticatedUser())}
                     reactionsCount={this.props.comment.reaction_count}
                     reactions={comment.reactions}
                     onReaction={this.handleReaction}
@@ -251,7 +251,7 @@ class CommentFooter extends React.Component<CommentFooterProps,{}>
             <div className="row status-footer-stats secondary-text">
                 <div className="col-7">
                 {this.props.canReact &&
-                    <span className="like-wrapper">
+                    <span className="reaction-wrapper">
                     {this.renderReactButton()}
 
                         <ReactionStats reactions={this.props.reactions}

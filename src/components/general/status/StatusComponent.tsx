@@ -96,7 +96,7 @@ class StatusComponent extends React.Component<Props, State> {
         return "text";
     }
     handleReaction(reaction:string) {
-        let oldReaction = StatusUtilities.getReaction(this.props.status, ProfileManager.getAuthenticatedUser())
+        let oldReaction = StatusUtilities.getStatusReaction(this.props.status, ProfileManager.getAuthenticatedUser())
         let rCount = this.props.status.reaction_count
         let r = this.props.status.reactions || {}
         let userId = ProfileManager.getAuthenticatedUser().id
@@ -143,7 +143,7 @@ class StatusComponent extends React.Component<Props, State> {
                         commentsCount={status.comments_count}
                         created_at={status.created_at}
                         onReact={this.handleReaction}
-                        reaction={StatusUtilities.getReaction(this.props.status, ProfileManager.getAuthenticatedUser())}
+                        reaction={StatusUtilities.getStatusReaction(this.props.status, ProfileManager.getAuthenticatedUser())}
                         reactions={this.props.status.reactions}
                         reactionsCount={this.props.status.reaction_count}
                         children={this.props.pageItem.children}
