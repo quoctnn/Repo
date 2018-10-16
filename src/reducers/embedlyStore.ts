@@ -1,23 +1,23 @@
 import { combineReducers } from 'redux';
 import { Types } from '../utilities/Types';
 import { AjaxRequest } from '../network/AjaxRequest';
-import * as Actions from "../actions/Actions" 
+import * as Actions from "../actions/Actions"
 import Constants from '../utilities/Constants';
-export interface EmbedlyMedia 
+export interface EmbedlyMedia
 {
     height:number
     width:number
     type:string
     html:string
 }
-export class EmbedlyItem 
+export class EmbedlyItem
 {
     url:string
     provider_url:string
     original_url:string
-    description:string 
+    description:string
     title:string
-    thumbnail_url:string 
+    thumbnail_url:string
     thumbnail_width:number
     thumbnail_height:number
     media:EmbedlyMedia
@@ -31,7 +31,7 @@ const addPages = (state, action) => {
     })
     return newState
 }
-export const pagesById = (state = {}, action) => 
+export const pagesById = (state = {}, action) =>
 {
     switch(action.type) {
         case Types.EMBEDLYSTORE_ADD_PAGES: return addPages(state, action);
@@ -41,7 +41,7 @@ export const pagesById = (state = {}, action) =>
 }
 ///////////////////////
 const addPageIdsToQueue = (state:{}, action) => {
-    
+
     let pages = action.ids as string[]
     let newState = {...state}
     pages.forEach(p => {
@@ -50,7 +50,7 @@ const addPageIdsToQueue = (state:{}, action) => {
     return newState
 }
 const removePageIdsFromQueue = (state:{}, action) => {
-    
+
     let pages = action.ids as string[]
     let newState = {...state}
     pages.forEach(p => {
@@ -60,7 +60,7 @@ const removePageIdsFromQueue = (state:{}, action) => {
 }
 
 const addPageIds = (state:string[], action) => {
-    
+
     let pages = action.pages as EmbedlyItem[]
     let newState = [...state]
     pages.forEach(p => {
@@ -69,7 +69,7 @@ const addPageIds = (state:string[], action) => {
     })
     return newState
 }
-export const allPages = (state:string[] = [], action) => 
+export const allPages = (state:string[] = [], action) =>
 {
     switch(action.type) {
         case Types.EMBEDLYSTORE_ADD_PAGES: return addPageIds(state, action);
@@ -77,7 +77,7 @@ export const allPages = (state:string[] = [], action) =>
         default : return state;
     }
 }
-export const pageQueue = (state = {}, action) => 
+export const pageQueue = (state = {}, action) =>
 {
     switch(action.type) {
         case Types.EMBEDLYSTORE_ADD_PAGES_TO_QUEUE: return addPageIdsToQueue(state, action);
@@ -89,16 +89,19 @@ export const pageQueue = (state = {}, action) =>
 ​
 export const embedlyStore = combineReducers({
     byId : pagesById,
-    allIds : allPages,  
+    allIds : allPages,
     queuedIds:pageQueue
 });
 
 export const embedlyMiddleware = store => next => action => {
+    let state = store.getState().debug
     let result = next(action);
     if (action.type === Types.REQUEST_EMBEDLY_DATA) {
         let ids = action.urls as string[]
         store.dispatch(Actions.embedlyStoreAddPagesToQueue(ids))
-        let url = Constants.embedlyApiEndpoint + "&urls=" + ids.map(id => encodeURIComponent( id )).join(",")  + "&key=" + Constants.embedlyApiKey;
+        let url = state.availableApiEndpoints[state.apiEndpoint].endpoint +
+                  Constants.apiRoute.embedlyApiEndpoint +
+                  "?urls=" + ids.map(id => encodeURIComponent( id )).join(",");
         AjaxRequest.get(url,(data:any[], status, request) => {
               let pages = data.map( d => {
                 let item = new EmbedlyItem()
@@ -122,7 +125,6 @@ export const embedlyMiddleware = store => next => action => {
               store.dispatch(Actions.embedlyStoreRemovePagesFromQueue(ids))
           },
           (request, status, error) => {
-              debugger
                 store.dispatch(Actions.embedlyStoreRemovePagesFromQueue(ids))
           }
         );

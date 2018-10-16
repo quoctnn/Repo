@@ -16,6 +16,8 @@ export default  {
             return `/api/v1/subscription/${id}/`
         },
 
+        // Embedly Cache
+        embedlyApiEndpoint: "/api/v2/embedly/",
 
         //search
         searchUrl: '/api/v1/search/',
@@ -181,11 +183,9 @@ export default  {
     defaultImg: {
         user: "img/default-user.png",
         group: "img/default-widget.jpg",
-        event: "img/default-widget.jpg", 
+        event: "img/default-widget.jpg",
         docs: "img/docs_logo.png",
         sendDark:"img/icon-send-dark.png"
     },
     staticUrl:"/static/",
-    embedlyApiKey:"a0c58531bc5a480f8272ed5b2bb8d889",
-    embedlyApiEndpoint: "https://api-cdn.embed.ly/1/card-details?card=1&native=true&scheme=https"
 };
