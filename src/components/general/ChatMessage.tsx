@@ -126,7 +126,7 @@ export class ChatMessage extends React.Component<Props, {}> {
                 if(!user)
                     return null
                 return {
-                    regex:new RegExp("@" + user.username, 'g'),
+                    regex:new RegExp("@" + user.username.replace("+","\\+"), 'g'),
                     fn: (key, result) => {
                         return <Link key={key} to={Routes.PROFILES + user.slug_name }>{user.first_name + " " + user.last_name}</Link>;
                     }

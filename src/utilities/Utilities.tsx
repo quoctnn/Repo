@@ -65,7 +65,7 @@ export function getTextContent(text:string, mentions:UserProfile[], includeEmbed
     config.push(breaks)
     let mentionSearch = mentions.map(user => {
         return {
-            regex:new RegExp("@" + user.username, 'g'),
+            regex:new RegExp("@" + user.username.replace("+","\\+"), 'g'),
             fn: (key, result) => {
                 return <Link key={key} to={Routes.PROFILES + user.slug_name }>{user.first_name + " " + user.last_name}</Link>;
             }
@@ -111,7 +111,7 @@ export function rawMarkup(text, mentions:any[]) {
         {
             let el = `<a href="${Routes.PROFILES + user.slug_name}" data-toggle="tooltip" title="${userFullName(user)}">${user.first_name + " " + user.last_name}</a>`
             // let elementHTML = "<a href=" + user.absolute_url + ">" + user.first_name + "</a>";
-            let regexExpression = new RegExp("@" + user.username, 'g');
+            let regexExpression = new RegExp("@" + user.username.replace("+","\\+"), 'g');
             markup = markup.replace(regexExpression, el);
         });
     }

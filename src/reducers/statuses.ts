@@ -62,6 +62,8 @@ export interface TempStatus
   mentions: number[]
   pending?:boolean
 }
+export interface ContextObject
+{absolute_url:string, name:string}
 export interface Status extends TempStatus
 {
     can_comment:boolean
@@ -69,7 +71,7 @@ export interface Status extends TempStatus
     children_ids:number[]
     comments_count:number
     community:ICommunity
-    context_object:{absolute_url:string, name:string}
+    context_object:ContextObject
     created_at:string
     edited_at:string
     files:UploadedFile[]
