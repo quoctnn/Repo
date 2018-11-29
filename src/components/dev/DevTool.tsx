@@ -342,6 +342,7 @@ const mapDispatchToProps = dispatch => {
       dispatch(Actions.resetProfileStore());
     },
     setAccessTokenOverride: (accessToken:string) => {
+      dispatch(Actions.setSignedIn(null));
       dispatch(Actions.setSignedInProfile(null));
       dispatch(Actions.setSignedIn(accessToken));
     },

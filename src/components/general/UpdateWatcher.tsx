@@ -26,7 +26,7 @@ class UpdateWatcher extends React.Component<Props, {}> {
           //this.resetCachedDataAndReload();
         }
       })
-      if(window.applicationCache.status == window.applicationCache.UPDATEREADY) {
+      if(window.applicationCache && window.applicationCache.status == window.applicationCache.UPDATEREADY) {
           //this.resetCachedDataAndReload();
       }
   }

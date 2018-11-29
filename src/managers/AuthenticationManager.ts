@@ -2,7 +2,6 @@ import {  Store } from 'redux';
 import { UserProfile } from '../reducers/profileStore';
 import * as Actions from '../actions/Actions';
 import { RootState } from '../reducers';
-import { setSignedInProfile } from '../actions/Actions';
 import { AjaxRequest } from '../network/AjaxRequest';
 export abstract class AuthenticationManager
 {
@@ -21,10 +20,10 @@ export abstract class AuthenticationManager
     {
         AuthenticationManager.getStore().dispatch(Actions.setSignedIn(token))
     }
-    static setAuthenticatedUser(profile:UserProfile)
+    static setAuthenticatedUser(profile:UserProfile|null)
     {
         AuthenticationManager.getStore().dispatch(Actions.setSignedInProfile(profile))
-
+        AuthenticationManager.updateProfileStatus(profile)
         AjaxRequest.setup(AuthenticationManager.getAuthenticationToken())
     }
     static signOut()
@@ -34,5 +33,9 @@ export abstract class AuthenticationManager
     private static getStore = ():Store<RootState,any> =>
     {
         return window.store 
+    }
+    private static updateProfileStatus = (profile:UserProfile|null) => 
+    {
+
     }
 }

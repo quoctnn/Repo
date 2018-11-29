@@ -185,7 +185,12 @@ class ChannelEventStream extends React.Component<Props, State> {
   componentDidMount = () => {
     this.updateConnection()
   }
-  componentDidUpdate = () => {
+  componentDidUpdate = (prevProps:Props) => 
+  {
+    if(prevProps.token && this.props.token && prevProps.token != this.props.token)
+    {
+      this.closeStream()
+    }
     this.updateConnection()
   }
   updateConnection = () => 
