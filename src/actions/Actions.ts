@@ -182,10 +182,6 @@ export const setApiEndpoint = (index: number) => ({
   type: Types.SET_API_ENDPOINT,
   apiEndpoint: index
 });
-export const setAccessTokenOverride = (accessToken: string) => ({
-  type: Types.SET_ACCESS_TOKEN_OVERRIDE,
-  accessToken: accessToken
-});
 export const setAuthorizationData = (token: string, sessionid: string) => ({
   type: Types.SET_AUTORIZATION_DATA,
   token: token,

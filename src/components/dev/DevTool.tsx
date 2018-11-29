@@ -172,7 +172,7 @@ class DevTool extends React.PureComponent<Props, State> {
     return (
       <div className="input-group">
         <input
-          value={this.state.accessToken}
+          value={this.state.accessToken || ""}
           onChange={e => {
             this.setState({ accessToken: e.target.value });
           }}
@@ -341,10 +341,9 @@ const mapDispatchToProps = dispatch => {
       dispatch(Actions.setApiEndpoint(index));
       dispatch(Actions.resetProfileStore());
     },
-    setAccessTokenOverride: accessToken => {
+    setAccessTokenOverride: (accessToken:string) => {
       dispatch(Actions.setSignedInProfile(null));
-      dispatch(Actions.setSignedIn(null));
-      dispatch(Actions.setAccessTokenOverride(accessToken));
+      dispatch(Actions.setSignedIn(accessToken));
     },
     clearDataStore: () => {
       dispatch(Actions.resetPagedData());

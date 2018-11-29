@@ -36,8 +36,6 @@ const debug = (state = INITIAL_STATE, action) => {
   switch (action.type) {
     case Types.SET_API_ENDPOINT:
       return { ...state, apiEndpoint: action.apiEndpoint };
-    case Types.SET_ACCESS_TOKEN_OVERRIDE:
-      return { ...state, accessToken: action.accessToken };
     case Types.SET_AUTORIZATION_DATA:
       var s = {
         ...state,

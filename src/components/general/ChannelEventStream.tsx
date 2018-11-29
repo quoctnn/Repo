@@ -183,14 +183,29 @@ class ChannelEventStream extends React.Component<Props, State> {
     }
   }
   componentDidMount = () => {
-    this.connectIfNeeded()
+    this.updateConnection()
   }
   componentDidUpdate = () => {
-    this.connectIfNeeded()
+    this.updateConnection()
   }
-  connectIfNeeded = () => {
-    if(!this.canSend() && !!this.props.token && !!this.props.endpoint)
-      this.connectStream()
+  updateConnection = () => 
+  {
+    const isOnline = this.canSend()
+    const canConnect = !!this.props.token && !!this.props.endpoint
+    if(isOnline)
+    {
+      if(!canConnect)
+      {
+        this.closeStream()
+      }
+    }
+    else 
+    {
+      if(canConnect)
+      {
+        this.connectStream()
+      }
+    }
   }
   componentWillUnmount = () => {
     this.closeStream();
