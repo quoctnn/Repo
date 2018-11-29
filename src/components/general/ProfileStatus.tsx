@@ -20,7 +20,7 @@ interface RouteProps
 }
 interface ReduxStateProps 
 {
-    profile:UserProfile,
+    authenticatedProfile:UserProfile,
     language:number,
 }
 interface ReduxDispatchProps 
@@ -37,15 +37,15 @@ class ProfileStatus extends React.Component<Props, State> {
     {
         return(
             <div id="profile-status">
-                {!this.props.profile && 
+                {!this.props.authenticatedProfile && 
                     <div className="">
                         <Link className="btn btn-outline-secondary" to={Routes.SIGNIN}>{translate("Sign in")}</Link>
                     </div>
                 }
-                {this.props.profile && 
+                {this.props.authenticatedProfile && 
                     <div className="d-flex align-items-center">
                         <div className="">
-                        <Link className="btn btn-outline-secondary" to={Routes.PROFILES + this.props.profile.slug_name}>{this.props.profile.first_name}</Link>
+                        <Link className="btn btn-outline-secondary" to={Routes.PROFILES + this.props.authenticatedProfile.slug_name}>{this.props.authenticatedProfile.first_name}</Link>
                         </div>
                         <div className="margin-left-sm">
                             <Button onClick={() => {this.props.signOut(); this.props.history.push(Routes.ROOT) }} outline color="secondary">{translate("Sign out")}</Button>
@@ -58,15 +58,15 @@ class ProfileStatus extends React.Component<Props, State> {
 }
 const mapStateToProps = (state:RootState, ownProps: OwnProps):ReduxStateProps => {
     return {
-        profile:state.profile, 
+        authenticatedProfile:state.auth.profile, 
         language: state.settings.language,
     }
 }
 const mapDispatchToProps = (dispatch:any, ownProps: OwnProps):ReduxDispatchProps => {
     return {
         signOut:() => {
-            dispatch(Actions.setProfile(null))
-            dispatch(Actions.setSignedIn(false))
+            dispatch(Actions.setSignedInProfile(null))
+            dispatch(Actions.setSignedIn(null))
             dispatch(Actions.setAuthorizationData(null, null))
             dispatch(Actions.resetCommunityStore())
             dispatch(Actions.resetGroupStore())

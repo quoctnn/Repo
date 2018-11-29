@@ -1,7 +1,7 @@
 'use strict';
 import { Settings } from "../utilities/Settings";
 import store from '../main/App';
-import { StoreManager } from '../main/managers/StoreManager';
+import { StoreManager } from '../managers/StoreManager';
 var $ = require("jquery")
 
 var isProduction = Settings.isProduction;
@@ -12,7 +12,7 @@ export type ErrorCallback = (request:JQuery.jqXHR, status:string, error:string) 
 export class AjaxRequest
 {
     static sendAuthorization:boolean = true
-    static setup(token:string)
+    static setup(token:string|null)
     {
         console.log("AjaxRequest.setup", token)
         $.ajaxSetup({

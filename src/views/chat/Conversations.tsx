@@ -9,17 +9,18 @@ import ConversationItem from '../../components/general/ConversationItem';
 import { FullPageComponent } from '../../components/general/FullPageComponent';
 import { PaginationUtilities } from '../../utilities/PaginationUtilities';
 import { nullOrUndefined, cloneDictKeys } from '../../utilities/Utilities';
-import { addSocketEventListener, SocketMessageType, removeSocketEventListener } from '../../components/general/ChannelEventStream';
+import { EventStreamMessageType} from '../../components/general/ChannelEventStream';
 import { UserProfile } from '../../reducers/profileStore';
 import { Settings } from '../../utilities/Settings';
 import { TypingIndicator } from '../../components/general/TypingIndicator';
 import { Avatar } from '../../components/general/Avatar';
-import { getProfileById } from '../../main/App';
 import { conversationReducerPageSize } from '../../reducers/conversations';
 import * as moment from 'moment-timezone';
 import { Link } from 'react-router-dom';
 import { Routes } from '../../utilities/Routes';
 import { List } from '../../components/general/List';
+import { NotificationCenter } from '../../notifications/NotificationCenter';
+import { ProfileManager } from '../../managers/ProfileManager';
 let timezone = moment.tz.guess()
 
 require("./Conversations.scss");
@@ -37,7 +38,7 @@ interface ReduxStateProps
     items:Conversation[],
     offset:number,
     error:string,
-    profile:UserProfile,
+    authenticatedProfile:UserProfile,
     last_fetched:number,
 }
 interface ReduxDispatchProps 
@@ -58,7 +59,7 @@ class Conversations extends React.PureComponent<Props, State> {
         items:[],
         offset:0,
         error:null,
-        profile:null,
+        authenticatedProfile:null,
         preventShowTyingInChatId:null,
         last_fetched:null
     }
@@ -80,17 +81,18 @@ class Conversations extends React.PureComponent<Props, State> {
     }
     componentDidMount()
     {
-        addSocketEventListener(SocketMessageType.CONVERSATION_TYPING, this.isTypingHandler)
+        NotificationCenter.addObserver("eventstream_" + EventStreamMessageType.CONVERSATION_TYPING, this.isTypingHandler)
     }
     componentWillUnmount()
     {
-        removeSocketEventListener(SocketMessageType.CONVERSATION_TYPING, this.isTypingHandler)
+        NotificationCenter.removeObserver("eventstream_" + EventStreamMessageType.CONVERSATION_TYPING, this.isTypingHandler)
     }
-    isTypingHandler(event:CustomEvent)
+    isTypingHandler(...args:any[])
     {
-        let user = event.detail.data.user
-        let conversation = event.detail.data.conversation
-        if((this.props.preventShowTyingInChatId && this.props.preventShowTyingInChatId == conversation) || user == this.props.profile.id || !this.props.items.find(i => i.id == conversation))
+        let object = args[0]
+        let user = object.user
+        let conversation = object.conversation
+        if((this.props.preventShowTyingInChatId && this.props.preventShowTyingInChatId == conversation) || user == this.props.authenticatedProfile.id || !this.props.items.find(i => i.id == conversation))
         {
             return
         }
@@ -166,7 +168,7 @@ class Conversations extends React.PureComponent<Props, State> {
             let keys = Object.keys(isTypingData).map(s => parseInt(s))
             return <div className="is-typing-container">
             {keys.map((data, index) => {
-                let avatar = getProfileById(data).avatar
+                let avatar = ProfileManager.getProfile(data).avatar
                 return (<Avatar key={index} image={avatar} size={24}/>)
 
             })}
@@ -225,7 +227,7 @@ const mapStateToProps = (state:RootState, ownProps: OwnProps):ReduxStateProps =>
         total,
         offset,
         error,
-        profile:state.profile,
+        authenticatedProfile:state.auth.profile,
         last_fetched
     }
 }

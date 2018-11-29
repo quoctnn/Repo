@@ -3,12 +3,12 @@ import * as React from 'react';
 import { Conversation } from '../../reducers/conversations';
 import { Link } from 'react-router-dom';
 import { Routes } from '../../utilities/Routes';
-import { getProfileById } from '../../main/App';
 import { OverflowList } from './OverflowList';
 import { RootState } from '../../reducers';
 import { connect } from 'react-redux'
 import { UserProfile } from '../../reducers/profileStore';
 import { getConversationTitle } from '../../utilities/ConversationUtilities';
+import { ProfileManager } from '../../managers/ProfileManager';
 require("./ConversationItem.scss");
 export interface OwnProps {
     conversation:Conversation
@@ -18,7 +18,7 @@ export interface OwnProps {
 }
 interface ReduxStateProps 
 {
-    profile:UserProfile
+    authenticatedProfile:UserProfile
 }
 interface State 
 {
@@ -30,16 +30,16 @@ class ConversationItem extends React.Component<Props, State> {
         super(props);
     }
     shouldComponentUpdate(nextProps:Props, nextState) {
-        return nextProps.isActive != this.props.isActive || nextProps.className != this.props.className || nextProps.conversation != this.props.conversation || nextProps.conversation.unread_messages.length != this.props.conversation.unread_messages.length || nextProps.profile != this.props.profile || this.props.children != nextProps.children
+        return nextProps.isActive != this.props.isActive || nextProps.className != this.props.className || nextProps.conversation != this.props.conversation || nextProps.conversation.unread_messages.length != this.props.conversation.unread_messages.length || nextProps.authenticatedProfile != this.props.authenticatedProfile || this.props.children != nextProps.children
     }
     render() {
-        let me = this.props.profile
+        let me = this.props.authenticatedProfile
         if(!me)
         {
             return null
         }
         let conversation = this.props.conversation
-        let myId = this.props.profile.id
+        let myId = this.props.authenticatedProfile.id
         let title = getConversationTitle(this.props.conversation, myId)
         let users = conversation.users.filter(i => i != myId)
         
@@ -56,7 +56,7 @@ class ConversationItem extends React.Component<Props, State> {
                     <div className="conversation-item-body d-flex">
                         <OverflowList count={conversation.users.length} size={26}>
                             {users.slice(0, ConversationItem.maxVisibleAvatars).map((uid, index) => {
-                                let p = getProfileById(uid)
+                                let p = ProfileManager.getProfile(uid)
                                 let avatar = (p && p.avatar) || null
                                 return <li key={index}><Avatar image={avatar} size={26} borderColor="white" borderWidth={2}  /></li>
                             })}
@@ -72,7 +72,7 @@ class ConversationItem extends React.Component<Props, State> {
 
 const mapStateToProps = (state:RootState, ownProps: OwnProps):ReduxStateProps => {
     return {
-        profile:state.profile
+        authenticatedProfile:state.auth.profile
     }
 }
 export default connect<ReduxStateProps, {}, OwnProps>(mapStateToProps, null)(ConversationItem);

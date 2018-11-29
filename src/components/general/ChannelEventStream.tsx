@@ -1,23 +1,13 @@
 import * as React from 'react';
-import { connect } from 'react-redux';
-import { ApiEndpoint } from '../../reducers/debug';
-import * as Actions from '../../actions/Actions';
-import { UserProfile, UserStatus } from '../../reducers/profileStore';
-import { Settings } from '../../utilities/Settings';
-import { AjaxRequest } from '../../network/AjaxRequest';
-import { Community } from '../../reducers/communityStore';
-import { RootState } from '../../reducers/index';
 import ReconnectingWebSocket from 'reconnecting-websocket';
+import { UserStatus } from '../../reducers/profileStore';
+import { IntraSocialUtilities } from '../../utilities/IntraSocialUtilities';
+import { nullOrUndefined } from '../../utilities/Utilities';
+import { NotificationCenter } from '../../notifications/NotificationCenter';
+import { connect } from 'react-redux';
+import { RootState } from '../../reducers';
 
-import { toast } from 'react-toastify';
-import { ErrorToast } from '../../components/general/Toast';
-import { Queue } from '../../reducers/queue';
-import { ConversationManager } from '../../main/managers/ConversationManager';
-import { StatusManager } from '../../main/managers/StatusManager';
-import { ProfileManager } from '../../main/managers/ProfileManager';
-import { uniqueId, nullOrUndefined } from '../../utilities/Utilities';
-
-export enum SocketMessageType {
+export enum EventStreamMessageType {
   STATE = "state",
   USER_UPDATE = "user.update",
   CLIENT_STATUS_CHANGE = "client.status_change",
@@ -35,11 +25,11 @@ enum WebsocketState {
   CLOSING,
   CLOSED
 }
-var publicStream: ReconnectingWebSocket = null;
+var publicStream: ReconnectingWebSocket|null = null;
 export const sendOnWebsocket = (data: string) => {
   if (canSendOnWebsocket()) {
     console.log('Sending Websocket', data);
-    publicStream.send(data);
+    publicStream!.send(data);
   }
 };
 export const canSendOnWebsocket = () => {
@@ -51,33 +41,20 @@ export const getStream = () => {
 export const sendUserStatus = (status: UserStatus) => {
   sendOnWebsocket(
     JSON.stringify({
-      type: SocketMessageType.USER_UPDATE,
+      type: EventStreamMessageType.USER_UPDATE,
       data: { status: status }
     })
   );
-};
-
-export const addSocketEventListener = (
-  type: SocketMessageType,
-  listener: EventListenerOrEventListenerObject
-) => {
-  window.socket.addEventListener(type, listener);
-};
-export const removeSocketEventListener = (
-  type: SocketMessageType,
-  listener: EventListenerOrEventListenerObject
-) => {
-  window.socket.removeEventListener(type, listener);
-};
+}
 const socket_options = {
   connectionTimeout: 4000,
   maxRetries: 10
 };
 class EventQueueLock 
 {
-    popCallback:(object) => void = null
-    didChangeLockStatus:(locked:boolean) => void = null
-    private eventQueue = []
+    popCallback?:(object:any) => void
+    didChangeLockStatus?:(locked:boolean) => void
+    private eventQueue:any[] = []
     eventStreamLocks:{[id:string]:string} = {}
     constructor()
     {
@@ -88,7 +65,7 @@ class EventQueueLock
     }
     lock()
     {
-      let id = uniqueId()  
+      let id = IntraSocialUtilities.uniqueId()  
       if(this.didChangeLockStatus && this.lockCount() == 0)
       {
         this.didChangeLockStatus(true)
@@ -112,85 +89,38 @@ class EventQueueLock
     {
       return this.eventQueue.pop()
     }
-    queueEvent(object)
+    queueEvent(object:any)
     {
       this.eventQueue.unshift(object)
     }
 }
 export const EventLock = new EventQueueLock()
-export interface OwnProps 
+interface OwnProps 
 {
 }
-interface ReduxStateProps 
-{  
-  apiEndpoint?: number;
-  availableApiEndpoints?: Array<ApiEndpoint>;
-  rehydrated:any
-  accessToken?: string;
-  signedIn: boolean;
-  profile: UserProfile;
-  awayTimeout: number;
-  queue: Queue;
-}
-interface ReduxDispatchProps 
+interface ReduxStateProps
 {
-  setProfile: (profile: UserProfile) => void;
-  setSignedIn: (signedIn: boolean) => void;
-  storeProfiles: (profiles: UserProfile[]) => void;
-  storeProfile: (profile: UserProfile) => void;
-  storeCommunities: (communities: Community[]) => void;
-  storeCommunity: (community: Community) => void;
-  setContactListCache: (contacts: number[]) => void;
-  setAwayTimeout: (timeout: number) => void;
+  token?: string|null
+  endpoint?: string
 }
+interface ReduxDispatchProps{}
 interface State 
 {
-  token: string
-  endpoint: string
 }
-type Props = ReduxStateProps & ReduxDispatchProps & OwnProps
+type Props = OwnProps & ReduxDispatchProps & ReduxStateProps
 class ChannelEventStream extends React.Component<Props, State> {
-  stream: ReconnectingWebSocket;
-  lastUserActivity: Date;
-  lastUserActivityTimer: NodeJS.Timer;
-  state: State
+  stream: ReconnectingWebSocket|null = null
   queueEvents = false
-  constructor(props) {
-    super(props);
-    this.state = { token: null, endpoint: null };
-
-    this.closeStream = this.closeStream.bind(this);
-    this.connectStream = this.connectStream.bind(this);
-    this.connectStream = this.connectStream.bind(this);
-    this.canSend = this.canSend.bind(this);
-    this.authorize = this.authorize.bind(this);
-    this.processStateResponse = this.processStateResponse.bind(this);
-    this.checkState = this.checkState.bind(this);
-
-    this.processStatusChangeResponse = this.processStatusChangeResponse.bind(
-      this
-    );
-    this.resetUserActivity = this.resetUserActivity.bind(this);
-    this.lastUserActivityTimerExpired = this.lastUserActivityTimerExpired.bind(
-      this
-    );
-    this.clearUserActivityTimer = this.clearUserActivityTimer.bind(this);
-    this.startTimer = this.startTimer.bind(this);
-    this.handleEventQueuePop = this.handleEventQueuePop.bind(this)
-    this.handleEventQueueLockStatusChanged = this.handleEventQueueLockStatusChanged.bind(this)
-    this.playEvent = this.playEvent.bind(this)
-
-    this.lastUserActivity = new Date();
-    this.lastUserActivityTimer = null;
+  constructor(props:Props) {
+    super(props)
     EventLock.popCallback = this.handleEventQueuePop
     EventLock.didChangeLockStatus = this.handleEventQueueLockStatusChanged
-    window["eventStream"] = this
   }
-  handleEventQueuePop(event)
+  handleEventQueuePop = (event:any) => 
   {
     this.playEvent(event)
   }
-  handleEventQueueLockStatusChanged(locked:boolean)
+  handleEventQueueLockStatusChanged = (locked:boolean) => 
   {
     this.queueEvents = locked
     var event = null
@@ -199,81 +129,27 @@ class ChannelEventStream extends React.Component<Props, State> {
       this.playEvent(event)
     } 
   }
-  authorize() {
+  authorize = () => {
     if (this.canSend()) {
-      let data = { type: 'authorization', data: { token: this.state.token } };
+      let data = { type: 'authorization', data: { token: this.props.token } };
       console.log('Sending Authorization on WebSocket', data);
-      this.stream.send(JSON.stringify(data));
+      this.stream!.send(JSON.stringify(data));
     }
   }
-  sendUserLastSeen() {
-    if (this.canSend()) {
-      let endTime = new Date();
-      var timeDiff = endTime.getTime() - this.lastUserActivity.getTime();
-      timeDiff = timeDiff / 1000;
-      var seconds = Math.round(timeDiff);
-      let data = { type: 'user.last_seen', data: { seconds: seconds } };
-      console.log('Sending User Last Seen on WebSocket', data);
-      this.stream.send(JSON.stringify(data));
-    }
-  }
-  canSend() {
+  canSend = () => {
     return this.stream && this.stream.readyState == WebsocketState.OPEN;
   }
-  processStateResponse(state: any) {
-    let contacts: UserProfile[] = state.contacts || [];
-    this.props.storeProfiles(contacts);
-    this.props.setContactListCache(contacts.map(i => i.id));
-    this.props.storeCommunities(state.communities || []);
-    this.props.setProfile(state.user || null);
-    this.props.setSignedIn(state.user != null);
-    ConversationManager.processTempQueue()
-    StatusManager.processTempQueue()
-    if (state.away_timeout && Number.isInteger(state.away_timeout))
-      this.props.setAwayTimeout(state.away_timeout);
-  }
-  processUserUpdateResponse(user: UserProfile) {
-    this.props.storeProfile(user);
-  }
-  processStatusChangeResponse(data: any) {
-    if (data.status == UserStatus.USER_UNAVAILABLE) {
-      this.sendUserLastSeen();
-    } else {
-      this.sendUserLastSeen();
-      let p = Object.assign({}, this.props.profile); //clone
-      p.user_status = data.status;
-      this.props.setProfile(p);
-    }
-  }
-  playEvent(event)
+  playEvent = (event:any) =>
   {
-    console.log('Message received on WebSocket', event);
-    switch (event.type) 
-    {
-      case SocketMessageType.STATE:
-        this.processStateResponse(event.data);
-        break;
-      case SocketMessageType.USER_UPDATE:
-        this.processUserUpdateResponse(event.data);
-        break;
-      case SocketMessageType.CLIENT_STATUS_CHANGE:
-        this.processStatusChangeResponse(event.data);
-        break;
-      default:
-        {
-          var e = new CustomEvent(event.type, {
-            detail: event
-          });
-          window.socket.dispatchEvent(e);
-        }
-    }
+    console.log('Message received on WebSocket', event)
+    NotificationCenter.push("eventstream_" + event.type,[event.data])
   }
-  connectStream() {
+  connectStream = () => {
     this.closeStream();
-    if (this.state.endpoint) {
+    if (this.props.endpoint) {
       console.log('Setting up WebSocket');
       this.stream = new ReconnectingWebSocket(
-        this.state.endpoint,
+        this.props.endpoint,
         [],
         socket_options
       );
@@ -294,112 +170,32 @@ class ChannelEventStream extends React.Component<Props, State> {
       };
       this.stream.onclose = event => {
         if (!event.wasClean)
-          toast.error(
+        {
+          /*toast.error(
             <ErrorToast message="WebSocket closed, please refresh browser" />,
             { hideProgressBar: true }
-          );
-        console.log('WebSocket CLOSED');
-        if ((this.stream as any)._shouldReconnect)
+          );*/
+        }
+        console.log('WebSocket CLOSED', this.stream);
+        if (this.stream && (this.stream as any)._shouldReconnect)
           (this.stream as any)._connect();
       };
     }
   }
-  lastUserActivityTimerExpired() {
-    this.clearUserActivityTimer();
-    sendUserStatus(UserStatus.USER_AWAY);
+  componentDidMount = () => {
+    this.connectIfNeeded()
   }
-  clearUserActivityTimer() {
-    if (this.lastUserActivityTimer) {
-      //console.log('clear timer');
-      clearTimeout(this.lastUserActivityTimer);
-      this.lastUserActivityTimer = null;
-    }
+  componentDidUpdate = () => {
+    this.connectIfNeeded()
   }
-  resetUserActivity() {
-    if (this.props.profile) {
-      if (this.props.profile.user_status == UserStatus.USER_AWAY) {
-        sendUserStatus(UserStatus.USER_ACTIVE);
-        this.startTimer();
-      } else if (this.props.profile.user_status == UserStatus.USER_ACTIVE) {
-        this.startTimer();
-      }
-    }
+  connectIfNeeded = () => {
+    if(!this.canSend() && !!this.props.token && !!this.props.endpoint)
+      this.connectStream()
   }
-  startTimer() {
-    this.clearUserActivityTimer();
-    this.lastUserActivity = new Date();
-    this.lastUserActivityTimer = setTimeout(
-      this.lastUserActivityTimerExpired,
-      this.props.awayTimeout * 1000
-    );
-    //console.log('Setting up timeout to ' + this.props.awayTimeout);
-  }
-  removeActivityHandlers() {
-    document.removeEventListener('mousedown', this.resetUserActivity);
-    window.removeEventListener('focus', this.resetUserActivity);
-    //console.log('removing activity handlers');
-  }
-  addActivityHandlers() {
-    //console.log('adding activity handlers');
-    document.addEventListener('mousedown', this.resetUserActivity);
-    window.addEventListener('focus', this.resetUserActivity);
-  }
-  componentDidMount() {
-    this.resetUserActivity();
-    this.checkState();
-  }
-  componentWillUnmount() {
+  componentWillUnmount = () => {
     this.closeStream();
   }
-  componentDidUpdate(prevProps: Props) {
-    this.checkState();
-    if (!prevProps.profile && this.props.profile) {
-      // just signed in
-      if (this.props.profile.user_status == UserStatus.USER_ACTIVE) {
-        this.addActivityHandlers();
-        this.startTimer();
-      }
-    } else if (this.props.profile) {
-      // profile updated
-      if (this.props.profile.user_status != prevProps.profile.user_status) {
-        //status changed
-        if (this.props.profile.user_status == UserStatus.USER_ACTIVE) {
-          this.addActivityHandlers();
-          this.startTimer();
-        } else if (this.props.profile.user_status == UserStatus.USER_AWAY) {
-          this.clearUserActivityTimer();
-        } else {
-          this.removeActivityHandlers();
-          this.clearUserActivityTimer();
-        }
-      }
-    } else if (!this.props.profile) {
-      // signed out
-      this.removeActivityHandlers();
-      this.clearUserActivityTimer();
-    }
-  }
-  checkState() {
-    var update = {};
-    let token = ProfileManager.getAuthorizationToken()
-    let endpoint = this.props.availableApiEndpoints[this.props.apiEndpoint]
-      .websocket;
-    var updateFunc: () => void = null;
-    if (this.state.token != token) {
-      Settings.accessToken = token;
-      AjaxRequest.setup(token);
-      update['token'] = token;
-      updateFunc = this.authorize;
-    }
-    if (this.state.endpoint != endpoint) {
-      update['endpoint'] = endpoint;
-      updateFunc = this.connectStream;
-    }
-    if (updateFunc) {
-      this.setState(update, updateFunc);
-    }
-  }
-  closeStream() {
+  closeStream = () => {
     if (this.stream) {
       console.log('Closing WebSocket');
       this.stream.close();
@@ -407,49 +203,23 @@ class ChannelEventStream extends React.Component<Props, State> {
       publicStream = null;
     }
   }
-  render() {
+  render = () => {
     return null;
   }
 }
-
-const mapStateToProps = (state:RootState, ownProps: OwnProps):ReduxStateProps => {
+const mapStateToProps = (state: RootState):ReduxStateProps => 
+{
+  const endpoint = state.debug.availableApiEndpoints[state.debug.apiEndpoint].websocket
   return {
-    availableApiEndpoints: state.debug.availableApiEndpoints,
-    rehydrated: state._persist.rehydrated,
-    accessToken: state.debug.accessToken,
-    signedIn: state.auth.signedIn,
-    apiEndpoint: state.debug.apiEndpoint,
-    profile: state.profile,
-    awayTimeout: state.settings.awayTimeout,
-    queue: state.queue,
-  }
-}
+    token:state.auth.authToken,
+    endpoint:endpoint
+  };
+};
 const mapDispatchToProps = (dispatch:any, ownProps: OwnProps):ReduxDispatchProps => {
   return {
-    setProfile: (profile: UserProfile) => {
-      dispatch(Actions.setProfile(profile));
-    },
-    setSignedIn: (signedIn: boolean) => {
-      dispatch(Actions.setSignedIn(signedIn));
-    },
-    storeProfiles: (profiles: UserProfile[]) => {
-      dispatch(Actions.storeProfiles(profiles));
-    },
-    storeProfile: (contact: UserProfile) => {
-      dispatch(Actions.storeProfile(contact));
-    },
-    storeCommunities: (communities: Community[]) => {
-      dispatch(Actions.storeCommunities(communities));
-    },
-    storeCommunity: (community: Community) => {
-      dispatch(Actions.storeCommunity(community));
-    },
-    setContactListCache: (contacts: number[]) => {
-      dispatch(Actions.setContactListCache(contacts));
-    },
-    setAwayTimeout: (timeout: number) => {
-      dispatch(Actions.setAwayTimeout(timeout));
-    },
   }
 }
-export default connect<ReduxStateProps, ReduxDispatchProps, OwnProps>(mapStateToProps, mapDispatchToProps)(ChannelEventStream);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(ChannelEventStream);

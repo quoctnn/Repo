@@ -201,9 +201,13 @@ export const setTheme = (index: number) => ({
   type: Types.SET_THEME,
   theme: index
 });
-export const setSignedIn = (signedIn: boolean) => ({
+export const setSignedIn = (authToken:string|undefined) => ({
   type: Types.SET_SIGNED_IN,
-  signedIn: signedIn
+  authToken,
+});
+export const setSignedInProfile = (profile:UserProfile|undefined) => ({
+  type: Types.SET_SIGNED_IN_PROFILE,
+  profile,
 });
 export const setAwayTimeout = (timeout: number) => ({
   type: Types.SET_AWAY_TIMEOUT,
@@ -215,9 +219,3 @@ export interface UpdateProfileAction {
   type: Types;
   profile: UserProfile;
 }
-
-export type SetProfileAction = (profile: UserProfile) => UpdateProfileAction;
-export const setProfile: SetProfileAction = (profile: UserProfile) => ({
-  type: Types.SET_PROFILE,
-  profile: profile
-});

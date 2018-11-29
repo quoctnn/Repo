@@ -1,17 +1,16 @@
 import * as React from "react";
 import { Message, UploadedFile } from '../../reducers/conversations';
-import { getProfileById } from '../../main/App';
 import { Link } from 'react-router-dom';
 import { URL_REGEX, uniqueId, IS_ONLY_LINK_REGEX } from '../../utilities/Utilities';
 import { Routes } from '../../utilities/Routes';
 import Embedly from './Embedly';
 import { translate } from '../intl/AutoIntlProvider';
 import RadialProgress from './RadialProgress';
-import { ConversationManager } from '../../main/managers/ConversationManager';
-import VideoPlayer from './video/VideoPlayer';
+import { ConversationManager } from '../../managers/ConversationManager';
 const processString = require('react-process-string');
 import store from '../../main/App';
 import { FileUtilities } from '../../utilities/FileUtilities';
+import { ProfileManager } from "../../managers/ProfileManager";
 require("./ChatMessage.scss");
 
 export enum MessagePosition
@@ -122,7 +121,7 @@ export class ChatMessage extends React.Component<Props, {}> {
             config.push(k)
             let mentions = msg.mentions || []
             let mentionSearch = mentions.map(m => {
-                let user = getProfileById(m)
+                let user = ProfileManager.getProfile(m)
                 if(!user)
                     return null
                 return {

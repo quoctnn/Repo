@@ -2,7 +2,7 @@ import * as React from 'react';
 import StatusFormContainerBase from "./StatusFormContainerBase";
 import StatusForm from "./StatusForm";
 import { Mention } from '../../input/MentionEditor';
-import { ProfileManager } from '../../../main/managers/ProfileManager';
+import { ProfileManager } from '../../../managers/ProfileManager';
 
 export default class StatusEditFormContainer extends StatusFormContainerBase {
 

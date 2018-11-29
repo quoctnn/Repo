@@ -9,6 +9,7 @@ import { connect } from 'react-redux'
 import * as Actions from '../../actions/Actions';
 import { ApiEndpoint, LoginType } from '../../reducers/debug';
 import { RootState } from '../../reducers/index';
+import { AuthenticationManager } from '../../managers/AuthenticationManager';
 
 require("./Signin.scss");
 
@@ -22,8 +23,8 @@ export interface Props {
 }
 class Signin extends React.Component<Props, {}> {
 
-    emailInput: HTMLInputElement
-    passwordInput: HTMLInputElement
+    emailInput: HTMLInputElement|null = null
+    passwordInput: HTMLInputElement|null = null
     constructor(props) {
         super(props);
         this.doSignin = this.doSignin.bind(this)
@@ -39,6 +40,7 @@ class Signin extends React.Component<Props, {}> {
         if(data.token)
         {
             this.props.setAuthorizationData(data.token, data.session_id)
+            AuthenticationManager.signIn(data.token)
         }
         this.props.history.push('/')
     }
@@ -48,11 +50,11 @@ class Signin extends React.Component<Props, {}> {
         let endpoint = this.props.availableApiEndpoints[this.props.apiEndpoint]
         if(endpoint.loginType == LoginType.API)
         {
-           ApiClient.apiLogin(this.emailInput.value, this.passwordInput.value, this.loginCallback)
+           ApiClient.apiLogin(this.emailInput!.value, this.passwordInput!.value, this.loginCallback)
         }
         else if(endpoint.loginType == LoginType.NATIVE)
         {
-            ApiClient.nativeLogin(this.emailInput.value, this.passwordInput.value, this.loginCallback)
+            ApiClient.nativeLogin(this.emailInput!.value, this.passwordInput!.value, this.loginCallback)
 
         }
     }

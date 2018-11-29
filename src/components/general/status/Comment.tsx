@@ -12,7 +12,7 @@ import { UserProfile } from '../../../reducers/profileStore';
 import { UploadedFile } from '../../../reducers/conversations';
 import { StatusUtilities } from '../../../utilities/StatusUtilities';
 import ApiClient from '../../../network/ApiClient';
-import { ProfileManager } from '../../../main/managers/ProfileManager';
+import { ProfileManager } from '../../../managers/ProfileManager';
 import ReactionStats from './ReactionStats';
 import { Avatar } from '../Avatar';
 import { Link } from 'react-router-dom';
@@ -21,6 +21,7 @@ import { NestedPageItem } from '../../../utilities/PaginationUtilities';
 import { RootState } from '../../../reducers/index';
 import { connect } from 'react-redux'
 import * as Actions from '../../../actions/Actions';
+import { AuthenticationManager } from '../../../managers/AuthenticationManager';
 require("./Comment.scss");
 let timezone = moment.tz.guess();
 export interface OwnProps 
@@ -71,10 +72,10 @@ class Comment extends React.Component<Props, State>  {
 
     handleReaction(reaction:string) {
 
-        let oldReaction = StatusUtilities.getStatusReaction(this.props.comment, ProfileManager.getAuthenticatedUser())
+        let oldReaction = StatusUtilities.getStatusReaction(this.props.comment, AuthenticationManager.getAuthenticatedUser())
         let rCount = this.props.comment.reaction_count
         let r = this.props.comment.reactions || {}
-        let userId = ProfileManager.getAuthenticatedUser().id
+        let userId = AuthenticationManager.getAuthenticatedUser().id
         let data = StatusUtilities.applyReaction(oldReaction, reaction, r, rCount, userId)
         this.props.setStatusReaction(this.props.comment, data.reactions, data.reactionsCount)
         ApiClient.reactToStatus(this.props.comment.id, reaction, (data, status, error) => {  
@@ -109,7 +110,7 @@ class Comment extends React.Component<Props, State>  {
                     canComment={this.props.canComment}
                     commentsCount={comment.comments_count}
                     created_at={comment.created_at}
-                    reaction={StatusUtilities.getStatusReaction(comment, ProfileManager.getAuthenticatedUser())}
+                    reaction={StatusUtilities.getStatusReaction(comment, AuthenticationManager.getAuthenticatedUser())}
                     reactionsCount={this.props.comment.reaction_count}
                     reactions={comment.reactions}
                     onReaction={this.handleReaction}

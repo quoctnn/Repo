@@ -1,4 +1,3 @@
-import { getProfileById } from '../../main/App';
 import * as React from 'react';
 import * as moment from 'moment-timezone';
 import { Message } from '../../reducers/conversations';
@@ -8,6 +7,7 @@ import { ChatMessage, MessagePosition } from './ChatMessage';
 import { DayLine } from './DayLine';
 import { ChatMessageUser } from './ChatMessageUser';
 import LoadingSpinner from './LoadingSpinner';
+import { ProfileManager } from '../../managers/ProfileManager';
 require("./ChatMessageList.scss");
 let timezone = moment.tz.guess()
 export interface Props {
@@ -116,7 +116,7 @@ export class ChatMessageList extends React.Component<Props, {}> {
                 var avatar = null
                 if(!isMessageFromCurrentUser)
                 {
-                    let user = getProfileById(message.user)
+                    let user = ProfileManager.getProfile(message.user)
                     str = `${user.first_name}, ${str}` 
                     avatar = user.avatar
                 }

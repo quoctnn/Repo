@@ -10,7 +10,7 @@ export interface OwnProps
 }
 interface ReduxStateProps 
 {
-    profile:UserProfile,
+    authenticatedProfile:UserProfile|null,
     language:number,
 }
 type Props = ReduxStateProps & OwnProps
@@ -33,11 +33,14 @@ class UserStatusSelector extends React.Component<Props, {}> {
     }
     renderStatusSelector()
     {
+        if(!this.props.authenticatedProfile)
+            return null
+        const currentStatus = this.props.authenticatedProfile.user_status
         return (
             
             <div className="dropdown margin-right-sm">
                 <button className="btn btn-secondary dropdown-toggle text-truncate" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    {this.props.profile.user_status}
+                    {currentStatus}
                 </button>
 
                 <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
@@ -60,7 +63,7 @@ class UserStatusSelector extends React.Component<Props, {}> {
 
 const mapStateToProps = (state:RootState, ownProps: OwnProps):ReduxStateProps => {
     return {
-        profile: state.profile,
+        authenticatedProfile: state.auth.profile,
         language:state.settings.language
     }
 }

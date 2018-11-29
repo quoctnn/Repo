@@ -16,7 +16,7 @@ const getRelativeParent = element => {
   const emojiPositionSuggestions = ({ decoratorRect, popover, state, filteredEmojis}) => {
 
     const relativeParent = getRelativeParent(popover.parentElement);
-    const relativeRect = {scrollLeft:null, scrollTop:null, left:0, top:0};
+    const relativeRect = {scrollLeft:0, scrollTop:0, left:0, top:0};
   
     if (relativeParent) {
       relativeRect.scrollLeft = relativeParent.scrollLeft;
@@ -25,11 +25,12 @@ const getRelativeParent = element => {
       const relativeParentRect = relativeParent.getBoundingClientRect();
       relativeRect.left = decoratorRect.left - relativeParentRect.left;
       relativeRect.top = decoratorRect.top - relativeParentRect.top;
-    } else {
+    } else 
+    {
       relativeRect.scrollTop =
-        window.pageYOffset || document.documentElement.scrollTop;
+        window.pageYOffset || document.documentElement!.scrollTop;
       relativeRect.scrollLeft =
-        window.pageXOffset || document.documentElement.scrollLeft;
+        window.pageXOffset || document.documentElement!.scrollLeft;
   
       relativeRect.top = decoratorRect.top;
       relativeRect.left = decoratorRect.left;

@@ -3,8 +3,8 @@ import { DropzoneComponent } from "react-dropzone-component";
 import { UploadedFile } from '../../../reducers/conversations';
 import Constants from '../../../utilities/Constants';
 import { Settings } from '../../../utilities/Settings';
-import { ProfileManager } from '../../../main/managers/ProfileManager';
-import { StoreManager } from '../../../main/managers/StoreManager';
+import { StoreManager } from '../../../managers/StoreManager';
+import { AuthenticationManager } from '../../../managers/AuthenticationManager';
 require("./FilesUpload.scss");
 
 var getSuccessFileUploadData = (file) => {
@@ -81,7 +81,7 @@ export default class FilesUpload extends React.Component<Props, State> {
 
         // Set CSRF token on XHR request header.
         dropzone.on("sending", function (file, xhr, formData) {
-            xhr.setRequestHeader("Authorization", "Token " + ProfileManager.getAuthorizationToken());
+            xhr.setRequestHeader("Authorization", "Token " + AuthenticationManager.getAuthenticationToken());
         });
     };
 

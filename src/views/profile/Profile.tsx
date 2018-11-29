@@ -6,6 +6,7 @@ import { RootState } from '../../reducers/index';
 import ApiClient from '../../network/ApiClient';
 import * as Actions from '../../actions/Actions'; 
 import LoadingSpinner from '../../components/general/LoadingSpinner';
+import { AuthenticationManager } from '../../managers/AuthenticationManager';
 require("./Profile.scss");
 
 export interface Props {
@@ -83,10 +84,11 @@ class Profile extends React.Component<Props, {}>
 }
 const mapStateToProps = (state:RootState, ownProps:Props) => {
     let slug = ownProps.match.params.slug
-    let isMe = state.profile && state.profile.slug_name == slug || false
+    const me = AuthenticationManager.getAuthenticatedUser()
+    let isMe = me && me.slug_name == slug || false
     if(isMe)
     {
-        return {user: state.profile}
+        return {user: me}
     }
     else 
     {

@@ -3,9 +3,7 @@ import { translate } from '../../../components/intl/AutoIntlProvider';
 import { UploadedFile } from '../../../reducers/conversations';
 import VideoPlayer from '../video/VideoPlayer';
 import Embedly from '../Embedly';
-import GoogleDocEmbedCard from '../GoogleDocEmbedCard';
 import { Modal, ModalBody } from 'reactstrap';
-import { uniqueId, appendTokenToUrl } from '../../../utilities/Utilities';
 import { FileUtilities } from '../../../utilities/FileUtilities';
 import debug from '../../../reducers/debug';
 import { Settings } from '../../../utilities/Settings';
@@ -16,6 +14,7 @@ import {
     CarouselIndicators,
     CarouselCaption
   } from 'reactstrap';
+import { IntraSocialUtilities } from '../../../utilities/IntraSocialUtilities';
 require("./ContentGallery.scss");
 export enum GalleryItemType 
 {
@@ -62,7 +61,7 @@ export class GalleryItem
         this.name = name
         this.url = url
         this.id = id
-        this.animId = uniqueId()
+        this.animId = IntraSocialUtilities.uniqueId()
         this.isClone = false
         this.key = this.animId
     }
@@ -74,7 +73,7 @@ export class GalleryItem
             ),
             this
           );
-          copied.animId = uniqueId()
+          copied.animId = IntraSocialUtilities.uniqueId()
           copied.isClone = true
           return copied;
     }
@@ -121,7 +120,7 @@ export class GalleryFile extends GalleryItem
     canDownload = true
     constructor(file:UploadedFile)
     {
-        super(file.filename, appendTokenToUrl(file.file), file.id.toString())
+        super(file.filename, IntraSocialUtilities.appendAuthorizationTokenToUrl(file.file), file.id.toString())
         this.size = file.size
         this.className = file.type + " gallery-file-item " + file.extension
     }
@@ -211,7 +210,7 @@ export class GalleryImage extends GalleryFile
     constructor(file:UploadedFile)
     {
         super(file)
-        let i = appendTokenToUrl( file.image )
+        let i = IntraSocialUtilities.appendAuthorizationTokenToUrl( file.image )
         this.src = i
         this.thumbnail = i
         this.w = file.image_width

@@ -6,23 +6,17 @@ export enum LoginType {
 export interface ApiEndpoint {
   endpoint: string;
   loginType: LoginType;
-  token: string;
-  sessionid: string;
   websocket: string;
 }
 const availableApiEndpoints: ApiEndpoint[] = [
   {
     endpoint: 'http://alesund-dev.intra.work:8000',
     loginType: LoginType.NATIVE,
-    token: null,
-    sessionid: null,
     websocket: 'ws://alesund-dev.intra.work:8000/socket/'
   },
   {
     endpoint: 'http://192.168.15.13:8000',
     loginType: LoginType.NATIVE,
-    token: null,
-    sessionid: null,
     websocket: 'ws://192.168.15.13:8000/socket/'
   },
   // {
@@ -37,7 +31,6 @@ const availableApiEndpoints: ApiEndpoint[] = [
 const INITIAL_STATE = {
   apiEndpoint: 0,
   availableApiEndpoints: availableApiEndpoints,
-  accessToken: ''
 };
 const debug = (state = INITIAL_STATE, action) => {
   switch (action.type) {

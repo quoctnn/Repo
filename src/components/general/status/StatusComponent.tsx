@@ -6,13 +6,13 @@ import StatusHeader from './StatusHeader';
 import StatusContent from './StatusContent';
 import ApiClient from '../../../network/ApiClient';
 import { UploadedFile } from '../../../reducers/conversations';
-import { ProfileManager } from '../../../main/managers/ProfileManager';
 import StatusFooter from './StatusFooter';
 import { nullOrUndefined } from '../../../utilities/Utilities';
 import { NestedPageItem } from '../../../utilities/PaginationUtilities';
 import { connect } from 'react-redux'
 import { RootState } from '../../../reducers/index';
 import * as Actions from '../../../actions/Actions';
+import { AuthenticationManager } from '../../../managers/AuthenticationManager';
 require("./StatusComponent.scss");
 
 export interface OwnProps 
@@ -96,10 +96,10 @@ class StatusComponent extends React.Component<Props, State> {
         return "text";
     }
     handleReaction(reaction:string) {
-        let oldReaction = StatusUtilities.getStatusReaction(this.props.status, ProfileManager.getAuthenticatedUser())
+        let oldReaction = StatusUtilities.getStatusReaction(this.props.status, AuthenticationManager.getAuthenticatedUser())
         let rCount = this.props.status.reaction_count
         let r = this.props.status.reactions || {}
-        let userId = ProfileManager.getAuthenticatedUser().id
+        let userId = AuthenticationManager.getAuthenticatedUser().id
         let data = StatusUtilities.applyReaction(oldReaction, reaction, r, rCount, userId)
         this.props.setStatusReaction(this.props.status, data.reactions, data.reactionsCount)
         ApiClient.reactToStatus(this.props.status.id, reaction, (data, status, error) => {  
@@ -143,7 +143,7 @@ class StatusComponent extends React.Component<Props, State> {
                         commentsCount={status.comments_count}
                         created_at={status.created_at}
                         onReact={this.handleReaction}
-                        reaction={StatusUtilities.getStatusReaction(this.props.status, ProfileManager.getAuthenticatedUser())}
+                        reaction={StatusUtilities.getStatusReaction(this.props.status, AuthenticationManager.getAuthenticatedUser())}
                         reactions={this.props.status.reactions}
                         reactionsCount={this.props.status.reaction_count}
                         children={this.props.pageItem.children}

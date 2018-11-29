@@ -16,7 +16,6 @@ const isTouchDevice = () =>
 export interface ISettings 
 {
     isProduction:boolean,
-    accessToken:string,
     supportsTheming:boolean,
     searchEnabled:boolean,
     clearSomeoneIsTypingInterval:number
@@ -28,7 +27,6 @@ export interface ISettings
 }
 export const Settings:ISettings = {
     isProduction : process.env.NODE_ENV === "production",
-    accessToken:null,
     searchEnabled:true,
     maxFileSize: 400,
     supportsTheming: window.CSS && window.CSS.supports && window.CSS.supports("(--foo: red)"),

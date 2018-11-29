@@ -1,26 +1,27 @@
 import Conversations from './Conversations';
-import { Conversation, Message, UploadedFile } from '../../reducers/conversations';
+import { Conversation, Message } from '../../reducers/conversations';
 import * as React from 'react';
 import { connect } from 'react-redux'
 import { RootState } from '../../reducers/index';
 import { ChatMessageList } from '../../components/general/ChatMessageList';
 import { UserProfile } from '../../reducers/profileStore';
 import { ChatMessageComposer } from '../../components/general/ChatMessageComposer';
-import { addSocketEventListener, SocketMessageType, removeSocketEventListener } from '../../components/general/ChannelEventStream';
+import { EventStreamMessageType } from '../../components/general/ChannelEventStream';
 import { Settings } from '../../utilities/Settings';
 import { TypingIndicator } from '../../components/general/TypingIndicator';
 import { Avatar } from '../../components/general/Avatar';
-import { cloneDictKeys, nullOrUndefined, appendTokenToUrl } from '../../utilities/Utilities';
+import { cloneDictKeys, nullOrUndefined } from '../../utilities/Utilities';
 import * as Actions from '../../actions/Actions'; 
 import { FullPageComponent } from '../../components/general/FullPageComponent';
 import { getConversationTitle } from '../../utilities/ConversationUtilities';
-import { getProfileById } from '../../main/App';
 import { getDefaultCachePage } from '../../reducers/createPaginator';
 import { PaginationUtilities } from '../../utilities/PaginationUtilities';
 import { QueueUtilities } from '../../utilities/QueueUtilities';
 import { messageReducerPageSize } from '../../reducers/messages';
 import { Mention } from '../../components/input/MentionEditor';
-import { ConversationManager } from '../../main/managers/ConversationManager';
+import { ConversationManager } from '../../managers/ConversationManager';
+import { NotificationCenter } from '../../notifications/NotificationCenter';
+import { ProfileManager } from '../../managers/ProfileManager';
 
 require("./ConversationView.scss")
 
@@ -30,7 +31,7 @@ const messageToUid = (message:Message) => message.conversation + "_" + message.u
 export interface OwnProps {
     match:any,
     conversation:Conversation,
-    profile:UserProfile,
+    authenticatedProfile:UserProfile,
     isFetching:boolean,
     total:number,
     offset:number,
@@ -92,13 +93,13 @@ class ConversationView extends React.PureComponent<Props, State> {
     }
     componentDidMount()
     {
-        addSocketEventListener(SocketMessageType.CONVERSATION_TYPING, this.isTypingHandler)
-        addSocketEventListener(SocketMessageType.CONVERSATION_MESSAGE, this.incomingMessageHandler)
+        NotificationCenter.addObserver("eventstream_" + EventStreamMessageType.CONVERSATION_TYPING, this.isTypingHandler)
+        NotificationCenter.addObserver("eventstream_" + EventStreamMessageType.CONVERSATION_MESSAGE, this.incomingMessageHandler)
         ConversationManager.ensureConversationExists(this.props.conversationId, () => {})
     }
-    incomingMessageHandler(event:CustomEvent)
+    incomingMessageHandler(...args:any[])
     {
-        let message = event.detail.data as Message
+        let message = args[0] as Message
         let conversation = this.props.conversationId
         if(message.conversation == conversation)
         {
@@ -107,10 +108,12 @@ class ConversationView extends React.PureComponent<Props, State> {
             this.setState({isTyping:it })
         }
     }
-    isTypingHandler(event:CustomEvent)
+    isTypingHandler(...args:any[])
     {
-        let user = event.detail.data.user
-        if(user == this.props.profile.id || event.detail.data.conversation != this.props.conversationId)
+        let object = args[0]
+        let user = object.user
+        let conversation = object.conversation
+        if(user == this.props.authenticatedProfile.id || conversation != this.props.conversationId)
         {
             return
         }
@@ -142,8 +145,8 @@ class ConversationView extends React.PureComponent<Props, State> {
     }
     componentWillUnmount()
     {
-        removeSocketEventListener(SocketMessageType.CONVERSATION_TYPING, this.isTypingHandler)
-        removeSocketEventListener(SocketMessageType.CONVERSATION_MESSAGE, this.incomingMessageHandler)
+        NotificationCenter.removeObserver("eventstream_" + EventStreamMessageType.CONVERSATION_TYPING, this.isTypingHandler)
+        NotificationCenter.removeObserver("eventstream_" + EventStreamMessageType.CONVERSATION_MESSAGE, this.incomingMessageHandler)
     }
     componentWillMount()
     {
@@ -200,7 +203,7 @@ class ConversationView extends React.PureComponent<Props, State> {
         let conversation = this.props.conversation
         if(!conversation)
             return
-        let tempId = `${conversation.id}_${this.props.profile.id}_${Date.now()}`
+        let tempId = `${conversation.id}_${this.props.authenticatedProfile.id}_${Date.now()}`
         this.getChatMessagePreview(text, null, tempId, mentions, conversation, (message) => {
             ConversationManager.sendMessage(message)
         })
@@ -215,7 +218,7 @@ class ConversationView extends React.PureComponent<Props, State> {
             uid:uid,
             pending:true,
             text: text,
-            user: this.props.profile.id,
+            user: this.props.authenticatedProfile.id,
             created_at: ds,
             conversation:conversation.id,
             attachment:null,
@@ -240,7 +243,7 @@ class ConversationView extends React.PureComponent<Props, State> {
         {
             return <li className="is-typing-container">
             {keys.map((id, index) => {
-                let avatar = getProfileById(id).avatar
+                let avatar = ProfileManager.getProfile(id).avatar
                 return (<Avatar key={index} image={avatar} size={24}/>)
 
             })}
@@ -259,7 +262,7 @@ class ConversationView extends React.PureComponent<Props, State> {
             return
         files.forEach(f => {
             
-            let tempId = `${conversation.id}_${this.props.profile.id}_${Date.now()}`
+            let tempId = `${conversation.id}_${this.props.authenticatedProfile.id}_${Date.now()}`
             this.getChatMessagePreview("", f, tempId, [], conversation, (message) => {
                 ConversationManager.sendMessage(message)
             })
@@ -340,7 +343,7 @@ class ConversationView extends React.PureComponent<Props, State> {
         completion(this.props.availableMentions)
     }
     render() {
-        let me = this.props.profile
+        let me = this.props.authenticatedProfile
         let conversation = this.props.conversation
         if(!me || !conversation)
         {
@@ -363,7 +366,7 @@ class ConversationView extends React.PureComponent<Props, State> {
                             </div>
                         </div>
                         <div ref={this.dropTarget} className={"droptarget card-body full-height" + (this.state.renderDropZone ? " drop-zone" : "")} onDragOver={this.onDragOver} onDrop={this.onDrop} onDragLeave={this.onDragLeave} onDragEnter={this.onDragEnter}>
-                            <ChatMessageList conversation={conversation.id} loading={this.props.isFetching} chatDidScrollToTop={this.chatDidScrollToTop} messages={messages} current_user={this.props.profile} >
+                            <ChatMessageList conversation={conversation.id} loading={this.props.isFetching} chatDidScrollToTop={this.chatDidScrollToTop} messages={messages} current_user={this.props.authenticatedProfile} >
                                 {this.renderSomeoneIsTyping()}
                             </ChatMessageList>
                         </div>
@@ -388,7 +391,7 @@ const mapStateToProps = (state:RootState, ownProps:Props) => {
     const last_fetched = pagination.last_fetch
     const conversation = state.conversations.items[id]
     const availableMentions = conversation ? conversation.users.map(u => {
-        let p = getProfileById(u)
+        let p = ProfileManager.getProfile(u)
         return p ? Mention.fromUser(p) : null
     }).filter(n => n != null) : []
     return {
@@ -399,7 +402,7 @@ const mapStateToProps = (state:RootState, ownProps:Props) => {
         offset,
         items,
         conversation:conversation,
-        profile:state.profile,
+        authenticatedProfile:state.auth.profile,
         signedIn:state.auth.signedIn,
         queuedMessages,
         last_fetched,

@@ -13,7 +13,7 @@ import emojiPositionSuggestions from "./emojiPositionSuggestion";
 import {defaultTheme} from 'draft-js-emoji-plugin'
 import { Settings } from '../../utilities/Settings';
 import { UserProfile } from '../../reducers/profileStore';
-import { appendTokenToUrl } from '../../utilities/Utilities';
+import { IntraSocialUtilities } from "../../utilities/IntraSocialUtilities";
 require("./MentionEditor.scss");
 
 
@@ -34,7 +34,7 @@ export class Mention {
   {
     return new Mention(user.first_name + " " + user.last_name,
     user.username,
-    appendTokenToUrl(user.avatar || user.avatar_thumbnail),
+    IntraSocialUtilities.appendAuthorizationTokenToUrl(user.avatar || user.avatar_thumbnail),
     user.id)
   }
 }

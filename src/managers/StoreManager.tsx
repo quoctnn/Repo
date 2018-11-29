@@ -1,5 +1,5 @@
 import {  Store } from 'redux';
-import { RootState } from '../../reducers';
+import { RootState } from '../reducers';
 class StoreManagerSingleton 
 {
     constructor()

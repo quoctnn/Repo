@@ -1,8 +1,9 @@
 import {  Store } from 'redux';
-import { RootState } from '../../reducers';
-import { canSendOnWebsocket, addSocketEventListener, SocketMessageType } from '../../components/general/ChannelEventStream';
-import * as Actions from '../../actions/Actions';
-import { Status, StatusContextKeys } from '../../reducers/statuses';
+import { RootState } from '../reducers';
+import { canSendOnWebsocket, EventStreamMessageType } from '../components/general/ChannelEventStream';
+import * as Actions from '../actions/Actions';
+import { Status, StatusContextKeys } from '../reducers/statuses';
+import { NotificationCenter } from '../notifications/NotificationCenter';
 class StatusManagerSingleton 
 {
     constructor()
@@ -16,8 +17,8 @@ class StatusManagerSingleton
     }
     setup()
     {
-        addSocketEventListener(SocketMessageType.STATUS_NEW, this.processIncomingNewStatus)
-        addSocketEventListener(SocketMessageType.STATUS_UPDATE, this.processIncomingUpdateStatus)
+        NotificationCenter.addObserver("eventstream_" + EventStreamMessageType.STATUS_NEW, this.processIncomingNewStatus)
+        NotificationCenter.addObserver("eventstream_" + EventStreamMessageType.STATUS_UPDATE, this.processIncomingUpdateStatus)
     }
     processTempQueue() 
     {
@@ -36,9 +37,9 @@ class StatusManagerSingleton
         let status = event.detail.data as Status
         this.insertStatus(status, false)
     }
-    private processIncomingNewStatus(event:CustomEvent)
+    private processIncomingNewStatus(...args:any[])
     {
-        let status = event.detail.data as Status
+        let status = args[0] as Status
         this.insertStatus(status, true)
     }
     private insertStatus(status:Status, isNew:boolean)

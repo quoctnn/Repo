@@ -3,11 +3,12 @@ import * as React from "react";
 import { connect } from "react-redux";
 import * as Actions from "../../actions/Actions";
 import { ApiEndpoint } from "../../reducers/debug";
-import { sendOnWebsocket, getStream } from "../general/ChannelEventStream";
+import { sendOnWebsocket } from "../general/ChannelEventStream";
 import { Form } from "reactstrap";
 import { availableLanguages, availableThemes } from "../../reducers/settings";
 import { RootState } from "../../reducers";
-import ReconnectingWebSocket from "reconnecting-websocket";
+import { Dialog } from "./Dialog";
+import Button from "reactstrap/lib/Button";
 require("./DevTool.scss");
 export interface Props {
   language: number;
@@ -24,27 +25,23 @@ export interface Props {
   clearDataStore: () => void;
   enablePushNotifications: () => void;
 }
-
-class DevTool extends React.PureComponent<Props, {}> {
-  stream: ReconnectingWebSocket;
-  state: {
-    accessToken: string;
-    websocketData: string;
-    websocketDisabled: boolean;
-  };
+interface State 
+{
+  accessToken: string;
+  websocketData: string;
+  dialogVisible:boolean
+}
+class DevTool extends React.PureComponent<Props, State> {
   constructor(props) {
     super(props);
-    this.stream = getStream();
     this.state = {
       accessToken: this.props.accessToken,
       websocketData: "",
-      websocketDisabled: false
+      dialogVisible:false
     };
   }
-  componentDidMount() {
-    if (this.stream.readyState > 1) {
-      this.setState({ websocketDisabled: true });
-    }
+  componentDidMount() 
+  {
   }
   renderThemeSelector() {
     return (
@@ -212,29 +209,13 @@ class DevTool extends React.PureComponent<Props, {}> {
       </div>
     );
   }
-  disableWebsocket(state: boolean) {
-    if (state) {
-      this.stream.close();
-    } else {
-      this.stream.reconnect();
-    }
-    this.setState({ websocketDisabled: state });
-  }
-  renderDisableWebsocketButton() {
-    return (
-      <div className="input-group">
-        <button
-          onClick={() => {
-            this.disableWebsocket(!this.state.websocketDisabled);
-          }}
-          className="btn btn-outline-secondary"
-          type="button"
-        >
-          {(this.state.websocketDisabled && translate("Enable")) ||
-            translate("Disable")}
-        </button>
-      </div>
-    );
+  renderDialog = () => {
+    return (<>
+      <Button onClick={() => this.setState({dialogVisible:!this.state.dialogVisible})}>Test Dialog</Button>
+      <Dialog visible={this.state.dialogVisible}><div>Test</div></Dialog>
+    </>
+
+    )
   }
   renderEnablePush() {
     // Check if push is available and not already set to granted
@@ -326,17 +307,6 @@ class DevTool extends React.PureComponent<Props, {}> {
                   {this.renderEnablePush()}
                 </div>
               </div>
-              <div className="form-group row">
-                <label
-                  htmlFor="disableWebsocket"
-                  className="col-sm-4 col-form-label"
-                >
-                  {translate("Websocket")}
-                </label>
-                <div className="col-sm-8" id="disableWebsocket">
-                  {this.renderDisableWebsocketButton()}
-                </div>
-              </div>
             </Form>
           </div>
         </div>
@@ -350,7 +320,7 @@ const mapStateToProps = (state: RootState) => {
     language: state.settings.language,
     apiEndpoint: state.debug.apiEndpoint,
     availableApiEndpoints: state.debug.availableApiEndpoints,
-    accessToken: state.debug.accessToken,
+    accessToken: state.auth.authToken,
     theme: state.settings.theme
   };
 };
@@ -363,8 +333,8 @@ const mapDispatchToProps = dispatch => {
       dispatch(Actions.setTheme(index));
     },
     setApiEndpoint: index => {
-      dispatch(Actions.setProfile(null));
-      dispatch(Actions.setSignedIn(false));
+      dispatch(Actions.setSignedInProfile(null));
+      dispatch(Actions.setSignedIn(null));
       dispatch(Actions.resetCommunityStore());
       dispatch(Actions.resetGroupStore());
       dispatch(Actions.resetCommunityGroupsCache());
@@ -372,8 +342,8 @@ const mapDispatchToProps = dispatch => {
       dispatch(Actions.resetProfileStore());
     },
     setAccessTokenOverride: accessToken => {
-      dispatch(Actions.setProfile(null));
-      dispatch(Actions.setSignedIn(false));
+      dispatch(Actions.setSignedInProfile(null));
+      dispatch(Actions.setSignedIn(null));
       dispatch(Actions.setAccessTokenOverride(accessToken));
     },
     clearDataStore: () => {

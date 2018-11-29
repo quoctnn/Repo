@@ -3,7 +3,6 @@ import { PageItem, CachePage } from './createPaginator';
 import { combineReducers } from 'redux'
 import debug from './debug';
 import settings from './settings';
-import profile from './profile';
 import auth from './auth';
 import groupStore from './groupStore';
 import groupListCache from './groupListCache';
@@ -23,20 +22,19 @@ import { statuses, Status } from './statuses';
 const rootPersistConfig:PersistConfig = {
   key: 'root',
   storage: storageLocal,
-  blacklist: ['auth'],
+  //blacklist: ['auth'],
   debug:true,
 } 
 const rootReducer = combineReducers({
   //debug: persistReducer(debugConfig, debug), 
-  settings, profile, auth, profileStore, communityStore, groupStore, groupListCache, contactListCache, debug,
+  settings, auth, profileStore, communityStore, groupStore, groupListCache, contactListCache, debug,
    queue, conversations, messages, embedlyStore, statuses
 })
 export default persistReducer(rootPersistConfig, rootReducer)
 export interface RootState
 {
-  settings: any;
-      profile: UserProfile;
-      auth: any;
+      settings: any;
+      auth:{signedIn:boolean, authToken:string|null, profile:UserProfile|null}
       profileStore: { byId:{[id:number]:UserProfile}, allIds:number[]};
       communityStore: any;
       groupStore: any;
@@ -47,6 +45,6 @@ export interface RootState
       messages:{items:Message[], conversations:PageItem}
       embedlyStore:{byId:{[id:string]:EmbedlyItem}, allIds:string[], queuedIds:{[id:string]:boolean}},
       statuses:{items:{[id:number]:Status}, feed:PageItem}
-    debug: {accessToken:string, apiEndpoint:number, availableApiEndpoints:ApiEndpoint[] };
+      debug: {apiEndpoint:number, availableApiEndpoints:ApiEndpoint[] };
   _persist:any
 }

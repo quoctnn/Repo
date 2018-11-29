@@ -1,12 +1,12 @@
 import { UploadedFile } from '../reducers/conversations';
-import { appendTokenToUrl } from './Utilities';
 import VideoPlayer from '../components/general/video/VideoPlayer';
 import React = require('react');
+import { IntraSocialUtilities } from './IntraSocialUtilities';
 export class FileUtilities {
     static renderDocument(file:UploadedFile)
     {
         let iconClass = "document " + file.extension
-        let url = appendTokenToUrl( file.file )
+        let url = IntraSocialUtilities.appendAuthorizationTokenToUrl( file.file )
         return (
             <div className={iconClass} key={file.id}>
                 <a href={url} target="_blank">
@@ -17,7 +17,7 @@ export class FileUtilities {
         )
     }
     static renderImage(file:UploadedFile) {
-        let i = appendTokenToUrl( file.image )
+        let i = IntraSocialUtilities.appendAuthorizationTokenToUrl( file.image )
         return <img src={i} className="img-responsive" key={i}/>;
     }
     static renderVideo(file:UploadedFile)

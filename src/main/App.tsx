@@ -20,11 +20,8 @@ import { PaginatorAction, MultiPaginatorAction } from '../reducers/createPaginat
 import ApiClient from '../network/ApiClient';
 import ChannelEventStream from '../components/general/ChannelEventStream';
 import { embedlyMiddleware } from '../reducers/embedlyStore';
-import { ConversationManager } from './managers/ConversationManager';
 import { queueMiddleware } from '../reducers/queue';
-import { ProfileManager } from './managers/ProfileManager';
-import { StatusManager } from './managers/StatusManager';
-import { StoreManager } from './managers/StoreManager';
+import setupManagers from '../managers/index';
 require('jquery/dist/jquery');
 require('popper.js/dist/umd/popper');
 require('bootstrap/dist/js/bootstrap');
@@ -40,7 +37,8 @@ const applyTheme = (themeIndex: number) => {
   let theme = availableThemes[themeIndex];
   let selector = theme.selector;
   let root = document.querySelector(':root');
-  root.className = selector;
+  if(root)
+    root.className = selector;
 };
 const themeSwitcherMiddleware = store => next => action => {
   let result = next(action);
@@ -53,23 +51,23 @@ const themeSwitcherMiddleware = store => next => action => {
 const paginationMiddleware = store => next => action => {
   let result = next(action);
   if (action.type === Types.REQUEST_PAGE) {
-    var endpoint:string = null
+    var endpoint:string|null = null
     var limit:number = 0
     var offset:number = 0
     if ("pagingId" in action.payload)
     {
 
       let a = action as MultiPaginatorAction;
-      endpoint = a.meta.endpoint(a.payload.pagingId)
-      limit = a.meta.pageSize
-      offset = a.payload.offset
+      endpoint = a.meta!.endpoint(a.payload!.pagingId)
+      limit = a.meta!.pageSize
+      offset = a.payload!.offset
     }
     else 
     {
       let a = action as PaginatorAction;
-      endpoint = a.meta.endpoint
-      limit = a.meta.pageSize
-      offset = a.payload.offset
+      endpoint = a.meta!.endpoint
+      limit = a.meta!.pageSize
+      offset = a.payload!.offset || 0
     }
     ApiClient.getPage(endpoint , limit, offset,  (data, status, error) => {
         let receivePageAction = ( offset: number, results: any[], total: number, error:string): PaginatorAction =>
@@ -99,29 +97,8 @@ if (Settings.supportsTheming) {
 }
 const store = createStore(appReducer, applyMiddleware(...middleWares));
 window.store = store 
-window.socket = document.createElement("div")
-//managers
-ConversationManager.setup()
-ProfileManager.setup()
-StatusManager.setup()
-StoreManager.setup()
-
-
-export const getProfileById = (id: number): UserProfile => {
-  let s = store.getState();
-  if (s.profile.id == id) return s.profile;
-  return s.profileStore.byId[id];
-};
-export const getProfileByUsername = (name: string): UserProfile => {
-  let s = store.getState();
-  if (s.profile.username == name) return s.profile;
-  let keys = Object.keys( s.profileStore.byId);
-  let k = keys.find(k => s.profileStore.byId[k].username == name)
-  if(k)
-  {
-    return s.profileStore.byId[k]
-  }
-};
+//setup managers
+setupManagers()
 
 const persistor = persistStore(store, {}, () => {
   //rehydrate complete

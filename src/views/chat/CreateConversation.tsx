@@ -11,7 +11,7 @@ import ApiClient from '../../network/ApiClient';
 import { withRouter} from 'react-router-dom'
 import { Routes } from '../../utilities/Routes';
 import { Conversation } from '../../reducers/conversations';
-import { ConversationManager } from '../../main/managers/ConversationManager';
+import { ConversationManager } from '../../managers/ConversationManager';
 import LoadingSpinner from '../../components/general/LoadingSpinner';
 import { toast } from 'react-toastify';
 import { ErrorToast } from '../../components/general/Toast';

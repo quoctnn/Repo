@@ -7,10 +7,11 @@ import { Avatar } from "../general/Avatar";
 import { Link } from "react-router-dom";
 import { List } from "../general/List";
 import { RootState } from "../../reducers";
-import { addSocketEventListener, SocketMessageType, removeSocketEventListener } from '../general/ChannelEventStream';
+import { EventStreamMessageType } from '../general/ChannelEventStream';
 import { TypingIndicator } from '../general/TypingIndicator';
 import { Settings } from '../../utilities/Settings';
 import { cloneDictKeys } from '../../utilities/Utilities';
+import { NotificationCenter } from "../../notifications/NotificationCenter";
 require("./RightNavigation.scss")
 interface State {
     contacts:UserProfile[],
@@ -24,7 +25,7 @@ interface ReduxStateProps
 {
     profiles:{[id:number]:UserProfile}
     contacts:number[]
-    profile:UserProfile
+    authenticatedProfile:UserProfile
 }
 type Props = ReduxStateProps & OwnProps
 class RightNavigation extends React.Component<Props, {}> {
@@ -40,16 +41,17 @@ class RightNavigation extends React.Component<Props, {}> {
     }
     componentDidMount()
     {
-        addSocketEventListener(SocketMessageType.CONVERSATION_TYPING, this.isTypingHandler)
+        NotificationCenter.addObserver("eventstream_" + EventStreamMessageType.CONVERSATION_TYPING, this.isTypingHandler)
     }
     componentWillUnmount()
     {
-        removeSocketEventListener(SocketMessageType.CONVERSATION_TYPING, this.isTypingHandler)
+        NotificationCenter.removeObserver("eventstream_" + EventStreamMessageType.CONVERSATION_TYPING, this.isTypingHandler)
     }
-    isTypingHandler(event:CustomEvent)
+    isTypingHandler(...args:any[])
     {
-        let user = event.detail.data.user  
-        if(user == this.props.profile.id)
+        let object = args[0]
+        let user = object.user
+        if(user == this.props.authenticatedProfile.id)
         {
             return
         }
@@ -119,7 +121,7 @@ const mapStateToProps = (state:RootState, ownProps: OwnProps):ReduxStateProps =>
     return {
         profiles:state.profileStore.byId,
         contacts:state.contactListCache.contacts,
-        profile:state.profile,
+        authenticatedProfile:state.auth.profile,
     }
 }
 export default connect<ReduxStateProps, void, OwnProps>(mapStateToProps, null)(RightNavigation);

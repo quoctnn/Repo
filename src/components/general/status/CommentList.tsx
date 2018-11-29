@@ -3,9 +3,9 @@ import classnames from 'classnames';
 import Comment from './Comment';
 import { translate } from '../../intl/AutoIntlProvider';
 import { Status } from '../../../reducers/statuses';
-import { ProfileManager } from '../../../main/managers/ProfileManager';
 import { UploadedFile } from '../../../reducers/conversations';
 import { NestedPageItem } from '../../../utilities/PaginationUtilities';
+
 export interface OwnProps
 {
     authorizedUserId:number
@@ -107,7 +107,6 @@ export default class CommentList extends React.Component<Props, State> {
         let min = ((data.length - max) >= 0) ? data.length - max : 0;
         let items = data.map(r => r).reverse().slice(min, data.length)
         let listClass = classnames('comment-list', {scrollable: this.state.showAll});
-        let authUser = ProfileManager.getAuthenticatedUser()
         return (
             <ul className={listClass} ref={this.listRef}>
                 <li className="text-center">{this.renderPreviousLink()}</li>

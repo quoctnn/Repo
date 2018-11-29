@@ -1,16 +1,18 @@
 import {  Store } from 'redux';
-import { RootState } from '../../reducers';
-import { addSocketEventListener, SocketMessageType, canSendOnWebsocket, sendOnWebsocket } from '../../components/general/ChannelEventStream';
-import { Conversation, Message } from '../../reducers/conversations';
-import * as Actions from '../../actions/Actions';
-import { Routes } from '../../utilities/Routes';
+import { RootState } from '../reducers';
+import { EventStreamMessageType, canSendOnWebsocket, sendOnWebsocket } from '../components/general/ChannelEventStream';
+import { Conversation, Message } from '../reducers/conversations';
+import * as Actions from '../actions/Actions';
+import { Routes } from '../utilities/Routes';
 import { toast } from 'react-toastify';
-import { UserProfile } from '../../reducers/profileStore';
-import { translate } from '../../components/intl/AutoIntlProvider';
-import { InfoToast } from '../../components/general/Toast';
+import { UserProfile } from '../reducers/profileStore';
+import { translate } from '../components/intl/AutoIntlProvider';
+import { InfoToast } from '../components/general/Toast';
 import * as React from 'react';
-import { getProfileById } from '../App';
-import ApiClient from '../../network/ApiClient';
+import ApiClient from '../network/ApiClient';
+import { NotificationCenter } from '../notifications/NotificationCenter';
+import { AuthenticationManager } from './AuthenticationManager';
+import { ProfileManager } from './ProfileManager';
 class ConversationManagerSingleton 
 {
     constructor()
@@ -29,9 +31,9 @@ class ConversationManagerSingleton
     }
     setup()
     {
-        addSocketEventListener(SocketMessageType.CONVERSATION_NEW, this.processIncomingNewConversation)
-        addSocketEventListener(SocketMessageType.CONVERSATION_MESSAGE, this.processIncomingConversationMessage)
-        addSocketEventListener(SocketMessageType.CONVERSATION_UPDATE, this.processIncomingUpdateConversation)
+        NotificationCenter.addObserver("eventstream_" + EventStreamMessageType.CONVERSATION_NEW, this.processIncomingNewConversation)
+        NotificationCenter.addObserver("eventstream_" + EventStreamMessageType.CONVERSATION_MESSAGE, this.processIncomingConversationMessage)
+        NotificationCenter.addObserver("eventstream_" + EventStreamMessageType.CONVERSATION_UPDATE, this.processIncomingUpdateConversation)
     }
     processTempQueue() 
     {
@@ -57,24 +59,26 @@ class ConversationManagerSingleton
         this.getStore().dispatch(Actions.queueUpdateChatMessage(m))
         this.getStore().dispatch(Actions.queueProcessChatMessage(m))
     }
-    private processIncomingUpdateConversation(event:CustomEvent)
+    private processIncomingUpdateConversation(...args:any[])
     {
-        let conversation = event.detail.data as Conversation
+        let conversation = args[0] as Conversation
         this.getStore().dispatch(Actions.insertConversation(conversation, false))
     }
-    private processIncomingNewConversation(event:CustomEvent)
+    private processIncomingNewConversation(...args:any[])
     {
-        let conversation = event.detail.data as Conversation
+        let conversation = args[0] as Conversation
         this.getStore().dispatch(Actions.insertConversation(conversation, true))
     }
-    private processIncomingConversationMessage(event:CustomEvent)
+    private processIncomingConversationMessage(...args:any[])
     {
         let store = this.getStore()
-        let message = event.detail.data as Message
-        if (message.user == store.getState().profile.id) 
+        let message = args[0] as Message
+        let me = AuthenticationManager.getAuthenticatedUser()!
+        if (message.user == me.id) 
         {
             store.dispatch(Actions.queueRemoveChatMessage(message))
-        } else 
+        } 
+        else 
         {
             store.dispatch(Actions.queueRemoveChatMessage(message))
             this.sendMessageNotification(message);
@@ -119,7 +123,7 @@ class ConversationManagerSingleton
     {
         sendOnWebsocket(
           JSON.stringify({
-            type: SocketMessageType.CONVERSATION_TYPING,
+            type: EventStreamMessageType.CONVERSATION_TYPING,
             data: { conversation: conversation }
           })
         );
@@ -145,7 +149,7 @@ class ConversationManagerSingleton
         if (document.hasFocus()) 
         {
             // If tab is focused
-            let user: UserProfile = getProfileById(message.user);
+            let user: UserProfile = ProfileManager.getProfile(message.user);
             // Show the toast if the user is not viewing that conversation
             if (user && window.location.pathname != uri) 
             {
@@ -157,7 +161,7 @@ class ConversationManagerSingleton
             // If window is not active and notifications are enabled
             if (Notification.permission === 'granted') 
             {
-                let user: UserProfile = getProfileById(message.user);
+                let user: UserProfile = ProfileManager.getProfile(message.user);
                 if (user) 
                 {
                     var options = {

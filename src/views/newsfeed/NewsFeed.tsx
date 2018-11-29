@@ -11,11 +11,12 @@ import LoadingSpinner from '../../components/general/LoadingSpinner';
 import { List } from '../../components/general/List';
 import { FullPageComponent } from '../../components/general/FullPageComponent';
 import StatusComponent from '../../components/general/status/StatusComponent';
-import { ProfileManager } from '../../main/managers/ProfileManager';
-import { StatusManager } from '../../main/managers/StatusManager';
+import { ProfileManager } from '../../managers/ProfileManager';
+import { StatusManager } from '../../managers/StatusManager';
 import { getDefaultCachePage } from '../../reducers/createPaginator';
 import { QueueUtilities } from '../../utilities/QueueUtilities';
 import * as Immutable from 'immutable';
+import { AuthenticationManager } from '../../managers/AuthenticationManager';
 require("./NewsFeed.scss");
 export interface OwnProps 
 {
@@ -27,7 +28,7 @@ interface ReduxStateProps
     items:NestedPageItem[],
     offset:number,
     error:string,
-    profile:UserProfile,
+    authenticatedProfile:UserProfile,
     last_fetched:number,
 }
 interface ReduxDispatchProps 
@@ -118,7 +119,7 @@ class NewsFeed extends React.Component<Props, {}> {
         status = Object.assign({}, status)
         status.id = d
         status.uid = d
-        status.owner = ProfileManager.getAuthenticatedUser()
+        status.owner = AuthenticationManager.getAuthenticatedUser()
         status.reactions = {}
         status.comments_count = 0
         status.children = []
@@ -128,7 +129,7 @@ class NewsFeed extends React.Component<Props, {}> {
         return status
     }
     render() {
-        let authUser = ProfileManager.getAuthenticatedUser()
+        let authUser = AuthenticationManager.getAuthenticatedUser()
         if(!authUser)
         {
             return null
@@ -207,7 +208,7 @@ const mapStateToProps = (state:RootState, ownProps: OwnProps):ReduxStateProps =>
         total,
         offset,
         error,
-        profile:state.profile,
+        authenticatedProfile:state.auth.profile,
         last_fetched
     }
 }

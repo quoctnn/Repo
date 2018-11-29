@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Status } from '../../../reducers/statuses';
 import { getTextContent } from '../../../utilities/Utilities';
-import { ProfileManager } from '../../../main/managers/ProfileManager';
+import { ProfileManager } from '../../../managers/ProfileManager';
 import ContentGallery from '../gallery/ContentGallery';
 require("./StatusContent.scss");
 

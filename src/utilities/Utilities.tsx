@@ -11,16 +11,6 @@ export const getDomainName = (url:string) =>  {
     var domain_name = domain_name_parts[0]
     return domain_name
 }
-export const appendTokenToUrl = (url:string) => 
-{
-    if(url && Settings.accessToken)
-    {
-        let img = new URL(url)
-        img.searchParams.set('token', Settings.accessToken);
-        return img.href
-    }
-    return url
-}
 export function userFullName(user:UserProfile) {
     if (user.first_name) {
         return `${user.first_name} ${user.last_name}`;

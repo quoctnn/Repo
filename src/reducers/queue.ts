@@ -1,6 +1,6 @@
 import {Types} from "../utilities/Types"
 import { Message, UploadedFile } from './conversations';
-import { sendOnWebsocket, SocketMessageType, EventLock } from '../components/general/ChannelEventStream';
+import { sendOnWebsocket, EventStreamMessageType, EventLock } from '../components/general/ChannelEventStream';
 import { FileUploader } from '../network/ApiClient';
 import * as Actions from '../actions/Actions';
 import { RootState } from './index';
@@ -70,7 +70,7 @@ const processMessage = (store, message:Message) =>
                 store.dispatch(Actions.queueUpdateChatMessage(m))
                 sendOnWebsocket(
                     JSON.stringify({
-                        type: SocketMessageType.CONVERSATION_MESSAGE,
+                        type: EventStreamMessageType.CONVERSATION_MESSAGE,
                         data: { conversation: message.conversation, text: message.text, uid: message.uid, mentions:message.mentions, files:[file.id] }
                     })
                 )
@@ -97,7 +97,7 @@ const processMessage = (store, message:Message) =>
         }
         sendOnWebsocket(
             JSON.stringify({
-                type: SocketMessageType.CONVERSATION_MESSAGE,
+                type: EventStreamMessageType.CONVERSATION_MESSAGE,
                 data
             })
         )

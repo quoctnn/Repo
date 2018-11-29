@@ -1,12 +1,10 @@
 import * as React from "react";
 import { connect } from 'react-redux'
 import { UserProfile } from '../../reducers/profileStore';
-import { appendTokenToUrl } from '../../utilities/Utilities';
-import { Card, CardImg, CardText, CardBody,
-    CardTitle, CardSubtitle, Button } from 'reactstrap';
 import { Link } from "react-router-dom";
 import { Routes } from "../../utilities/Routes";
 import { RootState } from "../../reducers";
+import { IntraSocialUtilities } from "../../utilities/IntraSocialUtilities";
 require("./SimpleUserProfile.scss");
 
 export interface Props {
@@ -17,7 +15,7 @@ class SimpleUserProfile extends React.Component<Props, {}> {
 
     render() 
     {
-        var imgUrl = appendTokenToUrl(this.props.profile.avatar )
+        var imgUrl = IntraSocialUtilities.appendAuthorizationTokenToUrl(this.props.profile.avatar )
         return(
             <div className="simple-user-profile">
                 <div className="card">

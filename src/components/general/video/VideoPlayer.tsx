@@ -3,7 +3,7 @@ import Youtube from './players/Youtube';
 import Vimeo from './players/Vimeo';
 import { DefaultPlayer as Video } from 'react-html5video'; 
 import 'react-html5video/dist/styles.css';
-import { appendTokenToUrl } from '../../../utilities/Utilities';
+import { IntraSocialUtilities } from '../../../utilities/IntraSocialUtilities';
 
 const VIDEO_EXTENSIONS = /\.(mp4|og[gv]|webm|MOV)($|\?)/i
 const AUDIO_EXTENSIONS = /\.(mp3|wav)($|\?)/i
@@ -34,7 +34,7 @@ export default class VideoPlayer extends React.Component<Props,State> {
             return (
                 <div className="video-player">
                     <Video preload="auto" controls={['PlayPause', 'Seek', 'Time', 'Volume', 'Fullscreen']}>
-                        <source src={appendTokenToUrl(this.props.link)}/>
+                        <source src={IntraSocialUtilities.appendAuthorizationTokenToUrl(this.props.link)}/>
                     </Video>
                 </div>
             );
@@ -42,7 +42,7 @@ export default class VideoPlayer extends React.Component<Props,State> {
             return (
                 <div className="col-lg-12">
                     <audio preload="auto" controls={true}>
-                        <source src={appendTokenToUrl(this.props.link)}/>
+                        <source src={IntraSocialUtilities.appendAuthorizationTokenToUrl(this.props.link)}/>
                     </audio>
                 </div>
             );

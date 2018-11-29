@@ -1,6 +1,5 @@
-import { appendTokenToUrl } from '../../utilities/Utilities';
 import * as React from 'react';
-import { Settings } from '../../utilities/Settings';
+import { IntraSocialUtilities } from '../../utilities/IntraSocialUtilities';
 require("./Avatar.scss");
 
 export interface Props {
@@ -30,7 +29,7 @@ export class Avatar extends React.PureComponent<Props & React.HTMLAttributes<HTM
 	};
     render() 
     {
-        var imgUrl = appendTokenToUrl(this.props.image)
+        var imgUrl = IntraSocialUtilities.appendAuthorizationTokenToUrl(this.props.image)
         return(
             
             <div onClick={this.props.onClick} className={"avatar" + (this.props.className ? " " + this.props.className : "")} style={{backgroundImage:"url(\"" + imgUrl + "\")", borderWidth:this.props.borderWidth + "px", borderColor:this.props.borderColor, width:this.props.size + "px", height:this.props.size + "px", borderStyle:"solid"}}>

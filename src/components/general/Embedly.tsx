@@ -4,7 +4,6 @@ import * as Actions from "../../actions/Actions"
 import { RootState } from '../../reducers/index';
 import { EmbedlyItem } from '../../reducers/embedlyStore';
 import { nullOrUndefined } from '../../utilities/Utilities';
-import {Dispatch} from 'redux'
 require("./Embedly.scss");
 export interface OwnProps {
   url: string

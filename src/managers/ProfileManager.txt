@@ -1,8 +1,8 @@
 import {  Store } from 'redux';
-import { RootState } from '../../reducers';
-import * as Actions from '../../actions/Actions';
-import ApiClient from '../../network/ApiClient';
-import { UserProfile } from '../../reducers/profileStore';
+import { RootState } from '../reducers';
+import * as Actions from '../actions/Actions';
+import ApiClient from '../network/ApiClient';
+import { UserProfile } from '../reducers/profileStore';
 class ProfileManagerSingleton 
 {
     constructor()
