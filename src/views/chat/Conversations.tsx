@@ -89,6 +89,13 @@ class Conversations extends React.PureComponent<Props, State> {
     {
         NotificationCenter.removeObserver("eventstream_" + EventStreamMessageType.CONVERSATION_TYPING, this.isTypingHandler)
     }
+    componentDidUpdate(prevProps:Props)
+    {
+        if (this.props.pagingDirty && !prevProps.pagingDirty)
+        {
+            this.loadFirstData(true)
+        }
+    }
     isTypingHandler(...args:any[])
     {
         let object = args[0]
@@ -143,8 +150,8 @@ class Conversations extends React.PureComponent<Props, State> {
             return
         }
         let pageSize = conversationReducerPageSize
-        if(this.props.total == 0 || this.props.offset == 0 || (!this.props.last_fetched && this.props.offset <= pageSize))
-            this.props.requestNextConversationPage(this.props.offset) 
+        if(this.props.pagingDirty || this.props.total == 0 || this.props.offset == 0 || (!this.props.last_fetched && this.props.offset <= pageSize))
+            this.props.requestNextConversationPage(0) 
     }
     loadNextPageData()
     {

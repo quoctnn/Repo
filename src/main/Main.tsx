@@ -54,9 +54,15 @@ class Main extends React.Component<Props, {}> {
                     <div id="content-block" className="transition">
                         <div className="container">
                             <div className="row">
+                            {!this.props.signedIn && 
                               <Switch>
                                 {!Settings.isProduction && <Route path={Routes.DEVELOPER_TOOL} component={DevTool} /> }
-                                create/
+                                <Route path={Routes.SIGNIN} component={Signin} />
+                                </Switch> 
+                            }
+                            {this.props.signedIn && 
+                              <Switch>
+                                {!Settings.isProduction && <Route path={Routes.DEVELOPER_TOOL} component={DevTool} /> }
                                 <Route path={Routes.SIGNIN} component={Signin} />
                                 <Route path={Routes.PROFILES + ":slug"} component={Profile} />
                                 <Route path={Routes.PROFILE_UPDATE} component={ProfileUpdate} />
@@ -71,6 +77,7 @@ class Main extends React.Component<Props, {}> {
                                 <Route path={Routes.UPDATE_TOOL} exact={true} component={UpdateTool} />
                                 <Route path={Routes.ANY} component={error404} />
                               </Switch>
+                            }
                             </div>
                         </div>
                     </div>

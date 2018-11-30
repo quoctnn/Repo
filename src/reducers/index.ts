@@ -23,7 +23,7 @@ import { CachePageV2 } from './simplePaginator';
 const rootPersistConfig:PersistConfig = {
   key: 'root',
   storage: storageLocal,
-  //blacklist: ['auth'],
+  blacklist: ['auth'],
   debug:true,
 } 
 const rootReducer = combineReducers({

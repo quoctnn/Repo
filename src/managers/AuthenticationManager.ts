@@ -28,6 +28,10 @@ export abstract class AuthenticationManager
     }
     static setAuthenticatedUser(profile:UserProfile|null)
     {
+        if(profile)
+        {
+            AuthenticationManager.getStore().dispatch(Actions.setDirtyPagedData())
+        }
         AjaxRequest.setup(AuthenticationManager.getAuthenticationToken())
         AuthenticationManager.getStore().dispatch(Actions.setSignedInProfile(profile))
         AuthenticationManager.updateProfileStatus(profile)
