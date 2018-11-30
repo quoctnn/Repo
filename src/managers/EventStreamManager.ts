@@ -6,6 +6,7 @@ import { EventStreamMessageType } from '../components/general/ChannelEventStream
 import { RootState } from '../reducers';
 import { AuthenticationManager } from './AuthenticationManager';
 import { UserProfile } from '../types/intrasocial_types';
+import * as Actions from '../actions/Actions';
 export abstract class EventStreamManager
 {
     static setup = () => 
@@ -21,6 +22,11 @@ export abstract class EventStreamManager
         ProfileManager.setContactListCache(contacts.map(i => i.id))
         CommunityManager.storeCommunities(state.communities || []);
         AuthenticationManager.setAuthenticatedUser(state.user)
+    }
+    static socketDisconnected = () => 
+    {
+        AuthenticationManager.setAuthenticatedUser(null)
+        EventStreamManager.getStore().dispatch(Actions.setDirtyPagedData())
     }
     private static getStore = ():Store<RootState,any> =>
     {

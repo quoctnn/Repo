@@ -7,7 +7,7 @@ import { sendOnWebsocket, EventStreamMessageType } from '../components/general/C
 export abstract class AuthenticationManager
 {
     private static lastUserActivity: number = 0;
-    private static keepAliveFrequency: number = 60; // How often do we send keepAlive message (in seconds)
+    private static keepAliveFrequency: number = 5; // How often do we send keepAlive message (in seconds)
     private static keepAlive: (NodeJS.Timer|null);
 
     static setup = () =>

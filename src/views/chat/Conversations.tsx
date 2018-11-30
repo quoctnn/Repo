@@ -96,6 +96,7 @@ class Conversations extends React.PureComponent<Props, State> {
     {
         if (this.props.signedIn && (this.props.pagingDirty && !prevProps.pagingDirty || !prevProps.signedIn))
         {
+            console.log("componentDidUpdate", this.props.signedIn, this.props.pagingDirty)
             this.loadFirstData(true)
         }
     }

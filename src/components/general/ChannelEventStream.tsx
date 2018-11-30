@@ -8,6 +8,7 @@ import { RootState } from '../../reducers';
 import { UserStatus } from '../../types/intrasocial_types';
 import * as Actions from "../../actions/Actions" 
 import { AuthenticationManager } from '../../managers/AuthenticationManager';
+import { EventStreamManager } from '../../managers/EventStreamManager';
 
 export enum EventStreamMessageType {
   STATE = "state",
@@ -181,7 +182,8 @@ class ChannelEventStream extends React.Component<Props, State> {
             { hideProgressBar: true }
           );*/
         }
-        this.props.setDirtyPagedData()
+        if(this.stream.retryCount == 0)
+          EventStreamManager.socketDisconnected()
         AuthenticationManager.clearKeepAliveTimer()
         console.log('WebSocket CLOSED', this.stream);
         if (this.stream && (this.stream as any)._shouldReconnect)
