@@ -7,6 +7,7 @@ import { connect } from 'react-redux';
 import { RootState } from '../../reducers';
 import { UserStatus } from '../../types/intrasocial_types';
 import * as Actions from "../../actions/Actions" 
+import { AuthenticationManager } from '../../managers/AuthenticationManager';
 
 export enum EventStreamMessageType {
   STATE = "state",
@@ -181,6 +182,7 @@ class ChannelEventStream extends React.Component<Props, State> {
           );*/
         }
         this.props.setDirtyPagedData()
+        AuthenticationManager.clearKeepAliveTimer()
         console.log('WebSocket CLOSED', this.stream);
         if (this.stream && (this.stream as any)._shouldReconnect)
           (this.stream as any)._connect();
