@@ -52,6 +52,13 @@ class UserStatusSelector extends React.Component<Props, {}> {
         if(!this.props.authenticatedProfile)
             return null
         const currentStatus = this.props.authenticatedProfile.user_status
+        let selectable = userStatuses.filter(function(value, _index, _arr){
+            if (value === "away" ||
+                value === "unavailable")
+                return
+            else
+                return value
+        })
         return (
 
             <div className="dropdown margin-right-sm">
@@ -60,7 +67,7 @@ class UserStatusSelector extends React.Component<Props, {}> {
                 </button>
 
                 <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                    {userStatuses.map((status, index) => {
+                    {selectable.map((status, index) => {
                         return <a key={index} onClick={this.setUserStatus.bind(this, status)} className="dropdown-item" href="#">{status}</a>
                     }) }
                 </div>
