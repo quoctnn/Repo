@@ -30,14 +30,22 @@ export abstract class AuthenticationManager
         AjaxRequest.setup(AuthenticationManager.getAuthenticationToken())
         AuthenticationManager.getStore().dispatch(Actions.setSignedInProfile(profile))
         AuthenticationManager.updateProfileStatus(profile)
+        if(profile)
+        {
+            AuthenticationManager.getStore().dispatch(Actions.setDirtyPagedData())
+        }
+    }
+    static clearKeepAliveTimer()
+    {
+        clearInterval(AuthenticationManager.keepAlive);
+        AuthenticationManager.keepAlive = null;
     }
     static signOut()
     {
         let store = AuthenticationManager.getStore();
 
         // Remove the keepAlive (last_seen) timer and eventListeners
-        clearInterval(AuthenticationManager.keepAlive);
-        AuthenticationManager.keepAlive = null;
+        AuthenticationManager.clearKeepAliveTimer()
         document.removeEventListener('mousedown', AuthenticationManager.resetUserActivityCounter);
         window.removeEventListener('focus', AuthenticationManager.resetUserActivityCounter);
 

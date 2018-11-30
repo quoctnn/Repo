@@ -54,9 +54,12 @@ export const simplePaginator = <T>(key:string, endpoint:string, itemIdKey:string
               [item[itemIdKey]]: item
             }
           }
-          const newItems = { ...page.items, ..._items }
+          const clearContent = page.dirty && action.payload.offset == 0
+          const prevItems = clearContent ? [] : page.items
+          const prevPos = clearContent ? 0 : page.position
+          const newItems = { ...prevItems, ..._items }
           const itemsArray = sortObjects(newItems, sortItemKey, sortAscending)
-          const position = page.position + action.payload!.results!.length
+          const position = prevPos + action.payload!.results!.length
           return { ...page, 
             ids: itemsArray,
             fetching:false,
@@ -87,7 +90,8 @@ export const simplePaginator = <T>(key:string, endpoint:string, itemIdKey:string
             p.items = newItems
             return p
         }
-        case Types.SET_DIRTY:return { ...page, dirty:true }
+        case Types.SET_DIRTY:
+          return { ...page, dirty:true }
         
         case Types.RESET_PAGED_DATA:  return getDefaultCachePageV2()
         default: return page
@@ -95,7 +99,7 @@ export const simplePaginator = <T>(key:string, endpoint:string, itemIdKey:string
     }
     const onlyForEndpoint = (reducer:any) => (state = {}, action:any) =>
     {
-        if((action.meta && action.meta.key == key) || action.type == Types.RESET_PAGED_DATA)
+        if((action.meta && action.meta.key == key) || action.type == Types.RESET_PAGED_DATA || action.type == Types.SET_DIRTY)
         {
             return reducer(state, action)
         }
