@@ -20,6 +20,7 @@ import { List } from '../../components/general/List';
 import { NotificationCenter } from '../../notifications/NotificationCenter';
 import { ProfileManager } from '../../managers/ProfileManager';
 import { UserProfile, Conversation } from '../../types/intrasocial_types';
+import { throws } from 'assert';
 let timezone = moment.tz.guess()
 
 require("./Conversations.scss");
@@ -32,14 +33,15 @@ export interface OwnProps
 }
 interface ReduxStateProps 
 {
-    total:number,
-    isFetching:boolean,
-    items:Conversation[],
-    offset:number,
-    error:string,
-    authenticatedProfile:UserProfile,
-    last_fetched:number,
+    total:number
+    isFetching:boolean
+    items:Conversation[]
+    offset:number
+    error:string
+    authenticatedProfile:UserProfile
+    last_fetched:number
     pagingDirty:boolean
+    signedIn:boolean
 }
 interface ReduxDispatchProps 
 {
@@ -63,7 +65,8 @@ class Conversations extends React.PureComponent<Props, State> {
         authenticatedProfile:null,
         preventShowTyingInChatId:null,
         last_fetched:null,
-        pagingDirty:false
+        pagingDirty:false,
+        signedIn:false,
     }
     constructor(props) {
         super(props);
@@ -91,7 +94,7 @@ class Conversations extends React.PureComponent<Props, State> {
     }
     componentDidUpdate(prevProps:Props)
     {
-        if (this.props.pagingDirty && !prevProps.pagingDirty)
+        if (this.props.signedIn && (this.props.pagingDirty && !prevProps.pagingDirty || !prevProps.signedIn))
         {
             this.loadFirstData(true)
         }
@@ -241,7 +244,8 @@ const mapStateToProps = (state:RootState, ownProps: OwnProps):ReduxStateProps =>
         error,
         authenticatedProfile:state.auth.profile,
         last_fetched,
-        pagingDirty
+        pagingDirty,
+        signedIn:state.auth.signedIn,
     }
 }
 const mapDispatchToProps = (dispatch:any, ownProps: OwnProps):ReduxDispatchProps => {
