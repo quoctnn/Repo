@@ -203,7 +203,9 @@ export class ChatMessageComposer extends React.Component<Props,{}> implements IE
     {
         let text = state.getCurrentContent().getPlainText()
         ProtectNavigation(text != "")
-        this.setState({plainText:text, editorState:state}, this.sendDidType)
+        const hasChanged = this.state.plainText != text
+        if(hasChanged)
+            this.setState({plainText:text, editorState:state}, this.sendDidType)
     }
     getProcessedText()
     {

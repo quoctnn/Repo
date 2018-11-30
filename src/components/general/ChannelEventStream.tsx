@@ -32,7 +32,7 @@ enum WebsocketState {
 var publicStream: ReconnectingWebSocket|null = null;
 export const sendOnWebsocket = (data: string) => {
   if (canSendOnWebsocket()) {
-    console.log('Sending Websocket', data);
+    //console.log('Sending Websocket', data);
     publicStream!.send(data);
   }
 };
