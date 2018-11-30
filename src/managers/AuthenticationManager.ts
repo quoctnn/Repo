@@ -1,8 +1,8 @@
 import {  Store } from 'redux';
-import { UserProfile, UserStatus } from '../reducers/profileStore';
 import * as Actions from '../actions/Actions';
 import { RootState } from '../reducers';
 import { AjaxRequest } from '../network/AjaxRequest';
+import { UserProfile, UserStatus } from '../types/intrasocial_types';
 import { sendOnWebsocket, EventStreamMessageType } from '../components/general/ChannelEventStream';
 export abstract class AuthenticationManager
 {
@@ -27,9 +27,9 @@ export abstract class AuthenticationManager
     }
     static setAuthenticatedUser(profile:UserProfile|null)
     {
+        AjaxRequest.setup(AuthenticationManager.getAuthenticationToken())
         AuthenticationManager.getStore().dispatch(Actions.setSignedInProfile(profile))
         AuthenticationManager.updateProfileStatus(profile)
-        AjaxRequest.setup(AuthenticationManager.getAuthenticationToken())
     }
     static signOut()
     {
@@ -56,7 +56,7 @@ export abstract class AuthenticationManager
     {
         AuthenticationManager.lastUserActivity = 0
         let profile = AuthenticationManager.getAuthenticatedUser() as UserProfile;
-        if (profile.user_status == UserStatus.USER_AWAY){
+        if (profile.user_status == UserStatus.away){
             sendOnWebsocket(
                 JSON.stringify({
                 type: EventStreamMessageType.USER_LAST_SEEN,

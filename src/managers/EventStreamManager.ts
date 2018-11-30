@@ -3,9 +3,9 @@ import { NotificationCenter } from '../notifications/NotificationCenter';
 import { ProfileManager } from './ProfileManager';
 import { CommunityManager } from './CommunityManager';
 import { EventStreamMessageType } from '../components/general/ChannelEventStream';
-import { UserProfile } from '../reducers/profileStore';
 import { RootState } from '../reducers';
 import { AuthenticationManager } from './AuthenticationManager';
+import { UserProfile } from '../types/intrasocial_types';
 export abstract class EventStreamManager
 {
     static setup = () => 

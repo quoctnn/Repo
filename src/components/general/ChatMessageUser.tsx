@@ -1,5 +1,4 @@
 import * as React from "react";
-import { UserProfile } from '../../reducers/profileStore';
 import { MessagePosition } from './ChatMessage';
 import { Avatar } from './Avatar';
 require("./ChatMessageUser.scss");

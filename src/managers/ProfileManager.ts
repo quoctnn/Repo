@@ -1,9 +1,9 @@
 import {  Store } from 'redux';
 import ApiClient from '../network/ApiClient';
 import { CommunityManager } from './CommunityManager';
-import { UserProfile } from '../reducers/profileStore';
 import * as Actions from '../actions/Actions';
 import { RootState } from '../reducers';
+import { UserProfile } from '../types/intrasocial_types';
 export abstract class ProfileManager
 {
     static setup = () => 

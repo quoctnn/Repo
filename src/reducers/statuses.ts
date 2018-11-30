@@ -2,8 +2,6 @@ import { PaginationUtilities } from '../utilities/PaginationUtilities';
 import Constants from '../utilities/Constants';
 import { statusMultiPaginator } from './createPaginator';
 import { combineReducers } from 'redux';
-import { UploadedFile } from './conversations';
-import { UserProfile } from './profileStore';
 
 export const StatusContextKeys = {
   NEWSFEED : "newsfeed",
@@ -41,50 +39,3 @@ export const statuses = combineReducers({
   items: statusesItemReducer,
   feed: statusesPaginator.paginationReducer
 });
-export interface ICommunity
-{
-  absolute_url:string
-  deactivated:boolean
-  id:number
-  name:string
-  slug_name:string
-  
-}
-export interface TempStatus 
-{
-  text: string
-  privacy: string
-  files_ids: number[]
-  link: string
-  context_natural_key?: string
-  context_object_id?: number
-  parent:number,
-  mentions: number[]
-  pending?:boolean
-}
-export interface ContextObject
-{absolute_url:string, name:string}
-export interface Status extends TempStatus
-{
-    can_comment:boolean
-    children:Status[]
-    children_ids:number[]
-    comments_count:number
-    community:ICommunity
-    context_object:ContextObject
-    created_at:string
-    edited_at:string
-    files:UploadedFile[]
-    id:number
-    uid:number
-    reactions:{ [id: string]: number[] }
-    reaction_count:number
-    owner:UserProfile
-    permission_set:number[]
-    poll:any
-    read:boolean
-    updated_at:string
-    serialization_date:string
-    extra?:string
-    highlights?:{[id:string]:[string]}
-}

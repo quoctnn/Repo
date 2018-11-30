@@ -1,13 +1,9 @@
 import { Types } from '../utilities/Types';
-import { Group } from '../reducers/groupStore';
-import { Community } from '../reducers/communityStore';
-import { UserProfile } from '../reducers/profileStore';
-import { Conversation, Message } from '../reducers/conversations';
 import { conversationPaginator, conversationReducerKey } from '../reducers/conversations';
 import { messagesPaginator, messageReducerKey } from '../reducers/messages';
 import { InsertItemAction } from '../reducers/createPaginator';
-import { EmbedlyItem } from '../reducers/embedlyStore';
-import { statusesPaginator, Status, statusReducerKey } from '../reducers/statuses';
+import { statusesPaginator } from '../reducers/statuses';
+import { Status, EmbedlyItem, Message, Conversation, Community, UserProfile, Group } from '../types/intrasocial_types';
 
 //embedly
 export const requestEmbedlyData = (urls:string[]) => ({
@@ -35,6 +31,9 @@ export const resetEmbedlyStore = () => ({
 export const resetPagedData = () => ({
   type: Types.RESET_PAGED_DATA
 });
+export const setDirtyPagedData = () => ({
+  type: Types.SET_DIRTY
+});
 //newsfeed
 export const requestNextStatusPage = statusesPaginator.requestNextStatusPage
 export const insertStatus = statusesPaginator.insertStatus
@@ -51,13 +50,13 @@ export const insertChatMessage = (pagingId:string, message:Message):InsertItemAc
     pagingId
 })
 //conversations
-export const setSortedConversationIds = conversationPaginator.setSortedIds
 export const requestNextConversationPage = conversationPaginator.requestNextPage
 export const insertConversation = (conversation:Conversation, isNew:boolean):InsertItemAction => ({
     type: Types.INSERT_ITEM_TO_PAGE,
     item:conversation,
     meta:{key:conversationReducerKey}
 })
+export const setConversationPageNotFetching = conversationPaginator.setNotFetching
 
 //queue status
 

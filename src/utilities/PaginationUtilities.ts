@@ -1,4 +1,5 @@
-import { Status } from '../reducers/statuses';
+import { Status } from "../types/intrasocial_types";
+
 export interface NestedPageItem
 {
     id:number

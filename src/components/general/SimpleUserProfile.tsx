@@ -1,10 +1,10 @@
 import * as React from "react";
 import { connect } from 'react-redux'
-import { UserProfile } from '../../reducers/profileStore';
 import { Link } from "react-router-dom";
 import { Routes } from "../../utilities/Routes";
 import { RootState } from "../../reducers";
 import { IntraSocialUtilities } from "../../utilities/IntraSocialUtilities";
+import { UserProfile } from "../../types/intrasocial_types";
 require("./SimpleUserProfile.scss");
 
 export interface Props {

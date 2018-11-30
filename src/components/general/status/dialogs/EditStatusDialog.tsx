@@ -1,9 +1,8 @@
 import * as React from 'react';
 import { ModalBody, Modal, ModalHeader, ModalFooter, Button } from 'reactstrap';
 import { translate } from '../../../../components/intl/AutoIntlProvider';
-import { Status } from '../../../../reducers/statuses';
 import StatusEditFormContainer from '../StatusEditFormContainer';
-import { UploadedFile } from '../../../../reducers/conversations';
+import { Status, UploadedFile } from '../../../../types/intrasocial_types';
 require("./EditStatusDialog.scss");
 
 export interface Props 

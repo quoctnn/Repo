@@ -1,11 +1,9 @@
 import * as React from 'react';
 import ReactButton from './ReactButton';
-import { UserProfile } from '../../../reducers/profileStore';
 import StatusOptions from './StatusOptions';
-import { Status } from '../../../reducers/statuses';
 import { StatusUtilities } from '../../../utilities/StatusUtilities';
 import ReactionStats from './ReactionStats';
-import { UploadedFile } from '../../../reducers/conversations';
+import { Status, UploadedFile, UserProfile } from '../../../types/intrasocial_types';
 require("./StatusFooterStats.scss");
 
 export interface Props 

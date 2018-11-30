@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { translate } from '../../../components/intl/AutoIntlProvider';
-import { UploadedFile } from '../../../reducers/conversations';
 import VideoPlayer from '../video/VideoPlayer';
 import Embedly from '../Embedly';
 import { Modal, ModalBody } from 'reactstrap';
@@ -15,6 +14,7 @@ import {
     CarouselCaption
   } from 'reactstrap';
 import { IntraSocialUtilities } from '../../../utilities/IntraSocialUtilities';
+import { UploadedFile } from '../../../types/intrasocial_types';
 require("./ContentGallery.scss");
 export enum GalleryItemType 
 {

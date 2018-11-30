@@ -15,7 +15,6 @@ import { availableThemes } from '../reducers/settings';
 import { Settings } from '../utilities/Settings';
 import appReducer from '../reducers/index';
 import { RootState } from '../reducers/index';
-import { UserProfile } from '../reducers/profileStore';
 import { PaginatorAction, MultiPaginatorAction } from '../reducers/createPaginator';
 import ApiClient from '../network/ApiClient';
 import ChannelEventStream from '../components/general/ChannelEventStream';

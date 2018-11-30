@@ -1,6 +1,4 @@
 import * as React from 'react';
-import { UserProfile } from '../../../reducers/profileStore';
-import { Status } from '../../../reducers/statuses';
 import { translate } from '../../intl/AutoIntlProvider';
 import * as moment from 'moment-timezone';
 import Moment from "react-moment";
@@ -10,6 +8,7 @@ import { StatusUtilities } from '../../../utilities/StatusUtilities';
 import { Avatar } from '../Avatar';
 import { Link } from 'react-router-dom';
 import { Routes } from '../../../utilities/Routes';
+import { UserProfile, Status } from '../../../types/intrasocial_types';
 let timezone = moment.tz.guess();
 require("./StatusHeader.scss");
 

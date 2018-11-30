@@ -1,11 +1,9 @@
 import * as React from 'react';
 import classNames from "classnames";
-import { Status } from '../../../reducers/statuses';
 import { StatusUtilities } from '../../../utilities/StatusUtilities';
 import StatusHeader from './StatusHeader';
 import StatusContent from './StatusContent';
 import ApiClient from '../../../network/ApiClient';
-import { UploadedFile } from '../../../reducers/conversations';
 import StatusFooter from './StatusFooter';
 import { nullOrUndefined } from '../../../utilities/Utilities';
 import { NestedPageItem } from '../../../utilities/PaginationUtilities';
@@ -13,6 +11,7 @@ import { connect } from 'react-redux'
 import { RootState } from '../../../reducers/index';
 import * as Actions from '../../../actions/Actions';
 import { AuthenticationManager } from '../../../managers/AuthenticationManager';
+import { Status, UploadedFile } from '../../../types/intrasocial_types';
 require("./StatusComponent.scss");
 
 export interface OwnProps 

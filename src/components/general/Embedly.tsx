@@ -2,8 +2,8 @@ import * as React from "react";
 import { connect } from 'react-redux'
 import * as Actions from "../../actions/Actions" 
 import { RootState } from '../../reducers/index';
-import { EmbedlyItem } from '../../reducers/embedlyStore';
 import { nullOrUndefined } from '../../utilities/Utilities';
+import { EmbedlyItem } from "../../types/intrasocial_types";
 require("./Embedly.scss");
 export interface OwnProps {
   url: string

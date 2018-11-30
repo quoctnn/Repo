@@ -1,10 +1,8 @@
 import Conversations from './Conversations';
-import { Conversation, Message } from '../../reducers/conversations';
 import * as React from 'react';
 import { connect } from 'react-redux'
 import { RootState } from '../../reducers/index';
 import { ChatMessageList } from '../../components/general/ChatMessageList';
-import { UserProfile } from '../../reducers/profileStore';
 import { ChatMessageComposer } from '../../components/general/ChatMessageComposer';
 import { EventStreamMessageType } from '../../components/general/ChannelEventStream';
 import { Settings } from '../../utilities/Settings';
@@ -22,6 +20,7 @@ import { Mention } from '../../components/input/MentionEditor';
 import { ConversationManager } from '../../managers/ConversationManager';
 import { NotificationCenter } from '../../notifications/NotificationCenter';
 import { ProfileManager } from '../../managers/ProfileManager';
+import { UserProfile, Conversation, Message } from '../../types/intrasocial_types';
 
 require("./ConversationView.scss")
 
@@ -354,7 +353,7 @@ class ConversationView extends React.PureComponent<Props, State> {
 
         return(
             <FullPageComponent>
-                <div className="d-none d-sm-block col-lg-4 col-md-4 col-sm-5">
+                <div className="d-none d-sm-block col-lg-4 col-md-4 col-sm-5 column-left">
                     <Conversations preventShowTyingInChatId={conversation.id} activeConversation={this.props.conversationId} />
                 </div>
                 <div className={"col-lg-8 col-md-8 col-sm-7" + (this.state.fullScreen ? " full-screen" : "")}>
@@ -389,7 +388,7 @@ const mapStateToProps = (state:RootState, ownProps:Props) => {
     const offset = items.length
     const queuedMessages = QueueUtilities.getQueuedMessageForConversation(id, state.queue.chatMessages)
     const last_fetched = pagination.last_fetch
-    const conversation = state.conversations.items[id]
+    const conversation = state.conversations.pagination.items[id]
     const availableMentions = conversation ? conversation.users.map(u => {
         let p = ProfileManager.getProfile(u)
         return p ? Mention.fromUser(p) : null

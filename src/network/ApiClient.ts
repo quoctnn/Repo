@@ -2,9 +2,7 @@ import Constants from "../utilities/Constants";
 import {AjaxRequest} from "./AjaxRequest";
 var $ = require("jquery")
 import store from '../main/App';
-import { UploadedFile } from '../reducers/conversations';
-import { UserProfile } from '../reducers/profileStore';
-import { Status } from '../reducers/statuses';
+import { Status, UserProfile, UploadedFile } from "../types/intrasocial_types";
 
 export type ApiClientCallback = (data: any, status:string, error:string) => void;
 export type ApiClientCommunityMembersCallback = (data: UserProfile[], status:string, error:string) => void;

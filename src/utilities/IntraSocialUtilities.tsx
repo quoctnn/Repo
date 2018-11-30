@@ -1,12 +1,10 @@
 import processString from 'react-process-string'
 import * as React from 'react';
-import { UploadedFile } from '../reducers/conversations';
-import { Status } from '../reducers/statuses';
 import { AuthenticationManager } from '../managers/AuthenticationManager';
-import { UserProfile } from '../reducers/profileStore';
 import Embedly from '../components/general/Embedly';
 import { Link } from 'react-router-dom';
 import { Routes } from './Routes';
+import { Status, UserProfile, UploadedFile } from '../types/intrasocial_types';
 
 export const URL_REGEX = /(\b(https?|ftp):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/gim
 export const URL_WWW_REGEX = /(^(\b|\s+)(www)\.[\S]+(\b|$))/gim

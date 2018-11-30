@@ -4,17 +4,16 @@ import { connect } from 'react-redux'
 import { translate } from '../../components/intl/AutoIntlProvider';
 import { RootState } from '../../reducers';
 import { Button,Form, FormGroup } from 'reactstrap';
-import { UserProfile } from '../../reducers/profileStore';
 import SelectUsersDialog from '../../components/general/SelectUsersDialog';
 import { Avatar } from '../../components/general/Avatar';
 import ApiClient from '../../network/ApiClient';
 import { withRouter} from 'react-router-dom'
 import { Routes } from '../../utilities/Routes';
-import { Conversation } from '../../reducers/conversations';
 import { ConversationManager } from '../../managers/ConversationManager';
 import LoadingSpinner from '../../components/general/LoadingSpinner';
 import { toast } from 'react-toastify';
 import { ErrorToast } from '../../components/general/Toast';
+import { UserProfile, Conversation } from '../../types/intrasocial_types';
 
 require("./CreateConversation.scss");
 export interface OwnProps {

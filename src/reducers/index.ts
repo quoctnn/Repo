@@ -1,5 +1,5 @@
-import { embedlyStore, EmbedlyItem } from './embedlyStore';
-import { PageItem, CachePage } from './createPaginator';
+import { embedlyStore } from './embedlyStore';
+import { PageItem } from './createPaginator';
 import { combineReducers } from 'redux'
 import debug from './debug';
 import settings from './settings';
@@ -7,16 +7,17 @@ import auth from './auth';
 import groupStore from './groupStore';
 import groupListCache from './groupListCache';
 import communityStore from './communityStore';
-import { profileStore, UserProfile } from './profileStore';
+import { profileStore } from './profileStore';
 import contactListCache from './contactListCache';
 import storageLocal from 'redux-persist/lib/storage'
 import { persistReducer, PersistConfig } from 'redux-persist';
 import { ApiEndpoint } from './debug';
 import queue from './queue';
 import { conversations } from './conversations';
-import { Conversation, Message } from './conversations';
 import { messages } from './messages';
-import { statuses, Status } from './statuses';
+import { statuses } from './statuses';
+import { Status, UserProfile, Message, EmbedlyItem, Conversation } from '../types/intrasocial_types';
+import { CachePageV2 } from './simplePaginator';
 
 
 const rootPersistConfig:PersistConfig = {
@@ -41,7 +42,7 @@ export interface RootState
       groupListCache: any;
       contactListCache: any;
       queue:{chatMessages:Message[], statusMessages:Status[]};
-      conversations:{items:{[id:number]:Conversation}, pagination:CachePage};
+      conversations:{pagination:CachePageV2<Conversation>};
       messages:{items:Message[], conversations:PageItem}
       embedlyStore:{byId:{[id:string]:EmbedlyItem}, allIds:string[], queuedIds:{[id:string]:boolean}},
       statuses:{items:{[id:number]:Status}, feed:PageItem}

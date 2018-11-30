@@ -12,8 +12,8 @@ import createEmojiPlugin from "draft-js-emoji-plugin";
 import emojiPositionSuggestions from "./emojiPositionSuggestion";
 import {defaultTheme} from 'draft-js-emoji-plugin'
 import { Settings } from '../../utilities/Settings';
-import { UserProfile } from '../../reducers/profileStore';
 import { IntraSocialUtilities } from "../../utilities/IntraSocialUtilities";
+import { UserProfile } from "../../types/intrasocial_types";
 require("./MentionEditor.scss");
 
 

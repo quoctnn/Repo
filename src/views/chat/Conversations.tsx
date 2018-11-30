@@ -4,13 +4,11 @@ import { connect } from 'react-redux'
 import LoadingSpinner from '../../components/general/LoadingSpinner';
 import { translate } from '../../components/intl/AutoIntlProvider';
 import { RootState } from '../../reducers';
-import { Conversation } from '../../reducers/conversations';
 import ConversationItem from '../../components/general/ConversationItem';
 import { FullPageComponent } from '../../components/general/FullPageComponent';
 import { PaginationUtilities } from '../../utilities/PaginationUtilities';
 import { nullOrUndefined, cloneDictKeys } from '../../utilities/Utilities';
 import { EventStreamMessageType} from '../../components/general/ChannelEventStream';
-import { UserProfile } from '../../reducers/profileStore';
 import { Settings } from '../../utilities/Settings';
 import { TypingIndicator } from '../../components/general/TypingIndicator';
 import { Avatar } from '../../components/general/Avatar';
@@ -21,6 +19,7 @@ import { Routes } from '../../utilities/Routes';
 import { List } from '../../components/general/List';
 import { NotificationCenter } from '../../notifications/NotificationCenter';
 import { ProfileManager } from '../../managers/ProfileManager';
+import { UserProfile, Conversation } from '../../types/intrasocial_types';
 let timezone = moment.tz.guess()
 
 require("./Conversations.scss");
@@ -40,10 +39,12 @@ interface ReduxStateProps
     error:string,
     authenticatedProfile:UserProfile,
     last_fetched:number,
+    pagingDirty:boolean
 }
 interface ReduxDispatchProps 
 {
-    requestNextConversationPage?:(page:number) => void,
+    requestNextConversationPage?:(page:number) => void
+    setConversationPageNotFetching?:() => void
 }
 type Props = ReduxStateProps & ReduxDispatchProps & OwnProps
 type IsTypingStore = {[conversation:number]:{[user:number]:NodeJS.Timer}}
@@ -61,7 +62,8 @@ class Conversations extends React.PureComponent<Props, State> {
         error:null,
         authenticatedProfile:null,
         preventShowTyingInChatId:null,
-        last_fetched:null
+        last_fetched:null,
+        pagingDirty:false
     }
     constructor(props) {
         super(props);
@@ -136,6 +138,8 @@ class Conversations extends React.PureComponent<Props, State> {
         let hasError = ignoreError ? false : !nullOrUndefined( this.props.error )
         if(this.props.isFetching || hasError)
         {
+            if(this.props.isFetching)
+                this.props.setConversationPageNotFetching() 
             return
         }
         let pageSize = conversationReducerPageSize
@@ -214,13 +218,14 @@ class Conversations extends React.PureComponent<Props, State> {
 }
 const mapStateToProps = (state:RootState, ownProps: OwnProps):ReduxStateProps => {
     const pagination = state.conversations.pagination
-    const allItems = state.conversations.items
+    const allItems = state.conversations.pagination.items
     const isFetching = pagination.fetching
     const items = PaginationUtilities.getCurrentPageResults(allItems, pagination)
     const total = pagination.totalCount
-    const offset = items.length
+    const offset = pagination.position
     const error = pagination.error
     const last_fetched = pagination.last_fetch
+    const pagingDirty = pagination.dirty
     return {
         isFetching,
         items,
@@ -228,14 +233,18 @@ const mapStateToProps = (state:RootState, ownProps: OwnProps):ReduxStateProps =>
         offset,
         error,
         authenticatedProfile:state.auth.profile,
-        last_fetched
+        last_fetched,
+        pagingDirty
     }
 }
 const mapDispatchToProps = (dispatch:any, ownProps: OwnProps):ReduxDispatchProps => {
     return {
         requestNextConversationPage:(page:number) => {
             dispatch(Actions.requestNextConversationPage(page))
-        }
+        },
+        setConversationPageNotFetching:() => {
+            dispatch(Actions.setConversationPageNotFetching())
+        },
     }
 }
 export default connect<ReduxStateProps, ReduxDispatchProps, OwnProps>(mapStateToProps, mapDispatchToProps)(Conversations);

@@ -5,8 +5,8 @@ import { connect } from 'react-redux'
 import { Button} from 'reactstrap';
 import * as Actions from "../../actions/Actions"
 import { Routes } from '../../utilities/Routes';
-import { UserProfile } from '../../reducers/profileStore';
 import { RootState } from '../../reducers/index';
+import { UserProfile } from "../../types/intrasocial_types";
 import { AuthenticationManager } from '../../managers/AuthenticationManager';
 require("./ProfileStatus.scss");
 

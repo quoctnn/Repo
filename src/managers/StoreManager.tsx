@@ -1,28 +1,21 @@
 import {  Store } from 'redux';
 import { RootState } from '../reducers';
-class StoreManagerSingleton 
+export abstract class StoreManager 
 {
-    constructor()
-    {
-        this.setup = this.setup.bind(this)
-        this.getStore = this.getStore.bind(this)
-        this.applyEndpointDomain = this.applyEndpointDomain.bind(this)
-    }
-    setup()
+    static setup()
     {
     }
-    applyEndpointDomain(url:string)
+    static applyEndpointDomain = (url:string) => 
     {
         if (url.indexOf('://') > 0 || url.indexOf('//') === 0 ) 
         {
             return url
         }
-        let state = this.getStore().getState().debug
+        let state = StoreManager.getStore().getState().debug
         return state.availableApiEndpoints[state.apiEndpoint].endpoint + url
     }
-    private getStore():Store<RootState,any>
+    private static getStore = ():Store<RootState,any> => 
     {
         return window.store 
     }
 }
-export let StoreManager = new StoreManagerSingleton();

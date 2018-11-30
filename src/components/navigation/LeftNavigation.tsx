@@ -1,8 +1,8 @@
 import * as React from "react";
 import CommunityTreeItem from '../general/CommunityTreeItem';
 import { connect } from 'react-redux'
-import { Community } from '../../reducers/communityStore';
 import { RootState } from "../../reducers";
+import { Community } from "../../types/intrasocial_types";
 require("./LeftNavigation.scss");
 
 export interface Props {

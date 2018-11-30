@@ -1,8 +1,8 @@
 import * as React from 'react';
 import classNames from "classnames";
-import { UserProfile } from '../../../reducers/profileStore';
 import { StatusInteractionDialog } from './dialogs/StatusInteractionDialog';
 import { ProfileManager } from '../../../managers/ProfileManager';
+import { UserProfile } from '../../../types/intrasocial_types';
 require("./ReactionStats.scss");
 
 export interface ReactionStatsProps

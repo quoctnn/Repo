@@ -2,21 +2,19 @@ import * as React from 'react';
 import { connect } from 'react-redux'
 import * as Actions from "../../actions/Actions" 
 import { RootState } from '../../reducers';
-import { UserProfile } from '../../reducers/profileStore';
-import { UploadedFile } from '../../reducers/conversations';
 import { nullOrUndefined } from '../../utilities/Utilities';
-import { statusReducerPageSize, Status, StatusContextKeys } from '../../reducers/statuses';
+import { statusReducerPageSize, StatusContextKeys } from '../../reducers/statuses';
 import { PaginationUtilities, NestedPageItem } from '../../utilities/PaginationUtilities';
 import LoadingSpinner from '../../components/general/LoadingSpinner';
 import { List } from '../../components/general/List';
 import { FullPageComponent } from '../../components/general/FullPageComponent';
 import StatusComponent from '../../components/general/status/StatusComponent';
-import { ProfileManager } from '../../managers/ProfileManager';
 import { StatusManager } from '../../managers/StatusManager';
 import { getDefaultCachePage } from '../../reducers/createPaginator';
 import { QueueUtilities } from '../../utilities/QueueUtilities';
 import * as Immutable from 'immutable';
 import { AuthenticationManager } from '../../managers/AuthenticationManager';
+import { Status, UserProfile, UploadedFile } from '../../types/intrasocial_types';
 require("./NewsFeed.scss");
 export interface OwnProps 
 {

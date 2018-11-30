@@ -1,11 +1,9 @@
 import {  Store } from 'redux';
 import { RootState } from '../reducers';
 import { EventStreamMessageType, canSendOnWebsocket, sendOnWebsocket } from '../components/general/ChannelEventStream';
-import { Conversation, Message } from '../reducers/conversations';
 import * as Actions from '../actions/Actions';
 import { Routes } from '../utilities/Routes';
 import { toast } from 'react-toastify';
-import { UserProfile } from '../reducers/profileStore';
 import { translate } from '../components/intl/AutoIntlProvider';
 import { InfoToast } from '../components/general/Toast';
 import * as React from 'react';
@@ -13,65 +11,52 @@ import ApiClient from '../network/ApiClient';
 import { NotificationCenter } from '../notifications/NotificationCenter';
 import { AuthenticationManager } from './AuthenticationManager';
 import { ProfileManager } from './ProfileManager';
-class ConversationManagerSingleton 
+import { Message, UserProfile, Conversation } from '../types/intrasocial_types';
+export abstract class ConversationManager 
 {
-    constructor()
+    static setup = () => 
     {
-        this.setup = this.setup.bind(this)
-        this.getStore = this.getStore.bind(this)
-        this.processIncomingNewConversation = this.processIncomingNewConversation.bind(this)
-        this.processIncomingConversationMessage = this.processIncomingConversationMessage.bind(this)
-        this.processIncomingUpdateConversation = this.processIncomingUpdateConversation.bind(this)
-        this.sendMessageNotification = this.sendMessageNotification.bind(this)
-        this.sortConversations = this.sortConversations.bind(this)
-        this.sendMessageNotification = this.sendMessageNotification.bind(this)
-        this.processTempQueue = this.processTempQueue.bind(this)
-        this.ensureConversationExists = this.ensureConversationExists.bind(this)
-        
+        NotificationCenter.addObserver("eventstream_" + EventStreamMessageType.CONVERSATION_NEW, ConversationManager.processIncomingNewConversation)
+        NotificationCenter.addObserver("eventstream_" + EventStreamMessageType.CONVERSATION_MESSAGE, ConversationManager.processIncomingConversationMessage)
+        NotificationCenter.addObserver("eventstream_" + EventStreamMessageType.CONVERSATION_UPDATE, ConversationManager.processIncomingUpdateConversation)
     }
-    setup()
-    {
-        NotificationCenter.addObserver("eventstream_" + EventStreamMessageType.CONVERSATION_NEW, this.processIncomingNewConversation)
-        NotificationCenter.addObserver("eventstream_" + EventStreamMessageType.CONVERSATION_MESSAGE, this.processIncomingConversationMessage)
-        NotificationCenter.addObserver("eventstream_" + EventStreamMessageType.CONVERSATION_UPDATE, this.processIncomingUpdateConversation)
-    }
-    processTempQueue() 
+    static processTempQueue = () => 
     {
         if (canSendOnWebsocket) 
         {
-            this.getStore().dispatch(Actions.queueProcessNextChatMessage())
+            ConversationManager.getStore().dispatch(Actions.queueProcessNextChatMessage())
         }
     }
-    setConversation(conversation:Conversation, isNew:boolean)
+    static setConversation = (conversation:Conversation, isNew:boolean) => 
     {
-        this.getStore().dispatch(Actions.insertConversation(conversation, isNew))
+        ConversationManager.getStore().dispatch(Actions.insertConversation(conversation, isNew))
     }
-    removeQueuedMessage(message:Message)
+    static removeQueuedMessage = (message:Message) => 
     {
-        this.getStore().dispatch(Actions.queueRemoveChatMessage(message))
+        ConversationManager.getStore().dispatch(Actions.queueRemoveChatMessage(message))
     }
-    retryQueuedMessage(message:Message)
+    static retryQueuedMessage = (message:Message) => 
     {
         let m = Object.assign({}, message)
         m.tempFile = Object.assign({}, m.tempFile)
         m.tempFile.progress = 0
         m.tempFile.error = null
-        this.getStore().dispatch(Actions.queueUpdateChatMessage(m))
-        this.getStore().dispatch(Actions.queueProcessChatMessage(m))
+        ConversationManager.getStore().dispatch(Actions.queueUpdateChatMessage(m))
+        ConversationManager.getStore().dispatch(Actions.queueProcessChatMessage(m))
     }
-    private processIncomingUpdateConversation(...args:any[])
+    private static processIncomingUpdateConversation = (...args:any[]) => 
     {
         let conversation = args[0] as Conversation
-        this.getStore().dispatch(Actions.insertConversation(conversation, false))
+        ConversationManager.getStore().dispatch(Actions.insertConversation(conversation, false))
     }
-    private processIncomingNewConversation(...args:any[])
+    private static processIncomingNewConversation = (...args:any[]) => 
     {
         let conversation = args[0] as Conversation
-        this.getStore().dispatch(Actions.insertConversation(conversation, true))
+        ConversationManager.getStore().dispatch(Actions.insertConversation(conversation, true))
     }
-    private processIncomingConversationMessage(...args:any[])
+    private static processIncomingConversationMessage = (...args:any[]) => 
     {
-        let store = this.getStore()
+        let store = ConversationManager.getStore()
         let message = args[0] as Message
         let me = AuthenticationManager.getAuthenticatedUser()!
         if (message.user == me.id) 
@@ -81,18 +66,17 @@ class ConversationManagerSingleton
         else 
         {
             store.dispatch(Actions.queueRemoveChatMessage(message))
-            this.sendMessageNotification(message);
+            ConversationManager.sendMessageNotification(message);
         }
-        this.ensureConversationExists(message.conversation, () => { 
+        ConversationManager.ensureConversationExists(message.conversation, () => { 
             store.dispatch(Actions.insertChatMessage(message.conversation.toString(), message))
-            this.sortConversations()
         })
         
     }
-    ensureConversationExists(conversationId:number, completion:() => void)
+    static ensureConversationExists = (conversationId:number, completion:() => void) => 
     {
-        let store = this.getStore()
-        let conversation = store.getState().conversations.items[conversationId]
+        let store = ConversationManager.getStore()
+        let conversation = store.getState().conversations.pagination.items[conversationId]
         if(!conversation)
         {
             ApiClient.getConversation(conversationId, (data, status, error) => {
@@ -113,13 +97,13 @@ class ConversationManagerSingleton
         }
 
     }
-    markConversationAsRead(conversationId:number, completion:() => void)
+    static markConversationAsRead = (conversationId:number, completion:() => void) => 
     {
         ApiClient.markConversationAsRead(conversationId, (data, status, error) => {
             completion()
         })
     }
-    sendTypingInConversation(conversation: number)
+    static sendTypingInConversation = (conversation: number) => 
     {
         sendOnWebsocket(
           JSON.stringify({
@@ -128,22 +112,12 @@ class ConversationManagerSingleton
           })
         );
     }
-    sendMessage(message:Message)
+    static sendMessage = (message:Message) => 
     {
-        let store = this.getStore()
+        let store = ConversationManager.getStore()
         store.dispatch(Actions.queueAddChatMessage(message))
     }
-    private sortConversations()
-    {
-        let store = this.getStore()
-        let state = store.getState()
-        let conversations = Object.keys(state.conversations.items).map(k => state.conversations.items[k])
-        let sortedIds = conversations.sort((a,b) => {
-            return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
-        }).map(c => c.id)
-        store.dispatch(Actions.setSortedConversationIds(sortedIds))
-    }
-    private sendMessageNotification(message: Message) 
+    private static sendMessageNotification = (message: Message) =>  
     {
         let uri = Routes.CONVERSATION + message.conversation;
         if (document.hasFocus()) 
@@ -178,9 +152,8 @@ class ConversationManagerSingleton
             }
         }
     }
-    private getStore():Store<RootState,any>
+    private static getStore = ():Store<RootState,any> => 
     {
         return window.store 
     }
 }
-export let ConversationManager = new ConversationManagerSingleton();

@@ -7,12 +7,8 @@ import ReactButton from "./ReactButton";
 import StatusOptions from "./StatusOptions";
 import StatusContent from "./StatusContent";
 import { translate } from '../../intl/AutoIntlProvider';
-import { Status } from '../../../reducers/statuses';
-import { UserProfile } from '../../../reducers/profileStore';
-import { UploadedFile } from '../../../reducers/conversations';
 import { StatusUtilities } from '../../../utilities/StatusUtilities';
 import ApiClient from '../../../network/ApiClient';
-import { ProfileManager } from '../../../managers/ProfileManager';
 import ReactionStats from './ReactionStats';
 import { Avatar } from '../Avatar';
 import { Link } from 'react-router-dom';
@@ -22,6 +18,7 @@ import { RootState } from '../../../reducers/index';
 import { connect } from 'react-redux'
 import * as Actions from '../../../actions/Actions';
 import { AuthenticationManager } from '../../../managers/AuthenticationManager';
+import { Status, UploadedFile, UserProfile } from '../../../types/intrasocial_types';
 require("./Comment.scss");
 let timezone = moment.tz.guess();
 export interface OwnProps 

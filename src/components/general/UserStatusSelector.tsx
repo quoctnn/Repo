@@ -1,12 +1,12 @@
 import * as React from 'react';
 import { connect } from 'react-redux'
-import { UserProfile, UserStatus } from '../../reducers/profileStore';
 import * as Actions from '../../actions/Actions';
 import { sendUserStatus, EventStreamMessageType } from './ChannelEventStream';
 import { RootState } from '../../reducers/index';
 import { NotificationCenter } from '../../notifications/NotificationCenter';
 import { Store, bindActionCreators } from 'redux';
 import { setSignedInProfile } from '../../actions/Actions';
+import { UserStatus, UserProfile } from '../../types/intrasocial_types';
 require("./UserStatusSelector.scss");
 
 export interface OwnProps

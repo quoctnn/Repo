@@ -1,5 +1,5 @@
-import { Message } from '../reducers/conversations';
-import { Status, parseStatusContextKey, StatusContextKeys } from '../reducers/statuses';
+import { parseStatusContextKey, StatusContextKeys } from '../reducers/statuses';
+import { Status, Message } from '../types/intrasocial_types';
 export class QueueUtilities {
     static getQueuedMessageForConversation = (conversationId:number, allQueuedChatMessages:Message[]):Message[] => 
     {

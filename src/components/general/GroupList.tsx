@@ -8,8 +8,8 @@ import { Button } from 'reactstrap';
 import { translate } from '../intl/AutoIntlProvider';
 import { Link } from 'react-router-dom';
 import { Routes } from '../../utilities/Routes';
-import { Group } from '../../reducers/groupStore';
 import { RootState } from '../../reducers';
+import { Group } from '../../types/intrasocial_types';
 export interface Props {
     community_id:number,
     pageSize?:number,

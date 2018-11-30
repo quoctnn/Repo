@@ -1,12 +1,13 @@
 import * as React from "react";
 import { connect } from 'react-redux'
-import { UserProfile, getProfileIdBySlugName } from '../../reducers/profileStore';
+import {getProfileIdBySlugName } from '../../reducers/profileStore';
 import { CoverImage } from '../../components/general/CoverImage';
 import { RootState } from '../../reducers/index';
 import ApiClient from '../../network/ApiClient';
 import * as Actions from '../../actions/Actions'; 
 import LoadingSpinner from '../../components/general/LoadingSpinner';
 import { AuthenticationManager } from '../../managers/AuthenticationManager';
+import { UserProfile } from "../../types/intrasocial_types";
 require("./Profile.scss");
 
 export interface Props {
