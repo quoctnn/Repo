@@ -3,26 +3,8 @@ import { Types } from '../utilities/Types';
 import { AjaxRequest } from '../network/AjaxRequest';
 import * as Actions from "../actions/Actions"
 import Constants from '../utilities/Constants';
-export interface EmbedlyMedia
-{
-    height:number
-    width:number
-    type:string
-    html:string
-}
-export class EmbedlyItem
-{
-    url:string
-    provider_url:string
-    original_url:string
-    description:string
-    title:string
-    thumbnail_url:string
-    thumbnail_width:number
-    thumbnail_height:number
-    media:EmbedlyMedia
-    error_code:number
-}
+import { EmbedlyItem } from '../types/intrasocial_types';
+
 const addPages = (state, action) => {
     let pages = action.pages as EmbedlyItem[]
     let newState = {  ...state }
@@ -104,7 +86,7 @@ export const embedlyMiddleware = store => next => action => {
                   "?urls=" + ids.map(id => encodeURIComponent( id )).join(",");
         AjaxRequest.get(url,(data:any[], status, request) => {
               let pages = data.map( d => {
-                let item = new EmbedlyItem()
+                let item = {} as EmbedlyItem
                 item.provider_url = d.provider_url
                 item.description = d.description
                 item.title = d.title

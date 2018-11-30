@@ -1,11 +1,11 @@
 import {Types} from "../utilities/Types"
-import { Message, UploadedFile } from './conversations';
 import { sendOnWebsocket, EventStreamMessageType, EventLock } from '../components/general/ChannelEventStream';
 import { FileUploader } from '../network/ApiClient';
 import * as Actions from '../actions/Actions';
 import { RootState } from './index';
-import { Status, StatusContextKeys } from './statuses';
+import { StatusContextKeys } from './statuses';
 import ApiClient from '../network/ApiClient';
+import { Status, Message, UploadedFile } from "../types/intrasocial_types";
 
 var messageQueueWorking = false
 var statusQueueWorking = false

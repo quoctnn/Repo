@@ -1,23 +1,6 @@
 import {Types} from "../utilities/Types"
-import { UserProfile } from './profileStore';
+import { Group } from "../types/intrasocial_types";
 
-export class Group {
-    id: number
-    name: string
-    slug: string
-    cover: string
-    community: number
-    cover_cropped: string
-    cover_thumbnail: string
-    description: string
-    creator: UserProfile
-    privacy: string
-    members: number[]
-    members_count: number
-    created_at: string
-    parent: number
-    updated_at: string
-}
 const groupsArray:Group[] = []
 
 const INITIAL_STATE = { groups: groupsArray}

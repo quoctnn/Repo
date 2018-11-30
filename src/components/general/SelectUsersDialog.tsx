@@ -1,10 +1,10 @@
 import * as React from "react";
 import { translate } from '../../components/intl/AutoIntlProvider';
 import { connect } from 'react-redux'
-import { UserProfile } from '../../reducers/profileStore';
 import {  Button, ModalBody, Modal, ModalHeader, ModalFooter } from 'reactstrap';
 import { RootState } from "../../reducers";
 import { Avatar } from './Avatar';
+import { UserProfile } from "../../types/intrasocial_types";
 require("./SelectUsersDialog.scss");
 export interface OwnProps {
     title?:string,

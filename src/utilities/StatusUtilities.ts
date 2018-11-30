@@ -1,7 +1,5 @@
-import { Status } from '../reducers/statuses';
 import Constants from '../utilities/Constants';
-import { UserProfile } from '../reducers/profileStore';
-import { UploadedFile } from '../reducers/conversations';
+import { Status, UserProfile, UploadedFile } from '../types/intrasocial_types';
 export class StatusUtilities {
     static filterStatusFileType = (files:UploadedFile[], type:string) => 
     {

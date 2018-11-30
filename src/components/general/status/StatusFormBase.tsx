@@ -1,9 +1,8 @@
 import * as React from 'react';
 import Constants from "../../../utilities/Constants";
-import { UploadedFile } from '../../../reducers/conversations';
 import { ChatMessageComposer, IEditorComponent } from '../ChatMessageComposer';
-import { Status } from '../../../reducers/statuses';
 import { Mention } from '../../input/MentionEditor';
+import { Status, UploadedFile } from '../../../types/intrasocial_types';
 
 export interface OwnProps
 {

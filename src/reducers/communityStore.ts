@@ -1,20 +1,5 @@
 import {Types} from "../utilities/Types"
-export interface Community {
-    absolute_url: string,
-    avatar: string,
-    avatar_thumbnail: string,
-    cover: string,
-    cover_cropped: string,
-
-    deactivated: boolean,
-    id: number,
-    members: number[],
-    relationship: any,
-    name: string,
-    slug_name:string,
-    updated_at:string
-}
-
+import { Community } from "../types/intrasocial_types";
 const communityArray:Community[] = []
 
 const INITIAL_STATE = { communities: communityArray}

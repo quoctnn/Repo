@@ -1,10 +1,9 @@
 import * as React from 'react';
-import { Status } from '../../../reducers/statuses';
 import CommentList from './CommentList';
 import StatusFooterStats from './StatusFooterStats';
-import { UploadedFile } from '../../../reducers/conversations';
 import CommentFormContainer from './CommentFormContainer';
 import { NestedPageItem } from '../../../utilities/PaginationUtilities';
+import { Status, UploadedFile } from '../../../types/intrasocial_types';
 require("./StatusFooter.scss");
 
 export interface Props 

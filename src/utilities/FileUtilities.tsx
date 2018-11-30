@@ -1,7 +1,7 @@
-import { UploadedFile } from '../reducers/conversations';
 import VideoPlayer from '../components/general/video/VideoPlayer';
 import React = require('react');
 import { IntraSocialUtilities } from './IntraSocialUtilities';
+import { UploadedFile } from '../types/intrasocial_types';
 export class FileUtilities {
     static renderDocument(file:UploadedFile)
     {

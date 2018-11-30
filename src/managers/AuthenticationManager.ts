@@ -1,8 +1,8 @@
 import {  Store } from 'redux';
-import { UserProfile } from '../reducers/profileStore';
 import * as Actions from '../actions/Actions';
 import { RootState } from '../reducers';
 import { AjaxRequest } from '../network/AjaxRequest';
+import { UserProfile } from '../types/intrasocial_types';
 export abstract class AuthenticationManager
 {
     static setup = () => 
@@ -22,9 +22,9 @@ export abstract class AuthenticationManager
     }
     static setAuthenticatedUser(profile:UserProfile|null)
     {
+        AjaxRequest.setup(AuthenticationManager.getAuthenticationToken())
         AuthenticationManager.getStore().dispatch(Actions.setSignedInProfile(profile))
         AuthenticationManager.updateProfileStatus(profile)
-        AjaxRequest.setup(AuthenticationManager.getAuthenticationToken())
     }
     static signOut()
     {

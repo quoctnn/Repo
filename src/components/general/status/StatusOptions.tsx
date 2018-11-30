@@ -1,9 +1,8 @@
 import StatusPermalinkDialog from './dialogs/StatusPermalinkDialog';
 import * as React from 'react';
 import { translate } from '../../../components/intl/AutoIntlProvider';
-import { Status } from '../../../reducers/statuses';
-import { UploadedFile } from '../../../reducers/conversations';
 import EditStatusDialog from './dialogs/EditStatusDialog';
+import { Status, UploadedFile } from '../../../types/intrasocial_types';
 require("./StatusOptions.scss");
 export interface Props 
 {

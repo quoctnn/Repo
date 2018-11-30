@@ -1,5 +1,5 @@
-import { Conversation } from '../reducers/conversations';
 import { ProfileManager } from '../managers/ProfileManager';
+import { Conversation } from '../types/intrasocial_types';
 export const getConversationTitle = (conversation: Conversation, me:number) => 
 {
     if(conversation.title)

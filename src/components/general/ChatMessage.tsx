@@ -1,5 +1,4 @@
 import * as React from "react";
-import { Message, UploadedFile } from '../../reducers/conversations';
 import { Link } from 'react-router-dom';
 import { URL_REGEX, uniqueId, IS_ONLY_LINK_REGEX } from '../../utilities/Utilities';
 import { Routes } from '../../utilities/Routes';
@@ -11,6 +10,7 @@ const processString = require('react-process-string');
 import store from '../../main/App';
 import { FileUtilities } from '../../utilities/FileUtilities';
 import { ProfileManager } from "../../managers/ProfileManager";
+import { Message } from "../../types/intrasocial_types";
 require("./ChatMessage.scss");
 
 export enum MessagePosition

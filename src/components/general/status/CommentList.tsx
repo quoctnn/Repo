@@ -2,9 +2,8 @@ import * as React from 'react';
 import classnames from 'classnames';
 import Comment from './Comment';
 import { translate } from '../../intl/AutoIntlProvider';
-import { Status } from '../../../reducers/statuses';
-import { UploadedFile } from '../../../reducers/conversations';
 import { NestedPageItem } from '../../../utilities/PaginationUtilities';
+import { Status, UploadedFile } from '../../../types/intrasocial_types';
 
 export interface OwnProps
 {

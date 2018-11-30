@@ -1,10 +1,10 @@
-import { UserProfile } from '../../../../reducers/profileStore';
 import * as React from 'react';
 import { translate } from '../../../intl/AutoIntlProvider';
 import LoadingSpinner from '../../LoadingSpinner';
 import ProfileItem from '../../ProfileItem';
 import { ModalBody, Modal, ModalHeader, ModalFooter, Button } from 'reactstrap';
 import { StatusUtilities } from '../../../../utilities/StatusUtilities';
+import { UserProfile } from '../../../../types/intrasocial_types';
 require("./StatusInteractionDialog.scss");
 export interface InteractionDialogProps
 {

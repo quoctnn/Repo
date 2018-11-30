@@ -1,10 +1,10 @@
 import { Settings } from './Settings';
-import { UserProfile } from '../reducers/profileStore';
 import Embedly from '../components/general/Embedly';
 import { Link} from 'react-router-dom'
 const processString = require('react-process-string');
 import { Routes } from './Routes';
 import * as React from 'react';
+import { UserProfile } from '../types/intrasocial_types';
 export const getDomainName = (url:string) =>  {
     var url_parts = url.split("/")
     var domain_name_parts = url_parts[2].split(":")

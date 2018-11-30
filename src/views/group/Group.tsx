@@ -1,8 +1,8 @@
 import * as React from "react";
 import { connect } from 'react-redux'
 import { CoverImage } from '../../components/general/CoverImage';
-import { Group } from "../../reducers/groupStore";
 import { RootState } from "../../reducers";
+import { Group } from "../../types/intrasocial_types";
 require("./Group.scss");
 export interface Props {
     match:any,

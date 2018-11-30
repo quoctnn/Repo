@@ -1,11 +1,12 @@
 import * as React from 'react';
 import ReconnectingWebSocket from 'reconnecting-websocket';
-import { UserStatus } from '../../reducers/profileStore';
 import { IntraSocialUtilities } from '../../utilities/IntraSocialUtilities';
 import { nullOrUndefined } from '../../utilities/Utilities';
 import { NotificationCenter } from '../../notifications/NotificationCenter';
 import { connect } from 'react-redux';
 import { RootState } from '../../reducers';
+import { UserStatus } from '../../types/intrasocial_types';
+import * as Actions from "../../actions/Actions" 
 
 export enum EventStreamMessageType {
   STATE = "state",
@@ -103,7 +104,9 @@ interface ReduxStateProps
   token?: string|null
   endpoint?: string
 }
-interface ReduxDispatchProps{}
+interface ReduxDispatchProps{
+  setDirtyPagedData:() => void
+}
 interface State 
 {
 }
@@ -176,6 +179,7 @@ class ChannelEventStream extends React.Component<Props, State> {
             { hideProgressBar: true }
           );*/
         }
+        this.props.setDirtyPagedData()
         console.log('WebSocket CLOSED', this.stream);
         if (this.stream && (this.stream as any)._shouldReconnect)
           (this.stream as any)._connect();
@@ -237,7 +241,10 @@ const mapStateToProps = (state: RootState):ReduxStateProps =>
 };
 const mapDispatchToProps = (dispatch:any, ownProps: OwnProps):ReduxDispatchProps => {
   return {
-  }
+    setDirtyPagedData: () => {
+        dispatch(Actions.setDirtyPagedData());
+    },
+};
 }
 export default connect(
   mapStateToProps,

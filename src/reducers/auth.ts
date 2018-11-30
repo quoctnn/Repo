@@ -1,6 +1,6 @@
-import { UserProfile } from "./profileStore";
 import { Types } from "../utilities/Types";
 import { nullOrUndefined } from '../utilities/Utilities';
+import { UserProfile } from "../types/intrasocial_types";
 
 const INITIAL_STATE:{signedIn:boolean, authToken:string|null, profile:UserProfile|null} = 
 { signedIn: false, authToken:null, profile:null}

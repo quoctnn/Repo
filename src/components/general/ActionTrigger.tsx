@@ -1,4 +1,3 @@
-import { Status } from '../../reducers/statuses';
 import * as React from 'react';
 import { Settings } from '../../utilities/Settings';
 export interface Props 

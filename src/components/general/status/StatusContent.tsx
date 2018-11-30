@@ -1,8 +1,8 @@
 import * as React from 'react';
-import { Status } from '../../../reducers/statuses';
 import { getTextContent } from '../../../utilities/Utilities';
 import { ProfileManager } from '../../../managers/ProfileManager';
 import ContentGallery from '../gallery/ContentGallery';
+import { Status } from '../../../types/intrasocial_types';
 require("./StatusContent.scss");
 
 export interface Props 

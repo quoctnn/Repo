@@ -1,11 +1,10 @@
 import * as React from 'react';
-import { Status, TempStatus } from '../../../reducers/statuses';
-import { UploadedFile } from '../../../reducers/conversations';
 import { Settings } from '../../../utilities/Settings';
 import { URL_REGEX, URL_WWW_REGEX } from '../../../utilities/Utilities';
 import { Mention } from '../../input/MentionEditor';
 import ApiClient from '../../../network/ApiClient';
 import { IEditorComponent, EditorContent } from '../ChatMessageComposer';
+import { TempStatus, UploadedFile, Status } from '../../../types/intrasocial_types';
 
 export interface Props 
 {

@@ -1,10 +1,10 @@
 import * as React from 'react';
 import { DropzoneComponent } from "react-dropzone-component";
-import { UploadedFile } from '../../../reducers/conversations';
 import Constants from '../../../utilities/Constants';
 import { Settings } from '../../../utilities/Settings';
 import { StoreManager } from '../../../managers/StoreManager';
 import { AuthenticationManager } from '../../../managers/AuthenticationManager';
+import { UploadedFile } from '../../../types/intrasocial_types';
 require("./FilesUpload.scss");
 
 var getSuccessFileUploadData = (file) => {

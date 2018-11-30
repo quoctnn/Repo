@@ -2,53 +2,44 @@ import {  Store } from 'redux';
 import { RootState } from '../reducers';
 import { canSendOnWebsocket, EventStreamMessageType } from '../components/general/ChannelEventStream';
 import * as Actions from '../actions/Actions';
-import { Status, StatusContextKeys } from '../reducers/statuses';
+import {StatusContextKeys } from '../reducers/statuses';
 import { NotificationCenter } from '../notifications/NotificationCenter';
-class StatusManagerSingleton 
+import { Status } from '../types/intrasocial_types';
+export abstract class StatusManager
 {
-    constructor()
+    static setup = () => 
     {
-        this.setup = this.setup.bind(this)
-        this.getStore = this.getStore.bind(this)
-        this.processTempQueue = this.processTempQueue.bind(this)
-        this.sendStatus = this.sendStatus.bind(this)
-        this.processIncomingNewStatus = this.processIncomingNewStatus.bind(this)
-        this.processIncomingUpdateStatus = this.processIncomingUpdateStatus.bind(this)
+        NotificationCenter.addObserver("eventstream_" + EventStreamMessageType.STATUS_NEW, StatusManager.processIncomingNewStatus)
+        NotificationCenter.addObserver("eventstream_" + EventStreamMessageType.STATUS_UPDATE, StatusManager.processIncomingUpdateStatus)
     }
-    setup()
-    {
-        NotificationCenter.addObserver("eventstream_" + EventStreamMessageType.STATUS_NEW, this.processIncomingNewStatus)
-        NotificationCenter.addObserver("eventstream_" + EventStreamMessageType.STATUS_UPDATE, this.processIncomingUpdateStatus)
-    }
-    processTempQueue() 
+    static processTempQueue = () => 
     {
         if (canSendOnWebsocket) 
         {
-            this.getStore().dispatch(Actions.queueProcessNextStatus())
+            StatusManager.getStore().dispatch(Actions.queueProcessNextStatus())
         }
     }
-    sendStatus(status:Status)
+    static sendStatus = (status:Status) => 
     {
-        let store = this.getStore()
+        let store = StatusManager.getStore()
         store.dispatch(Actions.queueAddStatus(status))
     }
-    private processIncomingUpdateStatus(event:CustomEvent)
-    {
-        let status = event.detail.data as Status
-        this.insertStatus(status, false)
-    }
-    private processIncomingNewStatus(...args:any[])
+    private static processIncomingUpdateStatus = (...args:any[]) => 
     {
         let status = args[0] as Status
-        this.insertStatus(status, true)
+        StatusManager.insertStatus(status, false)
     }
-    private insertStatus(status:Status, isNew:boolean)
+    private static processIncomingNewStatus = (...args:any[]) => 
     {
-        this.getStore().dispatch(Actions.insertStatus(StatusContextKeys.NEWSFEED, status, isNew)) //should be array of contexts. i.e. [NEWSFEED,COMMUNITY/5]
+        let status = args[0] as Status
+        StatusManager.insertStatus(status, true)
     }
-    private getStore():Store<RootState,any>
+    private static insertStatus = (status:Status, isNew:boolean) => 
+    {
+        StatusManager.getStore().dispatch(Actions.insertStatus(StatusContextKeys.NEWSFEED, status, isNew)) //should be array of contexts. i.e. [NEWSFEED,COMMUNITY/5]
+    }
+    private static getStore = ():Store<RootState,any> => 
     {
         return window.store 
     }
 }
-export let StatusManager = new StatusManagerSingleton();

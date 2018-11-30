@@ -1,14 +1,14 @@
 import { Avatar } from './Avatar';
 import * as React from 'react';
-import { Conversation } from '../../reducers/conversations';
 import { Link } from 'react-router-dom';
 import { Routes } from '../../utilities/Routes';
 import { OverflowList } from './OverflowList';
 import { RootState } from '../../reducers';
 import { connect } from 'react-redux'
-import { UserProfile } from '../../reducers/profileStore';
 import { getConversationTitle } from '../../utilities/ConversationUtilities';
 import { ProfileManager } from '../../managers/ProfileManager';
+import { Conversation, UserProfile } from '../../types/intrasocial_types';
+import { nullOrUndefined } from '../../utilities/Utilities';
 require("./ConversationItem.scss");
 export interface OwnProps {
     conversation:Conversation
@@ -41,28 +41,30 @@ class ConversationItem extends React.Component<Props, State> {
         let conversation = this.props.conversation
         let myId = this.props.authenticatedProfile.id
         let title = getConversationTitle(this.props.conversation, myId)
-        let users = conversation.users.filter(i => i != myId)
-        
+        let users = ProfileManager.getProfiles(conversation.users.filter(i => i != myId).slice(0, ConversationItem.maxVisibleAvatars))
+        const avatars = users.map(u => u.avatar_thumbnail || u.avatar).filter(a => !nullOrUndefined(a))
+        const size = 44
+        const padding = 10
         return (
             <div className={"conversation-item" + (this.props.isActive ? " active" : "") + (this.props.className ? " " + this.props.className:"") }>
                 <Link to={Routes.CONVERSATION + conversation.id}>
-                    <h6 className="title">
-                        <span className="text-truncate">{title}</span>
-                        {
-                            conversation.unread_messages.length > 0 && 
-                            <div className="notification-badge bg-success text-white">{conversation.unread_messages.length}</div>
-                        }
-                    </h6>
-                    <div className="conversation-item-body d-flex">
-                        <OverflowList count={conversation.users.length} size={26}>
-                            {users.slice(0, ConversationItem.maxVisibleAvatars).map((uid, index) => {
-                                let p = ProfileManager.getProfile(uid)
-                                let avatar = (p && p.avatar) || null
-                                return <li key={index}><Avatar image={avatar} size={26} borderColor="white" borderWidth={2}  /></li>
-                            })}
-                        </OverflowList>
-                        <div className="flex-grow-1"></div>
-                        {this.props.children}
+                    <div className="conversation-item-body d-flex align-items-center" style={{height:(size + padding * 2)  + "px", padding:padding + "px"}}>
+                        <div>
+                            <Avatar images={avatars} size={size} borderColor="white" borderWidth={2}>
+                                
+                            </Avatar>
+                        </div>
+                        <div className="d-flex text-truncate flex-column">
+                            <span className="d-flex text-truncate">
+                                <span className="title text-truncate">{title}</span>
+                                {
+                                    conversation.unread_messages.length > 0 && 
+                                    <div className="notification-badge bg-success text-white"><span>{conversation.unread_messages.length}</span></div>
+                                }
+                            </span>
+                            {this.props.children}
+                        </div>
+                        
                     </div>
                 </Link>
             </div>

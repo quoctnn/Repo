@@ -30,3 +30,7 @@
         @include var(border-color, border-color-default);
     }
 }
+.column-left
+{
+    padding-right: 5px !important;
+}

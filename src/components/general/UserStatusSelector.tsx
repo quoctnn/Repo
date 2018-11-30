@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { connect } from 'react-redux'
-import { UserProfile, UserStatus } from '../../reducers/profileStore';
 import { sendUserStatus } from './ChannelEventStream';
 import { RootState } from '../../reducers/index';
+import { UserStatus, UserProfile } from '../../types/intrasocial_types';
 require("./UserStatusSelector.scss");
 
 export interface OwnProps 

@@ -1,6 +1,5 @@
 import * as React from "react";
 import { connect } from 'react-redux'
-import { UserProfile, avatarStateColorForUserProfile } from '../../reducers/profileStore';
 import { CollapsiblePanel, ArrowDirectionCollapsed } from '../general/CollapsiblePanel';
 import { Routes } from "../../utilities/Routes";
 import { Avatar } from "../general/Avatar";
@@ -12,6 +11,7 @@ import { TypingIndicator } from '../general/TypingIndicator';
 import { Settings } from '../../utilities/Settings';
 import { cloneDictKeys } from '../../utilities/Utilities';
 import { NotificationCenter } from "../../notifications/NotificationCenter";
+import { UserProfile, avatarStateColorForUserProfile } from "../../types/intrasocial_types";
 require("./RightNavigation.scss")
 interface State {
     contacts:UserProfile[],

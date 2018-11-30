@@ -1,7 +1,7 @@
 import {  Store } from 'redux';
 import { RootState } from '../reducers';
 import * as Actions from '../actions/Actions';
-import { Community } from '../reducers/communityStore';
+import { Community } from '../types/intrasocial_types';
 export abstract class CommunityManager
 {
     static setup = () => 
