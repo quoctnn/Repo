@@ -11,6 +11,7 @@ import * as Actions from "../../actions/Actions"
 export enum EventStreamMessageType {
   STATE = "state",
   USER_UPDATE = "user.update",
+  USER_LAST_SEEN = "user.last_seen",
   CLIENT_STATUS_CHANGE = "client.status_change",
   CONVERSATION_TYPING = "conversation.typing",
   CONVERSATION_MESSAGE = "conversation.message",
@@ -51,7 +52,7 @@ const socket_options = {
   connectionTimeout: 4000,
   maxRetries: 10
 };
-class EventQueueLock 
+class EventQueueLock
 {
     popCallback?:(object:any) => void
     didChangeLockStatus?:(locked:boolean) => void
@@ -66,7 +67,7 @@ class EventQueueLock
     }
     lock()
     {
-      let id = IntraSocialUtilities.uniqueId()  
+      let id = IntraSocialUtilities.uniqueId()
       if(this.didChangeLockStatus && this.lockCount() == 0)
       {
         this.didChangeLockStatus(true)
@@ -96,7 +97,7 @@ class EventQueueLock
     }
 }
 export const EventLock = new EventQueueLock()
-interface OwnProps 
+interface OwnProps
 {
 }
 interface ReduxStateProps
@@ -119,18 +120,18 @@ class ChannelEventStream extends React.Component<Props, State> {
     EventLock.popCallback = this.handleEventQueuePop
     EventLock.didChangeLockStatus = this.handleEventQueueLockStatusChanged
   }
-  handleEventQueuePop = (event:any) => 
+  handleEventQueuePop = (event:any) =>
   {
     this.playEvent(event)
   }
-  handleEventQueueLockStatusChanged = (locked:boolean) => 
+  handleEventQueueLockStatusChanged = (locked:boolean) =>
   {
     this.queueEvents = locked
     var event = null
     while(!this.queueEvents && !nullOrUndefined(event = EventLock.popEvent()))
     {
       this.playEvent(event)
-    } 
+    }
   }
   authorize = () => {
     if (this.canSend()) {
@@ -189,7 +190,7 @@ class ChannelEventStream extends React.Component<Props, State> {
   componentDidMount = () => {
     this.updateConnection()
   }
-  componentDidUpdate = (prevProps:Props) => 
+  componentDidUpdate = (prevProps:Props) =>
   {
     if(prevProps.token && this.props.token && prevProps.token != this.props.token)
     {
@@ -197,7 +198,7 @@ class ChannelEventStream extends React.Component<Props, State> {
     }
     this.updateConnection()
   }
-  updateConnection = () => 
+  updateConnection = () =>
   {
     const isOnline = this.canSend()
     const canConnect = !!this.props.token && !!this.props.endpoint
@@ -208,7 +209,7 @@ class ChannelEventStream extends React.Component<Props, State> {
         this.closeStream()
       }
     }
-    else 
+    else
     {
       if(canConnect)
       {
@@ -231,7 +232,7 @@ class ChannelEventStream extends React.Component<Props, State> {
     return null;
   }
 }
-const mapStateToProps = (state: RootState):ReduxStateProps => 
+const mapStateToProps = (state: RootState):ReduxStateProps =>
 {
   const endpoint = state.debug.availableApiEndpoints[state.debug.apiEndpoint].websocket
   return {
