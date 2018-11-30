@@ -90,6 +90,12 @@
           {
             "data": "UserObject",
             "type": "user.update"
+          },
+          {
+            "data": {
+              "status": "dnd"
+            },
+            "type": "client.status_change"
           }
         ]
       }

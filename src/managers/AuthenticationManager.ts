@@ -1,5 +1,5 @@
 import {  Store } from 'redux';
-import { UserProfile } from '../reducers/profileStore';
+import { UserProfile, UserStatus } from '../reducers/profileStore';
 import * as Actions from '../actions/Actions';
 import { RootState } from '../reducers';
 import { AjaxRequest } from '../network/AjaxRequest';
@@ -7,8 +7,7 @@ import { sendOnWebsocket, EventStreamMessageType } from '../components/general/C
 export abstract class AuthenticationManager
 {
     private static lastUserActivity: number = 0;
-    // How often do we send keepAlive message (in seconds)
-    private static keepAliveFrequency: number = 60;
+    private static keepAliveFrequency: number = 60; // How often do we send keepAlive message (in seconds)
     private static keepAlive: (NodeJS.Timer|null);
 
     static setup = () =>
@@ -36,9 +35,11 @@ export abstract class AuthenticationManager
     {
         let store = AuthenticationManager.getStore();
 
-        // Remove the keepAlive (last_seen) timer
+        // Remove the keepAlive (last_seen) timer and eventListeners
         clearInterval(AuthenticationManager.keepAlive);
         AuthenticationManager.keepAlive = null;
+        document.removeEventListener('mousedown', AuthenticationManager.resetUserActivityCounter);
+        window.removeEventListener('focus', AuthenticationManager.resetUserActivityCounter);
 
         // Clean up cached data
         store.dispatch(Actions.resetCommunityStore());
@@ -54,6 +55,15 @@ export abstract class AuthenticationManager
     static resetUserActivityCounter()
     {
         AuthenticationManager.lastUserActivity = 0
+        let profile = AuthenticationManager.getAuthenticatedUser() as UserProfile;
+        if (profile.user_status == UserStatus.USER_AWAY){
+            sendOnWebsocket(
+                JSON.stringify({
+                type: EventStreamMessageType.USER_LAST_SEEN,
+                data: { seconds: AuthenticationManager.lastUserActivity }
+                })
+            )
+        }
     }
     private static getStore = ():Store<RootState,any> =>
     {
@@ -62,7 +72,11 @@ export abstract class AuthenticationManager
     private static updateProfileStatus = (profile:UserProfile|null) =>
     {
         if (profile) {
+            // Setup the keep-alive (last_seen) timer, and eventListeners
             AuthenticationManager.resetUserActivityCounter();
+            document.addEventListener('mousedown', AuthenticationManager.resetUserActivityCounter);
+            window.addEventListener('focus', AuthenticationManager.resetUserActivityCounter);
+
             AuthenticationManager.keepAlive = setInterval(
                 function() {
                     AuthenticationManager.lastUserActivity += AuthenticationManager.keepAliveFrequency;
