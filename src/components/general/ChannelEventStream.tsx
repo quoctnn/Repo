@@ -182,7 +182,7 @@ class ChannelEventStream extends React.Component<Props, State> {
             { hideProgressBar: true }
           );*/
         }
-        if(this.stream.retryCount == 0)
+        if(!this.stream || this.stream.retryCount == 0)
           EventStreamManager.socketDisconnected()
         AuthenticationManager.clearKeepAliveTimer()
         console.log('WebSocket CLOSED', this.stream);

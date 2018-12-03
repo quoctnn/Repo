@@ -45,7 +45,7 @@ export class Avatar extends React.PureComponent<Props & React.HTMLAttributes<HTM
         return(
             
             <div onClick={this.props.onClick}  className={"avatar" + (this.props.className ? " " + this.props.className : "")} >
-                <div className="image-container" style={{backgroundColor:this.props.borderColor, borderWidth:this.props.borderWidth + "px", borderColor:this.props.borderColor, width:this.props.size + "px", height:this.props.size + "px", borderStyle:"solid"}}>
+                <div className="image-container" style={{borderWidth:this.props.borderWidth + "px", borderColor:this.props.borderColor, width:this.props.size + "px", height:this.props.size + "px", borderStyle:"solid"}}>
                     {imgUrls.map((img, index) => {
                         const key = `image_${length}_${index}`
                         return <div key={img} className={"image multi " + key} style={{backgroundImage:"url("+img+")"}}></div>

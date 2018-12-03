@@ -18,6 +18,7 @@ import { messages } from './messages';
 import { statuses } from './statuses';
 import { Status, UserProfile, Message, EmbedlyItem, Conversation } from '../types/intrasocial_types';
 import { CachePageV2 } from './simplePaginator';
+import { CachePageV3 } from './simpleMultiPaginator';
 
 
 const rootPersistConfig:PersistConfig = {
@@ -43,7 +44,7 @@ export interface RootState
       contactListCache: any;
       queue:{chatMessages:Message[], statusMessages:Status[]};
       conversations:{pagination:CachePageV2<Conversation>};
-      messages:{items:Message[], conversations:PageItem}
+      messages:{conversations:CachePageV3<Message>}
       embedlyStore:{byId:{[id:string]:EmbedlyItem}, allIds:string[], queuedIds:{[id:string]:boolean}},
       statuses:{items:{[id:number]:Status}, feed:PageItem}
       debug: {apiEndpoint:number, availableApiEndpoints:ApiEndpoint[] };

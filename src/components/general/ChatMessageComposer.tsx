@@ -146,17 +146,14 @@ interface State
     plainText:string
     editorState:EditorState
 }
-export class ChatMessageComposer extends React.Component<Props,{}> implements IEditorComponent {
+export class ChatMessageComposer extends React.Component<Props,State> implements IEditorComponent {
     
-    state:State
-    throttleTime = 1000
-    canPublishDidType = true
     private inputRef = React.createRef<any>()
     constructor(props) {
         super(props)
         this.state = {plainText:"", editorState:EditorState.createWithContent(generateContentState(this.props.content, this.props.mentions))}
         this.handleSubmit = this.handleSubmit.bind(this)
-        this.fixFoucusInput = this.fixFoucusInput.bind(this)
+        this.fixFocusInput = this.fixFocusInput.bind(this)
         this.sendDidType = this.sendDidType.bind(this)
         this.getProcessedText = this.getProcessedText.bind(this)
         this.onChange = this.onChange.bind(this)
@@ -187,15 +184,8 @@ export class ChatMessageComposer extends React.Component<Props,{}> implements IE
     sendDidType()
     {
         this.props.onDidType(this.state.plainText)
-        if(this.canPublishDidType) 
-        {
-            this.canPublishDidType = false
-            setTimeout(() => {
-              this.canPublishDidType = true
-            }, this.throttleTime)
-        }
     }
-    fixFoucusInput() {
+    fixFocusInput() {
         // For mobile devices that doesn't show soft keyboard
         this.inputRef.current.click;
     }
@@ -204,8 +194,8 @@ export class ChatMessageComposer extends React.Component<Props,{}> implements IE
         let text = state.getCurrentContent().getPlainText()
         ProtectNavigation(text != "")
         const hasChanged = this.state.plainText != text
-        if(hasChanged)
-            this.setState({plainText:text, editorState:state}, this.sendDidType)
+        const f = hasChanged ? this.sendDidType : undefined
+        this.setState({plainText:text, editorState:state}, f)
     }
     getProcessedText()
     {
@@ -226,7 +216,7 @@ export class ChatMessageComposer extends React.Component<Props,{}> implements IE
     {
         if( !nullOrUndefined( this.props.canSubmit) )
             return this.props.canSubmit
-        return true
+        return this.state.plainText.length > 0
     }
     render() {
         const canSubmit = this.canSubmit()
@@ -235,7 +225,7 @@ export class ChatMessageComposer extends React.Component<Props,{}> implements IE
                 <form className="clearfix" action="." onSubmit={this.handleSubmit}>
                     <div className="input-group">
                         <div className="input-wrap"
-                            onFocus={this.fixFoucusInput}>
+                            onFocus={this.fixFocusInput}>
                             <MentionEditor onHandleUploadClick={this.props.onHandleUploadClick} filesAdded={this.props.filesAdded} mentionSearch={this.props.mentionSearch} editorState={this.state.editorState} ref={this.inputRef} onChange={this.onChange}/> 
                         </div>
                         <div className="button-wrap d-flex flex-column-reverse">

@@ -64,7 +64,7 @@ export abstract class AuthenticationManager
     {
         AuthenticationManager.lastUserActivity = 0
         let profile = AuthenticationManager.getAuthenticatedUser() as UserProfile;
-        if (profile.user_status == UserStatus.away){
+        if (profile && profile.user_status == UserStatus.away){
             sendOnWebsocket(
                 JSON.stringify({
                 type: EventStreamMessageType.USER_LAST_SEEN,

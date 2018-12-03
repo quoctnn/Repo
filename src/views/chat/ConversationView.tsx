@@ -21,6 +21,7 @@ import { ConversationManager } from '../../managers/ConversationManager';
 import { NotificationCenter } from '../../notifications/NotificationCenter';
 import { ProfileManager } from '../../managers/ProfileManager';
 import { UserProfile, Conversation, Message } from '../../types/intrasocial_types';
+import { getDefaultCachePageV3, CachePageV3 } from '../../reducers/simpleMultiPaginator';
 
 require("./ConversationView.scss")
 
@@ -46,10 +47,13 @@ export interface OwnProps {
 export interface ReduxProps 
 {
     availableMentions:Mention[]
+    pagingDirty:boolean
+    signedIn:boolean
 }
 interface ReduxDispatchProps
 {
     requestNextMessagePage:(conversation:number, offset:number) => void
+    setMessagePageNotFetching:(conversation:number) => void
 }
 type Props = ReduxDispatchProps & OwnProps & ReduxProps
 export interface State {
@@ -63,6 +67,7 @@ class ConversationView extends React.PureComponent<Props, State> {
     static maxRetries = 3
     clearSomeoneIsTypingTimer:NodeJS.Timer = null
     dragCount:number = 0
+    canPublishDidType = true
     private dropTarget = React.createRef<HTMLDivElement>();
     constructor(props) {
         super(props)
@@ -87,8 +92,6 @@ class ConversationView extends React.PureComponent<Props, State> {
         this.onDragLeave = this.onDragLeave.bind(this)
         this.onDragEnter = this.onDragEnter.bind(this)
         this.handleMentionSearch = this.handleMentionSearch.bind(this)
-        
-        
     }
     componentDidMount()
     {
@@ -152,10 +155,18 @@ class ConversationView extends React.PureComponent<Props, State> {
         this.loadFirstData(true)
         this.markConversationAsRead(true)
     }
-    componentDidUpdate(prevProps:Props, prevState) 
+    componentDidUpdate(prevProps:Props)
     {
         let isNewConversation = this.props.conversationId != prevProps.conversationId
-        this.loadFirstData(isNewConversation)
+        console.log("componentDidUpdate: ","isNewConversation(" + isNewConversation + ")",  this.props.signedIn, this.props.pagingDirty)
+        if (!isNewConversation && this.props.signedIn && (this.props.pagingDirty && !prevProps.pagingDirty || !prevProps.signedIn))
+        {
+            this.loadFirstData(true)
+        }
+        else if(isNewConversation)
+        {
+            this.loadFirstData(true)
+        }
         this.markConversationAsRead(isNewConversation)
     }
     markConversationAsRead(isNewConversation:boolean)
@@ -182,15 +193,17 @@ class ConversationView extends React.PureComponent<Props, State> {
         let hasError = ignoreError ? false : !nullOrUndefined( this.props.error )
         if(this.props.isFetching || hasError)
         {
+            if(this.props.isFetching)
+                this.props.setMessagePageNotFetching(this.props.conversationId)
             return
         }
-        let pageSize = messageReducerPageSize
-        if(!this.props.last_fetched && (this.props.total == 0 || this.props.offset == 0 || this.props.offset <= pageSize) )
-            this.props.requestNextMessagePage(this.props.conversationId, this.props.offset)
+        let pageSize = messageReducerPageSize        
+        if(this.props.pagingDirty || this.props.total == 0 || this.props.offset == 0 || (!this.props.last_fetched && this.props.offset <= pageSize))
+            this.props.requestNextMessagePage(this.props.conversationId, 0)
     }
     loadNextPageData()
     {
-        if(this.props.total > this.props.offset && !this.props.isFetching && !this.props.error)
+        if(this.props.total > this.props.offset && !this.props.isFetching && nullOrUndefined( this.props.error ))
             this.props.requestNextMessagePage(this.props.conversationId, this.props.offset)
     }
     chatDidScrollToTop()
@@ -233,7 +246,15 @@ class ConversationView extends React.PureComponent<Props, State> {
         let conversation = this.props.conversation
         if(!conversation)
             return
-        ConversationManager.sendTypingInConversation(conversation.id)
+        if(this.canPublishDidType) 
+        {
+            console.log("sendDidType")
+            ConversationManager.sendTypingInConversation(conversation.id)
+            this.canPublishDidType = false
+            setTimeout(() => {
+                this.canPublishDidType = true
+            }, Settings.sendSomeoneIsTypingthrottle)
+        }
     }
     renderSomeoneIsTyping()
     {
@@ -369,7 +390,7 @@ class ConversationView extends React.PureComponent<Props, State> {
                                 {this.renderSomeoneIsTyping()}
                             </ChatMessageList>
                         </div>
-                        <ChatMessageComposer mentionSearch={this.handleMentionSearch} content={this.props.content} mentions={this.props.mentions} filesAdded={this.filesAdded} onSubmit={this.onChatMessageSubmit} onDidType={this.onDidType} />
+                        <ChatMessageComposer className="secondary-text" mentionSearch={this.handleMentionSearch} content={this.props.content} mentions={this.props.mentions} filesAdded={this.filesAdded} onSubmit={this.onChatMessageSubmit} onDidType={this.onDidType} />
                     </div>
                 </div>
                
@@ -379,13 +400,13 @@ class ConversationView extends React.PureComponent<Props, State> {
 }
 const mapStateToProps = (state:RootState, ownProps:Props) => {
     let id = ownProps.match.params.conversationid
-    const pagination = state.messages.conversations[id] || getDefaultCachePage()
-    const allItems = state.messages.items
+    const pagination:CachePageV3<Message> = state.messages.conversations[id] || getDefaultCachePageV3<Message>()
+    const allItems = pagination.items
     const isFetching = pagination.fetching
     const items = PaginationUtilities.getCurrentPageResults(allItems, pagination)
     const total = pagination.totalCount
     const error = pagination.error
-    const offset = items.length
+    const offset = pagination.position
     const queuedMessages = QueueUtilities.getQueuedMessageForConversation(id, state.queue.chatMessages)
     const last_fetched = pagination.last_fetch
     const conversation = state.conversations.pagination.items[id]
@@ -393,6 +414,7 @@ const mapStateToProps = (state:RootState, ownProps:Props) => {
         let p = ProfileManager.getProfile(u)
         return p ? Mention.fromUser(p) : null
     }).filter(n => n != null) : []
+    const pagingDirty = pagination.dirty
     return {
         error,
         conversationId:id,
@@ -402,16 +424,20 @@ const mapStateToProps = (state:RootState, ownProps:Props) => {
         items,
         conversation:conversation,
         authenticatedProfile:state.auth.profile,
-        signedIn:state.auth.signedIn,
         queuedMessages,
         last_fetched,
-        availableMentions:availableMentions
+        availableMentions:availableMentions,
+        pagingDirty,
+        signedIn:state.auth.signedIn,
     };
 }
 const mapDispatchToProps = (dispatch) => {
     return {
         requestNextMessagePage:(conversation:number, offset:number) => {
             dispatch(Actions.requestNextMessagePage(conversation.toString(), offset))
+        },
+        setMessagePageNotFetching:(conversation:number) => {
+            dispatch(Actions.setMessagePageNotFetching(conversation.toString()))
         },
     }
 }

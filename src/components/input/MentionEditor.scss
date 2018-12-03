@@ -121,7 +121,8 @@ mention {
    margin-right: 5px;
    color:inherit;
    padding: 0;
-   input[type="file"]
+  input[type=file],
+  input[type=file]::-webkit-file-upload-button
    {
       bottom: 0;
       cursor: inherit;
@@ -130,6 +131,7 @@ mention {
       padding: 0;
       position: absolute;
       right: 0;
+      display: none;
    }
 }
 .upload-button
@@ -149,4 +151,5 @@ mention {
 {
   display: grid;
   align-items: center;
+  @include var(color, primary-text-color);
 }

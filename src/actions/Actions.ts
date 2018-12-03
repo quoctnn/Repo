@@ -49,6 +49,7 @@ export const insertChatMessage = (pagingId:string, message:Message):InsertItemAc
     isNew:true,
     pagingId
 })
+export const setMessagePageNotFetching = messagesPaginator.setNotFetching
 //conversations
 export const requestNextConversationPage = conversationPaginator.requestNextPage
 export const insertConversation = (conversation:Conversation, isNew:boolean):InsertItemAction => ({

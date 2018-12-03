@@ -19,6 +19,7 @@ export interface ISettings
     supportsTheming:boolean,
     searchEnabled:boolean,
     clearSomeoneIsTypingInterval:number
+    sendSomeoneIsTypingthrottle:number
     allowedTypesFileUpload:string
     commentMaxLength: number
     maxFileSize: number
@@ -31,6 +32,7 @@ export const Settings:ISettings = {
     maxFileSize: 400,
     supportsTheming: window.CSS && window.CSS.supports && window.CSS.supports("(--foo: red)"),
     clearSomeoneIsTypingInterval: 4000,
+    sendSomeoneIsTypingthrottle:1000,
     allowedTypesFileUpload:"image/*,video/*,audio/*,application/pdf," +
     ".doc,.docx,.xls,.xlsx,.ppt,.pptx,.pps,.ppsx,.xps,.odp,.ods,.odt,.rtf,.txt,.key," + // Docs
     ".css,.html,.php,.c,.cpp,.h,.hpp," + // Code

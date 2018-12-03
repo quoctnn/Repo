@@ -291,6 +291,12 @@ export default class MentionEditor extends React.Component<Props, {}> {
       this.fileUploader.current.value = ""
       this.props.filesAdded(files)
   }
+  onFileuploadButtonClick = (event) => {
+    if(this.props.filesAdded)
+      this.fileUploader.current.click()
+    else if(this.props.onHandleUploadClick)
+      this.props.onHandleUploadClick(event)
+  }
   render() {
     const { MentionSuggestions } = this.mentionPlugin;
     const plugins = [this.emojiPlugin, this.mentionPlugin];
@@ -320,9 +326,9 @@ export default class MentionEditor extends React.Component<Props, {}> {
                 </button>
                 {(this.props.filesAdded || this.props.onHandleUploadClick) && <button
                   className="upload-button editor-button btn btn-default"
-                  type="button" onClick={this.props.onHandleUploadClick} >
-                  <i className="fa fa-paperclip fa-lg"></i>
+                  type="button" onClick={this.onFileuploadButtonClick} >
                   {this.props.filesAdded && <input ref={this.fileUploader} accept={Settings.allowedTypesFileUpload} multiple={true} className="form-control" type="file" onChange={this.uploadFileChanged} /> }
+                  <i className="fa fa-paperclip fa-lg"></i>
                 </button>}
               </div>
           </div>
