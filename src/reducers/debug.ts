@@ -15,9 +15,9 @@ const availableApiEndpoints: ApiEndpoint[] = [
     websocket: 'ws://alesund-dev.intra.work:8000/socket/'
   },
   {
-    endpoint: 'http://192.168.15.13:8000',
+    endpoint: 'http://192.168.15.28:8000',
     loginType: LoginType.NATIVE,
-    websocket: 'ws://192.168.15.13:8000/socket/'
+    websocket: 'ws://192.168.15.28:8000/socket/'
   },
   // {
   //   endpoint: 'https://dev.intra.work',
