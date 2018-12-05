@@ -5,11 +5,18 @@ import { Mention } from '../../input/MentionEditor';
 import ApiClient from '../../../network/ApiClient';
 import { IEditorComponent, EditorContent } from '../ChatMessageComposer';
 import { TempStatus, UploadedFile, Status } from '../../../types/intrasocial_types';
+import { RootState } from '../../../reducers';
+import { NestedPageItem } from '../../../utilities/PaginationUtilities';
+import { connect } from 'react-redux';
+import * as Actions from '../../../actions/Actions';
+import { CommentForm } from './CommentForm';
+import classNames = require('classnames');
+require("./StatusFormContainer.scss");
 
-export interface Props 
+
+interface OwnProps 
 {
-    status?:Status //edit
-    parentStatus?:Status//comment
+    pageItem:NestedPageItem
     onCommentSubmit?:(comment:TempStatus, files:UploadedFile[]) => void
     onStatusSubmit?:(status:TempStatus, files:UploadedFile[]) => void
     contextNaturalKey?:string
@@ -17,8 +24,13 @@ export interface Props
     canMention:boolean
     canComment:boolean
     canUpload:boolean
-    communityId:number
+    className?:string
 }
+interface ReduxStateProps
+{
+    parentStatus:Status
+}
+interface ReduxDispatchProps{}
 interface State 
 {
     text: string,
@@ -27,11 +39,14 @@ interface State
     uploading: boolean,
     link: string,
     mentions: number[]
+    renderPlaceholder:boolean
 }
-
-export default class StatusFormContainerBase extends React.Component<Props, State> {  
+export type Props = ReduxStateProps & OwnProps
+class StatusFormContainer extends React.Component<Props, State> {  
 
     formRef = React.createRef<IEditorComponent & any>();
+    element = React.createRef<HTMLDivElement>()
+    observer:IntersectionObserver = null
     constructor(props) {
         super(props)
 
@@ -41,7 +56,8 @@ export default class StatusFormContainerBase extends React.Component<Props, Stat
             files: [],
             uploading: false,
             link: null,
-            mentions: []
+            mentions: [],
+            renderPlaceholder:true
         };
 
         this.handleTextChange = this.handleTextChange.bind(this);
@@ -60,13 +76,31 @@ export default class StatusFormContainerBase extends React.Component<Props, Stat
         this.handleMentionSearch = this.handleMentionSearch.bind(this);
         this.onDidType = this.onDidType.bind(this);
     }
-
+    componentDidMount() {
+        this.observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+              const { isIntersecting } = entry;
+              if (isIntersecting) 
+              {
+                this.setState({renderPlaceholder:false})
+                this.observer.disconnect();
+              }
+            });
+        },
+        {
+          root: document.querySelector(".status-list"),
+          rootMargin: "0px 0px 200px 0px"
+        });
+        this.observer.observe(this.element.current);
+        
+        //this.setState({renderPlaceholder:false})
+    }
     handleMentionSearch(search:string, completion:(mentions:Mention[]) => void)
     {
-        if(this.props.communityId)
+        if(this.props.pageItem.community)
         {
             console.log("searching", search)
-            ApiClient.getCommunityMembers(this.props.communityId, (data, status, error) => {
+            ApiClient.getCommunityMembers(this.props.pageItem.community, (data, status, error) => {
                 completion(data.map(u => Mention.fromUser(u)))
             })
         }
@@ -92,7 +126,7 @@ export default class StatusFormContainerBase extends React.Component<Props, Stat
                 link: link,
                 context_natural_key: this.props.contextNaturalKey,
                 context_object_id: this.props.contextObjectId,
-                parent: (this.props.parentStatus) ? this.props.parentStatus.id : null,
+                parent: this.props.pageItem.id,
                 mentions: this.state.mentions
             };
     
@@ -174,7 +208,8 @@ export default class StatusFormContainerBase extends React.Component<Props, Stat
         this.setState({mentions: mentions})
     }
 
-    handleFileQueueComplete() {
+    handleFileQueueComplete = () => 
+    {
         this.setState({uploading: false});
     }
 
@@ -182,7 +217,7 @@ export default class StatusFormContainerBase extends React.Component<Props, Stat
         this.setState({uploading: true});
     }
 
-    handleFileError() {
+    handleFileError = () => {
         // TODO: ¿Should we display an error message (multi-lang) to the user?
         this.setState({uploading: true});
     }
@@ -195,7 +230,8 @@ export default class StatusFormContainerBase extends React.Component<Props, Stat
         }
     }
 
-    removeFileFromList(file, fileList:UploadedFile[]) {
+    removeFileFromList = (file, fileList:UploadedFile[]) => 
+    {
         let list = fileList.map(f => f)
         let index = list.findIndex((item) => {
             return item.id == file.id;
@@ -208,7 +244,8 @@ export default class StatusFormContainerBase extends React.Component<Props, Stat
         return list
     }
 
-    removeFileIdFromList(file, fileIdList:number[]) {
+    removeFileIdFromList = (file, fileIdList:number[]) => 
+    {
         let list = fileIdList.map(f => f)
         let index = list.indexOf(file.id)
         if(index >= 0)
@@ -219,11 +256,59 @@ export default class StatusFormContainerBase extends React.Component<Props, Stat
         return list
     }
 
-    handleFileUploaded(file) {
+    handleFileUploaded = (file) => {
         let files = this.state.files.map(f => f)
         files.push(file)
         let files_ids = this.state.files_ids.map(f => f)
         files_ids.push(file.id)
         this.setState({files: files, files_ids: files_ids})
     }
+    render() 
+    {
+        if(this.state.renderPlaceholder)
+        {
+            let itemClass = classNames("chat-message-composer chat-message-composer-placeholder secondary-text", this.props.className)
+            return <div ref={this.element} className={itemClass}></div>
+        }
+        if ((this.props.canComment && this.props.parentStatus.can_comment) || false) {
+            const canPost = this.canPost()
+            return (
+                <CommentForm
+                    onFileError={this.handleFileError}
+                    mentionSearch={this.handleMentionSearch}
+                    ref={this.formRef}
+                    onDidType={this.onDidType}
+                    communityId={this.props.pageItem.community}
+                    canUpload={this.props.canUpload}
+                    //onTextChange={this.handleTextChange}
+                    canPost={canPost}
+                    onSubmit={this.handleSubmit}
+                    onFileAdded={this.handleFileAdded}
+                    onFileRemoved={this.handleFileRemoved}
+                    onFileUploaded={this.handleFileUploaded}
+                    onFileQueueComplete={this.handleFileQueueComplete}
+                    onChangeMentions={this.handleMentions}
+                    canMention={this.props.canMention}
+                    parentStatus={this.props.parentStatus}
+                    className={this.props.className}
+                    />
+            );
+        } else {
+            return null;
+        }
+    }
 }
+const mapStateToProps = (state:RootState, ownProps: OwnProps):ReduxStateProps => {
+    return {
+        parentStatus:ownProps.pageItem.isTemporary ? state.queue.statusMessages.find(i => i.id == ownProps.pageItem.id) : state.statuses.items[ownProps.pageItem.id]
+    }
+}
+const mapDispatchToProps = (dispatch:any, ownProps: OwnProps):ReduxDispatchProps => {
+    return {
+
+        setStatusReaction:(status:Status, reactions:{ [id: string]: number[] },reaction_count:number) => {
+            dispatch(Actions.setStatusReactions(status, reactions, reaction_count));
+        }
+    }
+}
+export default connect<ReduxStateProps, ReduxDispatchProps, OwnProps>(mapStateToProps, mapDispatchToProps)(StatusFormContainer);

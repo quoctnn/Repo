@@ -9,6 +9,7 @@ import { Avatar } from '../Avatar';
 import { Link } from 'react-router-dom';
 import { Routes } from '../../../utilities/Routes';
 import { UserProfile, Status } from '../../../types/intrasocial_types';
+import { Settings } from '../../../utilities/Settings';
 let timezone = moment.tz.guess();
 require("./StatusHeader.scss");
 
@@ -23,6 +24,7 @@ export interface Props
     addLinkToContext:boolean
     contextKey:string 
     contextId:number
+    isComment:boolean
 }
 interface State 
 {
@@ -193,12 +195,12 @@ export default class StatusHeader extends React.Component<Props, State> {
                     <span className="action"> {this.getActionText()} </span>
                     <span>{this.getScopeLinkElement()} </span>
                     {this.getCommunityLinkElement()}
-                    { this.props.status.created_at != null && this.props.status.permission_set == null &&
+                    {!this.props.isComment && this.props.status.created_at != null && this.props.status.permission_set == null &&
                         <span className="pull-right fa fa-globe" style={{ fontSize:"18px", color:"#999999"}}>
                         </span>
                     }
                     {   // Display permission set for debug
-                        process.env.NODE_ENV != 'production' &&
+                        !Settings.isProduction &&
                         this.props.status.created_at != null &&
                         this.props.status.permission_set != null &&
                         <span className="pull-right" style={{ fontSize:"14px", color:"#999999"}}>

@@ -14,8 +14,7 @@ export class CommentForm extends StatusFormBase {
     }
 
     render() {
-        const placeholder = translate("Write a comment")
-        return (<>
+        return (<div className="chat-message-composer-container file-upload-container">
                     {this.renderTextArea(this.props.canPost)}
                     {this.state.showDropzone &&
                         <FilesUpload onFileAdded={this.handleFileAdded}
@@ -25,7 +24,7 @@ export class CommentForm extends StatusFormBase {
                                 onFileQueueComplete={this.props.onFileQueueComplete}
                                 communityId={this.props.communityId}/>
                     }
-                </>)
+                </div>)
         
     }
 }

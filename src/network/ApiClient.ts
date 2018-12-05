@@ -15,6 +15,33 @@ export enum ListOrdering {
 }
 export default class ApiClient
 {
+    static getQueryString(params:any)
+    {
+        let keys = Object.keys(params)
+        let values = keys.map(key => params[key])
+        var arr:string[] = []
+        Object.keys(params).forEach(key => {
+            var val = params[key]
+            if(typeof val != "string" && Array.isArray(val))
+            {
+                val = val.join(",")
+            }
+            if(val)
+            {
+                arr.push(key + '=' + val)
+            }
+        })
+        return arr.join('&');
+    }
+    static newsfeed(limit:number,offset:number,parent:number|null, max_children:number|null, callback:ApiClientStatusCallback)
+    {
+        let url = Constants.apiRoute.newsfeed + "?" + this.getQueryString({limit,offset,parent,max_children})
+        AjaxRequest.get(url, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
     static createStatus(status:Status, callback:ApiClientStatusCallback)
     {
         let url = Constants.apiRoute.postUrl

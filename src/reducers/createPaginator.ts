@@ -46,7 +46,7 @@ export const createPaginator = (key:string, endpoint:string, itemIdKey:string, p
           return { ...page, fetching:true }
         case Types.RECEIVE_PAGE:
         {
-          const receivedIds = action.payload!.results!.map(item => item[action.meta!.itemIdKey])
+          const receivedIds = action.payload!.results!.map(item => item[itemIdKey])
           return { ...page, 
             ids: (page.ids || []).concat(receivedIds).distinct(),
             fetching:false,
@@ -99,7 +99,7 @@ export const createPaginator = (key:string, endpoint:string, itemIdKey:string, p
           for (let item of action.payload!.results!) {
             _items = {
               ..._items,
-              [item[action.meta!.itemIdKey]]: item
+              [item[itemIdKey]]: item
             }
           }
           return {
@@ -124,7 +124,7 @@ export const createPaginator = (key:string, endpoint:string, itemIdKey:string, p
           for (let item of action.payload!.results!) {
             _items = {
               ..._items,
-              [item[action.meta!.itemIdKey]]: item
+              [item[itemIdKey]]: item
             }
           }
           return {
@@ -173,6 +173,12 @@ export interface ItemMentionAction
   reactions?:{ [id: string]: number[] }
   reaction_count?:number
 }
+export interface InsertItemsAction
+{
+  type?: string
+  items?:Status[]
+  meta:{}
+}
 export type PageItem = { [page: string]: CachePage }
 export const createMultiPaginator = (key:string, endpoint:(id:string) => string, itemIdKey:string, pageSize:number) =>
 {
@@ -219,7 +225,7 @@ export const createMultiPaginator = (key:string, endpoint:(id:string) => string,
             [action.payload!.pagingId]: {
               ...p,
               fetching: false,
-              ids:p.ids.concat(action.payload!.results!.map(item => item[action.meta!.itemIdKey])).distinct(),
+              ids:p.ids.concat(action.payload!.results!.map(item => item[itemIdKey])).distinct(),
               totalCount: action.payload!.total || p.totalCount,
               error:action.payload!.error,
               last_fetch:Date.now()
@@ -267,7 +273,7 @@ export const createMultiPaginator = (key:string, endpoint:(id:string) => string,
           for (let item of action.payload!.results!) {  
             _items = {
               ..._items,
-              [item[action.meta!.itemIdKey]]: item
+              [item[itemIdKey]]: item
             }
           }
           return {
@@ -296,7 +302,7 @@ export const createMultiPaginator = (key:string, endpoint:(id:string) => string,
 
 
   //////////////
-export const statusMultiPaginator = (key:string, endpoint:(id:string) => string, itemIdKey:string, pageSize:number) =>
+export const statusMultiPaginator = (key:string, endpoint:(id:string) => string, itemIdKey:string, pageSize:number, sortItemKey:string, sortAscending:boolean) =>
 {
   /*
     key:{
@@ -350,6 +356,11 @@ export const statusMultiPaginator = (key:string, endpoint:(id:string) => string,
       reactions,
       reaction_count
     });
+    const insertStatuses = (items:any[]):InsertItemsAction => ({
+      type: Types.INSERT_ITEMS_TO_PAGE,
+      items,
+      meta:{},
+    });
     const pages = (pages:PageItem = {}, action:MultiPaginatorAction = {}) => {
       switch (action.type) 
       {
@@ -383,7 +394,7 @@ export const statusMultiPaginator = (key:string, endpoint:(id:string) => string,
             [action.payload!.pagingId]: {
               ...p,
               fetching: false,
-              ids:p.ids.concat(action.payload!.results!.map(item => item[action.meta!.itemIdKey])).distinct(),
+              ids:p.ids.concat(action.payload!.results!.map(item => item[itemIdKey])).distinct(),
               totalCount: action.payload!.total || p.totalCount,
               error:action.payload!.error,
               last_fetch:Date.now()
@@ -422,7 +433,7 @@ export const statusMultiPaginator = (key:string, endpoint:(id:string) => string,
     }
     const onlyForEndpoint = (reducer:any) => (state = {}, action:any = {}) =>
     {
-        if((action.meta && action.meta.key == key) || action.type == Types.RESET_PAGED_DATA)
+        if((action.meta && action.meta.key == key) || action.type == Types.RESET_PAGED_DATA || action.type == Types.INSERT_ITEMS_TO_PAGE)
         {
             return reducer(state, action)
         }
@@ -431,6 +442,11 @@ export const statusMultiPaginator = (key:string, endpoint:(id:string) => string,
     type reducerItems = {
       [key:string]: any
     }
+    const sortObjects = (allItems:any, ids:number[] ) => 
+    {
+       return ids.map(i => allItems[i]).sort((a:any,b:any) => sortAscending ?  (a[sortItemKey] as string).localeCompare(b[sortItemKey]) : (b[sortItemKey] as string).localeCompare(a[sortItemKey])).map((i:any) => i[itemIdKey])
+    }
+    const magicChildNumber = 5
     const itemsReducer = (items:reducerItems = {}, action:MultiPaginatorAction = {}) => { 
       switch (action.type) {
         case Types.RECEIVE_PAGE:
@@ -440,7 +456,7 @@ export const statusMultiPaginator = (key:string, endpoint:(id:string) => string,
           for (let item of res) {  
             _items = {
               ..._items,
-              [item[action.meta!.itemIdKey]]: item
+              [item[itemIdKey]]: item
             }
           }
           return {
@@ -464,15 +480,67 @@ export const statusMultiPaginator = (key:string, endpoint:(id:string) => string,
         }
         case Types.INSERT_ITEM_TO_PAGE:
         {
-          let _items:reducerItems = {}
+          let newItems:reducerItems = {}
           let a = action as InsertItemAction
-          let status = a.item as Status
-          let res = flattenList([status])
+          let newStatus = a.item as Status
+          const isNew = a.isNew
+          let res = flattenList([newStatus])
+          for (let item of res) {  
+            newItems = {
+              ...newItems,
+              [item[itemIdKey]]: item
+            }
+          }
+          let allObjects = {
+            ...items,
+            ...newItems
+          }
+          let newKeys = Object.keys(newItems)
+          newKeys.forEach(k => 
+            {
+              let item = newItems[k] as Status
+              if(item.parent)// if object has parent, find parent, insert child in children_ids, then sort
+              {
+                let parentStatus = Object.assign({}, allObjects[item.parent]) as Status
+                const oldParentStatus = items[item.parent] as Status
+                if(parentStatus && oldParentStatus)
+                {
+                  if(!isNew && oldParentStatus.children_ids && oldParentStatus.children_ids.length <= magicChildNumber || isNew)
+                  {
+                    let arr = parentStatus.children_ids || [] 
+                    let exists = arr.findIndex(id => id == item.id) != -1
+                    parentStatus.serialization_date = item.serialization_date
+                    if(!exists)
+                    {
+                      arr.unshift(item.id)
+                      parentStatus.children_ids = sortObjects(allObjects, arr)
+                    }
+                  }
+                  else
+                  {
+                    parentStatus.children_ids = oldParentStatus.children_ids
+                  }
+                  allObjects[parentStatus.id] = parentStatus
+                }
+              }
+            })
+          return allObjects
+        }
+        case Types.INSERT_ITEMS_TO_PAGE: 
+        {
+          let a = action as InsertItemsAction
+          let _items:reducerItems = {}
+          let comments = a.items
+          let res = flattenList(comments)
           for (let item of res) {  
             _items = {
               ..._items,
-              [item[action.meta!.itemIdKey]]: item
+              [item[itemIdKey]]: item
             }
+          }
+          let allObjects = {
+            ...items,
+            ..._items
           }
           let keys = Object.keys(_items)
           keys.forEach(k => 
@@ -480,7 +548,7 @@ export const statusMultiPaginator = (key:string, endpoint:(id:string) => string,
               let item = _items[k] as Status
               if(item.parent)
               {
-                let p = Object.assign({}, items[item.parent]) as Status
+                let p = Object.assign({}, allObjects[item.parent]) as Status
                 if(p)
                 {
                   let arr = p.children_ids || [] 
@@ -489,16 +557,13 @@ export const statusMultiPaginator = (key:string, endpoint:(id:string) => string,
                   if(!exists)
                   {
                     arr.unshift(item.id)
-                    p.children_ids = arr
-                    _items[p.id] = p
+                    p.children_ids = sortObjects(allObjects, arr)
+                    allObjects[p.id] = p
                   }
                 }
               }
             })
-          return {
-            ...items,
-            ..._items
-          }
+          return allObjects
         }
         default:
           return items
@@ -511,5 +576,6 @@ export const statusMultiPaginator = (key:string, endpoint:(id:string) => string,
       setNotFetcing,
       insertStatus,
       setStatusReactions,
+      insertStatuses
     }
   }

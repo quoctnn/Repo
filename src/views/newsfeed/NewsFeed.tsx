@@ -15,6 +15,9 @@ import { QueueUtilities } from '../../utilities/QueueUtilities';
 import * as Immutable from 'immutable';
 import { AuthenticationManager } from '../../managers/AuthenticationManager';
 import { Status, UserProfile, UploadedFile } from '../../types/intrasocial_types';
+import StatusFormContainer from '../../components/general/status/StatusFormContainer';
+import { translate } from '../../components/intl/AutoIntlProvider';
+import ApiClient from '../../network/ApiClient';
 require("./NewsFeed.scss");
 export interface OwnProps 
 {
@@ -23,25 +26,49 @@ interface ReduxStateProps
 {
     total:number,
     isFetching:boolean,
-    items:NestedPageItem[],
+    items:FeedListItem[],
     offset:number,
     error:string,
     authenticatedProfile:UserProfile,
     last_fetched:number,
 }
+class StatusComposer
+{
+    pageItem:NestedPageItem
+    constructor(pageItem:NestedPageItem )
+    {
+        this.pageItem = pageItem
+    }
+}
+class StatusCommentLoader
+{
+    statusId:number
+    currentCommentsCount:number 
+    totalCommentsCount:number 
+    constructor(statusId:number, currentCommentsCount:number, totalCommentsCount:number)
+    {
+        this.statusId = statusId
+        this.currentCommentsCount = currentCommentsCount
+        this.totalCommentsCount = totalCommentsCount
+    }
+}
+type FeedListItem = NestedPageItem | StatusComposer | StatusCommentLoader
+type StatusDict = {[id:number]:Status}
 interface ReduxDispatchProps 
 {
     requestNextStatusPage:(offset:number) => void
+    insertStatuses:(comments:Status[]) => void
 }
 interface State 
 {
+    activeCommentLoaders:{[index:number]:StatusCommentLoader}
 }
 type Props = ReduxStateProps & ReduxDispatchProps & OwnProps
-class NewsFeed extends React.Component<Props, {}> {
+class NewsFeed extends React.Component<Props, State> {
     constructor(props) {
         super(props);
         this.state = {
-            isTyping:{},
+            activeCommentLoaders:{},
         }
         this.loadFirstData = this.loadFirstData.bind(this)
         this.loadNextPageData = this.loadNextPageData.bind(this) 
@@ -105,9 +132,6 @@ class NewsFeed extends React.Component<Props, {}> {
     {
         console.log("onCommentSubmit", comment, files)
 
-        // Get the status index where the comment is child
-        let parentStatusIndex = this.props.items.findIndex(o => o.id == comment.parent)
-
         let previewComment = this.getStatusPreview(comment, files)
         console.log(previewComment)
         StatusManager.sendStatus(previewComment)
@@ -126,83 +150,154 @@ class NewsFeed extends React.Component<Props, {}> {
         status.pending = true
         return status
     }
+    renderStatus = (authUser:UserProfile, item:NestedPageItem, isLast:boolean, index:number) => 
+    {
+        const cn = isLast ? "last" : undefined
+        return <StatusComponent 
+        canMention={true}
+        canComment={true}
+        canUpload={true}
+        canReact={true}
+        onStatusEdit={this.onStatusEdit}
+        onCommentEdit={this.onCommentEdit}
+        onCommentDelete={this.onCommentDelete}
+        onStatusDelete={this.onStatusDelete}
+        onCommentSubmit={this.onCommentSubmit}
+        addLinkToContext={true}
+        key={"status_" + item.id} 
+        pageItem={item} 
+        bottomOptionsEnabled={true} 
+        authorizedUserId={authUser.id}
+        className={cn} />
+    }
+    renderStatusComposer = (composer:StatusComposer, index:number) => {
+            return (
+                <StatusFormContainer
+                    key={"statuscomposer_" + composer.pageItem.id}
+                    canUpload={true}
+                    pageItem={composer.pageItem}
+                    canMention={true}
+                    canComment={true}
+                    onCommentSubmit={this.onCommentSubmit} 
+                    className={"drop-shadow"}
+                    />
+            )
+    }
+    didLoadMoreComments = (loader:StatusCommentLoader, comments:Status[]) => 
+    {
+        this.props.insertStatuses(comments)
+    }
+    _loadComments = (loader:StatusCommentLoader) => 
+    {
+        const limit = 10
+        const offset = loader.currentCommentsCount
+        console.log("loadItems comments", "limit:" + limit, "offset:"+offset)
+        ApiClient.newsfeed(limit,offset,loader.statusId, null, (data, status, error) => {
+            console.log("data", data, status, error)
+            if(data && data.results)
+            {
+                this.didLoadMoreComments(loader, data.results)
+            }
+        })
+    }
+    loadMoreComments = (loader:StatusCommentLoader) => (e:any) => 
+    {
+        console.log("loadMoreFromLoader", loader.statusId)
+        let currentLoaders = this.state.activeCommentLoaders
+        currentLoaders[loader.statusId] = loader
+        this.setState({activeCommentLoaders:currentLoaders}, () => {this._loadComments(loader)})
+    
+    }
+    renderCommentLoader =  (loader: StatusCommentLoader, index:number) => 
+    {
+        const isLoading = this.state.activeCommentLoaders[loader.statusId] != undefined
+        return (
+            <button key={"statusloader_" + loader.statusId} className="btn btn-link link-text comment-loader" onClick={this.loadMoreComments(loader)}>
+                <i className="fa fa-arrow-down"/> &nbsp;
+                {translate("Show previous")}
+            </button>
+        )
+    }
     render() {
         let authUser = AuthenticationManager.getAuthenticatedUser()
         if(!authUser)
         {
             return null
         }
+        const len = this.props.items.length
         return(
+
             <FullPageComponent> 
-                <List enableAnimation={false} onScroll={this.onScroll} className="status-list full-height col-sm group-list vertical-scroll">
-                    {this.props.items.map((s) => {
-                        return <StatusComponent 
-                                canMention={true}
-                                canComment={true}
-                                canUpload={true}
-                                canReact={true}
-                                onStatusEdit={this.onStatusEdit}
-                                onCommentEdit={this.onCommentEdit}
-                                onCommentDelete={this.onCommentDelete}
-                                onStatusDelete={this.onStatusDelete}
-                                onCommentSubmit={this.onCommentSubmit}
-                                addLinkToContext={true}
-                                key={s.id} 
-                                pageItem={s} 
-                                bottomOptionsEnabled={true} authorizedUserId={authUser.id} />
-                    }) }
-                    {this.renderLoading()}
-                </List>
+                    <List 
+                    enableAnimation={false} 
+                    onScroll={this.onScroll} 
+                    className="status-list full-height col-sm group-list vertical-scroll">
+                        {this.props.items.map((s, i) => {
+                            const next = len > i + 1 ? this.props.items[i + 1] : undefined
+                            const isCurrentLast = next instanceof StatusComposer
+                            if(s instanceof StatusComposer)
+                            {
+                                return this.renderStatusComposer(s, i)
+                            }
+                            else if(s instanceof StatusCommentLoader)
+                            {
+                                return this.renderCommentLoader(s, i)
+                            }
+                            return this.renderStatus(authUser,s, isCurrentLast, i)
+                        }) }
+                        {this.renderLoading()}
+                    </List>
             </FullPageComponent> 
         );
     }
 }
-const mapStateToProps = (state:RootState, ownProps: OwnProps):ReduxStateProps => {
+const mapStateToProps = (state:RootState, ownProps: OwnProps):ReduxStateProps => 
+{
     const pagination = state.statuses.feed[StatusContextKeys.NEWSFEED] || getDefaultCachePage()
-    const allItems = Immutable.fromJS(state.statuses.items).toJS()
-    const isFetching = pagination.fetching
-    const items = PaginationUtilities.getStatusPageResults(allItems, pagination.ids, false)
-    const populateList = (statusList:Status[]) => 
-    {
-        statusList.forEach(c => 
-        {
-            if(c.children_ids && c.children_ids.length > 0)
-            {
-                c.children = PaginationUtilities.getResults(allItems, c.children_ids)
-                populateList(c.children)
-            }
-        } )
-    }
-    const total = pagination.totalCount
-    const offset = items.length
-    const queuedStatuses = QueueUtilities.getQueuedStatusesForFeed(StatusContextKeys.NEWSFEED, state.queue.statusMessages)
-    const error = pagination.error
-    const last_fetched = pagination.last_fetch
+    const allItems:StatusDict= Immutable.fromJS(state.statuses.items).toJS()
+    //
+    let rootItems = PaginationUtilities.getStatusPageResults(allItems, pagination.ids, false) // Root statuses
+
     const parents:number[] = []
-    const children:Status[] = []
-    const queuedDict:{[id:number]:Status} = {}
+    const tempChildren:Status[] = []
+    const queuedDict:StatusDict = {}
+    const queuedStatuses = QueueUtilities.getQueuedStatusesForFeed(StatusContextKeys.NEWSFEED, state.queue.statusMessages)
     queuedStatuses.forEach(s => {
         queuedDict[s.id] = s
         if(s.parent == null)
             parents.push(s.id)
         else 
-            children.push(s)
+            tempChildren.push(s)
     })
     const parentItems = PaginationUtilities.getStatusPageResults(queuedDict, parents, true)
-    const rootItems = parentItems.concat(items)
-    children.reverse().forEach(child => {
-        let rootItem = rootItems.find(p => p.id == child.parent)
+    const allRootItems = parentItems.concat(rootItems)
+    tempChildren.reverse().forEach(temp => {
+        let rootItem = allRootItems.find(p => p.id == temp.parent)
         if(rootItem)
         {
-            let childItems = PaginationUtilities.getStatusPageResults(queuedDict, [child.id], true)
+            let childItems = PaginationUtilities.getStatusPageResults(queuedDict, [temp.id], true)
             let chldrn = childItems.concat(rootItem.children)
             rootItem.children = chldrn
         }
     })
-
+    let result:FeedListItem[] = []
+    allRootItems.forEach(p => {
+        result.push(p)
+        if(p.childrenCount != p.children.length)
+            result.push(new StatusCommentLoader(p.id, p.children.length, p.childrenCount))
+        p.children.reverse().forEach(c => result.push(c))
+        const item:NestedPageItem = {id:p.id, isTemporary:p.isTemporary, children:[], community:p.community, childrenCount:p.childrenCount}
+        result.push(new StatusComposer(item))
+    })
+    const items = PaginationUtilities.getStatusPageResults(allItems, pagination.ids, false) 
+    const isFetching = pagination.fetching
+    const total = pagination.totalCount
+    const offset = items.length
+    const error = pagination.error
+    const last_fetched = pagination.last_fetch
     return {
         isFetching,
-        items:items,
+        items:result,
         total,
         offset,
         error,
@@ -214,7 +309,10 @@ const mapDispatchToProps = (dispatch:any, ownProps: OwnProps):ReduxDispatchProps
     return {
         requestNextStatusPage:(offset:number) => {
             dispatch(Actions.requestNextStatusPage(StatusContextKeys.NEWSFEED, offset))
-        }
+        },
+        insertStatuses:(comments:Status[]) => {
+            dispatch(Actions.insertStatuses(comments))
+        },
     }
 }
 export default connect<ReduxStateProps, ReduxDispatchProps, OwnProps>(mapStateToProps, mapDispatchToProps)(NewsFeed);

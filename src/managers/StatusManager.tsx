@@ -38,6 +38,10 @@ export abstract class StatusManager
     {
         StatusManager.getStore().dispatch(Actions.insertStatus(StatusContextKeys.NEWSFEED, status, isNew)) //should be array of contexts. i.e. [NEWSFEED,COMMUNITY/5]
     }
+    static setStatusReaction = (status:Status, reactions:{ [id: string]: number[] },reaction_count:number) => 
+    {
+        StatusManager.getStore().dispatch(Actions.setStatusReactions(status, reactions,  reaction_count))
+    }
     private static getStore = ():Store<RootState,any> => 
     {
         return window.store 

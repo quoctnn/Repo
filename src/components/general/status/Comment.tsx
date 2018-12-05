@@ -138,6 +138,7 @@ const mapDispatchToProps = (dispatch:any, ownProps: OwnProps):ReduxDispatchProps
         }
     }
 }
+
 export default connect<ReduxStateProps, ReduxDispatchProps, OwnProps>(mapStateToProps, mapDispatchToProps, null, {
     pure: true,
     areOwnPropsEqual: (next, prev) => {

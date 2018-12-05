@@ -38,6 +38,8 @@ export const setDirtyPagedData = () => ({
 export const requestNextStatusPage = statusesPaginator.requestNextStatusPage
 export const insertStatus = statusesPaginator.insertStatus
 export const setStatusReactions = statusesPaginator.setStatusReactions
+export const insertStatuses = statusesPaginator.insertStatuses
+
 
 
 //messages

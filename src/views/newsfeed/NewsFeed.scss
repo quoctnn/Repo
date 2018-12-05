@@ -1,12 +1,98 @@
+@import "../../main/Config";
 .status-list
 {
     padding: 10px !important;
     > li 
     {
-        margin-bottom: 16px;
+        margin: 0px;
+        * {
+            box-shadow: none;
+        }
+
+        .chat-message-composer
+        {
+            border-top-width: 0;
+        }
+        .chat-message-composer-container
+        {
+            background: white;
+            border-width:1px;
+            border-style:solid;
+            border-top-width: 0;
+            @include var(border-color, border-color-default);
+            border-bottom-left-radius: 8px;
+            border-bottom-right-radius: 8px;
+            margin-bottom: 10px;
+            position: relative;
+            &:before {
+                content: "";
+                left: 0;
+                right: 0;
+                top: 0;
+                position: absolute;
+                @include var(background, border-color-default);
+                margin: -1px 15px;
+                height: 1px;
+              }
+        }
+        .status,.status-placeholder
+        {
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+            &.statuscomment {
+                border-radius: 0;
+                border-top-width: 0;
+                .status-content
+                {
+                    margin-left: 60px;
+                }
+                .status-footer-stats
+                {
+                    margin-left: 45px;
+                }
+            }
+            &.temp{
+
+                border-top-width:1px;
+            }
+            &.last 
+            {
+                .status-footer-stats:after
+                {
+                    height: 0;
+                }
+            }
+        }
+        .status-placeholder
+        {
+            height: 137px;
+            background: white;
+            position: relative;
+            &.statuscomment:before {
+                content: "";
+                left: 0;
+                right: 0;
+                top: 0;
+                position: absolute;
+                @include var(background, border-color-default);
+                margin: -1px 15px;
+                height: 1px;
+              }
+        }
+        .chat-message-composer-placeholder
+        {
+            height: 50px;
+        }
+        .comment-loader{
+            background: white;
+            width: 100%;
+
+            border-width:1px;
+            border-style:solid;
+            border-top-width: 0;
+            border-bottom-width: 0;
+            @include var(border-color, border-color-default);
+        }
     }
-    > li:last-child
-    {
-        margin-bottom: 0px;
-    }
+
 }

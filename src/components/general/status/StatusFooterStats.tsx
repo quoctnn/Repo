@@ -25,6 +25,7 @@ export interface Props
     canMention:boolean
     isOwner:boolean
     communityId:number
+    isComment:boolean
 }
 interface State 
 {
@@ -50,11 +51,15 @@ export default class StatusFooterStats extends React.Component<Props, State> {
         return (
             <StatusOptions communityId={this.props.communityId} canUpload={this.props.canUpload} onDelete={this.props.onStatusDelete}
                            onSaveEdit={this.props.onStatusEdit}
-                           status={this.props.status} canComment={this.props.canComment} isOwner={this.props.isOwner} canMention={this.props.canMention}/>
+                           status={this.props.status} 
+                           canComment={this.props.canComment} 
+                           isOwner={this.props.isOwner} 
+                           canMention={this.props.canMention}/>
         )
     }
 
-    render() {
+    render() 
+    {
         return (
             <div className="row status-footer-stats secondary-text">
                 <div className="col-7">
@@ -73,7 +78,7 @@ export default class StatusFooterStats extends React.Component<Props, State> {
                     }
 
                     {/* Check if status is a task comment to display comment icon */}
-                    { this.props.canComment &&
+                    { this.props.canComment && !this.props.isComment &&
                         <span>
                             <i className="far fa-comment"></i><span className="comment-count">{this.props.commentsCount}</span>
                         </span>

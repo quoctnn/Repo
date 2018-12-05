@@ -24,6 +24,7 @@ import setupManagers from '../managers/index';
 require('jquery/dist/jquery');
 require('popper.js/dist/umd/popper');
 require('bootstrap/dist/js/bootstrap');
+require('intersection-observer');
 require('../utilities/Extensions');
 
 const loggingMiddleware = store => next => action => {

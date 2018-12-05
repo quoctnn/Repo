@@ -3,6 +3,7 @@ import Constants from "../../../utilities/Constants";
 import { ChatMessageComposer, IEditorComponent } from '../ChatMessageComposer';
 import { Mention } from '../../input/MentionEditor';
 import { Status, UploadedFile } from '../../../types/intrasocial_types';
+import classNames = require('classnames');
 
 export interface OwnProps
 {
@@ -23,6 +24,7 @@ export interface OwnProps
     mentions?:Mention[]
     parentStatus?:Status
     mentionSearch:(search:string, completion:(mentions:Mention[]) => void) => void
+    className?:string
 }
 export interface DefaultProps
 {
@@ -122,8 +124,9 @@ export default class StatusFormBase extends React.Component<Props, State> implem
         }
     }
     renderTextArea(canSubmit:boolean) {
+        let cn = classNames("secondary-text", this.props.className)
         return (
-            <ChatMessageComposer className="secondary-text" canSubmit={canSubmit} onHandleUploadClick={this.handleUploadClick} ref={this.inputRef} content={this.props.content} mentionSearch={this.props.mentionSearch} mentions={this.props.mentions} communityId={this.props.communityId} onSubmit={this.handleSubmit} onDidType={this.props.onDidType} />                      
+            <ChatMessageComposer className={cn} canSubmit={canSubmit} onHandleUploadClick={this.handleUploadClick} ref={this.inputRef} content={this.props.content} mentionSearch={this.props.mentionSearch} mentions={this.props.mentions} communityId={this.props.communityId} onSubmit={this.handleSubmit} onDidType={this.props.onDidType} />                      
         )
     }
    //<MentionEditor onKeyboardSubmit={this.handleSubmit} onChange={this.props.onTextChange}

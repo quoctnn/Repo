@@ -4,14 +4,12 @@ import { StatusUtilities } from '../../../utilities/StatusUtilities';
 import StatusHeader from './StatusHeader';
 import StatusContent from './StatusContent';
 import ApiClient from '../../../network/ApiClient';
-import StatusFooter from './StatusFooter';
 import { nullOrUndefined } from '../../../utilities/Utilities';
 import { NestedPageItem } from '../../../utilities/PaginationUtilities';
-import { connect } from 'react-redux'
-import { RootState } from '../../../reducers/index';
-import * as Actions from '../../../actions/Actions';
 import { AuthenticationManager } from '../../../managers/AuthenticationManager';
 import { Status, UploadedFile } from '../../../types/intrasocial_types';
+import StatusFooterStats from './StatusFooterStats';
+import { StatusManager } from '../../../managers/StatusManager';
 require("./StatusComponent.scss");
 
 export interface OwnProps 
@@ -29,47 +27,60 @@ export interface OwnProps
     canComment:boolean
     canReact:boolean
     canUpload:boolean
-    pageItem:NestedPageItem
     authorizedUserId:number
-}
-interface ReduxStateProps
-{
-    status:Status
+    pageItem:NestedPageItem
+    className?:string
 }
 interface State 
 {
+    renderPlaceholder:boolean
 }
-interface ReduxDispatchProps
+type Props = OwnProps 
+export default class StatusComponent extends React.Component<Props, State> 
 {
-    setStatusReaction:(status:Status, reactions:{ [id: string]: number[] },reaction_count:number) => void
-}
-type Props = ReduxStateProps & OwnProps & ReduxDispatchProps
-class StatusComponent extends React.Component<Props, State> {     
+    
+    element = React.createRef<HTMLDivElement>()
+    observer:IntersectionObserver = null
+
+
     constructor(props) {
         super(props);
         this.state = {
+            renderPlaceholder:true
         }
         this.handleReaction = this.handleReaction.bind(this)
     }
+    componentDidMount() {
+        this.observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+              const { isIntersecting } = entry;
+              if (isIntersecting) 
+              {
+                this.setState({renderPlaceholder:false})
+                this.observer.disconnect();
+              }
+            });
+        },
+        {
+          root: document.querySelector(".status-list"),
+          rootMargin: "0px 0px 200px 0px"
+        });
+        this.observer.observe(this.element.current);
+        
+        //this.setState({renderPlaceholder:false})
+    }
     shouldComponentUpdate(nextProps:Props, nextState:State) 
     {
-        let ret = nextProps.status.id != this.props.status.id || 
-                    nextProps.status.updated_at != this.props.status.updated_at || 
-                    nextProps.status.serialization_date != this.props.status.serialization_date ||
-                    nextProps.pageItem.children.length != this.props.pageItem.children.length ||
-                    nextProps.status.reaction_count != this.props.status.reaction_count || 
-                    nextProps.status.reactions != this.props.status.reactions
-        console.log("status id:" + this.props.status.id, ret,(this.props.status.children_ids || []).length, (nextProps.status.children_ids|| []).length, )
+        const nextStatus = nextProps.pageItem.status
+        const status = this.props.pageItem.status
+        let ret = nextState.renderPlaceholder != this.state.renderPlaceholder || nextStatus.id != status.id || 
+        nextStatus.updated_at != status.updated_at || 
+        nextStatus.serialization_date != status.serialization_date ||
+        nextStatus.reaction_count != status.reaction_count //|| 
+        //nextStatus.reactions != status.reactions
+        //console.log("status id:" + status.id, ret,(status.children_ids || []).length, (nextStatus.children_ids|| []).length, )
         return ret
     }
-   /*  componentWillReceiveProps(nextProps:Props) {
-        let status = nextProps.status
-        this.setState({
-            reaction:StatusUtilities.getReaction(status, ProfileManager.getAuthenticatedUser()),
-            reactionsCount: status.reaction_count,
-            reactions: status.reactions || {}
-        });
-    } */
     getTypeOfContent(status:Status)
     {
         let videos = StatusUtilities.filterStatusFileType(status.files, "video")
@@ -95,87 +106,70 @@ class StatusComponent extends React.Component<Props, State> {
         return "text";
     }
     handleReaction(reaction:string) {
-        let oldReaction = StatusUtilities.getStatusReaction(this.props.status, AuthenticationManager.getAuthenticatedUser())
-        let rCount = this.props.status.reaction_count
-        let r = this.props.status.reactions || {}
+
+        const status = this.props.pageItem.status
+        let oldReaction = StatusUtilities.getStatusReaction(status, AuthenticationManager.getAuthenticatedUser())
+        let rCount = status.reaction_count
+        let r = status.reactions || {}
         let userId = AuthenticationManager.getAuthenticatedUser().id
         let data = StatusUtilities.applyReaction(oldReaction, reaction, r, rCount, userId)
-        this.props.setStatusReaction(this.props.status, data.reactions, data.reactionsCount)
-        ApiClient.reactToStatus(this.props.status.id, reaction, (data, status, error) => {  
+        StatusManager.setStatusReaction(status, data.reactions, data.reactionsCount)
+        ApiClient.reactToStatus(status.id, reaction, (data, status, error) => {  
             if(!nullOrUndefined( error ))
             {
                 console.log("error sending reaction:", error)
+                const st = this.props.pageItem.status
                 let {reactions, reactionsCount} = StatusUtilities.applyReaction(reaction, oldReaction, data.reactions, data.reactionsCount, userId)
-                this.props.setStatusReaction(this.props.status, reactions, reactionsCount)
+                StatusManager.setStatusReaction(st, reactions, reactionsCount)
             }
         })
     }
     render()
     {
-        let status = this.props.status
+        let status = this.props.pageItem.status
+        const isComment = status.parent != null
+        if(this.state.renderPlaceholder)
+        {
+            let itemClass = classNames("status-placeholder drop-shadow", this.props.className, { statuscomment: isComment, temp: status.pending})
+            return <div ref={this.element} className={itemClass}></div>
+        }
         let communityId = status.community && status.community.id ? status.community.id : null
         let statusId = "status" + status.id
         let statusType = this.getTypeOfContent(status)
-        let itemClass = classNames("status status-component drop-shadow", statusType) + (status.pending ? " temp" : "")
-        let cl = status.created_at ? "panel item-panel" : "panel item-panel temp"
+        let itemClass = classNames("status status-component drop-shadow", statusType, this.props.className, { statuscomment: isComment, temp: status.pending})
+        const addLinkToContext = !isComment && this.props.addLinkToContext
         return (<div className={itemClass} id={statusId}>
                     <hr className="line"/>
                     <StatusHeader
                         owner={status.owner}
                         created_at={status.created_at}
                         edited_at={status.edited_at}
-                        status={status} addLinkToContext={this.props.addLinkToContext} 
+                        status={status} 
+                        addLinkToContext={addLinkToContext} 
                         contextKey={this.props.contextKey} 
-                        contextId={this.props.contextId}/>
+                        contextId={this.props.contextId} isComment={isComment}/>
 
                     <StatusContent status={status} embedLinks={true}/>
-
-                    <StatusFooter
-                        authorizedUserId={this.props.authorizedUserId}
-                        communityId={communityId}
-                        bottomOptionsEnabled={this.props.bottomOptionsEnabled}
-                        onCommentSubmit={this.props.onCommentSubmit}
-                        onStatusDelete={this.props.onStatusDelete}
-                        onCommentDelete={this.props.onCommentDelete}
-                        onCommentEdit={this.props.onCommentEdit}
-                        onStatusEdit={this.props.onStatusEdit}
-                        commentsCount={status.comments_count}
-                        created_at={status.created_at}
-                        onReact={this.handleReaction}
-                        reaction={StatusUtilities.getStatusReaction(this.props.status, AuthenticationManager.getAuthenticatedUser())}
-                        reactions={this.props.status.reactions}
-                        reactionsCount={this.props.status.reaction_count}
-                        children={this.props.pageItem.children}
-                        status={status}
-                        isOwner={status.owner.id == this.props.authorizedUserId}
-                        canMention={this.props.canMention}
-                        canComment={this.props.canComment}
-                        canUpload={this.props.canUpload}
-                        canReact={this.props.canReact}/>
+                    <StatusFooterStats
+                    communityId={communityId}
+                    canUpload={this.props.canUpload}
+                    commentsCount={status.comments_count}
+                    created_at={status.created_at}
+                    onReact={this.handleReaction}
+                    reaction={StatusUtilities.getStatusReaction(status, AuthenticationManager.getAuthenticatedUser())}
+                    reactions={status.reactions}
+                    reactionsCount={status.reaction_count}
+                    onStatusDelete={this.props.onStatusDelete}
+                    onStatusEdit={this.props.onStatusEdit}
+                    onCommentEdit={this.props.onCommentEdit}
+                    owner={status.owner}
+                    isOwner={status.owner.id == this.props.authorizedUserId}
+                    status={status} 
+                    canComment={this.props.canComment} 
+                    canReact={this.props.canReact} 
+                    canMention={this.props.canMention} 
+                    isComment={isComment}
+                    />
                 </div>)
     }
 }
-const hasOwnPropsChanged = (nextProps:OwnProps, props:OwnProps) => 
-{
-    let ret = nextProps.pageItem.children.length != props.pageItem.children.length 
-    return ret
-}
-const mapStateToProps = (state:RootState, ownProps: OwnProps):ReduxStateProps => {
-    return {
-        status:ownProps.pageItem.isTemporary ? state.queue.statusMessages.find(i => i.id == ownProps.pageItem.id) : state.statuses.items[ownProps.pageItem.id]
-    }
-}
-const mapDispatchToProps = (dispatch:any, ownProps: OwnProps):ReduxDispatchProps => {
-    return {
-
-        setStatusReaction:(status:Status, reactions:{ [id: string]: number[] },reaction_count:number) => {
-            dispatch(Actions.setStatusReactions(status, reactions, reaction_count));
-        }
-    }
-}
-export default connect<ReduxStateProps, ReduxDispatchProps, OwnProps>(mapStateToProps, mapDispatchToProps, null, {
-    pure: true,
-    areOwnPropsEqual: (next, prev) => {
-      return !hasOwnPropsChanged(next, prev)
-    },
-  })(StatusComponent);

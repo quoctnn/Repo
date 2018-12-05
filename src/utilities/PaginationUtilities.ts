@@ -4,14 +4,24 @@ export interface NestedPageItem
 {
     id:number
     children:NestedPageItem[]
+    childrenCount:number
     isTemporary:boolean
+    community?:number
+    status?:Status
 }
 export class PaginationUtilities {
     
     static getPageItem = (items:{[id:number]:Status}, id, isTemporary:boolean):NestedPageItem => 
     {
         let item = items[id]
-        return {id:id, children:(item.children_ids || []).map(c => PaginationUtilities.getPageItem(items, c, isTemporary)), isTemporary:isTemporary}
+        return {
+                id:id, 
+                children:(item.children_ids || []).map(c => PaginationUtilities.getPageItem(items, c, isTemporary)), 
+                isTemporary:isTemporary, 
+                community:item.community && item.community.id,
+                childrenCount:item.comments_count,
+                status:item
+                }
     }
     static getCurrentPageNumber = (pagination) => {
         if (pagination) 

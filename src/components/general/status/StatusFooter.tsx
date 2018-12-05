@@ -1,7 +1,6 @@
 import * as React from 'react';
 import CommentList from './CommentList';
 import StatusFooterStats from './StatusFooterStats';
-import CommentFormContainer from './CommentFormContainer';
 import { NestedPageItem } from '../../../utilities/PaginationUtilities';
 import { Status, UploadedFile } from '../../../types/intrasocial_types';
 require("./StatusFooter.scss");
@@ -36,13 +35,9 @@ interface State
 export default class StatusFooter extends React.Component<Props, State> {     
     constructor(props) {
         super(props)
-        // Auto-binding
-        this.renderStats = this.renderStats.bind(this)
-        this.renderCommentList = this.renderCommentList.bind(this)
-        this.renderCommentForm = this.renderCommentForm.bind(this)
     }
-
-    renderStats() {
+    renderStats = () => 
+    {
         if (this.props.bottomOptionsEnabled) {
             return (
                 <StatusFooterStats
@@ -60,39 +55,15 @@ export default class StatusFooter extends React.Component<Props, State> {
                     owner={this.props.status.owner}
                     isOwner={this.props.isOwner}
                     status={this.props.status} 
-                    canComment={this.props.canComment} canReact={this.props.canReact} canMention={this.props.canMention} />
+                    canComment={this.props.canComment} canReact={this.props.canReact} canMention={this.props.canMention} 
+                    isComment={this.props.status.parent != null}/>
             )
         }
     }
-
-    renderCommentList() {
-        return (
-            <CommentList authorizedUserId={this.props.authorizedUserId} canComment={this.props.canComment} communityId={this.props.communityId} canUpload={this.props.canUpload} data={this.props.children} canReact={this.props.canReact}
-                         onCommentEdit={this.props.onCommentEdit}
-                         onCommentDelete={this.props.onCommentDelete} canMention={this.props.canMention}/>
-        )
-    }
-
-    renderCommentForm() {
-        return (
-            <CommentFormContainer
-                communityId={this.props.communityId}
-                canUpload={this.props.canUpload}
-                parentStatus={this.props.status}
-                canMention={this.props.canMention}
-                canComment={this.props.canComment}
-                onCommentSubmit={this.props.onCommentSubmit} 
-                />
-        )
-    }
-
-
     render() {
         return (
             <div className="panel-footer status-footer">
                 {this.renderStats()}
-                {this.renderCommentList()}
-                {this.renderCommentForm()}
             </div>
         );
     }
