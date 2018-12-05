@@ -30,6 +30,7 @@ export interface OwnProps
     authorizedUserId:number
     pageItem:NestedPageItem
     className?:string
+    isLastComment:boolean
 }
 interface State 
 {
@@ -76,7 +77,8 @@ export default class StatusComponent extends React.Component<Props, State>
         let ret = nextState.renderPlaceholder != this.state.renderPlaceholder || nextStatus.id != status.id || 
         nextStatus.updated_at != status.updated_at || 
         nextStatus.serialization_date != status.serialization_date ||
-        nextStatus.reaction_count != status.reaction_count //|| 
+        nextStatus.reaction_count != status.reaction_count || 
+        nextProps.isLastComment != this.props.isLastComment
         //nextStatus.reactions != status.reactions
         //console.log("status id:" + status.id, ret,(status.children_ids || []).length, (nextStatus.children_ids|| []).length, )
         return ret
@@ -130,13 +132,13 @@ export default class StatusComponent extends React.Component<Props, State>
         const isComment = status.parent != null
         if(this.state.renderPlaceholder)
         {
-            let itemClass = classNames("status-placeholder drop-shadow", this.props.className, { statuscomment: isComment, temp: status.pending})
+            let itemClass = classNames("status-placeholder drop-shadow", this.props.className, { statuscomment: isComment, temp: status.pending, last:this.props.isLastComment})
             return <div ref={this.element} className={itemClass}></div>
         }
         let communityId = status.community && status.community.id ? status.community.id : null
         let statusId = "status" + status.id
         let statusType = this.getTypeOfContent(status)
-        let itemClass = classNames("status status-component drop-shadow", statusType, this.props.className, { statuscomment: isComment, temp: status.pending})
+        let itemClass = classNames("status status-component drop-shadow", statusType, this.props.className, { statuscomment: isComment, temp: status.pending, last:this.props.isLastComment})
         const addLinkToContext = !isComment && this.props.addLinkToContext
         return (<div className={itemClass} id={statusId}>
                     <hr className="line"/>

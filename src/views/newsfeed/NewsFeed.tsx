@@ -152,7 +152,6 @@ class NewsFeed extends React.Component<Props, State> {
     }
     renderStatus = (authUser:UserProfile, item:NestedPageItem, isLast:boolean, index:number) => 
     {
-        const cn = isLast ? "last" : undefined
         return <StatusComponent 
         canMention={true}
         canComment={true}
@@ -168,7 +167,8 @@ class NewsFeed extends React.Component<Props, State> {
         pageItem={item} 
         bottomOptionsEnabled={true} 
         authorizedUserId={authUser.id}
-        className={cn} />
+        isLastComment={isLast}
+        />
     }
     renderStatusComposer = (composer:StatusComposer, index:number) => {
             return (
