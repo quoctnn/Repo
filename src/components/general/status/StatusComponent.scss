@@ -4,13 +4,13 @@
         display: none;
         @include var(border-color, $color);
         border-style:solid;
-        border-width: 1px;
+        border-width: thin;
         margin: -8px -8px 5px -8px;
     }
   }
 .status.temp 
 {
-    border:1px solid red;
+    border:thin solid red;
 }
 .status,.status-placeholder
 {
@@ -18,7 +18,7 @@
     background: white;
     padding: 8px;
     padding-bottom: 0;
-    border-width:1px;
+    border-width:thin;
     border-bottom-width: 0;
     border-style:solid;
     @include var(border-color, border-color-default);

@@ -16,7 +16,7 @@
         .chat-message-composer-container
         {
             background: white;
-            border-width:1px;
+            border-width:thin;
             border-style:solid;
             border-top-width: 0;
             @include var(border-color, border-color-default);
@@ -30,9 +30,10 @@
                 right: 0;
                 top: 0;
                 position: absolute;
-                @include var(background, border-color-default);
-                margin: -1px 15px;
-                height: 1px;
+                @include var(border-top-color, border-color-default);
+                margin: 0 15px;
+                border-top-style: solid;
+                border-top-width: thin;
               }
         }
         .status,.status-placeholder
@@ -53,7 +54,7 @@
             }
             &.temp{
 
-                border-top-width:1px;
+                border-top-width:thin;
             }
             &.last 
             {
@@ -74,9 +75,10 @@
                 right: 0;
                 top: 0;
                 position: absolute;
-                @include var(background, border-color-default);
-                margin: -1px 15px;
-                height: 1px;
+                @include var(border-top-color, border-color-default);
+                margin: 0 15px;
+                border-top-style: solid;
+                border-top-width: thin;
               }
         }
         .chat-message-composer-placeholder
@@ -87,7 +89,7 @@
             background: white;
             width: 100%;
 
-            border-width:1px;
+            border-width:thin;
             border-style:solid;
             border-top-width: 0;
             border-bottom-width: 0;
