@@ -39,7 +39,8 @@
     right: 0;
     bottom: 0;
     position: absolute;
-    @include var(background, border-color-default);
-    margin: -1px 15px;
-    height: 1px;
+    @include var(border-top-color, border-color-default);
+    margin: 0 15px;
+    border-top-style: solid;
+    border-top-width: thin;
   }
