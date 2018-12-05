@@ -6,7 +6,7 @@ import { NotificationCenter } from '../../notifications/NotificationCenter';
 import { connect } from 'react-redux';
 import { RootState } from '../../reducers';
 import { UserStatus } from '../../types/intrasocial_types';
-import * as Actions from "../../actions/Actions" 
+import * as Actions from "../../actions/Actions"
 import { AuthenticationManager } from '../../managers/AuthenticationManager';
 import { EventStreamManager } from '../../managers/EventStreamManager';
 
@@ -51,8 +51,11 @@ export const sendUserStatus = (status: UserStatus) => {
   );
 }
 const socket_options = {
-  connectionTimeout: 4000,
-  maxRetries: 10
+  maxRetries: 20,
+  maxReconnectionDelay: 256000,
+  minReconnectionDelay: 8000,
+  reconnectionDelayGrowFactor: 6.0,
+  connectionTimeout: 8000,
 };
 class EventQueueLock
 {
@@ -110,7 +113,7 @@ interface ReduxStateProps
 interface ReduxDispatchProps{
   setDirtyPagedData:() => void
 }
-interface State 
+interface State
 {
 }
 type Props = OwnProps & ReduxDispatchProps & ReduxStateProps
