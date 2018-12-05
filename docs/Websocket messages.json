@@ -115,8 +115,14 @@
             "data": "StatusObject",
             "status_id": 1,
             "type": "status.update"
+          },
+          {
+            "data": {
+              "id": 241
+            },
+            "status_id": 241,
+            "type": "status.deleted"
           }
-
         ]
       }
     ],

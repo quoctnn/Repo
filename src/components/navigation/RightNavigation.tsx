@@ -12,16 +12,17 @@ import { Settings } from '../../utilities/Settings';
 import { cloneDictKeys } from '../../utilities/Utilities';
 import { NotificationCenter } from "../../notifications/NotificationCenter";
 import { UserProfile, avatarStateColorForUserProfile } from "../../types/intrasocial_types";
+import { ProfileManager } from '../../managers/ProfileManager';
 require("./RightNavigation.scss")
 interface State {
     contacts:UserProfile[],
     isTyping:any
 }
 
-export interface OwnProps 
+export interface OwnProps
 {
 }
-interface ReduxStateProps 
+interface ReduxStateProps
 {
     profiles:{[id:number]:UserProfile}
     contacts:number[]
@@ -42,10 +43,12 @@ class RightNavigation extends React.Component<Props, {}> {
     componentDidMount()
     {
         NotificationCenter.addObserver("eventstream_" + EventStreamMessageType.CONVERSATION_TYPING, this.isTypingHandler)
+        NotificationCenter.addObserver("eventstream_" + EventStreamMessageType.USER_UPDATE, this.isUserUpdateHandler)
     }
     componentWillUnmount()
     {
         NotificationCenter.removeObserver("eventstream_" + EventStreamMessageType.CONVERSATION_TYPING, this.isTypingHandler)
+        NotificationCenter.removeObserver("eventstream_" + EventStreamMessageType.USER_UPDATE, this.isUserUpdateHandler)
     }
     isTypingHandler(...args:any[])
     {
@@ -62,7 +65,7 @@ class RightNavigation extends React.Component<Props, {}> {
         {
             clearTimeout(oldUserTimer)
         }
-        it[user] = setTimeout(() => 
+        it[user] = setTimeout(() =>
         {
             let st = this.state.isTyping
             let it = cloneDictKeys(st)
@@ -72,6 +75,10 @@ class RightNavigation extends React.Component<Props, {}> {
         }, Settings.clearSomeoneIsTypingInterval)
         this.setState({isTyping:it})
     }
+    isUserUpdateHandler(...args:any[]) {
+        let object = args[0];
+        ProfileManager.storeProfile(object);
+    }
     componentDidUpdate()
     {
         this.checkUpdate()
@@ -79,13 +86,13 @@ class RightNavigation extends React.Component<Props, {}> {
     checkUpdate()
     {
         let newContacts:UserProfile[] = []
-        this.props.contacts.forEach((id) => 
+        this.props.contacts.forEach((id) =>
         {
             let f = this.props.profiles[id]
             if(f)
             newContacts.push(f)
         })
-        var needsUpdate = false 
+        var needsUpdate = false
         let currentContacts = this.state.contacts
         if (currentContacts.length != newContacts.length)
         {
@@ -97,7 +104,7 @@ class RightNavigation extends React.Component<Props, {}> {
             this.setState({contacts: newContacts})
     }
     render() {
-        
+
         return(
             <div id="right-navigation" className="d-flex transition">
                 <CollapsiblePanel id="right-navigation" arrowDirectionCollapsed={ArrowDirectionCollapsed.LEFT}>
