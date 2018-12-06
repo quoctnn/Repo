@@ -6,10 +6,10 @@ import { RootState } from '../reducers';
 import { UserProfile } from '../types/intrasocial_types';
 export abstract class ProfileManager
 {
-    static setup = () => 
+    static setup = () =>
     {
     }
-    static ensureProfilesExists = (profiles:number[], completion:() => void) => 
+    static ensureProfilesExists = (profiles:number[], completion:() => void) =>
     {
         let store = ProfileManager.getStore()
         let state = store.getState()
@@ -23,22 +23,22 @@ export abstract class ProfileManager
                 {
                     store.dispatch(Actions.storeProfiles(data.results))
                 }
-                else 
+                else
                 {
                     console.log("error fetching profiles", error)
                 }
                 completion()
             })
         }
-        else 
+        else
         {
             completion()
         }
     }
-    static getProfileByUsername = (name: string): UserProfile|null => 
+    static getProfileByUsername = (name: string): UserProfile|null =>
     {
         let s = ProfileManager.getStore().getState();
-        if (s.auth.profile && s.auth.profile.username == name) 
+        if (s.auth.profile && s.auth.profile.username == name)
           return s.auth.profile;
         let keys = Object.keys( s.profileStore.byId);
         let k = keys.find(k => s.profileStore.byId[k].username == name)
@@ -48,7 +48,7 @@ export abstract class ProfileManager
         }
         return null
     }
-    static getProfile = (profile:number) => 
+    static getProfile = (profile:number) =>
     {
         let s = ProfileManager.getStore().getState()
         let authUser = s.auth.profile!
@@ -56,7 +56,7 @@ export abstract class ProfileManager
             return authUser
         return s.profileStore.byId[profile]
     }
-    static getProfiles = (profiles:number[]) => 
+    static getProfiles = (profiles:number[]) =>
     {
         let s = ProfileManager.getStore().getState()
         let authUser = s.auth.profile!
@@ -73,7 +73,7 @@ export abstract class ProfileManager
         return compareString.toLowerCase().indexOf(query.toLowerCase()) > -1
     }
 
-    static searchProfiles = ( query:string, communityId?:number) => 
+    static searchProfiles = ( query:string, communityId?:number) =>
     {
         var searchables:number[] = []
         if(communityId)
@@ -83,12 +83,12 @@ export abstract class ProfileManager
             {
                 searchables = community.members
             }
-            else 
+            else
             {
                 //no community
             }
         }
-        else 
+        else
         {
             searchables = ProfileManager.getContactListIds()
         }
@@ -100,6 +100,9 @@ export abstract class ProfileManager
     }
     static storeProfiles = (profiles:UserProfile[]) => {
         ProfileManager.getStore().dispatch(Actions.storeProfiles(profiles))
+    }
+    static storeProfile = (profile:UserProfile) => {
+        ProfileManager.getStore().dispatch(Actions.storeProfile(profile))
     }
     static setContactListCache = (contacts:number[]) => {
         ProfileManager.getStore().dispatch(Actions.setContactListCache(contacts))
