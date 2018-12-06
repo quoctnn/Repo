@@ -12,7 +12,6 @@ import { cloneDictKeys, nullOrUndefined } from '../../utilities/Utilities';
 import * as Actions from '../../actions/Actions'; 
 import { FullPageComponent } from '../../components/general/FullPageComponent';
 import { getConversationTitle } from '../../utilities/ConversationUtilities';
-import { getDefaultCachePage } from '../../reducers/createPaginator';
 import { PaginationUtilities } from '../../utilities/PaginationUtilities';
 import { QueueUtilities } from '../../utilities/QueueUtilities';
 import { messageReducerPageSize } from '../../reducers/messages';

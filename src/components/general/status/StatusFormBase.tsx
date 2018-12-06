@@ -22,7 +22,6 @@ export interface OwnProps
     files?:UploadedFile[]
     content?:string 
     mentions?:Mention[]
-    parentStatus?:Status
     mentionSearch:(search:string, completion:(mentions:Mention[]) => void) => void
     className?:string
 }

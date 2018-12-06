@@ -1,8 +1,8 @@
 import * as React from 'react';
-import CommentList from './CommentList';
 import StatusFooterStats from './StatusFooterStats';
 import { NestedPageItem } from '../../../utilities/PaginationUtilities';
 import { Status, UploadedFile } from '../../../types/intrasocial_types';
+import { StatusActions } from './StatusComponent';
 require("./StatusFooter.scss");
 
 export interface Props 
@@ -10,7 +10,7 @@ export interface Props
     bottomOptionsEnabled:boolean
     commentsCount:number 
     created_at:string 
-    onReact:(reaction: string) => void
+    onActionPress:(action:StatusActions, extra?:Object) => void
     reactions:{[id:string]:number[]}
     reactionsCount:number
     reaction:string
@@ -45,7 +45,7 @@ export default class StatusFooter extends React.Component<Props, State> {
                     canUpload={this.props.canUpload}
                     commentsCount={this.props.commentsCount}
                     created_at={this.props.created_at}
-                    onReact={this.props.onReact}
+                    onReact={this.props.onActionPress}
                     reaction={this.props.reaction}
                     reactions={this.props.reactions}
                     reactionsCount={this.props.reactionsCount}

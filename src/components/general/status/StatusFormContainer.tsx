@@ -5,10 +5,7 @@ import { Mention } from '../../input/MentionEditor';
 import ApiClient from '../../../network/ApiClient';
 import { IEditorComponent, EditorContent } from '../ChatMessageComposer';
 import { TempStatus, UploadedFile, Status } from '../../../types/intrasocial_types';
-import { RootState } from '../../../reducers';
 import { NestedPageItem } from '../../../utilities/PaginationUtilities';
-import { connect } from 'react-redux';
-import * as Actions from '../../../actions/Actions';
 import { CommentForm } from './CommentForm';
 import classNames = require('classnames');
 require("./StatusFormContainer.scss");
@@ -16,21 +13,17 @@ require("./StatusFormContainer.scss");
 
 interface OwnProps 
 {
-    pageItem:NestedPageItem
     onCommentSubmit?:(comment:TempStatus, files:UploadedFile[]) => void
     onStatusSubmit?:(status:TempStatus, files:UploadedFile[]) => void
-    contextNaturalKey?:string
-    contextObjectId?:number
+    contextNaturalKey:string
+    contextObjectId:number
     canMention:boolean
     canComment:boolean
     canUpload:boolean
     className?:string
+    statusId:number
+    community?:number
 }
-interface ReduxStateProps
-{
-    parentStatus:Status
-}
-interface ReduxDispatchProps{}
 interface State 
 {
     text: string,
@@ -41,8 +34,8 @@ interface State
     mentions: number[]
     renderPlaceholder:boolean
 }
-export type Props = ReduxStateProps & OwnProps
-class StatusFormContainer extends React.Component<Props, State> {  
+export type Props = OwnProps
+export default class StatusFormContainer extends React.Component<Props, State> {  
 
     formRef = React.createRef<IEditorComponent & any>();
     element = React.createRef<HTMLDivElement>()
@@ -97,10 +90,10 @@ class StatusFormContainer extends React.Component<Props, State> {
     }
     handleMentionSearch(search:string, completion:(mentions:Mention[]) => void)
     {
-        if(this.props.pageItem.community)
+        if(this.props.community)
         {
             console.log("searching", search)
-            ApiClient.getCommunityMembers(this.props.pageItem.community, (data, status, error) => {
+            ApiClient.getCommunityMembers(this.props.community, (data, status, error) => {
                 completion(data.map(u => Mention.fromUser(u)))
             })
         }
@@ -126,7 +119,7 @@ class StatusFormContainer extends React.Component<Props, State> {
                 link: link,
                 context_natural_key: this.props.contextNaturalKey,
                 context_object_id: this.props.contextObjectId,
-                parent: this.props.pageItem.id,
+                parent: this.props.statusId,
                 mentions: this.state.mentions
             };
     
@@ -134,8 +127,8 @@ class StatusFormContainer extends React.Component<Props, State> {
             // Statuses with a parent node are comments.
             if (status.parent && status.parent > 0) {
                 // Comment must have same context as parent:
-                status.context_natural_key = this.props.parentStatus.context_natural_key;
-                status.context_object_id = this.props.parentStatus.context_object_id;
+                status.context_natural_key = this.props.contextNaturalKey;
+                status.context_object_id = this.props.contextObjectId;
     
                 this.props.onCommentSubmit(status, this.state.files);
             } else {
@@ -270,7 +263,8 @@ class StatusFormContainer extends React.Component<Props, State> {
             let itemClass = classNames("chat-message-composer chat-message-composer-placeholder secondary-text", this.props.className)
             return <div ref={this.element} className={itemClass}></div>
         }
-        if ((this.props.canComment && this.props.parentStatus.can_comment) || false) {
+        if (this.props.canComment) 
+        {
             const canPost = this.canPost()
             return (
                 <CommentForm
@@ -278,7 +272,7 @@ class StatusFormContainer extends React.Component<Props, State> {
                     mentionSearch={this.handleMentionSearch}
                     ref={this.formRef}
                     onDidType={this.onDidType}
-                    communityId={this.props.pageItem.community}
+                    communityId={this.props.community}
                     canUpload={this.props.canUpload}
                     //onTextChange={this.handleTextChange}
                     canPost={canPost}
@@ -289,7 +283,6 @@ class StatusFormContainer extends React.Component<Props, State> {
                     onFileQueueComplete={this.handleFileQueueComplete}
                     onChangeMentions={this.handleMentions}
                     canMention={this.props.canMention}
-                    parentStatus={this.props.parentStatus}
                     className={this.props.className}
                     />
             );
@@ -298,17 +291,3 @@ class StatusFormContainer extends React.Component<Props, State> {
         }
     }
 }
-const mapStateToProps = (state:RootState, ownProps: OwnProps):ReduxStateProps => {
-    return {
-        parentStatus:ownProps.pageItem.isTemporary ? state.queue.statusMessages.find(i => i.id == ownProps.pageItem.id) : state.statuses.items[ownProps.pageItem.id]
-    }
-}
-const mapDispatchToProps = (dispatch:any, ownProps: OwnProps):ReduxDispatchProps => {
-    return {
-
-        setStatusReaction:(status:Status, reactions:{ [id: string]: number[] },reaction_count:number) => {
-            dispatch(Actions.setStatusReactions(status, reactions, reaction_count));
-        }
-    }
-}
-export default connect<ReduxStateProps, ReduxDispatchProps, OwnProps>(mapStateToProps, mapDispatchToProps)(StatusFormContainer);

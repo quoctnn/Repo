@@ -4,13 +4,14 @@ import StatusOptions from './StatusOptions';
 import { StatusUtilities } from '../../../utilities/StatusUtilities';
 import ReactionStats from './ReactionStats';
 import { Status, UploadedFile, UserProfile } from '../../../types/intrasocial_types';
+import { StatusActions } from './StatusComponent';
 require("./StatusFooterStats.scss");
 
 export interface Props 
 {
     commentsCount:number
     created_at:string
-    onReact:(reaction:string) => void
+    onReact:(action:StatusActions, extra?:Object) => void
     reaction:string
     reactionsCount:number
     reactions:{[id:string]:number[]}
