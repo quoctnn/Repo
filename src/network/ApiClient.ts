@@ -87,7 +87,7 @@ export default class ApiClient
             callback(null, status, error)
         })
     }
-    static createConversation(title:string, users:number[], callback:ApiClientCallback) 
+    static createConversation(title:string, users:number[], callback:ApiClientCallback)
     {
         let d:any = {users}
         if(title)
@@ -100,7 +100,7 @@ export default class ApiClient
             callback(null, status, error)
         })
     }
-    static getProfile(id:number, callback:ApiClientCallback) 
+    static getProfile(id:number, callback:ApiClientCallback)
     {
         AjaxRequest.get(Constants.apiRoute.profileUrl(id), (data, status, request) => {
             callback(data, status, null)
@@ -108,7 +108,7 @@ export default class ApiClient
             callback(null, status, error)
         })
     }
-    static getProfileBySlug(slug:string, callback:ApiClientCallback) 
+    static getProfileBySlug(slug:string, callback:ApiClientCallback)
     {
         AjaxRequest.get(Constants.apiRoute.profilesUrl + "?slug_name=" + encodeURIComponent( slug ), (data, status, request) => {
             callback(data, status, null)
@@ -116,7 +116,7 @@ export default class ApiClient
             callback(null, status, error)
         })
     }
-    static getMyProfile(callback:ApiClientCallback) 
+    static getMyProfile(callback:ApiClientCallback)
     {
         AjaxRequest.get(Constants.apiRoute.myProfileUrl, (data, status, request) => {
             callback(data, status, null)
@@ -160,6 +160,24 @@ export default class ApiClient
     static getGroups(community:number, limit:number, offset:number,callback:ApiClientCallback)
     {
         let url = Constants.apiRoute.groupsUrl + "?limit=" + limit + "&offset=" + offset + "&community=" + community;
+        AjaxRequest.get(url, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
+    static getEvents(community:number, limit:number, offset:number,callback:ApiClientCallback)
+    {
+        let url = Constants.apiRoute.eventsUrl + "?limit=" + limit + "&offset=" + offset + "&community=" + community;
+        AjaxRequest.get(url, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
+    static getProjects(community:number, limit:number, offset:number,callback:ApiClientCallback)
+    {
+        let url = Constants.apiRoute.projectsUrl + "?limit=" + limit + "&offset=" + offset + "&community=" + community;
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
@@ -212,7 +230,7 @@ export default class ApiClient
         })
     }
 }
-export class FileUploader 
+export class FileUploader
 {
     file:Blob
     progress:(percent:number) => void

@@ -6,6 +6,10 @@ import settings from './settings';
 import auth from './auth';
 import groupStore from './groupStore';
 import groupListCache from './groupListCache';
+import eventStore from './eventStore';
+import eventListCache from './eventListCache';
+import projectStore from './projectStore';
+import projectListCache from './projectListCache';
 import communityStore from './communityStore';
 import { profileStore } from './profileStore';
 import contactListCache from './contactListCache';
@@ -26,11 +30,12 @@ const rootPersistConfig:PersistConfig = {
   storage: storageLocal,
   blacklist: ['auth'],
   debug:true,
-} 
+}
 const rootReducer = combineReducers({
-  //debug: persistReducer(debugConfig, debug), 
-  settings, auth, profileStore, communityStore, groupStore, groupListCache, contactListCache, debug,
-   queue, conversations, messages, embedlyStore, statuses
+  //debug: persistReducer(debugConfig, debug),
+  settings, auth, profileStore, communityStore, groupStore, groupListCache,
+  eventStore, eventListCache, projectStore, projectListCache, contactListCache,
+   debug, queue, conversations, messages, embedlyStore, statuses
 })
 export default persistReducer(rootPersistConfig, rootReducer)
 export interface RootState
@@ -41,6 +46,10 @@ export interface RootState
       communityStore: any;
       groupStore: any;
       groupListCache: any;
+      eventStore: any;
+      eventListCache: any;
+      projectStore: any;
+      projectListCache: any;
       contactListCache: any;
       queue:{chatMessages:Message[], statusMessages:Status[]};
       conversations:{pagination:CachePageV2<Conversation>};

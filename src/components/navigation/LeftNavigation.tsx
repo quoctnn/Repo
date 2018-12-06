@@ -1,5 +1,5 @@
 import * as React from "react";
-import CommunityTreeItem from '../general/CommunityTreeItem';
+import CommunityTreeItem from '../general/community/CommunityTreeItem';
 import { connect } from 'react-redux'
 import { RootState } from "../../reducers";
 import { Community } from "../../types/intrasocial_types";
@@ -47,7 +47,7 @@ class LeftNavigation extends React.Component<Props, {}> {
             if(!document.body.classList.contains(LeftNavigation.leftMenuOpen))
                 document.body.classList.add(LeftNavigation.leftMenuOpen)
         }
-        else 
+        else
         {
             if(document.body.classList.contains(LeftNavigation.leftMenuOpen))
                 document.body.classList.remove(LeftNavigation.leftMenuOpen)
@@ -81,7 +81,7 @@ class LeftNavigation extends React.Component<Props, {}> {
 }
 const mapStateToProps = (state:RootState) => {
     return {
-        communities:state.communityStore.communities, 
+        communities:state.communityStore.communities,
     };
 }
 export default connect(mapStateToProps, null)(LeftNavigation);

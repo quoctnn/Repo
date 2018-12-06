@@ -7,6 +7,8 @@ import NewsFeed from "../views/newsfeed/NewsFeed";
 import TopNavigation from '../components/navigation/TopNavigation';
 import { Community } from "../views/community/Community";
 import GroupView from '../views/group/Group';
+import EventView from '../views/event/Event';
+import ProjectView from '../views/project/Project';
 import { error404 } from '../views/error/error404';
 import Signin from "../views/signin/Signin";
 import { ToastContainer } from 'react-toastify';
@@ -26,17 +28,17 @@ require("./Main.scss");
 
 interface State {
 }
-export interface OwnProps 
+export interface OwnProps
 {
 }
-interface ReduxStateProps 
+interface ReduxStateProps
 {
   signedIn:boolean
 }
-interface ReduxDispatchProps 
+interface ReduxDispatchProps
 {
 }
-interface State 
+interface State
 {
 }
 type Props = ReduxStateProps & ReduxDispatchProps & OwnProps
@@ -45,7 +47,7 @@ class Main extends React.Component<Props, {}> {
   constructor(props) {
     super(props);
   }
-  render() { 
+  render() {
     return (
           <Router ref="router">
             <div id="main-content">
@@ -54,13 +56,13 @@ class Main extends React.Component<Props, {}> {
                     <div id="content-block" className="transition">
                         <div className="container">
                             <div className="row">
-                            {!this.props.signedIn && 
+                            {!this.props.signedIn &&
                               <Switch>
                                 {!Settings.isProduction && <Route path={Routes.DEVELOPER_TOOL} component={DevTool} /> }
                                 <Route path={Routes.SIGNIN} component={Signin} />
-                                </Switch> 
+                                </Switch>
                             }
-                            {this.props.signedIn && 
+                            {this.props.signedIn &&
                               <Switch>
                                 {!Settings.isProduction && <Route path={Routes.DEVELOPER_TOOL} component={DevTool} /> }
                                 <Route path={Routes.SIGNIN} component={Signin} />
@@ -71,7 +73,9 @@ class Main extends React.Component<Props, {}> {
                                 <Route path={Routes.CONVERSATIONS} component={Conversations} />
                                 <Route path={Routes.CONVERSATION + ":conversationid"} component={ConversationView} />
 
-                                <Route path={Routes.COMMUNITY + ":communityid/:groupname"} component={GroupView} />
+                                <Route path={Routes.COMMUNITY + ":communityid/group/:groupname"} component={GroupView} />
+                                <Route path={Routes.COMMUNITY + ":communityid/event/:eventname"} component={EventView} />
+                                <Route path={Routes.COMMUNITY + ":communityid/project/:projectname"} component={ProjectView} />
                                 <Route path={Routes.COMMUNITY + ":communityname"} component={Community} />
                                 <Route path={Routes.ROOT} exact={true} component={NewsFeed} />
                                 <Route path={Routes.UPDATE_TOOL} exact={true} component={UpdateTool} />

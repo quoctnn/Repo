@@ -1,15 +1,15 @@
 import * as React from 'react';
-import * as Actions from "../../actions/Actions" 
+import * as Actions from "../../../actions/Actions"
 import { connect } from 'react-redux'
-import {CommunityGroups } from '../../reducers/groupListCache';
-import ApiClient from '../../network/ApiClient';
-import LoadingSpinner from './LoadingSpinner';
+import {CommunityGroups } from '../../../reducers/groupListCache';
+import ApiClient from '../../../network/ApiClient';
+import LoadingSpinner from '../LoadingSpinner';
 import { Button } from 'reactstrap';
-import { translate } from '../intl/AutoIntlProvider';
+import { translate } from '../../intl/AutoIntlProvider';
 import { Link } from 'react-router-dom';
-import { Routes } from '../../utilities/Routes';
-import { RootState } from '../../reducers';
-import { Group } from '../../types/intrasocial_types';
+import { Routes } from '../../../utilities/Routes';
+import { RootState } from '../../../reducers';
+import { Group } from '../../../types/intrasocial_types';
 export interface Props {
     community_id:number,
     pageSize?:number,
@@ -34,12 +34,12 @@ class GroupList extends React.Component<Props, {}> {
         setCommunityGroups:null,
         appendCommunityGroups:null,
         groupStore:[]
-        
+
     }
     constructor(props) {
         super(props);
         this.state = {
-            loading:false, 
+            loading:false,
             data:[],
             cache: new CommunityGroups([], this.props.community_id, 0),
             offset:0,
@@ -72,7 +72,7 @@ class GroupList extends React.Component<Props, {}> {
             if(data && data != this.state.cache)
             {
                 let result = []
-                data.groups.forEach((id) => 
+                data.groups.forEach((id) =>
                 {
                     let f = this.props.groupStore.find( i => i.id == id)
                     if(f)
@@ -87,7 +87,7 @@ class GroupList extends React.Component<Props, {}> {
         this.setState({loading:false}, () => {
             if(this.state.data && this.state.data.length > 0)
                 this.props.appendCommunityGroups(this.props.community_id, data.results)
-            else 
+            else
                 this.props.setCommunityGroups(this.props.community_id, data.results, data.count)
         })
     }
@@ -132,7 +132,7 @@ class GroupList extends React.Component<Props, {}> {
         return (<ul className="group-list">
                     {groups.map((g, index) => {
                         return (<li className="text-truncate" key={index}>
-                            <Link to={Routes.COMMUNITY + g.community + "/" + g.slug}>{g.name}</Link>
+                            <Link to={Routes.COMMUNITY + g.community + "/group/" + g.slug}>{g.name}</Link>
                             </li>)
                     }) }
                     {this.renderLoadMore()}

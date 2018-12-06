@@ -55,7 +55,7 @@ export default  {
         },
 
         // Project URLs
-        projectUrl: '/api/v1/project/',
+        projectsUrl: '/api/v1/project/',
         projectDetailUrl: (id) => {
             return `/api/v1/project/${id}/`
         },
@@ -98,6 +98,7 @@ export default  {
 
         // Event URLs
         upcomingEventsUrl: '/api/v1/event/upcoming/',
+        eventsUrl: '/api/v1/event/',
         eventFilesUrl: (id) => {
             return `/api/v1/event/${id}/files/`
         },

@@ -25,7 +25,7 @@ export interface Props {
   clearDataStore: () => void;
   enablePushNotifications: () => void;
 }
-interface State 
+interface State
 {
   accessToken: string;
   websocketData: string;
@@ -40,7 +40,7 @@ class DevTool extends React.PureComponent<Props, State> {
       dialogVisible:false
     };
   }
-  componentDidMount() 
+  componentDidMount()
   {
   }
   renderThemeSelector() {
@@ -338,6 +338,10 @@ const mapDispatchToProps = dispatch => {
       dispatch(Actions.resetCommunityStore());
       dispatch(Actions.resetGroupStore());
       dispatch(Actions.resetCommunityGroupsCache());
+      dispatch(Actions.resetEventStore());
+      dispatch(Actions.resetCommunityEventsCache());
+      dispatch(Actions.resetProjectStore());
+      dispatch(Actions.resetCommunityProjectsCache());
       dispatch(Actions.setApiEndpoint(index));
       dispatch(Actions.resetProfileStore());
     },
@@ -348,8 +352,12 @@ const mapDispatchToProps = dispatch => {
     },
     clearDataStore: () => {
       dispatch(Actions.resetPagedData());
-      dispatch(Actions.resetEmbedlyStore());
-      dispatch(Actions.resetQueueData());
+      dispatch(Actions.resetGroupStore());
+      dispatch(Actions.resetCommunityGroupsCache());
+      dispatch(Actions.resetEventStore());
+      dispatch(Actions.resetCommunityEventsCache());
+      dispatch(Actions.resetProjectStore());
+      dispatch(Actions.resetCommunityProjectsCache());
     },
     sendOnWebsocket: (data: string) => {
       sendOnWebsocket(data);

@@ -8,7 +8,7 @@ export interface ICommunity
   id:number
   name:string
   slug_name:string
-  
+
 }
 export interface Community extends ICommunity
 {
@@ -20,7 +20,7 @@ export interface Community extends ICommunity
     relationship: any,
     updated_at:string
 }
-export interface TempStatus 
+export interface TempStatus
 {
   text: string
   privacy: string
@@ -59,7 +59,7 @@ export interface Status extends TempStatus
     extra?:string
     highlights?:{[id:string]:[string]}
 }
-export interface FileUpload 
+export interface FileUpload
 {
     file:File
     progress:number
@@ -70,7 +70,7 @@ export interface FileUpload
     fileId?:number
 }
 
-export class Message 
+export class Message
 {
     id!:number
     pending?:boolean
@@ -79,14 +79,14 @@ export class Message
     conversation!:number
     text!:string
     attachment:any
-    created_at!:string 
+    created_at!:string
     updated_at!:string
     read_by!:number[]
     mentions!:number[]
     files?:UploadedFile[]
     tempFile?:FileUpload
 }
-export enum UploadedFileType 
+export enum UploadedFileType
 {
     IMAGE = "image",
     DOCUMENT = "document",
@@ -94,11 +94,11 @@ export enum UploadedFileType
     AUDIO = "audio",
 }
 
-export interface UploadedFile 
+export interface UploadedFile
 {
     id:number
     user:number
-    filename:string 
+    filename:string
     file:string
     type:string
     extension:string
@@ -110,7 +110,7 @@ export interface UploadedFile
     created_at:string
 }
 type FileIcon = {name:string, color:string}
-export const fileIcon = (file:UploadedFile) => 
+export const fileIcon = (file:UploadedFile) =>
 {
     switch(file.type)
     {
@@ -121,21 +121,21 @@ export const fileIcon = (file:UploadedFile) =>
         default:return documentIcon(file.extension)
     }
 }
-export const videoIcon = (extension:string):FileIcon => 
+export const videoIcon = (extension:string):FileIcon =>
 {
     switch(extension)
     {
         default: return {name:"file-video", color:"#A63636"}
     }
 }
-export const audioIcon = (extension:string):FileIcon => 
+export const audioIcon = (extension:string):FileIcon =>
 {
     switch(extension)
     {
         default: return {name:"file-audio", color:"#FFD00C"}
     }
 }
-export const imageIcon = (extension:string):FileIcon => 
+export const imageIcon = (extension:string):FileIcon =>
 {
     switch(extension)
     {
@@ -158,7 +158,7 @@ export const documentIcon = (extension:string):FileIcon => {
         case "odt": return {name:"file-word", color:"#547980"}
 
         case "xlsx":
-        case "xls": 
+        case "xls":
         case "ods": return {name:"file-excel", color:"#6abe67"}
 
         default: return {name:"file-alt", color:"#4A87EC"}
@@ -214,6 +214,43 @@ export interface Group {
     parent: number
     updated_at: string
 }
+export interface Event {
+    id: number
+    name: string
+    slug: string
+    cover: string
+    community: number
+    cover_cropped: string
+    cover_thumbnail: string
+    description: string
+    creator: UserProfile
+    privacy: string
+    attendees_count: number
+    attending: number[]
+    not_attending: number[]
+    created_at: string
+    group: Group
+    updated_at: string
+}
+export interface Project {
+    id: number
+    name: string
+    slug: string
+    cover: string
+    community: number
+    cover_cropped: string
+    cover_thumbnail: string
+    description: string
+    creator: UserProfile
+    privacy: string
+    tasks: number
+    tags: string[]
+    members: number[]
+    members_count: number
+    created_at: string
+    group: Group
+    updated_at: string
+}
 function strEnum<T extends string>(o: Array<T>): {[K in T]: K} {
     return o.reduce((res, key) => {
         res[key] = key;
@@ -237,9 +274,9 @@ export interface StatusReactionProps
     innerRef?: any
     selected:boolean
 }
-export abstract class StatusReactionUtilities 
+export abstract class StatusReactionUtilities
 {
-    public static iconNameForReaction = (reaction:StatusReaction, large = true, showBackground:boolean) => 
+    public static iconNameForReaction = (reaction:StatusReaction, large = true, showBackground:boolean) =>
     {
         switch (reaction)
         {
@@ -249,7 +286,7 @@ export abstract class StatusReactionUtilities
             case StatusReaction.LIKE : return "thumbs-up"
         }
     }
-    public static styleForReaction = (reaction:StatusReaction, large = true, selected:boolean) => 
+    public static styleForReaction = (reaction:StatusReaction, large = true, selected:boolean) =>
     {
         const size = StatusReactionUtilities.size(large)
         var style:React.CSSProperties = {
@@ -263,7 +300,7 @@ export abstract class StatusReactionUtilities
         }
         return style
     }
-    public static wrapperStyleForReaction = (reaction:StatusReaction, large = true, showBackground:boolean) => 
+    public static wrapperStyleForReaction = (reaction:StatusReaction, large = true, showBackground:boolean) =>
     {
         var style:React.CSSProperties = {
             justifyContent:"center",
@@ -278,11 +315,11 @@ export abstract class StatusReactionUtilities
         }
         return style
     }
-    public static size = (large = true) => 
+    public static size = (large = true) =>
     {
         return large ? 32 : 16
     }
-    public static parseStatusReaction = (reaction:string):StatusReaction => 
+    public static parseStatusReaction = (reaction:string):StatusReaction =>
     {
         switch (reaction)
         {
@@ -292,26 +329,26 @@ export abstract class StatusReactionUtilities
             default : return StatusReaction.LIKE
         }
     }
-    public static reactionsList = ():StatusReaction[] => 
+    public static reactionsList = ():StatusReaction[] =>
     {
         var arr = []
         for(var n in StatusReaction) {
-            if (typeof StatusReaction[n] === 'string') 
+            if (typeof StatusReaction[n] === 'string')
             {
                 arr.push(StatusReaction[n]);
             }
         }
         return arr.map(s => StatusReactionUtilities.parseStatusReaction(s))
     }
-    public static classNameForReactionContainer = (reaction:StatusReaction, large = true, showBackground:boolean) => 
+    public static classNameForReactionContainer = (reaction:StatusReaction, large = true, showBackground:boolean) =>
     {
         return "emoji-reaction-container" + (large ? " large fa-2x": "") + (showBackground ? " fa-stack-1-5" : "" )
     }
-    public static classNameForReactionBackground = (reaction:StatusReaction, large = true) => 
+    public static classNameForReactionBackground = (reaction:StatusReaction, large = true) =>
     {
         return "fas fa-circle fa-stack-1-5x emoji-reaction-bg " + reaction
     }
-    public static classNameForReaction = (reaction:StatusReaction, large = true, showBackground:boolean) => 
+    public static classNameForReaction = (reaction:StatusReaction, large = true, showBackground:boolean) =>
     {
         var ret = "far emoji-reaction " + reaction + (showBackground ? " fa-stack-1x fa-inverse" : "")
         switch (reaction)
@@ -324,7 +361,7 @@ export abstract class StatusReactionUtilities
         ret += (large ? " large": "")
         return ret
     }
-    public static Component = (props:StatusReactionProps) => 
+    public static Component = (props:StatusReactionProps) =>
     {
         let showBG = nullOrUndefined (props.showBackground ) ? true : props.showBackground
         return (<span onClick={props.onClick} className={StatusReactionUtilities.classNameForReactionContainer(props.reaction, props.large, showBG)}>
@@ -357,7 +394,7 @@ export interface UserProfile {
     username: string,
     uuid:string|null,
     user_status:UserStatus,
-    biography:string, 
+    biography:string,
     slug_name:string,
     updated_at:number
     relationship?: string[],
@@ -387,25 +424,25 @@ export enum AvatarStateColor
 {
     GREEN = "green",
     ORANGE = "orange",
-    RED = "red", 
+    RED = "red",
     GRAY = "gray",
     NONE = "none",
 }
-export interface EmbedlyMedia 
+export interface EmbedlyMedia
 {
     height:number
     width:number
     type:string
     html:string
 }
-export interface EmbedlyItem 
+export interface EmbedlyItem
 {
     url:string
     provider_url:string
     original_url:string
-    description:string 
+    description:string
     title:string
-    thumbnail_url:string 
+    thumbnail_url:string
     thumbnail_width:number
     thumbnail_height:number
     media:EmbedlyMedia

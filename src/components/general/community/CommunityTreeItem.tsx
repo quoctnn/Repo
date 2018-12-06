@@ -1,9 +1,11 @@
 import * as React from "react";
-import { Avatar } from '../general/Avatar';
-import { translate } from '../intl/AutoIntlProvider';
-import GroupList from './GroupList'; 
+import { Avatar } from '../Avatar';
+import { translate } from '../../intl/AutoIntlProvider';
+import GroupList from './GroupList';
+import ProjectList from './ProjectList';
+import EventList from './EventList';
 import { connect } from 'react-redux'
-import { RootState } from "../../reducers";
+import { RootState } from "../../../reducers";
 require("./CommunityTreeItem.scss");
 export interface Props {
     communityData:any,
@@ -40,8 +42,8 @@ class CommunityTreeItem extends React.Component<Props, {}> {
         super(props);
         this.subListItems = [
             new SubListItem("group-list", "Groups", <GroupList community_id={this.props.communityData.id}/>),
-            new SubListItem("project-list", "Projects", <GroupList community_id={this.props.communityData.id}/>),
-            new SubListItem("event-list", "Events", <GroupList community_id={this.props.communityData.id}/>),
+            new SubListItem("project-list", "Projects", <ProjectList community_id={this.props.communityData.id}/>),
+            new SubListItem("event-list", "Events", <EventList community_id={this.props.communityData.id}/>),
         ],
         this.state = {listOpenState:this.subListItems.map(() => false)}
     }
@@ -63,7 +65,7 @@ class CommunityTreeItem extends React.Component<Props, {}> {
                     })}
                 </ul>)
     }
-    render() 
+    render()
     {
         return(
             <div className="community-tree-item transition">
