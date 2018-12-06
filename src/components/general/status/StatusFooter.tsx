@@ -45,17 +45,14 @@ export default class StatusFooter extends React.Component<Props, State> {
                     canUpload={this.props.canUpload}
                     commentsCount={this.props.commentsCount}
                     created_at={this.props.created_at}
-                    onReact={this.props.onActionPress}
                     reaction={this.props.reaction}
                     reactions={this.props.reactions}
                     reactionsCount={this.props.reactionsCount}
-                    onStatusDelete={this.props.onStatusDelete}
-                    onStatusEdit={this.props.onStatusEdit}
-                    onCommentEdit={this.props.onCommentEdit}
                     owner={this.props.status.owner}
                     isOwner={this.props.isOwner}
                     status={this.props.status} 
                     canComment={this.props.canComment} canReact={this.props.canReact} canMention={this.props.canMention} 
+                    onActionPress={this.props.onActionPress}
                     isComment={this.props.status.parent != null}/>
             )
         }

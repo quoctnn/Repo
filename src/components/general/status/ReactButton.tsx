@@ -10,7 +10,7 @@ require("./ReactButton.scss");
 export interface Props 
 {
     reaction:string
-    onReact:(action:StatusActions, extra?:Object) => void
+    onActionPress:(action:StatusActions, extra?:Object) => void
 }
 interface State 
 {
@@ -45,7 +45,7 @@ export default class ReactButton extends React.Component<Props, State>
         if(event)
             event.preventDefault()
         let reaction = this.props.reaction == null ? "like" : null
-        this.props.onReact(StatusActions.react, {reaction} )
+        this.props.onActionPress(StatusActions.react, {reaction} )
     }
     toggleReactionsView = () => 
     {
@@ -59,7 +59,7 @@ export default class ReactButton extends React.Component<Props, State>
         this.hideReactionsView()
         if(this.props.reaction != reaction)
         {
-            this.props.onReact(StatusActions.react, {reaction} )
+            this.props.onActionPress(StatusActions.react, {reaction} )
         }
     }
     renderReactions = () => {

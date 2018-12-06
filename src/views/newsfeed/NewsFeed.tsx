@@ -22,13 +22,9 @@ class StatusComposer
 {
     statusId:number
     communityId?:number
-    contextNaturalKey:string
-    contextObjectId:number
-    constructor(statusId:number,contextNaturalKey:string, contextObjectId:number, communityId?:number )
+    constructor(statusId:number, communityId?:number )
     {
         this.statusId = statusId
-        this.contextNaturalKey = contextNaturalKey
-        this.contextObjectId = contextObjectId
         this.communityId = communityId
     }
 }
@@ -92,9 +88,6 @@ class NewsFeed extends React.Component<Props, State> {
         }
         this.onStatusEdit = this.onStatusEdit.bind(this)
         this.onCommentEdit = this.onCommentEdit.bind(this)
-        this.onCommentDelete = this.onCommentDelete.bind(this)
-        this.onStatusDelete = this.onStatusDelete.bind(this)
-        this.onCommentSubmit = this.onCommentSubmit.bind(this)
     }
     componentDidMount = () => 
     {
@@ -126,7 +119,7 @@ class NewsFeed extends React.Component<Props, State> {
                 res = res.concat(this.flattenData(c).reverse())
             }
             if(nullOrUndefined( s.parent ))
-                res.push(new StatusComposer(s.id, s.context_natural_key, s.context_object_id, s.community && s.community.id))
+                res.push(new StatusComposer(s.id, s.community && s.community.id))
         })
         return res
     }
@@ -181,9 +174,10 @@ class NewsFeed extends React.Component<Props, State> {
         this.setState({items:stateItems})
         return newStatus
     }
-    handleReaction(reaction:string, status:Status) {
-
+    handleReaction(reaction:string, status:Status) 
+    {
         const clone = this.getClonedStatus(status)
+        clone.serialization_date = new Date().toUTCString()
         let index = this.findIndexByStatusId(clone.id)
         let me = AuthenticationManager.getAuthenticatedUser()!
         let oldReaction = StatusUtilities.getStatusReaction(clone, me)
@@ -227,42 +221,6 @@ class NewsFeed extends React.Component<Props, State> {
     {
         console.log("onCommentEdit", comment, files)
     }
-    onCommentDelete(comment:Status)
-    {
-        console.log("onCommentDelete", comment)
-    }
-    onStatusDelete(removeId:number)
-    {
-        console.log("onStatusDelete", removeId)
-        ApiClient.deleteStatus(removeId, (data, status, error) => {
-            if(nullOrUndefined(error) )
-            {
-                StatusManager.removeStatus(removeId)
-            }
-        })
-    }
-    onCommentSubmit(comment:Status, files:UploadedFile[])
-    {
-        console.log("onCommentSubmit", comment, files)
-
-        let previewComment = this.getStatusPreview(comment, files)
-        console.log(previewComment)
-        StatusManager.sendStatus(previewComment)
-    }
-    getStatusPreview(status:Status, files:UploadedFile[]) {
-        let d = Date.now()
-        status = Object.assign({}, status)
-        status.id = d
-        status.uid = d
-        status.owner = AuthenticationManager.getAuthenticatedUser()
-        status.reactions = {}
-        status.comments_count = 0
-        status.children = []
-        status.link = status.link
-        status.files = files
-        status.pending = true
-        return status
-    }
     updateItems = (updated:ArrayItem[]) => {
         this.setState(prevState => {
             const items = prevState.items
@@ -279,6 +237,25 @@ class NewsFeed extends React.Component<Props, State> {
             return ({
                 items: items,
               })
+        })
+    }
+    removeObjectAtIndex = (index:number) => {
+        this.setState(prevState => {
+            const items = prevState.items
+            items.splice(index,1)
+            return ({
+                items: items,
+              })
+        })
+    }
+    deleteStatus = (status:Status) => {
+        console.log("deleteStatus", status.id)
+        ApiClient.deleteStatus(status.id, (data, st, error) => {
+            if(nullOrUndefined(error))
+            {
+                let index = this.findIndexByStatusId(status.id)
+                this.removeObjectAtIndex(index)
+            }
         })
     }
     createNewComment = (parent:Status, message:string, mentions?:number[], files?:UploadedFile[], completion?:(success:boolean) => void) => {
@@ -389,6 +366,11 @@ class NewsFeed extends React.Component<Props, State> {
                 }
                 logWarn()
             }
+            case StatusActions.delete: 
+            {
+                this.deleteStatus(status)
+                break;
+            }
             case StatusActions.react:this.handleReaction(extra.reaction, status); break;
             default:logWarn()
         }
@@ -406,11 +388,6 @@ class NewsFeed extends React.Component<Props, State> {
         canComment={true}
         canUpload={true}
         canReact={true}
-        onStatusEdit={this.onStatusEdit}
-        onCommentEdit={this.onCommentEdit}
-        onCommentDelete={this.onCommentDelete}
-        onStatusDelete={this.onStatusDelete}
-        onCommentSubmit={this.onCommentSubmit}
         addLinkToContext={true}
         key={"status_" + item.id} 
         status={item} 
@@ -427,11 +404,10 @@ class NewsFeed extends React.Component<Props, State> {
                     canUpload={true}
                     canMention={true}
                     canComment={true}
-                    onCommentSubmit={this.onCommentSubmit} 
                     className={"drop-shadow"}
-                    contextNaturalKey={composer.contextNaturalKey}
-                    contextObjectId={composer.contextObjectId}
                     statusId={composer.statusId}
+                    onActionPress={this.navigateToActionWithId(composer.statusId)}
+                    community={composer.communityId}
                     />
             )
     }
@@ -511,7 +487,6 @@ class NewsFeed extends React.Component<Props, State> {
             {
                 this.setState({activeCommentLoaders:currentLoaders})
             }
-
         })
     }
     loadMoreComments = (loader:StatusCommentLoader) => (e:any) => 
@@ -526,7 +501,7 @@ class NewsFeed extends React.Component<Props, State> {
     {
         const isLoading = this.state.activeCommentLoaders[loader.statusId] != undefined
         return (
-            <button key={"statusloader_" + loader.statusId} className="btn btn-link link-text comment-loader" onClick={this.loadMoreComments(loader)}>
+            <button disabled={isLoading} key={"statusloader_" + loader.statusId} className="btn btn-link link-text comment-loader" onClick={this.loadMoreComments(loader)}>
                 {!isLoading && <i className="fa fa-arrow-down"/>} 
                 {isLoading && <CircularLoadingSpinner size={16} />} 
                 &nbsp;{translate("Show previous")}
@@ -541,7 +516,6 @@ class NewsFeed extends React.Component<Props, State> {
         }
         const len = this.state.items.length
         return(
-
             <FullPageComponent> 
                     <List 
                     enableAnimation={false} 

@@ -91,8 +91,8 @@ const positionSuggestions = ({ state, props }) => {
     padding: "0",
     boxShadow: "none",
     margin: "0.5rem 0.5rem -0.5rem -0.5rem",
-    marginBottom: "-0.375rem",
-
+    marginBottom: "4px",
+    marginLeft:"4px",
     maxWidth: "initial",
     maxHeight: "150px",
     overflowY: "auto"

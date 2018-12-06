@@ -21,7 +21,7 @@ export enum StatusActions
     react = 5,
     /**Creates a new comment: extra:{message:string, mentions?:number[], files?:UploadedFile[], completion?:(success:boolean) => void} */
     new = 6,
-     /** NOOP extra:{} */
+    /**Edits a status: extra:{message:string, mentions?:number[], files?:UploadedFile[], completion?:(success:boolean) => void} */
     edit = 7,
     /** NOOP extra:{} */
     delete = 8,
@@ -38,11 +38,6 @@ export interface OwnProps
     contextKey?:string
     contextId?:number
     canMention:boolean
-    onStatusEdit:(status:Status, files:UploadedFile[]) => void
-    onCommentEdit:(comment:Status, files:UploadedFile[]) => void
-    onCommentDelete:(comment:Status) => void
-    onStatusDelete:(removeId:number) => void
-    onCommentSubmit:(comment:Status, files:UploadedFile[]) => void
     canComment:boolean
     canReact:boolean
     canUpload:boolean
@@ -156,13 +151,9 @@ export default class StatusComponent extends React.Component<Props, State>
                     canUpload={this.props.canUpload}
                     commentsCount={status.comments_count}
                     created_at={status.created_at}
-                    onReact={this.props.onActionPress}
                     reaction={StatusUtilities.getStatusReaction(status, AuthenticationManager.getAuthenticatedUser())}
                     reactions={status.reactions}
                     reactionsCount={status.reaction_count}
-                    onStatusDelete={this.props.onStatusDelete}
-                    onStatusEdit={this.props.onStatusEdit}
-                    onCommentEdit={this.props.onCommentEdit}
                     owner={status.owner}
                     isOwner={status.owner.id == this.props.authorizedUserId}
                     status={status} 
@@ -170,6 +161,7 @@ export default class StatusComponent extends React.Component<Props, State>
                     canReact={this.props.canReact} 
                     canMention={this.props.canMention} 
                     isComment={isComment}
+                    onActionPress={this.props.onActionPress}
                     />
                 </div>)
     }

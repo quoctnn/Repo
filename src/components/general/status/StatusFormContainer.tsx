@@ -5,18 +5,15 @@ import { Mention } from '../../input/MentionEditor';
 import ApiClient from '../../../network/ApiClient';
 import { IEditorComponent, EditorContent } from '../ChatMessageComposer';
 import { TempStatus, UploadedFile, Status } from '../../../types/intrasocial_types';
-import { NestedPageItem } from '../../../utilities/PaginationUtilities';
 import { CommentForm } from './CommentForm';
 import classNames = require('classnames');
+import { StatusActions } from './StatusComponent';
 require("./StatusFormContainer.scss");
 
 
 interface OwnProps 
 {
-    onCommentSubmit?:(comment:TempStatus, files:UploadedFile[]) => void
-    onStatusSubmit?:(status:TempStatus, files:UploadedFile[]) => void
-    contextNaturalKey:string
-    contextObjectId:number
+    onActionPress:(action:StatusActions, extra?:Object) => void
     canMention:boolean
     canComment:boolean
     canUpload:boolean
@@ -108,39 +105,10 @@ export default class StatusFormContainer extends React.Component<Props, State> {
             if (!this.canPost()) {
                 return;
             }
-    
             let text = this.state.text.trim();
-            let link = this.findPrimaryLink();
-    
-            var status = {
-                text: text,
-                privacy: "members",
-                files_ids: this.state.files_ids,
-                link: link,
-                context_natural_key: this.props.contextNaturalKey,
-                context_object_id: this.props.contextObjectId,
-                parent: this.props.statusId,
-                mentions: this.state.mentions
-            };
-    
-            // Send callback depending on type of status.
-            // Statuses with a parent node are comments.
-            if (status.parent && status.parent > 0) {
-                // Comment must have same context as parent:
-                status.context_natural_key = this.props.contextNaturalKey;
-                status.context_object_id = this.props.contextObjectId;
-    
-                this.props.onCommentSubmit(status, this.state.files);
-            } else {
-                if(!status.context_natural_key || !status.context_object_id)
-                {
-                    throw new Error("contextNaturalKey and/or contextObjectId are missing");
-                }
-                this.props.onStatusSubmit(status, this.state.files);
-            }
-    
-            this.clearStatusState()
-            this.clearEditor()
+            this.props.onActionPress(StatusActions.new, {message:text, mentions:this.state.mentions, files:this.state.files})
+            this.clearStatusState()//maybe not here?
+            this.clearEditor()//maybe not here?
         })
         
     }

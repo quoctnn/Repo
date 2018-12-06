@@ -11,13 +11,10 @@ export interface Props
 {
     commentsCount:number
     created_at:string
-    onReact:(action:StatusActions, extra?:Object) => void
+    onActionPress:(action:StatusActions, extra?:Object) => void
     reaction:string
     reactionsCount:number
     reactions:{[id:string]:number[]}
-    onStatusDelete:(removeId: number) => void
-    onStatusEdit:(status: Status, files: UploadedFile[]) => void
-    onCommentEdit:(comment: Status, files: UploadedFile[]) => void
     owner:UserProfile
     status:Status
     canComment:boolean
@@ -43,7 +40,7 @@ export default class StatusFooterStats extends React.Component<Props, State> {
         if (this.props.created_at != null) {
             return (
                 <ReactButton reaction={this.props.reaction}
-                onReact={this.props.onReact}/>
+                onActionPress={this.props.onActionPress}/>
             )
         }
     }
@@ -52,8 +49,7 @@ export default class StatusFooterStats extends React.Component<Props, State> {
         return (
             <StatusOptions communityId={this.props.communityId} 
                 canUpload={this.props.canUpload} 
-                onDelete={this.props.onStatusDelete}
-                onSaveEdit={this.props.onStatusEdit}
+                onActionPress={this.props.onActionPress}
                 status={this.props.status} 
                 canComment={this.props.canComment} 
                 isOwner={this.props.isOwner} 

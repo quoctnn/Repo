@@ -4,6 +4,7 @@ import { translate } from '../../../components/intl/AutoIntlProvider';
 import EditStatusDialog from './dialogs/EditStatusDialog';
 import { Status, UploadedFile } from '../../../types/intrasocial_types';
 import ConfirmDialog from '../dialogs/ConfirmDialog';
+import { StatusActions } from './StatusComponent';
 require("./StatusOptions.scss");
 export interface Props 
 {
@@ -11,8 +12,7 @@ export interface Props
     canComment:boolean 
     canMention:boolean
     canUpload:boolean
-    onDelete:(removeId: number) => void
-    onSaveEdit:(status:Status, files:UploadedFile[]) => void
+    onActionPress:(action:StatusActions, extra?:Object) => void
     isOwner:boolean
     communityId:number
 }
@@ -56,7 +56,7 @@ export default class StatusOptions extends React.Component<Props, State> {
         this.toggleDeleteModal()
         if(success)
         {
-            this.props.onDelete(this.props.status.id)
+            this.props.onActionPress(StatusActions.delete)
         }
     }
     renderEditDialog()
@@ -74,7 +74,7 @@ export default class StatusOptions extends React.Component<Props, State> {
     }
     save(status:Status, files:UploadedFile[]) {
         this.setState({showEditDialog:false}, () => {
-            this.props.onSaveEdit(status, files)
+            this.props.onActionPress(StatusActions.edit,{message:status.text, mentions:status.mentions, files:files} )
         })
     }
     renderRemoveDialog()
