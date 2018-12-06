@@ -335,6 +335,7 @@ const mapDispatchToProps = dispatch => {
     setApiEndpoint: index => {
       dispatch(Actions.setSignedInProfile(null));
       dispatch(Actions.setSignedIn(null));
+      dispatch(Actions.resetPagedData());
       dispatch(Actions.resetCommunityStore());
       dispatch(Actions.resetGroupStore());
       dispatch(Actions.resetCommunityGroupsCache());
