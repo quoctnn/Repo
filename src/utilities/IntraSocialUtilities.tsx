@@ -11,6 +11,16 @@ export const URL_WWW_REGEX = /(^(\b|\s+)(www)\.[\S]+(\b|$))/gim
 export const LINEBREAK_REGEX = /\r?\n|\r/g
 export class IntraSocialUtilities 
 {
+    static copyToClipboard = (text:string) => 
+    {
+        var textField = document.createElement('textarea')
+        textField.style.opacity = "0"
+        textField.innerText = text
+        document.body.appendChild(textField)
+        textField.select()
+        document.execCommand('copy')
+        textField.remove()
+    }
     static getStatusPreview(parent:Status, message:string, mentions?:number[], files?:UploadedFile[]) 
     {
         let d = Date.now()

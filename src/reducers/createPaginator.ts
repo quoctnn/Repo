@@ -302,7 +302,7 @@ export const createMultiPaginator = (key:string, endpoint:(id:string) => string,
 
 
   //////////////
-export const statusMultiPaginator = (key:string, endpoint:(id:string) => string, itemIdKey:string, pageSize:number, sortItemKey:string, sortAscending:boolean) =>
+export const statusMultiPaginator = (key:string, endpoint:(id:string) => string, itemIdKey:string, pageSize:number, sortItemKey:string, sortAscending:boolean, sortKeyIsNumber:boolean) =>
 {
   /*
     key:{
@@ -348,6 +348,11 @@ export const statusMultiPaginator = (key:string, endpoint:(id:string) => string,
       item:status,
       isNew:isNew,
       pagingId
+    })
+    const removeStatus = (statusId:number):InsertItemAction => ({
+      type: Types.REMOVE_ITEM_FROM_PAGE,
+      meta:{key, itemIdKey},
+      item:statusId,
     })
     const setStatusReactions = (item:any, reactions:{ [id: string]: number[] },reaction_count:number):ItemMentionAction => ({
       type: Types.SET_STATUS_REACTIONS,
@@ -425,6 +430,31 @@ export const statusMultiPaginator = (key:string, endpoint:(id:string) => string,
             }
           }
         }
+        case Types.REMOVE_ITEM_FROM_PAGE: //if any root elements are deleted, remove from "ids"
+        {
+          const a = action as InsertItemAction
+          const removeId = a.item
+          const pageIds = Object.keys(pages)
+          let _pages = {}
+          for (let item of pageIds) 
+          {  
+            const page = pages[item] || getDefaultCachePage()
+            const index = page.ids.indexOf(removeId)
+            if (index > -1)
+            {
+              page.ids.splice(index, 1)
+              _pages = {
+                ..._pages,
+                [item]: page
+              }
+            }
+          }
+          return {
+            ...pages,
+            ..._pages
+          }
+
+        }
         case Types.RESET_PAGED_DATA: 
           return {}
         default:
@@ -442,9 +472,19 @@ export const statusMultiPaginator = (key:string, endpoint:(id:string) => string,
     type reducerItems = {
       [key:string]: any
     }
-    const sortObjects = (allItems:any, ids:number[] ) => 
+    const sortObjects = (allItems:any, ids:number[]) => 
     {
-       return ids.map(i => allItems[i]).sort((a:any,b:any) => sortAscending ?  (a[sortItemKey] as string).localeCompare(b[sortItemKey]) : (b[sortItemKey] as string).localeCompare(a[sortItemKey])).map((i:any) => i[itemIdKey])
+        if(sortKeyIsNumber)
+          return sortNumbers(allItems, ids)
+        return sortStrings(allItems, ids)
+    }
+    const sortStrings = (allItems:any, ids:number[]) => 
+    {
+      return ids.map(i => allItems[i]).sort((a:any,b:any) => sortAscending ?  (a[sortItemKey] as string).localeCompare(b[sortItemKey]) : (b[sortItemKey] as string).localeCompare(a[sortItemKey])).map((i:any) => i[itemIdKey]) 
+    }
+    const sortNumbers = (allItems:any, ids:number[] ) => 
+    {
+       return ids.map(i => allItems[i]).sort((a:any,b:any) => sortAscending ?  a[sortItemKey] - b[sortItemKey] : b[sortItemKey] - a[sortItemKey]).map((i:any) => i[itemIdKey])
     }
     const magicChildNumber = 5
     const itemsReducer = (items:reducerItems = {}, action:MultiPaginatorAction = {}) => { 
@@ -565,6 +605,35 @@ export const statusMultiPaginator = (key:string, endpoint:(id:string) => string,
             })
           return allObjects
         }
+        case Types.REMOVE_ITEM_FROM_PAGE: 
+        {
+          const a = action as InsertItemAction
+          const removeId = a.item
+          const elementToDelete = items[removeId] as Status
+          //find parent if any, remove "removeId" from "children_ids" array
+          let _pages = {}
+          if(elementToDelete && elementToDelete.parent)
+          {
+            let parent = Object.assign({}, items[elementToDelete.parent]) as Status
+            if(parent)
+            {
+              let arr = (parent.children_ids || []).map(id => id)
+              const index = arr.indexOf(removeId)
+              let exists = index != -1
+              if(exists)
+              {
+                  arr.splice(index, 1)
+                  parent.children_ids = arr
+                _pages = {
+                  ..._pages,
+                  [elementToDelete.parent]: parent
+                }
+              }
+            }
+          }
+          delete items[removeId]
+          return {...items, ..._pages}
+        }
         default:
           return items
       }
@@ -575,6 +644,7 @@ export const statusMultiPaginator = (key:string, endpoint:(id:string) => string,
       requestNextStatusPage,
       setNotFetcing,
       insertStatus,
+      removeStatus,
       setStatusReactions,
       insertStatuses
     }

@@ -2,6 +2,8 @@ import * as React from 'react';
 import { ModalBody, Modal, ModalHeader, ModalFooter } from 'reactstrap';
 import { translate } from '../../../../components/intl/AutoIntlProvider';
 import { StatusUtilities } from '../../../../utilities/StatusUtilities';
+import { IntraSocialUtilities } from '../../../../utilities/IntraSocialUtilities';
+import { ToastManager } from '../../../../managers/ToastManager';
 require("./StatusPermalinkDialog.scss");
 
 export interface OwnProps 
@@ -15,13 +17,26 @@ export interface DefaultProps
 }
 interface State 
 {
+    message:string|null
 }
 type Props = DefaultProps & OwnProps
 export default class StatusPermalinkDialog extends React.Component<Props, State> {  
     constructor(props) {
         super(props);
         this.state = {
+            message:null
         }
+        
+    }
+    copyToClipboard = (e) => 
+    {
+        let permaLink = StatusUtilities.getPermaLink(this.props.statusId)
+        IntraSocialUtilities.copyToClipboard(permaLink)
+        this.showCopied()
+    }
+    showCopied = () => 
+    {
+        ToastManager.showInfoToast(translate("Link copied!"))
     }
     render()
     {
@@ -40,15 +55,17 @@ export default class StatusPermalinkDialog extends React.Component<Props, State>
                                 target="_blank">{permaLink}</a>
                         </pre>
                         <span className="input-group-btn">
-                            <button id="status_option_copy_link" data-toggle="tooltip" data-placement="top"
+                            <button onClick={this.copyToClipboard} id="status_option_copy_link" data-toggle="tooltip" data-placement="top"
                                 data-clipboard-text={permaLink} data-original-title={copyText}
                                 title={copyText} className="btn btn-default" type="button">
                                 <span><i className="fa fa-copy"></i></span>
                             </button>
+                            
                         </span>
                     </div>
                 </ModalBody>
                 <ModalFooter>
+                    <div>{this.state.message}</div>
                 </ModalFooter>
             </Modal>)
     }

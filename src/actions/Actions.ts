@@ -37,6 +37,7 @@ export const setDirtyPagedData = () => ({
 //newsfeed
 export const requestNextStatusPage = statusesPaginator.requestNextStatusPage
 export const insertStatus = statusesPaginator.insertStatus
+export const removeStatus = statusesPaginator.removeStatus
 export const setStatusReactions = statusesPaginator.setStatusReactions
 export const insertStatuses = statusesPaginator.insertStatuses
 

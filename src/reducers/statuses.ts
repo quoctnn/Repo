@@ -28,7 +28,7 @@ export const statusesPaginator = statusMultiPaginator(statusReducerKey, (id:stri
 {
   return Constants.apiRoute.newsfeed
 }
-, "id", statusReducerPageSize,"created_at", false)
+, "id", statusReducerPageSize,"id", false, true)
 const statusesItemReducer = (state = {}, action) => {
   switch (action.type) {
     default:

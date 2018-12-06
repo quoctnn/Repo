@@ -7328,6 +7328,7 @@ a.text-dark:hover, a.text-dark:focus {
 
 .fa-stack-1x, .fa-stack-2x {
   left: 0;
+  top:0;
   position: absolute;
   text-align: center;
   width: 100%; }

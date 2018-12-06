@@ -21,6 +21,7 @@ export enum EventStreamMessageType {
   CONVERSATION_UPDATE = "conversation.update",
   STATUS_NEW = "status.new",
   STATUS_UPDATE = "status.update",
+  STATUS_DELETED = "status.deleted",
 }
 
 enum WebsocketState {

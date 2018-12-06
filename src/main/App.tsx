@@ -21,6 +21,8 @@ import ChannelEventStream from '../components/general/ChannelEventStream';
 import { embedlyMiddleware } from '../reducers/embedlyStore';
 import { queueMiddleware } from '../reducers/queue';
 import setupManagers from '../managers/index';
+import "react-dropzone-component/styles/filepicker.css"
+import "dropzone/dist/min/dropzone.min.css"
 require('jquery/dist/jquery');
 require('popper.js/dist/umd/popper');
 require('bootstrap/dist/js/bootstrap');

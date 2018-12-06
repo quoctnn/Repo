@@ -51,6 +51,15 @@ export default class ApiClient
             callback(null, status, error)
         })
     }
+    static deleteStatus(statusId:number, callback:ApiClientStatusCallback)
+    {
+        let url = Constants.apiRoute.postUrl + statusId + "/"
+        AjaxRequest.delete(url, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
     static getCommunityMembers(communityId:number, callback:ApiClientCommunityMembersCallback)
     {
         let url = Constants.apiRoute.communityMembersUrl(communityId)

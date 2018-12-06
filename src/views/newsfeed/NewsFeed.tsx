@@ -18,6 +18,7 @@ import { Status, UserProfile, UploadedFile } from '../../types/intrasocial_types
 import StatusFormContainer from '../../components/general/status/StatusFormContainer';
 import { translate } from '../../components/intl/AutoIntlProvider';
 import ApiClient from '../../network/ApiClient';
+import CircularLoadingSpinner from '../../components/general/CircularLoadingSpinner';
 require("./NewsFeed.scss");
 export interface OwnProps 
 {
@@ -127,6 +128,12 @@ class NewsFeed extends React.Component<Props, State> {
     onStatusDelete(removeId:number)
     {
         console.log("onStatusDelete", removeId)
+        ApiClient.deleteStatus(removeId, (data, status, error) => {
+            if(nullOrUndefined(error) )
+            {
+                StatusManager.removeStatus(removeId)
+            }
+        })
     }
     onCommentSubmit(comment:Status, files:UploadedFile[])
     {
@@ -198,6 +205,12 @@ class NewsFeed extends React.Component<Props, State> {
             {
                 this.didLoadMoreComments(loader, data.results)
             }
+            let currentLoaders = this.state.activeCommentLoaders
+            if (delete currentLoaders[loader.statusId])
+            {
+                this.setState({activeCommentLoaders:currentLoaders})
+            }
+
         })
     }
     loadMoreComments = (loader:StatusCommentLoader) => (e:any) => 
@@ -213,8 +226,9 @@ class NewsFeed extends React.Component<Props, State> {
         const isLoading = this.state.activeCommentLoaders[loader.statusId] != undefined
         return (
             <button key={"statusloader_" + loader.statusId} className="btn btn-link link-text comment-loader" onClick={this.loadMoreComments(loader)}>
-                <i className="fa fa-arrow-down"/> &nbsp;
-                {translate("Show previous")}
+                {!isLoading && <i className="fa fa-arrow-down"/>} 
+                {isLoading && <CircularLoadingSpinner size={16} />} 
+                &nbsp;{translate("Show previous")}
             </button>
         )
     }
@@ -283,7 +297,7 @@ const mapStateToProps = (state:RootState, ownProps: OwnProps):ReduxStateProps =>
     let result:FeedListItem[] = []
     allRootItems.forEach(p => {
         result.push(p)
-        if(p.childrenCount != p.children.length)
+        if(p.childrenCount > p.children.length)
             result.push(new StatusCommentLoader(p.id, p.children.length, p.childrenCount))
         p.children.reverse().forEach(c => result.push(c))
         const item:NestedPageItem = {id:p.id, isTemporary:p.isTemporary, children:[], community:p.community, childrenCount:p.childrenCount}

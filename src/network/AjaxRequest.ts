@@ -49,7 +49,7 @@ export class AjaxRequest
     {
         return AjaxRequest.ajaxCall("PATCH", url, data, success, error);
     }
-    static delete(url, data, success:SuccessCallback, error:ErrorCallback)
+    static delete(url, success:SuccessCallback, error:ErrorCallback)
     {
         return AjaxRequest.ajaxCall("DELETE", url, null, success, error);
     }

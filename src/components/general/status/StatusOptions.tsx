@@ -3,6 +3,7 @@ import * as React from 'react';
 import { translate } from '../../../components/intl/AutoIntlProvider';
 import EditStatusDialog from './dialogs/EditStatusDialog';
 import { Status, UploadedFile } from '../../../types/intrasocial_types';
+import ConfirmDialog from '../dialogs/ConfirmDialog';
 require("./StatusOptions.scss");
 export interface Props 
 {
@@ -51,6 +52,13 @@ export default class StatusOptions extends React.Component<Props, State> {
                 nextState.showPermalinkDialog != this.state.showPermalinkDialog || 
                 nextState.showReportDialog != this.state.showReportDialog
     }
+    onConfirmDelete = (success:boolean) => {
+        this.toggleDeleteModal()
+        if(success)
+        {
+            this.props.onDelete(this.props.status.id)
+        }
+    }
     renderEditDialog()
     {
         return (
@@ -71,7 +79,10 @@ export default class StatusOptions extends React.Component<Props, State> {
     }
     renderRemoveDialog()
     {
-
+        const title = translate("Confirm delete")
+        const message = translate("Are you sure to remove it?")
+        const okButtonTitle = translate("Yes, delete")
+        return <ConfirmDialog visible={this.state.showDeleteDialog} title={title} message={message} didComplete={this.onConfirmDelete} okButtonTitle={okButtonTitle}/>
     }
     renderPermalinkDialog()
     {

@@ -49,12 +49,14 @@ export default class StatusFooterStats extends React.Component<Props, State> {
 
     renderOptionsButton() {
         return (
-            <StatusOptions communityId={this.props.communityId} canUpload={this.props.canUpload} onDelete={this.props.onStatusDelete}
-                           onSaveEdit={this.props.onStatusEdit}
-                           status={this.props.status} 
-                           canComment={this.props.canComment} 
-                           isOwner={this.props.isOwner} 
-                           canMention={this.props.canMention}/>
+            <StatusOptions communityId={this.props.communityId} 
+                canUpload={this.props.canUpload} 
+                onDelete={this.props.onStatusDelete}
+                onSaveEdit={this.props.onStatusEdit}
+                status={this.props.status} 
+                canComment={this.props.canComment} 
+                isOwner={this.props.isOwner} 
+                canMention={this.props.canMention}/>
         )
     }
 
