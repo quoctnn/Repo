@@ -11,9 +11,8 @@ import { withRouter} from 'react-router-dom'
 import { Routes } from '../../utilities/Routes';
 import { ConversationManager } from '../../managers/ConversationManager';
 import LoadingSpinner from '../../components/general/LoadingSpinner';
-import { toast } from 'react-toastify';
-import { ErrorToast } from '../../components/general/Toast';
 import { UserProfile, Conversation } from '../../types/intrasocial_types';
+import { ToastManager } from '../../managers/ToastManager';
 
 require("./CreateConversation.scss");
 export interface OwnProps {
@@ -84,7 +83,7 @@ class CreateConversation extends React.Component<Props, State> {
                     }
                     if(error || status == "error")
                     {
-                        toast.error(<ErrorToast message={error || translate("Could not create conversation")} />, { hideProgressBar: true })
+                        ToastManager.showErrorToast(error || translate("Could not create conversation"))
                         return
                     }
                 })

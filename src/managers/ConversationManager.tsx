@@ -3,15 +3,13 @@ import { RootState } from '../reducers';
 import { EventStreamMessageType, canSendOnWebsocket, sendOnWebsocket } from '../components/general/ChannelEventStream';
 import * as Actions from '../actions/Actions';
 import { Routes } from '../utilities/Routes';
-import { toast } from 'react-toastify';
 import { translate } from '../components/intl/AutoIntlProvider';
-import { InfoToast } from '../components/general/Toast';
-import * as React from 'react';
 import ApiClient from '../network/ApiClient';
 import { NotificationCenter } from '../notifications/NotificationCenter';
 import { AuthenticationManager } from './AuthenticationManager';
 import { ProfileManager } from './ProfileManager';
 import { Message, UserProfile, Conversation } from '../types/intrasocial_types';
+import { ToastManager } from './ToastManager';
 export abstract class ConversationManager 
 {
     static setup = () => 
@@ -127,7 +125,7 @@ export abstract class ConversationManager
             // Show the toast if the user is not viewing that conversation
             if (user && window.location.pathname != uri) 
             {
-                toast.info(<InfoToast message={user.first_name + ': ' + message.text} />);
+                ToastManager.showInfoToast(user.first_name + ': ' + message.text)
             }
         } 
         else if ('Notification' in window && Notification.permission === 'granted')

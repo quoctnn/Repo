@@ -3,13 +3,12 @@ import { translate } from '../../components/intl/AutoIntlProvider';
 import ApiClient from '../../network/ApiClient';
 import { Button, Input , Form , FormGroup} from 'reactstrap';
 import { History} from 'history'
-import { toast } from 'react-toastify';
-import { ErrorToast } from '../../components/general/Toast';
 import { connect } from 'react-redux'
 import * as Actions from '../../actions/Actions';
 import { ApiEndpoint, LoginType } from '../../reducers/debug';
 import { RootState } from '../../reducers/index';
 import { AuthenticationManager } from '../../managers/AuthenticationManager';
+import { ToastManager } from '../../managers/ToastManager';
 
 require("./Signin.scss");
 
@@ -34,7 +33,7 @@ class Signin extends React.Component<Props, {}> {
     {
         if(error || status == "error")
         {
-            toast.error(<ErrorToast message={error || "Could not sign in"} />, { hideProgressBar: true })
+            ToastManager.showErrorToast(error || translate("Could not sign in"))
             return
         }
         if(data.token)

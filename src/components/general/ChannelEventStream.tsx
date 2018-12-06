@@ -9,6 +9,8 @@ import { UserStatus } from '../../types/intrasocial_types';
 import * as Actions from "../../actions/Actions"
 import { AuthenticationManager } from '../../managers/AuthenticationManager';
 import { EventStreamManager } from '../../managers/EventStreamManager';
+import { ToastManager } from '../../managers/ToastManager';
+import { translate } from '../intl/AutoIntlProvider';
 
 export enum EventStreamMessageType {
   STATE = "state",
@@ -181,10 +183,7 @@ class ChannelEventStream extends React.Component<Props, State> {
       this.stream.onclose = event => {
         if (!event.wasClean)
         {
-          /*toast.error(
-            <ErrorToast message="WebSocket closed, please refresh browser" />,
-            { hideProgressBar: true }
-          );*/
+          /*ToastManager.showErrorToast(translate("WebSocket closed, please refresh browser"))  */
         }
         if(!this.stream || this.stream.retryCount == 0)
           EventStreamManager.socketDisconnected()
