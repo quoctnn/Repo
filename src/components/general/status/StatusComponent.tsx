@@ -3,17 +3,36 @@ import classNames from "classnames";
 import { StatusUtilities } from '../../../utilities/StatusUtilities';
 import StatusHeader from './StatusHeader';
 import StatusContent from './StatusContent';
-import ApiClient from '../../../network/ApiClient';
-import { nullOrUndefined } from '../../../utilities/Utilities';
-import { NestedPageItem } from '../../../utilities/PaginationUtilities';
 import { AuthenticationManager } from '../../../managers/AuthenticationManager';
 import { Status, UploadedFile } from '../../../types/intrasocial_types';
 import StatusFooterStats from './StatusFooterStats';
-import { StatusManager } from '../../../managers/StatusManager';
 require("./StatusComponent.scss");
-
+export enum StatusActions
+{
+    /**Navigates to the context of the current status (context_natural_key and context_object_id), i.e "group.group" or "core.community" ... and the the corresponding object id */
+    context = 0,
+    /**Navigates to the community of the current status: extra:{} */
+    community = 1,
+    /**Navigates to User profile for the current status or the profile in extra field: extra:{profile?:UserProfile} */
+    user = 3,
+    /**Navigates to a browser component that loads the "link": extra:{link:string} */
+    link = 4,
+    /**Sends a reaction to the server: extra:{reaction:string|null} */
+    react = 5,
+    /**Creates a new comment: extra:{message:string, mentions?:number[], files?:UploadedFile[], completion?:(success:boolean) => void} */
+    new = 6,
+     /** NOOP extra:{} */
+    edit = 7,
+    /** NOOP extra:{} */
+    delete = 8,
+    /** NOOP extra:{} */
+    reactionsCount = 9,
+    /** NOOP extra:{} */
+    file = 10,
+}
 export interface OwnProps 
 {
+    onActionPress:(action:StatusActions, extra?:Object) => void
     bottomOptionsEnabled:boolean
     addLinkToContext:boolean
     contextKey?:string
@@ -28,7 +47,7 @@ export interface OwnProps
     canReact:boolean
     canUpload:boolean
     authorizedUserId:number
-    pageItem:NestedPageItem
+    status:Status
     className?:string
     isLastComment:boolean
 }
@@ -49,7 +68,6 @@ export default class StatusComponent extends React.Component<Props, State>
         this.state = {
             renderPlaceholder:true
         }
-        this.handleReaction = this.handleReaction.bind(this)
     }
     componentDidMount() {
         this.observer = new IntersectionObserver((entries) => {
@@ -72,8 +90,8 @@ export default class StatusComponent extends React.Component<Props, State>
     }
     shouldComponentUpdate(nextProps:Props, nextState:State) 
     {
-        const nextStatus = nextProps.pageItem.status
-        const status = this.props.pageItem.status
+        const nextStatus = nextProps.status
+        const status = this.props.status
         let ret = nextState.renderPlaceholder != this.state.renderPlaceholder || nextStatus.id != status.id || 
         nextStatus.updated_at != status.updated_at || 
         nextStatus.serialization_date != status.serialization_date ||
@@ -107,28 +125,9 @@ export default class StatusComponent extends React.Component<Props, State>
         }
         return "text";
     }
-    handleReaction(reaction:string) {
-
-        const status = this.props.pageItem.status
-        let oldReaction = StatusUtilities.getStatusReaction(status, AuthenticationManager.getAuthenticatedUser())
-        let rCount = status.reaction_count
-        let r = status.reactions || {}
-        let userId = AuthenticationManager.getAuthenticatedUser().id
-        let data = StatusUtilities.applyReaction(oldReaction, reaction, r, rCount, userId)
-        StatusManager.setStatusReaction(status, data.reactions, data.reactionsCount)
-        ApiClient.reactToStatus(status.id, reaction, (data, status, error) => {  
-            if(!nullOrUndefined( error ))
-            {
-                console.log("error sending reaction:", error)
-                const st = this.props.pageItem.status
-                let {reactions, reactionsCount} = StatusUtilities.applyReaction(reaction, oldReaction, data.reactions, data.reactionsCount, userId)
-                StatusManager.setStatusReaction(st, reactions, reactionsCount)
-            }
-        })
-    }
     render()
     {
-        let status = this.props.pageItem.status
+        let status = this.props.status
         const isComment = status.parent != null
         if(this.state.renderPlaceholder)
         {
@@ -157,7 +156,7 @@ export default class StatusComponent extends React.Component<Props, State>
                     canUpload={this.props.canUpload}
                     commentsCount={status.comments_count}
                     created_at={status.created_at}
-                    onReact={this.handleReaction}
+                    onReact={this.props.onActionPress}
                     reaction={StatusUtilities.getStatusReaction(status, AuthenticationManager.getAuthenticatedUser())}
                     reactions={status.reactions}
                     reactionsCount={status.reaction_count}

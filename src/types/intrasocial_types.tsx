@@ -230,7 +230,7 @@ export enum StatusReaction
 export interface StatusReactionProps
 {
     reaction:StatusReaction
-    onClick?:() => void
+    onClick?:(event:any) => void
     large:boolean
     showBackground?:boolean
     style?:React.CSSProperties

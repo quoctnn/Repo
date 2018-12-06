@@ -3,13 +3,14 @@ import classNames from "classnames";
 import ActionTrigger from '../ActionTrigger';
 import {  Popover, PopoverBody } from 'reactstrap';
 import { StatusReaction, StatusReactionUtilities } from '../../../types/intrasocial_types';
+import { StatusActions } from './StatusComponent';
 require("./ReactButton.scss");
 
 
 export interface Props 
 {
     reaction:string
-    onReact:(reaction:string) => void
+    onReact:(action:StatusActions, extra?:Object) => void
 }
 interface State 
 {
@@ -44,7 +45,7 @@ export default class ReactButton extends React.Component<Props, State>
         if(event)
             event.preventDefault()
         let reaction = this.props.reaction == null ? "like" : null
-        this.props.onReact(reaction)
+        this.props.onReact(StatusActions.react, {reaction} )
     }
     toggleReactionsView = () => 
     {
@@ -52,20 +53,20 @@ export default class ReactButton extends React.Component<Props, State>
             reactionsOpen: !prevState.reactionsOpen
           }))
     }
-    onReact = (reaction, event) => 
+    onReact = (reaction:string|null) => (event) => 
     {
         event.preventDefault()
         this.hideReactionsView()
         if(this.props.reaction != reaction)
         {
-            this.props.onReact(reaction)
+            this.props.onReact(StatusActions.react, {reaction} )
         }
     }
     renderReactions = () => {
         let list = StatusReactionUtilities.reactionsList()
         
         let items = list.map((item, index) => {
-            return (<StatusReactionUtilities.Component selected={true} large={true} key={item} reaction={item} onClick={this.onReact.bind(this, item)}></StatusReactionUtilities.Component>)
+            return (<StatusReactionUtilities.Component selected={true} large={true} key={item} reaction={item} onClick={this.onReact(item)}></StatusReactionUtilities.Component>)
         })
         return items
     }

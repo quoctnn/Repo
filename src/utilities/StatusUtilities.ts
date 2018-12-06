@@ -1,6 +1,50 @@
 import Constants from '../utilities/Constants';
 import { Status, UserProfile, UploadedFile } from '../types/intrasocial_types';
-export class StatusUtilities {
+import { AuthenticationManager } from '../managers/AuthenticationManager';
+import { URL_REGEX, URL_WWW_REGEX } from './IntraSocialUtilities';
+export class StatusUtilities 
+{
+    static getStatusPreview(parent:Status, message:string, mentions?:number[], files?:UploadedFile[]) 
+    {
+        let d = Date.now()
+        const status = {} as Status
+
+        status.text = message,
+        status.privacy = "members",
+        status.files_ids = (files || []).map(f => f.id),
+        status.link = StatusUtilities.findPrimaryLink(message),
+        status.context_natural_key = parent.context_natural_key,
+        status.context_object_id = parent.context_object_id,
+        status.parent = parent.id,
+        status.mentions = mentions || []
+        status.id = d
+        status.uid = d
+        status.owner = AuthenticationManager.getAuthenticatedUser()!
+        status.reactions = {}
+        status.comments_count = 0
+        status.children = []
+        status.files = files || []
+        status.pending = true
+        status.reaction_count = 0
+        return status
+    }
+    static findPrimaryLink(text:string) {
+        // Return first url found in text if any.
+        // We are using two regex (with and without http://)
+        var pattern = new RegExp(URL_REGEX.source, "im");
+        var pattern2 = new RegExp(URL_WWW_REGEX.source, "im");
+        var result = text.match(pattern)
+        var result2 = text.match(pattern2)
+
+        if (result != null && result2 != null) {
+            // Both regex match, return the first found
+            return (result!.index! > result2!.index!) ? result2[0] : result[0]
+        } else {
+            if (result != null) return result[0]
+            if (result2 != null) return result2[0]
+            return null
+        }
+    }
     static filterStatusFileType = (files:UploadedFile[], type:string) => 
     {
         return files.filter((file) => {

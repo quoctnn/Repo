@@ -1,6 +1,5 @@
 import * as React from "react"
 import StatusFormBase from './StatusFormBase';
-import { translate } from '../../intl/AutoIntlProvider';
 import FilesUpload from './FilesUpload';
 
 
