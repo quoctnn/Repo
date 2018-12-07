@@ -14,9 +14,12 @@
     {
         flex-grow: 1;
         width: inherit;
-        overflow: auto;
+        overflow: hidden;
         overflow-x: hidden;
         background: white;
+        display: flex;
+        flex-direction: column;
+        height:100%;
     }
     
 }

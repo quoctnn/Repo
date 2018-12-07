@@ -25,4 +25,35 @@
             top: 0;
         }
     }
+    #notifications-list
+    {
+        min-height: 50%;
+        display: flex;
+        flex: 1 1 0;
+        .list{
+            overflow: hidden;
+            overflow-y: auto;
+        }
+    }
+    #contact-list
+    {
+        display: flex;
+        overflow: hidden;
+        .list{
+            overflow: hidden;
+            overflow-y: auto;
+            justify-content: space-evenly;
+            display: flex;
+            flex-wrap: wrap;
+            padding-top: 5px;
+            li
+            {
+                
+                display: inline-flex;
+                padding:0;
+                padding-bottom: 5px;
+            }
+
+        }
+    }
 }

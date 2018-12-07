@@ -13,10 +13,12 @@ import { cloneDictKeys } from '../../utilities/Utilities';
 import { NotificationCenter } from "../../notifications/NotificationCenter";
 import { UserProfile, avatarStateColorForUserProfile } from "../../types/intrasocial_types";
 import { ProfileManager } from '../../managers/ProfileManager';
+import NotificationsList from "../general/NotificationsList";
 require("./RightNavigation.scss")
 interface State {
     contacts:UserProfile[],
     isTyping:any
+    collapsibleOpen:boolean
 }
 
 export interface OwnProps
@@ -33,7 +35,7 @@ class RightNavigation extends React.Component<Props, {}> {
     state:State
     constructor(props) {
         super(props);
-        this.state = {contacts:[], isTyping:{}}
+        this.state = {contacts:[], isTyping:{}, collapsibleOpen:false}
         this.isTypingHandler = this.isTypingHandler.bind(this)
     }
     componentWillMount()
@@ -103,21 +105,27 @@ class RightNavigation extends React.Component<Props, {}> {
         if(needsUpdate)
             this.setState({contacts: newContacts})
     }
+    onCollapsibleStateChanged = (open:boolean) => {
+        this.setState({collapsibleOpen:open})
+    }
     render() {
-
+        const contacts = this.state.contacts
         return(
             <div id="right-navigation" className="d-flex transition">
-                <CollapsiblePanel id="right-navigation" arrowDirectionCollapsed={ArrowDirectionCollapsed.LEFT}>
-                    <List>{this.state.contacts.map((contact, index) => {
-                        return (
-                        <div className="avatar-profile" key={index}>
-                            <Link to={Routes.PROFILES + contact.slug_name}>
-                                <Avatar image={contact.avatar} borderColor="green" borderWidth={2} stateColor={avatarStateColorForUserProfile(contact)}>
-                                {this.state.isTyping[contact.id] && <div className="typing-indicator-container"><TypingIndicator /></div>}
-                                </Avatar>
-                            </Link>
-                        </div>)
+                <CollapsiblePanel onCollapsibleStateChanged={this.onCollapsibleStateChanged} id="right-navigation" arrowDirectionCollapsed={ArrowDirectionCollapsed.LEFT}>
+                    <div id="contact-list">
+                        <List>{contacts.map((contact, index) => {
+                            return (
+                            <div className="avatar-profile" key={index}>
+                                <Link to={Routes.PROFILES + contact.slug_name}>
+                                    <Avatar image={contact.avatar} borderColor="green" borderWidth={2} stateColor={avatarStateColorForUserProfile(contact)}>
+                                    {this.state.isTyping[contact.id] && <div className="typing-indicator-container"><TypingIndicator /></div>}
+                                    </Avatar>
+                                </Link>
+                            </div>)
                     } )}</List>
+                    </div>
+                    {this.state.collapsibleOpen && <NotificationsList />}
                 </CollapsiblePanel>
             </div>
         );

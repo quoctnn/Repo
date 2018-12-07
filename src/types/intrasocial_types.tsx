@@ -4,14 +4,30 @@ import * as React from 'react';
 export interface Verb 
 {
     id:number
+    infinitive:string 
+    past_tense:string
 }
-export interface Notification 
+export interface SimpleNotification 
 {
     absolute_url:string
     actor:SimpleUserProfile
     extra:any
     message:string 
     verb:Verb
+}
+export interface Notification 
+{
+    serialization_id:string
+    created_at:string
+    updated_at:string
+    verb:Verb
+    is_seen: boolean
+    is_read: boolean
+    actor_count:number 
+    display_text:string 
+    extra:any 
+    absolute_url:string
+    actors:UserProfile[]
 }
 export interface ICommunity
 {

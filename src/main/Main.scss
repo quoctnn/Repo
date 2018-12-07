@@ -209,11 +209,6 @@ body
             @include var(top, top-navigation-height);
             right: 0;
             bottom: 0;
-            li
-            {
-                display: inline-flex;
-                padding: 5px 5px 0 5px;
-            }
         }
         #right-navigation.open
         {

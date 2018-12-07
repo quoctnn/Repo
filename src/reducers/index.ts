@@ -20,9 +20,10 @@ import queue from './queue';
 import { conversations } from './conversations';
 import { messages } from './messages';
 import { statuses } from './statuses';
-import { Status, UserProfile, Message, EmbedlyItem, Conversation } from '../types/intrasocial_types';
+import { Status, UserProfile, Message, EmbedlyItem, Conversation, Notification } from '../types/intrasocial_types';
 import { CachePageV2 } from './simplePaginator';
 import { CachePageV3 } from './simpleMultiPaginator';
+import { notifications } from './notifications';
 
 
 const rootPersistConfig:PersistConfig = {
@@ -35,7 +36,7 @@ const rootReducer = combineReducers({
   //debug: persistReducer(debugConfig, debug),
   settings, auth, profileStore, communityStore, groupStore, groupListCache,
   eventStore, eventListCache, projectStore, projectListCache, contactListCache,
-   debug, queue, conversations, messages, embedlyStore, statuses
+   debug, queue, conversations, messages, embedlyStore, statuses, notifications
 })
 export default persistReducer(rootPersistConfig, rootReducer)
 export interface RootState
@@ -57,5 +58,6 @@ export interface RootState
       embedlyStore:{byId:{[id:string]:EmbedlyItem}, allIds:string[], queuedIds:{[id:string]:boolean}},
       statuses:{items:{[id:number]:Status}, feed:PageItem}
       debug: {apiEndpoint:number, availableApiEndpoints:ApiEndpoint[] };
+      notifications:{pagination:CachePageV2<Notification>}
   _persist:any
 }

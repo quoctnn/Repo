@@ -5,6 +5,8 @@ import { InsertItemAction } from '../reducers/createPaginator';
 import { statusesPaginator } from '../reducers/statuses';
 import { Status, EmbedlyItem, Message, Conversation, Community,
          UserProfile, Group, Event, Project } from '../types/intrasocial_types';
+import { notificationsPaginator, notificationsReducerKey } from '../reducers/notifications';
+import { Notification } from '../types/intrasocial_types';
 
 //embedly
 export const requestEmbedlyData = (urls:string[]) => ({
@@ -62,6 +64,16 @@ export const insertConversation = (conversation:Conversation, isNew:boolean):Ins
     meta:{key:conversationReducerKey}
 })
 export const setConversationPageNotFetching = conversationPaginator.setNotFetching
+
+//notifications 
+export const requestNextNotificationPage = notificationsPaginator.requestNextPage
+export const insertNotification = (notification:Notification, isNew:boolean):InsertItemAction => ({
+    type: Types.INSERT_ITEM_TO_PAGE,
+    item:notification,
+    meta:{key:notificationsReducerKey}
+})
+export const setNotificationPageNotFetching = notificationsPaginator.setNotFetching
+
 
 //queue status
 

@@ -20,7 +20,6 @@ import { List } from '../../components/general/List';
 import { NotificationCenter } from '../../notifications/NotificationCenter';
 import { ProfileManager } from '../../managers/ProfileManager';
 import { UserProfile, Conversation } from '../../types/intrasocial_types';
-import { throws } from 'assert';
 let timezone = moment.tz.guess()
 
 require("./Conversations.scss");
@@ -157,7 +156,7 @@ class Conversations extends React.PureComponent<Props, State> {
         if(this.props.pagingDirty || this.props.total == 0 || this.props.offset == 0 || (!this.props.last_fetched && this.props.offset <= pageSize))
             this.props.requestNextConversationPage(0) 
     }
-    loadNextPageData()
+    loadNextPageData = () =>
     {
         if(this.props.total > this.props.offset && !this.props.isFetching && nullOrUndefined( this.props.error ))
             this.props.requestNextConversationPage(this.props.offset)

@@ -1,4 +1,6 @@
 import * as React from "react";
+import { nullOrUndefined } from '../../utilities/Utilities';
+import { throws } from "assert";
 require("./CollapsiblePanel.scss");
 
 export enum ArrowDirectionCollapsed
@@ -10,6 +12,7 @@ export interface Props {
     arrowDirectionCollapsed:ArrowDirectionCollapsed,
     className?:string
     id?:string
+    onCollapsibleStateChanged?:(open:boolean) => void
 }
 export interface State {
     open:boolean
@@ -23,14 +26,16 @@ export class CollapsiblePanel extends React.Component<Props, {}> {
         id:null
     }
     state:State
-    constructor(props) {
+    constructor(props:Props) {
         super(props);
-        this.state = {open:false}
-        this.toggleOpenState = this.toggleOpenState.bind(this)
+        this.state = {open: false}
     }
-    toggleOpenState()
+    toggleOpenState = () => 
     {
-        this.setState({open:!this.state.open})
+        this.setState({open:!this.state.open}, () => {
+            if(this.props.onCollapsibleStateChanged)
+                this.props.onCollapsibleStateChanged(this.state.open)
+        })
     }
     render() 
     {
