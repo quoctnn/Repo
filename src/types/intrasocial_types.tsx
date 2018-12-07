@@ -1,6 +1,18 @@
 import { nullOrUndefined } from "../utilities/Utilities";
 import * as React from 'react';
 
+export interface Verb 
+{
+    id:number
+}
+export interface Notification 
+{
+    absolute_url:string
+    actor:SimpleUserProfile
+    extra:any
+    message:string 
+    verb:Verb
+}
 export interface ICommunity
 {
   absolute_url:string
@@ -8,7 +20,6 @@ export interface ICommunity
   id:number
   name:string
   slug_name:string
-
 }
 export interface Community extends ICommunity
 {
@@ -386,18 +397,21 @@ export const UserStatus = strEnum([
     "invisible",
 ])
 export type UserStatus = keyof typeof UserStatus;
-export interface UserProfile {
+export interface SimpleUserProfile 
+{
+    absolute_url: string,
+    avatar: string,
+    first_name: string,
+    last_name: string,
+    id: number,
+}
+export interface UserProfile extends SimpleUserProfile{
     email:string|null
     locale:string|null
     timezone:string|null
-    absolute_url: string,
-    avatar: string,
     avatar_thumbnail: string,
     cover: string,
     cover_cropped: string,
-    first_name: string,
-    id: number,
-    last_name: string,
     username: string,
     uuid:string|null,
     user_status:UserStatus,

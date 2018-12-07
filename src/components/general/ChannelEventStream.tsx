@@ -9,8 +9,6 @@ import { UserStatus } from '../../types/intrasocial_types';
 import * as Actions from "../../actions/Actions"
 import { AuthenticationManager } from '../../managers/AuthenticationManager';
 import { EventStreamManager } from '../../managers/EventStreamManager';
-import { ToastManager } from '../../managers/ToastManager';
-import { translate } from '../intl/AutoIntlProvider';
 
 export enum EventStreamMessageType {
   STATE = "state",
@@ -24,6 +22,7 @@ export enum EventStreamMessageType {
   STATUS_NEW = "status.new",
   STATUS_UPDATE = "status.update",
   STATUS_DELETED = "status.deleted",
+  NOTIFICATION_NEW = "notification.new"
 }
 
 enum WebsocketState {
