@@ -8,7 +8,7 @@ import { StatusUtilities } from '../../../utilities/StatusUtilities';
 import { Avatar } from '../Avatar';
 import { Link } from 'react-router-dom';
 import { Routes } from '../../../utilities/Routes';
-import { UserProfile, Status } from '../../../types/intrasocial_types';
+import { UserProfile, Status, ContextNaturalKey } from '../../../types/intrasocial_types';
 import { Settings } from '../../../utilities/Settings';
 let timezone = moment.tz.guess();
 require("./StatusHeader.scss");
@@ -60,7 +60,7 @@ export default class StatusHeader extends React.Component<Props, State> {
                         </span>)
             }
             let contextKey = status.context_natural_key;
-            if (contextKey == "auth.user") {
+            if (contextKey == ContextNaturalKey.USER) {
                 if (status.owner.id == status.context_object_id) {
                     // Owner user profile
                     return "";
@@ -69,7 +69,7 @@ export default class StatusHeader extends React.Component<Props, State> {
                 return translate("published on user")
             }
 
-            if (contextKey == "group.group") {
+            if (contextKey == ContextNaturalKey.GROUP) {
                 if (this.props.contextKey == contextKey && this.props.contextId == status.context_object_id) {
                     // Posted in this group
                     return "";
@@ -77,7 +77,7 @@ export default class StatusHeader extends React.Component<Props, State> {
                 return translate("published on the group")
             }
 
-            if (contextKey == "project.project") {
+            if (contextKey == ContextNaturalKey.PROJECT) {
                 return translate("published on the project")
             }
 
@@ -104,7 +104,7 @@ export default class StatusHeader extends React.Component<Props, State> {
 
         let status = this.props.status;
         let contextKey = status.context_natural_key;
-        if (!status.community || contextKey == "core.community") {
+        if (!status.community || contextKey == ContextNaturalKey.COMMUNITY) {
             return "";
         }
         else
@@ -127,11 +127,11 @@ export default class StatusHeader extends React.Component<Props, State> {
 
         if (this.props.addLinkToContext && contextObj != null) 
         {
-            if (status.owner.id == contextId && contextKey == "auth.user") {
+            if (status.owner.id == contextId && contextKey == ContextNaturalKey.USER) {
                 // Owner user profile
                 return "";
             }
-            if (this.props.contextId == contextId && contextKey == "group.group") {
+            if (this.props.contextId == contextId && contextKey == ContextNaturalKey.GROUP) {
                 // Posted in this group
                 return "";
             }
@@ -172,12 +172,12 @@ export default class StatusHeader extends React.Component<Props, State> {
 
     renderEditedAt(date) {
         if (date) {
-            let time = moment.utc(date).tz(timezone).date()
+            let time = moment.utc(date).tz(timezone).toDate()
             return (
                 <span className="edited-at">
-                    {translate("edited")}{' '}
+                    {' ('}{translate("edited")}{' '}
                     <FormattedDate value={time} />{' '}
-                    <FormattedTime value={time} />
+                    <FormattedTime value={time} />{')'}
                 </span>
             )
         }

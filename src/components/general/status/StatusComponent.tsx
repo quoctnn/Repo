@@ -21,7 +21,7 @@ export enum StatusActions
     react = 5,
     /**Creates a new comment: extra:{message:string, mentions?:number[], files?:UploadedFile[], completion?:(success:boolean) => void} */
     new = 6,
-    /**Edits a status: extra:{message:string, mentions?:number[], files?:UploadedFile[], completion?:(success:boolean) => void} */
+    /**Edits a status: extra:{status:Status, files?:UploadedFile[], completion?:(success:boolean) => void} */
     edit = 7,
     /** NOOP extra:{} */
     delete = 8,
@@ -88,6 +88,7 @@ export default class StatusComponent extends React.Component<Props, State>
         const nextStatus = nextProps.status
         const status = this.props.status
         let ret = nextState.renderPlaceholder != this.state.renderPlaceholder || nextStatus.id != status.id || 
+        nextStatus.comments_count != status.comments_count ||
         nextStatus.updated_at != status.updated_at || 
         nextStatus.serialization_date != status.serialization_date ||
         nextStatus.reaction_count != status.reaction_count || 

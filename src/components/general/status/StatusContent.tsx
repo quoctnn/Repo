@@ -39,12 +39,13 @@ export default class StatusContent extends React.Component<Props, State>
     }
 
     renderDescription() {
-        let text = this.getTextForField("text")
+        const text = this.getTextForField("text")
+        const content = getTextContent(text, ProfileManager.getProfiles(this.props.status.mentions),false)
         if (text) {
             return (
                 <div className="item-description">
                     <span className="text">
-                        {getTextContent(text, ProfileManager.getProfiles(this.props.status.mentions),false)}
+                        {content}
                     </span>
                 </div>
             )

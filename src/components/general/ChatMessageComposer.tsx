@@ -79,7 +79,7 @@ const generateContentState = (content:string, mentions:Mention[]):ContentState =
         blockMap.forEach((block) => {
             let text = block.getText()
             mentions.forEach(m => {
-                var re = new RegExp("@"+m.key, 'g')
+                var re = new RegExp("@"+m.key.replace("+","\\+"), 'g')
                 var match:RegExpExecArray = null
                 while (match = re.exec(text)) {
                     let key = block.getKey()
@@ -133,7 +133,6 @@ export interface Props
     onSubmit:(text:string, mentions:number[]) => void,
     onDidType:(unprocessedText:string) => void
     filesAdded?:(files:File[]) => void
-    communityId?:number
     content:string
     mentions:Mention[]
     mentionSearch:(search:string, completion:(mentions:Mention[]) => void) => void

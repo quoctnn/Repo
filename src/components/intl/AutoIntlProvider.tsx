@@ -5,10 +5,10 @@ import { connect } from 'react-redux'
 
 import * as en from 'react-intl/locale-data/en';
 import * as es from 'react-intl/locale-data/es';
-import * as no from 'react-intl/locale-data/no';
+import * as nb from 'react-intl/locale-data/nb';
 import { availableLanguages } from '../../reducers/settings';
 import { RootState } from "../../reducers";
-addLocaleData([...en, ...es, ...no]);
+addLocaleData([...en, ...es, ...nb]);
 
 export interface Props {
     language: string,

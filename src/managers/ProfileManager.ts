@@ -3,7 +3,7 @@ import ApiClient from '../network/ApiClient';
 import { CommunityManager } from './CommunityManager';
 import * as Actions from '../actions/Actions';
 import { RootState } from '../reducers';
-import { UserProfile } from '../types/intrasocial_types';
+import { UserProfile, ContextNaturalKey } from '../types/intrasocial_types';
 export abstract class ProfileManager
 {
     static setup = () =>
@@ -92,7 +92,11 @@ export abstract class ProfileManager
         {
             searchables = ProfileManager.getContactListIds()
         }
-        let users = ProfileManager.getProfiles(searchables)
+        return ProfileManager.searchProfilesIds(query, searchables)
+    }
+    static searchProfilesIds = ( query:string, profiles:number[]) =>
+    {
+        let users = ProfileManager.getProfiles(profiles)
         return users.filter(u => ProfileManager.filterProfile(query,u!))
     }
     static getContactListIds = () => {
@@ -106,6 +110,23 @@ export abstract class ProfileManager
     }
     static setContactListCache = (contacts:number[]) => {
         ProfileManager.getStore().dispatch(Actions.setContactListCache(contacts))
+    }
+    static searchMembersInContext = (query:string, contextObjectId:number, contextNaturalKey:string, completion:(members:UserProfile[]) => void) => {
+        switch(contextNaturalKey)
+        {
+            case ContextNaturalKey.COMMUNITY: 
+            {
+                CommunityManager.getCommunitySecure(contextObjectId, (community) => 
+                {
+                    let result:UserProfile[] = []
+                    if(community)
+                        result = ProfileManager.searchProfilesIds(query, community.members)
+                    completion(result)
+                })
+                break;
+            }
+            default:completion([]);
+        }
     }
     private static getStore = ():Store<RootState,any> =>
     {

@@ -15,7 +15,8 @@ export interface OwnProps
     onFileUploaded?:(file:UploadedFile) => void
     onFileQueueComplete?:() => void
     onChangeMentions?:(mentions: any) => void
-    communityId:number
+    contextObjectId:number 
+    contextNaturalKey:string
     canMention:boolean
     canPost:boolean
     canUpload:boolean
@@ -24,6 +25,7 @@ export interface OwnProps
     mentions?:Mention[]
     mentionSearch:(search:string, completion:(mentions:Mention[]) => void) => void
     className?:string
+    communityId:number
 }
 export interface DefaultProps
 {
@@ -125,13 +127,17 @@ export default class StatusFormBase extends React.Component<Props, State> implem
     renderTextArea(canSubmit:boolean) {
         let cn = classNames("secondary-text", this.props.className)
         return (
-            <ChatMessageComposer className={cn} canSubmit={canSubmit} onHandleUploadClick={this.handleUploadClick} ref={this.inputRef} content={this.props.content} mentionSearch={this.props.mentionSearch} mentions={this.props.mentions} communityId={this.props.communityId} onSubmit={this.handleSubmit} onDidType={this.props.onDidType} />                      
+            <ChatMessageComposer 
+            className={cn} 
+            canSubmit={canSubmit} 
+            onHandleUploadClick={this.handleUploadClick} 
+            ref={this.inputRef} 
+            content={this.props.content} 
+            mentionSearch={this.props.mentionSearch} 
+            mentions={this.props.mentions} 
+            onSubmit={this.handleSubmit} 
+            onDidType={this.props.onDidType} 
+            />                      
         )
     }
-   //<MentionEditor onKeyboardSubmit={this.handleSubmit} onChange={this.props.onTextChange}
-    //                             handleUpload={this.handleUploadClick}
-    //                             onSuggestionVisibilityChange={this.handleSuggestionVisibility}
-     //                            onChangeMentions={this.props.onChangeMentions}
-      //                           communityId={this.getCommunityId()}
-       //                          feedType={this.getFeedType()}/>
 }

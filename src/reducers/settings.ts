@@ -9,7 +9,7 @@ export const availableThemes: StyleTheme[] = [
   { name: 'Dark', selector: 'dark' }
 ];
 
-export const availableLanguages = ['en', 'es', 'no'];
+export const availableLanguages = ['en', 'es', 'nb'];
 const INITIAL_STATE = {
   language: 0,
   awayTimeout: 300,

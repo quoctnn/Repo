@@ -389,7 +389,15 @@ class ConversationView extends React.PureComponent<Props, State> {
                                 {this.renderSomeoneIsTyping()}
                             </ChatMessageList>
                         </div>
-                        <ChatMessageComposer className="secondary-text" mentionSearch={this.handleMentionSearch} content={this.props.content} mentions={this.props.mentions} filesAdded={this.filesAdded} onSubmit={this.onChatMessageSubmit} onDidType={this.onDidType} />
+                        <ChatMessageComposer 
+                                className="secondary-text" 
+                                mentionSearch={this.handleMentionSearch} 
+                                content={this.props.content} 
+                                mentions={this.props.mentions} 
+                                filesAdded={this.filesAdded} 
+                                onSubmit={this.onChatMessageSubmit} 
+                                onDidType={this.onDidType} 
+                            />
                     </div>
                 </div>
                

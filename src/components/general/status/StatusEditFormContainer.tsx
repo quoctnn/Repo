@@ -29,7 +29,7 @@ interface State
     link: string,
     mentions: number[]
 }
-export default class StatusEditFormContainer extends  React.Component<Props, State> {
+export default class StatusEditFormContainer extends React.Component<Props, State> {
 
     formRef = React.createRef<IEditorComponent & any>();
     constructor(props) {
@@ -51,7 +51,7 @@ export default class StatusEditFormContainer extends  React.Component<Props, Sta
             mentions: this.props.status.mentions
         };
     }
-    getContent():EditorContent {
+    getContent = ():EditorContent => {
         return this.formRef.current.getContent()
     }
     canPost = () =>
@@ -86,7 +86,7 @@ export default class StatusEditFormContainer extends  React.Component<Props, Sta
             return null
         }
     }
-    handleSubmit() {
+    handleSubmit = () => {
         let content = this.getContent()
         this.setState({text:content.text, mentions: content.mentions}, () => {
             if (!this.canPost()) {
@@ -130,13 +130,10 @@ export default class StatusEditFormContainer extends  React.Component<Props, Sta
     }
     handleMentionSearch = (search:string, completion:(mentions:Mention[]) => void) => 
     {
-        if(this.props.status.community)
-        {
-            console.log("searching", search)
-            ApiClient.getCommunityMembers(this.props.status.community.id, (data, status, error) => {
-                completion(data.map(u => Mention.fromUser(u)))
-            })
-        }
+        console.log("searching", search)
+        ProfileManager.searchMembersInContext(search, this.props.status.context_object_id, this.props.status.context_natural_key, (members) => {
+            completion(members.map(u => Mention.fromUser(u)))
+        })
     }
     handleFileAdded = () => 
     {
@@ -212,9 +209,10 @@ export default class StatusEditFormContainer extends  React.Component<Props, Sta
                 onFileError={this.handleFileError}
                 onFileUploaded={this.handleFileUploaded}
                 onFileQueueComplete={this.handleFileQueueComplete}
-                //onChangeMentions={this.handleMentions}
                 canMention={this.props.canMention}
                 canUpload={this.props.canUpload}
+                contextNaturalKey={this.props.contextNaturalKey}
+                contextObjectId={this.props.contextObjectId}
                 />
         );
     }

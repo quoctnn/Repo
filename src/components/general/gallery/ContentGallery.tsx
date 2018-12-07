@@ -4,7 +4,6 @@ import VideoPlayer from '../video/VideoPlayer';
 import Embedly from '../Embedly';
 import { Modal, ModalBody } from 'reactstrap';
 import { FileUtilities } from '../../../utilities/FileUtilities';
-import debug from '../../../reducers/debug';
 import { Settings } from '../../../utilities/Settings';
 import {
     Carousel,
@@ -248,10 +247,11 @@ export default class ContentGallery extends React.Component<Props, State> {
     windowResizeOn = false
     animationDuration = 300
     animating = false
-    constructor(props) {
+
+    constructor(props:Props) {
         super(props);
         this.state = {
-            data:this.getContentData(),
+            data:this.getContentData(props),
             index:0,
             visible:false,
 
@@ -260,13 +260,45 @@ export default class ContentGallery extends React.Component<Props, State> {
         this.onGalleryItemClick = this.onGalleryItemClick.bind(this)
         this.onDialogClose = this.onDialogClose.bind(this)
     }
-    getContentData()
+    arrayEqual = (arr1:any[],arr2:any[]) => 
+    {
+        if(!arr1  || !arr2) 
+            return false
+        let result;
+        arr1.forEach((e1,i)=>arr2.forEach(e2=>{
+            
+                if(Array.isArray(e1) && Array.isArray(e2) && e1.length > 1 && e2.length)
+                {
+                    result = this.arrayEqual(e1,e2)
+                }
+                else if(e1 !== e2 )
+                {
+                    result = false
+                }
+                else
+                {
+                    result = true
+                }
+            })
+        )
+        return result
+     }
+    componentWillReceiveProps(nextProps:Props) 
+    {
+        const changed = !this.arrayEqual( nextProps.links , this.props.links) ||
+        !this.arrayEqual(nextProps.files.map(f => f.id), this.props.files.map(f => f.id))
+        if(changed)
+        {
+            this.setState({ data: this.getContentData(nextProps) });
+        }
+    }
+    getContentData(props:Props)
     {
         let data:GalleryItem[] = []
-        this.props.files.forEach(file => {
+        props.files.forEach(file => {
             data.push(convertToGalleryItem(file))
         })
-        this.props.links.distinct().forEach(link => 
+        props.links.distinct().forEach(link => 
         {
             data.push(new GalleryLink(link, link, link))
         })

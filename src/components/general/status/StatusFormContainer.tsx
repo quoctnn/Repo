@@ -2,12 +2,12 @@ import * as React from 'react';
 import { Settings } from '../../../utilities/Settings';
 import { URL_REGEX, URL_WWW_REGEX } from '../../../utilities/Utilities';
 import { Mention } from '../../input/MentionEditor';
-import ApiClient from '../../../network/ApiClient';
 import { IEditorComponent, EditorContent } from '../ChatMessageComposer';
 import { TempStatus, UploadedFile, Status } from '../../../types/intrasocial_types';
 import { CommentForm } from './CommentForm';
 import classNames = require('classnames');
 import { StatusActions } from './StatusComponent';
+import { ProfileManager } from '../../../managers/ProfileManager';
 require("./StatusFormContainer.scss");
 
 
@@ -19,7 +19,9 @@ interface OwnProps
     canUpload:boolean
     className?:string
     statusId:number
-    community?:number
+    contextObjectId:number 
+    contextNaturalKey:string
+    communityId:number
 }
 interface State 
 {
@@ -87,13 +89,10 @@ export default class StatusFormContainer extends React.Component<Props, State> {
     }
     handleMentionSearch(search:string, completion:(mentions:Mention[]) => void)
     {
-        if(this.props.community)
-        {
-            console.log("searching", search)
-            ApiClient.getCommunityMembers(this.props.community, (data, status, error) => {
-                completion(data.map(u => Mention.fromUser(u)))
-            })
-        }
+        console.log("searching", search)
+        ProfileManager.searchMembersInContext(search, this.props.contextObjectId, this.props.contextNaturalKey, (members) => {
+            completion(members.map(u => Mention.fromUser(u)))
+        })
     }
     handleTextChange(text) {
         this.setState({text: text})
@@ -240,7 +239,8 @@ export default class StatusFormContainer extends React.Component<Props, State> {
                     mentionSearch={this.handleMentionSearch}
                     ref={this.formRef}
                     onDidType={this.onDidType}
-                    communityId={this.props.community}
+                    contextNaturalKey={this.props.contextNaturalKey}
+                    contextObjectId={this.props.contextObjectId}
                     canUpload={this.props.canUpload}
                     //onTextChange={this.handleTextChange}
                     canPost={canPost}
@@ -252,6 +252,7 @@ export default class StatusFormContainer extends React.Component<Props, State> {
                     onChangeMentions={this.handleMentions}
                     canMention={this.props.canMention}
                     className={this.props.className}
+                    communityId={this.props.communityId}
                     />
             );
         } else {

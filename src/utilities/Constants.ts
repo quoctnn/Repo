@@ -35,6 +35,9 @@ export default  {
         communityFilesUrl: (id) => {
             return `/api/v1/community/${id}/files/`
         },
+        communityUrl: (id) => {
+            return `/api/v1/community/${id}/`
+        },
         communityList:'/api/v1/community/',
         // Profile URLs
         myProfileUrl: '/api/v1/profile/me/',

@@ -74,7 +74,7 @@ export default class StatusOptions extends React.Component<Props, State> {
     }
     save(status:Status, files:UploadedFile[]) {
         this.setState({showEditDialog:false}, () => {
-            this.props.onActionPress(StatusActions.edit,{message:status.text, mentions:status.mentions, files:files} )
+            this.props.onActionPress(StatusActions.edit,{status:status, files:files} )
         })
     }
     renderRemoveDialog()

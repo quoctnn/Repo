@@ -156,8 +156,8 @@ export default class MentionEditor extends React.Component<Props, {}> {
   }
   componentDidUpdate(prevProps:Props, prevState:State)
   {
-    if(prevState.search != this.state.search)
-        this.onSearchChange({value:this.state.search})
+    //if(prevState.search != this.state.search)
+        //this.onSearchChange({value:this.state.search})
   }
   onSearchChange = ({ value }) => {
     this.props.mentionSearch(value, (mentions) => {

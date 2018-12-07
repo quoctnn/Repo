@@ -2,10 +2,11 @@ import Constants from "../utilities/Constants";
 import {AjaxRequest} from "./AjaxRequest";
 var $ = require("jquery")
 import store from '../main/App';
-import { Status, UserProfile, UploadedFile } from "../types/intrasocial_types";
+import { Status, UserProfile, UploadedFile, Community } from "../types/intrasocial_types";
 
 export type ApiClientCallback = (data: any, status:string, error:string) => void;
 export type ApiClientCommunityMembersCallback = (data: UserProfile[], status:string, error:string) => void;
+export type ApiClientCommunityCallback = (data: Community, status:string, error:string) => void;
 export type ApiClientStatusCallback = (data: Status, status:string, error:string) => void;
 
 export enum ListOrdering {
@@ -60,6 +61,15 @@ export default class ApiClient
             callback(null, status, error)
         })
     }
+    static updateStatus(status:Status, callback:ApiClientStatusCallback)
+    {
+        let url = Constants.apiRoute.postUrl + status.id + "/"
+        AjaxRequest.put(url, status, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
     static getCommunityMembers(communityId:number, callback:ApiClientCommunityMembersCallback)
     {
         let url = Constants.apiRoute.communityMembersUrl(communityId)
@@ -68,6 +78,16 @@ export default class ApiClient
             callback(result, status, null)
         }, (request, status, error) => {
             callback([], status, error)
+        })
+    }
+    static getCommunity(communityId:number, callback:ApiClientCommunityCallback)
+    {
+        let url = Constants.apiRoute.communityUrl(communityId)
+        AjaxRequest.get(url, (data, status, request) => {
+            let result = data && data.results ? data.results : []
+            callback(result, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
         })
     }
     static getProfiles(profiles:number[], callback:ApiClientCallback)

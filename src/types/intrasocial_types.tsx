@@ -86,6 +86,13 @@ export class Message
     files?:UploadedFile[]
     tempFile?:FileUpload
 }
+export enum ContextNaturalKey
+{
+    GROUP = "group.group",
+    COMMUNITY = "core.community",
+    USER = "auth.user",
+    PROJECT = "project.project",
+}
 export enum UploadedFileType
 {
     IMAGE = "image",
