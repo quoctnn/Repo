@@ -46,6 +46,12 @@ var translations = {
     "replied to a ":"replied to a ",
     "post":"post",
     "Publishing...":"Publishing...",
+    "Yes":"Yes",
+    "Cancel":"Cancel",
+    "Confirm deletetion":"Confirm deletetion",
+    "Are you sure you want to delete this status?":"Are you sure you want to delete this status?",
+    "Are you sure you want to delete this comment?":"Are you sure you want to delete this comment?",
+
   },
   no: {
     "search.placeholder": "Søk ...",
@@ -94,6 +100,11 @@ var translations = {
     "replied to a ":"svarte på en ",
     "post":"post",
     "Publishing...":"Publiserer...",
+    "Yes":"Ja",
+    "Cancel":"Avbryt",
+    "Confirm deletetion":"Bekreft sletting",
+    "Are you sure you want to delete this status?":"Er du sikker på at du vil slette denne statusen?",
+    "Are you sure you want to delete this comment?":"Er du sikker på at du vil slette denne kommentaren?",
   },
   en: {
     "search.placeholder": "Search ...",
@@ -142,6 +153,11 @@ var translations = {
     "replied to a ":"replied to a ",
     "post":"post",
     "Publishing...":"Publishing...",
+    "Yes":"Yes",
+    "Cancel":"Cancel",
+    "Confirm deletetion":"Confirm deletetion",
+    "Are you sure you want to delete this status?":"Are you sure you want to delete this status?",
+    "Are you sure you want to delete this comment?":"Are you sure you want to delete this comment?",
   }
 };
 

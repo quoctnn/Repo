@@ -13,7 +13,7 @@
   .reaction-wrapper{
     margin-right: 18px;
     margin-left: 3px;
-    span 
+    span
     {
       padding: 0;
     }
@@ -42,11 +42,11 @@
 {
   .emoji-reaction-bg
    {
-      &.like 
+      &.like
       {
           @include var(color, primary-color);
       }
-      &.heart 
+      &.heart
       {
         @include var(color, danger-color);
       }
@@ -63,7 +63,7 @@
 }
 .fa-stack-1-5
 {
-    display: inline-block;
+    display: inline-flex;
     height: 1.5em;
     line-height: 1.5em;
     position: relative;

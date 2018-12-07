@@ -6,24 +6,24 @@ import { Status, UploadedFile } from '../../../types/intrasocial_types';
 import ConfirmDialog from '../dialogs/ConfirmDialog';
 import { StatusActions } from './StatusComponent';
 require("./StatusOptions.scss");
-export interface Props 
+export interface Props
 {
     status:Status
-    canComment:boolean 
+    canComment:boolean
     canMention:boolean
     canUpload:boolean
     onActionPress:(action:StatusActions, extra?:Object) => void
     isOwner:boolean
     communityId:number
 }
-interface State 
+interface State
 {
     showEditDialog: boolean
     showDeleteDialog: boolean
     showPermalinkDialog: boolean
     showReportDialog: boolean
 }
-export default class StatusOptions extends React.Component<Props, State> {   
+export default class StatusOptions extends React.Component<Props, State> {
     constructor(props) {
         super(props);
         this.state = {
@@ -45,11 +45,11 @@ export default class StatusOptions extends React.Component<Props, State> {
     }
     shouldComponentUpdate(nextProps:Props, nextState:State)
     {
-        return nextProps.status.id != this.props.status.id || 
-                nextProps.status.updated_at != this.props.status.updated_at || 
-                nextState.showEditDialog != this.state.showEditDialog || 
-                nextState.showDeleteDialog != this.state.showDeleteDialog || 
-                nextState.showPermalinkDialog != this.state.showPermalinkDialog || 
+        return nextProps.status.id != this.props.status.id ||
+                nextProps.status.updated_at != this.props.status.updated_at ||
+                nextState.showEditDialog != this.state.showEditDialog ||
+                nextState.showDeleteDialog != this.state.showDeleteDialog ||
+                nextState.showPermalinkDialog != this.state.showPermalinkDialog ||
                 nextState.showReportDialog != this.state.showReportDialog
     }
     onConfirmDelete = (success:boolean) => {
@@ -79,15 +79,16 @@ export default class StatusOptions extends React.Component<Props, State> {
     }
     renderRemoveDialog()
     {
-        const title = translate("Confirm delete")
-        const message = translate("Are you sure to remove it?")
-        const okButtonTitle = translate("Yes, delete")
+        const title = translate("Confirm deletetion")
+        const message = this.props.status.parent ? translate("Are you sure you want to delete this comment?") :
+                                                   translate("Are you sure you want to delete this status?")
+        const okButtonTitle = translate("Yes")
         return <ConfirmDialog visible={this.state.showDeleteDialog} title={title} message={message} didComplete={this.onConfirmDelete} okButtonTitle={okButtonTitle}/>
     }
     renderPermalinkDialog()
     {
         return (
-            <StatusPermalinkDialog visible={this.state.showPermalinkDialog} 
+            <StatusPermalinkDialog visible={this.state.showPermalinkDialog}
             didCancel={this.togglePermalinkModal} statusId={this.props.status.id}
                 ref="permalinkDialog" />
         )
