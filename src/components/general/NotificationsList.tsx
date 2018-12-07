@@ -7,7 +7,7 @@ import { PaginationUtilities } from '../../utilities/PaginationUtilities';
 import { nullOrUndefined } from "../../utilities/Utilities";
 import LoadingSpinner from "./LoadingSpinner";
 import { notificationsReducerPageSize } from "../../reducers/notifications";
-import * as Actions from "../../actions/Actions" 
+import * as Actions from "../../actions/Actions"
 import { List } from "./List";
 import { setNotificationPageNotFetching } from '../../actions/Actions';
 import NotificationItem from "./NotificationItem";
@@ -45,11 +45,11 @@ interface State
 type Props = ReduxStateProps & ReduxDispatchProps & OwnProps & RouteProps
 class NotificationsList extends React.PureComponent<Props, State> {
 
-    componentWillMount = () => 
+    componentWillMount = () =>
     {
         this.loadFirstData(true)
     }
-    componentDidUpdate = (prevProps:Props) => 
+    componentDidUpdate = (prevProps:Props) =>
     {
         if (this.props.signedIn && (this.props.pagingDirty && !prevProps.pagingDirty || !prevProps.signedIn))
         {
@@ -57,25 +57,25 @@ class NotificationsList extends React.PureComponent<Props, State> {
             this.loadFirstData(true)
         }
     }
-    loadFirstData = (ignoreError = false) => 
+    loadFirstData = (ignoreError = false) =>
     {
         let hasError = ignoreError ? false : !nullOrUndefined( this.props.error )
         if(this.props.isFetching || hasError)
         {
             if(this.props.isFetching)
-                this.props.setNotificationPageNotFetching() 
+                this.props.setNotificationPageNotFetching()
             return
         }
         let pageSize = notificationsReducerPageSize
         if(this.props.pagingDirty || this.props.total == 0 || this.props.offset == 0 || (!this.props.last_fetched && this.props.offset <= pageSize))
-            this.props.requestNextNotificationPage(0) 
+            this.props.requestNextNotificationPage(0)
     }
     loadNextPageData = () =>
     {
         if(this.props.total > this.props.offset && !this.props.isFetching && nullOrUndefined( this.props.error ))
             this.props.requestNextNotificationPage(this.props.offset)
     }
-    renderLoading = () => 
+    renderLoading = () =>
     {
         if (this.props.isFetching) {
             return (<LoadingSpinner key="loading"/>)
@@ -89,14 +89,14 @@ class NotificationsList extends React.PureComponent<Props, State> {
             this.loadNextPageData()
         }
     }
-    render = () => 
+    render = () =>
     {
         let notifications = this.props.items
         return(
             <div id="notifications-list">
                 <List onScroll={this.onScroll} className="group-list vertical-scroll">
                     {notifications.map((n, index) => {
-                        return (<NotificationItem text={n.display_text} date={n.created_at} avatarProfiles={n.actors.map(i => i.id)} key={n.serialization_id} />)
+                        return (<NotificationItem text={n.display_text} date={n.created_at} avatarProfiles={n.actors} key={n.serialization_id} />)
                     }) }
                     {this.renderLoading()}
                 </List>

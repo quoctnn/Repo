@@ -1,21 +1,21 @@
 import { nullOrUndefined } from "../utilities/Utilities";
 import * as React from 'react';
 
-export interface Verb 
+export interface Verb
 {
     id:number
-    infinitive:string 
+    infinitive:string
     past_tense:string
 }
-export interface SimpleNotification 
+export interface SimpleNotification
 {
     absolute_url:string
     actor:SimpleUserProfile
     extra:any
-    message:string 
+    message:string
     verb:Verb
 }
-export interface Notification 
+export interface Notification
 {
     serialization_id:string
     created_at:string
@@ -23,11 +23,11 @@ export interface Notification
     verb:Verb
     is_seen: boolean
     is_read: boolean
-    actor_count:number 
-    display_text:string 
-    extra:any 
+    actor_count:number
+    display_text:string
+    extra:any
     absolute_url:string
-    actors:UserProfile[]
+    actors:number[]
 }
 export interface ICommunity
 {
@@ -413,7 +413,7 @@ export const UserStatus = strEnum([
     "invisible",
 ])
 export type UserStatus = keyof typeof UserStatus;
-export interface SimpleUserProfile 
+export interface SimpleUserProfile
 {
     absolute_url: string,
     avatar: string,

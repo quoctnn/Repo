@@ -107,19 +107,19 @@ export default  {
         },
 
         // Notification URLs
-        notificationUrl: '/api/v1/notification/',
-        notificationLastActivityTimeUrl: '/api/v1/notification/last-activity-time/',
-        notificationUnreadUrl: '/api/v1/notification/unread-count/',
-        notificationMarkReadUrl: '/api/v1/notification/update-as-read/',
-        notificationMarkAllReadUrl: '/api/v1/notification/mark-all-as-read/',
+        notificationUrl: '/api/v2/notification/',
+        notificationLastActivityTimeUrl: '/api/v2/notification/last-activity-time/',
+        notificationUnreadUrl: '/api/v2/notification/unread-count/',
+        notificationMarkReadUrl: '/api/v2/notification/update-as-read/',
+        notificationMarkAllReadUrl: '/api/v2/notification/mark-all-as-read/',
 
         newsfeed:'/api/v2/newsfeed/',
         // Conversation Notification URLs
-        convNotificationUrl: '/api/v1/notification_conv/',
-        convNotificationLastActivityTimeUrl: '/api/v1/notification_conv/last-activity-time/',
-        convNotificationUnreadUrl: '/api/v1/notification_conv/unread-count/',
-        convNotificationMarkReadUrl: '/api/v1/notification_conv/update-as-read/',
-        convNotificationMarkAllReadUrl: '/api/v1/notification_conv/mark-all-as-read/',
+        convNotificationUrl: '/api/v2/notification_conv/',
+        convNotificationLastActivityTimeUrl: '/api/v2/notification_conv/last-activity-time/',
+        convNotificationUnreadUrl: '/api/v2/notification_conv/unread-count/',
+        convNotificationMarkReadUrl: '/api/v2/notification_conv/update-as-read/',
+        convNotificationMarkAllReadUrl: '/api/v2/notification_conv/mark-all-as-read/',
 
         // Other
         postUrl: '/api/v2/status/',
