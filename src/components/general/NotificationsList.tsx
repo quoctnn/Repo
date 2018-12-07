@@ -10,6 +10,7 @@ import { notificationsReducerPageSize } from "../../reducers/notifications";
 import * as Actions from "../../actions/Actions" 
 import { List } from "./List";
 import { setNotificationPageNotFetching } from '../../actions/Actions';
+import NotificationItem from "./NotificationItem";
 require("./NotificationsList.scss");
 
 export interface OwnProps
@@ -95,7 +96,7 @@ class NotificationsList extends React.PureComponent<Props, State> {
             <div id="notifications-list">
                 <List onScroll={this.onScroll} className="group-list vertical-scroll">
                     {notifications.map((n, index) => {
-                        return (<div key={n.serialization_id}>{n.display_text}</div>)
+                        return (<NotificationItem text={n.display_text} date={n.created_at} avatarProfiles={n.actors.map(i => i.id)} key={n.serialization_id} />)
                     }) }
                     {this.renderLoading()}
                 </List>

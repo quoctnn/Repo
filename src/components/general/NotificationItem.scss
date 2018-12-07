@@ -1,0 +1,8 @@
+.notification-item 
+{
+    display: flex;
+    .avatar{
+        margin-right: 10px;
+        flex-shrink: 0;
+    }
+}
