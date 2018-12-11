@@ -92,6 +92,16 @@
             "type": "user.update"
           },
           {
+            "data": "UserObject",
+            "type": "user.add"
+          },
+          {
+            "data": {
+              "user_id": 5
+            },
+            "type": "user.remove"
+          },
+          {
             "data": {
               "status": "dnd"
             },
