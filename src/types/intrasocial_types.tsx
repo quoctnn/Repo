@@ -438,6 +438,7 @@ export interface UserProfile extends SimpleUserProfile{
     slug_name:string,
     updated_at:number
     relationship?: string[],
+    mutual_friends?: number[],
     last_seen?:number,
 }
 export const avatarStateColorForUserProfile = (userProfile:UserProfile) => {
