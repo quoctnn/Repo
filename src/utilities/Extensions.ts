@@ -31,6 +31,29 @@ Array.prototype.contains = function<T>(element:T): boolean {
 Array.prototype.cloneArray = function() {
   return nullOrUndefined(this) ? this : Immutable.fromJS(this).toJS()
 }
+Array.prototype.isEqual = function<T>(arr2:T[]) 
+{
+  if(!this  || !arr2) 
+            return false
+        let result;
+        this.forEach((e1,i)=>arr2.forEach(e2=>{
+            
+                if(Array.isArray(e1) && Array.isArray(e2) && e1.length > 1 && e2.length)
+                {
+                    result = this.arrayEqual(e1,e2)
+                }
+                else if(e1 !== e2 )
+                {
+                    result = false
+                }
+                else
+                {
+                    result = true
+                }
+            })
+        )
+        return result
+}
 Number.prototype.mod = function(n) {
   return ((this%n)+n)%n;
 };

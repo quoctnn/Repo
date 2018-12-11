@@ -20,7 +20,7 @@ import queue from './queue';
 import { conversations } from './conversations';
 import { messages } from './messages';
 import { statuses } from './statuses';
-import { Status, UserProfile, Message, EmbedlyItem, Conversation, Notification } from '../types/intrasocial_types';
+import { Status, UserProfile, Message, EmbedlyItem, Conversation, Notification, Group, Community } from '../types/intrasocial_types';
 import { CachePageV2 } from './simplePaginator';
 import { CachePageV3 } from './simpleMultiPaginator';
 import { notifications } from './notifications';
@@ -44,8 +44,8 @@ export interface RootState
       settings: any;
       auth:{signedIn:boolean, authToken:string|null, profile:UserProfile|null}
       profileStore: { byId:{[id:number]:UserProfile}, allIds:number[]};
-      communityStore: any;
-      groupStore: any;
+      communityStore: {communities:Community[]};
+      groupStore: {groups:Group[]};
       groupListCache: any;
       eventStore: any;
       eventListCache: any;

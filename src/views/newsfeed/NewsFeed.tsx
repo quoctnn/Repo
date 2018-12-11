@@ -16,6 +16,8 @@ import { StatusUtilities } from '../../utilities/StatusUtilities';
 import { withRouter } from 'react-router';
 import * as Immutable from 'immutable';
 import { ToastManager } from '../../managers/ToastManager';
+import { statusReducerPageSize } from '../../reducers/statuses';
+import { NavigationUtilities } from '../../utilities/NavigationUtilities';
 require("./NewsFeed.scss");
 
 class StatusComposer
@@ -53,6 +55,7 @@ type ArrayItem =
 export interface OwnProps 
 {
     limit:number
+    feedContextKey:string
 }
 interface RouteProps
 {
@@ -79,6 +82,10 @@ interface State
 }
 type Props = ReduxStateProps & ReduxDispatchProps & OwnProps & RouteProps
 class NewsFeed extends React.Component<Props, State> {
+    static defaultProps:OwnProps = {
+        limit:statusReducerPageSize,
+        feedContextKey:ContextNaturalKey.NEWSFEED
+    }
     constructor(props) {
         super(props);
         this.state = {
@@ -336,19 +343,22 @@ class NewsFeed extends React.Component<Props, State> {
         }
     }
     navigateToProfile = (profile:number) => {
-
+        NavigationUtilities.navigateToProfileId(this.props.history, profile )
     }
     navigateToCommunity = (community:number) => {
 
+        NavigationUtilities.navigateToCommunity(this.props.history, community )
     }
     navigateToGroup = (group:number) => {
 
+        NavigationUtilities.navigateToGroup(this.props.history, group )
     }
     navigateToProject = (group:number) => {
 
     }
     navigateToWeb = (url:string) => {
 
+        NavigationUtilities.navigateToUrl(this.props.history, url)
     }
     navigateToAction = (status:Status, action:StatusActions, extra?:any) => 
     {
@@ -358,7 +368,15 @@ class NewsFeed extends React.Component<Props, State> {
         }
         switch(action)
         {
-            case StatusActions.user: this.navigateToProfile(status.owner.id);break;
+            case StatusActions.user: 
+            {
+                if(extra && extra.profile)
+                {
+                    this.navigateToProfile(extra.profile.id);
+                    break;
+                }
+                logWarn()
+            }
             case StatusActions.community: {
                 let c = status.community && status.community.id
                 if(c)
@@ -445,6 +463,7 @@ class NewsFeed extends React.Component<Props, State> {
         authorizedUserId={authUser.id}
         isLastComment={isLast}
         onActionPress={this.navigateToActionWithId(item.id)}
+        feedContextKey={this.props.feedContextKey}
         />
     }
     renderStatusComposer = (composer:StatusComposer, index:number) => {

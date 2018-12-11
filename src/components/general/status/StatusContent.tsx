@@ -3,12 +3,14 @@ import { getTextContent } from '../../../utilities/Utilities';
 import { ProfileManager } from '../../../managers/ProfileManager';
 import ContentGallery from '../gallery/ContentGallery';
 import { Status } from '../../../types/intrasocial_types';
+import { StatusActions } from './StatusComponent';
 require("./StatusContent.scss");
 
 export interface Props 
 {
     status:Status
     embedLinks:boolean
+    onActionPress:(action:StatusActions, extra?:Object) => void
 }
 interface State 
 {
@@ -40,7 +42,7 @@ export default class StatusContent extends React.Component<Props, State>
 
     renderDescription() {
         const text = this.getTextForField("text")
-        const content = getTextContent(text, ProfileManager.getProfiles(this.props.status.mentions),false)
+        const content = getTextContent(text, ProfileManager.getProfiles(this.props.status.mentions),false, this.props.onActionPress)
         if (text) {
             return (
                 <div className="item-description">

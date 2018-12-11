@@ -2,12 +2,11 @@ import * as React from 'react';
 import StatusForm from "./StatusForm";
 import { Mention } from '../../input/MentionEditor';
 import { ProfileManager } from '../../../managers/ProfileManager';
-import StatusFormContainer from './StatusFormContainer';
 import { Status, TempStatus, UploadedFile } from '../../../types/intrasocial_types';
 import { EditorContent, IEditorComponent } from '../ChatMessageComposer';
 import { Settings } from '../../../utilities/Settings';
 import { URL_REGEX, URL_WWW_REGEX } from '../../../utilities/IntraSocialUtilities';
-import ApiClient from '../../../network/ApiClient';
+import FilesUpload from './FilesUpload';
 
 interface Props 
 {
@@ -233,6 +232,16 @@ class StatusEditForm extends StatusForm{
             <div className="panel panel-flat create-post-panel">
                 <div className="panel-body">
                     {this.renderTextArea(canPost)}
+                    {this.state.showDropzone && <FilesUpload 
+
+                                files={this.props.files}
+                                onFileAdded={this.handleFileAdded}
+                                onFileError={this.handleFileError}
+                                onFileRemoved={this.handleFileRemoved}
+                                onFileUploaded={this.props.onFileUploaded}
+                                onFileQueueComplete={this.props.onFileQueueComplete}
+                                communityId={this.props.communityId}/>
+                        }
                 </div>
             </div>
         );

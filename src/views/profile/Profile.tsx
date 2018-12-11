@@ -42,7 +42,7 @@ class Profile extends React.Component<Props, {}>
     fetchProfile()
     {
         let slug = this.props.match.params.slug
-        ApiClient.getProfileBySlug(slug, (data:{results:UserProfile[]},status,error) => 
+        ApiClient.getProfilesBySlug(slug, (data,status,error) => 
         {
             if(data && data.results && data.results.length > 0)
             {

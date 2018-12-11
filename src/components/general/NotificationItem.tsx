@@ -12,27 +12,17 @@ export interface OwnProps
 {
     text:string 
     date:string
-    avatarProfiles:number[]
+    avatars:string[]
 }
 interface State
 {
-    avatarProfiles:UserProfile[]
 }
 type Props = OwnProps
 export default class NotificationItem extends React.PureComponent<Props, State> {
     constructor(props) {
         super(props)
         this.state = {
-            avatarProfiles:[]
         }
-    }
-    componentDidMount = () => 
-    {
-        ProfileManager.ensureProfilesExists(this.props.avatarProfiles, () => {
-            this.setState({
-                avatarProfiles: ProfileManager.getProfiles(this.props.avatarProfiles),
-            });
-        })
     }
     getTimestamp = () => 
     {
@@ -53,7 +43,7 @@ export default class NotificationItem extends React.PureComponent<Props, State> 
     }
     render = () => 
     {
-        const avatars = this.state.avatarProfiles.map(u => u.avatar_thumbnail || u.avatar).filter(a => !nullOrUndefined(a))
+        const avatars = this.props.avatars
         return(
             <div className="panel-heading notification-item">
                 <Avatar images={avatars} />

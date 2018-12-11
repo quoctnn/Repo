@@ -4,7 +4,7 @@ import { StatusUtilities } from '../../../utilities/StatusUtilities';
 import StatusHeader from './StatusHeader';
 import StatusContent from './StatusContent';
 import { AuthenticationManager } from '../../../managers/AuthenticationManager';
-import { Status, UploadedFile } from '../../../types/intrasocial_types';
+import { Status } from '../../../types/intrasocial_types';
 import StatusFooterStats from './StatusFooterStats';
 require("./StatusComponent.scss");
 export enum StatusActions
@@ -29,6 +29,10 @@ export enum StatusActions
     reactionsCount = 9,
     /** NOOP extra:{} */
     file = 10,
+    /**Navigates to an intrasocial link that loads "link": extra:{link:string} */
+    intrasocial_link = 11,
+    /**Navigates to a status; extra:{status:number} */
+    status = 12,
 }
 export interface OwnProps 
 {
@@ -45,6 +49,7 @@ export interface OwnProps
     status:Status
     className?:string
     isLastComment:boolean
+    feedContextKey:string
 }
 interface State 
 {
@@ -135,6 +140,8 @@ export default class StatusComponent extends React.Component<Props, State>
         let statusType = this.getTypeOfContent(status)
         let itemClass = classNames("status status-component drop-shadow", statusType, this.props.className, { statuscomment: isComment, temp: status.pending, last:this.props.isLastComment})
         const addLinkToContext = !isComment && this.props.addLinkToContext
+        const communityName = !!status.community ? status.community.name : undefined
+        const contextObjectName = !!status.context_object ? status.context_object.name : undefined
         return (<div className={itemClass} id={statusId}>
                     <hr className="line"/>
                     <StatusHeader
@@ -144,9 +151,18 @@ export default class StatusComponent extends React.Component<Props, State>
                         status={status} 
                         addLinkToContext={addLinkToContext} 
                         contextKey={this.props.contextKey} 
-                        contextId={this.props.contextId} isComment={isComment}/>
+                        contextId={this.props.contextId} isComment={isComment} 
+                        onActionPress={this.props.onActionPress}
+                        communityName={communityName}
+                        contextObjectName={contextObjectName}
+                        context_natural_key={status.context_natural_key}
+                        context_object_id={status.context_object_id}
+                        feedContextKey={this.props.feedContextKey}
+                        />
 
-                    <StatusContent status={status} embedLinks={true}/>
+                    <StatusContent status={status} embedLinks={true} 
+                    onActionPress={this.props.onActionPress}/>
+
                     <StatusFooterStats
                     communityId={communityId}
                     canUpload={this.props.canUpload}

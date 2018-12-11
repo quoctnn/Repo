@@ -119,6 +119,9 @@ export enum ContextNaturalKey
     COMMUNITY = "core.community",
     USER = "auth.user",
     PROJECT = "project.project",
+    TASK = "project.task",
+    EVENT = "event.event",
+    NEWSFEED = "newsfeed",
 }
 export enum UploadedFileType
 {

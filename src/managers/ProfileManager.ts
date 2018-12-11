@@ -18,7 +18,7 @@ export abstract class ProfileManager
         let requestIds = profiles.filter(id => ids.indexOf(id) == -1)
         if(requestIds.length > 0)
         {
-            ApiClient.getProfiles(requestIds, (data:{results:UserProfile[]}, status, error) => {
+            ApiClient.getProfiles(requestIds, (data, status, error) => {
                 if(data && data.results && data.results.length > 0)
                 {
                     store.dispatch(Actions.storeProfiles(data.results))
@@ -125,7 +125,16 @@ export abstract class ProfileManager
                 })
                 break;
             }
-            default:completion([]);
+            case ContextNaturalKey.USER: 
+            {
+                
+                break;
+            }
+            default:
+            {
+                console.log("searchMembersInContext", query, contextObjectId, contextNaturalKey)
+                completion([]);
+            }
         }
     }
     private static getStore = ():Store<RootState,any> =>

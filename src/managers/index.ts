@@ -7,6 +7,7 @@ import { StatusManager } from './StatusManager';
 import { StoreManager } from './StoreManager';
 import { ToastManager } from './ToastManager';
 import { NotificationManager } from './NotificationManager';
+import { GroupManager } from './GroupManager';
 const setupManagers = () => 
 {
     AuthenticationManager.setup()
@@ -18,5 +19,6 @@ const setupManagers = () =>
     StoreManager.setup()
     ToastManager.setup()
     NotificationManager.setup()
+    GroupManager.setup()
 }
 export default setupManagers

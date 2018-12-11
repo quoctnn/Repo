@@ -51,6 +51,9 @@ export default  {
         friendsUrl: '/api/v1/friends/',
 
         // Group URLs
+        groupUrl: (id) => {
+            return `/api/v1/group/${id}/`
+        },
         groupsUrl: '/api/v1/group/',
         myGroupsUrl: '/api/v1/group/as-member/',
         groupFilesUrl: (id) => {
