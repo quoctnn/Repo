@@ -148,12 +148,13 @@ body
     -moz-backface-visibility : hidden;
     backface-visibility : hidden;
 }
-.link-text, a
+.link-text, a, .text.link
 {
     @include var(color, link-color);
     font-weight: 500;
+    cursor: pointer;
 }
-.link-text:hover, a:hover
+.link-text:hover, a:hover, .text.link:hover
 {
     @include var(color, link-color);
 }

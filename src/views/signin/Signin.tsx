@@ -14,7 +14,7 @@ require("./Signin.scss");
 
 
 export interface Props {
-    setAuthorizationData:(token:string, sessionid:string) => void,
+    setAuthorizationData:(token:string) => void,
     apiEndpoint?:number,
     availableApiEndpoints?:Array<ApiEndpoint>,
     language:number,
@@ -29,7 +29,7 @@ class Signin extends React.Component<Props, {}> {
         this.doSignin = this.doSignin.bind(this)
         this.loginCallback = this.loginCallback.bind(this)
     }
-    loginCallback(data:any, status:string, error:string)
+    loginCallback(data:{token:string|null}, status:string, error:string)
     {
         if(error || status == "error")
         {
@@ -38,7 +38,7 @@ class Signin extends React.Component<Props, {}> {
         }
         if(data.token)
         {
-            this.props.setAuthorizationData(data.token, data.session_id)
+            this.props.setAuthorizationData(data.token)
             AuthenticationManager.signIn(data.token)
         }
         this.props.history.push('/')

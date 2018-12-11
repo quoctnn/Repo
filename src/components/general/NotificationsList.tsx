@@ -9,8 +9,8 @@ import LoadingSpinner from "./LoadingSpinner";
 import { notificationsReducerPageSize } from "../../reducers/notifications";
 import * as Actions from "../../actions/Actions"
 import { List } from "./List";
-import { setNotificationPageNotFetching } from '../../actions/Actions';
 import NotificationItem from "./NotificationItem";
+import { ProfileManager } from "../../managers/ProfileManager";
 require("./NotificationsList.scss");
 
 export interface OwnProps
@@ -39,12 +39,46 @@ interface ReduxDispatchProps
     requestNextNotificationPage?:(page:number) => void
     setNotificationPageNotFetching?:() => void
 }
+type DictionaryWithNumberString = {[id:number]:string}
 interface State
 {
+    allUserAvatars:DictionaryWithNumberString
 }
 type Props = ReduxStateProps & ReduxDispatchProps & OwnProps & RouteProps
 class NotificationsList extends React.PureComponent<Props, State> {
 
+    constructor(props) {
+        super(props)
+        this.state = {
+            allUserAvatars:{}
+        }
+    }
+    componentDidMount = () => {
+
+        this.loadUserAvatars(this.props)
+    }
+    loadUserAvatars = (props:Props) => 
+    {
+        let notifications = props.items
+        const sort = (a:number,b:number) => b - a
+        const prevActors = Object.keys( this.state.allUserAvatars ).map(s => parseInt(s)).sort(sort)
+        const allActors = notifications.map(n => n.actors).reduce((i, a) => i.concat(a), []).distinct().sort(sort)
+        if (!prevActors.isEqual(allActors))
+        {
+            ProfileManager.ensureProfilesExists(allActors, () => {
+                var avs:DictionaryWithNumberString = {}
+                ProfileManager.getProfiles(allActors).forEach(p => {
+                    avs[p.id] = p.avatar_thumbnail || p.avatar
+                })
+                this.setState({
+                    allUserAvatars: avs,
+                });
+            })
+        }
+    }
+    componentWillReceiveProps = (newProps:Props) => {
+        this.loadUserAvatars(newProps)
+    }
     componentWillMount = () =>
     {
         this.loadFirstData(true)
@@ -89,6 +123,9 @@ class NotificationsList extends React.PureComponent<Props, State> {
             this.loadNextPageData()
         }
     }
+    getAvatars = (avatars:number[]) => {
+        return avatars.map(id =>  this.state.allUserAvatars[id]).filter(i => !nullOrUndefined(i))
+    }
     render = () =>
     {
         let notifications = this.props.items
@@ -96,7 +133,7 @@ class NotificationsList extends React.PureComponent<Props, State> {
             <div id="notifications-list">
                 <List onScroll={this.onScroll} className="group-list vertical-scroll">
                     {notifications.map((n, index) => {
-                        return (<NotificationItem text={n.display_text} date={n.created_at} avatarProfiles={n.actors} key={n.serialization_id} />)
+                        return (<NotificationItem text={n.display_text} date={n.created_at} avatars={this.getAvatars(n.actors)} key={n.serialization_id} />)
                     }) }
                     {this.renderLoading()}
                 </List>

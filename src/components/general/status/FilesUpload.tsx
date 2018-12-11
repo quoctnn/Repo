@@ -5,6 +5,7 @@ import { Settings } from '../../../utilities/Settings';
 import { StoreManager } from '../../../managers/StoreManager';
 import { AuthenticationManager } from '../../../managers/AuthenticationManager';
 import { UploadedFile } from '../../../types/intrasocial_types';
+import { IntraSocialUtilities } from '../../../utilities/IntraSocialUtilities';
 require("./FilesUpload.scss");
 
 var getSuccessFileUploadData = (file) => {
@@ -69,7 +70,7 @@ export default class FilesUpload extends React.Component<Props, State> {
     initDropzoneComponent(dropzone) {
         if (typeof this.props.files !== 'undefined') {
             this.props.files.forEach((file) => {
-                addExistingFiles(dropzone, file.filename, file.thumbnail, file.size, file)
+                addExistingFiles(dropzone, file.filename, IntraSocialUtilities.appendAuthorizationTokenToUrl(file.thumbnail), file.size, file)
             })
 
             // With existing files, adjust it to the correct amount of maxFiles:

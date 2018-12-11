@@ -73,8 +73,14 @@ div.filepicker .fa {
 /* Overrite dropzone css */
 .dropzone .dz-preview .dz-image {
   border-radius: 0;
-}
 
+}
+.dz-image {
+  img {
+    max-width: 100%;
+    max-height: 100%;
+  }
+}
 .dz-success-mark svg path {
   @include var(fill, success-color);
 }

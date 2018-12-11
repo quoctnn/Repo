@@ -5,6 +5,8 @@ const processString = require('react-process-string');
 import { Routes } from './Routes';
 import * as React from 'react';
 import { UserProfile } from '../types/intrasocial_types';
+import { StatusActions } from '../components/general/status/StatusComponent';
+import Text from '../components/general/Text';
 export const getDomainName = (url:string) =>  {
     var url_parts = url.split("/")
     var domain_name_parts = url_parts[2].split(":")
@@ -28,7 +30,7 @@ export const LINEBREAK_REGEX = /\r?\n|\r/g
 export const truncate = (text, maxChars) => {
     return text.length > (maxChars - 3) ? text.substring(0, maxChars - 3) + '...' : text;
 }
-export function getTextContent(text:string, mentions:UserProfile[], includeEmbedlies:false)
+export function getTextContent(text:string, mentions:UserProfile[], includeEmbedlies:false, onLinkPress:(action:StatusActions, extra?:Object) => void)
 {
     var processed:any = null
     var config = []
@@ -41,7 +43,9 @@ export function getTextContent(text:string, mentions:UserProfile[], includeEmbed
             {
                 embedlyArr[result[0]] = <Embedly key={uniqueId()} url={result[0]} />
             }
-            return (<a key={uniqueId()} href={result[0]} target="_blank"  data-toggle="tooltip" title={result[0]}>{truncate(result[0], 50 )}</a>)
+            return (<Text key={uniqueId()} onPress={() => onLinkPress(StatusActions.link, {link:result[0]} )}>{truncate(result[0], 50 )}</Text>)
+
+            //return (<a key={uniqueId()} href={result[0]} target="_blank"  data-toggle="tooltip" title={result[0]}>{truncate(result[0], 50 )}</a>)
         }
     }
     config.push(k)
@@ -57,7 +61,8 @@ export function getTextContent(text:string, mentions:UserProfile[], includeEmbed
         return {
             regex:new RegExp("@" + user.username.replace("+","\\+"), 'g'),
             fn: (key, result) => {
-                return <Link key={key} to={Routes.PROFILES + user.slug_name }>{user.first_name + " " + user.last_name}</Link>;
+                return <Text key={key} onPress={() => onLinkPress(StatusActions.user,{profile:user} )}>{user.first_name + " " + user.last_name}</Text>
+                //return <Link key={key} to={Routes.PROFILES + user.slug_name }>{user.first_name + " " + user.last_name}</Link>;
             }
         }
     }).filter(o => o)

@@ -260,33 +260,10 @@ export default class ContentGallery extends React.Component<Props, State> {
         this.onGalleryItemClick = this.onGalleryItemClick.bind(this)
         this.onDialogClose = this.onDialogClose.bind(this)
     }
-    arrayEqual = (arr1:any[],arr2:any[]) => 
-    {
-        if(!arr1  || !arr2) 
-            return false
-        let result;
-        arr1.forEach((e1,i)=>arr2.forEach(e2=>{
-            
-                if(Array.isArray(e1) && Array.isArray(e2) && e1.length > 1 && e2.length)
-                {
-                    result = this.arrayEqual(e1,e2)
-                }
-                else if(e1 !== e2 )
-                {
-                    result = false
-                }
-                else
-                {
-                    result = true
-                }
-            })
-        )
-        return result
-     }
     componentWillReceiveProps(nextProps:Props) 
     {
-        const changed = !this.arrayEqual( nextProps.links , this.props.links) ||
-        !this.arrayEqual(nextProps.files.map(f => f.id), this.props.files.map(f => f.id))
+        const changed = !nextProps.links.isEqual(this.props.links) || 
+        !nextProps.files.map(f => f.id).isEqual(this.props.files.map(f => f.id))
         if(changed)
         {
             this.setState({ data: this.getContentData(nextProps) });

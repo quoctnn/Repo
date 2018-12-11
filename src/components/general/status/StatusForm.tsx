@@ -30,14 +30,13 @@ export default class StatusForm extends StatusFormBase {
             <div className="panel panel-flat create-post-panel">
                 <div className="panel-body">
                         {this.renderTextArea(canPost)}
-                                {this.state.showDropzone &&
-                        <FilesUpload onFileAdded={this.handleFileAdded}
+                        {this.state.showDropzone && <FilesUpload onFileAdded={this.handleFileAdded}
                                 onFileError={this.handleFileError}
                                 onFileRemoved={this.handleFileRemoved}
                                 onFileUploaded={this.props.onFileUploaded}
                                 onFileQueueComplete={this.props.onFileQueueComplete}
                                 communityId={this.props.communityId}/>
-                    }
+                        }
                 </div>
             </div>
         );
