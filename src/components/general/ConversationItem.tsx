@@ -47,15 +47,15 @@ class ConversationItem extends React.Component<Props, State> {
         const padding = 10
         return (
             <div className={"conversation-item" + (this.props.isActive ? " active" : "") + (this.props.className ? " " + this.props.className:"") }>
-                <Link to={Routes.conversationUrl(conversation.id)}>
+                <Link className="d-flex" to={Routes.conversationUrl(conversation.id)}>
                     <div className="conversation-item-body d-flex align-items-center" style={{height:(size + padding * 2)  + "px", padding:padding + "px"}}>
                         <div>
                             <Avatar images={avatars} size={size} borderColor="white" borderWidth={2}>
                                 
                             </Avatar>
                         </div>
-                        <div className="d-flex text-truncate flex-column">
-                            <span className="d-flex text-truncate">
+                        <div className="text-truncate flex-column">
+                            <span className="text-truncate">
                                 <span className="title text-truncate">{title}</span>
                                 {
                                     conversation.unread_messages.length > 0 && 
