@@ -11,6 +11,7 @@ import * as Actions from "../../actions/Actions"
 import { List } from "./List";
 import NotificationItem from "./NotificationItem";
 import { ProfileManager } from "../../managers/ProfileManager";
+import classNames = require("classnames");
 require("./NotificationsList.scss");
 
 export interface OwnProps
@@ -126,14 +127,32 @@ class NotificationsList extends React.PureComponent<Props, State> {
     getAvatars = (avatars:number[]) => {
         return avatars.map(id =>  this.state.allUserAvatars[id]).filter(i => !nullOrUndefined(i))
     }
+    onItemPress = (event:any, id:string) => {
+        event.preventDefault()
+        const notification = this.props.items.find(i => i.serialization_id == id)
+        if(notification)
+        {
+
+        }
+    }
+
     render = () =>
     {
         let notifications = this.props.items
         return(
             <div id="notifications-list">
                 <List onScroll={this.onScroll} className="group-list vertical-scroll">
-                    {notifications.map((n, index) => {
-                        return (<NotificationItem text={n.display_text} date={n.created_at} avatars={this.getAvatars(n.actors)} key={n.serialization_id} />)
+                    {notifications.map((n, index) => 
+                    {
+                        let itemClass = classNames("notification-item list-group-item", {
+                            "seen": n.is_read,
+                            "completed": n.extra == 'completed',
+                            "to-verify": n.extra == 'to-verify',
+                            "not-applicable": n.extra == 'not-applicable',
+                            "progress": n.extra == 'progress',
+                            "clickable": n.absolute_url != null,
+                        })
+                        return (<NotificationItem className={itemClass} id={n.serialization_id} onItemClick={this.onItemPress} text={n.display_text} date={n.created_at} avatars={this.getAvatars(n.actors)} key={n.serialization_id} />)
                     }) }
                     {this.renderLoading()}
                 </List>

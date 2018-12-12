@@ -15,7 +15,7 @@ import { Avatar } from '../../components/general/Avatar';
 import { conversationReducerPageSize } from '../../reducers/conversations';
 import * as moment from 'moment-timezone';
 import { Link } from 'react-router-dom';
-import { Routes } from '../../utilities/Routes';
+import Routes from '../../utilities/Routes';
 import { List } from '../../components/general/List';
 import { NotificationCenter } from '../../notifications/NotificationCenter';
 import { ProfileManager } from '../../managers/ProfileManager';
@@ -182,7 +182,7 @@ class Conversations extends React.PureComponent<Props, State> {
             let keys = Object.keys(isTypingData).map(s => parseInt(s))
             return <div className="is-typing-container">
             {keys.map((data, index) => {
-                let avatar = ProfileManager.getProfile(data).avatar
+                let avatar = ProfileManager.getProfileById(data).avatar
                 return (<Avatar key={index} image={avatar} size={24}/>)
 
             })}

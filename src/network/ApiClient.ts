@@ -2,9 +2,9 @@ import Constants from "../utilities/Constants";
 import {AjaxRequest} from "./AjaxRequest";
 var $ = require("jquery")
 import store from '../main/App';
-import { Status, UserProfile, UploadedFile, Community, Group, Conversation, Project, Message } from "../types/intrasocial_types";
-
-export type ApiClientFeedPageCallback<T> = (data: {results:T[], count:number, previous:string|null, next:string|null}, status:string, error:string|null) => void;
+import { Status, UserProfile, UploadedFile, Community, Group, Conversation, Project, Message, Event, Task } from '../types/intrasocial_types';
+export type PaginationResult<T> = {results:T[], count:number, previous:string|null, next:string|null}
+export type ApiClientFeedPageCallback<T> = (data: PaginationResult<T>, status:string, error:string|null) => void;
 export type ApiClientCallback<T> = (data: T|null, status:string, error:string|null) => void;
 
 
@@ -69,9 +69,36 @@ export default class ApiClient
             callback(null, status, error)
         })
     }
-    static getCommunity(communityId:number, callback:ApiClientCallback<Community>)
+    static getCommunity(communityId:string|number, callback:ApiClientCallback<Community>)
     {
         let url = Constants.apiRoute.communityUrl(communityId)
+        AjaxRequest.get(url, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
+    static getProject(projectId:string|number, callback:ApiClientCallback<Project>)
+    {
+        let url = Constants.apiRoute.projectDetailUrl(projectId)
+        AjaxRequest.get(url, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
+    static getTask(taskId:number, callback:ApiClientCallback<Task>)
+    {
+        let url = Constants.apiRoute.taskDetailUrl(taskId)
+        AjaxRequest.get(url, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
+    static getEvent(eventId:string|number, callback:ApiClientCallback<Event>)
+    {
+        let url = Constants.apiRoute.eventDetailUrl(eventId)
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
@@ -108,7 +135,7 @@ export default class ApiClient
             callback(null, status, error)
         })
     }
-    static getProfile(id:number, callback:ApiClientCallback<UserProfile>)
+    static getProfile(id:string|number, callback:ApiClientCallback<UserProfile>)
     {
         AjaxRequest.get(Constants.apiRoute.profileUrl(id), (data, status, request) => {
             callback(data, status, null)
@@ -166,7 +193,7 @@ export default class ApiClient
             callback(null, status, error)
         })
     }
-    static getGroup(groupId:number, callback:ApiClientCallback<Group>)
+    static getGroup(groupId:string, callback:ApiClientCallback<Group>)
     {
         let url = Constants.apiRoute.groupUrl(groupId)
         AjaxRequest.get(url, (data, status, request) => {

@@ -4,7 +4,7 @@ import { withRouter, Link} from 'react-router-dom'
 import { connect } from 'react-redux'
 import { Button} from 'reactstrap';
 import * as Actions from "../../actions/Actions"
-import { Routes } from '../../utilities/Routes';
+import Routes from '../../utilities/Routes';
 import { RootState } from '../../reducers/index';
 import { UserProfile } from "../../types/intrasocial_types";
 import { AuthenticationManager } from '../../managers/AuthenticationManager';
@@ -45,7 +45,7 @@ class ProfileStatus extends React.Component<Props, State> {
                 {this.props.authenticatedProfile &&
                     <div className="d-flex align-items-center">
                         <div className="">
-                        <Link className="btn btn-outline-secondary" to={Routes.PROFILES + this.props.authenticatedProfile.slug_name}>{this.props.authenticatedProfile.first_name}</Link>
+                        <Link className="btn btn-outline-secondary" to={Routes.profileUrl( this.props.authenticatedProfile.slug_name )}>{this.props.authenticatedProfile.first_name}</Link>
                         </div>
                         <div className="margin-left-sm">
                             <Button onClick={() => {AuthenticationManager.signOut(); this.props.history.push(Routes.ROOT) }} outline color="secondary">{translate("Sign out")}</Button>

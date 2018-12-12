@@ -4,7 +4,7 @@ import { messagesPaginator, messageReducerKey } from '../reducers/messages';
 import { InsertItemAction } from '../reducers/createPaginator';
 import { statusesPaginator } from '../reducers/statuses';
 import { Status, EmbedlyItem, Message, Conversation, Community,
-         UserProfile, Group, Event, Project } from '../types/intrasocial_types';
+         UserProfile, Group, Event, Project, Task } from '../types/intrasocial_types';
 import { notificationsPaginator, notificationsReducerKey } from '../reducers/notifications';
 import { Notification } from '../types/intrasocial_types';
 
@@ -181,6 +181,20 @@ export const storeProject = (project: Project) => ({
 });
 export const resetProjectStore = () => ({
   type: Types.PROJECTSTORE_RESET
+});
+
+
+//taskStore
+export const storeTasks = (tasks: Task[]) => ({
+  type: Types.TASKSTORE_ADD_TASKS,
+  tasks: tasks
+});
+export const storeTask = (task: Task) => ({
+  type: Types.TASKSTORE_ADD_TASK,
+  task: task
+});
+export const resetTaskStore = () => ({
+  type: Types.TASKSTORE_RESET
 });
 
 //contactListCache

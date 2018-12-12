@@ -3,7 +3,7 @@ import * as React from 'react';
 import { AuthenticationManager } from '../managers/AuthenticationManager';
 import Embedly from '../components/general/Embedly';
 import { Link } from 'react-router-dom';
-import { Routes } from './Routes';
+import Routes from './Routes';
 import { Status, UserProfile, UploadedFile } from '../types/intrasocial_types';
 
 export const URL_REGEX = /(\b(https?|ftp):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/gim
@@ -124,7 +124,7 @@ export class IntraSocialUtilities
             return {
                 regex:new RegExp("@" + user.username.replace("+","\\+"), 'g'),
                 fn: (key:string, result:any) => {
-                    return <Link key={key} to={Routes.PROFILES + user.slug_name }>{user.first_name + " " + user.last_name}</Link>;
+                    return <Link key={key} to={Routes.profileUrl(user.slug_name)}>{user.first_name + " " + user.last_name}</Link>;
                 }
             }
         }).filter(o => o)

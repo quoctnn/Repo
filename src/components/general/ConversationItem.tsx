@@ -1,7 +1,7 @@
 import { Avatar } from './Avatar';
 import * as React from 'react';
 import { Link } from 'react-router-dom';
-import { Routes } from '../../utilities/Routes';
+import Routes from '../../utilities/Routes';
 import { OverflowList } from './OverflowList';
 import { RootState } from '../../reducers';
 import { connect } from 'react-redux'
@@ -47,7 +47,7 @@ class ConversationItem extends React.Component<Props, State> {
         const padding = 10
         return (
             <div className={"conversation-item" + (this.props.isActive ? " active" : "") + (this.props.className ? " " + this.props.className:"") }>
-                <Link to={Routes.CONVERSATION + conversation.id}>
+                <Link to={Routes.conversationUrl(conversation.id)}>
                     <div className="conversation-item-body d-flex align-items-center" style={{height:(size + padding * 2)  + "px", padding:padding + "px"}}>
                         <div>
                             <Avatar images={avatars} size={size} borderColor="white" borderWidth={2}>

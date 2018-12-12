@@ -2,7 +2,7 @@ import {  Store } from 'redux';
 import { RootState } from '../reducers';
 import { EventStreamMessageType, canSendOnWebsocket, sendOnWebsocket } from '../components/general/ChannelEventStream';
 import * as Actions from '../actions/Actions';
-import { Routes } from '../utilities/Routes';
+import Routes from '../utilities/Routes';
 import { translate } from '../components/intl/AutoIntlProvider';
 import ApiClient from '../network/ApiClient';
 import { NotificationCenter } from '../notifications/NotificationCenter';
@@ -117,11 +117,11 @@ export abstract class ConversationManager
     }
     private static sendMessageNotification = (message: Message) =>  
     {
-        let uri = Routes.CONVERSATION + message.conversation;
+        let uri = Routes.conversationUrl(message.conversation);
         if (document.hasFocus()) 
         {
             // If tab is focused
-            let user: UserProfile = ProfileManager.getProfile(message.user);
+            let user: UserProfile = ProfileManager.getProfileById(message.user);
             // Show the toast if the user is not viewing that conversation
             if (user && window.location.pathname != uri) 
             {
@@ -133,7 +133,7 @@ export abstract class ConversationManager
             // If window is not active and notifications are enabled
             if (Notification.permission === 'granted') 
             {
-                let user: UserProfile = ProfileManager.getProfile(message.user);
+                let user: UserProfile = ProfileManager.getProfileById(message.user);
                 if (user) 
                 {
                     var options = {

@@ -8,26 +8,29 @@ export abstract class GroupManager
     static setup = () => 
     {
     }
-    static storeCommunities = (groups:Group[]) => {
+    static storeGroups = (groups:Group[]) => {
         GroupManager.getStore().dispatch(Actions.storeGroups(groups))
     }
-    static getGroup = (groupId:number):Group|null => 
+    static getGroup = (groupId:string):Group|null => 
     {
-        return GroupManager.getStore().getState().groupStore.groups.find(c => c.id == groupId)
+        const isNumber = groupId.isNumber()
+        var group = GroupManager.getStore().getState().groupStore.groups.find(g => g.slug == groupId)
+        if(!group && isNumber)
+        {
+            return GroupManager.getStore().getState().groupStore.groups.find(g => g.id == parseInt(groupId))
+        }
+        return group
     }
-    static getCommunitySecure = (communityId:number, completion:(group:Group) => void) => 
+    static ensureGroupExists = (groupId:string|number, completion:(group:Group) => void) => 
     {
-        return GroupManager.ensureGroupExists(communityId, completion)
-    }
-    static ensureGroupExists = (groupId:number, completion:(group:Group) => void) => 
-    {
-        let group = GroupManager.getGroup(groupId)
+        const id = groupId.toString()
+        let group = GroupManager.getGroup(id)
         if(!group)
         {
-            ApiClient.getGroup(groupId, (data, status, error) => {
+            ApiClient.getGroup(id, (data, status, error) => {
                 if(data)
                 {
-                    GroupManager.storeCommunities([data])
+                    GroupManager.storeGroups([data])
                 }
                 else 
                 {

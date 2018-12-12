@@ -2,7 +2,7 @@ import { Settings } from './Settings';
 import Embedly from '../components/general/Embedly';
 import { Link} from 'react-router-dom'
 const processString = require('react-process-string');
-import { Routes } from './Routes';
+import Routes from './Routes';
 import * as React from 'react';
 import { UserProfile } from '../types/intrasocial_types';
 import { StatusActions } from '../components/general/status/StatusComponent';
@@ -62,7 +62,6 @@ export function getTextContent(text:string, mentions:UserProfile[], includeEmbed
             regex:new RegExp("@" + user.username.replace("+","\\+"), 'g'),
             fn: (key, result) => {
                 return <Text key={key} onPress={() => onLinkPress(StatusActions.user,{profile:user} )}>{user.first_name + " " + user.last_name}</Text>
-                //return <Link key={key} to={Routes.PROFILES + user.slug_name }>{user.first_name + " " + user.last_name}</Link>;
             }
         }
     }).filter(o => o)
@@ -104,7 +103,7 @@ export function rawMarkup(text, mentions:any[]) {
     if (mentions !== undefined) {
         mentions.map(function (user) 
         {
-            let el = `<a href="${Routes.PROFILES + user.slug_name}" data-toggle="tooltip" title="${userFullName(user)}">${user.first_name + " " + user.last_name}</a>`
+            let el = `<a href="${Routes.profileUrl(user.slug_name)}" data-toggle="tooltip" title="${userFullName(user)}">${user.first_name + " " + user.last_name}</a>`
             // let elementHTML = "<a href=" + user.absolute_url + ">" + user.first_name + "</a>";
             let regexExpression = new RegExp("@" + user.username.replace("+","\\+"), 'g');
             markup = markup.replace(regexExpression, el);

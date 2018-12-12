@@ -15,7 +15,14 @@ String.prototype.hashCode = function() {
 String.prototype.splice = function(idx, rem, str) {
     return this.slice(0, idx) + str + this.slice(idx + Math.abs(rem));
 };
-
+function isNumber(value: string | number): boolean
+{
+   return !isNaN(Number(value.toString()));
+}
+String.prototype.isNumber = function(): boolean
+{
+   return !isNaN(Number(this.toString()));
+}
 Array.prototype.move = function(oldIndex, newIndex) {
   if (newIndex >= this.length) {
       newIndex = this.length - 1;
@@ -57,3 +64,7 @@ Array.prototype.isEqual = function<T>(arr2:T[])
 Number.prototype.mod = function(n) {
   return ((this%n)+n)%n;
 };
+Number.prototype.isNumber = function(): boolean
+{
+   return !isNaN(Number(this.toString()));
+}

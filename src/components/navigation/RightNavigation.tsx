@@ -1,7 +1,7 @@
 import * as React from "react";
 import { connect } from 'react-redux'
 import { CollapsiblePanel, ArrowDirectionCollapsed } from '../general/CollapsiblePanel';
-import { Routes } from "../../utilities/Routes";
+import Routes from "../../utilities/Routes";
 import { Avatar } from "../general/Avatar";
 import { Link } from "react-router-dom";
 import { List } from "../general/List";
@@ -117,7 +117,7 @@ class RightNavigation extends React.Component<Props, {}> {
                         <List>{contacts.map((contact, index) => {
                             return (
                             <div className="avatar-profile" key={index}>
-                                <Link to={Routes.PROFILES + contact.slug_name}>
+                                <Link to={Routes.profileUrl(contact.slug_name)}>
                                     <Avatar image={contact.avatar} borderColor="green" borderWidth={2} stateColor={avatarStateColorForUserProfile(contact)}>
                                     {this.state.isTyping[contact.id] && <div className="typing-indicator-container"><TypingIndicator /></div>}
                                     </Avatar>

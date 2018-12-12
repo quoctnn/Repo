@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Link } from 'react-router-dom';
 import { URL_REGEX, uniqueId, IS_ONLY_LINK_REGEX } from '../../utilities/Utilities';
-import { Routes } from '../../utilities/Routes';
+import Routes from '../../utilities/Routes';
 import Embedly from './Embedly';
 import { translate } from '../intl/AutoIntlProvider';
 import RadialProgress from './RadialProgress';
@@ -121,13 +121,13 @@ export class ChatMessage extends React.Component<Props, {}> {
             config.push(k)
             let mentions = msg.mentions || []
             let mentionSearch = mentions.map(m => {
-                let user = ProfileManager.getProfile(m)
+                let user = ProfileManager.getProfileById(m)
                 if(!user)
                     return null
                 return {
                     regex:new RegExp("@" + user.username.replace("+","\\+"), 'g'),
                     fn: (key, result) => {
-                        return <Link key={key} to={Routes.PROFILES + user.slug_name }>{user.first_name + " " + user.last_name}</Link>;
+                        return <Link key={key} to={Routes.profileUrl(user.slug_name) }>{user.first_name + " " + user.last_name}</Link>;
                     }
                 }
             }).filter(o => o)

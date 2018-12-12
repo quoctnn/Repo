@@ -76,6 +76,7 @@ export const simplePaginator = <T>(key:string, endpoint:string, itemIdKey:string
             let a = action as InsertItemAction
             const newItems = {...page.items,[a.item[itemIdKey]]: a.item}
             let p = { ...page}
+            p.ids = p.ids || []
             let newId = a.item[itemIdKey]
             let didExist = p.ids.findIndex(id => id == newId) != -1
 

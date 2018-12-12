@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as OfflinePluginRuntime from 'offline-plugin/runtime';
 import { History} from 'history'
 import { withRouter} from 'react-router-dom'
-import { Routes } from '../../utilities/Routes';
+import Routes from '../../utilities/Routes';
 require("react-toastify/dist/ReactToastify.css");
 
 export interface Props {

@@ -2,14 +2,15 @@ import * as React from 'react';
 import * as Actions from "../../../actions/Actions"
 import { connect } from 'react-redux'
 import {CommunityGroups } from '../../../reducers/groupListCache';
-import ApiClient from '../../../network/ApiClient';
+import ApiClient, { ApiClientFeedPageCallback } from '../../../network/ApiClient';
 import LoadingSpinner from '../LoadingSpinner';
 import { Button } from 'reactstrap';
 import { translate } from '../../intl/AutoIntlProvider';
 import { Link } from 'react-router-dom';
-import { Routes } from '../../../utilities/Routes';
+import Routes from '../../../utilities/Routes';
 import { RootState } from '../../../reducers';
 import { Group } from '../../../types/intrasocial_types';
+import { ToastManager } from '../../../managers/ToastManager';
 export interface Props {
     community_id:number,
     pageSize?:number,
@@ -45,7 +46,6 @@ class GroupList extends React.Component<Props, {}> {
             offset:0,
             hasLoadedData:false
         }
-        this.responseFromServer = this.responseFromServer.bind(this)
         this.requestFromServer = this.requestFromServer.bind(this)
         this.checkUpdate = this.checkUpdate.bind(this)
         this.loadFromServer = this.loadFromServer.bind(this)
@@ -82,13 +82,20 @@ class GroupList extends React.Component<Props, {}> {
             }
         }
     }
-    responseFromServer(data:any, status:string, error:string)
+    responseFromServer:ApiClientFeedPageCallback<Group> = (data, status, error) => 
     {
         this.setState({loading:false}, () => {
-            if(this.state.data && this.state.data.length > 0)
-                this.props.appendCommunityGroups(this.props.community_id, data.results)
-            else
-                this.props.setCommunityGroups(this.props.community_id, data.results, data.count)
+            if (data.results)
+            {
+                if(this.state.data && this.state.data.length > 0)
+                    this.props.appendCommunityGroups(this.props.community_id, data.results)
+                else
+                    this.props.setCommunityGroups(this.props.community_id, data.results, data.count)
+            }
+            else 
+            {
+                ToastManager.showErrorToast(`Request error:${status}${error}`)
+            }
         })
     }
     requestFromServer()
@@ -132,7 +139,7 @@ class GroupList extends React.Component<Props, {}> {
         return (<ul className="group-list">
                     {groups.map((g, index) => {
                         return (<li className="text-truncate" key={index}>
-                            <Link to={Routes.COMMUNITY + g.community + "/group/" + g.slug}>{g.name}</Link>
+                            <Link to={Routes.groupUrl(g.community, g.slug)}>{g.name}</Link>
                             </li>)
                     }) }
                     {this.renderLoadMore()}

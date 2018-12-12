@@ -1,4 +1,4 @@
-import { Routes } from '../../utilities/Routes';
+import Routes from '../../utilities/Routes';
 import * as React from 'react';
 import ProfileStatus from "../general/ProfileStatus";
 import {Settings} from "../../utilities/Settings"

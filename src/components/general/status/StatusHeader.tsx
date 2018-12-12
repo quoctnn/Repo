@@ -187,14 +187,14 @@ export default class StatusHeader extends React.Component<Props, State> {
                 <p className="name secondary-text">
                     {this.renderTitle()}
                     {!this.props.isComment && this.props.status.created_at != null && this.props.status.permission_set == null &&
-                        <span className="pull-right fa fa-globe" style={{ fontSize:"18px", color:"#999999"}}>
+                        <span className="float-right fa fa-globe" style={{ fontSize:"18px", color:"#999999"}}>
                         </span>
                     }
                     {   // Display permission set for debug
                         !Settings.isProduction &&
                         this.props.status.created_at != null &&
                         this.props.status.permission_set != null &&
-                        <span className="pull-right" style={{ fontSize:"14px", color:"#999999"}}>
+                        <span className="float-right" style={{ fontSize:"14px", color:"#999999"}}>
                         {this.props.status.permission_set}
                         </span>
                     }

@@ -288,6 +288,13 @@ export interface Project {
     group: Group
     updated_at: string
 }
+export interface Task 
+{
+    id: number
+    updated_at: string
+    project:number
+    title:string
+}
 function strEnum<T extends string>(o: Array<T>): {[K in T]: K} {
     return o.reduce((res, key) => {
         res[key] = key;

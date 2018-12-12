@@ -153,6 +153,7 @@ body
     @include var(color, link-color);
     font-weight: 500;
     cursor: pointer;
+    display: inline-block;
 }
 .link-text:hover, a:hover, .text.link:hover
 {

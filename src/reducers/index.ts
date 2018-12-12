@@ -20,10 +20,11 @@ import queue from './queue';
 import { conversations } from './conversations';
 import { messages } from './messages';
 import { statuses } from './statuses';
-import { Status, UserProfile, Message, EmbedlyItem, Conversation, Notification, Group, Community } from '../types/intrasocial_types';
+import { Status, UserProfile, Message, EmbedlyItem, Conversation, Notification, Group, Community, Project, Task , Event} from '../types/intrasocial_types';
 import { CachePageV2 } from './simplePaginator';
 import { CachePageV3 } from './simpleMultiPaginator';
 import { notifications } from './notifications';
+import taskStore from './taskStore';
 
 
 const rootPersistConfig:PersistConfig = {
@@ -36,7 +37,7 @@ const rootReducer = combineReducers({
   //debug: persistReducer(debugConfig, debug),
   settings, auth, profileStore, communityStore, groupStore, groupListCache,
   eventStore, eventListCache, projectStore, projectListCache, contactListCache,
-   debug, queue, conversations, messages, embedlyStore, statuses, notifications
+   debug, queue, conversations, messages, embedlyStore, statuses, notifications, taskStore
 })
 export default persistReducer(rootPersistConfig, rootReducer)
 export interface RootState
@@ -47,11 +48,12 @@ export interface RootState
       communityStore: {communities:Community[]};
       groupStore: {groups:Group[]};
       groupListCache: any;
-      eventStore: any;
+      eventStore: {events:Event[]};
       eventListCache: any;
-      projectStore: any;
+      projectStore: {projects:Project[]};
+      taskStore: {tasks:Task[]};
       projectListCache: any;
-      contactListCache: any;
+      contactListCache: {contacts:number[]};
       queue:{chatMessages:Message[], statusMessages:Status[]};
       conversations:{pagination:CachePageV2<Conversation>};
       messages:{conversations:CachePageV3<Message>}

@@ -3,13 +3,14 @@ import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { Button } from 'reactstrap';
 import * as Actions from "../../../actions/Actions";
-import ApiClient from '../../../network/ApiClient';
+import ApiClient, { ApiClientFeedPageCallback } from '../../../network/ApiClient';
 import { RootState } from '../../../reducers';
 import { CommunityEvents } from '../../../reducers/eventListCache';
 import { Event } from '../../../types/intrasocial_types';
-import { Routes } from '../../../utilities/Routes';
+import Routes from '../../../utilities/Routes';
 import { translate } from '../../intl/AutoIntlProvider';
 import LoadingSpinner from '../LoadingSpinner';
+import { ToastManager } from '../../../managers/ToastManager';
 export interface Props {
     community_id:number,
     pageSize?:number,
@@ -45,7 +46,6 @@ class EventList extends React.Component<Props, {}> {
             offset:0,
             hasLoadedData:false
         }
-        this.responseFromServer = this.responseFromServer.bind(this)
         this.requestFromServer = this.requestFromServer.bind(this)
         this.checkUpdate = this.checkUpdate.bind(this)
         this.loadFromServer = this.loadFromServer.bind(this)
@@ -82,13 +82,21 @@ class EventList extends React.Component<Props, {}> {
             }
         }
     }
-    responseFromServer(data:any, status:string, error:string)
+    responseFromServer:ApiClientFeedPageCallback<Event> = (data, status, error) => 
     {
         this.setState({loading:false}, () => {
-            if(this.state.data && this.state.data.length > 0)
-                this.props.appendCommunityEvents(this.props.community_id, data.results)
-            else
-                this.props.setCommunityEvents(this.props.community_id, data.results, data.count)
+            if (data.results)
+            {
+                if(this.state.data && this.state.data.length > 0)
+                    this.props.appendCommunityEvents(this.props.community_id, data.results)
+                else
+                    this.props.setCommunityEvents(this.props.community_id, data.results, data.count)
+            }
+            else 
+            {
+                ToastManager.showErrorToast(`Request error:${status}${error}`)
+            }
+            
         })
     }
     requestFromServer()
@@ -132,7 +140,7 @@ class EventList extends React.Component<Props, {}> {
         return (<ul className="event-list">
                     {events.map((g, index) => {
                         return (<li className="text-truncate" key={index}>
-                            <Link to={Routes.COMMUNITY + g.community + "/event/" + g.slug}>{g.name}</Link>
+                            <Link to={Routes.eventUrl(g.community,g.slug)}>{g.name}</Link>
                             </li>)
                     }) }
                     {this.renderLoadMore()}

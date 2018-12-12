@@ -262,7 +262,7 @@ class ConversationView extends React.PureComponent<Props, State> {
         {
             return <li className="is-typing-container">
             {keys.map((id, index) => {
-                let avatar = ProfileManager.getProfile(id).avatar
+                let avatar = ProfileManager.getProfileById(id).avatar
                 return (<Avatar key={index} image={avatar} size={24}/>)
 
             })}
@@ -418,7 +418,7 @@ const mapStateToProps = (state:RootState, ownProps:Props) => {
     const last_fetched = pagination.last_fetch
     const conversation = state.conversations.pagination.items[id]
     const availableMentions = conversation ? conversation.users.map(u => {
-        let p = ProfileManager.getProfile(u)
+        let p = ProfileManager.getProfileById(u)
         return p ? Mention.fromUser(p) : null
     }).filter(n => n != null) : []
     const pagingDirty = pagination.dirty

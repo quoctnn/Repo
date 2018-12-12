@@ -7,6 +7,7 @@ declare global {
     interface String {
         hashCode(): number;
         splice(idx:number, rem:number, str:string):string;
+        isNumber():boolean
     }
     interface Array<T> 
     {
@@ -19,6 +20,7 @@ declare global {
     interface Number 
     {
         mod(val:number):number
+        isNumber():boolean
     }
 
 }

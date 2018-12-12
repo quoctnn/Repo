@@ -8,7 +8,7 @@ import SelectUsersDialog from '../../components/general/SelectUsersDialog';
 import { Avatar } from '../../components/general/Avatar';
 import ApiClient from '../../network/ApiClient';
 import { withRouter} from 'react-router-dom'
-import { Routes } from '../../utilities/Routes';
+import Routes from '../../utilities/Routes';
 import { ConversationManager } from '../../managers/ConversationManager';
 import LoadingSpinner from '../../components/general/LoadingSpinner';
 import { UserProfile, Conversation } from '../../types/intrasocial_types';
@@ -79,7 +79,7 @@ class CreateConversation extends React.Component<Props, State> {
                     if(data)
                     {
                         ConversationManager.setConversation(conversation, true)
-                        this.props.history.push(Routes.CONVERSATION + conversation.id)
+                        this.props.history.push(Routes.conversationUrl(conversation.id))
                     }
                     if(error || status == "error")
                     {

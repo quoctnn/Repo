@@ -115,7 +115,7 @@ export class ChatMessageList extends React.Component<Props, {}> {
                 var avatar = null
                 if(!isMessageFromCurrentUser)
                 {
-                    let user = ProfileManager.getProfile(message.user)
+                    let user = ProfileManager.getProfileById(message.user)
                     str = `${user.first_name}, ${str}` 
                     avatar = user.avatar
                 }

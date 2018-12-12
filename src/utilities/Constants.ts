@@ -41,7 +41,7 @@ export default  {
         communityList:'/api/v1/community/',
         // Profile URLs
         myProfileUrl: '/api/v1/profile/me/',
-        profileUrl: (id:number) => {
+        profileUrl: (id:string|number) => {
             return `/api/v1/profile/${id}/`
         },
         profilesUrl: '/api/v1/profile/',
@@ -52,18 +52,18 @@ export default  {
 
         // Group URLs
         groupUrl: (id) => {
-            return `/api/v1/group/${id}/`
+            return `/api/v2/group/${id}/`
         },
-        groupsUrl: '/api/v1/group/',
-        myGroupsUrl: '/api/v1/group/as-member/',
+        groupsUrl: '/api/v2/group/',
+        myGroupsUrl: '/api/v2/group/as-member/',
         groupFilesUrl: (id) => {
-            return `/api/v1/group/${id}/files/`
+            return `/api/v2/group/${id}/files/`
         },
 
         // Project URLs
-        projectsUrl: '/api/v1/project/',
+        projectsUrl: '/api/v2/project/',
         projectDetailUrl: (id) => {
-            return `/api/v1/project/${id}/`
+            return `/api/v2/project/${id}/`
         },
         taskUrl: '/api/v1/task/',
 
@@ -80,10 +80,10 @@ export default  {
             return `/api/v1/source/get/?id=${encodeURIComponent(customerId)}`
         },
         projectTeamProfilesUrl: (id) => {
-            return `/api/v1/project/${id}/team/`
+            return `/api/v2/project/${id}/team/`
         },
         projectTasksUrl: (id) => {
-            return `/api/v1/project/${id}/tasks/`
+            return `/api/v2/project/${id}/tasks/`
         },
         taskSubTasksUrl: (id) => {
             return `/api/v1/task/${id}/subtasks/`
@@ -92,7 +92,7 @@ export default  {
             return `/api/v1/task/${id}/`
         },
         projectFilesUrl: (id) => {
-            return `/api/v1/project/${id}/files/`
+            return `/api/v2/project/${id}/files/`
         },
         timeSheetUrl: '/api/v1/timesheet/',
         timeSheetDetailUrl: (id) => {
@@ -105,6 +105,9 @@ export default  {
         // Event URLs
         upcomingEventsUrl: '/api/v1/event/upcoming/',
         eventsUrl: '/api/v1/event/',
+        eventDetailUrl: (id) => {
+            return `/api/v1/event/${id}/`
+        },
         eventFilesUrl: (id) => {
             return `/api/v1/event/${id}/files/`
         },

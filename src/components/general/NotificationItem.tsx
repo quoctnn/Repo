@@ -3,9 +3,7 @@ import { Avatar } from "./Avatar";
 import * as moment from 'moment-timezone';
 import Moment from "react-moment";
 import { translate } from "../intl/AutoIntlProvider";
-import { UserProfile } from '../../types/intrasocial_types';
-import { nullOrUndefined } from "../../utilities/Utilities";
-import { ProfileManager } from '../../managers/ProfileManager';
+import classNames = require("classnames");
 require("./NotificationItem.scss");
 
 export interface OwnProps
@@ -13,6 +11,9 @@ export interface OwnProps
     text:string 
     date:string
     avatars:string[]
+    id:string
+    onItemClick?: (event:any, id:string) => void
+    className?:string
 }
 interface State
 {
@@ -41,11 +42,15 @@ export default class NotificationItem extends React.PureComponent<Props, State> 
             return <Moment format='DD-MM-YYYY HH:mm' date={created} />
         }
     }
+    onItemClick = (event:any) => {
+        this.props.onItemClick(event, this.props.id)
+    }
     render = () => 
     {
         const avatars = this.props.avatars
+        const cn = classNames("panel-heading notification-item", this.props.className)
         return(
-            <div className="panel-heading notification-item">
+            <div className={cn} onClick={this.onItemClick}>
                 <Avatar images={avatars} />
                 <p className="name secondary-text">
                     <span className="user link-text">{this.props.text}</span>

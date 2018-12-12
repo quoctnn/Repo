@@ -286,6 +286,11 @@ class NewsFeed extends React.Component<Props, State> {
                         this.updateItems(updateArray)
                     }
                 }
+                else // root status, remove status composer
+                {
+                    let cIndex = this.findStatusComposerByStatusId(status.id)
+                    this.removeObjectAtIndex(cIndex)
+                }
                 let index = this.findIndexByStatusId(status.id)
                 this.removeObjectAtIndex(index)
             }
@@ -346,18 +351,21 @@ class NewsFeed extends React.Component<Props, State> {
         NavigationUtilities.navigateToProfileId(this.props.history, profile )
     }
     navigateToCommunity = (community:number) => {
-
         NavigationUtilities.navigateToCommunity(this.props.history, community )
     }
     navigateToGroup = (group:number) => {
-
         NavigationUtilities.navigateToGroup(this.props.history, group )
     }
-    navigateToProject = (group:number) => {
-
+    navigateToProject = (project:number) => {
+        NavigationUtilities.navigateToProject(this.props.history, project )
+    }
+    navigateToTask = (task:number) => {
+        NavigationUtilities.navigateToTask(this.props.history, task )
+    }
+    navigateToEvent = (event:number) => {
+        NavigationUtilities.navigateToEvent(this.props.history, event )
     }
     navigateToWeb = (url:string) => {
-
         NavigationUtilities.navigateToUrl(this.props.history, url)
     }
     navigateToAction = (status:Status, action:StatusActions, extra?:any) => 
@@ -370,12 +378,9 @@ class NewsFeed extends React.Component<Props, State> {
         {
             case StatusActions.user: 
             {
-                if(extra && extra.profile)
-                {
-                    this.navigateToProfile(extra.profile.id);
-                    break;
-                }
-                logWarn()
+                const profile = extra && extra.profile && extra.profile.id || status.owner.id
+                this.navigateToProfile(profile);
+                break;
             }
             case StatusActions.community: {
                 let c = status.community && status.community.id
@@ -388,23 +393,32 @@ class NewsFeed extends React.Component<Props, State> {
                 if(status.context_natural_key == ContextNaturalKey.GROUP)
                 {
                     this.navigateToGroup(status.context_object_id || -1)
-                    break;
                 }
                 else if(status.context_natural_key == ContextNaturalKey.COMMUNITY)
                 {
                     this.navigateToCommunity(status.context_object_id || -1)
-                    break;
                 }
                 else if(status.context_natural_key == ContextNaturalKey.USER)
                 {
                     this.navigateToProfile(status.context_object_id || -1)
-                    break;
                 }
                 else if(status.context_natural_key == ContextNaturalKey.PROJECT)
                 {
                     this.navigateToProject(status.context_object_id || -1)
-                    break;
                 }
+                else if(status.context_natural_key == ContextNaturalKey.EVENT)
+                {
+                    this.navigateToEvent(status.context_object_id || -1)
+                }
+                else if(status.context_natural_key == ContextNaturalKey.TASK)
+                {
+                    this.navigateToTask(status.context_object_id || -1)
+                }
+                else 
+                {
+                    logWarn()
+                }
+                break;
                 
             }
             case StatusActions.link:
@@ -412,34 +426,47 @@ class NewsFeed extends React.Component<Props, State> {
                 if(extra && extra.link)
                 {
                     this.navigateToWeb(extra.link)
-                    break;
                 }
-                logWarn()
+                else 
+                {
+                    logWarn()
+                }
+                break;
             }
             case StatusActions.new: 
             {
                 if(extra && extra.message)
                 {
                     this.createNewComment(status, extra.message, extra.mentions, extra.files, extra.completion)
-                    break;
                 }
-                logWarn()
+                else 
+                {
+                    logWarn()
+                }
+                break;
             }
             case StatusActions.edit: 
             {
                 if(extra && extra.status)
                 {
                     this.updateStatus(status.id, extra.status, extra.files, extra.completion)
-                    break;
                 }
-                logWarn()
+                else 
+                {
+                    logWarn()
+                }
+                break;
             }
             case StatusActions.delete: 
             {
                 this.deleteStatus(status)
                 break;
             }
-            case StatusActions.react:this.handleReaction(extra.reaction, status); break;
+            case StatusActions.react:
+            {
+                this.handleReaction(extra.reaction, status); 
+                break;
+            }
             default:logWarn()
         }
     }

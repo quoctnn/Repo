@@ -341,6 +341,7 @@ const mapDispatchToProps = dispatch => {
       dispatch(Actions.resetCommunityGroupsCache());
       dispatch(Actions.resetEventStore());
       dispatch(Actions.resetCommunityEventsCache());
+      dispatch(Actions.resetTaskStore());
       dispatch(Actions.resetProjectStore());
       dispatch(Actions.resetCommunityProjectsCache());
       dispatch(Actions.setApiEndpoint(index));
@@ -357,6 +358,7 @@ const mapDispatchToProps = dispatch => {
       dispatch(Actions.resetCommunityGroupsCache());
       dispatch(Actions.resetEventStore());
       dispatch(Actions.resetCommunityEventsCache());
+      dispatch(Actions.resetTaskStore());
       dispatch(Actions.resetProjectStore());
       dispatch(Actions.resetCommunityProjectsCache());
     },

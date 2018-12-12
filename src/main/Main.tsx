@@ -1,14 +1,15 @@
 import UpdateWatcher from '../components/general/UpdateWatcher';
-import Profile from '../views/profile/Profile';
-import { Routes } from '../utilities/Routes';
+import Profile from '../views/profile/ProfileView';
+import Routes from '../utilities/Routes';
 import * as React from 'react';
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import NewsFeed from "../views/newsfeed/NewsFeed";
 import TopNavigation from '../components/navigation/TopNavigation';
-import { Community } from "../views/community/Community";
-import GroupView from '../views/group/Group';
-import EventView from '../views/event/Event';
-import ProjectView from '../views/project/Project';
+import CommunityView from "../views/community/CommunityView";
+import GroupView from '../views/group/GroupView';
+import EventView from '../views/event/EventView';
+import ProjectView from '../views/project/ProjectView';
+import TaskView from '../views/task/TaskView';
 import { error404 } from '../views/error/error404';
 import Signin from "../views/signin/Signin";
 import { ToastContainer } from 'react-toastify';
@@ -48,6 +49,7 @@ class Main extends React.Component<Props, {}> {
     super(props);
   }
   render() {
+    console.log("routes", Routes.eventUrl(":communityid",":eventname"))
     return (
           <Router ref="router">
             <div id="main-content">
@@ -66,17 +68,18 @@ class Main extends React.Component<Props, {}> {
                               <Switch>
                                 {!Settings.isProduction && <Route path={Routes.DEVELOPER_TOOL} component={DevTool} /> }
                                 <Route path={Routes.SIGNIN} component={Signin} />
-                                <Route path={Routes.PROFILES + ":slug"} component={Profile} />
+                                <Route path={Routes.profileUrl(":slug")} component={Profile} />
                                 <Route path={Routes.PROFILE_UPDATE} component={ProfileUpdate} />
                                 {/* CONVERSATIONS */}
                                 <Route path={Routes.CONVERSATION_CREATE} component={CreateConversation} />
                                 <Route path={Routes.CONVERSATIONS} component={Conversations} />
-                                <Route path={Routes.CONVERSATION + ":conversationid"} component={ConversationView} />
+                                <Route path={Routes.conversationUrl(":conversationid")} component={ConversationView} />
 
-                                <Route path={Routes.COMMUNITY + ":communityid/group/:groupname"} component={GroupView} />
-                                <Route path={Routes.COMMUNITY + ":communityid/event/:eventname"} component={EventView} />
-                                <Route path={Routes.COMMUNITY + ":communityid/project/:projectname"} component={ProjectView} />
-                                <Route path={Routes.COMMUNITY + ":communityname"} component={Community} />
+                                <Route path={Routes.groupUrl(":communityid", ":groupname")} component={GroupView} />
+                                <Route path={Routes.eventUrl(":communityid",":eventname")} component={EventView} />
+                                <Route path={Routes.taskUrl(":communityid", ":projectname", ":taskid")} component={TaskView} />
+                                <Route path={Routes.projectUrl(":communityid", ":projectname")} component={ProjectView} />
+                                <Route path={Routes.communityUrl(":communityname")} component={CommunityView} />
                                 <Route path={Routes.ROOT} exact={true} component={NewsFeed} />
                                 <Route path={Routes.UPDATE_TOOL} exact={true} component={UpdateTool} />
                                 <Route path={Routes.ANY} component={error404} />
