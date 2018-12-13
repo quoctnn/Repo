@@ -1,11 +1,16 @@
-.notification-item 
+@import "../../main/Config";
+.notification-item
 {
     display: flex;
+    @include var(color, primary-text-color);
+    @include var(background-color, nav-background-color);
+
+
     .avatar{
         margin-right: 10px;
         flex-shrink: 0;
     }
-    .name 
+    .name
     {
         word-break: break-word;
     }
