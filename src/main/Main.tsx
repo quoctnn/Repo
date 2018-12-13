@@ -35,6 +35,7 @@ export interface OwnProps
 interface ReduxStateProps
 {
   signedIn:boolean
+  userList:boolean
 }
 interface ReduxDispatchProps
 {
@@ -91,7 +92,7 @@ class Main extends React.Component<Props, {}> {
                     <div id="navigation-content" className="navigation">
                         <TopNavigation />
                         <LeftNavigation />
-                        {this.props.signedIn && <RightNavigation /> }
+                        {this.props.signedIn && this.props.userList && <RightNavigation /> }
                     </div>
             </div>
           </Router>
@@ -101,6 +102,7 @@ class Main extends React.Component<Props, {}> {
 const mapStateToProps = (state:RootState, ownProps: OwnProps):ReduxStateProps => {
   return {
     signedIn:state.auth.signedIn,
+    userList:false,
   }
 }
 export default connect<ReduxStateProps, void, OwnProps>(mapStateToProps, null)(Main)
