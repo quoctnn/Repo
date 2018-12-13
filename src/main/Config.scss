@@ -1,5 +1,5 @@
 @charset "UTF-8";
-//let hasRootSupport = window.CSS && window.CSS.supports && window.CSS.supports('--a', 0) 
+//let hasRootSupport = window.CSS && window.CSS.supports && window.CSS.supports('--a', 0)
 //root = document.querySelector(':root')
 //root.className = currentTheme
 
@@ -13,8 +13,14 @@ $root: (
     feed-form-options-bg: #f5f5f5,
     body-background: #eeeeee,
     border-color-default: #cccccc,
-    title-color:#7D7D7D,
+    title-color:#4d4d4d,
     main-content-background:#EFF5FE,
+
+    /* Buttons */
+    button-background-color: #CFD5DE,
+    button-color: white,
+    button-border-color: #cccccc,
+    button-hover-background-color: #9F959E,
 
     default-color: #fff,
     primary-color: #428bca,
@@ -23,7 +29,7 @@ $root: (
     success-color: #5cb85c,
     warning-color: #f0ad4e,
     link-color:#292929,
-    primary-text-color:#727272,
+    primary-text-color:#5d5d5d,
     secondary-text-color:#AFAFAF,
 
     navbar-background: #428bca,
@@ -82,8 +88,14 @@ $root: (
     --feed-form-options-bg: #f5f5f5;
     --body-background: #eeeeee;
     --border-color-default: rgba(0,0,0,0.1);
-    --title-color:#7D7D7D;
+    --title-color:#4d4d4d;
     --main-content-background:#EFF5FE;
+    --button-color: white;
+    --button-background-color: #6c757d;
+    --button-border-color: #cccccc;
+    --button-hover-background-color: #4c555d;
+    --button-disabled-background-color: body-background;
+
     --default-color: #fff;
     --primary-color: #428bca;
     --info-color: #5bc0de;
@@ -91,7 +103,7 @@ $root: (
     --success-color: #5cb85c;
     --warning-color: #f0ad4e;
     --link-color:#292929;
-    --primary-text-color:#727272;
+    --primary-text-color:#5d5d5d;
     --secondary-text-color:#AFAFAF;
 
     --navbar-background: #428bca;
@@ -140,9 +152,21 @@ $root: (
     --left-navigation-min-width:160px;
 }
 :root.dark {
-    --nav-background-color:#231E2E;
-    --nav-border-color:red;
-    --nav-border-width:5px;
+    --nav-background-color:#1c2938;
+    --nav-border-color:#070a0e;
+    --nav-border-width:2px;
     --border-width-default: 5px;
     --border-color-default: green;
+    --body-background: #10171e;
+
+    --title-color:rgb(210, 210, 210);
+    --primary-text-color: #DFDFDF;
+    --secondary-text-color: #929292;
+    --link-color: #C5C5C5;
+
+    --button-color: #FFFFFF;
+    --button-background-color: #4c555d;
+    --button-border-color: rgb(108, 117, 125);
+    --button-hover-background-color: #6c757d;
+
 }

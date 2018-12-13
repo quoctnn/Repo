@@ -11,7 +11,7 @@ import Text from '../Text';
 let timezone = moment.tz.guess();
 require("./StatusHeader.scss");
 
-export interface Props 
+export interface Props
 {
     owner:UserProfile
     created_at:string
@@ -20,7 +20,7 @@ export interface Props
 
     //
     addLinkToContext:boolean
-    contextKey:string 
+    contextKey:string
     contextId:number
     isComment:boolean
 
@@ -30,15 +30,15 @@ export interface Props
     active_context_key?:string
     active_context_id?:number
     contextObjectName?:string
-    context_natural_key?:string 
+    context_natural_key?:string
     context_object_id?:number
     communityName?:string
     feedContextKey:string
 }
-interface State 
+interface State
 {
 }
-export default class StatusHeader extends React.Component<Props, State> {     
+export default class StatusHeader extends React.Component<Props, State> {
     constructor(props) {
         super(props);
 
@@ -49,12 +49,12 @@ export default class StatusHeader extends React.Component<Props, State> {
     }
     shouldComponentUpdate(nextProps:Props, nextState)
     {
-        return nextProps.status.id != this.props.status.id || 
-                nextProps.status.extra != this.props.status.extra || 
-                nextProps.status.permission_set != this.props.status.permission_set || 
-                nextProps.edited_at != this.props.edited_at || 
-                nextProps.contextKey != this.props.contextKey || 
-                nextProps.contextId != this.props.contextId || 
+        return nextProps.status.id != this.props.status.id ||
+                nextProps.status.extra != this.props.status.extra ||
+                nextProps.status.permission_set != this.props.status.permission_set ||
+                nextProps.edited_at != this.props.edited_at ||
+                nextProps.contextKey != this.props.contextKey ||
+                nextProps.contextId != this.props.contextId ||
                 nextProps.addLinkToContext != this.props.addLinkToContext
     }
 
@@ -74,7 +74,7 @@ export default class StatusHeader extends React.Component<Props, State> {
             return <Moment format='DD-MM-YYYY HH:mm' date={created} />
         }
     }
-    
+
     getUserNames(users) {
         return users.map(function(user) {
             return user.first_name;
@@ -93,14 +93,14 @@ export default class StatusHeader extends React.Component<Props, State> {
             )
         }
     }
-    getScopeLinkElement = () => 
+    getScopeLinkElement = () =>
     {
         let contextKey = this.props.context_natural_key
         let contextId = this.props.context_object_id
 
-        if (this.props.addLinkToContext) 
+        if (this.props.addLinkToContext)
         {
-            if (this.props.owner.id == contextId && contextKey == ContextNaturalKey.USER && this.props.feedContextKey == contextKey) 
+            if (this.props.owner.id == contextId && contextKey == ContextNaturalKey.USER)
             {
                 // Owner user profile
                 return null
@@ -118,9 +118,9 @@ export default class StatusHeader extends React.Component<Props, State> {
     getLink = (text:string, key:StatusActions) => {
         return <Text key={key} onPress={() => this.props.onActionPress(key)}>{text}</Text>
     }
-    getCommunityLinkElement = () => 
+    getCommunityLinkElement = () =>
     {
-        if (this.props.addLinkToContext) 
+        if (this.props.addLinkToContext)
         {
             let contextKey = this.props.context_natural_key
             if (!this.props.communityName || contextKey == ContextNaturalKey.COMMUNITY) {
@@ -136,16 +136,16 @@ export default class StatusHeader extends React.Component<Props, State> {
     getActionText = () =>
     {
         let contextKey = this.props.context_natural_key
-        if (contextKey == ContextNaturalKey.USER) 
+        if (contextKey == ContextNaturalKey.USER)
         {
-            if (this.props.owner.id == this.props.context_object_id) 
+            if (this.props.owner.id == this.props.context_object_id)
             {
                 // Owner user profile
-                return "";
+                return translate("published on his wall");
             }
             return translate("published on user")
         }
-        if (contextKey == ContextNaturalKey.GROUP) 
+        if (contextKey == ContextNaturalKey.GROUP)
         {
             if (this.props.active_context_key == contextKey && this.props.active_context_id == this.props.context_object_id) {
                 // Posted in this group
@@ -159,7 +159,7 @@ export default class StatusHeader extends React.Component<Props, State> {
         if (contextKey == ContextNaturalKey.TASK) {
             return translate("published on the task")
         }
-        if (contextKey == ContextNaturalKey.EVENT) 
+        if (contextKey == ContextNaturalKey.EVENT)
         {
             return translate("published on the event")
         }
@@ -177,7 +177,7 @@ export default class StatusHeader extends React.Component<Props, State> {
         }
         return this.getLink(this.props.owner.first_name, StatusActions.user)
     }
-    render() 
+    render()
     {
         let photoSrc = this.props.owner.avatar || this.props.owner.avatar_thumbnail
 

@@ -39,16 +39,16 @@ class ProfileStatus extends React.Component<Props, State> {
             <div id="profile-status">
                 {!this.props.authenticatedProfile &&
                     <div className="">
-                        <Link className="btn btn-outline-secondary" to={Routes.SIGNIN}>{translate("Sign in")}</Link>
+                        <Link className="btn btn-secondary btn-outline-secondary" to={Routes.SIGNIN}>{translate("Sign in")}</Link>
                     </div>
                 }
                 {this.props.authenticatedProfile &&
                     <div className="d-flex align-items-center">
                         <div className="">
-                        <Link className="btn btn-outline-secondary" to={Routes.profileUrl( this.props.authenticatedProfile.slug_name )}>{this.props.authenticatedProfile.first_name}</Link>
+                        <Link className="btn btn-secondary btn-outline-secondary" to={Routes.profileUrl( this.props.authenticatedProfile.slug_name )}>{this.props.authenticatedProfile.first_name}</Link>
                         </div>
                         <div className="margin-left-sm">
-                            <Button onClick={() => {AuthenticationManager.signOut(); this.props.history.push(Routes.ROOT) }} outline color="secondary">{translate("Sign out")}</Button>
+                            <Button className="btn btn-secondary btn-outline-secondary" onClick={() => {AuthenticationManager.signOut(); this.props.history.push(Routes.ROOT) }} outline color="secondary">{translate("Sign out")}</Button>
                         </div>
                     </div>
                 }
