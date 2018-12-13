@@ -1,4 +1,5 @@
 @import "../../main/Config";
+
 #left-navigation
 {
     border:0 !important;
@@ -49,10 +50,16 @@
     }
     .community-icon 
     {
-        background: url("/src/resources/community-white.svg");
+        -webkit-mask: url("/src/resources/community-white.svg") no-repeat 100% 100%;
+        mask: url("/src/resources/community-white.svg") no-repeat 100% 100%;
+        -webkit-mask-size: cover;
+        mask-size: cover;
+        @include var(background-color, nav-left-menu-item-color);
         width: 24px;
         height: 24px;
-        background-size: 100%;
-        @include var(background-color, nav-left-menu-item-color);
+    }
+    .selected > .community-icon 
+    {
+        @include var(background-color, nav-left-selected-menu-item-color);
     }
 }
