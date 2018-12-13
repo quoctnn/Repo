@@ -373,10 +373,7 @@ class ConversationView extends React.PureComponent<Props, State> {
 
         return(
             <FullPageComponent>
-                <div className="d-none d-sm-block col-lg-4 col-md-4 col-sm-5 column-left">
-                    <Conversations preventShowTyingInChatId={conversation.id} activeConversation={this.props.conversationId} />
-                </div>
-                <div className={"col-lg-8 col-md-8 col-sm-7" + (this.state.fullScreen ? " full-screen" : "")}>
+                <div className={"col-sm-12" + (this.state.fullScreen ? " full-screen" : "")}>
                     <div id="conversation-view" className="card full-height">
                         <div className="card-header grey d-flex align-items-center">
                             {conversation && <span className="text-truncate d-block flex-grow-1">{getConversationTitle(conversation, myId)}</span>}

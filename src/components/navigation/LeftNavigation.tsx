@@ -6,6 +6,7 @@ import NotificationsList from "../general/NotificationsList";
 import ContactList from "../general/ContactList";
 import classnames from 'classnames';
 import CommunityList from "../general/CommunityList";
+import Conversations from "../../views/chat/Conversations";
 require("./LeftNavigation.scss");
 
 export interface Props {
@@ -24,6 +25,7 @@ const menuData:MenuItem[] = []
 menuData.push({key:"notificationlist", icon:"fas fa-bell", component:<NotificationsList />})
 menuData.push({key:"contactlist", icon:"fas fa-user", component:<ContactList />})
 menuData.push({key:"communitylist", icon:"community-icon", component:<CommunityList />})
+menuData.push({key:"conversationlist", icon:"fas fa-comment", component:<Conversations />})
 class LeftNavigation extends React.Component<Props, State> {
     static leftMenuOpen = "left-menu-open"
     static defaultProps:Props = {
