@@ -1,5 +1,12 @@
+@import "../../main/Config";
 #create-conversation
 {
+    @include var(color, primary-text-color);
+
+    .jumbotron {
+        @include var(background-color, nav-background-color);
+    }
+
     .member-list
     {
         > *
@@ -7,7 +14,7 @@
             margin: 8px;
             width: 80px;
             display: inline-block;
-            .avatar 
+            .avatar
             {
                 margin: 0 auto;
             }
@@ -23,15 +30,30 @@
             }
         }
     }
-    .submit-button 
+    .btn {
+        @include var(background, button-background-color);
+        @include var(color, button-color);
+        @include var(border-color, button-border-color);
+    }
+    .btn:hover {
+        @include var(background, button-hover-background-color); }
+
+    .btn:disabled {
+        @include var(background, button-disabled-background-color); }
+
+    .submit-button
     {
+        @include var(background, button-background-color);
+        @include var(color, button-color);
+        @include var(border-color, button-border-color);
         .spinner
         {
             margin: 0;
-            > div 
+            > div
             {
                 background-color:white;
             }
         }
+
     }
 }

@@ -5,6 +5,7 @@
     @include var(background, nav-background-color);
     @include var(border-right-width, nav-border-width);
     @include var(border-right-color, nav-border-color);
+    @include var(color, primary-text-color);
     border-style: solid;
     ul
     {

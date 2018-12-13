@@ -1,5 +1,12 @@
+@import "../../main/Config";
 #right-navigation
 {
+    border:0;
+    @include var(background, nav-background-color);
+    @include var(border-left-width, nav-border-width);
+    @include var(border-left-color, nav-border-color);
+    border-style: solid;
+
     .avatar-profile
     {
         .typing-indicator:after,.typing-indicator:before
@@ -48,12 +55,10 @@
             padding-top: 5px;
             li
             {
-                
                 display: inline-flex;
                 padding:0;
                 padding-bottom: 5px;
             }
-
         }
     }
 }

@@ -1,9 +1,25 @@
+@import "../../main/Config";
 #dev-tool
 {
     min-width: 700px;
+    @include var(color, primary-text-color);
 
     .dropdown-toggle
     {
         max-width: 100%;
     }
+    .jumbotron {
+        @include var(background-color, nav-background-color);
+    }
+    .btn {
+        @include var(background, button-background-color);
+        @include var(color, button-color);
+        @include var(border-color, button-border-color);
+    }
+    .btn:hover {
+        @include var(background, button-hover-background-color); }
+
+    .btn:disabled {
+        @include var(background, button-disabled-background-color); }
+
 }

@@ -11,7 +11,7 @@
 {
     display: none;
 }
-.dropdown-menu 
+.dropdown-menu
 {
     padding: 0;
 }
@@ -21,7 +21,7 @@
     max-width: 100%;
     height: auto;
 }
-.flex-truncate-container 
+.flex-truncate-container
 {
   min-width: 0;
 }
@@ -133,13 +133,13 @@
 .margin-left-xl { margin-left: 3em; }
 li{list-style-type: none;}
 ul,li{margin:0; padding: 0;}
-body 
+body
 {
     @include var(background-color, body-background);
 }
 .transition
 {
-    position : relative; 
+    position : relative;
     -webkit-transition : 300ms ease-in-out all;
      -o-transition : 300ms ease-in-out all;
     -moz-transition : 300ms ease-in-out all;
@@ -205,7 +205,6 @@ body
         {
             padding: 0;
             @include var(width, right-navigation-min-width);
-            border-left: 1px solid #DFE0DF;
             z-index: 999;
             position: fixed !important;
             @include var(top, top-navigation-height);
@@ -216,7 +215,7 @@ body
         {
             @include var(width, right-navigation-max-width);
         }
-        
+
     }
     #content-block
     {
@@ -226,7 +225,7 @@ body
         padding: 5px;
         > .container
         {
-            > .row 
+            > .row
             {
                 > *
                 {
@@ -251,7 +250,7 @@ body.left-menu-open
                 @include var(width, left-navigation-max-width);
             }
         }
-        
+
     }
 }
 body[class^="full-page-"], body[class*=" full-page-"]
@@ -278,7 +277,7 @@ body[class^="full-page-"], body[class*=" full-page-"]
 .profile-popover
 {
     left:-50px !important;
-    .arrow 
+    .arrow
     {
         right: calc((0.5rem + 1px) * -1);
         width: 0.5rem;
