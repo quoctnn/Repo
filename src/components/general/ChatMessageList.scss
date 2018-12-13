@@ -1,6 +1,6 @@
 @import "../../main/Config";
 .message-list {
-    @include var(background-color, nav-background-color);
+    @include var(background-color, main-content-background);
     @include var(color, primary-text-color);
 
     margin: 0;

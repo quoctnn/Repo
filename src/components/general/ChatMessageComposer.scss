@@ -2,7 +2,7 @@
 .chat-message-composer
 {
     @include var(color, primary-text-color);
-    @include var(background-color, nav-background-color);
+    @include var(background-color, main-content-background);
 
     width: 100%;
     padding: 5px 8px;
@@ -69,5 +69,6 @@
     .input-group
     {
         flex-wrap: initial;
+
     }
 }

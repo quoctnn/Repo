@@ -1,7 +1,7 @@
 @import "../../main/Config";
 #conversation-view
 {
-    @include var(background-color, nav-background-color);
+    @include var(background-color, main-content-background);
     @include var(color, primary-text-color);
 
     .card-body
@@ -14,7 +14,7 @@
         position: -moz-sticky;
         position: -o-sticky;
         position: sticky;
-        @include var(background-color, nav-background-color);
+        @include var(background-color, main-content-background);
         bottom: 0px;
         padding: 5px 5px 5px 15px;
         display: flex;

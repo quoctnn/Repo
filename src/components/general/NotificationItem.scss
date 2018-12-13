@@ -3,7 +3,7 @@
 {
     display: flex;
     @include var(color, primary-text-color);
-    @include var(background-color, nav-background-color);
+    @include var(background-color, main-content-background);
 
 
     .avatar{
