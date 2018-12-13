@@ -20,6 +20,7 @@
         @include var(background, button-hover-background-color); }
 
     .btn:disabled {
-        @include var(background, button-disabled-background-color); }
+        @include var(background, button-disabled-background-color);
+        @include var(color, button-disabled-text-color); }
 
 }

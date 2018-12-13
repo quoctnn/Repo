@@ -226,7 +226,10 @@ body
     {
         @include var(margin-left, left-navigation-min-width);
         @include var(margin-top, top-navigation-height);
+        /*
+        enable when showing right-navigation
         @include var(margin-right, right-navigation-min-width);
+        */
         padding: 5px;
         > .container
         {

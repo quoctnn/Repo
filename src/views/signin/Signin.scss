@@ -1,7 +1,10 @@
+@import "../../main/Config";
 #sign-in
 {
+    @include var(color, primary-text-color);
     .jumbotron
     {
+        @include var(background-color, nav-background-color);
         max-width: 500px;
         margin: 0 auto;
     }

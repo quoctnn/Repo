@@ -1,6 +1,9 @@
 @import "../../main/Config";
 .chat-message-composer
 {
+    @include var(color, primary-text-color);
+    @include var(background-color, nav-background-color);
+
     width: 100%;
     padding: 5px 8px;
     z-index: 999;
@@ -11,11 +14,14 @@
     {
         display: flex;
     }
-    > input 
+    > input
     {
         width: 87%;
         position: relative;
         float: left;
+    }
+    .editor-button {
+        color: #9c9c9c !important
     }
     .btn-submit
     {

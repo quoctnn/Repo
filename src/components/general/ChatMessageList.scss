@@ -1,5 +1,8 @@
 @import "../../main/Config";
 .message-list {
+    @include var(background-color, nav-background-color);
+    @include var(color, primary-text-color);
+
     margin: 0;
     width: 100%;
     flex-grow: 1;

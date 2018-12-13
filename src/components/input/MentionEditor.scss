@@ -1,5 +1,5 @@
 @import "../../main/Config";
-.mention-editor 
+.mention-editor
 {
     box-sizing: border-box;
     cursor: text;
@@ -10,7 +10,7 @@ mention {
     color: #4a85bb;
     text-decoration: none;
   }
-  
+
   .mentionSuggestions {
     border-top: 1px solid #eee;
     background: #fff;
@@ -25,51 +25,51 @@ mention {
     transform: scaleY(0);
     margin: -16px;
   }
-  
+
   .mentionSuggestionsEntryContainer {
     display: table;
     width: 100%;
   }
-  
+
   .mentionSuggestionsEntryContainerLeft,
   .mentionSuggestionsEntryContainerRight {
     display: table-cell;
     vertical-align: middle;
   }
-  
+
   .mentionSuggestionsEntryContainerRight {
     width: 100%;
     padding-left: 8px;
     max-width:0;
   }
-  
+
   .mentionSuggestionsEntry {
     padding: 7px 10px 3px 10px;
     transition: background-color 0.4s cubic-bezier(.27,1.27,.48,.56);
   }
-  
+
   .mentionSuggestionsEntry:active {
     background-color: #cce7ff;
   }
-  
+
   .mentionSuggestionsEntryFocused {
     padding: 7px 10px 3px 10px;
     transition: background-color 0.4s cubic-bezier(.27,1.27,.48,.56);
     background-color: #e6f3ff;
   }
-  
+
   .mentionSuggestionsEntryText,
   .mentionSuggestionsEntryTitle {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
-  
+
   .mentionSuggestionsEntryTitle {
     font-size: 80%;
     color: #a7a7a7;
   }
-  
+
   .mentionSuggestionsEntryAvatar {
     display: block;
     width: 30px;
@@ -115,12 +115,13 @@ mention {
 }
 .editor-button
 {
-  background: 0;
-   width: 39px;
-   height:39px;
-   margin-right: 5px;
-   color:inherit;
-   padding: 0;
+  background: 0 !important;
+  border: 0 !important;
+  width: 39px;
+  height:39px;
+  margin-right: 5px;
+  color:inherit;
+  padding: 0;
   input[type=file],
   input[type=file]::-webkit-file-upload-button
    {
@@ -140,11 +141,11 @@ mention {
 }
 .DraftEditor-root
 {
-  word-break: break-all;    
+  word-break: break-all;
 }
 .public-DraftEditorPlaceholder-root
 {
-  position: absolute;  
+  position: absolute;
 }
 .DraftEditor-editorContainer
 {

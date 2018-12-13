@@ -95,6 +95,7 @@ $root: (
     --button-border-color: #cccccc;
     --button-hover-background-color: #4c555d;
     --button-disabled-background-color: body-background;
+    --button-disabled-text-color: title-color;
 
     --default-color: #fff;
     --primary-color: #428bca;
@@ -156,13 +157,14 @@ $root: (
     --nav-border-color:#070a0e;
     --nav-border-width:2px;
     --nav-left-right-background-color: #1c2938;
-    --border-width-default: 5px;
-    --border-color-default: green;
+    --border-width-default: 2px;
+    --border-color-default: gray;
     --body-background: #10171e;
 
+    --default-color: rgb(221,221,221);
     --title-color:rgb(210, 210, 210);
     --primary-text-color: #DFDFDF;
-    --secondary-text-color: #929292;
+    --secondary-text-color: #A2A2A2;
     --link-color: #C5C5C5;
 
     --button-color: #FFFFFF;
