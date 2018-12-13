@@ -66,8 +66,8 @@
         }
         .status-placeholder
         {
+            @include var(background-color, main-content-background);
             height: 137px;
-            background: white;
             position: relative;
             &.statuscomment:before {
                 content: "";

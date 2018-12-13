@@ -62,8 +62,8 @@ class CommunityTreeItem extends React.Component<Props, State> {
                         const cn = classNames("fa fa-sm chevron", collapsed ? "fa-chevron-down": "fa-chevron-up")
                         return (
                         <li key={index} id={item.id}>
-                            <div className="d-flex content" >
-                                <div className="name" onClick={this.onSubListClick.bind(this, index)}>
+                            <div className="d-flex content" onClick={this.onSubListClick.bind(this, index)}>
+                                <div className="name">
                                     {translate(item.name)}
                                 </div>
                                 <i className={cn}></i>

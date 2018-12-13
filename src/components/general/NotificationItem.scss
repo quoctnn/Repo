@@ -1,11 +1,8 @@
-@import "../../main/Config";
 .notification-item
 {
+    background: transparent;
+    border: 0;
     display: flex;
-    @include var(color, primary-text-color);
-    @include var(background-color, main-content-background);
-
-
     .avatar{
         margin-right: 10px;
         flex-shrink: 0;

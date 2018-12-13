@@ -1,4 +1,6 @@
+@import "../../main/Config";
 #contact-list {
+    @include var(background, nav-background-color);
     > ul {
         overflow-y: auto;
         height:100%;
