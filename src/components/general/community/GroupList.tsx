@@ -130,7 +130,7 @@ class GroupList extends React.Component<Props, {}> {
         }
         else if(this.state.data.length == 0)
         {
-            return (<li>+ NO GROUPS AVAILABLE</li>)
+            return (<li  className="text-truncate content">+ NO GROUPS AVAILABLE</li>)
         }
     }
     render()
@@ -139,7 +139,7 @@ class GroupList extends React.Component<Props, {}> {
         return (<ul className="group-list">
                     {groups.map((g, index) => {
                         return (<li className="text-truncate" key={index}>
-                            <Link to={Routes.groupUrl(g.community, g.slug)}>{g.name}</Link>
+                            <Link className="text-truncate content" to={Routes.groupUrl(g.community, g.slug)}>{g.name}</Link>
                             </li>)
                     }) }
                     {this.renderLoadMore()}

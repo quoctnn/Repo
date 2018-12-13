@@ -41,9 +41,18 @@
         @include var(left, left-navigation-min-width);
         right: 0;
         bottom:0;
-        > * 
+        > .menu-component,
+        > .menu-component > * 
         {
             height: 100%;
         }
+    }
+    .community-icon 
+    {
+        background: url("/src/resources/community-white.svg");
+        width: 24px;
+        height: 24px;
+        background-size: 100%;
+        @include var(background-color, nav-left-menu-item-color);
     }
 }

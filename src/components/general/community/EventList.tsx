@@ -131,7 +131,7 @@ class EventList extends React.Component<Props, {}> {
         }
         else if(this.state.data.length == 0)
         {
-            return (<li>+ NO EVENTS AVAILABLE</li>)
+            return (<li className="text-truncate content">+ NO EVENTS AVAILABLE</li>)
         }
     }
     render()
@@ -140,8 +140,8 @@ class EventList extends React.Component<Props, {}> {
         return (<ul className="event-list">
                     {events.map((g, index) => {
                         return (<li className="text-truncate" key={index}>
-                            <Link to={Routes.eventUrl(g.community,g.slug)}>{g.name}</Link>
-                            </li>)
+                                    <Link className="text-truncate  content" to={Routes.eventUrl(g.community,g.slug)}>{g.name}</Link>
+                                </li>)
                     }) }
                     {this.renderLoadMore()}
                     {this.renderLoading()}

@@ -6,6 +6,7 @@ import ProjectList from './ProjectList';
 import EventList from './EventList';
 import { connect } from 'react-redux'
 import { RootState } from "../../../reducers";
+import classNames = require("classnames");
 require("./CommunityTreeItem.scss");
 export interface Props {
     communityData:any,
@@ -29,7 +30,7 @@ class SubListItem
 }
 
 
-class CommunityTreeItem extends React.Component<Props, {}> {
+class CommunityTreeItem extends React.Component<Props, State> {
     subListItems:SubListItem[]
     static defaultProps:Props = {
         communityData:null,
@@ -37,7 +38,6 @@ class CommunityTreeItem extends React.Component<Props, {}> {
         onClick:null,
         language:0
     }
-    state:State
     constructor(props) {
         super(props);
         this.subListItems = [
@@ -57,9 +57,17 @@ class CommunityTreeItem extends React.Component<Props, {}> {
     {
         return (<ul className="community-tree-item-list">
                     {this.subListItems.map((item, index) => {
+
+                        const collapsed = !this.state.listOpenState[index]
+                        const cn = classNames("fa fa-sm chevron", collapsed ? "fa-chevron-down": "fa-chevron-up")
                         return (
                         <li key={index} id={item.id}>
-                            <div className="name" onClick={this.onSubListClick.bind(this, index)}>{translate(item.name)}</div>
+                            <div className="d-flex content" >
+                                <div className="name" onClick={this.onSubListClick.bind(this, index)}>
+                                    {translate(item.name)}
+                                </div>
+                                <i className={cn}></i>
+                            </div>
                             {this.state.listOpenState[index] && item.component}
                         </li>)
                     })}
@@ -67,11 +75,13 @@ class CommunityTreeItem extends React.Component<Props, {}> {
     }
     render()
     {
+        const cn = classNames("fa fa-sm chevron",this.props.collapsed ? "fa-chevron-down": "fa-chevron-up")
         return(
             <div className="community-tree-item transition">
-                <div className="d-flex align-items-center" onClick={this.props.onClick}>
-                    <Avatar borderWidth={2} borderColor="red" image={this.props.communityData.avatar} />
+                <div className="d-flex align-items-center content" onClick={this.props.onClick}>
+                    <Avatar image={this.props.communityData.avatar} size={24} />
                     <div className="community-name text-truncate">{this.props.communityData.name}</div>
+                    <i className={cn}></i>
                 </div>
                 {!this.props.collapsed && this.renderContent()}
             </div>

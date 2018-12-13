@@ -131,7 +131,7 @@ class ProjectList extends React.Component<Props, {}> {
         }
         else if(this.state.data.length == 0)
         {
-            return (<li>+ NO PROJECTS AVAILABLE</li>)
+            return (<li className="text-truncate content">+ NO PROJECTS AVAILABLE</li>)
         }
     }
     render()
@@ -140,7 +140,7 @@ class ProjectList extends React.Component<Props, {}> {
         return (<ul className="project-list">
                     {projects.map((g, index) => {
                         return (<li className="text-truncate" key={index}>
-                            <Link to={Routes.projectUrl(g.community,g.slug)}>{g.name}</Link>
+                            <Link className="text-truncate content" to={Routes.projectUrl(g.community,g.slug)}>{g.name}</Link>
                             </li>)
                     }) }
                     {this.renderLoadMore()}

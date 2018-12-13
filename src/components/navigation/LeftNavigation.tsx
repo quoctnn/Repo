@@ -5,6 +5,7 @@ import { Community } from "../../types/intrasocial_types";
 import NotificationsList from "../general/NotificationsList";
 import ContactList from "../general/ContactList";
 import classnames from 'classnames';
+import CommunityList from "../general/CommunityList";
 require("./LeftNavigation.scss");
 
 export interface Props {
@@ -17,10 +18,12 @@ export interface State {
 type MenuItem = {
     icon:string
     component:JSX.Element
+    key:string
 }
 const menuData:MenuItem[] = []
-menuData.push({icon:"fas fa-bell", component:<NotificationsList />})
-menuData.push({icon:"fas fa-user", component:<ContactList />})
+menuData.push({key:"notificationlist", icon:"fas fa-bell", component:<NotificationsList />})
+menuData.push({key:"contactlist", icon:"fas fa-user", component:<ContactList />})
+menuData.push({key:"communitylist", icon:"community-icon", component:<CommunityList />})
 class LeftNavigation extends React.Component<Props, State> {
     static leftMenuOpen = "left-menu-open"
     static defaultProps:Props = {
@@ -65,7 +68,6 @@ class LeftNavigation extends React.Component<Props, State> {
     }
     renderData = () =>
     {
-        const component = this.state.selectedIndex >= 0 && this.state.selectedIndex - menuData.length ? menuData[this.state.selectedIndex].component : undefined
         return (<>
             <ul className="left">{
                 menuData.map( (menuItem, index) => {
@@ -75,7 +77,11 @@ class LeftNavigation extends React.Component<Props, State> {
                             </li>)
                 })
             }</ul>
-            {component && <div className="right">{component}</div>}
+            {<div className="right">{
+                menuData.map( (menuItem, index) => {
+                    return (<div className="menu-component" key={menuItem.key} style={{display: index == this.state.selectedIndex ? "block" : "none"}}>{menuItem.component}</div>)
+                })
+            }</div>}
         </>)
     }
     render = () => 
