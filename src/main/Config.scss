@@ -14,7 +14,8 @@ $root: (
     body-background: #eeeeee,
     border-color-default: #cccccc,
     title-color:#4d4d4d,
-    main-content-background:#EFF5FE,
+    main-content-background:#FFFFFF,
+    main-content-border:#cccccc,
 
     /* Buttons */
     button-background-color: #CFD5DE,
@@ -89,12 +90,14 @@ $root: (
     --body-background: #eeeeee;
     --border-color-default: rgba(0,0,0,0.1);
     --title-color:#4d4d4d;
-    --main-content-background:#EFF5FE;
+    --main-content-background:#FFFFFF;
+    --main-content-border: #cccccc;
     --button-color: white;
     --button-background-color: #6c757d;
     --button-border-color: #cccccc;
     --button-hover-background-color: #4c555d;
     --button-disabled-background-color: body-background;
+    --button-disabled-text-color: title-color;
 
     --default-color: #fff;
     --primary-color: #428bca;
@@ -156,13 +159,16 @@ $root: (
     --nav-border-color:#070a0e;
     --nav-border-width:2px;
     --nav-left-right-background-color: #1c2938;
-    --border-width-default: 5px;
-    --border-color-default: green;
+    --border-width-default: 2px;
+    --border-color-default: gray;
     --body-background: #10171e;
+    --main-content-background: #1c2938;
+    --main-content-border: #404040;
 
+    --default-color: rgb(221,221,221);
     --title-color:rgb(210, 210, 210);
     --primary-text-color: #DFDFDF;
-    --secondary-text-color: #929292;
+    --secondary-text-color: #A2A2A2;
     --link-color: #C5C5C5;
 
     --button-color: #FFFFFF;

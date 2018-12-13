@@ -1,5 +1,4 @@
-$leftColor: #4FA7CF !default;
-$rightColor: #F1F1F4 !default;
+@import "../../main/Config";
 .chat-message
 {
     word-wrap: break-word;
@@ -8,12 +7,12 @@ $rightColor: #F1F1F4 !default;
     margin: 2px auto;
     max-width: calc(90% - 40px);
     position: relative;
-    > .body 
+    > .body
     {
         display: block;
 
     }
-    
+
 }
 .chat-message.single-embed
 {
@@ -24,7 +23,7 @@ $rightColor: #F1F1F4 !default;
     margin-bottom: 5px;
 }
 .chat-message.left {
-    background-color: $leftColor;
+    @include var(background-color, primary-color);
     color: white;
     text-align: left;
     margin-left: 40px;
@@ -32,22 +31,23 @@ $rightColor: #F1F1F4 !default;
     {
         color: white;
         text-decoration: underline;
-        
+
     }
 }
-  
-.chat-message.right 
+
+.chat-message.right
 {
-    background-color: $rightColor;
+    @include var(background-color, button-background-color);
+    @include var(color, button-color);
     text-align: right;
     margin-right: 15px;
     > .body a
     {
         color: #4FA7CF;
-        
+
     }
 }
-.chat-message.temp 
+.chat-message.temp
 {
     border:1px solid red;
 }
@@ -57,19 +57,19 @@ $rightColor: #F1F1F4 !default;
 .document .file-icon:before {
     content: "\f15b";
   }
-  
+
   .document.ppt .file-icon:before,
   .document.pptx .file-icon:before,
   .document.odp .file-icon:before {
     content: "\f1c4";
     color: #FF8D52;
   }
-  
+
   .document.pdf .file-icon:before {
     content: "\f1c1";
     color: #FF5656;
   }
-  
+
   .document.doc .file-icon:before,
   .document.docx .file-icon:before,
   .document.txt .file-icon:before,
@@ -78,24 +78,24 @@ $rightColor: #F1F1F4 !default;
     content: "\f15c";
     color: #547980;
   }
-  
+
   .document.xlsx .file-icon:before,
   .document.xls .file-icon:before,
   .document.ods .file-icon:before {
     content: "\f1c3";
     color: #6abe67;
   }
-  
+
   .image .file-icon:before {
     content: "\f1c5";
     color: #029555;
   }
-  
+
   .video .file-icon:before {
     content: "\f1c8";
     color: #A63636;
   }
-  
+
   .audio .file-icon:before {
     content: "\f1c7";
     color: #FFD00C

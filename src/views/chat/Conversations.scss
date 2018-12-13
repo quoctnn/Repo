@@ -1,20 +1,24 @@
+@import "../../main/Config";
 #conversations-view
 {
+   @include var(background-color, main-content-background);
+   @include var(color, primary-text-color);
+
    padding: 0;
     .card-body
     {
-        padding: 0; 
+        padding: 0;
     }
-    @-webkit-keyframes yellow-fade {
-        0% {background: yellow;}
+    @-webkit-keyframes primary-fade {
+        0% {background: primary-color;}
         100% {background: none;}
      }
-     @keyframes yellow-fade {
-        0% {background: yellow;}
+     @keyframes primary-fade {
+        0% {background: primary-color;}
         100% {background: none;}
      }
      .highlight-insert {
-        -webkit-animation: yellow-fade 2s ease-in 1;
-        animation: yellow-fade 2s ease-in 1;
+        -webkit-animation: primary-fade 2s ease-in 1;
+        animation: primary-fade 2s ease-in 1;
      }
 }

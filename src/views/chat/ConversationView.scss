@@ -1,6 +1,9 @@
 @import "../../main/Config";
 #conversation-view
 {
+    @include var(background-color, main-content-background);
+    @include var(color, primary-text-color);
+
     .card-body
     {
         padding: 0;
@@ -11,7 +14,7 @@
         position: -moz-sticky;
         position: -o-sticky;
         position: sticky;
-        background: white;
+        @include var(background-color, main-content-background);
         bottom: 0px;
         padding: 5px 5px 5px 15px;
         display: flex;
@@ -29,6 +32,18 @@
         border-style: dashed;
         @include var(border-color, border-color-default);
     }
+    .btn {
+        @include var(background, button-background-color);
+        @include var(color, button-color);
+        @include var(border-color, button-border-color);
+    }
+    .btn:hover {
+        @include var(background, button-hover-background-color); }
+
+    .btn:disabled {
+        @include var(background, button-disabled-background-color);
+        @include var(color, button-disabled-text-color); }
+
 }
 .column-left
 {

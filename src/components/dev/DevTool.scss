@@ -9,7 +9,7 @@
         max-width: 100%;
     }
     .jumbotron {
-        @include var(background-color, nav-background-color);
+        @include var(background-color, main-content-background);
     }
     .btn {
         @include var(background, button-background-color);
@@ -20,6 +20,7 @@
         @include var(background, button-hover-background-color); }
 
     .btn:disabled {
-        @include var(background, button-disabled-background-color); }
+        @include var(background, button-disabled-background-color);
+        @include var(color, button-disabled-text-color); }
 
 }

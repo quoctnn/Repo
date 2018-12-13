@@ -2,7 +2,7 @@
 .conversation-item
 {
     &:hover{
-        background: lightgray
+        @include var(background, button-hover-background-color);
     }
     .title
     {
@@ -14,6 +14,9 @@
     {
         @include var(color, title-color);
         text-decoration: none;
+    }
+    a:hover{
+        @include var(color, button-color);
     }
     .is-typing-container
     {
