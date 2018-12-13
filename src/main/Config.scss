@@ -54,6 +54,10 @@ $root: (
     nav-background-color:white,
     nav-border-color:#DFE0DF,
     nav-border-width:1px,
+    nav-left-left-background-color:#231E2E,
+    nav-left-right-background-color:white,
+    nav-left-menu-item-color:rgb(199, 197, 197),
+    nav-left-selected-menu-item-color:white,
     top-navigation-height:60px,
     left-navigation-min-width:60px,
     left-navigation-max-width:270px,
@@ -117,6 +121,10 @@ $root: (
     --nav-background-color:white;
     --nav-border-color: #DFE0DF;
     --nav-border-width:1px;
+    --nav-left-left-background-color:#231E2E;
+    --nav-left-right-background-color:white;
+    --nav-left-menu-item-color:rgb(199, 197, 197);
+    --nav-left-selected-menu-item-color:white;
 
     --top-navigation-height:60px;
     --left-navigation-min-width:60px;
@@ -132,7 +140,7 @@ $root: (
     --left-navigation-min-width:160px;
 }
 :root.dark {
-    --nav-background-color:black;
+    --nav-background-color:#231E2E;
     --nav-border-color:red;
     --nav-border-width:5px;
     --border-width-default: 5px;

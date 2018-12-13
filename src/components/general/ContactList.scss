@@ -1,0 +1,17 @@
+#contact-list {
+    > ul {
+        overflow-y: auto;
+        height:100%;
+    }
+    .avatar-profile
+    {
+        .avatar {
+            margin: 5px;
+        }
+        .right-text-rows
+        {
+            justify-content: center;
+            align-items: center;
+        }
+    }
+}

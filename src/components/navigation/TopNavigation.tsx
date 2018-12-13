@@ -59,7 +59,7 @@ class TopNavigation extends React.Component<Props, State> {
             endpoint = endpoint.replace(/(:\d+$)/, '');
         }
         return(
-            <div id="top-navigation" className="d-flex align-items-center">
+            <div id="top-navigation" className="d-flex align-items-center transition">
                 <div className="flex-shrink-0">
                     <Link className="btn btn-primary margin-right-sm" to={Routes.ROOT}><i className="fas fa-home" /></Link>
                     <Link className="btn btn-primary margin-right-sm" to={Routes.CONVERSATIONS}><i className="fas fa-comments" /></Link>

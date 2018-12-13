@@ -3,6 +3,7 @@ import Constants from "../../../utilities/Constants";
 import { ChatMessageComposer, IEditorComponent } from '../ChatMessageComposer';
 import { Mention } from '../../input/MentionEditor';
 import { Status, UploadedFile } from '../../../types/intrasocial_types';
+import { translate } from '../../intl/AutoIntlProvider';
 import classNames = require('classnames');
 
 export interface OwnProps
@@ -126,6 +127,7 @@ export default class StatusFormBase extends React.Component<Props, State> implem
     }
     renderTextArea(canSubmit:boolean) {
         let cn = classNames("secondary-text", this.props.className)
+        const placeholder = translate("Write a comment")
         return (
             <ChatMessageComposer 
             className={cn} 
@@ -137,6 +139,7 @@ export default class StatusFormBase extends React.Component<Props, State> implem
             mentions={this.props.mentions} 
             onSubmit={this.handleSubmit} 
             onDidType={this.props.onDidType} 
+            placeholder={placeholder}
             />                      
         )
     }

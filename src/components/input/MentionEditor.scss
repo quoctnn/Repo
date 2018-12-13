@@ -142,6 +142,10 @@ mention {
 {
   word-break: break-all;    
 }
+.public-DraftEditorPlaceholder-root
+{
+  position: absolute;  
+}
 .DraftEditor-editorContainer
 {
   overflow-y: auto;

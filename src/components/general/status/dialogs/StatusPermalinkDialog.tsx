@@ -44,7 +44,12 @@ export default class StatusPermalinkDialog extends React.Component<Props, State>
         let copyText = translate("Copy")
         return (<Modal toggle={this.props.didCancel} id="status-permalink-dialog" zIndex={1070} isOpen={this.props.visible} className="full-height">
                 <ModalHeader>
-                    {translate("Status Permalink")}
+                    <button type="button" className="close" onClick={this.props.didCancel}
+                        data-dismiss="modal">
+                        <span aria-hidden="true">&times;</span>
+                        <span className="sr-only">Close</span>
+                    </button>
+                    <span>{translate("Status Permalink")}</span>
                 </ModalHeader>
                 <ModalBody className="vertical-scroll">
                     <p>{translate("Copy this link as the permanent URL for this item")}

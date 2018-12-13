@@ -39,7 +39,7 @@ export default class ConfirmDialog extends React.Component<Props, State> {
                     <p>{this.props.message}</p>
                 </ModalBody>
                 <ModalFooter>
-                    <button type="button" className="btn btn-default" onClick={this.didComplete(false)}>{translate("Cancel")}
+                    <button type="button" className="btn btn-secondary" onClick={this.didComplete(false)}>{translate("Cancel")}
                     </button>
                     <button type="button" className="btn btn-danger" onClick={this.didComplete(true)}>{okButtonTitle}
                     </button>

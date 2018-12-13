@@ -1,45 +1,40 @@
 import * as React from "react";
-import CommunityTreeItem from '../general/community/CommunityTreeItem';
 import { connect } from 'react-redux'
 import { RootState } from "../../reducers";
 import { Community } from "../../types/intrasocial_types";
+import NotificationsList from "../general/NotificationsList";
+import ContactList from "../general/ContactList";
+import classnames from 'classnames';
 require("./LeftNavigation.scss");
 
 export interface Props {
     communities:Community[]
 }
 export interface State {
-    collapsedState:boolean[],
     open:boolean
+    selectedIndex:number 
 }
-class LeftNavigation extends React.Component<Props, {}> {
-    state:State
+type MenuItem = {
+    icon:string
+    component:JSX.Element
+}
+const menuData:MenuItem[] = []
+menuData.push({icon:"fas fa-bell", component:<NotificationsList />})
+menuData.push({icon:"fas fa-user", component:<ContactList />})
+class LeftNavigation extends React.Component<Props, State> {
     static leftMenuOpen = "left-menu-open"
     static defaultProps:Props = {
         communities:[],
 	};
     constructor(props) {
         super(props);
-        this.state = { collapsedState:[], open: false  }
-        this.handleClick = this.handleClick.bind(this)
-        this.updateBody = this.updateBody.bind(this)
+        this.state = { open: false,selectedIndex:-1  }
     }
     componentWillUnmount()
     {
         document.body.classList.remove(LeftNavigation.leftMenuOpen)
     }
-    componentDidMount()
-    {
-        this.setState({ collapsedState:this.props.communities.map(() => true) }, this.updateBody)
-    }
-    componentDidUpdate(prevProps:Props)
-    {
-        if(this.props.communities.length != prevProps.communities.length)
-        {
-            this.setState({ collapsedState:this.props.communities.map(() => true) , open: false }, this.updateBody)
-        }
-    }
-    updateBody()
+    updateBody = () => 
     {
         let open = this.state.open
         if(open)
@@ -53,25 +48,38 @@ class LeftNavigation extends React.Component<Props, {}> {
                 document.body.classList.remove(LeftNavigation.leftMenuOpen)
         }
     }
-    handleClick(index:number)
-    {
-        let collapsedState = this.state.collapsedState
-        collapsedState[index] = !collapsedState[index];
-        this.setState({collapsedState: collapsedState, open: collapsedState.filter((cs) => !cs).length > 0 }, this.updateBody);
+    toggleMenu = () => {
+        this.setState(prevState => ({
+            open: !prevState.open
+          }), this.updateBody)
     }
-    renderData()
-    {
-        if(this.props.communities)
+    menuItemPressed = (index:number) => {
+
+        const {open, selectedIndex} = this.state
+        if(index == selectedIndex)
         {
-            return (<ul>{
-                this.props.communities.map( (item, index) => {
-                    return (<li key={index}><CommunityTreeItem communityData={item} collapsed={this.state.collapsedState[index]} onClick={this.handleClick.bind(null, index)} /></li>)
-                })
-            }</ul>)
+            this.toggleMenu()
+            return
         }
-        return null
+        this.setState({open: true, selectedIndex: index }, this.updateBody);
     }
-    render() {
+    renderData = () =>
+    {
+        const component = this.state.selectedIndex >= 0 && this.state.selectedIndex - menuData.length ? menuData[this.state.selectedIndex].component : undefined
+        return (<>
+            <ul className="left">{
+                menuData.map( (menuItem, index) => {
+                    const cn = classnames({selected : this.state.selectedIndex == index})
+                    return (<li className={cn} key={index} onClick={() => {this.menuItemPressed(index)}}>
+                                <i className={menuItem.icon}></i>
+                            </li>)
+                })
+            }</ul>
+            {component && <div className="right">{component}</div>}
+        </>)
+    }
+    render = () => 
+    {
         return(
             <div id="left-navigation" className="flex transition">
                 {this.renderData()}

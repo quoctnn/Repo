@@ -1,17 +1,48 @@
 @import "../../main/Config";
 #left-navigation
 {
-    border:0;
-    @include var(background, nav-background-color);
+    border:0 !important;
     @include var(border-right-width, nav-border-width);
     @include var(border-right-color, nav-border-color);
     border-style: solid;
-    ul
+    .left
     {
-        width:100%;
-        li
+        @include var(background, nav-left-left-background-color);
+        @include var(width, left-navigation-min-width);
+        position: absolute;
+        top:0;
+        left:0;
+        bottom:0;
+        overflow-x: hidden;
+        overflow-y: auto;
+        font-size: 24px;
+        > li {
+            @include var(width, left-navigation-min-width);
+            @include var(height, left-navigation-min-width);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            @include var(color, nav-left-menu-item-color);
+            &.selected
+            {
+                @include var(color, nav-left-selected-menu-item-color);
+            }
+        }
+        
+    }
+    .right
+    {
+        @include var(background, nav-left-right-background-color);
+        width:calc(#{map-get($root, left-navigation-max-width)} - #{map-get($root, left-navigation-min-width)});
+        overflow: hidden;
+        position: absolute;
+        top:0;
+        @include var(left, left-navigation-min-width);
+        right: 0;
+        bottom:0;
+        > * 
         {
-            padding: 5px 5px 0 5px;
+            height: 100%;
         }
     }
 }

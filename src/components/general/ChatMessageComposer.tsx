@@ -139,6 +139,7 @@ export interface Props
     onHandleUploadClick?:(event) => void
     canSubmit?:boolean
     className?:string
+    placeholder?:string
 }
 interface State
 {
@@ -225,7 +226,15 @@ export class ChatMessageComposer extends React.Component<Props,State> implements
                     <div className="input-group">
                         <div className="input-wrap"
                             onFocus={this.fixFocusInput}>
-                            <MentionEditor onHandleUploadClick={this.props.onHandleUploadClick} filesAdded={this.props.filesAdded} mentionSearch={this.props.mentionSearch} editorState={this.state.editorState} ref={this.inputRef} onChange={this.onChange}/> 
+                            <MentionEditor 
+                            onHandleUploadClick={this.props.onHandleUploadClick} 
+                            filesAdded={this.props.filesAdded} 
+                            mentionSearch={this.props.mentionSearch} 
+                            editorState={this.state.editorState} 
+                            ref={this.inputRef} 
+                            onChange={this.onChange}
+                            placeholder={this.props.placeholder}
+                            /> 
                         </div>
                         <div className="button-wrap d-flex flex-column-reverse">
                             <button disabled={!canSubmit} className="btn btn-submit btn-default align-items-end btn-primary message-send-button">

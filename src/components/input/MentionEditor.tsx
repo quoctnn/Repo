@@ -105,6 +105,7 @@ interface Props {
   filesAdded?:(files:File[]) => void
   mentionSearch:(search:string, completion:(mentions:Mention[]) => void) => void
   onHandleUploadClick?:(event) => void
+  placeholder?:string
 }
 interface State {
   suggestions: Mention[]
@@ -312,6 +313,7 @@ export default class MentionEditor extends React.Component<Props, {}> {
                       onChange={this.onChange}
                       plugins={plugins}
                       ref={this.editor}
+                      placeholder={this.props.placeholder}
                     />
                     <EmojiSuggestions />
                 </div>

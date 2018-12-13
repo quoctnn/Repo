@@ -39,13 +39,12 @@ export default class EditStatusDialog extends React.Component<Props, State> {
     {
         return (<Modal toggle={this.props.didCancel} id="edit-status-dialog" zIndex={1070} isOpen={this.props.visible} className="full-height">
                 <ModalHeader>
-                    {translate("Edit")}
                     <button type="button" className="close" onClick={this.props.didCancel}
                         data-dismiss="modal">
                         <span aria-hidden="true">&times;</span>
                         <span className="sr-only">Close</span>
                     </button>
-                    
+                    <span>{translate("Edit")}</span>
                 </ModalHeader>
                 <ModalBody className="vertical-scroll">
                     {this.renderForm()}
