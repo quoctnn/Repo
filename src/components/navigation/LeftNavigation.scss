@@ -40,6 +40,7 @@
     {
         @include var(background, nav-left-right-background-color);
         width:calc(#{map-get($root, left-navigation-max-width)} - #{map-get($root, left-navigation-min-width)});
+        width:calc(var(--left-navigation-max-width) - var(--left-navigation-min-width));
         overflow: hidden;
         position: absolute;
         top:0;
