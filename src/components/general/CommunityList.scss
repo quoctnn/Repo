@@ -2,7 +2,6 @@
 
 #community-list
 {
-    @include var(background, nav-background-color);
     ul.list{
         height: 100%;
         overflow-y: auto;

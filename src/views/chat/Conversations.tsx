@@ -205,14 +205,14 @@ class Conversations extends React.PureComponent<Props, State> {
         let conversations = this.props.items
         
         return (<FullPageComponent> 
-                    <div id="conversations-view" className={"card full-height col-sm" + (this.props.className ? " " + this.props.className : "")}>
-                        <div className="card-header grey d-flex align-items-center">
+                    <div id="conversations-view" className={"full-height col-sm" + (this.props.className ? " " + this.props.className : "")}>
+                        <div className="d-flex align-items-center">
                             <span className="text-truncate d-block flex-grow-1">{translate("Conversations")}</span>
                             <div className="flex-shrink-0">
                                 <Link className="btn btn-primary rounded-circle flex-shrink-0" to={Routes.CONVERSATION_CREATE}><i className="fas fa-plus"></i></Link>
                             </div>
                         </div>
-                        <div className="card-body full-height">
+                        <div className="full-height">
                             <List onScroll={this.onScroll} className="group-list vertical-scroll">
                                 {conversations.map((c, index) => {
                                     return (<ConversationItem isActive={c.id == this.props.activeConversation} className={this.conversationItemClassName(c) } list-key={c.id} key={c.id} conversation={c}>

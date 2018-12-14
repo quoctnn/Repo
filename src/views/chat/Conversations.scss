@@ -1,9 +1,8 @@
 @import "../../main/Config";
 #conversations-view
 {
-   @include var(background-color, main-content-background);
    @include var(color, primary-text-color);
-
+   
    padding: 0;
     .card-body
     {

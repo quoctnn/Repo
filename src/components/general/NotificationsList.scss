@@ -1,7 +1,4 @@
 @import "../../main/Config";
 #notifications-list
 {
-    @include var(color, primary-text-color);
-    @include var(background-color, main-content-background);
-
 }

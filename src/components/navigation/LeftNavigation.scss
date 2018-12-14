@@ -46,17 +46,18 @@
         @include var(left, left-navigation-min-width);
         right: 0;
         bottom:0;
+        > .menu-header
+        {
+            @include var(height, top-navigation-height);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            
+        }
         > .menu-component
         {
             height: 100%;
-            .menu-header
-            {
-                @include var(height, top-navigation-height);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                
-            }
+            
             .menu-content{
 
                 height:calc(100% - #{map-get($root, top-navigation-height)});

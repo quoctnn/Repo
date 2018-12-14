@@ -12,6 +12,7 @@ import { withRouter } from "react-router-dom";
 import { History } from "history";
 import { Settings } from "../../utilities/Settings";
 import { translate } from "../intl/AutoIntlProvider";
+import { ApiEndpoint } from "../../reducers/debug";
 require("./LeftNavigation.scss");
 
 interface OwnProps {
@@ -22,6 +23,10 @@ interface RouteProps
     history:any
     location: any
     match:any
+}
+interface ReduxStateProps {
+    apiEndpoint?:number
+    availableApiEndpoints?:Array<ApiEndpoint>
 }
 interface State {
     open:boolean
@@ -51,7 +56,7 @@ const getMenuData = () => {
     }
     return menuData
 }
-type Props = RouteProps & OwnProps
+type Props = RouteProps & OwnProps & ReduxStateProps
 class LeftNavigation extends React.Component<Props, State> {
     static leftMenuOpen = "left-menu-open"
     static defaultProps:OwnProps = {
@@ -102,6 +107,7 @@ class LeftNavigation extends React.Component<Props, State> {
     }
     renderData = () =>
     {
+        const title = this.getTitle()
         return (<>
             <ul className="left">{
                 this.state.menuData.map( (menuItem, index) => {
@@ -111,15 +117,26 @@ class LeftNavigation extends React.Component<Props, State> {
                             </li>)
                 })
             }</ul>
-            {<div className="right">{
-                this.state.menuData.map( (menuItem, index) => {
-                    return (<div className="menu-component" key={menuItem.key} style={{display: index == this.state.selectedIndex ? "block" : "none"}}>
-                                <div className="menu-header text-truncate">{menuItem.title}</div>
-                                <div className="menu-content">{menuItem.component}</div>
-                            </div>)
-                })
-            }</div>}
+            {<div className="right">
+
+                <div className="menu-header text-truncate">{title}</div>
+                {this.state.menuData.map( (menuItem, index) => {
+                        return (<div className="menu-component" key={menuItem.key} style={{display: index == this.state.selectedIndex ? "block" : "none"}}>
+                                    <div className="menu-content">{menuItem.component}</div>
+                                </div>)
+                    })
+                }
+            </div>}
         </>)
+    }
+    getTitle = () => {
+        var endpoint = "";
+        if (this.props.availableApiEndpoints && this.props.apiEndpoint != null) {
+            endpoint = this.props.availableApiEndpoints[this.props.apiEndpoint].endpoint
+            endpoint = endpoint.replace(/(^\w+:|)\/\//, '');
+            endpoint = endpoint.replace(/(:\d+$)/, '');
+        }
+        return endpoint
     }
     render = () => 
     {
@@ -133,6 +150,8 @@ class LeftNavigation extends React.Component<Props, State> {
 const mapStateToProps = (state:RootState) => {
     return {
         communities:state.communityStore.communities,
+        apiEndpoint: state.debug.apiEndpoint,
+        availableApiEndpoints: state.debug.availableApiEndpoints,
     };
 }
 export default withRouter(connect(mapStateToProps, null)(LeftNavigation));
