@@ -21,7 +21,7 @@ $root: (
     button-background-color: #CFD5DE,
     button-color: white,
     button-border-color: #cccccc,
-    button-hover-background-color: #9F959E,
+    button-hover-background-color: #4c555d,
 
     default-color: #fff,
     primary-color: #428bca,
@@ -65,6 +65,11 @@ $root: (
     nav-left-right-background-color:rgb(103, 103, 104),
     nav-left-menu-item-color:rgb(199, 197, 197),
     nav-left-selected-menu-item-color:white,
+
+    nav-left-right-foreground-color:white,
+    nav-left-right-highlight-foreground-color:white,
+    nav-left-right-highlight-background-color:#4c555d,
+
     top-navigation-height:60px,
     left-navigation-min-width:60px,
     left-navigation-max-width:270px,
@@ -140,6 +145,10 @@ $root: (
     --nav-left-right-background-color:rgb(103, 103, 104);
     --nav-left-menu-item-color:rgb(199, 197, 197);
     --nav-left-selected-menu-item-color:white;
+
+    --nav-left-right-foreground-color:white;
+    --nav-left-right-highlight-foreground-color:white;
+    --nav-left-right-highlight-background-color:#4c555d;
 
     --top-navigation-height:60px;
     --left-navigation-min-width:60px;

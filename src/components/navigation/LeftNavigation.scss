@@ -46,12 +46,24 @@
         @include var(left, left-navigation-min-width);
         right: 0;
         bottom:0;
+        a.button-link
+        {
+            @include var(color, nav-left-right-foreground-color);
+            &:hover {
+                @include var(color, nav-left-right-highlight-foreground-color);
+                @include var(background, nav-left-right-highlight-background-color);
+                
+            }
+        }
+        
         > .menu-header
         {
             @include var(height, top-navigation-height);
             display: flex;
             align-items: center;
             justify-content: center;
+            @include var(color, nav-left-right-highlight-foreground-color);
+            font-weight: 500;
             
         }
         > .menu-component
