@@ -6,12 +6,12 @@
 div.filepicker {
   text-align: center;
   padding: 5px;
-  background-color: whitesmoke;
+  @include var(background-color, main-content-secondary-background);
   border-radius: 5px;
   min-height: 60px;
   border-width: 2px;
   border-style:dashed;
-  @include var(border-color, primary-color);
+  @include var(border-color, main-content-secondary-border);
 }
 
 .dropzone .dz-message {
