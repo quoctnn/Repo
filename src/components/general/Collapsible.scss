@@ -1,0 +1,21 @@
+.collapsible
+{
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 1 !important;
+    margin: 5px 0;
+    &:not(.open) {
+        
+        flex-shrink: 0 !important;
+    }
+    .collapse.show {
+        display: flex;
+        flex-direction: column;
+        flex-shrink: 1;
+    }
+    .toggle-button
+    {
+        flex-shrink: 0;
+        align-items: center;
+    }
+}

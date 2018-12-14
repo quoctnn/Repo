@@ -2,7 +2,7 @@
 #conversations-view
 {
    @include var(color, primary-text-color);
-   
+   display: flex;
    padding: 0;
     .card-body
     {

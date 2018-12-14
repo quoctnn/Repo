@@ -2,6 +2,9 @@
 
 #left-navigation
 {
+    a{
+        text-decoration: none;
+    }
     border:0 !important;
     @include var(border-right-width, nav-border-width);
     @include var(border-right-color, nav-border-color);

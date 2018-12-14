@@ -2,7 +2,6 @@ import * as React from 'react';
 import * as Actions from "../../actions/Actions" 
 import { connect } from 'react-redux'
 import LoadingSpinner from '../../components/general/LoadingSpinner';
-import { translate } from '../../components/intl/AutoIntlProvider';
 import { RootState } from '../../reducers';
 import ConversationItem from '../../components/general/ConversationItem';
 import { FullPageComponent } from '../../components/general/FullPageComponent';
@@ -14,8 +13,6 @@ import { TypingIndicator } from '../../components/general/TypingIndicator';
 import { Avatar } from '../../components/general/Avatar';
 import { conversationReducerPageSize } from '../../reducers/conversations';
 import * as moment from 'moment-timezone';
-import { Link } from 'react-router-dom';
-import Routes from '../../utilities/Routes';
 import { List } from '../../components/general/List';
 import { NotificationCenter } from '../../notifications/NotificationCenter';
 import { ProfileManager } from '../../managers/ProfileManager';
@@ -205,23 +202,15 @@ class Conversations extends React.PureComponent<Props, State> {
         let conversations = this.props.items
         
         return (<FullPageComponent> 
-                    <div id="conversations-view" className={"full-height col-sm" + (this.props.className ? " " + this.props.className : "")}>
-                        <div className="d-flex align-items-center">
-                            <span className="text-truncate d-block flex-grow-1">{translate("Conversations")}</span>
-                            <div className="flex-shrink-0">
-                                <Link className="btn btn-primary rounded-circle flex-shrink-0" to={Routes.CONVERSATION_CREATE}><i className="fas fa-plus"></i></Link>
-                            </div>
-                        </div>
-                        <div className="full-height">
-                            <List onScroll={this.onScroll} className="group-list vertical-scroll">
-                                {conversations.map((c, index) => {
-                                    return (<ConversationItem isActive={c.id == this.props.activeConversation} className={this.conversationItemClassName(c) } list-key={c.id} key={c.id} conversation={c}>
-                                               {this.renderSomeoneIsTyping(c.id)} 
-                                            </ConversationItem>)
-                                }) }
-                                {this.renderLoading()}
-                            </List>
-                        </div>
+                    <div id="conversations-view">
+                        <List onScroll={this.onScroll} className="group-list vertical-scroll">
+                            {conversations.map((c, index) => {
+                                return (<ConversationItem isActive={c.id == this.props.activeConversation} className={this.conversationItemClassName(c) } list-key={c.id} key={c.id} conversation={c}>
+                                            {this.renderSomeoneIsTyping(c.id)} 
+                                        </ConversationItem>)
+                            }) }
+                            {this.renderLoading()}
+                        </List>
                     </div>
                 </FullPageComponent>)
     }

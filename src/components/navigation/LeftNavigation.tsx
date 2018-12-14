@@ -6,13 +6,13 @@ import NotificationsList from "../general/NotificationsList";
 import ContactList from "../general/ContactList";
 import classnames from 'classnames';
 import CommunityList from "../general/CommunityList";
-import Conversations from "../../views/chat/Conversations";
 import { NavigationUtilities } from "../../utilities/NavigationUtilities";
 import { withRouter } from "react-router-dom";
 import { History } from "history";
 import { Settings } from "../../utilities/Settings";
 import { translate } from "../intl/AutoIntlProvider";
 import { ApiEndpoint } from "../../reducers/debug";
+import { ConversationSidebar } from '../../views/chat/ConversationSidebar';
 require("./LeftNavigation.scss");
 
 interface OwnProps {
@@ -46,7 +46,7 @@ const getMenuData = () => {
     menuData.push({title:translate("Notifications"), key:"notificationlist", icon:"fas fa-bell", component:<NotificationsList />})
     menuData.push({title:"", key:"contactlist", icon:"fas fa-user", component:<ContactList />})
     menuData.push({title:"", key:"communitylist", icon:"community-icon", component:<CommunityList />})
-    menuData.push({title:"", key:"conversationlist", icon:"fas fa-comment", component:<Conversations />})
+    menuData.push({title:"", key:"conversationlist", icon:"fas fa-comment", component:<ConversationSidebar />})
     menuData.push({key:"spacer", className:"flex-grow-1 flex-shrink-1"})
     if(!Settings.isProduction)
     {
