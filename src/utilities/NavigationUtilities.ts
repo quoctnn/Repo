@@ -69,7 +69,10 @@ export class NavigationUtilities {
             })
          })
     }
-    
+    static navigateToDevTool = (history: H.History) => 
+    {
+        history.push(Routes.DEVELOPER_TOOL)
+    }
 }
 
   

@@ -44,27 +44,24 @@ class ConversationItem extends React.Component<Props, State> {
         let users = ProfileManager.getProfiles(conversation.users.filter(i => i != myId).slice(0, ConversationItem.maxVisibleAvatars))
         const avatars = users.map(u => u.avatar_thumbnail || u.avatar).filter(a => !nullOrUndefined(a))
         const size = 44
-        const padding = 10
         return (
             <div className={"conversation-item" + (this.props.isActive ? " active" : "") + (this.props.className ? " " + this.props.className:"") }>
-                <Link className="d-flex" to={Routes.conversationUrl(conversation.id)}>
-                    <div className="conversation-item-body d-flex align-items-center" style={{height:(size + padding * 2)  + "px", padding:padding + "px"}}>
+                <Link className="d-flex button-link" to={Routes.conversationUrl(conversation.id)}>
+                    <div className="conversation-item-body d-flex align-items-center">
                         <div>
                             <Avatar images={avatars} size={size} borderColor="white" borderWidth={2}>
                                 
                             </Avatar>
                         </div>
                         <div className="text-truncate flex-column">
-                            <span className="text-truncate">
-                                <span className="title text-truncate">{title}</span>
+                            <div className="text-truncate d-flex">
+                                <div className="title text-truncate">{this.props.children ? this.props.children :title}</div>
                                 {
                                     conversation.unread_messages.length > 0 && 
                                     <div className="notification-badge bg-success text-white"><span>{conversation.unread_messages.length}</span></div>
                                 }
-                            </span>
-                            {this.props.children}
+                            </div>
                         </div>
-                        
                     </div>
                 </Link>
             </div>

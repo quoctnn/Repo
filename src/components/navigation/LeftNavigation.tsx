@@ -7,33 +7,59 @@ import ContactList from "../general/ContactList";
 import classnames from 'classnames';
 import CommunityList from "../general/CommunityList";
 import Conversations from "../../views/chat/Conversations";
+import { NavigationUtilities } from "../../utilities/NavigationUtilities";
+import { withRouter } from "react-router-dom";
+import { History } from "history";
+import { Settings } from "../../utilities/Settings";
+import { translate } from "../intl/AutoIntlProvider";
 require("./LeftNavigation.scss");
 
-export interface Props {
+interface OwnProps {
     communities:Community[]
 }
-export interface State {
+interface RouteProps
+{
+    history:any
+    location: any
+    match:any
+}
+interface State {
     open:boolean
     selectedIndex:number 
+    menuData:MenuItem[]
 }
 type MenuItem = {
-    icon:string
-    component:JSX.Element
+    title?:string
+    icon?:string
+    component?:JSX.Element
     key:string
+    className?:string
+    onClick?:(history:History) => void
 }
-const menuData:MenuItem[] = []
-menuData.push({key:"notificationlist", icon:"fas fa-bell", component:<NotificationsList />})
-menuData.push({key:"contactlist", icon:"fas fa-user", component:<ContactList />})
-menuData.push({key:"communitylist", icon:"community-icon", component:<CommunityList />})
-menuData.push({key:"conversationlist", icon:"fas fa-comment", component:<Conversations />})
+const getMenuData = () => {
+    const menuData:MenuItem[] = []
+    menuData.push({title:translate("Notifications"), key:"notificationlist", icon:"fas fa-bell", component:<NotificationsList />})
+    menuData.push({title:"", key:"contactlist", icon:"fas fa-user", component:<ContactList />})
+    menuData.push({title:"", key:"communitylist", icon:"community-icon", component:<CommunityList />})
+    menuData.push({title:"", key:"conversationlist", icon:"fas fa-comment", component:<Conversations />})
+    menuData.push({key:"spacer", className:"flex-grow-1 flex-shrink-1"})
+    if(!Settings.isProduction)
+    {
+        menuData.push({title:"", key:"devtool", icon:"fas fa-cog", onClick:(history) => {
+            NavigationUtilities.navigateToDevTool(history)
+        }})
+    }
+    return menuData
+}
+type Props = RouteProps & OwnProps
 class LeftNavigation extends React.Component<Props, State> {
     static leftMenuOpen = "left-menu-open"
-    static defaultProps:Props = {
+    static defaultProps:OwnProps = {
         communities:[],
 	};
     constructor(props) {
         super(props);
-        this.state = { open: false,selectedIndex:-1  }
+        this.state = { open: false,selectedIndex:-1, menuData:getMenuData()  }
     }
     componentWillUnmount()
     {
@@ -61,6 +87,12 @@ class LeftNavigation extends React.Component<Props, State> {
     menuItemPressed = (index:number) => {
 
         const {open, selectedIndex} = this.state
+        const item = this.state.menuData[index]
+        if(item.onClick)
+        {
+            item.onClick(this.props.history)
+            return
+        }
         if(index == selectedIndex)
         {
             this.toggleMenu()
@@ -72,16 +104,19 @@ class LeftNavigation extends React.Component<Props, State> {
     {
         return (<>
             <ul className="left">{
-                menuData.map( (menuItem, index) => {
-                    const cn = classnames({selected : this.state.selectedIndex == index})
+                this.state.menuData.map( (menuItem, index) => {
+                    const cn = classnames({selected : this.state.selectedIndex == index}, menuItem.className)
                     return (<li className={cn} key={index} onClick={() => {this.menuItemPressed(index)}}>
-                                <i className={menuItem.icon}></i>
+                                {menuItem.icon && <i className={menuItem.icon}></i>}
                             </li>)
                 })
             }</ul>
             {<div className="right">{
-                menuData.map( (menuItem, index) => {
-                    return (<div className="menu-component" key={menuItem.key} style={{display: index == this.state.selectedIndex ? "block" : "none"}}>{menuItem.component}</div>)
+                this.state.menuData.map( (menuItem, index) => {
+                    return (<div className="menu-component" key={menuItem.key} style={{display: index == this.state.selectedIndex ? "block" : "none"}}>
+                                <div className="menu-header text-truncate">{menuItem.title}</div>
+                                <div className="menu-content">{menuItem.component}</div>
+                            </div>)
                 })
             }</div>}
         </>)
@@ -100,4 +135,4 @@ const mapStateToProps = (state:RootState) => {
         communities:state.communityStore.communities,
     };
 }
-export default connect(mapStateToProps, null)(LeftNavigation);
+export default withRouter(connect(mapStateToProps, null)(LeftNavigation));

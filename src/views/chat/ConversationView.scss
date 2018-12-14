@@ -8,6 +8,21 @@
     {
         padding: 0;
     }
+    .chat-message-composer
+    {
+        position: relative;
+        &:before {
+            content: "";
+            left: 0;
+            right: 0;
+            top: 0;
+            position: absolute;
+            @include var(border-top-color, border-color-default);
+            margin: 0 15px;
+            border-top-style: solid;
+            border-top-width: thin;
+          }
+    }
     .is-typing-container
     {
         position: -webkit-sticky;

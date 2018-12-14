@@ -44,8 +44,7 @@ interface State
 {
 }
 type Props = ReduxStateProps & ReduxDispatchProps & OwnProps
-class Main extends React.Component<Props, {}> {
-  state:State
+class Main extends React.Component<Props, State> {
   constructor(props) {
     super(props);
   }
@@ -90,9 +89,9 @@ class Main extends React.Component<Props, {}> {
                         </div>
                     </div>
                     <div id="navigation-content" className="navigation">
-                        <TopNavigation />
-                        <LeftNavigation />
+                        {this.props.signedIn && <LeftNavigation /> }
                         {this.props.signedIn && this.props.userList && <RightNavigation /> }
+                        <TopNavigation />
                     </div>
             </div>
           </Router>

@@ -1,15 +1,8 @@
 @import "../../main/Config";
 .chat-message-composer
 {
-    @include var(color, primary-text-color);
-    @include var(background-color, main-content-background);
-
-    width: 100%;
     padding: 5px 8px;
     z-index: 999;
-    border-top-style: solid;
-    @include var(border-top-color, border-color-default);
-    @include var(border-top-width, border-width-default);
     form
     {
         display: flex;

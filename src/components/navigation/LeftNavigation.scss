@@ -9,6 +9,8 @@
     border-style: solid;
     .left
     {
+        display: flex;
+        flex-direction: column;
         @include var(background, nav-left-left-background-color);
         @include var(width, left-navigation-min-width);
         position: absolute;
@@ -22,13 +24,15 @@
             @include var(width, left-navigation-min-width);
             @include var(height, left-navigation-min-width);
             display: flex;
+            flex-shrink: 0;
             justify-content: center;
             align-items: center;
             @include var(color, nav-left-menu-item-color);
-            &.selected
+            &.selected, &:hover
             {
                 @include var(color, nav-left-selected-menu-item-color);
             }
+            cursor: pointer;
         }
         
     }
@@ -42,10 +46,25 @@
         @include var(left, left-navigation-min-width);
         right: 0;
         bottom:0;
-        > .menu-component,
-        > .menu-component > * 
+        > .menu-component
         {
             height: 100%;
+            .menu-header
+            {
+                @include var(height, top-navigation-height);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                
+            }
+            .menu-content{
+
+                height:calc(100% - #{map-get($root, top-navigation-height)});
+                > * 
+                {
+                    height: 100%;
+                }
+            }
         }
     }
     .community-icon 
@@ -58,7 +77,7 @@
         width: 24px;
         height: 24px;
     }
-    .selected > .community-icon 
+    .selected > .community-icon, li:hover .community-icon
     {
         @include var(background-color, nav-left-selected-menu-item-color);
     }

@@ -93,7 +93,8 @@
             border-style:solid;
             border-top-width: 0;
             border-bottom-width: 0;
-            @include var(border-color, border-color-default);
+            @include var(border-color, main-content-border);
+            border-radius: 0;
         }
     }
 

@@ -144,7 +144,7 @@ class NotificationsList extends React.PureComponent<Props, State> {
                 <List onScroll={this.onScroll} className="group-list vertical-scroll">
                     {notifications.map((n, index) => 
                     {
-                        let itemClass = classNames("notification-item list-group-item", {
+                        let itemClass = classNames("notification-item", {
                             "seen": n.is_read,
                             "completed": n.extra == 'completed',
                             "to-verify": n.extra == 'to-verify',

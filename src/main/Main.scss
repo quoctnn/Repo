@@ -40,6 +40,16 @@
     display: block;
     width: 100%;
 }
+a.button-link
+{
+    @include var(color, title-color);
+    padding: 5px;
+}
+a.button-link:hover{
+    @include var(background, button-hover-background-color);
+    @include var(color, button-color);
+    text-decoration: none;
+}
 .full-screen {
     position: fixed;
     width: 100%;
@@ -204,6 +214,9 @@ body
             right: 0;
             left:0;
             top: 0;
+        }
+        #left-navigation ~ #top-navigation
+        {
             @include var(margin-left, left-navigation-min-width);
         }
         #right-navigation
@@ -257,7 +270,7 @@ body.left-menu-open
             {
                 @include var(width, left-navigation-max-width);
             }
-            #top-navigation
+            #left-navigation ~ #top-navigation
             {
                 @include var(margin-left, left-navigation-max-width);
             }

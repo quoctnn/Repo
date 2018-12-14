@@ -31,7 +31,7 @@
     {
         color: white;
         text-decoration: underline;
-
+        display: block;
     }
 }
 
@@ -44,6 +44,8 @@
     > .body a
     {
         color: #4FA7CF;
+        display: block;
+        text-decoration: underline;
 
     }
 }

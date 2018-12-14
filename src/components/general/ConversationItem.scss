@@ -1,22 +1,11 @@
 @import "../../main/Config";
 .conversation-item
 {
-    &:hover{
-        @include var(background, button-hover-background-color);
-    }
     .title
     {
         padding-left: 8px;
         padding-right: 8px;
 
-    }
-    a
-    {
-        @include var(color, title-color);
-        text-decoration: none;
-    }
-    a:hover{
-        @include var(color, button-color);
     }
     .is-typing-container
     {

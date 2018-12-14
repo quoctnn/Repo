@@ -78,7 +78,7 @@ class ContactList extends React.PureComponent<Props, State> {
                 <List>{contacts.map((contact, index) => {
                     return (
                     <div className="avatar-profile" key={index}>
-                        <Link className="d-flex" to={Routes.profileUrl(contact.slug_name)}>
+                        <Link className="d-flex button-link" to={Routes.profileUrl(contact.slug_name)}>
                             <Avatar image={contact.avatar} borderColor="green" borderWidth={2} stateColor={avatarStateColorForUserProfile(contact)}>
                             {this.state.isTyping[contact.id] && <div className="typing-indicator-container"><TypingIndicator /></div>}
                             </Avatar>

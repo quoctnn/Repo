@@ -1,8 +1,6 @@
 import Routes from '../../utilities/Routes';
 import * as React from 'react';
 import ProfileStatus from "../general/ProfileStatus";
-import {Settings} from "../../utilities/Settings"
-import { DevToolTrigger } from '../dev/DevToolTrigger';
 import { Link} from 'react-router-dom'
 import UserStatusSelector from '../general/UserStatusSelector';
 import { connect } from 'react-redux'
@@ -11,7 +9,6 @@ import { ApiEndpoint } from '../../reducers/debug';
 import Button from 'reactstrap/lib/Button';
 import ReconnectingWebSocket from 'reconnecting-websocket';
 import { getStream } from '../general/ChannelEventStream';
-import { func } from 'prop-types';
 require("./TopNavigation.scss");
 export interface OwnProps
 {
@@ -62,7 +59,6 @@ class TopNavigation extends React.Component<Props, State> {
             <div id="top-navigation" className="d-flex align-items-center transition">
                 <div className="flex-shrink-0">
                     <Link className="btn btn-primary margin-right-sm" to={Routes.ROOT}><i className="fas fa-home" /></Link>
-                    <Link className="btn btn-primary margin-right-sm" to={Routes.CONVERSATIONS}><i className="fas fa-comments" /></Link>
                 </div>
                 { endpoint &&
                     <div className="text-truncate align-items-center lead">{endpoint}</div>
@@ -77,7 +73,6 @@ class TopNavigation extends React.Component<Props, State> {
                 }
                 </div>
                 <div className="d-flex">
-                    {!Settings.isProduction && <DevToolTrigger /> }
                     {this.props.signedIn && <UserStatusSelector /> }
                     <ProfileStatus />
                 </div>

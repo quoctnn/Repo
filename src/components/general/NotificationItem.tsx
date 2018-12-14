@@ -48,15 +48,17 @@ export default class NotificationItem extends React.PureComponent<Props, State> 
     render = () => 
     {
         const avatars = this.props.avatars
-        const cn = classNames("panel-heading notification-item", this.props.className)
+        const cn = classNames("panel-heading", this.props.className)
         return(
             <div className={cn} onClick={this.onItemClick}>
-                <Avatar images={avatars} />
-                <p className="name secondary-text">
-                    <span className="user link-text">{this.props.text}</span>
-                    <br/>
-                    <span className="date secondary-text">{this.getTimestamp()}</span>
-                </p>
+                <a href="#" className="d-flex button-link">
+                    <Avatar images={avatars} />
+                    <div className="name">
+                        <span className="user">{this.props.text}</span>
+                        <br/>
+                        <span className="date secondary-text">{this.getTimestamp()}</span>
+                    </div>
+                </a>
             </div>
         );
     }
