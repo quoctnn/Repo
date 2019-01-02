@@ -22,7 +22,7 @@ export class ConversationSidebar extends React.Component<Props, State> {
         return(
             <div id="conversation-sidebar">
                 <div className="d-flex align-self-end margin-md">
-                    <Link className="btn btn-dark flex-shrink-0" to={Routes.CONVERSATION_CREATE}>
+                    <Link className="btn btn-dark flex-shrink-0 btn-sm" to={Routes.CONVERSATION_CREATE}>
                         <i className="fas fa-plus"></i>
                         <span className="text-success padding-left-xs">{translate("New conversation")}</span>
                     </Link>

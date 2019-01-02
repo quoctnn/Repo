@@ -1,4 +1,7 @@
 @import "../../main/Config";
 #notifications-list
 {
+    > ul {
+        height: 100%;
+    }
 }

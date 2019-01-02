@@ -18,13 +18,13 @@ try {
 
 config.entry = {
   main: [
-    'webpack-dev-server/client?http://' + localDomain + ':3000',
+    'webpack-dev-server/client?http://' + localDomain + ':3010',
     'webpack/hot/only-dev-server',
     path.resolve(__dirname, '../src/main/App.tsx')
   ]
 };
 
-config.output.publicPath = 'http://' + localDomain + ':3000/';
+config.output.publicPath = 'http://' + localDomain + ':3010/';
 
 config.plugins = [
   new webpack.HotModuleReplacementPlugin(),
