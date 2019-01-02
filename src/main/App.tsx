@@ -1,4 +1,6 @@
 import 'bootstrap/dist/css/bootstrap.css';
+import "react-dropzone-component/styles/filepicker.css"
+import "dropzone/dist/min/dropzone.min.css"
 import '@fortawesome/fontawesome-free/css/fontawesome.min.css';
 import '@fortawesome/fontawesome-free/css/solid.min.css';
 import '@fortawesome/fontawesome-free/css/regular.min.css';
@@ -21,8 +23,6 @@ import ChannelEventStream from '../components/general/ChannelEventStream';
 import { embedlyMiddleware } from '../reducers/embedlyStore';
 import { queueMiddleware } from '../reducers/queue';
 import setupManagers from '../managers/index';
-import "react-dropzone-component/styles/filepicker.css"
-import "dropzone/dist/min/dropzone.min.css"
 require('jquery/dist/jquery');
 require('popper.js/dist/umd/popper');
 require('bootstrap/dist/js/bootstrap');
@@ -64,7 +64,7 @@ const paginationMiddleware = store => next => action => {
       limit = a.meta!.pageSize
       offset = a.payload!.offset
     }
-    else 
+    else
     {
       let a = action as PaginatorAction;
       endpoint = a.meta!.endpoint
@@ -98,7 +98,7 @@ if (Settings.supportsTheming) {
   middleWares.push(themeSwitcherMiddleware);
 }
 const store = createStore(appReducer, applyMiddleware(...middleWares));
-window.store = store 
+window.store = store
 //setup managers
 setupManagers()
 
