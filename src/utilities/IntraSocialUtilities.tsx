@@ -9,9 +9,9 @@ import { Status, UserProfile, UploadedFile } from '../types/intrasocial_types';
 export const URL_REGEX = /(\b(https?|ftp):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/gim
 export const URL_WWW_REGEX = /(^(\b|\s+)(www)\.[\S]+(\b|$))/gim
 export const LINEBREAK_REGEX = /\r?\n|\r/g
-export class IntraSocialUtilities 
+export class IntraSocialUtilities
 {
-    static copyToClipboard = (text:string) => 
+    static copyToClipboard = (text:string) =>
     {
         var textField = document.createElement('textarea')
         textField.style.opacity = "0"
@@ -21,7 +21,7 @@ export class IntraSocialUtilities
         document.execCommand('copy')
         textField.remove()
     }
-    static getStatusPreview(parent:Status, message:string, mentions?:number[], files?:UploadedFile[]) 
+    static getStatusPreview(parent:Status, message:string, mentions?:number[], files?:UploadedFile[])
     {
         let d = Date.now()
         const status = {} as Status
@@ -62,18 +62,24 @@ export class IntraSocialUtilities
             return null
         }
     }
-    static appendAuthorizationTokenToUrl = (url:string) => 
+    static appendAuthorizationTokenToUrl = (url:string) =>
     {
         const authToken = AuthenticationManager.getAuthenticationToken()
         if(!!authToken && !!url)
         {
-            let u = new URL(url)
+            // Failsafe to prevent crash if unable to parse url
+            let u: URL;
+            try {
+                u = new URL(url)
+            } catch {
+                u = new URL("https://intra.work")
+            }
             u.searchParams.set('token', authToken);
             return u.href
         }
         return url
     }
-    static getProfileImageUrl = (user:UserProfile) => 
+    static getProfileImageUrl = (user:UserProfile) =>
     {
         if(user === undefined)
         {
@@ -81,7 +87,7 @@ export class IntraSocialUtilities
         }
         return IntraSocialUtilities.appendAuthorizationTokenToUrl(user.avatar_thumbnail || user.avatar)
     }
-    static getTextString = (text:string, mentions:UserProfile[]) => 
+    static getTextString = (text:string, mentions:UserProfile[]) =>
     {
         var processed:any = null
         var config:any[] = []
@@ -97,20 +103,20 @@ export class IntraSocialUtilities
         processed = processString(config)(text)
         if(typeof processed == "string")
             return processed
-        else 
+        else
         {
             let a = processed as any[]
             return a.join("")
         }
     }
-    static getTextContent = (text:string, mentions:UserProfile[], includeEmbedlies:boolean, maxNumberOfEmbedlies:number) => 
+    static getTextContent = (text:string, mentions:UserProfile[], includeEmbedlies:boolean, maxNumberOfEmbedlies:number) =>
     {
         var processed:any = null
         var config = []
         let embedlies:{[id:string]:any} = {}
         let k = {
             regex: URL_REGEX,
-            fn: (key:string, result:any) => 
+            fn: (key:string, result:any) =>
             {
                 if(includeEmbedlies && Object.keys( embedlies).length < maxNumberOfEmbedlies)
                 {
@@ -139,7 +145,7 @@ export class IntraSocialUtilities
     static truncateText = (text:string, maxChars:number) => {
         return text.length > (maxChars - 3) ? text.substring(0, maxChars - 3) + '...' : text;
     }
-    static groupFiles = (files:UploadedFile[]) => 
+    static groupFiles = (files:UploadedFile[]) =>
     {
         let dict:{[type:string]:UploadedFile[]} = {}
         files.forEach(f => {
@@ -148,7 +154,7 @@ export class IntraSocialUtilities
             {
                 arr.push(f)
             }
-            else 
+            else
             {
                 dict[f.type] = [f]
             }
@@ -203,7 +209,7 @@ export class IntraSocialUtilities
             {
                 delete newReactions[prevReaction]
             }
-            else 
+            else
             {
                 newReactions[prevReaction] = oldReactions
             }
