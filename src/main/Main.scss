@@ -150,6 +150,8 @@ ul,li{margin:0; padding: 0;}
 body
 {
     @include var(background-color, body-background);
+    @include var(font-family, font-family-default);
+    
 }
 .transition
 {
