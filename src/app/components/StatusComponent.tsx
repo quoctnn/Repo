@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Status, StatusActions } from '../types/intrasocial_types';
 import { Avatar } from "./general/Avatar";
-import { userAvatar, userFullName } from '../utilities/Utilities';
+import { userAvatar, userFullName, getTextContent } from '../utilities/Utilities';
 import classNames from 'classnames';
 import Moment from "react-moment";
 import * as moment from 'moment-timezone';
@@ -10,6 +10,8 @@ let timezone = moment.tz.guess();
 
 import "./StatusComponent.scss"
 import { translate } from "../localization/AutoIntlProvider";
+import { ProfileManager } from "../managers/ProfileManager";
+import { StatusGallery } from './StatusGallery';
 
 interface OwnProps 
 {
@@ -23,7 +25,7 @@ interface OwnProps
     authorizedUserId:number
     status:Status
     className?:string
-    isLastComment:boolean
+    isComment:boolean
 }
 type Props = OwnProps
 export class StatusComponent extends React.Component<Props, {}> {
@@ -44,13 +46,16 @@ export class StatusComponent extends React.Component<Props, {}> {
     render() {
         const isComment = !!this.props.status.parent
         const contextObject =  isComment ? null : this.props.status.context_object
-        const content = this.props.status.text
-        const cn = classNames("status-component", this.props.className)
+        const mentions = ProfileManager.getProfiles(this.props.status.mentions)
+        const content = getTextContent( this.props.status.text, mentions, false, this.props.onActionPress)
+        const cn = classNames("status-component", this.props.className, {comment:this.props.isComment})
+        const avatarSize = this.props.isComment ? 40 : 50
+        const files = this.props.status.files || []
         return(
             <div className={cn}>
                 <div className="d-flex text-truncate">
                     <div className="flex-shrink-0 header-left">
-                        <Avatar image={userAvatar(this.props.status.owner)}/>
+                        <Avatar size={avatarSize} image={userAvatar(this.props.status.owner)}/>
                     </div>
                     <div className="flex-grow-1 d-flex header-center text-truncate">
                         <div className="header-center-content text-truncate">
@@ -67,7 +72,7 @@ export class StatusComponent extends React.Component<Props, {}> {
                         {contextObject && <div className="text-truncate context-container"><div className="context">{contextObject.name}</div></div>}
                     </div>
                 </div>
-                <div className="gallery"></div>
+                {files.length > 0 && <StatusGallery files={files}/>}
             </div>
         );
     }

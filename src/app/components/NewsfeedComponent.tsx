@@ -478,7 +478,7 @@ class NewsfeedComponent extends React.Component<Props, State> {
         let status = this.state.items[index] as Status
         this.navigateToAction(status, action, extra)
     }
-    renderStatus = (authUser:UserProfile, item:Status, isLast:boolean, index:number, color:string) => 
+    renderStatus = (authUser:UserProfile, item:Status, isComment:boolean, index:number, color:string) => 
     {
         return <StatusComponent 
         canMention={true}
@@ -490,7 +490,7 @@ class NewsfeedComponent extends React.Component<Props, State> {
         status={item} 
         bottomOptionsEnabled={true} 
         authorizedUserId={authUser.id}
-        isLastComment={isLast}
+        isComment={isComment}
         onActionPress={this.navigateToActionWithId(item.id)}
         className={color}
         />
@@ -601,7 +601,7 @@ class NewsfeedComponent extends React.Component<Props, State> {
     renderCommentLoader =  (loader: StatusCommentLoader, index:number, color:string) => 
     {
         const isLoading = this.state.activeCommentLoaders[loader.statusId] != undefined
-        const cn = classnames("btn btn-link link-text comment-loader", color)
+        const cn = classnames("btn btn-link primary-text comment-loader", color)
         return (
             <button disabled={isLoading} key={"statusloader_" + loader.statusId} className={cn} onClick={this.loadMoreComments(loader)}>
                 <div className="line"></div>
@@ -634,8 +634,6 @@ class NewsfeedComponent extends React.Component<Props, State> {
                     onScroll={this.onScroll} 
                     className="status-list group-list vertical-scroll">
                         {this.state.items.map((s, i) => {
-                            const next = len > i + 1 ? this.state.items[i + 1] : undefined
-                            const isCurrentLast = next instanceof StatusComposer
                             if(s instanceof StatusComposer)
                             {
                                 const comp = this.renderStatusComposer(s, i, color)
@@ -646,7 +644,8 @@ class NewsfeedComponent extends React.Component<Props, State> {
                             {
                                 return this.renderCommentLoader(s, i, color)
                             }
-                            return this.renderStatus(authUser,s, isCurrentLast, i, color)
+                            const isComment = !!s.parent
+                            return this.renderStatus(authUser, s, isComment, i, color)
                         }) }
                         {this.renderLoading()}
                     </List>
