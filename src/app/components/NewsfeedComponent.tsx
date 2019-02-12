@@ -83,13 +83,13 @@ interface State
 }
 type Props = ReduxStateProps & ReduxDispatchProps & OwnProps & RouteProps
 class NewsfeedComponent extends React.Component<Props, State> {
-    isOdd:false
+    isOdd:boolean = false
     static defaultProps:OwnProps = {
         limit:30,
         defaultChildrenLimit:5,
         childrenLimit:10
     }
-    constructor(props) {
+    constructor(props:Props) {
         super(props);
         this.state = {
             activeCommentLoaders:{},
