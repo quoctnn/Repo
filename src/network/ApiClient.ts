@@ -1,7 +1,7 @@
 import Constants from "../utilities/Constants";
 import {AjaxRequest} from "./AjaxRequest";
+import { StoreManager } from '../managers/StoreManager';
 var $ = require("jquery")
-import store from '../main/App';
 import { Status, UserProfile, UploadedFile, Community, Group, Conversation, Project, Message, Event, Task } from '../types/intrasocial_types';
 export type PaginationResult<T> = {results:T[], count:number, previous:string|null, next:string|null}
 export type ApiClientFeedPageCallback<T> = (data: PaginationResult<T>, status:string, error:string|null) => void;
@@ -279,8 +279,7 @@ export class FileUploader
     }
     doUpload(completion:(file:UploadedFile) => void)
     {
-        let state = store.getState().debug
-        let url = state.availableApiEndpoints[state.apiEndpoint].endpoint + Constants.apiRoute.fileUploadUrl
+        let url = StoreManager.applyEndpointDomain(Constants.apiRoute.fileUploadUrl)
         const data = new FormData();
         data.append("file", this.file)
         $.ajax({

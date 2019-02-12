@@ -1,4 +1,3 @@
-import UpdateWatcher from '../components/general/UpdateWatcher';
 import Profile from '../views/profile/ProfileView';
 import Routes from '../utilities/Routes';
 import * as React from 'react';
@@ -53,7 +52,6 @@ class Main extends React.Component<Props, State> {
     return (
           <Router ref="router">
             <div id="main-content">
-              <UpdateWatcher />
                 <ToastContainer />
                     <div id="content-block" className="transition">
                         <div className="container">

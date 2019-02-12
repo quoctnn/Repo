@@ -1,11 +1,11 @@
 import React = require("react");
 import { NotificationCenter } from "../notifications/NotificationCenter";
-import { EventStreamMessageType } from "../components/general/ChannelEventStream";
 import { ToastManager } from './ToastManager';
 import { Notification } from '../types/intrasocial_types';
 import { Store } from "redux";
 import * as Actions from '../actions/Actions';
 import { RootState } from "../reducers";
+import { EventStreamMessageType } from "../app/network/ChannelEventStream";
 
 export abstract class NotificationManager 
 {

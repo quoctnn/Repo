@@ -3,7 +3,7 @@ import * as Actions from '../actions/Actions';
 import { RootState } from '../reducers';
 import { AjaxRequest } from '../network/AjaxRequest';
 import { UserProfile, UserStatus } from '../types/intrasocial_types';
-import { sendOnWebsocket, EventStreamMessageType } from '../components/general/ChannelEventStream';
+import { sendOnWebsocket, EventStreamMessageType } from '../app/network/ChannelEventStream';
 export abstract class AuthenticationManager
 {
     private static lastUserActivity: number = 0;

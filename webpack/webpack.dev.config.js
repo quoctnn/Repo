@@ -2,7 +2,6 @@ var path = require('path');
 var webpack = require('webpack');
 var BundleTracker = require('webpack-bundle-tracker');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-var OfflinePlugin = require('offline-plugin');
 var config = require('./webpack.base.config.js');
 var localDomain;
 
@@ -20,7 +19,7 @@ config.entry = {
   main: [
     'webpack-dev-server/client?http://' + localDomain + ':3010',
     'webpack/hot/only-dev-server',
-    path.resolve(__dirname, '../src/main/App.tsx')
+    path.resolve(__dirname, '../src/app/App.tsx')
   ]
 };
 
@@ -41,17 +40,6 @@ config.plugins = [
   new MiniCssExtractPlugin({
     filename: '[name].css',
     chunkFilename: '[id].css'
-  }),
-  new OfflinePlugin({
-    appShell: '/',
-    ServiceWorker: {
-      events: true
-    },
-    externals: [
-      '/',
-      '/node_modules/react-dom/umd/react-dom.development.js',
-      '/node_modules/react/umd/react.development.js'
-    ]
   })
 ];
 config.module.rules.unshift(

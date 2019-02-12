@@ -6,12 +6,12 @@ import { connect } from 'react-redux'
 import * as en from 'react-intl/locale-data/en';
 import * as es from 'react-intl/locale-data/es';
 import * as nb from 'react-intl/locale-data/nb';
-import { availableLanguages } from '../../reducers/settings';
-import { RootState } from "../../reducers";
+import { availableLanguages } from "../../app/redux/language";
+import { ReduxState } from "../../app/redux";
 addLocaleData([...en, ...es, ...nb]);
 
 export interface Props {
-    language: string,
+    language: number,
 }
 var private_messages = null
 export const translate = (key:any) => {
@@ -27,7 +27,7 @@ class AutoIntlProvider extends React.Component<Props, {}> {
         let lang = availableLanguages[this.props.language]
         private_messages = messages[lang]
     }
-    componentWillUpdate(nextProps, nextState)
+    componentWillUpdate(nextProps:Props, nextState)
     {
         let lang = availableLanguages[nextProps.language]
         private_messages = messages[lang]
@@ -41,13 +41,10 @@ class AutoIntlProvider extends React.Component<Props, {}> {
         );
     }
 }
-interface StateFromProps {
-    language: string;
-}
-const mapStateToProps = (state:RootState) => {
+const mapStateToProps = (state:ReduxState) => {
     return {
-        language:state.settings.language,
+        language:state.language.language,
     };
 }
   
-export default connect<StateFromProps>(mapStateToProps, null)(AutoIntlProvider);
+export default connect<Props>(mapStateToProps, null)(AutoIntlProvider);

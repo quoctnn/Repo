@@ -1,5 +1,6 @@
 import {  Store } from 'redux';
-import { RootState } from '../reducers';
+import { ReduxState } from '../app/redux';
+import { availableEndpoints } from '../app/redux/endpoint';
 export abstract class StoreManager 
 {
     static setup()
@@ -11,10 +12,10 @@ export abstract class StoreManager
         {
             return url
         }
-        let state = StoreManager.getStore().getState().debug
-        return state.availableApiEndpoints[state.apiEndpoint].endpoint + url
+        let state = StoreManager.getStore().getState().endpoint
+        return availableEndpoints[state.endpoint].endpoint + url
     }
-    private static getStore = ():Store<RootState,any> => 
+    private static getStore = ():Store<ReduxState,any> => 
     {
         return window.store 
     }

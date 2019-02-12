@@ -1,6 +1,6 @@
 
 import * as React from 'react';
-import store from '../../main/App';
+import store from '../../main/OldApp';
 import Constants from "../../utilities/Constants";
 export interface Props
 {

@@ -4,7 +4,6 @@ var BundleTracker = require('webpack-bundle-tracker');
 var config = require('./webpack.base.config.js');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
-const OfflinePlugin = require('offline-plugin');
 
 config.module.rules.unshift(
   { test: /\.tsx?$/, loader: 'ts-loader' },
@@ -51,18 +50,6 @@ module.exports = merge(config, {
     new MiniCssExtractPlugin({
       filename: '[name].css',
       chunkFilename: '[id].css'
-    }),
-    new OfflinePlugin({
-      publicPath: '/dist/',
-      appShell: '/',
-      externals: [
-        '/',
-        '/node_modules/react-dom/umd/react-dom.development.js',
-        '/node_modules/react/umd/react.development.js'
-      ],
-      ServiceWorker: {
-        events: true
-      }
     })
   ],
   devtool: 'cheap-module-source-map',

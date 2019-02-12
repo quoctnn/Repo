@@ -1,6 +1,5 @@
 'use strict';
 import { Settings } from "../utilities/Settings";
-import store from '../main/App';
 import { StoreManager } from '../managers/StoreManager';
 var $ = require("jquery")
 

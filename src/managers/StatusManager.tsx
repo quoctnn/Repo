@@ -1,10 +1,10 @@
 import {  Store } from 'redux';
 import { RootState } from '../reducers';
-import { canSendOnWebsocket, EventStreamMessageType } from '../components/general/ChannelEventStream';
 import * as Actions from '../actions/Actions';
 import {StatusContextKeys } from '../reducers/statuses';
 import { NotificationCenter } from '../notifications/NotificationCenter';
 import { Status } from '../types/intrasocial_types';
+import { EventStreamMessageType, canSendOnWebsocket } from '../app/network/ChannelEventStream';
 export abstract class StatusManager
 {
     static setup = () => 

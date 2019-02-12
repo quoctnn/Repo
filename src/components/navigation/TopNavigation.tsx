@@ -8,7 +8,7 @@ import { RootState } from '../../reducers/index';
 import { ApiEndpoint } from '../../reducers/debug';
 import Button from 'reactstrap/lib/Button';
 import ReconnectingWebSocket from 'reconnecting-websocket';
-import { getStream } from '../general/ChannelEventStream';
+import { getStream } from '../../app/network/ChannelEventStream';
 require("./TopNavigation.scss");
 export interface OwnProps
 {

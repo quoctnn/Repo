@@ -1,14 +1,21 @@
 import * as React from 'react';
 import { connect } from 'react-redux'
 import * as Actions from '../../actions/Actions';
-import { sendUserStatus, EventStreamMessageType } from './ChannelEventStream';
 import { RootState } from '../../reducers/index';
 import { NotificationCenter } from '../../notifications/NotificationCenter';
-import { Store, bindActionCreators } from 'redux';
-import { setSignedInProfile } from '../../actions/Actions';
+import { Store } from 'redux';
 import { UserStatus, UserProfile } from '../../types/intrasocial_types';
+import { sendOnWebsocket, EventStreamMessageType } from '../../app/network/ChannelEventStream';
 require("./UserStatusSelector.scss");
 
+export const sendUserStatus = (status: UserStatus) => {
+    sendOnWebsocket(
+        JSON.stringify({
+        type: EventStreamMessageType.USER_UPDATE,
+        data: { status: status }
+        })
+    );
+}
 export interface OwnProps
 {
 }

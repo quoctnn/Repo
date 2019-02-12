@@ -7,7 +7,7 @@ import { translate } from '../intl/AutoIntlProvider';
 import RadialProgress from './RadialProgress';
 import { ConversationManager } from '../../managers/ConversationManager';
 const processString = require('react-process-string');
-import store from '../../main/App';
+import store from '../../main/OldApp';
 import { FileUtilities } from '../../utilities/FileUtilities';
 import { ProfileManager } from "../../managers/ProfileManager";
 import { Message } from "../../types/intrasocial_types";

@@ -1,6 +1,5 @@
 import { Settings } from './Settings';
 import Embedly from '../components/general/Embedly';
-import { Link} from 'react-router-dom'
 const processString = require('react-process-string');
 import Routes from './Routes';
 import * as React from 'react';

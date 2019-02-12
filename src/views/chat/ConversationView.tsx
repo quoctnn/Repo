@@ -4,7 +4,6 @@ import { connect } from 'react-redux'
 import { RootState } from '../../reducers/index';
 import { ChatMessageList } from '../../components/general/ChatMessageList';
 import { ChatMessageComposer } from '../../components/general/ChatMessageComposer';
-import { EventStreamMessageType } from '../../components/general/ChannelEventStream';
 import { Settings } from '../../utilities/Settings';
 import { TypingIndicator } from '../../components/general/TypingIndicator';
 import { Avatar } from '../../components/general/Avatar';
@@ -21,6 +20,7 @@ import { NotificationCenter } from '../../notifications/NotificationCenter';
 import { ProfileManager } from '../../managers/ProfileManager';
 import { UserProfile, Conversation, Message } from '../../types/intrasocial_types';
 import { getDefaultCachePageV3, CachePageV3 } from '../../reducers/simpleMultiPaginator';
+import { EventStreamMessageType } from '../../app/network/ChannelEventStream';
 
 require("./ConversationView.scss")
 

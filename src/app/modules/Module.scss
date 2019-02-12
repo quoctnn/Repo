@@ -1,0 +1,91 @@
+.module
+{
+    position: relative;
+    flex: 1;
+    border-radius: 10px;
+    background-color: #E1E2DD;
+    .module-header 
+    {
+        background: white;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        padding: 8px 12px;
+        flex-shrink: 0;
+
+        .module-menu-trigger
+        {
+            min-width: 30px;
+            text-align: center;
+            display: none;
+        }
+    }
+    &.menu-visible
+    {
+        .module-header
+        {
+            .module-menu-trigger
+            {
+                display: block;
+            }
+        }
+    }
+    .module-header:hover
+    {
+        .module-menu-trigger
+        {
+            display: block;
+        }
+    }
+    .module-content 
+    {
+        flex-shrink: 1;
+        min-height: 0px;
+        flex-grow: 1;
+    }
+    .module-footer 
+    {
+        flex-shrink: 0;
+    }
+    .module-menu 
+    {
+        position: absolute;
+        top: 40px;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: white;
+        border-top: 1px solid lightgray;
+        transform: scale(1, 0);
+        transform-origin: top center;
+        transition-property: transform, height !important;
+         &.module-menu-entered
+        {
+            height: auto;
+            transform: scale(1, 1);
+            transform-origin: top center;
+        }
+    }
+}
+body.touch .module
+{
+    .module-header
+    {
+        .module-menu-trigger
+        {
+            display: block;
+        }
+    }
+}
+body.RB-Mini, body.RB-Micro 
+{
+    .module-menu 
+    {
+        position:initial;
+        height: 0;
+        &.module-menu-entered
+        {
+            height: 200px;
+        }
+    }
+} 

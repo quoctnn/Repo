@@ -1,0 +1,50 @@
+.status-component{
+    .header-left 
+    {
+        padding: 10px;
+    }
+    .header-center 
+    {
+        padding: 10px;
+        padding-left: 0;
+        flex-direction: column;
+        .header-center-content 
+        {
+            align-items: baseline;
+            align-content:baseline;
+            display: flex;
+            flex-wrap: wrap;
+        }
+        .title, .date {
+            line-height: 20px;
+        }
+        .title{
+            font-size: 20px;
+            padding-right: 8px;
+        }
+        .date{
+            font-size: 14px;
+        }
+        .text-content
+        {
+            white-space: normal;
+        }
+    }
+    .header-right 
+    {
+        padding: 10px;
+        padding-left: 0;
+        align-items: baseline;
+        align-content:baseline;
+        display: flex;
+        flex-wrap: wrap;
+        .context{
+            font-size: 11px;
+            line-height: 20px;
+        }
+    }
+    .gallery
+    {
+        
+    }
+}

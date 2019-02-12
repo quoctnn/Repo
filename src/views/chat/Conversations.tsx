@@ -7,7 +7,6 @@ import ConversationItem from '../../components/general/ConversationItem';
 import { FullPageComponent } from '../../components/general/FullPageComponent';
 import { PaginationUtilities } from '../../utilities/PaginationUtilities';
 import { nullOrUndefined, cloneDictKeys } from '../../utilities/Utilities';
-import { EventStreamMessageType} from '../../components/general/ChannelEventStream';
 import { Settings } from '../../utilities/Settings';
 import { TypingIndicator } from '../../components/general/TypingIndicator';
 import { Avatar } from '../../components/general/Avatar';
@@ -17,6 +16,7 @@ import { List } from '../../components/general/List';
 import { NotificationCenter } from '../../notifications/NotificationCenter';
 import { ProfileManager } from '../../managers/ProfileManager';
 import { UserProfile, Conversation } from '../../types/intrasocial_types';
+import { EventStreamMessageType } from '../../app/network/ChannelEventStream';
 let timezone = moment.tz.guess()
 
 require("./Conversations.scss");

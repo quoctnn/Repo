@@ -3,12 +3,12 @@ import * as React from "react";
 import { connect } from "react-redux";
 import * as Actions from "../../actions/Actions";
 import { ApiEndpoint } from "../../reducers/debug";
-import { sendOnWebsocket } from "../general/ChannelEventStream";
 import { Form } from "reactstrap";
 import { availableLanguages, availableThemes } from "../../reducers/settings";
 import { RootState } from "../../reducers";
 import { Dialog } from "./Dialog";
 import Button from "reactstrap/lib/Button";
+import { sendOnWebsocket } from "../../app/network/ChannelEventStream";
 require("./DevTool.scss");
 export interface Props {
   language: number;

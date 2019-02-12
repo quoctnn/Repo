@@ -1,0 +1,12 @@
+@import "../Config";
+#page-top-navigation
+{
+    .profile-name{
+        font-size: 24px;
+        @include var(color, title-color);
+    }
+    .community-name{
+        font-size: 28px;
+        @include var(color, title-color);
+    }
+}

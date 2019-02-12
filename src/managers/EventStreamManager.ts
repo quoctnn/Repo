@@ -2,16 +2,23 @@ import {  Store } from 'redux';
 import { NotificationCenter } from '../notifications/NotificationCenter';
 import { ProfileManager } from './ProfileManager';
 import { CommunityManager } from './CommunityManager';
-import { EventStreamMessageType } from '../components/general/ChannelEventStream';
 import { RootState } from '../reducers';
 import { AuthenticationManager } from './AuthenticationManager';
 import { UserProfile } from '../types/intrasocial_types';
 import * as Actions from '../actions/Actions';
+import { eventStreamNotificationPrefix, EventStreamMessageType } from '../app/network/ChannelEventStream';
 export abstract class EventStreamManager
 {
     static setup = () => 
     {
-        NotificationCenter.addObserver("eventstream_" + EventStreamMessageType.STATE, EventStreamManager.eventstreamStateReceived)
+        NotificationCenter.addObserver(eventStreamNotificationPrefix + EventStreamMessageType.STATE, EventStreamManager.eventstreamStateReceived)
+        NotificationCenter.addObserver(eventStreamNotificationPrefix + EventStreamMessageType.SOCKET_STATE_CHANGE, EventStreamManager.eventstreamSocketStateChanged)
+    }
+    static eventstreamSocketStateChanged = (...args:any[]) => 
+    {
+        console.log("eventstreamSocketStateChanged args", args)
+        EventStreamManager.socketDisconnected()
+        AuthenticationManager.clearKeepAliveTimer()
     }
     static eventstreamStateReceived = (...args:any[]) => 
     {

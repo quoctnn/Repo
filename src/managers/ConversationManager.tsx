@@ -1,6 +1,5 @@
 import {  Store } from 'redux';
 import { RootState } from '../reducers';
-import { EventStreamMessageType, canSendOnWebsocket, sendOnWebsocket } from '../components/general/ChannelEventStream';
 import * as Actions from '../actions/Actions';
 import Routes from '../utilities/Routes';
 import { translate } from '../components/intl/AutoIntlProvider';
@@ -10,6 +9,7 @@ import { AuthenticationManager } from './AuthenticationManager';
 import { ProfileManager } from './ProfileManager';
 import { Message, UserProfile, Conversation } from '../types/intrasocial_types';
 import { ToastManager } from './ToastManager';
+import { EventStreamMessageType, canSendOnWebsocket, sendOnWebsocket } from '../app/network/ChannelEventStream';
 export abstract class ConversationManager 
 {
     static setup = () => 

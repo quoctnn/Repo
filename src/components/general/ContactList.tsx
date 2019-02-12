@@ -8,9 +8,9 @@ import { Avatar } from "./Avatar";
 import Routes from "../../utilities/Routes";
 import { TypingIndicator } from "./TypingIndicator";
 import { NotificationCenter } from "../../notifications/NotificationCenter";
-import { EventStreamMessageType } from "./ChannelEventStream";
 import { cloneDictKeys } from "../../utilities/Utilities";
 import { Settings } from "../../utilities/Settings";
+import { EventStreamMessageType } from "../../app/network/ChannelEventStream";
 require("./ContactList.scss");
 
 export interface OwnProps

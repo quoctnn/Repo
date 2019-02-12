@@ -6,7 +6,6 @@ import { Avatar } from "../general/Avatar";
 import { Link } from "react-router-dom";
 import { List } from "../general/List";
 import { RootState } from "../../reducers";
-import { EventStreamMessageType } from '../general/ChannelEventStream';
 import { TypingIndicator } from '../general/TypingIndicator';
 import { Settings } from '../../utilities/Settings';
 import { cloneDictKeys } from '../../utilities/Utilities';
@@ -14,6 +13,7 @@ import { NotificationCenter } from "../../notifications/NotificationCenter";
 import { UserProfile, avatarStateColorForUserProfile } from "../../types/intrasocial_types";
 import { ProfileManager } from '../../managers/ProfileManager';
 import NotificationsList from "../general/NotificationsList";
+import { EventStreamMessageType } from "../../app/network/ChannelEventStream";
 require("./RightNavigation.scss")
 interface State {
     contacts:UserProfile[],
