@@ -35,6 +35,10 @@ export abstract class AuthenticationManager
             //AuthenticationManager.getStore().dispatch(Actions.setDirtyPagedData())
         }
     }
+    static setUpdatedProfileStatus = (profile:UserProfile) => {
+
+        AuthenticationManager.getStore().dispatch(setAuthenticationProfileAction(profile))
+    }
     static clearKeepAliveTimer()
     {
         clearInterval(AuthenticationManager.keepAlive);

@@ -15,6 +15,7 @@ import { nullOrUndefined } from '../utilities/Utilities';
 import { ToastManager } from '../managers/ToastManager';
 import { StatusComponent } from './StatusComponent';
 import { StatusComposerComponent } from './StatusComposerComponent';
+import classnames = require('classnames');
 require("./NewsfeedComponent.scss");
 
 class StatusComposer
@@ -491,6 +492,7 @@ class NewsfeedComponent extends React.Component<Props, State> {
         authorizedUserId={authUser.id}
         isLastComment={isLast}
         onActionPress={this.navigateToActionWithId(item.id)}
+        className={color}
         />
     }
     renderStatusComposer = (composer:StatusComposer, index:number, color:string) => {
@@ -500,7 +502,7 @@ class NewsfeedComponent extends React.Component<Props, State> {
                     canUpload={true}
                     canMention={true}
                     canComment={true}
-                    className={"drop-shadow"}
+                    className={color}
                     statusId={composer.statusId}
                     onActionPress={this.navigateToActionWithId(composer.statusId)}
                     contextNaturalKey={composer.contextNaturalKey}
@@ -599,8 +601,9 @@ class NewsfeedComponent extends React.Component<Props, State> {
     renderCommentLoader =  (loader: StatusCommentLoader, index:number, color:string) => 
     {
         const isLoading = this.state.activeCommentLoaders[loader.statusId] != undefined
+        const cn = classnames("btn btn-link link-text comment-loader", color)
         return (
-            <button disabled={isLoading} key={"statusloader_" + loader.statusId} className="btn btn-link link-text comment-loader" onClick={this.loadMoreComments(loader)}>
+            <button disabled={isLoading} key={"statusloader_" + loader.statusId} className={cn} onClick={this.loadMoreComments(loader)}>
                 <div className="line"></div>
                 <div className="button">
                     {!isLoading && <i className="fa fa-arrow-down"/>} 
@@ -612,7 +615,7 @@ class NewsfeedComponent extends React.Component<Props, State> {
         )
     }
     getNextColor = () => {
-        const c = this.isOdd ? "odd" : "even"
+        const c = this.isOdd ? "odd-color" : "even-color"
         this.isOdd = !this.isOdd 
         return c
     }

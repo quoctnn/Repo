@@ -58,7 +58,7 @@ class UserStatusSelector extends React.Component<Props, State> {
             return
         let profile = Object.assign({}, this.props.profile)
         profile.user_status = status
-        AuthenticationManager.setAuthenticatedUser(profile)
+        AuthenticationManager.setUpdatedProfileStatus(profile)
     }
     setUserStatus = (status:string) =>
     {
