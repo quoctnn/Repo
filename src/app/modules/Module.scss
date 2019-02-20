@@ -39,9 +39,11 @@
     }
     .module-content 
     {
-        flex-shrink: 1;
+        min-height: 0px;
+        /*flex-shrink: 1;
         min-height: 0px;
         flex-grow: 1;
+        display: flex;*/
     }
     .module-footer 
     {

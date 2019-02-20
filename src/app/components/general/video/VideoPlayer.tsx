@@ -1,0 +1,52 @@
+import * as React from 'react';
+import Youtube from './players/Youtube';
+import Vimeo from './players/Vimeo';
+import { DefaultPlayer as Video } from 'react-html5video'; 
+import 'react-html5video/dist/styles.css';
+import { IntraSocialUtilities } from '../../../utilities/IntraSocialUtilities';
+
+const VIDEO_EXTENSIONS = /\.(mp4|og[gv]|webm|MOV)($|\?)/i
+const AUDIO_EXTENSIONS = /\.(mp3|wav)($|\?)/i
+export interface Props 
+{
+    link:string
+    extension?:string
+}
+interface State 
+{
+    
+}
+export default class VideoPlayer extends React.Component<Props,State> {
+    static canPlay(url:string, extension?:string) {
+        return (extension && VIDEO_EXTENSIONS.test("." + extension)) || Youtube.canPlay(url) || Vimeo.canPlay(url) || VIDEO_EXTENSIONS.test(url) || AUDIO_EXTENSIONS.test(url)
+    }
+    getStreamingLink() 
+    {
+        return window.location.protocol + '//' + window.location.host + "/stream/?url=" + encodeURIComponent(this.props.link)
+    }
+    render() {
+        if (Youtube.canPlay(this.props.link)) {
+            return (<Youtube url={this.props.link}/>)
+
+        } else if (Vimeo.canPlay(this.props.link)) {
+            return (<Vimeo url={this.props.link}/>)
+
+        } else if ((this.props.extension && VIDEO_EXTENSIONS.test("." + this.props.extension)) || VIDEO_EXTENSIONS.test(this.props.link)) {
+            return (
+                <div className="video-player">
+                    <Video preload="auto" controls={['PlayPause', 'Seek', 'Time', 'Volume', 'Fullscreen']}>
+                        <source src={IntraSocialUtilities.appendAuthorizationTokenToUrl(this.props.link)}/>
+                    </Video>
+                </div>
+            );
+        } else if (AUDIO_EXTENSIONS.test(this.props.link)) {
+            return (
+                <div className="col-lg-12">
+                    <audio preload="auto" controls={true}>
+                        <source src={IntraSocialUtilities.appendAuthorizationTokenToUrl(this.props.link)}/>
+                    </audio>
+                </div>
+            );
+        }
+    }
+}

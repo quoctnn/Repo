@@ -1,6 +1,7 @@
 @import "../Config";
 .newsfeed-component
 {
+    height: 100%;
     .status-list
     {
         overflow-y: auto;
@@ -9,6 +10,7 @@
         overflow-x: hidden;
         display: flex;
         flex-direction: column;
+        -webkit-overflow-scrolling: touch;
     }
     .comment-loader{
         display: flex;

@@ -3,7 +3,7 @@ import {AjaxRequest} from "./AjaxRequest";
 import { EndpointManager } from '../managers/EndpointManager';
 var $ = require("jquery")
 import { Status, UserProfile, UploadedFile, Community, Group, Conversation, Project, Message, Event, Task } from '../types/intrasocial_types';
-import { nullOrUndefined } from '../../utilities/Utilities';
+import { nullOrUndefined } from '../utilities/Utilities';
 export type PaginationResult<T> = {results:T[], count:number, previous:string|null, next:string|null}
 export type StatusCommentsResult<T> = {results:T[], count:number, parent:T}
 export type ApiClientFeedPageCallback<T> = (data: PaginationResult<T>, status:string, error:string|null) => void;

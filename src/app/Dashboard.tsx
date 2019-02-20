@@ -121,9 +121,9 @@ export class Dashboard extends React.Component<Props, State> {
 export const DashCompWithData = (props:any) => {
     const grid = { 
                 desktop:[
-                    {id:1, columnStart:1, rowStart:1, columnSpan:12, rowSpan:3},
-                    {id:2, columnStart:1, rowStart:4, columnSpan:6, rowSpan:2},
-                    {id:3, columnStart:7, rowStart:4, columnSpan:6, rowSpan:2},
+                    {id:1, columnStart:1, rowStart:1, columnSpan:12, rowSpan:6},
+                    {id:2, columnStart:1, rowStart:7, columnSpan:6, rowSpan:2},
+                    {id:3, columnStart:7, rowStart:7, columnSpan:6, rowSpan:2},
                     ],
                 mobile:[
                     {id:1, columnStart:1, rowStart:1, columnSpan:12, rowSpan:2},

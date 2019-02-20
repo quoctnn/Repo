@@ -1,7 +1,7 @@
 import storageLocal from 'redux-persist/lib/storage'
 import { persistReducer } from "redux-persist";
 import { UserProfile } from '../../types/intrasocial_types';
-import { nullOrUndefined } from '../../utilities/Utilities';
+import { nullOrUndefined } from '../utilities/Utilities';
 export enum AuthenticationActionTypes {
     SetSignedInToken = 'authentication.set_signed_in_token',
     SetSignedInProfile = 'authentication.set_signed_in_profile',

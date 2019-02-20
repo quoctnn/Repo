@@ -1,5 +1,6 @@
 import { nullOrUndefined } from "../utilities/Utilities";
 import * as React from 'react';
+import Emoji from "../components/general/Emoji";
 
 export interface Verb
 {
@@ -67,7 +68,9 @@ export interface Status extends TempStatus
     can_comment:boolean
     children:Status[]
     children_ids:number[]
+    //old style
     comments_count:number
+    comments:number
     community?:ICommunity
     context_object:ContextObject
     created_at:string
@@ -385,13 +388,13 @@ export abstract class StatusReactionUtilities
         }
         return arr.map(s => StatusReactionUtilities.parseStatusReaction(s))
     }
-    public static classNameForReactionContainer = (reaction:StatusReaction, large = true, showBackground:boolean) =>
+    public static classNameForReactionContainer = (props:StatusReactionProps) =>
     {
-        return "emoji-reaction-container" + (large ? " large fa-2x": "") + (showBackground ? " fa-stack-1-5" : "" )
+        return "emoji-reaction-container" + (props.large ? " large": "")
     }
-    public static classNameForReactionBackground = (reaction:StatusReaction, large = true) =>
+    public static classNameForReactionBackground = (props:StatusReactionProps) =>
     {
-        return "fas fa-circle fa-stack-1-5x emoji-reaction-bg " + reaction
+        return "fas fa-circle fa-stack-1-5x emoji-reaction-bg " + props.reaction
     }
     public static classNameForReaction = (reaction:StatusReaction, large = true, showBackground:boolean) =>
     {
@@ -406,11 +409,25 @@ export abstract class StatusReactionUtilities
         ret += (large ? " large": "")
         return ret
     }
+    public static emojiForReaction = (props:StatusReactionProps) =>
+    {
+        switch (props.reaction)
+        {
+            case StatusReaction.SAD : return <span className={StatusReactionUtilities.classNameForReactionContainer(props)} onClick={props.onClick}><Emoji symbol="😔" label={props.reaction} /></span>
+            case StatusReaction.JOY : return <span className={StatusReactionUtilities.classNameForReactionContainer(props)} onClick={props.onClick}><Emoji symbol="😂" label={props.reaction} /></span>
+            case StatusReaction.HEART : return <span className={StatusReactionUtilities.classNameForReactionContainer(props)} onClick={props.onClick}><Emoji symbol="😍" label={props.reaction} /></span>
+            case StatusReaction.LIKE : return <span className={StatusReactionUtilities.classNameForReactionContainer(props)} onClick={props.onClick}><Emoji symbol="👍" label={props.reaction} /></span>
+        }
+    }
     public static Component = (props:StatusReactionProps) =>
     {
+        return StatusReactionUtilities.emojiForReaction(props)
+    }
+    public static Component2 = (props:StatusReactionProps) =>
+    {
         let showBG = nullOrUndefined (props.showBackground ) ? true : props.showBackground
-        return (<span onClick={props.onClick} className={StatusReactionUtilities.classNameForReactionContainer(props.reaction, props.large, showBG)}>
-                    {showBG && <i className={StatusReactionUtilities.classNameForReactionBackground(props.reaction, props.large)}></i>}
+        return (<span onClick={props.onClick} className={StatusReactionUtilities.classNameForReactionContainer(props)}>
+                    {showBG && <i className={StatusReactionUtilities.classNameForReactionBackground(props)}></i>}
                     <i className={StatusReactionUtilities.classNameForReaction(props.reaction, props.large, showBG)}></i>
                 </span>)
     }

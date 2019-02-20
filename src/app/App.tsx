@@ -25,6 +25,7 @@ import initializeManagers from "./managers";
 import ChannelEventStream from "./network/ChannelEventStream";
 import AutoIntlProvider from "./localization/AutoIntlProvider";
 import { BrowserRouter as Router} from "react-router-dom";
+import "./utilities/Extensions"
 
 
 

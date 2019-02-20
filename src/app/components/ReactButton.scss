@@ -1,0 +1,67 @@
+@import "../Config";
+.btn-like {
+    cursor: pointer;
+    padding-right:0px;
+  }
+
+  .btn-like:hover,
+  .btn-like.active {
+    @include var(color, primary-color);
+    cursor: pointer;
+  }
+
+  .reactions-count.active {
+    @include var(color, primary-color);
+  }
+  .reactions-count.active:hover,
+  .reactions-count.active:focus {
+    text-decoration: underline;
+    cursor: pointer;
+  }
+
+.fa-stack-1-5x
+{
+  font-size: 1.5em;
+}
+.fa-stack-1-5
+{
+    display: inline-flex;
+    height: 1.5em;
+    line-height: 1.5em;
+    position: relative;
+    vertical-align: middle;
+    width: 1.5em;
+}
+.reactions-panel
+{
+    font-size: 2em;
+    .emoji 
+    {
+        padding: 4px;
+    }
+    .emoji-reaction-container
+    {
+        display: inline-block;
+        cursor:pointer;
+        transition: transform .2s;
+    }
+    .emoji-reaction-container.large:hover
+    {
+        transform: scale(1.5);
+        z-index: 55;
+    }
+}
+.reaction-wrapper{
+    .popover{
+        background: none;
+        border: none;
+        .popover-body{
+            border-radius: 8px;
+            background: black;
+        }
+        .arrow:after{
+            border-bottom-color:black; 
+            border-top-color:black; 
+        }
+    }
+}

@@ -1,4 +1,5 @@
-.status-component{
+.status-component{    
+    clear: both;
     &.comment {
         padding-left: 20px;
     }
@@ -16,9 +17,8 @@
             align-items: baseline;
             align-content:baseline;
             display: flex;
-            flex-wrap: wrap;
         }
-        .title, .date {
+        .title, .date, .context {
             line-height: 20px;
         }
         .title{
@@ -28,26 +28,50 @@
         .date{
             font-size: 14px;
         }
+        .context {
+            max-width: 130px;
+            font-size: 12px;
+        }
         .text-content
         {
             white-space: normal;
+            word-break: break-word;
         }
     }
-    .header-right 
+
+
+    .reaction-wrapper{
+        margin: 0;
+        > span
+        {
+            padding: 0;
+        }
+        button {
+            border:0;
+            background: transparent;
+            outline: 0;
+            box-shadow: none;
+        }
+        button:focus{
+            outline: 0;
+            box-shadow: none;
+        }
+        .reactions-count
+        {
+            padding-left: 4px;
+        }
+    }
+    .comments-count-wrapper
     {
-        padding: 10px;
+        margin: 0;
+        padding: 6px 12px;
         padding-left: 0;
-        align-items: baseline;
-        align-content:baseline;
-        display: flex;
-        flex-wrap: wrap;
-        .context{
-            font-size: 11px;
-            line-height: 20px;
+        .comment-count
+        {
+            padding-left: 4px;
         }
     }
-    .gallery
-    {
-        
+    .info-container{
+        margin-right: -12px;
     }
 }

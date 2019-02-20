@@ -6,6 +6,8 @@ import { ProfileManager } from './ProfileManager';
 import { GroupManager } from './GroupManager';
 import { ProjectManager } from './ProjectManager';
 import { ToastManager } from './ToastManager';
+import { EventManager } from './EventManager';
+import { TaskManager } from './TaskManager';
 const initializeManagers = () => 
 {
     EndpointManager.setup()
@@ -16,5 +18,7 @@ const initializeManagers = () =>
     GroupManager.setup()
     ProjectManager.setup()
     ToastManager.setup()
+    EventManager.setup()
+    TaskManager.setup()
 }
 export default initializeManagers

@@ -3,8 +3,8 @@ import { connect } from 'react-redux'
 import LoadingSpinner from '../../components/general/LoadingSpinner';
 import { List } from '../../components/general/List';
 import CircularLoadingSpinner from '../../components/general/CircularLoadingSpinner';
-import { StatusUtilities } from '../../utilities/StatusUtilities';
-import { NavigationUtilities } from '../../utilities/NavigationUtilities';
+import { StatusUtilities } from '../utilities/StatusUtilities';
+import { NavigationUtilities } from '../utilities/NavigationUtilities';
 import { withRouter } from 'react-router';
 import * as Immutable from 'immutable';
 import ApiClient from '../network/ApiClient';
@@ -625,7 +625,7 @@ class NewsfeedComponent extends React.Component<Props, State> {
         {
             return null
         }
-        const len = this.state.items.length
+        this.isOdd = false
         let color = this.getNextColor()
         return(
             <div className="newsfeed-component"> 
