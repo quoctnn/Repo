@@ -108,7 +108,7 @@ export class StatusComponent extends React.Component<Props, State> {
         const style = this.state.longPress ? {background:"green"} : (this.state.hover ? {background:"orange"} : undefined)
         console.log("render fix status hover:", this.state.hover)
         return(
-            <HoverLongPressTrigger onHover={this.onHover} onHoverOut={this.onHoverOut} onLongPress={this.onLongPress} className={cn}>
+            <HoverLongPressTrigger leaveTimeout={0} onHover={this.onHover} onHoverOut={this.onHoverOut} onLongPress={this.onLongPress} className={cn}>
                 <div style={style} className="d-flex text-truncate">
                     <div className="flex-shrink-0 header-left">
                         <Avatar size={avatarSize} image={userAvatar(this.props.status.owner)}/>

@@ -37,7 +37,10 @@ export default class HoverLongPressTrigger extends React.Component<Props, State>
         event.preventDefault()
         this.clearTimer()
         this.log("onMouseLeave before timeout")
-        this.timeoutTimer = setTimeout(this.onHoverOut, this.props.leaveTimeout)
+        if(this.props.leaveTimeout > 0)
+            this.timeoutTimer = setTimeout(this.onHoverOut, this.props.leaveTimeout)
+        else 
+            this.onHoverOut()
     }
     onHoverOut = () => {
         this.log("onHoverOut")

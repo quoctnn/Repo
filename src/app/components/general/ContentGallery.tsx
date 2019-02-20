@@ -288,7 +288,7 @@ export default class ContentGallery extends React.Component<Props, State> {
         const sizes = this.calculateSizes(files.slice(0, Settings.maxStatusPreviewItems))
         const overflowedItems = totalFiles - Settings.maxStatusPreviewItems
         let items:GalleryItem[] = []
-        const preferThumbnail = files.length > 2
+        const preferThumbnail = true
         let pos = 0
         files.forEach((f,i) => {
             const isPreview = i <= Settings.maxStatusPreviewItems - 1
