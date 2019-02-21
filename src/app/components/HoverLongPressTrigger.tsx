@@ -8,11 +8,13 @@ interface OwnProps
     onLongPress:() => void
     style?:React.CSSProperties
     leaveTimeout?:number
+    enterTimeout?:number
     onClick?:(event:any) => void
 }
 interface DefaultProps
 {
     leaveTimeout?:number
+    enterTimeout?:number
 }
 interface State 
 {
@@ -26,21 +28,29 @@ export default class HoverLongPressTrigger extends React.Component<Props, State>
     preventClick:boolean = false
     static defaultProps:DefaultProps = {
         leaveTimeout:500,
+        enterTimeout:0
     }
     onMouseEnter = (event:React.SyntheticEvent) => {
         event.preventDefault()
         this.clearTimer()
-        this.log("onMouseEnter")
-        this.props.onHover()
+        this.log("onMouseEnter before timeout:" +  this.props.enterTimeout)
+        if(this.props.enterTimeout > 0)
+            this.timeoutTimer = setTimeout(this.onHover, this.props.enterTimeout)
+        else 
+            this.onHover()
     }
     onMouseLeave = (event:React.SyntheticEvent) => {
         event.preventDefault()
         this.clearTimer()
-        this.log("onMouseLeave before timeout")
+        this.log("onMouseLeave before timeout:" +  this.props.leaveTimeout)
         if(this.props.leaveTimeout > 0)
             this.timeoutTimer = setTimeout(this.onHoverOut, this.props.leaveTimeout)
         else 
             this.onHoverOut()
+    }
+    onHover = () => {
+        this.log("onHover")
+        this.props.onHover()
     }
     onHoverOut = () => {
         this.log("onHoverOut")

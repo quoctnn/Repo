@@ -9,10 +9,12 @@ export abstract class ToastManager
     }
     static showInfoToast = (message:string, opts?:ToastOptions) => 
     {
-        toast.info(<InfoToast message={message} />,opts || {hideProgressBar: true});
+        if(message)
+            toast.info(<InfoToast message={message} />,opts || {hideProgressBar: true});
     }
     static showErrorToast = (message:string, opts?:ToastOptions) => 
     {
-        toast.error(<ErrorToast message={message} />,opts || {hideProgressBar: true});
+        if(message)
+            toast.error(<ErrorToast message={message} />,opts || {hideProgressBar: true});
     }
 }

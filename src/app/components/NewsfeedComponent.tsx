@@ -152,6 +152,7 @@ class NewsfeedComponent extends React.Component<Props, State> {
                     isLoading:false
                 });
             }
+            ToastManager.showErrorToast(error)
         })
     }
     handleRefresh = () => 
@@ -208,6 +209,7 @@ class NewsfeedComponent extends React.Component<Props, State> {
                 console.log("error sending reaction:", error)
                 this.updateStatusItem(status) // setting old status
             }
+            ToastManager.showErrorToast(error)
         })
     }
     handleLoadMore = () => 
@@ -296,6 +298,7 @@ class NewsfeedComponent extends React.Component<Props, State> {
                 let index = this.findIndexByStatusId(status.id)
                 this.removeObjectAtIndex(index)
             }
+            ToastManager.showErrorToast(error)
         })
     }
     updateStatus = (statusId:number, status:Status, files?:UploadedFile[], completion?:(success:boolean) => void) => {
@@ -304,14 +307,11 @@ class NewsfeedComponent extends React.Component<Props, State> {
             {
                 this.updateStatusItem(data)
             }
-            else if (error)
-            {
-                ToastManager.showErrorToast(error)
-            }
             if(completion)
             {
                 completion(data && !error)
             }
+            ToastManager.showErrorToast(error)
         })
     }
     createNewComment = (parent:Status, message:string, mentions?:number[], files?:UploadedFile[], completion?:(success:boolean) => void) => {
@@ -346,6 +346,7 @@ class NewsfeedComponent extends React.Component<Props, State> {
                 console.log("status created----- replace temp", newObject )
                 if(completion)
                     completion(success)
+                ToastManager.showErrorToast(error)
             })
         }
     }
@@ -588,6 +589,7 @@ class NewsfeedComponent extends React.Component<Props, State> {
             {
                 this.setState({activeCommentLoaders:currentLoaders})
             }
+            ToastManager.showErrorToast(error)
         })
     }
     loadMoreComments = (loader:StatusCommentLoader) => (e:any) => 

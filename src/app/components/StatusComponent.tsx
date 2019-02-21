@@ -79,7 +79,7 @@ export class StatusComponent extends React.Component<Props, State> {
             return <Moment interval={60000} fromNow={true} date={now} />
         }
     }
-    renderLikeButton = () => {
+    renderReactButton = () => {
         if (this.props.status.created_at != null) {
             const reaction = StatusUtilities.getStatusReaction(this.props.status, AuthenticationManager.getAuthenticatedUser())
             return (
@@ -132,7 +132,7 @@ export class StatusComponent extends React.Component<Props, State> {
                             <div className="flex-shrink-0 d-flex align-content-start info-container">
                                 {this.props.canReact && 
                                     <div className="reaction-wrapper">
-                                        {this.renderLikeButton()}
+                                        {this.renderReactButton()}
                                         <ReactionStats reactions={this.props.status.reactions}
                                             reactionsCount={this.props.status.reaction_count}/>
                                     </div>

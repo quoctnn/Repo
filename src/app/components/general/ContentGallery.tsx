@@ -15,6 +15,7 @@ import { translate } from '../../localization/AutoIntlProvider';
 import { Settings } from '../../utilities/Settings';
 import { FileUtilities } from '../../utilities/FileUtilities';
 import PhotoSwipeComponent from './gallery/PhotoSwipeComponent';
+import { nullOrUndefined } from '../../utilities/Utilities';
 require("./ContentGallery.scss");
 type GalleryItemSettings = {
     styles?: React.CSSProperties
@@ -67,6 +68,9 @@ export class GalleryItem
     }
     getUrl = () => {
         return IntraSocialUtilities.appendAuthorizationTokenToUrl(this.file.file)
+    }
+    hasImage = () => {
+        return !nullOrUndefined(this.file.image || this.file.thumbnail)
     }
     getImage = (isFullVersion:boolean) => {
 
@@ -124,6 +128,11 @@ export class GalleryFile extends GalleryItem
     {
         return this.renderFile(false, onClick)
     }
+    renderFileType = () => {
+        return (<div className="file-type">
+                    <i className="fa file-icon"></i>&nbsp;{this.file.extension.toUpperCase()}
+                </div>)
+    }
     private renderFile(isFullVersion:boolean, onClick?:(event) => void)
     {
         const cn = isFullVersion ? "btn btn-primary" : ""
@@ -140,6 +149,7 @@ export class GalleryFile extends GalleryItem
         const image = this.getImage(isFullVersion)
         return (<div style={style} key={this.key} onClick={onClick} className={"gallery-item" + (this.className ? " " + this.className : "")}>
                    {!image && <div className={gc}>
+                        {isFullVersion && this.renderFileType()}
                         {isFullVersion && <div className="file-info text-white h6">{name + " - " + FileUtilities.humanFileSize(this.file.size)}</div>}
                         <a onClick={onLinkClick} className={cn} href={url} target="_blank">
                             {isFullVersion ? translate("Download") : name}
@@ -147,9 +157,7 @@ export class GalleryFile extends GalleryItem
                     </div>
                    }
                     {image && <img src={image} className="img-responsive" />}
-                    <div className="file-type">
-                        <i className="fa file-icon"></i>&nbsp;{this.file.extension.toUpperCase()}
-                    </div> 
+                    {!isFullVersion && this.renderFileType()}
                     {!isFullVersion && this.renderOverflowedItem()}
                 </div>)
     }
@@ -305,7 +313,7 @@ export default class ContentGallery extends React.Component<Props, State> {
             const item = convertToGalleryItem(f, {styles:styles, preferThumbnail:preferThumbnail, totalFiles, overflowedItems:overflowed })
             items.push(item)
         })
-        return {items: items, width:sizes.width, height:sizes.height * 100 / sizes.width  }
+        return {items: items, width:sizes.maxWidth, height:sizes.height * 100 / sizes.width  }
     }
     onDialogClose = () => 
     {
@@ -479,8 +487,9 @@ export default class ContentGallery extends React.Component<Props, State> {
         const newPoints:Point[] = points.map(p => {
             return {width:p.width / scale, height:p.height / scale}
         })
-        console.log("rescale", newPoints, scale)
-        return {points:newPoints, width:targetWidth, height:targetHeight / scale }
+        const maxWidth = Math.min( targetWidth * scale , targetWidth) 
+        console.log("rescale", newPoints, scale, maxWidth)
+        return {points:newPoints, maxWidth:maxWidth, width:targetWidth, height:targetHeight / scale }
     }
     renderItems = () => 
     {

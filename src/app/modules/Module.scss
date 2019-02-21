@@ -40,10 +40,8 @@
     .module-content 
     {
         min-height: 0px;
-        /*flex-shrink: 1;
-        min-height: 0px;
-        flex-grow: 1;
-        display: flex;*/
+        display: flex;
+        flex-direction: column;
     }
     .module-footer 
     {

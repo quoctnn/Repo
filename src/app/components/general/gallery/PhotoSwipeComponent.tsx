@@ -1,4 +1,4 @@
-import * as PhotoSwipe from "photoswipe"
+import * as PhotoSwipe from "./photoswipe"
 import * as PhotoSwipeUI_Default from "photoswipe/dist/photoswipe-ui-default.js"
 import "photoswipe/dist/photoswipe.css"
 import "photoswipe/dist/default-skin/default-skin.css"
@@ -37,6 +37,7 @@ export default class PhotoSwipeComponent extends React.Component<Props, State>
                 switch(gi.file.type)
                 {
                     case GalleryItemType.IMAGE:return {msrc:gi.getImage(false), src:gi.getImage(true), w:gi.file.image_width, h:gi.file.image_height, download:gi.getUrl()}
+                    case GalleryItemType.AUDIO:
                     case GalleryItemType.VIDEO:{
                         const el =  gi.renderFull(null)
                         var html = document.createElement('div');
@@ -46,6 +47,16 @@ export default class PhotoSwipeComponent extends React.Component<Props, State>
                             html
                         )
                         return {html:html, filetype:gi.file.type, download:gi.getUrl()}
+                    }
+                    case GalleryItemType.DOCUMENT:{
+                        const el =  gi.renderFull(null)
+                        var html = document.createElement('div');
+                        html.classList.add("gallery-item-full-container")
+                        ReactDOM.render(
+                            el ,
+                            html
+                        )
+                        return {html:html, filetype:gi.file.type, download:gi.getUrl(),w:gi.file.image_width || 0, h:gi.file.image_height || 0,}
                     }
                     default:return {msrc:gi.getImage(false), src:gi.getImage(true), w:gi.file.image_width, h:gi.file.image_height, download:gi.getUrl()}
                 }
@@ -83,7 +94,6 @@ export default class PhotoSwipeComponent extends React.Component<Props, State>
         
         // Initializes and opens PhotoSwipe
         this.gallery = new PhotoSwipe(this.pswp, PhotoSwipeUI_Default, this.state.items, options)
-        this.gallery.init()
         this.gallery.listen('destroy', () => {
                 this.gallery.close()
                 this.gallery = null
@@ -104,6 +114,22 @@ export default class PhotoSwipeComponent extends React.Component<Props, State>
             }
             console.log("afterChange", this.gallery)
         });
+        this.gallery.listen('outItemSize', (item) => { 
+            item.w = window.innerWidth 
+            item.h = window.innerWidth * 3 / 4
+            console.log("outItemSize", item)
+
+        });
+        this.gallery.listen('preventDragEvent', (e, isDown, _preventObj) => { 
+            console.log("preventDragEvent", _preventObj)
+            const index = this.gallery.getCurrentIndex()
+            const item = this.state.items[index]
+            if(item.filetype == GalleryItemType.VIDEO || item.filetype == GalleryItemType.VIDEO)
+                _preventObj.prevent = false
+
+        });
+        this.gallery.init()
+        
     }
     pauseMedia = (item:(PhotoSwipe.Item|any)) => {
         if(item.html && item.filetype && (item.filetype == GalleryItemType.VIDEO || item.filetype == GalleryItemType.VIDEO))

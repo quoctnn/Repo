@@ -97,7 +97,7 @@ export default class ReactButton extends React.Component<Props, State>
         }
         return <Popover placement="top" hideArrow={false} isOpen={open} target={this.ref.current} container={this.popoverContainerRef.current} toggle={this.hideReactionsView}>
                     <PopoverBody>
-                        <HoverLongPressTrigger className="trigger reactions-panel"
+                        <HoverLongPressTrigger leaveTimeout={200} className="trigger reactions-panel"
                             onHover={this.onPopoverHover} 
                             onHoverOut={this.onPopoverHoverOut} 
                             onLongPress={() => {}}>
@@ -117,7 +117,7 @@ export default class ReactButton extends React.Component<Props, State>
                 <span ref={this.popoverContainerRef}>
                     {this.renderReactionsView()}
                 </span>
-                <HoverLongPressTrigger onClick={this.toggleReaction} style={{display:"inline-block"}} onHover={this.onReactionButtonHover} onHoverOut={this.onReactionButtonHoverOut} onLongPress={this.onReactionButtonHover}>
+                <HoverLongPressTrigger enterTimeout={500} onClick={this.toggleReaction} style={{display:"inline-block"}} onHover={this.onReactionButtonHover} onHoverOut={this.onReactionButtonHoverOut} onLongPress={this.onReactionButtonHover}>
                     <span className="" ref={this.containerRef}>
                         <button ref={this.ref} className={classes}>
                             <StatusReactionUtilities.Component selected={active} showBackground={showBG} large={false} reaction={reaction}></StatusReactionUtilities.Component>

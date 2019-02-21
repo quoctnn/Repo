@@ -2,10 +2,10 @@
 .newsfeed-component
 {
     height: 100%;
+    display: flex;
     .status-list
     {
         overflow-y: auto;
-        height: 100%;
         padding:0;
         overflow-x: hidden;
         display: flex;
