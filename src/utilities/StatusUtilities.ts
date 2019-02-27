@@ -21,7 +21,7 @@ export class StatusUtilities
         status.uid = d
         status.owner = AuthenticationManager.getAuthenticatedUser()!
         status.reactions = {}
-        status.comments_count = 0
+        status.comments = 0
         status.children = []
         status.files = files || []
         status.pending = true

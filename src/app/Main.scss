@@ -10,8 +10,10 @@ body
 {
     @include var(background-color, body-background);
     @include var(font-family, font-family-default);
+    @include var(color, primary-text-color);
     
 }
+button{@include var(color, primary-text-color);}
 ul,li{ list-style-type: none;}
 // 
 .link-text, a, .text.link
@@ -19,7 +21,7 @@ ul,li{ list-style-type: none;}
     @include var(color, link-color);
     font-weight: 500;
     cursor: pointer;
-    display: inline-block;
+    display: inline;
 }
 .link-text:hover, a:hover, .text.link:hover
 {

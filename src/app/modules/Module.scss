@@ -18,6 +18,7 @@
             min-width: 30px;
             text-align: center;
             display: none;
+            cursor: pointer;
         }
     }
     &.menu-visible
@@ -42,6 +43,7 @@
         min-height: 0px;
         display: flex;
         flex-direction: column;
+        flex:1;
     }
     .module-footer 
     {
@@ -59,6 +61,7 @@
         transform: scale(1, 0);
         transform-origin: top center;
         transition-property: transform, height !important;
+        z-index: 200;
          &.module-menu-entered
         {
             height: auto;

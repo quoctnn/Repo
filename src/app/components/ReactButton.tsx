@@ -117,7 +117,7 @@ export default class ReactButton extends React.Component<Props, State>
                 <span ref={this.popoverContainerRef}>
                     {this.renderReactionsView()}
                 </span>
-                <HoverLongPressTrigger enterTimeout={500} onClick={this.toggleReaction} style={{display:"inline-block"}} onHover={this.onReactionButtonHover} onHoverOut={this.onReactionButtonHoverOut} onLongPress={this.onReactionButtonHover}>
+                <HoverLongPressTrigger debug={true} enterTimeoutTouch={500} enterTimeout={500} onClick={this.toggleReaction} style={{display:"inline-block"}} onHover={this.onReactionButtonHover} onHoverOut={this.onReactionButtonHoverOut} onLongPress={this.onReactionButtonHover}>
                     <span className="" ref={this.containerRef}>
                         <button ref={this.ref} className={classes}>
                             <StatusReactionUtilities.Component selected={active} showBackground={showBG} large={false} reaction={reaction}></StatusReactionUtilities.Component>

@@ -68,8 +68,6 @@ export interface Status extends TempStatus
     can_comment:boolean
     children:Status[]
     children_ids:number[]
-    //old style
-    comments_count:number
     comments:number
     community?:ICommunity
     context_object:ContextObject
@@ -117,6 +115,15 @@ export class Message
     files?:UploadedFile[]
     tempFile?:FileUpload
 }
+export enum ElasticSearchTypes 
+{
+    GROUP = "Group",
+    COMMUNITY = "Community",
+    USER = "User",
+    PROJECT = "Project",
+    TASK = "Task",
+    EVENT = "Event",
+}
 export enum ContextNaturalKey
 {
     GROUP = "group.group",
@@ -126,6 +133,16 @@ export enum ContextNaturalKey
     TASK = "project.task",
     EVENT = "event.event",
     NEWSFEED = "newsfeed",
+}
+export type ContextItem = {
+    label:string
+    id:number
+    image?:string
+    type:ContextNaturalKey
+}
+export type ContextGroup = {
+    items:ContextItem[]
+    type:ContextNaturalKey
 }
 export enum UploadedFileType
 {
@@ -540,4 +557,6 @@ export enum StatusActions
     intrasocial_link = 11,
     /**Navigates to a status; extra:{status:number} */
     status = 12,
+    /**Navigates to a search page; extra:{query:string} */
+    search,
 }

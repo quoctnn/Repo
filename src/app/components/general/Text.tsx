@@ -6,6 +6,8 @@ export interface Props
 {
     onPress?:(event:any) => void
     children?:React.ReactNode
+    disabled?:boolean
+    className?:string
 }
 interface State 
 {
@@ -27,7 +29,8 @@ export default class Text extends React.Component<Props, State>
     render() 
     {
         const renderLink = !nullOrUndefined( this.props.onPress )
-        const cn = classNames("text", {link:renderLink})
+        const {className} = this.props
+        const cn = classNames("text", className, {link:renderLink})
         const link = renderLink ? this.didPressLink : undefined
         return (
             <span className={cn} onClick={link}>

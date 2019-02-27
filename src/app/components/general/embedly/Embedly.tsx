@@ -4,6 +4,7 @@ import { nullOrUndefined } from '../../../utilities/Utilities';
 import { EmbedlyItem } from "../../../types/intrasocial_types";
 import { ReduxState } from '../../../redux/index';
 import { embedlyRequestDataAction } from './redux';
+import { SecureImage } from '../SecureImage';
 require("./Embedly.scss");
 export interface OwnProps {
   url: string
@@ -65,10 +66,10 @@ class Embedly extends React.Component<Props, State> {
     return (
       <a className="embedly embedly-card" href={page.url} target="_blank">
         <div className="embedly__image">
-          <img
+          <SecureImage
             className="img-responsive image"
-            src={page.thumbnail_url}
-            alt={page.title}
+            url={page.thumbnail_url}
+            label={page.title}
           />
         </div>
         <div className="embedly__text">

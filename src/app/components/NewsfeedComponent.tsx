@@ -1,23 +1,21 @@
 import * as React from 'react';
 import { connect } from 'react-redux'
-import LoadingSpinner from '../../components/general/LoadingSpinner';
-import { List } from '../../components/general/List';
-import CircularLoadingSpinner from '../../components/general/CircularLoadingSpinner';
 import { StatusUtilities } from '../utilities/StatusUtilities';
 import { NavigationUtilities } from '../utilities/NavigationUtilities';
 import { withRouter } from 'react-router';
 import * as Immutable from 'immutable';
 import ApiClient from '../network/ApiClient';
 import { ReduxState } from '../redux/index';
-import { translate } from '../localization/AutoIntlProvider';
 import { UserProfile, Status, UploadedFile, ContextNaturalKey, StatusActions } from '../types/intrasocial_types';
 import { nullOrUndefined } from '../utilities/Utilities';
 import { ToastManager } from '../managers/ToastManager';
 import { StatusComponent } from './StatusComponent';
 import { StatusComposerComponent } from './StatusComposerComponent';
-import classnames = require('classnames');
+import { StatusCommentLoader as CommentLoader } from './StatusCommentLoader';
+import LoadingSpinner from './LoadingSpinner';
+import { List } from './general/List';
+import { ContextValue } from './general/input/ContextFilter';
 require("./NewsfeedComponent.scss");
-
 class StatusComposer
 {
     statusId:number
@@ -57,7 +55,7 @@ export interface OwnProps
     contextObjectId?:number
     defaultChildrenLimit:number
     childrenLimit:number
-
+    scrollParent?:any
 }
 interface RouteProps
 {
@@ -75,7 +73,6 @@ interface ReduxDispatchProps
 interface State 
 {
     activeCommentLoaders:{[index:number]:StatusCommentLoader}
-    total:number
     items:FeedListItem[]
     offset:number
     isLoading: boolean
@@ -88,13 +85,12 @@ class NewsfeedComponent extends React.Component<Props, State> {
     static defaultProps:OwnProps = {
         limit:30,
         defaultChildrenLimit:5,
-        childrenLimit:10
+        childrenLimit:10,
     }
     constructor(props:Props) {
         super(props);
         this.state = {
             activeCommentLoaders:{},
-            total:-1,
             isLoading:false,
             isRefreshing:false,
             items:[],
@@ -102,15 +98,41 @@ class NewsfeedComponent extends React.Component<Props, State> {
             hasMore:true,
         }
     }
+    componentDidUpdate = (prevProps:Props) => {
+        if(this.props.contextNaturalKey != prevProps.contextNaturalKey || this.props.contextObjectId != prevProps.contextObjectId)
+        {
+            this.setState({
+                offset: 0,
+                isRefreshing: true,
+                isLoading: true,
+                items:[],
+            }, this.loadStatuses);
+        }
+    }
     componentDidMount = () => 
     {
+        if(this.props.scrollParent)
+        {
+            this.props.scrollParent.addEventListener("scroll", this.onScroll)
+        }
         this.setState({
             isLoading: true
         }, this.loadStatuses);
     }
-    onScroll = (event:React.UIEvent<HTMLUListElement>) =>
+    componentWillUnmount = () =>
     {
-        let isAtBottom = event.currentTarget.scrollTop + event.currentTarget.offsetHeight >= event.currentTarget.scrollHeight
+        if(this.props.scrollParent)
+        {
+            this.props.scrollParent.removeEventListener("scroll", this.onScroll)
+        }
+    }
+    onScroll = (event:any) =>
+    {
+        let isAtBottom = false
+        if(event.target instanceof Document)
+            isAtBottom = (window.innerHeight + window.scrollY) >= document.body.offsetHeight
+        else 
+            isAtBottom = event.target.scrollTop + event.target.offsetHeight >= event.target.scrollHeight
         if(isAtBottom)
         {
             this.handleLoadMore()
@@ -350,6 +372,9 @@ class NewsfeedComponent extends React.Component<Props, State> {
             })
         }
     }
+    navigateToSearch = (query:string) => {
+        NavigationUtilities.navigateToSearch(this.props.history, query)
+    }
     navigateToProfile = (profile:number) => {
         NavigationUtilities.navigateToProfileId(this.props.history, profile )
     }
@@ -379,6 +404,11 @@ class NewsfeedComponent extends React.Component<Props, State> {
         }
         switch(action)
         {
+            case StatusActions.search: 
+            {
+                this.navigateToSearch(extra && extra.query)
+                break;
+            }
             case StatusActions.user: 
             {
                 const profile = extra && extra.profile && extra.profile.id || status.owner.id
@@ -603,18 +633,7 @@ class NewsfeedComponent extends React.Component<Props, State> {
     renderCommentLoader =  (loader: StatusCommentLoader, index:number, color:string) => 
     {
         const isLoading = this.state.activeCommentLoaders[loader.statusId] != undefined
-        const cn = classnames("btn btn-link primary-text comment-loader", color)
-        return (
-            <button disabled={isLoading} key={"statusloader_" + loader.statusId} className={cn} onClick={this.loadMoreComments(loader)}>
-                <div className="line"></div>
-                <div className="button">
-                    {!isLoading && <i className="fa fa-arrow-down"/>} 
-                    {isLoading && <CircularLoadingSpinner size={16} />} 
-                    &nbsp;{translate("Show previous")}
-                </div>
-                <div className="line"></div>
-            </button>
-        )
+        return <CommentLoader key={"statusloader_" + loader.statusId} color={color} isLoading={isLoading} loadMoreComments={this.loadMoreComments(loader)}/>
     }
     getNextColor = () => {
         const c = this.isOdd ? "odd-color" : "even-color"
@@ -629,11 +648,12 @@ class NewsfeedComponent extends React.Component<Props, State> {
         }
         this.isOdd = false
         let color = this.getNextColor()
+        const scroll = this.props.scrollParent ? undefined : this.onScroll
         return(
             <div className="newsfeed-component"> 
                     <List 
                     enableAnimation={false} 
-                    onScroll={this.onScroll} 
+                    onScroll={scroll} 
                     className="status-list group-list vertical-scroll">
                         {this.state.items.map((s, i) => {
                             if(s instanceof StatusComposer)
@@ -649,8 +669,8 @@ class NewsfeedComponent extends React.Component<Props, State> {
                             const isComment = !!s.parent
                             return this.renderStatus(authUser, s, isComment, i, color)
                         }) }
-                        {this.renderLoading()}
                     </List>
+                    {this.renderLoading()}
             </div> 
         );
     }

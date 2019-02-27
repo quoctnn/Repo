@@ -1,17 +1,16 @@
 import * as React from "react";
-import debug from '../../reducers/debug';
 const ReactDOM = require("react-dom");
 require("./List.scss");
 
 export interface Props {
     className?:string,
     id?:string
-    onScroll?:(event:React.UIEvent<HTMLUListElement>) => void
+    onScroll?:(event:React.UIEvent<any>) => void
     enableAnimation:boolean
 }
 export interface State {
 
-    items:React.ReactChild[]
+    items:React.ReactElement<any>[]
     rects:{[id:number]:DOMRect}
 }
 export class List extends React.PureComponent<Props, {}> {
@@ -118,14 +117,14 @@ export class List extends React.PureComponent<Props, {}> {
     render() 
     {
         return(
-            <ul onScroll={this.props.onScroll} className={"list" + (this.props.className ? " " + this.props.className : "") } >
-                { React.Children.map(this.props.children, (c:any, i)  => {
-                    if(!c)
-                        return null
-                    let k = c.key
-                    return <li ref={k} key={k}>{c}</li>
-                })}
-            </ul>
+            <div onScroll={this.props.onScroll} className={"list" + (this.props.className ? " " + this.props.className : "") } >
+                  {React.Children.map(this.props.children, (c:any, i)  => {
+                      if(!c)
+                          return null
+                      let k = c.key
+                      return <div ref={k} key={k}>{c}</div>
+                  })}
+            </div>
         );
     }
 }

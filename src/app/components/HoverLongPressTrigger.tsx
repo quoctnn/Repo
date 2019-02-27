@@ -9,12 +9,16 @@ interface OwnProps
     style?:React.CSSProperties
     leaveTimeout?:number
     enterTimeout?:number
+    enterTimeoutTouch?:number
     onClick?:(event:any) => void
+    debug?:boolean
 }
 interface DefaultProps
 {
     leaveTimeout?:number
     enterTimeout?:number
+    enterTimeoutHover?:number
+    debug:boolean
 }
 interface State 
 {
@@ -23,12 +27,13 @@ interface State
 type Props = OwnProps & DefaultProps
 export default class HoverLongPressTrigger extends React.Component<Props, State> 
 {
-    timeout:number = 500
     timeoutTimer:NodeJS.Timer
     preventClick:boolean = false
     static defaultProps:DefaultProps = {
         leaveTimeout:500,
-        enterTimeout:0
+        enterTimeout:0,
+        enterTimeoutHover:500,
+        debug:false
     }
     onMouseEnter = (event:React.SyntheticEvent) => {
         event.preventDefault()
@@ -62,13 +67,16 @@ export default class HoverLongPressTrigger extends React.Component<Props, State>
     }
     onTouchStart = (event:React.SyntheticEvent) => {
         this.preventClick = false
-        this.timeoutTimer = setTimeout(this.onLongPress, this.timeout)
+        this.timeoutTimer = setTimeout(this.onLongPress, this.props.enterTimeoutTouch)
         this.log("onTouchStart")
     }
     onTouchEnd = (event:React.SyntheticEvent) => {
         this.clearTimer()
+        this.log("onTouchStart")
     }
     onClick = (event:any) => {
+        this.log("onClick")
+        this.clearTimer()
         if(this.preventClick)
             event.preventDefault()
         else 
@@ -80,8 +88,8 @@ export default class HoverLongPressTrigger extends React.Component<Props, State>
         this.log("clearTimer")
     }
     log = (text:string) => {
-
-        console.log(text + " " + this.props.className)
+        if(this.props.debug)
+            console.log(text + " " + this.props.className)
     }
     render() {
         const click = this.props.onClick ? this.onClick : undefined

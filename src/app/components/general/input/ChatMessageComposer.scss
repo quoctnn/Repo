@@ -1,0 +1,67 @@
+@import "../../../Config";
+.chat-message-composer
+{
+    padding: 5px 8px;
+    z-index: 999;
+    form
+    {
+        display: flex;
+    }
+    > input
+    {
+        width: 87%;
+        position: relative;
+        float: left;
+    }
+    .editor-button {
+        color: #9c9c9c !important
+    }
+    .btn-submit
+    {
+        border-radius: 50%;
+        padding: 0;
+        height: 38px;
+        width: 38px;
+    }
+    .btn-submit:focus,
+    .btn-submit:active,
+    .btn-submit:visited,
+    .btn-submit:hover {
+        outline: 0 !important;
+    }
+
+    .btn-submit::-moz-focus-inner {
+        border: 0
+    }
+    .btn-submit > .fas {
+        font-size: 1em;
+        font-weight: bold;
+        color: white;
+        padding: 0 1px;
+        margin-right: 4px;
+        transform:rotate(45deg);
+    }
+    .btn-submit:disabled
+    {
+        background: none;
+        border:0;
+        > .fas
+        {
+            @include var(color, secondary-text-color);
+        }
+    }
+    .input-wrap {
+        position: relative;
+        flex-grow: 1;
+    }
+
+    .button-wrap {
+        position: relative;
+        margin-bottom: 1px;
+    }
+    .input-group
+    {
+        flex-wrap: initial;
+
+    }
+}

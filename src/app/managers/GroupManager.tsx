@@ -29,6 +29,41 @@ export abstract class GroupManager
         }
         return null
     }
+    static searchGroups = ( query:string, communityId?:number, maxItems?:number) =>
+    {
+        var searchables:number[] = []
+        const store = GroupManager.getStore().getState().groupStore
+        if(communityId)
+        {
+            searchables = GroupManager.getGroups(store.allIds).filter(g => g.community == communityId).map(g => g.id)
+        }
+        else
+        {
+            searchables = store.allIds
+        }
+        const result = GroupManager.searchGroupIds(query, searchables)
+        if(maxItems)
+            return result.slice(0, maxItems)
+        return result
+    }
+    static searchGroupIds = ( query:string, groupIds:number[]) =>
+    {
+        let groups = GroupManager.getGroups(groupIds || [])
+        return groups.filter(g => GroupManager.filterGroup(query,g!))
+    }
+    static getGroups = (groupIds:number[]) =>
+    {
+        let store = GroupManager.getStore().getState().groupStore
+        let groups = groupIds.map(p =>{
+            return store.byId[p]
+        }).filter(u => u != null)
+        return groups
+    }
+    private static filterGroup = (query:string, group:Group) =>
+    {
+        let compareString = group.name
+        return compareString.toLowerCase().indexOf(query.toLowerCase()) > -1
+    }
     static ensureGroupExists = (groupId:string|number, completion:(group:Group) => void) => 
     {
         const id = groupId.toString()

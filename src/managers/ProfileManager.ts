@@ -124,7 +124,7 @@ export abstract class ProfileManager
         return compareString.toLowerCase().indexOf(query.toLowerCase()) > -1
     }
 
-    static searchProfiles = ( query:string, communityId?:number) =>
+    static searchProfiles = ( query:string, communityId?:number, maxItems?:number) =>
     {
         var searchables:number[] = []
         if(communityId)
@@ -132,7 +132,7 @@ export abstract class ProfileManager
             let community = CommunityManager.getCommunityById(communityId)
             if(community)
             {
-                searchables = community.members
+                searchables = community.members || []
             }
             else
             {
@@ -143,11 +143,13 @@ export abstract class ProfileManager
         {
             searchables = ProfileManager.getContactListIds()
         }
+        if(maxItems)
+            searchables.slice(0, maxItems)
         return ProfileManager.searchProfilesIds(query, searchables)
     }
-    static searchProfilesIds = ( query:string, profiles:number[]) =>
+    static searchProfilesIds = ( query:string, profiles:number[] = []) =>
     {
-        let users = ProfileManager.getProfiles(profiles)
+        let users = ProfileManager.getProfiles(profiles || [])
         return users.filter(u => ProfileManager.filterProfile(query,u!))
     }
     static getContactListIds = () => {

@@ -9,6 +9,12 @@ import { TaskManager } from '../managers/TaskManager';
 import { EventManager } from '../managers/EventManager';
 
 export class NavigationUtilities {
+    static navigateToSearch = (history: H.History, query:string) => {
+        history.push(Routes.searchUrl(query))
+    }
+    static navigateToNewsfeed = (history: H.History) => {
+        history.push(Routes.newsfeedUrl())
+    }
     static navigateToProfile = (history: H.History, profile:UserProfile) => {
         history.push(Routes.profileUrl(profile.slug_name))
     }

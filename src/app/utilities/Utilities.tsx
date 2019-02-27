@@ -49,7 +49,7 @@ export function getTextContent(text:string, mentions:UserProfile[], includeEmbed
     var processed:any = null
     var config = []
     let embedlyArr:{[id:string]:any} = {}
-    let k = {
+    const embedlies = {
         regex: URL_REGEX,
         fn: (key, result) => 
         {
@@ -62,8 +62,18 @@ export function getTextContent(text:string, mentions:UserProfile[], includeEmbed
             //return (<a key={uniqueId()} href={result[0]} target="_blank"  data-toggle="tooltip" title={result[0]}>{truncate(result[0], 50 )}</a>)
         }
     }
-    config.push(k)
-    let breaks = {
+    config.push(embedlies)
+    if (Settings.searchEnabled) {
+        const hashtags = {
+            regex: HASHTAG_REGEX_WITH_HIGHLIGHT,
+            fn: (key, result) => 
+            {
+                return (<Text key={uniqueId()} onPress={() => onLinkPress(StatusActions.search, {query:result[0]} )}>{result[0]}</Text>)
+            }
+        }
+        config.push(hashtags)
+    }
+    const breaks = {
         regex: LINEBREAK_REGEX,
         fn: (key, result) => 
         {
@@ -71,7 +81,7 @@ export function getTextContent(text:string, mentions:UserProfile[], includeEmbed
         }
     }
     config.push(breaks)
-    let mentionSearch = mentions.map(user => {
+    const mentionSearch = mentions.map(user => {
         return {
             regex:new RegExp("@" + user.username.replace("+","\\+"), 'g'),
             fn: (key, result) => {

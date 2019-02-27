@@ -9,6 +9,7 @@ export type ErrorCallback = (request:JQuery.jqXHR, status:string, error:string) 
 
 export class AjaxRequest
 {
+    static requestCache:{[key:string]:JQueryXHR} = {}
     static sendAuthorization:boolean = true
     static setup(token:string|null)
     {
@@ -29,7 +30,11 @@ export class AjaxRequest
     }
     static postNoProcess(url:string, data, success:SuccessCallback, error:ErrorCallback)
     {
-        return AjaxRequest.ajaxCallNoProcess("POST", url, data, success, error);
+        return AjaxRequest.ajaxCallNoProcess("POST", url, data, false, success, error);
+    }
+    static getNoProcess(url:string, cache:boolean, success:SuccessCallback, error:ErrorCallback)
+    {
+        return AjaxRequest.ajaxCallNoProcess("GET", url, undefined, cache, success, error);
     }
     static post(url:string, data, success:SuccessCallback, error:ErrorCallback)
     {
@@ -81,27 +86,36 @@ export class AjaxRequest
         });
     }
     
-    private static ajaxCallNoProcess(method, url, data, success:SuccessCallback, error:ErrorCallback) 
+    private static ajaxCallNoProcess(method:string, url, cache:boolean, data, success:SuccessCallback, error:ErrorCallback) 
     {
         url = EndpointManager.applyEndpointDomain(url)
         if (typeof  success === 'undefined') {
             success = defaultCallback;
         }
-    
         if (typeof  error === 'undefined') {
             error = defaultErrorCallback;
         }
-        return $.ajax({
-            url: url,
-            cache: false,
-            type: method,
-            traditional: true,
-            data: data,
-            processData: false,
-            contentType: false,
-            success: success.bind(this),
-            error: error.bind(this)
-        });
+        const getRequest = () => {
+            return $.ajax({
+                url: url,
+                cache: cache,
+                type: method,
+                traditional: true,
+                data: data,
+                processData: false,
+                contentType: false,
+                success: success.bind(this),
+                error: error.bind(this)
+            })
+        }
+        /*if(method.toLowerCase() == "get")
+        {
+            if (!this.requestCache[url]) {
+                this.requestCache[url] = getRequest()
+            }
+            return this.requestCache[url]
+        }*/
+        return getRequest()
     }
     private static ajaxCall(method, url, data, success:SuccessCallback, error:ErrorCallback) 
     {

@@ -123,9 +123,9 @@ class NewsFeed extends React.Component<Props, State> {
             res.push(s)
             if(c.length > 0)
             {
-                if(s.comments_count != c.length)
+                if(s.comments != c.length)
                 {
-                    res.push(new StatusCommentLoader(s.id, c.length, s.comments_count))
+                    res.push(new StatusCommentLoader(s.id, c.length, s.comments))
                 }
                 res = res.concat(this.flattenData(c).reverse())
             }
@@ -272,7 +272,7 @@ class NewsFeed extends React.Component<Props, State> {
                     {
                         let updateArray:ArrayItem[] = []
                         const parent = this.getClonedStatus(this.state.items[ix] as Status)
-                        parent.comments_count -= 1
+                        parent.comments -= 1
                         updateArray.push({index:ix, object:parent})
 
                         let commentsLoaderIndex = this.findStatusCommentLoaderByStatusId(parent.id)
@@ -328,7 +328,7 @@ class NewsFeed extends React.Component<Props, State> {
                     let newStatusIndex = this.findIndexByStatusId(status.id)
                     updateArray.push({index:newStatusIndex, object:newStatus})
                     let updatedParent = this.getClonedStatus(parent)
-                    updatedParent.comments_count += 1
+                    updatedParent.comments += 1
                     let updatedParentIndex = this.findIndexByStatusId(parent.id)
                     updateArray.push({index:updatedParentIndex, object:updatedParent})
                     let commentsLoaderIndex = this.findStatusCommentLoaderByStatusId(parent.id)

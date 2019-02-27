@@ -1,7 +1,8 @@
+import "intersection-observer"
 import * as React from "react";
 import { Route, Switch, withRouter, RouteComponentProps } from "react-router-dom";
 import { ToastContainer } from 'react-toastify';
-import Routes from "../utilities/Routes";
+import Routes from "./utilities/Routes";
 import { connect } from 'react-redux'
 import "./Main.scss"
 import { DashCompWithData } from "./Dashboard";
@@ -9,6 +10,7 @@ import { ReduxState } from "./redux";
 import Signin from "./views/signin/Signin";
 import { error404 } from "./views/error/error404";
 import { Transition  } from 'react-transition-group';
+import NewsfeedPage from "./components/general/pages/NewsfeedPage";
 const DEMO = (props:any) => {
     return (<div>DEMO</div>)
 }
@@ -56,14 +58,15 @@ class Main extends React.Component<Props, State> {
                     <div id="main-content">
                         <ToastContainer />
                         <div id="content-block" className="">
-                        {!this.props.signedIn &&
-                              <Switch>
-                                <Route path={Routes.ANY} component={Signin} />
+                            {!this.props.signedIn &&
+                                <Switch>
+                                    <Route path={Routes.ANY} component={Signin} />
                                 </Switch>
                             }
                             {this.props.signedIn &&
                                 <>
                                     <Switch location={modal ? this.previousLocation : location}>
+                                        <Route path={Routes.NEWSFEED} component={NewsfeedPage} />
                                         <Route path={Routes.SIGNIN} component={Signin} />
                                         <Route path={Routes.ROOT} exact={true} component={DashCompWithData} />
                                         <Route path={Routes.ANY} component={error404} />

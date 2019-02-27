@@ -58,6 +58,33 @@ export abstract class CommunityManager
         }
 
     }
+    static searchCommunities = ( query:string, maxItems?:number) =>
+    {
+        const store = CommunityManager.getStore().getState().communityStore
+        var searchables:number[] = store.allIds
+        const result = CommunityManager.searchCommunityIds(query, searchables)
+        if(maxItems)
+            return result.slice(0, maxItems)
+        return result
+    }
+    static searchCommunityIds = ( query:string, communityIds:number[]) =>
+    {
+        let communities = CommunityManager.getCommunities(communityIds || [])
+        return communities.filter(c => CommunityManager.filterGroup(query,c!))
+    }
+    static getCommunities = (communityIds:number[]) =>
+    {
+        let store = CommunityManager.getStore().getState().communityStore
+        let communities = communityIds.map(p =>{
+            return store.byId[p]
+        }).filter(u => u != null)
+        return communities
+    }
+    private static filterGroup = (query:string, community:Community) =>
+    {
+        let compareString = community.name
+        return compareString.toLowerCase().indexOf(query.toLowerCase()) > -1
+    }
     private static getStore = ():Store<ReduxState,any> =>
     {
         return window.store 

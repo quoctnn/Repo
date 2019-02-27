@@ -2,7 +2,7 @@ import Constants from "../utilities/Constants";
 import {AjaxRequest} from "./AjaxRequest";
 import { EndpointManager } from '../managers/EndpointManager';
 var $ = require("jquery")
-import { Status, UserProfile, UploadedFile, Community, Group, Conversation, Project, Message, Event, Task } from '../types/intrasocial_types';
+import { Status, UserProfile, UploadedFile, Community, Group, Conversation, Project, Message, Event, Task, ElasticSearchTypes } from '../types/intrasocial_types';
 import { nullOrUndefined } from '../utilities/Utilities';
 export type PaginationResult<T> = {results:T[], count:number, previous:string|null, next:string|null}
 export type StatusCommentsResult<T> = {results:T[], count:number, parent:T}
@@ -33,6 +33,14 @@ export default class ApiClient
             }
         })
         return arr.join('&');
+    }
+    static search(term :string,types:ElasticSearchTypes[], include_results:boolean = true, include_suggestions:boolean = false, slim_types:boolean = true, limit:number, offset:number, callback:ApiClientCallback<any>){
+        let url = Constants.apiRoute.searchUrl + "?" + this.getQueryString({limit, offset})
+        AjaxRequest.postJSON(url, {term, include_results, include_suggestions, slim_types, types:types}, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
     }
     static statusComments(parent:number, position:number, children:number, includeParent:boolean, callback:ApiStatusCommentsCallback<Status>)
     {

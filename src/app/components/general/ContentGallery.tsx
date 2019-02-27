@@ -1,240 +1,103 @@
 import * as React from 'react';
-import { Modal, ModalBody } from 'reactstrap'
 import * as PhotoSwipe from "photoswipe"
-import {
-    Carousel,
-    CarouselItem,
-    CarouselControl,
-    CarouselIndicators,
-    CarouselCaption
-  } from 'reactstrap';
+import Swiper from "react-id-swiper";
+import "react-id-swiper/src/styles/css/swiper.css"
 import VideoPlayer from './video/VideoPlayer';
-import { UploadedFile } from '../../types/intrasocial_types';
+import { UploadedFile, UploadedFileType } from '../../types/intrasocial_types';
 import { IntraSocialUtilities } from '../../utilities/IntraSocialUtilities';
-import { translate } from '../../localization/AutoIntlProvider';
-import { Settings } from '../../utilities/Settings';
-import { FileUtilities } from '../../utilities/FileUtilities';
 import PhotoSwipeComponent from './gallery/PhotoSwipeComponent';
 import { nullOrUndefined } from '../../utilities/Utilities';
+import classnames from 'classnames';
+import { SecureImage } from './SecureImage';
 require("./ContentGallery.scss");
-type GalleryItemSettings = {
-    styles?: React.CSSProperties
-    preferThumbnail:boolean
-    totalFiles:number
-    overflowedItems?:number
-}
-export enum GalleryItemType 
-{
-    IMAGE = "image",
-    DOCUMENT = "document",
-    VIDEO = "video",
-    AUDIO = "audio",
-    NONE = "none",
-}
-export const parseGalleryItemType = (value:string):GalleryItemType => {
-    switch(value)
-    {
-        case "image": return GalleryItemType.IMAGE
-        case "document": return GalleryItemType.DOCUMENT
-        case "video": return GalleryItemType.VIDEO
-        case "audio": return GalleryItemType.AUDIO
-        default: return GalleryItemType.NONE
-    }
-}
-export const convertToGalleryItem = (file:UploadedFile, settings:GalleryItemSettings):GalleryItem => {
+export const convertToComponent = (file:UploadedFile,galleryMode?:boolean, onClick?:(file:UploadedFile, event) => void):JSX.Element => {
+    const gm = nullOrUndefined( galleryMode ) ? false : galleryMode
     switch(file.type)
     {
-        case "image": return new GalleryImage(file, settings)
-        case "document": return new GalleryDocument(file, settings)
-        case "audio":
-        case "video": return new GalleryMedia(file, settings)
-        default: return new GalleryItem(file, settings)
+        case UploadedFileType.IMAGE: return <GalleryImageComponent galleryMode={gm} file={file} onClick={onClick}/>
+        case UploadedFileType.DOCUMENT: return <GalleryDocumentComponent galleryMode={gm} file={file} onClick={onClick}/>
+        case UploadedFileType.AUDIO:
+        case UploadedFileType.VIDEO: return <GalleryMediaComponent galleryMode={gm} file={file} onClick={onClick}/>
+        default: return <GalleryImageComponent galleryMode={gm} file={file} onClick={onClick}/>
     }
 }
-export class GalleryItem 
-{
-    className:string
-    key:string
-    animId:string
+type GalleryComponentProps = {
     file:UploadedFile
-    settings:GalleryItemSettings
-    canDownload:boolean = false
-    constructor(file:UploadedFile, settings:GalleryItemSettings)
-    {
-        this.file = file
-        this.animId = IntraSocialUtilities.uniqueId()
-        this.key = this.animId
-        this.settings = settings
-    }
-    getUrl = () => {
-        return IntraSocialUtilities.appendAuthorizationTokenToUrl(this.file.file)
-    }
-    hasImage = () => {
-        return !nullOrUndefined(this.file.image || this.file.thumbnail)
-    }
-    getImage = (isFullVersion:boolean) => {
+    onClick?:(file:UploadedFile, event) => void
+    galleryMode:boolean
+}
+export const getFileUrl = (file:UploadedFile) => {
+    return IntraSocialUtilities.appendAuthorizationTokenToUrl(file.file)
+}
+export const getImageUrl = (file:UploadedFile, preferFullVersion:boolean) => {
 
-        let img = isFullVersion || !this.settings.preferThumbnail ? this.file.image : this.file.thumbnail
-        if(!img) // pick any if not found
-            img = this.file.image || this.file.thumbnail
-        if(!img)
-            return null
-        return IntraSocialUtilities.appendAuthorizationTokenToUrl(img)
-    } 
-    renderOverflowedItem = () => {
-        if(this.settings.overflowedItems)
-            return (<div className="overflow">
-                        <div>{ "+" + this.settings.overflowedItems}</div>
-                    </div>)
-        return null
+    let img = preferFullVersion ? file.image : file.thumbnail
+    if(!img) // pick any if not found
+        img = file.image || file.thumbnail
+    return img
+} 
+export class GalleryImageComponent extends React.Component<GalleryComponentProps, {}> {
+    onClick = (event:any) => {
+        if(this.props.onClick)
+            this.props.onClick(this.props.file, event)
     }
-    renderFull(onClick?:(event) => void)
-    {
-        return this.render(true, onClick)
-    }
-    renderPreview(onClick?:(event) => void):JSX.Element
-    {
-        return this.render(false, onClick)
-    }
-    private render(isFullVersion:boolean, onClick?:(event) => void)
-    {
-        const style = isFullVersion ? undefined : this.settings.styles
-        const name = this.file.filename
-        const url = this.getUrl()
-        return (<div style={style} key={this.key} onClick={onClick} className={"gallery-item" + (this.className ? " " + this.className : "")}>
-                    <div className="gallery-container">
-                        <a className="" href={url} target="_blank">
-                            <i className="fa file-icon"></i>
-                            {name}
-                        </a>
-                    </div>
-                    {!isFullVersion && this.renderOverflowedItem()}
+    render = () => {
+        const cn = classnames("gallery-item gallery-file-item gallery-image-item", this.props.file.type, this.props.file.extension)
+        const img = getImageUrl(this.props.file, false)
+        return (<div key={"image_" + this.props.file.id} onClick={this.onClick} className={cn}>
+                    <SecureImage url={img} className="img-responsive" />
                 </div>)
     }
 }
-export class GalleryFile extends GalleryItem
-{
-    canDownload = true
-    constructor(file:UploadedFile, settings:GalleryItemSettings)
-    {
-        super(file, settings)
-        this.className = file.type + " gallery-file-item " + file.extension
-    }
-    renderFull(onClick?:(event) => void)
-    {
-        return this.renderFile(true, onClick)
-    }
-    renderPreview(onClick?:(event) => void):JSX.Element
-    {
-        return this.renderFile(false, onClick)
-    }
-    renderFileType = () => {
-        return (<div className="file-type">
-                    <i className="fa file-icon"></i>&nbsp;{this.file.extension.toUpperCase()}
-                </div>)
-    }
-    private renderFile(isFullVersion:boolean, onClick?:(event) => void)
-    {
-        const cn = isFullVersion ? "btn btn-primary" : ""
-        const gc = "gallery-container" + (isFullVersion ?  " text-center" : "")
 
-        const onLinkClick = (event:React.SyntheticEvent) =>
-        {
-            if(isFullVersion)
-                event.stopPropagation()
+export class GalleryDocumentComponent extends React.Component<GalleryComponentProps, {}> {
+    render = () => {
+        const cn = classnames("gallery-item gallery-file-item gallery-document-item", this.props.file.type, this.props.file.extension)
+        const img = getImageUrl(this.props.file, false)
+        const url = getFileUrl(this.props.file)
+        return <a key={"document_" + this.props.file.id} className={cn} href={url} target="_blank">
+                    {img && <SecureImage url={img} className="img-responsive" />}
+                    {!img && <i className="fa file-icon"></i>}
+                    <div className="document-preview-footer">
+                        <h4 className="text-truncate m-2 primary-text">
+                            <i className="fa file-icon mr-1"></i>
+                            {this.props.file.filename}
+                        </h4>
+                    </div>
+                </a>
+    }
+}
+export class GalleryMediaComponent extends React.Component<GalleryComponentProps, {active:boolean}> {
+    constructor(props:GalleryComponentProps)
+    {
+        super(props)
+        this.state = {
+            active:false
         }
-        const style = isFullVersion ? undefined : this.settings.styles
-        const name = this.file.filename
-        const url = this.getUrl()
-        const image = this.getImage(isFullVersion)
-        return (<div style={style} key={this.key} onClick={onClick} className={"gallery-item" + (this.className ? " " + this.className : "")}>
-                   {!image && <div className={gc}>
-                        {isFullVersion && this.renderFileType()}
-                        {isFullVersion && <div className="file-info text-white h6">{name + " - " + FileUtilities.humanFileSize(this.file.size)}</div>}
-                        <a onClick={onLinkClick} className={cn} href={url} target="_blank">
-                            {isFullVersion ? translate("Download") : name}
-                        </a>
-                    </div>
-                   }
-                    {image && <img src={image} className="img-responsive" />}
-                    {!isFullVersion && this.renderFileType()}
-                    {!isFullVersion && this.renderOverflowedItem()}
-                </div>)
     }
-}
-export class GalleryDocument extends GalleryFile
-{
-    constructor(file:UploadedFile, settings:GalleryItemSettings)
-    {
-        super(file, settings)
-    }
-}
-export class GalleryMedia extends GalleryFile
-{
-    playerContainer = React.createRef<HTMLDivElement>();
-    constructor(file:UploadedFile, settings:GalleryItemSettings)
-    {
-        super(file, settings)
-    }
-    renderFull = (onClick?:(event) => void) => 
-    {
-        return this.renderVideo(true, onClick)
-    }
-    renderPreview = (onClick?:(event) => void) => 
-    {
-        return this.renderVideo(false, onClick)
-    }
-    private renderVideo(isFullVersion:boolean, onClick?:(event) => void)
-    {
-        const url = this.file.file
-        const extension = this.file.extension
-        if (VideoPlayer.canPlay(url, extension)) 
+    onClick = (event) => {
+        if(!this.state.active)
         {
-            const onLocalClick = (event:React.SyntheticEvent) =>
-            {
-                if(isFullVersion && this.playerContainer && this.playerContainer.current && this.playerContainer.current.contains(event.target as any))
-                {
-                    return
-                }
-                if(onClick)
-                {
-                    onClick(event)
-                }
-            }
-            const style = isFullVersion ? undefined : this.settings.styles
-            return (<div style={style}  key={this.key} onClick={onLocalClick} className={"gallery-item gallery-video-item" + (this.className ? " " + this.className : "")}>
-                        <div className="gallery-container" ref={this.playerContainer}>
-                            <VideoPlayer link={url} extension={extension}/>
+            this.setState({active:true})
+        }
+    }
+    render = () => {
+        const cn = classnames("gallery-item gallery-file-item gallery-media-item", this.props.file.type, this.props.file.extension, {active:this.state.active})
+        const active = this.state.active
+        const poster = getImageUrl(this.props.file, false)
+        const url = getFileUrl(this.props.file)
+        const extension = this.props.file.extension
+        return <div key={"media_" + this.props.file.id} className={cn} onClick={this.onClick}>
+                    {active && <VideoPlayer autoPlay={true} poster={poster} link={url} extension={extension}/>}
+                    {!active && 
+                        <div className="poster-container">
+                            <SecureImage label={this.props.file.filename + " poster image"} url={poster} setBearer={false} />
+                            <div className="play-button">
+                                <i className="fas fa-play"></i>
+                            </div>
+                            
                         </div>
-                    {!isFullVersion && this.renderOverflowedItem()}
-                    </div>)
-        }
-        if(isFullVersion)
-            return super.renderFull(onClick)
-        else 
-            return super.renderPreview(onClick)
-    }
-}
-export class GalleryImage extends GalleryFile
-{
-    constructor(file:UploadedFile, settings:GalleryItemSettings)
-    {
-        super(file, settings)
-    }
-    renderFull(onClick?: (event: any) => void)
-    {
-        return this.renderItem(true, onClick)
-    }
-    renderPreview(onClick?: (event: any) => void)
-    {
-        return this.renderItem(false, onClick)
-    }
-    renderItem = (isFullVersion:boolean, onClick?: (event: any) => void) => {
-        const style = isFullVersion ? undefined : this.settings.styles
-        let img = this.getImage(isFullVersion)
-        return <div style={style} key={this.key} onClick={onClick} className={"gallery-item gallery-image-item" + (this.className ? " " + this.className : "")}>
-                    <img src={img} className="img-responsive" />
-                    {!isFullVersion && this.renderOverflowedItem()}
+                    }
                 </div>
     }
 }
@@ -248,198 +111,45 @@ export interface OwnProps
 }
 export interface DefaultProps 
 {
+    height:number
 }
 interface State 
 {
-    data:GalleryItem[]
     index:number
     visible:boolean
-    width:number
-    height:number
 }
 type Props = OwnProps & DefaultProps
 
 export default class ContentGallery extends React.Component<Props, State> {     
     static defaultProps:DefaultProps = {
+        height:200
     }
     windowResizeOn = false
     animationDuration = 300
     animating = false
-
+    swiper = null
     galleryContainer = React.createRef<HTMLDivElement>();
     constructor(props:Props) {
         super(props);
-        const d = this.getContentData(props)
         this.state = {
-            data:d.items,
             index:0,
             visible:false,
-            width:d.width,
-            height:d.height,
         }
-        this.getContentData = this.getContentData.bind(this)
-        this.onGalleryItemClick = this.onGalleryItemClick.bind(this)
-    }
-    componentWillReceiveProps(nextProps:Props) 
-    {
-        const changed = !nextProps.files.map(f => f.id).isEqual(this.props.files.map(f => f.id))
-        if(changed)
-        {
-            const d = this.getContentData(nextProps)
-            this.setState({ data: d.items, width:d.width, height:d.height });
-        }
-    }
-    getContentData(props:Props)
-    {
-        const totalFiles = props.files.length
-        const files = props.files
-        const sizes = this.calculateSizes(files.slice(0, Settings.maxStatusPreviewItems))
-        const overflowedItems = totalFiles - Settings.maxStatusPreviewItems
-        let items:GalleryItem[] = []
-        const preferThumbnail = true
-        let pos = 0
-        files.forEach((f,i) => {
-            const isPreview = i <= Settings.maxStatusPreviewItems - 1
-            let styles:React.CSSProperties = undefined
-            let overflowed:number = undefined
-            if(isPreview)
-            {
-                const size = sizes.points[i]
-                const width = (size.width * 100 / sizes.width)
-                styles =  {width: width + "%", height:"100%", left: pos + "%"}
-                pos += width
-                overflowed = i == Settings.maxStatusPreviewItems - 1 && overflowedItems > 0 ? overflowedItems: undefined
-            }
-            const item = convertToGalleryItem(f, {styles:styles, preferThumbnail:preferThumbnail, totalFiles, overflowedItems:overflowed })
-            items.push(item)
-        })
-        return {items: items, width:sizes.maxWidth, height:sizes.height * 100 / sizes.width  }
     }
     onDialogClose = () => 
     {
         this.setState({visible:false})
     }
-    onGalleryItemClick(item, event)
+    onGalleryItemClick = (file:UploadedFile, event) => 
     {
         event.preventDefault()
-        let ix = this.state.data.indexOf(item)
+        let ix = this.props.files.indexOf(file)
         if(ix > -1)
         {
             this.setState({index:ix, visible:true})
         }
     }
-    getPageItems = (index:number) => 
-    {
-        let data = this.state.data
-        let arr:number[] = []
-        if(data.length == 1)
-        {
-            arr.push(0)
-            return arr
-        }
-        return [index > 0 ? index - 1: this.state.data.length - 1, index, index == this.state.data.length - 1 ? 0 :index + 1] 
-    }
-    onExiting = () => 
-    {
-        this.animating = true;
-    }
-    
-    onExited = () =>  {
-        this.animating = false;
-    }
-    
-    next = () => {
-        if (this.animating) return;
-        const nextIndex = this.state.index === this.state.data.length - 1 ? 0 : this.state.index + 1;
-        this.setState({ index: nextIndex });
-    }
-    
-    previous = () =>  {
-        if (this.animating) return;
-        const nextIndex = this.state.index === 0 ? this.state.data.length - 1 : this.state.index - 1;
-        this.setState({ index: nextIndex });
-    }
 
-    goToIndex = (newIndex:number) => {
-        if (this.animating) return;
-        this.setState({ index: newIndex });
-    }
-    renderSlides = () => 
-    {
-        const slides = this.state.data.map((item) => {
-            const name = item.file.filename
-            return (
-              <CarouselItem
-                onExiting={this.onExiting}
-                onExited={this.onExited}
-                key={item.animId}
-              >
-                {item.renderFull(this.onDialogClose)}
-                <CarouselCaption captionText={name} captionHeader={name} />
-              </CarouselItem>
-            );
-          });
-        return (<Carousel
-            activeIndex={this.state.index}
-            next={this.next}
-            previous={this.previous}
-            interval={false}
-          >
-            <CarouselIndicators items={this.state.data} activeIndex={this.state.index} onClickHandler={this.goToIndex} />
-            {slides}
-            <CarouselControl direction="prev" directionText="Previous" onClickHandler={this.previous} />
-            <CarouselControl direction="next" directionText="Next" onClickHandler={this.next} />
-          </Carousel>)
-    }
-    downloadCurrent = (event:React.SyntheticEvent) => {
-        event.preventDefault()
-        const dataItem = this.state.data[this.state.index]
-        var element = document.createElement("a")
-        element.setAttribute("href", dataItem.getUrl())
-        element.setAttribute("download", dataItem.file.filename)
-        element.setAttribute("target", "_blank")
-        element.setAttribute("crossOrigin", "anonymous")
-        element.style.display = "none"
-        document.body.appendChild(element)
-        element.click()
-        document.body.removeChild(element)
-    }
-    renderModal = () => 
-    {
-        if(!this.state.visible)
-            return null
-        const options:PhotoSwipe.Options = {index:this.state.index, getThumbBoundsFn:(index) => {
-            const child = this.galleryContainer.current.children[index]
-            if(child)
-            {
-                const rect = child.getBoundingClientRect()
-                var pageYScroll = window.pageYOffset || document.documentElement.scrollTop
-                return {x:rect.left, y:rect.top + pageYScroll, w:rect.width}
-            }
-            return null
-        }}
-        return <PhotoSwipeComponent items={this.props.files} options={options} visible={this.state.visible} onClose={this.onDialogClose}/>
-    }
-    renderModal2 = () => 
-    {
-        if(!this.state.visible)
-        {
-            return null
-        }
-        const dataItem = this.state.data[this.state.index]
-        return <Modal modalClassName="fade-scale" centered={true} zIndex={1070} isOpen={this.state.visible} fade={false} toggle={this.onDialogClose} className="content-gallery-lightbox">
-            <ModalBody>
-                <nav className="navbar navbar-dark bg-dark">
-                    <button disabled={!dataItem.canDownload} onClick={this.downloadCurrent} className="btn btn-outline-info">
-                        <i className="fas fa-download"></i>
-                    </button>
-                </nav>
-                <div className="slider-wrapper">
-                    {this.renderSlides()}
-                </div>
-            </ModalBody>
-          </Modal>
-    }
     targetHeightForCount = (count:number) => {
         switch(count)
         {
@@ -461,8 +171,6 @@ export default class ContentGallery extends React.Component<Props, State> {
         }
     }
     calculateSizes = (files:UploadedFile[]) => {
-
-        
         //find total width at height
         //scale to specific width 
         const targetWidth = this.targetWidthForCount(files.length)
@@ -491,26 +199,74 @@ export default class ContentGallery extends React.Component<Props, State> {
         console.log("rescale", newPoints, scale, maxWidth)
         return {points:newPoints, maxWidth:maxWidth, width:targetWidth, height:targetHeight / scale }
     }
-    renderItems = () => 
+    renderModal = () => 
     {
-        const count = this.state.data.length
-        if(count == 0)
+        if(!this.state.visible)
             return null
-        const items = this.state.data.slice(0, Settings.maxStatusPreviewItems).map(i => i.renderPreview(this.onGalleryItemClick.bind(this, i)))
+        const options:PhotoSwipe.Options = {index:this.state.index, getThumbBoundsFn:(index) => {
+            const child = (this.swiper && this.swiper.wrapperEl || this.galleryContainer && this.galleryContainer.current).children[index]
+            if(child)
+            {
+                const rect = child.getBoundingClientRect()
+                var pageYScroll = window.pageYOffset || document.documentElement.scrollTop
+                return {x:rect.left, y:rect.top + pageYScroll, w:rect.width}
+            }
+            return null
+        }}
+        return <PhotoSwipeComponent items={this.props.files} options={options} visible={this.state.visible} onClose={this.onDialogClose}/>
+    }
+    renderItems = (files:UploadedFile[], setSizes:boolean = false) => 
+    {
+        if(files.length == 0)
+            return null
+        const items = files.map(f => {
+            const item = convertToComponent(f, false, this.onGalleryItemClick)
+            const scale = f.image_width && f.image_height ? (f.image_width / f.image_height) : 1
+            const styles = setSizes ? {width: this.props.height * scale, height:this.props.height } : undefined
+            return <div key={f.type + "_" + f.id} className="gallery-item-container" style={styles}>{item}</div>
+        })  
         return items
+    }
+    renderSingleItem = () => {
+
+        const files = this.props.files
+        const sizes = this.calculateSizes(files)
+        const height = sizes.height * 100 / sizes.width
+        const items = this.renderItems(files)
+        return (<div className="gallery-container" style={{ maxWidth:sizes.maxWidth}}>
+                    <div ref={this.galleryContainer} style={{paddingBottom:height + "%"}} className={"gallery-list"}>
+                        {items}
+                    </div>
+                </div>)
+    }
+    renderMultipleItems = () => {
+
+        const items = this.renderItems(this.props.files, true)
+        const params = {
+            slidesPerView: "auto",
+            spaceBetween: 10,
+            freeMode: true,
+            shouldSwiperUpdate:true,
+            pagination: {
+              el: '.swiper-pagination',
+              clickable: true,
+            },
+            style:{height:this.props.height}
+          }
+        return  (<Swiper ref={(node) => {if(node) this.swiper = node.swiper}  } {...params}>
+                    {items}
+                </Swiper>)
     }
     render()
     {
-        let items = this.renderItems()
-        return (<> 
-                    <div className="content-gallery ">
-                            <div className="gallery-container" style={{ maxWidth:this.state.width}}>
-                                {items && items.length > 0 && 
-                                    <div ref={this.galleryContainer} style={{paddingBottom:this.state.height + "%"}} className={"gallery-list grid-items-" + items.length}>
-                                    {items}
-                                    </div>
-                                }
-                            </div>
+        const items = this.props.files
+        const styles:React.CSSProperties = {}
+        if(items.length > 1)
+            styles.height = this.props.height
+        return (<>
+                    <div className="content-gallery" style={styles}>
+                        {items.length > 1 && this.renderMultipleItems()}
+                        {items.length == 1 && this.renderSingleItem()}
                     </div>
                     {this.renderModal()}
                 </>)

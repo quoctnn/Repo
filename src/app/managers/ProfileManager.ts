@@ -8,6 +8,7 @@ import { ProjectManager } from './ProjectManager';
 import { ReduxState } from '../redux';
 import { addProfilesAction } from '../redux/profileStore';
 import { contactListSetAction } from '../redux/contactListCache';
+import { userFullName } from '../utilities/Utilities';
 export abstract class ProfileManager
 {
     static setup = () =>
@@ -121,11 +122,11 @@ export abstract class ProfileManager
     }
     private static filterProfile = (query:string, profile:UserProfile) =>
     {
-        let compareString = profile.first_name + " " + profile.last_name
+        let compareString = userFullName(profile)
         return compareString.toLowerCase().indexOf(query.toLowerCase()) > -1
     }
 
-    static searchProfiles = ( query:string, communityId?:number) =>
+    static searchProfiles = ( query:string, communityId?:number, maxItems?:number) =>
     {
         var searchables:number[] = []
         if(communityId)
@@ -133,7 +134,7 @@ export abstract class ProfileManager
             let community = CommunityManager.getCommunityById(communityId)
             if(community)
             {
-                searchables = community.members
+                searchables = community.members || []
             }
             else
             {
@@ -144,11 +145,14 @@ export abstract class ProfileManager
         {
             searchables = ProfileManager.getContactListIds()
         }
-        return ProfileManager.searchProfilesIds(query, searchables)
+        const result = ProfileManager.searchProfilesIds(query, searchables)
+        if(maxItems)
+            return result.slice(0, maxItems)
+        return result
     }
     static searchProfilesIds = ( query:string, profiles:number[]) =>
     {
-        let users = ProfileManager.getProfiles(profiles)
+        let users = ProfileManager.getProfiles(profiles || [])
         return users.filter(u => ProfileManager.filterProfile(query,u!))
     }
     static getContactListIds = () => {

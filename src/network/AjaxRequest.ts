@@ -30,7 +30,11 @@ export class AjaxRequest
     }
     static postNoProcess(url:string, data, success:SuccessCallback, error:ErrorCallback)
     {
-        return AjaxRequest.ajaxCallNoProcess("POST", url, data, success, error);
+        return AjaxRequest.ajaxCallNoProcess("POST", url, data, false, success, error);
+    }
+    static getNoProcess(url:string, cache:boolean, success:SuccessCallback, error:ErrorCallback)
+    {
+        return AjaxRequest.ajaxCallNoProcess("GET", url, undefined, cache, success, error);
     }
     static post(url:string, data, success:SuccessCallback, error:ErrorCallback)
     {
@@ -82,7 +86,7 @@ export class AjaxRequest
         });
     }
     
-    private static ajaxCallNoProcess(method, url, data, success:SuccessCallback, error:ErrorCallback) 
+    private static ajaxCallNoProcess(method, url, data, cache:boolean, success:SuccessCallback, error:ErrorCallback) 
     {
         url = StoreManager.applyEndpointDomain(url)
         if (typeof  success === 'undefined') {
@@ -94,7 +98,7 @@ export class AjaxRequest
         }
         return $.ajax({
             url: url,
-            cache: false,
+            cache: cache,
             type: method,
             traditional: true,
             data: data,

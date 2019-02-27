@@ -1,0 +1,14 @@
+body,#app-root, #main, #main-content, #content-block, .newsfeed-page{
+ 
+}
+.newsfeed-page
+{
+    .newsfeed-component
+    {
+        display: block;
+        .status-list
+        {
+            height: 100%;
+        }
+    }
+}

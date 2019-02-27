@@ -67,8 +67,6 @@ export interface Status extends TempStatus
     can_comment:boolean
     children:Status[]
     children_ids:number[]
-    //old style
-    comments_count:number
     comments:number
     community?:ICommunity
     context_object:ContextObject

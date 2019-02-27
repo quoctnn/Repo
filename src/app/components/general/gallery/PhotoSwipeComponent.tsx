@@ -3,8 +3,8 @@ import * as PhotoSwipeUI_Default from "photoswipe/dist/photoswipe-ui-default.js"
 import "photoswipe/dist/photoswipe.css"
 import "photoswipe/dist/default-skin/default-skin.css"
 import * as React from 'react';
-import { UploadedFile } from '../../../types/intrasocial_types';
-import { convertToGalleryItem, GalleryItemType } from "../ContentGallery";
+import { UploadedFile, UploadedFileType } from '../../../types/intrasocial_types';
+import { convertToComponent, getImageUrl, getFileUrl } from "../ContentGallery";
 import ReactDOM = require("react-dom");
 
 export interface Props 
@@ -33,32 +33,33 @@ export default class PhotoSwipeComponent extends React.Component<Props, State>
 
         const items:(PhotoSwipe.Item|any)[] = props.items.map(f => 
             {
-                const gi = convertToGalleryItem(f, {preferThumbnail:false, totalFiles:1 })
-                switch(gi.file.type)
+                const gi = convertToComponent(f, true, null)
+                const thumbImage = getImageUrl(f, false)
+                const fullImage = getImageUrl(f, true)
+                const fileUrl = getFileUrl(f)
+                switch(f.type)
                 {
-                    case GalleryItemType.IMAGE:return {msrc:gi.getImage(false), src:gi.getImage(true), w:gi.file.image_width, h:gi.file.image_height, download:gi.getUrl()}
-                    case GalleryItemType.AUDIO:
-                    case GalleryItemType.VIDEO:{
-                        const el =  gi.renderFull(null)
+                    case UploadedFileType.IMAGE:return {msrc:thumbImage, src:fullImage, w:f.image_width, h:f.image_height, download:fileUrl}
+                    case UploadedFileType.AUDIO:
+                    case UploadedFileType.VIDEO:{
                         var html = document.createElement('div');
                         html.classList.add("gallery-item-full-container")
                         ReactDOM.render(
-                            el ,
+                            gi ,
                             html
                         )
-                        return {html:html, filetype:gi.file.type, download:gi.getUrl()}
+                        return {html:html, filetype:f.type, download:fileUrl}
                     }
-                    case GalleryItemType.DOCUMENT:{
-                        const el =  gi.renderFull(null)
+                    case UploadedFileType.DOCUMENT:{
                         var html = document.createElement('div');
                         html.classList.add("gallery-item-full-container")
                         ReactDOM.render(
-                            el ,
+                            gi ,
                             html
                         )
-                        return {html:html, filetype:gi.file.type, download:gi.getUrl(),w:gi.file.image_width || 0, h:gi.file.image_height || 0,}
+                        return {html:html, filetype:f.type, download:fileUrl,w:f.image_width || 0, h:f.image_height || 0,}
                     }
-                    default:return {msrc:gi.getImage(false), src:gi.getImage(true), w:gi.file.image_width, h:gi.file.image_height, download:gi.getUrl()}
+                    default:return {msrc:thumbImage, src:fullImage, w:f.image_width, h:f.image_height, download:fileUrl}
                 }
             }
         )
@@ -124,7 +125,7 @@ export default class PhotoSwipeComponent extends React.Component<Props, State>
             console.log("preventDragEvent", _preventObj)
             const index = this.gallery.getCurrentIndex()
             const item = this.state.items[index]
-            if(item.filetype == GalleryItemType.VIDEO || item.filetype == GalleryItemType.VIDEO)
+            if(item.filetype == UploadedFileType.VIDEO || item.filetype == UploadedFileType.VIDEO)
                 _preventObj.prevent = false
 
         });
@@ -132,7 +133,7 @@ export default class PhotoSwipeComponent extends React.Component<Props, State>
         
     }
     pauseMedia = (item:(PhotoSwipe.Item|any)) => {
-        if(item.html && item.filetype && (item.filetype == GalleryItemType.VIDEO || item.filetype == GalleryItemType.VIDEO))
+        if(item.html && item.filetype && (item.filetype == UploadedFileType.VIDEO || item.filetype == UploadedFileType.VIDEO))
         {
             const medias = item.html.querySelectorAll("video, audio")
             for (let media of medias) {

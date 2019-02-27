@@ -8,6 +8,7 @@ import { ProjectManager } from './ProjectManager';
 import { ToastManager } from './ToastManager';
 import { EventManager } from './EventManager';
 import { TaskManager } from './TaskManager';
+import { ContextManager } from './ContextManager';
 const initializeManagers = () => 
 {
     EndpointManager.setup()
@@ -20,5 +21,6 @@ const initializeManagers = () =>
     ToastManager.setup()
     EventManager.setup()
     TaskManager.setup()
+    ContextManager.setup()
 }
 export default initializeManagers

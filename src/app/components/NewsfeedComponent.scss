@@ -3,6 +3,7 @@
 {
     height: 100%;
     display: flex;
+    flex-direction: column;
     .status-list
     {
         overflow-y: auto;
@@ -11,21 +12,6 @@
         display: flex;
         flex-direction: column;
         -webkit-overflow-scrolling: touch;
-    }
-    .comment-loader{
-        display: flex;
-        width: 100%;
-        align-items: center;
-        .line{
-            flex-grow: 1;
-            height: 1px;
-            @include var(background-color, secondary-text-color);
-            margin: 0 10px;
-        }
-        .button{
-            flex-grow:0;
-            font-size: 13px;
-        }
     }
     .odd-color
     {

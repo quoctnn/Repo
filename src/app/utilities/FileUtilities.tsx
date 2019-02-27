@@ -2,6 +2,7 @@ import VideoPlayer from '../components/general/video/VideoPlayer';
 import React = require('react');
 import { IntraSocialUtilities } from './IntraSocialUtilities';
 import { UploadedFile } from '../types/intrasocial_types';
+import { SecureImage } from '../components/general/SecureImage';
 export class FileUtilities {
     static renderDocument(file:UploadedFile)
     {
@@ -17,8 +18,7 @@ export class FileUtilities {
         )
     }
     static renderImage(file:UploadedFile) {
-        let i = IntraSocialUtilities.appendAuthorizationTokenToUrl( file.image )
-        return <img src={i} className="img-responsive" key={i}/>;
+        return <SecureImage url={file.image} setBearer={true} className="img-responsive" key={file.image}/>;
     }
     static renderVideo(file:UploadedFile)
     {

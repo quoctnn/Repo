@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Status, StatusActions } from '../types/intrasocial_types';
+import { Status, StatusActions, UploadedFileType } from '../types/intrasocial_types';
 import { Avatar } from "./general/Avatar";
 import { userAvatar, userFullName, getTextContent } from '../utilities/Utilities';
 import classNames from 'classnames';
@@ -7,8 +7,6 @@ import Moment from "react-moment";
 import * as moment from 'moment-timezone';
 let timezone = moment.tz.guess();
 
-
-import "./StatusComponent.scss"
 import { translate } from "../localization/AutoIntlProvider";
 import { ProfileManager } from "../managers/ProfileManager";
 import ReactionStats from "./ReactionStats";
@@ -17,6 +15,9 @@ import { StatusUtilities } from "../utilities/StatusUtilities";
 import { AuthenticationManager } from "../managers/AuthenticationManager";
 import ContentGallery from './general/ContentGallery';
 import HoverLongPressTrigger from "./HoverLongPressTrigger";
+
+import "./StatusComponent.scss"
+import Text from "./general/Text";
 
 interface OwnProps 
 {
@@ -38,8 +39,8 @@ interface State
     longPress:boolean
 }
 type Props = OwnProps
+
 export class StatusComponent extends React.Component<Props, State> {
-    
     constructor(props:Props)
     {
         super(props)
@@ -53,14 +54,13 @@ export class StatusComponent extends React.Component<Props, State> {
         const nextStatus = nextProps.status
         const status = this.props.status
         let ret:boolean = nextStatus.id != status.id || 
-        nextStatus.comments_count != status.comments_count ||
+        nextStatus.comments != status.comments ||
         nextStatus.updated_at != status.updated_at || 
         nextStatus.serialization_date != status.serialization_date ||
         nextStatus.reaction_count != status.reaction_count || 
 
         nextState.hover != this.state.hover || 
         nextState.longPress != this.state.longPress
-
 
         //nextStatus.reactions != status.reactions
         //console.log("status id:" + status.id, ret,(status.children_ids || []).length, (nextStatus.children_ids|| []).length, )
@@ -100,6 +100,7 @@ export class StatusComponent extends React.Component<Props, State> {
     render() {
         const isComment = !!this.props.status.parent
         const contextObject =  isComment ? null : this.props.status.context_object
+        const contextObjectAction =  isComment ? null : () => this.props.onActionPress(StatusActions.context)
         const mentions = ProfileManager.getProfiles(this.props.status.mentions)
         const content = getTextContent( this.props.status.text, mentions, false, this.props.onActionPress)
         const cn = classNames("status-component", this.props.className, "sid-" + this.props.status.id, {comment:this.props.isComment})
@@ -107,24 +108,33 @@ export class StatusComponent extends React.Component<Props, State> {
         const files = this.props.status.files || []
         const style = this.state.longPress ? {background:"green"} : (this.state.hover ? {background:"orange"} : undefined)
         console.log("render fix status hover:", this.state.hover)
-        return(
-            <HoverLongPressTrigger leaveTimeout={0} onHover={this.onHover} onHoverOut={this.onHoverOut} onLongPress={this.onLongPress} className={cn}>
+        const ownerAction = () => this.props.onActionPress(StatusActions.user, {profile:this.props.status.owner})
+        return(<HoverLongPressTrigger leaveTimeout={0} onHover={this.onHover} onHoverOut={this.onHoverOut} onLongPress={this.onLongPress} className={cn}>
                 <div style={style} className="d-flex text-truncate">
                     <div className="flex-shrink-0 header-left">
-                        <Avatar size={avatarSize} image={userAvatar(this.props.status.owner)}/>
+                        <Text onPress={ownerAction}>
+                            <Avatar size={avatarSize} image={userAvatar(this.props.status.owner)}/>
+                        </Text>
+                        
                     </div>
                     <div className="d-flex header-center text-truncate flex-grow-1">
                         <div className="d-flex header-center-content text-truncate">
                             <div className="text-truncate flex-grow-1 d-flex flex-wrap">
                                 <div className="text-truncate">
-                                    <div className="title text-truncate">{userFullName(this.props.status.owner)}</div>
+                                    <Text onPress={ownerAction}>
+                                        <div className="title text-truncate">{userFullName(this.props.status.owner)}</div>
+                                    </Text>
                                 </div>
                                 <div className="text-truncate">
                                     <div className="date text-truncate secondary-text">{this.getTimestamp(this.props.status.created_at)}</div>
                                 </div>
                             </div>
                             <div className="text-truncate  flex-grow-0 flex-shrink-0">
-                                {contextObject && <div className="text-truncate"><div className="context text-truncate">{contextObject.name}</div></div>}
+                                {contextObject && 
+                                    <div className="text-truncate">
+                                        <div className="context text-truncate"><Text onPress={contextObjectAction}>{contextObject.name}</Text></div>
+                                    </div>
+                                }
                             </div>
                         </div>
                         <div className="d-flex">

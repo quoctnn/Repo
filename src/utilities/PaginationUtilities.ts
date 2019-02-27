@@ -19,7 +19,7 @@ export class PaginationUtilities {
                 children:(item.children_ids || []).map(c => PaginationUtilities.getPageItem(items, c, isTemporary)), 
                 isTemporary:isTemporary, 
                 community:item.community && item.community.id,
-                childrenCount:item.comments_count,
+                childrenCount:item.comments,
                 status:item
                 }
     }

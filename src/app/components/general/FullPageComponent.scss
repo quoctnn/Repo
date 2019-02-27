@@ -1,0 +1,22 @@
+@import "../../Config";
+body[class^="full-page-"], body[class*=" full-page-"]
+{
+    #main-content
+    {
+        #content-block
+        {
+            height:calc(100vh - #{map-get($root, top-navigation-height)});
+            height: calc(100vh - var(--top-navigation-height, #{map-get($root, top-navigation-height)}));
+            @supports (-webkit-overflow-scrolling: touch) {
+                @media all and (orientation:portrait) {
+                    height:calc(100vh - #{map-get($root, top-navigation-height)} - 80px);
+                    height:calc(100vh - var(--top-navigation-height, #{map-get($root, top-navigation-height)}) - 80px);
+                  }
+            }
+            > .container, > .container>div
+            {
+                height: 100%;
+            }
+        }
+    }
+}

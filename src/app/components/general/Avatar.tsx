@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { IntraSocialUtilities } from '../../utilities/IntraSocialUtilities';
+import { SecureImage } from './SecureImage';
 require("./Avatar.scss");
 
 export interface Props {
@@ -40,7 +40,7 @@ export class Avatar extends React.PureComponent<Props & React.HTMLAttributes<HTM
             images.push(this.props.image)
         if(this.props.images)
             images = images.concat( this.props.images )
-        var imgUrls = images.map(i => IntraSocialUtilities.appendAuthorizationTokenToUrl(i)).slice(0,4)
+        var imgUrls = images/*.map(i => IntraSocialUtilities.appendAuthorizationTokenToUrl(i))*/.slice(0,4)
         const length = imgUrls.length
         return(
             
@@ -48,7 +48,7 @@ export class Avatar extends React.PureComponent<Props & React.HTMLAttributes<HTM
                 <div className="image-container" style={{borderWidth:this.props.borderWidth + "px", borderColor:this.props.borderColor, width:this.props.size + "px", height:this.props.size + "px", borderStyle:"solid"}}>
                     {imgUrls.map((img, index) => {
                         const key = `image_${length}_${index}`
-                        return <div key={img} className={"image multi " + key} style={{backgroundImage:"url("+img+")"}}></div>
+                        return <SecureImage setAsBackground={true} key={img} className={"image multi " + key} url={img}></SecureImage>
                     })}
                 </div>
                 {this.props.children}

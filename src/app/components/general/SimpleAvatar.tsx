@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { SecureImage } from './SecureImage';
 require("./Avatar.scss");
 
 export interface Props {
@@ -35,7 +36,7 @@ export class SimpleAvatar extends React.PureComponent<Props & React.HTMLAttribut
                 <div className="image-container" style={{borderWidth:this.props.borderWidth + "px", borderColor:this.props.borderColor, width:this.props.size + "px", height:this.props.size + "px", borderStyle:"solid"}}>
                     {imgUrls.map((img, index) => {
                         const key = `image_${length}_${index}`
-                        return <div key={img} className={"image multi " + key} style={{backgroundImage:"url("+img+")"}}></div>
+                        return <SecureImage setAsBackground={true} key={img} className={"image multi " + key} url={img}></SecureImage>
                     })}
                 </div>
                 {this.props.children}

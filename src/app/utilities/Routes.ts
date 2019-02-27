@@ -8,6 +8,7 @@ export default abstract class Routes {
     static CONVERSATION_CREATE = "/conversation/create/"
     static SEARCH = "/search/"
     static UPDATE_TOOL = "/app-update"
+    static NEWSFEED = "/newsfeed"
     
     private static PROFILE = "/profile/"
     private static COMMUNITY = "/community/"
@@ -17,6 +18,14 @@ export default abstract class Routes {
     private static GROUP = "/group/"
     private static EVENT = "/event/"
 
+    static searchUrl = (query:string) => {
+        if(query)
+            return `${Routes.SEARCH}?term=${encodeURIComponent( query )}`
+        return Routes.SEARCH
+    }
+    static newsfeedUrl = () => {
+        return `${Routes.NEWSFEED}/`
+    }
     static profileUrl = (profile:string|number) => {
         return `${Routes.PROFILE}${profile}/`
     }

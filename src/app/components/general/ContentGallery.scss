@@ -1,35 +1,33 @@
 @import "../../Config";
 .content-gallery
 {
-    padding: 0 10px;
-    .gallery-container{
-        margin: 0 auto;
-    }
-    .gallery-list
-    {
-        display: flex;
-        justify-content: space-around;
-        position: relative;
-        height: 0;
-        width: 100%;
-        overflow:hidden;
-        border-radius: 8px;
-    }
+    margin: 0 10px;
+    position: relative;
     .img-responsive
     {
-        object-fit: cover;
+        object-fit: contain;
         width: 100%;
         max-width: initial;
         max-height: 100%;
+    }
+    .gallery-container 
+    {
+        margin:auto;
+    }
+    .gallery-list{
+        position: relative;
     }
     .gallery-item
     {
         position: absolute;
         top:0;
+        left: 0;
+        right: 0;
+        bottom: 0;
         height: 100%;
         display: flex;
         justify-content: center;
-        box-shadow: 0px 0px 10px -5px rgba(0,0,0,0.6);
+        box-shadow: 0px 0px 10px -3px rgba(0,0,0,0.6);
         cursor: pointer;
         .file-type{
             position: absolute;
@@ -55,6 +53,35 @@
             justify-content: center;
             align-items: center;
         }
+        .poster-container
+        {
+            display: flex;  
+            justify-content: center;
+            align-content: center;
+            > img
+            {
+                position: absolute;
+                top:0;
+                left:0;
+                right:0;
+                bottom:0;
+            }
+            > .play-button 
+            {
+                z-index: 2;
+                color: white;
+                font-size: 30px;
+                padding: 12px 20px;
+                border-radius: 8px;
+                background: rgba(0, 0, 0, 0.445);
+                line-height: 1em;
+            }
+        }
+        > .file-icon
+        {
+            font-size: 30px;
+        }
+       
     }
     .gallery-item:first-child
     {
@@ -101,6 +128,7 @@
         @include var(background, highlight-color);
         opacity: 0;
         transition: all 0.1s ease;
+        pointer-events: none;
     } 
     .gallery-item:hover:after
     {
@@ -109,6 +137,26 @@
     .gallery-item:hover 
     {
         @include var(background, highlight-color);
+        .poster-container
+        {
+            > .play-button{
+                background: rgba(0, 0, 0, 0.6);
+            }
+        }
+    }
+    .document-preview-footer{
+        border-top-style: solid;
+        border-width: 1px;
+        border-color: #d8d6d681;
+        background: rgba(255, 255, 255, 0.582);
+        flex-grow: 0;
+        flex-shrink: 0;
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        h4{
+            font-size: 14px;
+        }
     }
 }
 
@@ -236,10 +284,6 @@
         align-self: center;
         height: 100%;
         width: 100%;
-        .gallery-container 
-        {
-            margin:auto;
-        }
     }
     .gallery-item-link
     {
@@ -288,5 +332,12 @@
             max-width: initial;
             max-height: 100%;
         }
+    }
+}
+.swiper-container
+{
+    height: 100%;
+    .gallery-item{
+        overflow: hidden;
     }
 }

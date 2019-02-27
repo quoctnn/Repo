@@ -32,7 +32,7 @@ const addCommunities = (state, action:AddCommunitiesAction) => {
     communities.forEach(c => {
         let id = c.id
         let old = state[id]
-        if(!old || new Date(old.updated_at) < new Date(c.updated_at)) // update
+        if(!old || new Date(c.updated_at) >= new Date(old.updated_at)) // update
         {
             newState[c.id] = c
         }
