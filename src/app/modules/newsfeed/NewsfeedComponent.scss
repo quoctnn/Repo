@@ -1,0 +1,45 @@
+@import "../../Config";
+.newsfeed-component
+{
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    .status-list
+    {
+        overflow-y: auto;
+        padding:0;
+        overflow-x: hidden;
+        display: flex;
+        flex-direction: column;
+        -webkit-overflow-scrolling: touch;
+        &.rb-mini{
+            .status-component:not(.comment){
+                .header-center {
+                    justify-content: center;
+                    .header-center-left{
+                        display: block !important;
+                    }
+                }
+            }
+        }
+    }
+    .odd-color
+    {
+        background-color: #f3f3f3;
+    }
+    .even-color
+    {
+        background-color: white;
+    }
+    .status-component-placeholder
+    {
+        height: 137px;
+        position: relative;
+        flex-shrink: 0;
+    }
+    .chat-message-composer-placeholder
+    {
+        height: 50px;
+        flex-shrink: 0;
+    }
+}

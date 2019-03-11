@@ -1,9 +1,7 @@
 import * as React from 'react';
 import AsyncSelect from 'react-select/lib/Async'
 import classnames from "classnames"
-import { InputActionMeta } from 'react-select/lib/types';
-import { ContextManager } from '../../../managers/ContextManager';
-import { ContextItem, ElasticSearchTypes, ContextNaturalKey } from '../../../types/intrasocial_types';
+import { ContextItem, ElasticSearchType, ContextNaturalKey } from '../../../types/intrasocial_types';
 import ApiClient from '../../../network/ApiClient';
 require("./ContextFilter.scss");
 
@@ -18,7 +16,7 @@ type State = {
     selectedValue:ContextValue
 }
 export class ContextFilter extends React.PureComponent<Props & React.HTMLAttributes<HTMLDivElement>, State> {
-    static searchTypes = [ElasticSearchTypes.COMMUNITY, ElasticSearchTypes.GROUP, ElasticSearchTypes.USER]
+    static searchTypes = [ElasticSearchType.COMMUNITY, ElasticSearchType.GROUP, ElasticSearchType.USER]
     constructor(props:Props)
     {
         super(props)
@@ -27,9 +25,9 @@ export class ContextFilter extends React.PureComponent<Props & React.HTMLAttribu
     convertResultItem = (item:any):ContextValue => {
         switch(item.object_type)
         {
-            case ElasticSearchTypes.COMMUNITY:return {id:item.django_id, label:item.name, type:ContextNaturalKey.COMMUNITY, value:ContextNaturalKey.COMMUNITY + "_"+ item.django_id}
-            case ElasticSearchTypes.GROUP:return {id:item.django_id, label:item.name, type:ContextNaturalKey.GROUP, value:ContextNaturalKey.GROUP + "_"+ item.django_id}
-            case ElasticSearchTypes.USER:return {id:item.django_id, label:item.user_name, type:ContextNaturalKey.USER, value:ContextNaturalKey.USER + "_"+ item.django_id}
+            case ElasticSearchType.COMMUNITY:return {id:item.django_id, label:item.name, type:ContextNaturalKey.COMMUNITY, value:ContextNaturalKey.COMMUNITY + "_"+ item.django_id}
+            case ElasticSearchType.GROUP:return {id:item.django_id, label:item.name, type:ContextNaturalKey.GROUP, value:ContextNaturalKey.GROUP + "_"+ item.django_id}
+            case ElasticSearchType.USER:return {id:item.django_id, label:item.user_name, type:ContextNaturalKey.USER, value:ContextNaturalKey.USER + "_"+ item.django_id}
             default: return null
         }
     }
@@ -48,16 +46,9 @@ export class ContextFilter extends React.PureComponent<Props & React.HTMLAttribu
     }
     searchOptions = (text:string) => {
         return new Promise((resolve) => {
-            return ApiClient.search(text, ContextFilter.searchTypes, true, false, true, 10, 0, (data,status,error) => {
+            return ApiClient.search("*" + text + "*", ContextFilter.searchTypes,false , true, false, true, 10, 0, (data,status,error) => {
                 const d = data && data.results || []
                 resolve(this.groupResultItems( d.map(r => this.convertResultItem(r)).filter(r => r != null)) )
-            })
-        });
-    }
-    searchOptions2 = (text:string) => {
-        return new Promise((resolve) => {
-            return ContextManager.search(text, null, (result) => {
-                resolve(result.map(g => { return {options:g.items.map(o => {return {...o, value:o.type + "_" + o.id,}}), label:g.type}}))
             })
         });
     }

@@ -40,13 +40,14 @@ export interface ICommunity
 }
 export interface Community extends ICommunity
 {
-    avatar: string,
-    avatar_thumbnail: string,
-    cover: string,
-    cover_cropped: string,
-    members: number[],
-    relationship: any,
+    avatar: string
+    avatar_thumbnail: string
+    cover: string
+    cover_cropped: string
+    members: number[]
+    relationship: any
     updated_at:string
+    permission:number
 }
 export interface TempStatus
 {
@@ -79,6 +80,7 @@ export interface Status extends TempStatus
     reactions:{ [id: string]: number[] }
     reaction_count:number
     owner:UserProfile
+    permission:number
     permission_set:number[]
     poll:any
     read:boolean
@@ -86,6 +88,8 @@ export interface Status extends TempStatus
     serialization_date:string
     extra?:string
     highlights?:{[id:string]:[string]}
+    attributes:SimpleObjectAttribute[]
+    temporary:boolean
 }
 
 export interface FileUpload
@@ -115,7 +119,20 @@ export class Message
     files?:UploadedFile[]
     tempFile?:FileUpload
 }
-export enum ElasticSearchTypes 
+export enum Permission{
+    none = 0,
+    list = 10,
+    read = 11,
+    interact = 12,
+    post = 13,
+    limited_write = 20,
+    write = 21,
+    moderate = 40,
+    admin = 50,
+    update = 70,
+    superuser = 99,
+}
+export enum ElasticSearchType 
 {
     GROUP = "Group",
     COMMUNITY = "Community",
@@ -123,6 +140,44 @@ export enum ElasticSearchTypes
     PROJECT = "Project",
     TASK = "Task",
     EVENT = "Event",
+}
+export type SimpleObjectAttribute = {
+    attribute: ObjectAttributeType
+    datetime: string
+    extra_data:string
+    id:number
+}
+export type ObjectAttribute = {
+    created_at:string
+    created_by:number
+    user:number
+} & SimpleObjectAttribute
+export type StatusObjectAttribute = {
+    status:number
+} & ObjectAttribute
+export type TaskObjectAttribute = {
+    task:number
+} & ObjectAttribute
+export type ReportTag = { value: string, label: string}
+export type ReportResult = {
+    context_natural_key: ContextNaturalKey
+    context_object_id: number
+    created_at: string
+    creator: number
+    description: string
+    id: number
+    moderated_at: string
+    moderator: number
+    tags:string[]
+}
+export enum ObjectAttributeType
+{
+    important = "important",
+    reminder = "reminder",
+    attention = "attn",
+    pinned = "pinned",
+    follow = "follow",
+    link = "link",
 }
 export enum ContextNaturalKey
 {
@@ -309,12 +364,33 @@ export interface Project {
     group: Group
     updated_at: string
 }
-export interface Task 
+export enum TaskPriority{
+    low = "low",
+    medium = "medium",
+    high = "high",
+}
+export enum TaskState{
+    notStarted = "not-started",
+    progress = "progress",
+    toVerify = "to-verify",
+    notApplicable = "not-applicable",
+    completed = "completed"
+}
+export interface SimpleTask 
 {
     id: number
     updated_at: string
     project:number
     title:string
+    absolute_url: string
+    category: string
+    creator: SimpleUserProfile
+    priority: TaskPriority
+    state: TaskState
+}
+export interface Task extends SimpleTask
+{
+    
 }
 function strEnum<T extends string>(o: Array<T>): {[K in T]: K} {
     return o.reduce((res, key) => {
@@ -329,6 +405,9 @@ export enum StatusReaction
     SAD = "sad",
     JOY = "joy"
 }
+export enum StatusReactionStyle {
+    emoji, icon
+}
 export interface StatusReactionProps
 {
     reaction:StatusReaction
@@ -338,52 +417,10 @@ export interface StatusReactionProps
     style?:React.CSSProperties
     innerRef?: any
     selected:boolean
+    reactionStyle?:StatusReactionStyle
 }
 export abstract class StatusReactionUtilities
 {
-    public static iconNameForReaction = (reaction:StatusReaction, large = true, showBackground:boolean) =>
-    {
-        switch (reaction)
-        {
-            case StatusReaction.SAD : return "sad-tear"
-            case StatusReaction.JOY : return "grin-tears"
-            case StatusReaction.HEART : return "grin-hearts"
-            case StatusReaction.LIKE : return "thumbs-up"
-        }
-    }
-    public static styleForReaction = (reaction:StatusReaction, large = true, selected:boolean) =>
-    {
-        const size = StatusReactionUtilities.size(large)
-        var style:React.CSSProperties = {
-        }
-        switch (reaction)
-        {
-            case StatusReaction.SAD : style.color = "white";break;
-            case StatusReaction.JOY : style.color = "white";break;
-            case StatusReaction.HEART : style.color = "white";break;
-            case StatusReaction.LIKE : style.color = selected ? "#428bca" : "#AFAFAF" ;break;
-        }
-        return style
-    }
-    public static wrapperStyleForReaction = (reaction:StatusReaction, large = true, showBackground:boolean) =>
-    {
-        var style:React.CSSProperties = {
-            justifyContent:"center",
-            alignItems:"center"
-        }
-        switch (reaction)
-        {
-            case StatusReaction.SAD : style.backgroundColor = "#f0ad4e";break;
-            case StatusReaction.JOY : style.backgroundColor = "#f0ad4e";break;
-            case StatusReaction.HEART : style.backgroundColor = "#d9534f";break;
-            case StatusReaction.LIKE : style.backgroundColor = "transparent";break;
-        }
-        return style
-    }
-    public static size = (large = true) =>
-    {
-        return large ? 32 : 16
-    }
     public static parseStatusReaction = (reaction:string):StatusReaction =>
     {
         switch (reaction)
@@ -409,44 +446,29 @@ export abstract class StatusReactionUtilities
     {
         return "emoji-reaction-container" + (props.large ? " large": "")
     }
-    public static classNameForReactionBackground = (props:StatusReactionProps) =>
-    {
-        return "fas fa-circle fa-stack-1-5x emoji-reaction-bg " + props.reaction
-    }
-    public static classNameForReaction = (reaction:StatusReaction, large = true, showBackground:boolean) =>
-    {
-        var ret = "far emoji-reaction " + reaction + (showBackground ? " fa-stack-1x fa-inverse" : "")
-        switch (reaction)
-        {
-            case StatusReaction.SAD : ret += " fa-sad-tear";break;
-            case StatusReaction.JOY : ret += " fa-grin-tears";break;
-            case StatusReaction.HEART : ret += " fa-grin-hearts";break;
-            case StatusReaction.LIKE : ret += " fa-thumbs-up";break;
-        }
-        ret += (large ? " large": "")
-        return ret
-    }
     public static emojiForReaction = (props:StatusReactionProps) =>
     {
+        const reactionStyle = props.reactionStyle || StatusReactionStyle.emoji
         switch (props.reaction)
         {
-            case StatusReaction.SAD : return <span className={StatusReactionUtilities.classNameForReactionContainer(props)} onClick={props.onClick}><Emoji symbol="😔" label={props.reaction} /></span>
-            case StatusReaction.JOY : return <span className={StatusReactionUtilities.classNameForReactionContainer(props)} onClick={props.onClick}><Emoji symbol="😂" label={props.reaction} /></span>
-            case StatusReaction.HEART : return <span className={StatusReactionUtilities.classNameForReactionContainer(props)} onClick={props.onClick}><Emoji symbol="😍" label={props.reaction} /></span>
-            case StatusReaction.LIKE : return <span className={StatusReactionUtilities.classNameForReactionContainer(props)} onClick={props.onClick}><Emoji symbol="👍" label={props.reaction} /></span>
+            case StatusReaction.SAD : return    <span className={StatusReactionUtilities.classNameForReactionContainer(props)} onClick={props.onClick}>
+                                                    <Emoji symbol="😔" label={props.reaction} />
+                                                </span>
+            case StatusReaction.JOY : return    <span className={StatusReactionUtilities.classNameForReactionContainer(props)} onClick={props.onClick}>
+                                                    <Emoji symbol="😂" label={props.reaction} />
+                                                </span>
+            case StatusReaction.HEART : return  <span className={StatusReactionUtilities.classNameForReactionContainer(props)} onClick={props.onClick}>
+                                                    <Emoji symbol="😍" label={props.reaction} />
+                                                </span>
+            case StatusReaction.LIKE : return   <span className={StatusReactionUtilities.classNameForReactionContainer(props)} onClick={props.onClick}>
+                                                    {reactionStyle == StatusReactionStyle.emoji && <Emoji symbol="👍" label={props.reaction} />}
+                                                    {reactionStyle == StatusReactionStyle.icon && <i className="far fa-thumbs-up"></i>}
+                                                </span>
         }
     }
     public static Component = (props:StatusReactionProps) =>
     {
         return StatusReactionUtilities.emojiForReaction(props)
-    }
-    public static Component2 = (props:StatusReactionProps) =>
-    {
-        let showBG = nullOrUndefined (props.showBackground ) ? true : props.showBackground
-        return (<span onClick={props.onClick} className={StatusReactionUtilities.classNameForReactionContainer(props)}>
-                    {showBG && <i className={StatusReactionUtilities.classNameForReactionBackground(props)}></i>}
-                    <i className={StatusReactionUtilities.classNameForReaction(props.reaction, props.large, showBG)}></i>
-                </span>)
     }
 }
 export const UserStatus = strEnum([
@@ -511,25 +533,37 @@ export enum AvatarStateColor
     GRAY = "gray",
     NONE = "none",
 }
-export interface EmbedlyMedia
+export interface EmbedMedia
 {
     height:number
     width:number
     type:string
     html:string
 }
-export interface EmbedlyItem
+export type EmbedImage = {
+    
+    caption: string,
+    height: number,
+    width: number,
+    size: number,
+    url: string
+}
+export interface EmbedCardItem
 {
+    key:string
     url:string
     provider_url:string
+    provider_display:string
     original_url:string
     description:string
     title:string
-    thumbnail_url:string
-    thumbnail_width:number
-    thumbnail_height:number
-    media:EmbedlyMedia
+    favicon_url:string
+    images:EmbedImage[]
+    media:EmbedMedia
     error_code:number
+    type:string
+    avatar:string
+    subtitle:string
 }
 export enum StatusActions
 {
@@ -559,4 +593,9 @@ export enum StatusActions
     status = 12,
     /**Navigates to a search page; extra:{query:string} */
     search,
+    /**creates an attribute on status; extra:{type:ObjectAttributeType, user?:number} */
+    createAttribute,
+    /**deletes an attribute on status; extra:{id:number} */
+    deleteAttribute,
+
 }

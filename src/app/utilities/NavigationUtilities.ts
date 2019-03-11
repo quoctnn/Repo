@@ -1,4 +1,4 @@
-import { UserProfile } from '../types/intrasocial_types';
+import { UserProfile, ContextNaturalKey } from '../types/intrasocial_types';
 import * as H from 'history';
 import Routes from './Routes';
 import { ProfileManager } from '../managers/ProfileManager';
@@ -12,8 +12,8 @@ export class NavigationUtilities {
     static navigateToSearch = (history: H.History, query:string) => {
         history.push(Routes.searchUrl(query))
     }
-    static navigateToNewsfeed = (history: H.History) => {
-        history.push(Routes.newsfeedUrl())
+    static navigateToNewsfeed = (history: H.History, contextNaturalKey?: ContextNaturalKey, contextObjectId?:number, includeSubContext?:boolean) => {
+        history.push(Routes.newsfeedUrl(contextNaturalKey, contextObjectId, includeSubContext))
     }
     static navigateToProfile = (history: H.History, profile:UserProfile) => {
         history.push(Routes.profileUrl(profile.slug_name))

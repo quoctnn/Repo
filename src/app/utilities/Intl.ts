@@ -16,6 +16,7 @@ declare global {
         isEqual(arr:T[])
         contains(element): boolean
         cloneArray(): T[];
+        toDictionary(indexKey: keyof T):{ [key: string]: T }
     }
     interface Number 
     {

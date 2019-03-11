@@ -2,7 +2,7 @@ import Constants from "../utilities/Constants";
 import {AjaxRequest} from "./AjaxRequest";
 import { EndpointManager } from '../managers/EndpointManager';
 var $ = require("jquery")
-import { Status, UserProfile, UploadedFile, Community, Group, Conversation, Project, Message, Event, Task, ElasticSearchTypes } from '../types/intrasocial_types';
+import { Status, UserProfile, UploadedFile, Community, Group, Conversation, Project, Message, Event, Task, ElasticSearchType, ObjectAttributeType, StatusObjectAttribute, EmbedCardItem, ReportTag, ContextNaturalKey, ReportResult, SimpleTask } from '../types/intrasocial_types';
 import { nullOrUndefined } from '../utilities/Utilities';
 export type PaginationResult<T> = {results:T[], count:number, previous:string|null, next:string|null}
 export type StatusCommentsResult<T> = {results:T[], count:number, parent:T}
@@ -22,21 +22,71 @@ export default class ApiClient
     {
         var arr:string[] = []
         Object.keys(params).forEach(key => {
-            var val = params[key]
+            const val = params[key]
             if(typeof val != "string" && Array.isArray(val))
             {
-                val = val.join(",")
+                if(val.length > 0)
+                {
+                    val.forEach(v => {
+                        if(!nullOrUndefined( v ))
+                            arr.push(key + '=' + v)
+                    })
+                }
             }
-            if(!nullOrUndefined( val ))
+            else if(!nullOrUndefined( val ))
             {
                 arr.push(key + '=' + val)
             }
         })
         return arr.join('&');
     }
-    static search(term :string,types:ElasticSearchTypes[], include_results:boolean = true, include_suggestions:boolean = false, slim_types:boolean = true, limit:number, offset:number, callback:ApiClientCallback<any>){
+    static reportObject(type:string, contextId:number, tags:string[], description:string , callback:ApiClientCallback<ReportResult>){
+       
+        const endpoint = Constants.apiRoute.reportUrl(type,contextId)
+        AjaxRequest.postJSON(endpoint,  { description, tags}, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
+    static getReportTags(callback:ApiClientCallback<ReportTag[]>){
+        const url = Constants.apiRoute.reportTags
+        AjaxRequest.get(url, (data, status, request) => {
+            var arr = Object.keys(data).map(function (key, index) {
+                return { value: key, label: data[key] }
+            });
+            callback(arr, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
+    static createStatusAttribute(status:number, attribute:ObjectAttributeType, user:number, callback:ApiClientCallback<StatusObjectAttribute>){
+        const endpoint = Constants.apiRoute.statusAttributes
+        AjaxRequest.postJSON(endpoint, {status, attribute, user}, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
+    static deleteStatusAttribute(id:number, callback:ApiClientCallback<any>){
+        let url = Constants.apiRoute.statusAttributesId(id)
+        AjaxRequest.delete(url, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
+    static getEmbedCards(urls:string[], callback:ApiClientCallback<EmbedCardItem[]>){
+        const url = Constants.apiRoute.embedlyApiEndpoint + "?" + this.getQueryString({urls})
+        AjaxRequest.get(url, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
+    static search(term :string,types:ElasticSearchType[], use_simple_query_string:boolean = true, include_results:boolean = true, include_suggestions:boolean = false, slim_types:boolean = true, limit:number, offset:number, callback:ApiClientCallback<any>){
         let url = Constants.apiRoute.searchUrl + "?" + this.getQueryString({limit, offset})
-        AjaxRequest.postJSON(url, {term, include_results, include_suggestions, slim_types, types:types}, (data, status, request) => {
+        AjaxRequest.postJSON(url, {term, include_results, include_suggestions, slim_types, types, use_simple_query_string}, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
             callback(null, status, error)
@@ -52,9 +102,9 @@ export default class ApiClient
             callback(null, status, error)
         })
     }
-    static newsfeedV2(limit:number,offset:number,context_natural_key:string|null, context_object_id:number|null, parent:number|null, children:number|null,  callback:ApiClientFeedPageCallback<Status>)
+    static newsfeedV2(limit:number,offset:number,context_natural_key:string|null, context_object_id:number|null, parent:number|null, children:number|null,include_sub_context:boolean = true,  callback:ApiClientFeedPageCallback<Status>)
     {
-        let url = Constants.apiRoute.postUrl + "?" + this.getQueryString({limit,offset,context_natural_key	,context_object_id, parent, children })
+        let url = Constants.apiRoute.postUrl + "?" + this.getQueryString({limit,offset,context_natural_key	,context_object_id, parent, children, include_sub_context })
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
@@ -91,7 +141,7 @@ export default class ApiClient
     static updateStatus(status:Status, callback:ApiClientCallback<Status>)
     {
         let url = Constants.apiRoute.postUrl + status.id + "/"
-        AjaxRequest.put(url, status, (data, status, request) => {
+        AjaxRequest.patch(url, status, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
             callback(null, status, error)
@@ -109,6 +159,14 @@ export default class ApiClient
     static getProject(projectId:string|number, callback:ApiClientCallback<Project>)
     {
         let url = Constants.apiRoute.projectDetailUrl(projectId)
+        AjaxRequest.get(url, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
+    static getTasks(limit:number, offset:number, project:number, state:string[], callback:ApiClientFeedPageCallback<SimpleTask>){
+        let url = Constants.apiRoute.taskUrl + "?" + this.getQueryString({limit,offset,project,state})
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
@@ -173,7 +231,8 @@ export default class ApiClient
     }
     static getProfilesBySlug(slug:string, callback:ApiClientFeedPageCallback<UserProfile>)
     {
-        AjaxRequest.get(Constants.apiRoute.profilesUrl + "?slug_name=" + encodeURIComponent( slug ), (data, status, request) => {
+        const url = Constants.apiRoute.profilesUrl + "?" + this.getQueryString({slug_name:encodeURIComponent( slug )})
+        AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
             callback(null, status, error)
@@ -205,7 +264,7 @@ export default class ApiClient
     }
     static getCommunities(is_member:boolean, ordering:ListOrdering, limit:number, offset:number,callback:ApiClientFeedPageCallback<Community>)
     {
-        let url = Constants.apiRoute.communityList + "?limit=" + limit + "&offset=" + offset + "&is_member=" + (is_member ? "True":"False") + "&ordering=" + ordering;
+        let url = Constants.apiRoute.communityList + "?" + this.getQueryString({is_member:(is_member ? "True":"False"), limit, offset, ordering})
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
@@ -214,7 +273,7 @@ export default class ApiClient
     }
     static getGroups(community:number, limit:number, offset:number,callback:ApiClientFeedPageCallback<Group>)
     {
-        let url = Constants.apiRoute.groupsUrl + "?limit=" + limit + "&offset=" + offset + "&community=" + community;
+        let url = Constants.apiRoute.groupsUrl + "?" + this.getQueryString({community, limit, offset})
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
@@ -232,7 +291,7 @@ export default class ApiClient
     }
     static getEvents(community:number, limit:number, offset:number,callback:ApiClientFeedPageCallback<Event>)
     {
-        let url = Constants.apiRoute.eventsUrl + "?limit=" + limit + "&offset=" + offset + "&community=" + community;
+        let url = Constants.apiRoute.eventsUrl + "?" + this.getQueryString({community, limit, offset})
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
@@ -241,7 +300,7 @@ export default class ApiClient
     }
     static getProjects(community:number, limit:number, offset:number,callback:ApiClientFeedPageCallback<Project>)
     {
-        let url = Constants.apiRoute.projectsUrl + "?limit=" + limit + "&offset=" + offset + "&community=" + community;
+        let url = Constants.apiRoute.projectsUrl + "?" + this.getQueryString({community, limit, offset})
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
@@ -250,7 +309,7 @@ export default class ApiClient
     }
     static getConversations(limit:number, offset:number,callback:ApiClientFeedPageCallback<Conversation>)
     {
-        let url = Constants.apiRoute.conversations + "?limit=" + limit + "&offset=" + offset;
+        let url = Constants.apiRoute.conversations + "?" + this.getQueryString({limit, offset})
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
@@ -268,7 +327,7 @@ export default class ApiClient
     }
     static getConversationMessages(conversationId:number, limit:number, offset:number,callback:ApiClientFeedPageCallback<Message>)
     {
-        let url = Constants.apiRoute.conversationMessagesUrl(conversationId) + "?limit=" + limit + "&offset=" + offset;
+        let url = Constants.apiRoute.conversationMessagesUrl(conversationId) + "?" + this.getQueryString({limit, offset})
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
@@ -286,7 +345,7 @@ export default class ApiClient
     }
     static getPage<T>(endpoint:string, limit:number, offset:number,callback:ApiClientFeedPageCallback<T>)
     {
-        let url = endpoint + "?limit=" + limit + "&offset=" + offset;
+        let url = endpoint + "?" + this.getQueryString({ limit, offset})
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {

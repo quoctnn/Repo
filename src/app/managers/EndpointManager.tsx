@@ -8,12 +8,10 @@ export abstract class EndpointManager
     }
     static applyEndpointDomain = (url:string) => 
     {
-        if (url.indexOf('://') > 0 || url.indexOf('//') === 0 ) 
-        {
-            return url
-        }
         let state = EndpointManager.getStore().getState().endpoint
-        return availableEndpoints[state.endpoint].endpoint + url
+        const baseUrl = availableEndpoints[state.endpoint].endpoint
+        const u = new URL(url, baseUrl)
+        return u.href
     }
     static currentEndpoint = () => {
         let state = EndpointManager.getStore().getState().endpoint

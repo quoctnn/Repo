@@ -308,7 +308,7 @@ export default class MentionEditor extends React.Component<Props, {}> {
           <div>
             <div className="d-flex">
               <div className="flex-grow-1 editor-container">
-                <div className="">
+                <div className="editor-inner-container">
                     <Editor
                       editorState={this.props.editorState}
                       onChange={this.onChange}

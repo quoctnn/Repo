@@ -42,7 +42,7 @@ export class GalleryImageComponent extends React.Component<GalleryComponentProps
             this.props.onClick(this.props.file, event)
     }
     render = () => {
-        const cn = classnames("gallery-item gallery-file-item gallery-image-item", this.props.file.type, this.props.file.extension)
+        const cn = classnames("gallery-item gallery-file-item gallery-image-item hover-card drop-shadow", this.props.file.type, this.props.file.extension)
         const img = getImageUrl(this.props.file, false)
         return (<div key={"image_" + this.props.file.id} onClick={this.onClick} className={cn}>
                     <SecureImage url={img} className="img-responsive" />
@@ -52,7 +52,7 @@ export class GalleryImageComponent extends React.Component<GalleryComponentProps
 
 export class GalleryDocumentComponent extends React.Component<GalleryComponentProps, {}> {
     render = () => {
-        const cn = classnames("gallery-item gallery-file-item gallery-document-item", this.props.file.type, this.props.file.extension)
+        const cn = classnames("gallery-item gallery-file-item gallery-document-item hover-card drop-shadow", this.props.file.type, this.props.file.extension)
         const img = getImageUrl(this.props.file, false)
         const url = getFileUrl(this.props.file)
         return <a key={"document_" + this.props.file.id} className={cn} href={url} target="_blank">
@@ -82,7 +82,7 @@ export class GalleryMediaComponent extends React.Component<GalleryComponentProps
         }
     }
     render = () => {
-        const cn = classnames("gallery-item gallery-file-item gallery-media-item", this.props.file.type, this.props.file.extension, {active:this.state.active})
+        const cn = classnames("gallery-item gallery-file-item gallery-media-item hover-card drop-shadow", this.props.file.type, this.props.file.extension, {active:this.state.active})
         const active = this.state.active
         const poster = getImageUrl(this.props.file, false)
         const url = getFileUrl(this.props.file)
@@ -135,6 +135,12 @@ export default class ContentGallery extends React.Component<Props, State> {
             index:0,
             visible:false,
         }
+    }
+    shouldComponentUpdate = (nextProps:Props, nextState:State) => {
+        return nextProps.height != this.props.height || 
+                !nextProps.files.isEqual(this.props.files) || 
+                nextState.visible != this.state.visible || 
+                nextState.index != this.state.index
     }
     onDialogClose = () => 
     {

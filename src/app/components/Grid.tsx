@@ -2,7 +2,7 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import classnames from 'classnames';
 import { DashboardComponents, DashboardComponent, DashboardGridPosition } from "../Dashboard";
-import { ResponsiveBreakpoint } from "./ResponsiveComponent";
+import { ResponsiveBreakpoint } from "./general/observers/ResponsiveComponent";
 
 export interface Props {
     grid:DashboardGridPosition[]
@@ -26,7 +26,7 @@ export class Grid extends React.PureComponent<Props, {}> {
         components:null,
         id:null,
         enableAnimation:true,
-        breakpoint:ResponsiveBreakpoint.Mini
+        breakpoint:ResponsiveBreakpoint.mini
     }
     state:State
     constructor(props) {

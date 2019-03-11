@@ -5,20 +5,24 @@ import {  Button, ModalBody, Modal, ModalHeader, ModalFooter } from 'reactstrap'
 import { RootState } from "../../reducers";
 import { Avatar } from './Avatar';
 import { UserProfile } from "../../types/intrasocial_types";
-require("./SelectUsersDialog.scss");
-export interface OwnProps {
-    title?:string,
-    completeButtonTitle?:string
+import "./SelectUsersDialog3.scss"
+
+type DefaultProps = {
     preselectedContacts?:number[]
-    didCancel?:() => void
-    didComplete?:(users:UserProfile[]) => void
     visible:boolean
 }
+type OwnProps = {
+    selected:number[]
+    title?:string,
+    completeButtonTitle?:string
+    didCancel?:() => void
+    didComplete:(users:UserProfile[]) => void
+} & DefaultProps
 interface ReduxStateProps 
 {
     contacts:UserProfile[]
 }
-type Props = ReduxStateProps & OwnProps
+type Props = ReduxStateProps & OwnProps 
 interface UserInfoProps
 {
     user:UserProfile
@@ -47,7 +51,7 @@ interface State
 }
 class SelectUsersDialog extends React.Component<Props, State> {
 
-    static defaultProps:OwnProps = {
+    static defaultProps:DefaultProps = {
         visible:false,
         preselectedContacts:[]
     }
@@ -62,8 +66,7 @@ class SelectUsersDialog extends React.Component<Props, State> {
     {
         this.setState({selected:nextProps.preselectedContacts})
     }
-    didToggleUser(user:number)
-    {
+    didToggleUser = (user:number) => {
         let arr = this.state.selected
         let index = arr.indexOf(user)
         if(index == -1)
@@ -77,6 +80,10 @@ class SelectUsersDialog extends React.Component<Props, State> {
         this.setState({selected:arr}, () => {
             console.log(this.state.selected)
         })
+    }
+    didSubmit = () => {
+        const profiles = this.state.selected.map(id => this.props.contacts.find(u => u.id == id))
+        this.props.didComplete(profiles)
     }
     render() 
     {
@@ -92,7 +99,7 @@ class SelectUsersDialog extends React.Component<Props, State> {
                     <ModalBody className="vertical-scroll">
                         {
                             this.props.contacts.map((u, index) => {
-                                return <UserInfo onClick={() => {this.didToggleUser(u.id)}} key={u.id} user={u} selected={this.props.preselectedContacts.indexOf(u.id) >= 0}/>
+                                return <UserInfo onClick={() => {this.didToggleUser(u.id)}} key={u.id} user={u} selected={this.props.selected.indexOf(u.id) >= 0}/>
                             })
                         }
                     </ModalBody>
@@ -100,9 +107,7 @@ class SelectUsersDialog extends React.Component<Props, State> {
                         <Button color="secondary" onClick={this.props.didCancel}>
                             {translate("Cancel")}
                         </Button>
-                        <Button color="primary" onClick={() => {
-                            this.props.didComplete(this.props.preselectedContacts.map(id => this.props.contacts.find(u => u.id == id)))
-                        }}>
+                        <Button color="primary" onClick={this.didSubmit}>
                             {this.props.completeButtonTitle || translate("Submit")}
                         </Button>
                     </ModalFooter>

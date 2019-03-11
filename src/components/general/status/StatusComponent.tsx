@@ -81,7 +81,7 @@ export default class StatusComponent extends React.Component<Props, State>
             });
         },
         {
-          root: document.querySelector(".status-list"),
+          //root: document.querySelector(".status-list"),
           rootMargin: "0px 0px 200px 0px"
         });
         this.observer.observe(this.element.current);

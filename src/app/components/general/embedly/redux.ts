@@ -1,7 +1,7 @@
 import { combineReducers } from 'redux';
-import { EmbedlyItem } from '../../../types/intrasocial_types';
-import { AjaxRequest } from '../../../network/AjaxRequest';
-import Constants from '../../../utilities/Constants';
+import { EmbedCardItem } from '../../../types/intrasocial_types';
+import { LinkCardType } from './Embedly';
+import ApiClient from '../../../network/ApiClient';
 export enum EmbedlyStoreActionTypes {
     AddPages = 'embedly.add_page',
     Reset = 'embedly.reset',
@@ -11,23 +11,29 @@ export enum EmbedlyStoreActionTypes {
 }
 export interface EmbedlyDataRequestAction{
     type:string
-    urls:string[]
+    urls:string[],
+    cardType:LinkCardType
 }
 export interface EmbedlyPagesAction{
     type:string
-    pages:EmbedlyItem[]
+    pages:EmbedCardItem[]
 }
 export interface EmbedlyIdsAction{
     type:string
     ids:string[]
 }
-export const embedlyRequestDataAction = (urls: string[]):EmbedlyDataRequestAction => ({
+export const embedlyRequestDataAction = (urls: string[], cardType:LinkCardType):EmbedlyDataRequestAction => ({
     type: EmbedlyStoreActionTypes.RequestData,
-    urls
+    urls,
+    cardType
 })
-export const embedlyAddPagesAction = (pages: EmbedlyItem[]):EmbedlyPagesAction => ({
+export const embedlyAddPagesAction = (pages: EmbedCardItem[]):EmbedlyPagesAction => ({
     type: EmbedlyStoreActionTypes.AddPages,
     pages
+})
+export const embedlyAddPagesToQueue = (ids: string[]):EmbedlyIdsAction => ({
+    type: EmbedlyStoreActionTypes.AddToQueue,
+    ids
 })
 export const embedlyRemovePagesFromQueue = (ids: string[]):EmbedlyIdsAction => ({
     type: EmbedlyStoreActionTypes.RemoveFromQueue,
@@ -100,42 +106,26 @@ export const embedlyStore = combineReducers({
     allIds : allPages,
     queuedIds:pageQueue
 });
+const requestEmbedlyCards = (store, action:EmbedlyDataRequestAction) => {
 
+    let ids = action.urls
+    ApiClient.getEmbedCards(ids, (data, status, error) => {
+
+        if(data && !error)
+            store.dispatch(embedlyAddPagesAction(data))
+        store.dispatch(embedlyRemovePagesFromQueue(ids))
+    })
+}
 export const embedlyMiddleware = store => next => (action:EmbedlyDataRequestAction) => {
-    let state = store.getState().debug
-    let result = next(action);
+    let result = next(action)
     if (action.type === EmbedlyStoreActionTypes.RequestData) {
         let ids = action.urls
-        store.dispatch(embedlyRequestDataAction(ids))
-        let url = state.availableApiEndpoints[state.apiEndpoint].endpoint +
-                  Constants.apiRoute.embedlyApiEndpoint +
-                  "?urls=" + ids.map(id => encodeURIComponent( id )).join(",");
-        AjaxRequest.get(url,(data:any[], status, request) => {
-              let pages = data.map( d => {
-                let item = {} as EmbedlyItem
-                item.provider_url = d.provider_url
-                item.description = d.description
-                item.title = d.title
-                item.url = d.url
-                item.original_url = d.original_url
-                item.media = d.media
-                item.error_code = d.error_code
-                if(d.images && d.images.length > 0)
-                {
-                    let img = d.images[0]
-                    item.thumbnail_url = img.url
-                    item.thumbnail_width = img.width
-                    item.thumbnail_height = img.height
-                }
-                return item
-              })
-              store.dispatch(embedlyAddPagesAction(pages))
-              store.dispatch(embedlyRemovePagesFromQueue(ids))
-          },
-          (request, status, error) => {
-                store.dispatch(embedlyRemovePagesFromQueue(ids))
-          }
-        );
+        store.dispatch(embedlyAddPagesToQueue(ids))
+        switch(action.cardType)
+        {
+            case LinkCardType.embed: requestEmbedlyCards(store, action);break;
+            default:break;
+        }
     }
     return result;
   };

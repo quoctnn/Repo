@@ -19,6 +19,8 @@ export default  {
         // Embedly Cache
         embedlyApiEndpoint: "/api/v2/embedly/",
 
+        //embed card
+        parseUrl:'/api/v1/links/parse-url/',
         //search
         searchUrl: '/api/v1/search/',
         getSearchHistoryUrl: '/api/v1/search/history/',//GET
@@ -65,7 +67,7 @@ export default  {
         projectDetailUrl: (id:number|string) => {
             return `/api/v2/project/${id}/`
         },
-        taskUrl: '/api/v1/task/',
+        taskUrl: '/api/v2/task/',
 
         productsPlans: '/api/v1/products/plan/',
         productsSKU: '/api/v1/products/sku/',
@@ -86,10 +88,10 @@ export default  {
             return `/api/v2/project/${id}/tasks/`
         },
         taskSubTasksUrl: (id:number) => {
-            return `/api/v1/task/${id}/subtasks/`
+            return `/api/v2/task/${id}/subtasks/`
         },
         taskDetailUrl: (id:number) => {
-            return `/api/v1/task/${id}/`
+            return `/api/v2/task/${id}/`
         },
         projectFilesUrl: (id:number) => {
             return `/api/v2/project/${id}/files/`
@@ -127,6 +129,11 @@ export default  {
         convNotificationMarkReadUrl: '/api/v2/notification_conv/update-as-read/',
         convNotificationMarkAllReadUrl: '/api/v2/notification_conv/mark-all-as-read/',
 
+        //Status attributes
+        statusAttributes:'/api/v2/status-attributes/',
+        statusAttributesId: (id:number) => {
+            return `/api/v2/status-attributes/${id}/`
+        },
         // Other
         postUrl: '/api/v2/status/',
         postCommentsUrl: (id:number) => {
@@ -194,11 +201,17 @@ export default  {
     },
 
     defaultImg: {
-        user: "img/default-user.png",
-        group: "img/default-widget.jpg",
-        event: "img/default-widget.jpg",
         docs: "img/docs_logo.png",
-        sendDark:"img/icon-send-dark.png"
+        sendDark:"img/icon-send-dark.png",
+        user: 'img/default-widget.jpg',
+        userAvatar: 'img/default-user.png',
+        group: 'img/default-widget.jpg',
+        groupAvatar: 'img/default-group.jpg',
+        community: 'img/default-widget.jpg',
+        communityAvatar: 'img/default-group.jpg',
+        event: 'img/default-widget.jpg',
+        eventAvatar: 'img/default-group.jpg',
+        default: 'img/og_image.jpg'
     },
     staticUrl:"/static/",
 };

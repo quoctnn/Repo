@@ -1,3 +1,4 @@
+import ApiClient from '../network/ApiClient';
 export default abstract class Routes {
     static ANY = "*"
     static ROOT = "/"
@@ -8,7 +9,7 @@ export default abstract class Routes {
     static CONVERSATION_CREATE = "/conversation/create/"
     static SEARCH = "/search/"
     static UPDATE_TOOL = "/app-update"
-    static NEWSFEED = "/newsfeed"
+    static NEWSFEED = "/newsfeed/"
     
     private static PROFILE = "/profile/"
     private static COMMUNITY = "/community/"
@@ -23,8 +24,16 @@ export default abstract class Routes {
             return `${Routes.SEARCH}?term=${encodeURIComponent( query )}`
         return Routes.SEARCH
     }
-    static newsfeedUrl = () => {
-        return `${Routes.NEWSFEED}/`
+    static newsfeedUrl = (contextNaturalKey?: string, contextObjectId?:number|string, includeSubContext?:boolean|string) => {
+        let ret = Routes.NEWSFEED
+        if(contextNaturalKey && contextObjectId)
+        {
+            ret += `${contextNaturalKey}/${contextObjectId}/`
+        }
+        const query = ApiClient.getQueryString({includeSubContext})
+        if(query.length > 0)
+            ret += "?" + query
+        return ret
     }
     static profileUrl = (profile:string|number) => {
         return `${Routes.PROFILE}${profile}/`

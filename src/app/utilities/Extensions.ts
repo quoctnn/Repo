@@ -40,26 +40,37 @@ Array.prototype.cloneArray = function() {
 }
 Array.prototype.isEqual = function<T>(arr2:T[]) 
 {
-  if(!this  || !arr2) 
-            return false
-        let result;
-        this.forEach((e1,i)=>arr2.forEach(e2=>{
-            
-                if(Array.isArray(e1) && Array.isArray(e2) && e1.length > 1 && e2.length)
-                {
-                    result = this.arrayEqual(e1,e2)
-                }
-                else if(e1 !== e2 )
-                {
-                    result = false
-                }
-                else
-                {
-                    result = true
-                }
-            })
-        )
-        return result
+    if(!this || !arr2) 
+        return false
+    if(this.length == 0 && arr2.length == 0)
+        return true
+    let result = false;
+    this.forEach((e1,i)=>arr2.forEach(e2=>{
+        
+            if(Array.isArray(e1) && Array.isArray(e2) && e1.length > 1 && e2.length)
+            {
+                result = this.arrayEqual(e1,e2)
+            }
+            else if(e1 !== e2 )
+            {
+                result = false
+            }
+            else
+            {
+                result = true
+            }
+        })
+    )
+    return result
+}
+Array.prototype.toDictionary = function<T>(indexKey: keyof T) 
+{
+    const object: { [key: string]: T } = {}
+    for (let i = 0; i < self.length; i++) {
+            const key = self[i][indexKey]
+            object[key] = self[i]
+    }
+    return object
 }
 Number.prototype.mod = function(n) {
   return ((this%n)+n)%n;

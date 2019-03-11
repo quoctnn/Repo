@@ -9,6 +9,7 @@ import { ToastManager } from './ToastManager';
 import { EventManager } from './EventManager';
 import { TaskManager } from './TaskManager';
 import { ContextManager } from './ContextManager';
+import { PermissionManager } from './PermissionManager';
 const initializeManagers = () => 
 {
     EndpointManager.setup()
@@ -22,5 +23,6 @@ const initializeManagers = () =>
     EventManager.setup()
     TaskManager.setup()
     ContextManager.setup()
+    PermissionManager.setup()
 }
 export default initializeManagers

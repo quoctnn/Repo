@@ -26,6 +26,7 @@ export class StatusUtilities
         status.files = files || []
         status.pending = true
         status.reaction_count = 0
+        status.temporary = true
         return status
     }
     static findPrimaryLink(text:string) {

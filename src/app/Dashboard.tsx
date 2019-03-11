@@ -2,13 +2,14 @@ import * as React from "react";
 import { PageHeader } from "./components/PageHeader";
 import PageTopNavigation from "./components/PageTopNavigation";
 import "./Dashboard.scss"
-import { ResponsiveBreakpoint } from "./components/ResponsiveComponent";
+import { ResponsiveBreakpoint } from "./components/general/observers/ResponsiveComponent";
 import { Grid } from './components/Grid';
-import WindowResponsiveComponent from "./components/WindowResponsiveComponent";
-import NewsfeedModule from './modules/NewsfeedModule';
+import WindowResponsiveComponent from "./components/general/observers/WindowResponsiveComponent";
+import NewsfeedModule from './modules/newsfeed/NewsfeedModule';
 import Module from "./modules/Module";
 import ModuleContent from "./modules/ModuleContent";
 import ModuleHeader from "./modules/ModuleHeader";
+import ProjectModule from "./modules/project/ProjectModule";
 
 type DemoProps = {
     text?:string
@@ -26,10 +27,13 @@ class DemoComponent extends React.Component<DemoProps, {}> {
                 </Module>
     }
 }
+
+//this should be fetched from server soon :-)
 export namespace DashboardComponents {
     export const componentMap = {
         "DemoComponent": DemoComponent,
-        "NewsfeedModule":NewsfeedModule
+        "NewsfeedModule":NewsfeedModule,
+        "ProjectModule": ProjectModule
     }
     export function getComponent(type: string, props:any) {
         return React.createElement(componentMap[type], props)
@@ -66,7 +70,7 @@ export class Dashboard extends React.Component<Props, State> {
     constructor(props:Props)
     {
         super(props)
-        const l = this.getGridLayoutForBreakpoint(props.grid, ResponsiveBreakpoint.Micro, true)
+        const l = this.getGridLayoutForBreakpoint(props.grid, ResponsiveBreakpoint.micro, true)
         const grid = l.map(m => Object.assign({},m))
         let rowStart = 1
         grid.forEach((m) => {
@@ -87,13 +91,13 @@ export class Dashboard extends React.Component<Props, State> {
     getGridLayoutForBreakpoint = (grid: DashboardGrid, breakpoint:ResponsiveBreakpoint, useFirstAsFallback:boolean = false):DashboardGridPosition[] =>
     {
         let layout:DashboardGridPosition[]
-        if(breakpoint >= ResponsiveBreakpoint.Big)
+        if(breakpoint >= ResponsiveBreakpoint.big)
         {
             layout = grid.desktop
             if(layout)
                 return layout
         }
-        else if(breakpoint >= ResponsiveBreakpoint.Standard)
+        else if(breakpoint >= ResponsiveBreakpoint.standard)
         {
             layout = grid.mobile
         }
@@ -121,20 +125,20 @@ export class Dashboard extends React.Component<Props, State> {
 export const DashCompWithData = (props:any) => {
     const grid = { 
                 desktop:[
-                    {id:1, columnStart:1, rowStart:1, columnSpan:12, rowSpan:6},
-                    {id:2, columnStart:1, rowStart:7, columnSpan:6, rowSpan:2},
-                    {id:3, columnStart:7, rowStart:7, columnSpan:6, rowSpan:2},
+                    {id:1, columnStart:1, rowStart:1, columnSpan:6, rowSpan:2},
+                    {id:2, columnStart:7, rowStart:1, columnSpan:6, rowSpan:2},
+                    {id:3, columnStart:1, rowStart:3, columnSpan:6, rowSpan:4},
                     ],
                 mobile:[
-                    {id:1, columnStart:1, rowStart:1, columnSpan:12, rowSpan:2},
-                    {id:2, columnStart:1, rowStart:3, columnSpan:12, rowSpan:2},
-                    {id:3, columnStart:1, rowStart:5, columnSpan:12, rowSpan:2},
+                    {id:1, columnStart:1, rowStart:1, columnSpan:12, rowSpan:4},
+                    {id:2, columnStart:1, rowStart:5, columnSpan:12, rowSpan:2},
+                    {id:3, columnStart:1, rowStart:7, columnSpan:12, rowSpan:2},
                     ]
     }
     const components = [
-        {id:1, component:"NewsfeedModule", position:1, props:{text:"1"}},
-        {id:2, component:"DemoComponent", position:2, props:{text:"22"}},
-        {id:3, component:"DemoComponent", position:3, props:{text:"33"}}
+        {id:2, component:"ProjectModule", position:1, props:{text:"22"}},
+        {id:3, component:"DemoComponent", position:2, props:{text:"33"}},
+        {id:1, component:"NewsfeedModule", position:3, props:{text:"1"}},
     ]
     return (
 

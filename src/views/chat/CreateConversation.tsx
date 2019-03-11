@@ -14,7 +14,7 @@ import LoadingSpinner from '../../components/general/LoadingSpinner';
 import { UserProfile, Conversation } from '../../types/intrasocial_types';
 import { ToastManager } from '../../managers/ToastManager';
 
-require("./CreateConversation.scss");
+import "./CreateConversation.scss"
 export interface OwnProps {
 }
 interface ReduxStateProps {
@@ -153,7 +153,7 @@ class CreateConversation extends React.Component<Props, State> {
                             </Form>
                         </div>
                     </div>
-                    <SelectUsersDialog completeButtonTitle={translate("Add to conversation")} title={translate("Add Members")} preselectedContacts={this.state.selectedUsers.map(u => u.id)} visible={this.state.dialogVisible} didCancel={() => {this.setState({dialogVisible:false})}} didComplete={this.didCompleteDialog} />
+                    <SelectUsersDialog selected={[]} completeButtonTitle={translate("Add to conversation")} title={translate("Add Members")} preselectedContacts={this.state.selectedUsers.map(u => u.id)} visible={this.state.dialogVisible} didCancel={() => {this.setState({dialogVisible:false})}} didComplete={this.didCompleteDialog} />
                 </div>)
     }
 }

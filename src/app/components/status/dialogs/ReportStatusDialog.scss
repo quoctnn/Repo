@@ -1,0 +1,17 @@
+@import "../../../Config";
+#report-status-dialog{
+    .tag-list
+    {
+        > li.tag {
+            display: inline-block;
+            margin: 5px;
+            border-radius: 25%;
+            @include var(background, primary-color);
+            height: 32px;
+            border-radius: 16px;
+            line-height: 32px;
+            padding: 0 10px;
+            color: white;
+        }
+    }
+}

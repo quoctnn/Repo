@@ -1,0 +1,131 @@
+@import "../../Config";
+.status-component{
+    position: relative;   
+    clear: both;
+    .header-left 
+    {
+        padding: 10px;
+    }
+    .header-center 
+    {
+        padding: 10px;
+        padding-left: 0;
+        flex-direction: column;
+        flex: 1;
+        min-width: 0px;
+        .header-center-content 
+        {
+            align-items: baseline;
+            align-content:baseline;
+            display: flex;
+            
+        }
+        .title, .date, .context {
+            line-height: 20px;
+        }
+        .title{
+            font-size: 20px;
+            padding-right: 8px;
+        }
+        .date{
+            font-size: 14px;
+            margin-right: 3px;
+        }
+        .context {
+            max-width: 130px;
+            font-size: 12px;
+        }
+        .text-content
+        {
+            white-space: normal;
+            word-break: break-word;
+            margin-top: 5px;
+            .status-options{
+                display: inline-flex;
+                float: right;
+                .overflow-menu
+                {
+                    visibility: hidden;
+                    &.active{
+                        visibility: visible;
+                    }
+                }
+                .dropdown > button{
+                    opacity: 0.4;
+                    @include var(color, link-color);
+                    &:hover{
+                        opacity: 1;
+                    }
+                }
+                
+            }
+            &:hover{
+                .status-options{
+                    .overflow-menu
+                    {
+                        visibility: visible;
+                    }
+                }
+            }
+        }
+    }
+    .reaction-wrapper, .comments-count-wrapper{
+        display: flex;
+        align-items: center;
+        align-self: flex-start;
+    }
+
+    .reaction-wrapper{
+        margin: 0;
+        > span
+        {
+            padding: 0;
+        }
+        button {
+            border:0;
+            background: transparent;
+            outline: 0;
+            box-shadow: none;
+        }
+        button:focus{
+            outline: 0;
+            box-shadow: none;
+        }
+        .reactions-count
+        {
+            padding-left: 4px;
+        }
+    }
+    .comments-count-wrapper
+    {
+        margin: 0;
+        padding: 6px 12px;
+        padding-left: 0;
+        .comment-count
+        {
+            padding-left: 4px;
+        }
+    }
+    .info-container{
+        margin-right: -12px;
+    }
+    .status-content{
+        margin: 0 10px;
+    }
+    &.comment {
+        padding-left: 5px;
+        .header-center 
+        {
+            padding-left: 5px;
+            .title{
+                font-size: 16px;
+                line-height: 20px;
+            }
+        }
+        .status-content{
+            margin-left: 65px;
+            .status-footer{
+            }
+        }
+    }
+}

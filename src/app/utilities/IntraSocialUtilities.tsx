@@ -143,7 +143,7 @@ export class IntraSocialUtilities
         return Math.random().toString(36).substr(2, 16);
     }
     static truncateText = (text:string, maxChars:number) => {
-        return text.length > (maxChars - 3) ? text.substring(0, maxChars - 3) + '...' : text;
+        return text && text.length > (maxChars - 3) ? text.substring(0, maxChars - 3) + '...' : text;
     }
     static groupFiles = (files:UploadedFile[]) =>
     {

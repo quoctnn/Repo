@@ -4,7 +4,7 @@ import MentionEditor from "../input/MentionEditor";
 import { EditorState, ContentState, SelectionState, Modifier} from "draft-js";
 import { Mention } from '../input/MentionEditor';
 import { ProtectNavigation, nullOrUndefined } from "../../../utilities/Utilities";
-require("./ChatMessageComposer.scss");
+import "./ChatMessageComposer.scss"
 export type EditorContent = {text:string, mentions:number[]}
 export interface IEditorComponent 
 {
@@ -237,7 +237,7 @@ export class ChatMessageComposer extends React.Component<Props,State> implements
                             /> 
                         </div>
                         <div className="button-wrap d-flex flex-column-reverse">
-                            <button disabled={!canSubmit} className="btn btn-submit btn-default align-items-end btn-primary message-send-button">
+                            <button disabled={!canSubmit} className="btn btn-submit btn-default align-items-end message-send-button">
                                 <i className="fas fa-location-arrow" />
                             </button>
                         </div>

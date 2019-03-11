@@ -36,30 +36,39 @@ export function communityAvatar(community:Community) {
 export const EMAIL_REGEX = /(\b\s+)(([a-zA-Z0-9\-\_\.])+@[a-zA-Z\_]+?(\.[a-zA-Z]{2,6})+)/gm
 export const URL_REGEX = /(\b(https?|ftp):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/gim
 export const URL_WWW_REGEX = /(^(\b|\s+)(www)\.[\S]+(\b|$))/gim
-export const HASHTAG_REGEX = /(?:#)(\w(?:(?:\w|(?:\.(?!\.))){0,28}(?:\w))?)/ig
-export const HASHTAG_REGEX_WITH_HIGHLIGHT = /(?:#)((?:\w|(?:<em>))(?:(?:(?:\w|(?:<\/em>))|(?:\.(?!\.))){0,28}(?:(?:\w|(?:<\/em>))))?)/ig
+export const HASHTAG_REGEX = /(?:#)(\w(?:(?:\w|(?:\.(?!\.))){0,200}(?:\w))?)/ig
+export const HASHTAG_REGEX_WITH_HIGHLIGHT = /(?:#)((?:\w|(?:<em>))(?:(?:(?:\w|(?:<\/em>))|(?:\.(?!\.))){0,200}(?:(?:\w|(?:<\/em>))))?)/ig
 export const TAG_REGEX = /(<([^>]+)>)/ig
 export const IS_ONLY_LINK_REGEX = /^(\b(https?|ftp):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])$/i
 export const LINEBREAK_REGEX = /\r?\n|\r/g
+export const SENTENCES_REGEX = /[^\.!\?]+[\.!\?]+|[^\.!\?]+$/g
 export const truncate = (text, maxChars) => {
     return text.length > (maxChars - 3) ? text.substring(0, maxChars - 3) + '...' : text;
 }
-export function getTextContent(text:string, mentions:UserProfile[], includeEmbedlies:false, onLinkPress:(action:StatusActions, extra?:Object) => void)
+export function getTextContent(prefixId:string, 
+                                text:string, 
+                                mentions:UserProfile[], 
+                                includeEmbedlies:boolean, 
+                                onLinkPress:(action:StatusActions, extra?:Object) => void, 
+                                truncateLength:number = 0,
+                                linebreakLimit:number = 0)
 {
     var processed:any = null
     var config = []
-    let embedlyArr:{[id:string]:any} = {}
+    let embedlyArr:{[id:string]:JSX.Element} = {}
+    let seed = 0
+    const getKey = (key:string ) => {
+        return `${prefixId}_${key}_${seed++}`
+    }
     const embedlies = {
         regex: URL_REGEX,
         fn: (key, result) => 
         {
             if(includeEmbedlies)
             {
-                embedlyArr[result[0]] = <Embedly key={uniqueId()} url={result[0]} />
+                embedlyArr[result[0]] = <Embedly key={getKey("embedly_" + result[0])} url={result[0]} />
             }
-            return (<Text key={uniqueId()} onPress={() => onLinkPress(StatusActions.link, {link:result[0]} )}>{truncate(result[0], 50 )}</Text>)
-
-            //return (<a key={uniqueId()} href={result[0]} target="_blank"  data-toggle="tooltip" title={result[0]}>{truncate(result[0], 50 )}</a>)
+            return (<Text key={getKey("link_" + result[0])} onPress={() => onLinkPress(StatusActions.link, {link:result[0]} )}>{truncate(result[0], 50 )}</Text>)
         }
     }
     config.push(embedlies)
@@ -68,7 +77,7 @@ export function getTextContent(text:string, mentions:UserProfile[], includeEmbed
             regex: HASHTAG_REGEX_WITH_HIGHLIGHT,
             fn: (key, result) => 
             {
-                return (<Text key={uniqueId()} onPress={() => onLinkPress(StatusActions.search, {query:result[0]} )}>{result[0]}</Text>)
+                return (<Text key={getKey("hashtag" + result[0])} onPress={() => onLinkPress(StatusActions.search, {query:result[0]} )}>{result[0]}</Text>)
             }
         }
         config.push(hashtags)
@@ -85,18 +94,108 @@ export function getTextContent(text:string, mentions:UserProfile[], includeEmbed
         return {
             regex:new RegExp("@" + user.username.replace("+","\\+"), 'g'),
             fn: (key, result) => {
-                return <Text key={key} onPress={() => onLinkPress(StatusActions.user,{profile:user} )}>{user.first_name + " " + user.last_name}</Text>
+                return <Text key={getKey(key)} onPress={() => onLinkPress(StatusActions.user,{profile:user} )}>{user.first_name + " " + user.last_name}</Text>
             }
         }
     }).filter(o => o)
     config = config.concat(mentionSearch)
-    processed = processString(config)(text);
-    let embedKeys = Object.keys(embedlyArr)
+    processed = processString(config)(text)
+    const embedKeys = Object.keys(embedlyArr)
+    let flatten = flattenElements(processed)
+    let hasMore = false
+    if(truncateLength > 0)
+    {
+        const truncatedResult = truncateElements(flatten, truncateLength,linebreakLimit)
+        flatten = truncatedResult.result
+        hasMore = truncatedResult.rest.length > 0
+    }
+    const ret:{textContent:JSX.Element[], linkCards:JSX.Element[], hasMore:boolean} = {textContent:flatten, linkCards:[], hasMore}
     if(includeEmbedlies && embedKeys.length > 0)
     {
-        processed = processed.concat( embedKeys.map(k => embedlyArr[k]) )
+        ret.linkCards = embedKeys.map(k => embedlyArr[k])
     }
-    return processed
+    return ret
+}
+const flattenElements = (arr:JSX.Element[]) => {
+    let result:JSX.Element[] = []
+    for (let i = 0; i < arr.length; i++) {
+        const item = arr[i]
+        if(typeof item != "string" && Array.isArray(item))
+        {
+            result = result.concat(flattenElements(item))
+        }
+        else {
+            result.push(item)
+        }
+    }
+    return result
+}
+const truncateElements = (arr:JSX.Element[], limit:number, linebreakLimit:number) => {
+    let result:JSX.Element[] = []
+    let rest:JSX.Element[] = []
+    let banked = 0
+    let linebreaks = 0
+    const processLinebreaks = linebreakLimit > 0
+    const bank = (item:any, length:number, ignoreIfEmpty = false, isLinebreak = false) => {
+        if(!ignoreIfEmpty ||  length > 0)
+        {
+            if(processLinebreaks && isLinebreak)
+            {
+                linebreaks += 1
+                if(linebreaks >= linebreakLimit)
+                    done = true
+            }
+            if(done)
+                rest.push(item)
+            else 
+            {
+                result.push(item)
+                banked += length
+                if(banked > limit)
+                    done = true
+            }
+        }
+    }
+    let done = false
+    for (let i = 0; i < arr.length; i++) {
+        const item = arr[i]
+        if(done)
+        {
+            bank(item, 0, true)
+        }
+        if(typeof item == "string")
+        {
+            const str = item as string
+            const len = str.length
+            if(len + banked > limit) //too big, split string
+            {
+                const sentences = str.match(SENTENCES_REGEX)
+                if(sentences.length > 0)
+                {
+                    for (let si = 0; si < sentences.length; si++) {
+                        const sentence = sentences[si];
+                        bank(sentence, sentence.length, true)
+                    }
+                }
+                else {
+
+                    bank(str, len, true)
+                }
+            }
+            else 
+            {
+                bank(str, len, true)
+            }
+        }
+        else if(item.props && item.props.children && typeof item.props.children == "string")//must be type 'Text'
+        {
+            bank(item, item.props.children.length)
+        }
+        else {//must be type 'br'
+            bank(item, 0, false, true)
+        }
+    }
+    return {result,length:banked, rest} 
 }
 export function rawMarkup(text, mentions:any[]) {
     var markup = text

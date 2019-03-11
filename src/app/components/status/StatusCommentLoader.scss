@@ -1,0 +1,16 @@
+@import "../../Config";
+.status-comment-loader{
+    display: flex !important;
+    width: 100%;
+    align-items: center;
+    .line{
+        flex-grow: 1;
+        height: 1px;
+        @include var(background-color, secondary-text-color);
+        margin: 0 10px;
+    }
+    .button{
+        flex-grow:0;
+        font-size: 13px;
+    }
+}

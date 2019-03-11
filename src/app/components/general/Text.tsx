@@ -21,6 +21,10 @@ export default class Text extends React.Component<Props, State>
             reactionsOpen:false
         }
     }
+    shouldComponentUpdate = (nextProps:Props) => {
+        return nextProps.className != this.props.className ||
+                nextProps.disabled != this.props.disabled
+    }
     didPressLink = (event) => 
     {
         event.preventDefault()

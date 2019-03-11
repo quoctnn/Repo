@@ -2,9 +2,9 @@ import * as React from 'react';
 import Youtube from './players/Youtube';
 import Vimeo from './players/Vimeo';
 import { IntraSocialUtilities } from '../../../utilities/IntraSocialUtilities';
-import VisibilitySensor from 'react-visibility-sensor';
 import "./VideoPlayer.scss"
 import { NotificationCenter } from '../../../utilities/NotificationCenter';
+import { IntersectionObserverComponent } from '../observers/IntersectionObserverComponent';
 const VIDEO_EXTENSIONS = /\.(mp4|og[gv]|webm|MOV)($|\?)/i
 const AUDIO_EXTENSIONS = /\.(mp3|wav)($|\?)/i
 
@@ -53,47 +53,6 @@ export class GlobalMediaPlayerMananger
     }
     
 }
-type ViewportProps = {
-    onChange:(isVisible:boolean) => void
-    className?:string
-}
-type ViewportState = {
-    isVisible:boolean
-}
-export class ViewportObserver extends React.Component<ViewportProps,ViewportState> {
-    io = null
-    container = null
-    constructor(props:ViewportProps) {
-      super(props);
-      this.state = { isVisible: false }
-      this.io = null;
-      this.container = null;
-    }
-    componentDidMount() {
-        this.io = new IntersectionObserver( ([entry]) => {
-            if(this.state.isVisible != entry.isIntersecting)
-                this.setState({ isVisible: entry.isIntersecting }, () => {this.props.onChange(this.state.isVisible)})
-        }, {})
-        this.io.observe(this.container)
-    }
-    componentWillUnmount() {
-        if (this.io) {
-            this.io.disconnect()
-        }
-    }
-    render() {
-        var {onChange, children, ...rest} = this.props
-      return (
-        <div {...rest}
-          ref={div => {
-            this.container = div;
-          }}
-        >
-          {children}
-        </div>
-      );
-    }
-  }
 export default class VideoPlayer extends React.Component<Props,State> {
     videoRef = React.createRef<HTMLVideoElement>();
     static defaultProps:DefaultProps = {
@@ -134,11 +93,11 @@ export default class VideoPlayer extends React.Component<Props,State> {
                 "x-webkit-airplay":"allow"
             }
             return (
-                <ViewportObserver onChange={this.onVisibilityChange} className="video-player">
+                <IntersectionObserverComponent onChange={this.onVisibilityChange} className="video-player">
                     <video ref={this.videoRef} {...props } controlsList="nodownload" playsInline={this.props.playsInline}  autoPlay={this.props.autoPlay} poster={this.props.poster} preload="auto" controls={true}>
                         <source src={IntraSocialUtilities.appendAuthorizationTokenToUrl(this.props.link)}/>
                     </video>
-                </ViewportObserver>
+                </IntersectionObserverComponent>
             );
         } else if (AUDIO_EXTENSIONS.test(this.props.link)) {
             return (

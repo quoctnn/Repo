@@ -17,6 +17,7 @@ export interface ISettings
 {
     isProduction:boolean,
     supportsTheming:boolean,
+    showEmbedlyCards:boolean,
     searchEnabled:boolean,
     clearSomeoneIsTypingInterval:number
     sendSomeoneIsTypingthrottle:number
@@ -25,12 +26,15 @@ export interface ISettings
     maxFileSize: number
     maxStatusPreviewItems: number
     isTouchDevice:boolean
+    statusTruncationLength:number
+    statusLinebreakLimit:number
 }
 export const Settings:ISettings = {
     isProduction : process.env.NODE_ENV === "production",
     searchEnabled:true,
     maxFileSize: 400,
     supportsTheming: window.CSS && window.CSS.supports && window.CSS.supports("(--foo: red)"),
+    showEmbedlyCards:true,
     clearSomeoneIsTypingInterval: 4000,
     sendSomeoneIsTypingthrottle:1000,
     allowedTypesFileUpload:"image/*,video/*,audio/*,application/pdf," +
@@ -39,5 +43,7 @@ export const Settings:ISettings = {
     ".dxf,.ai,.psd,.eps,.ps,.svg,.ttf,",
     commentMaxLength: 5000,
     maxStatusPreviewItems:5,
-    isTouchDevice:isTouchDevice()
+    isTouchDevice:isTouchDevice(),
+    statusTruncationLength:200,
+    statusLinebreakLimit:5
 }

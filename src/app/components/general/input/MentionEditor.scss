@@ -157,4 +157,8 @@ mention {
   display: grid;
   align-items: center;
   @include var(color, primary-text-color);
+  .editor-inner-container{
+    flex: 1;
+    margin: 8px 0;
+  }
 }

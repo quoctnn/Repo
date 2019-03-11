@@ -1,18 +1,19 @@
 @import "../../Config";
 .content-gallery
 {
-    margin: 0 10px;
+    margin: 0px;
     position: relative;
+    height: auto !important;
     .img-responsive
     {
-        object-fit: contain;
+        /*object-fit: contain;*/
         width: 100%;
         max-width: initial;
         max-height: 100%;
     }
     .gallery-container 
     {
-        margin:auto;
+        margin:3px auto;
     }
     .gallery-list{
         position: relative;
@@ -27,7 +28,6 @@
         height: 100%;
         display: flex;
         justify-content: center;
-        box-shadow: 0px 0px 10px -3px rgba(0,0,0,0.6);
         cursor: pointer;
         .file-type{
             position: absolute;
@@ -99,44 +99,8 @@
     {
         align-items: center;
     }
-    .additional-items-count
-    {
-        position: absolute;
-        top: 5px;
-        bottom: 5px;
-        left: 5px;
-        right: 5px;
-        display: flex;
-        align-content: center;
-        align-items: center;
-        justify-content: center;
-        font-size: 24px;
-        font-weight: bolder;
-        @include var(background, highlight-color);
-        color: white;
-        pointer-events: none;
-        overflow:hidden;
-    }
-    .gallery-item:after
-    {
-        content:'';
-        position: absolute;
-        top: 0px;
-        left: 0px;
-        right: 0px;
-        bottom: 0px;
-        @include var(background, highlight-color);
-        opacity: 0;
-        transition: all 0.1s ease;
-        pointer-events: none;
-    } 
-    .gallery-item:hover:after
-    {
-        opacity: 1;
-    }
     .gallery-item:hover 
     {
-        @include var(background, highlight-color);
         .poster-container
         {
             > .play-button{
@@ -339,5 +303,8 @@
     height: 100%;
     .gallery-item{
         overflow: hidden;
+    }
+    .swiper-wrapper{
+        margin: 3px 0;
     }
 }

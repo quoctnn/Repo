@@ -6,24 +6,41 @@
     ::-webkit-scrollbar-thumb { background: #888;background:var(--blue, #888); border-radius:50vw;}
     ::-webkit-scrollbar-thumb:hover {background: #555;background:var(--blue, #555);}
 }
+//standard overrides
+ul,li{ list-style-type: none; padding: 0;}
+//bootstrap extensions/overrides
+.modal-title {
+    display: block;
+    width: 100%;
+}
+//borders 
+.border-1{
+    @include var(border-color, border-color-default);
+    border-width: 1px;
+    border-style: solid;
+}
+//theme
 body
 {
     @include var(background-color, body-background);
     @include var(font-family, font-family-default);
     @include var(color, primary-text-color);
-    
 }
 button{@include var(color, primary-text-color);}
-ul,li{ list-style-type: none;}
-// 
-.link-text, a, .text.link
+.btn-xs{
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    line-height: 1.5;
+    border-radius: 0.2rem;
+}
+.link-text, a, .text.link, .btn-link
 {
     @include var(color, link-color);
     font-weight: 500;
     cursor: pointer;
     display: inline;
 }
-.link-text:hover, a:hover, .text.link:hover
+.link-text:hover, a:hover, .text.link:hover, .btn-link:hover
 {
     @include var(color, link-color);
 }
@@ -42,6 +59,25 @@ ul,li{ list-style-type: none;}
 .drop-shadow
 {
     box-shadow:map-get($root, drop-shadow);
+}
+.hover-card:after{
+    content: '';
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+    @include var(background, highlight-color);
+    opacity: 0;
+    transition: all 0.1s ease;
+    pointer-events: none;
+}
+.hover-card:hover:after {
+    opacity: 1;
+}
+.hover-card:hover{
+    @include var(background, highlight-color);
+    overflow: hidden;
 }
 .transition
 {

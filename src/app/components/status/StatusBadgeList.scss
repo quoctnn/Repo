@@ -1,0 +1,8 @@
+.status-badge-list{
+    font-size: 12px;
+    margin-right: 4px;
+    > *:not(:first-child) {
+        padding-left: 2px;
+
+    }
+}

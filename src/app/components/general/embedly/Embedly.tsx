@@ -1,98 +1,132 @@
 import * as React from "react";
 import { connect } from 'react-redux'
 import { nullOrUndefined } from '../../../utilities/Utilities';
-import { EmbedlyItem } from "../../../types/intrasocial_types";
+import { EmbedCardItem } from '../../../types/intrasocial_types';
 import { ReduxState } from '../../../redux/index';
 import { embedlyRequestDataAction } from './redux';
-import { SecureImage } from '../SecureImage';
-require("./Embedly.scss");
+import "./Embedly.scss"
+import LoadingSpinner from "../../LoadingSpinner";
+import Constants from "../../../utilities/Constants";
+import { Avatar } from "../Avatar";
 export interface OwnProps {
-  url: string
+    url: string
 }
 interface ReduxStateProps 
 {
-  page:EmbedlyItem
-  isLoading:boolean
+    data:EmbedCardItem
+    isLoading:boolean
 }
 interface ReduxDispatchProps 
 {
-  requestEmbedlyData:(urls:string[]) => void
+    requestEmbedData:(urls:string[], cardType:LinkCardType) => void
 }
 type Props = ReduxStateProps & ReduxDispatchProps & OwnProps
+
+export enum LinkCardType {
+    embed 
+}
 interface State {
-  provider_url: string;
-  description: string;
-  title: string;
-  thumbnail_width: number;
-  url: string;
-  thumbnail_url: string;
-  version: string;
-  provider_name: string;
-  type: string;
-  thumbnail_height: number;
+    cardType:LinkCardType
 }
 class Embedly extends React.Component<Props, State> {
-  state: State;
-  constructor(props) {
-    super(props);
-    this.state = {
-      provider_url: "",
-      description: "",
-      title: "",
-      thumbnail_width: 1,
-      url: "",
-      thumbnail_url:
-        "data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACwAAAAAAQABAAACAkQBADs=",
-      version: "",
-      provider_name: "",
-      type: "",
-      thumbnail_height: 1
-    };
-  }
-  componentWillMount() {
-    if(!this.props.page && !this.props.isLoading)
-        this.props.requestEmbedlyData([this.props.url])
-  }
-  render() {
-    let page = this.props.page
-    if(!page || !page.provider_url || page.error_code)
-    {
-        return (<a href={this.props.url} target="_blank"  data-toggle="tooltip" title={this.props.url}>{this.props.url}</a>)
+    state: State;
+    constructor(props:Props) {
+        super(props);
+        this.state = {
+            cardType:LinkCardType.embed
+        }
     }
-    if(page.media && page.media.html)
-    {
-        return <div className="embedly responsive embedly-card" dangerouslySetInnerHTML={{__html: page.media.html}}></div>
+    shouldComponentUpdate = (nextProps:Props, nextState:State) => {
+        return nextProps.url != this.props.url || 
+                nextProps.isLoading != this.props.isLoading || 
+                nextProps.data != this.props.data
     }
-    return (
-      <a className="embedly embedly-card" href={page.url} target="_blank">
-        <div className="embedly__image">
-          <SecureImage
-            className="img-responsive image"
-            url={page.thumbnail_url}
-            label={page.title}
-          />
-        </div>
-        <div className="embedly__text">
-          <p className="embedly__title">{page.title}</p>
-          <p className="embedly__desc">{page.description}</p>
-          <p className="embedly__provider">{page.provider_url}</p>
-        </div>
-      </a>
-    );
-  }
+    componentWillMount() {
+        if(!this.props.data && !this.props.isLoading)
+                this.props.requestEmbedData([this.props.url], this.state.cardType)
+        
+    }
+    resolveIcon = (object_type:string) => 
+    {
+        if(object_type)
+        {
+            switch(object_type)
+            {
+                case "project.task" : return "fa fa-tasks avatar"
+                case "project.project" : return "fa fa-folder-o avatar"
+                default: return null
+            }
+        }
+        return null
+    }
+    renderCard = (image:string, title:string, subtitle:string, description:string, avatar:string, icon:string) => 
+    {
+        const bgImage = image || Constants.staticUrl + Constants.defaultImg.default
+        return (<div className="card card-horizontal card-highlight anim-transition hover-card drop-shadow">
+                    <div className="row">
+                        <div className="col-4" style={{padding:0}}>
+                            <div className="card-img-container">
+                                <span className="bgImage" style={{backgroundImage:"url(" + bgImage + ")"}} />
+                            </div>
+                        </div>
+                        <div className="col-8 card-content" style={{paddingLeft:"8px", paddingRight:"8px"}}>
+                            <div className="card-block">
+                                <h4 className="card-title text-uppercase text-truncate">
+                                {avatar && <Avatar size={24} image={avatar} className="" />}                                
+                                {icon && <i className={icon}></i>}
+                                <div className="text-truncate">{title}</div>
+                                </h4>
+                                {subtitle && <p className="card-subtitle font-italic text-muted">{subtitle}</p>}
+                                <p className="card-text" dangerouslySetInnerHTML={{__html: description}}></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>)
+    }
+    renderCardData = () => {
+        switch(this.state.cardType)
+        {
+            case LinkCardType.embed:
+            {
+                const data:EmbedCardItem = this.props.data as any
+                if(!data.provider_url || data.error_code || data.type == "error" )
+                {
+                    return null//(<a href={this.props.url} target="_blank"  data-toggle="tooltip" title={this.props.url}>{this.props.url}</a>)
+                }
+                if(data.media && data.media.html)
+                {
+                    return <div className="is-embed-card responsive" dangerouslySetInnerHTML={{__html: data.media.html}}></div>
+                }
+                const image = data.images && data.images.length > 0 ?  data.images[0].url : undefined
+                const title = data.title || ""
+                const subtitle = data.subtitle
+                const avatar = data.avatar
+                const description = data.description || ""
+                const icon = !avatar ? this.resolveIcon(data.type) : null
+                return this.renderCard(image, title, subtitle, description, avatar, icon)
+            }
+            default:return null;
+        }
+    }
+    render = () => {
+        return (<a href={this.props.url} className="is-embed-card" target="_blank">
+                {this.props.isLoading && <LoadingSpinner/>}
+                {this.props.data && this.renderCardData()}
+                </a>)
+    }
 }
 const mapStateToProps = (state:ReduxState, ownProps: OwnProps):ReduxStateProps => {
   const page = state.embedlyStore.byId[ownProps.url]
     const isLoading = !nullOrUndefined( state.embedlyStore.queuedIds[ownProps.url] )
     return {
-        page,
+        data:page,
         isLoading
     };
 }
 const mapDispatchToProps = (dispatch:any, ownProps: OwnProps):ReduxDispatchProps => {
     return {
-      requestEmbedlyData:(urls:string[]) => {
-          dispatch(embedlyRequestDataAction(urls))
+      requestEmbedData:(urls:string[], cardType:LinkCardType) => {
+          dispatch(embedlyRequestDataAction(urls, cardType))
       }
   }
 }

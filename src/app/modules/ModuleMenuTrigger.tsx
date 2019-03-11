@@ -1,4 +1,5 @@
 import * as React from "react";
+import classnames from 'classnames';
 
 export type Props = 
 {
@@ -7,9 +8,13 @@ export type Props =
 
 export default class ModuleMenuTrigger extends React.Component<Props, {}> {
     render() {
+        const cn = classnames("module-menu-trigger")
         return(
-            <div className="module-menu-trigger" onClick={this.props.onClick} >
-                <i className="fa fa-ellipsis-v"></i>
+            <div className={cn} onClick={this.props.onClick} >
+                <span className="fa-stack">
+                    <i className="fa fa-ellipsis-v fa-stack-1x icon-default"></i>
+                    <i className="fa fa-times fa-stack-1x icon-active"></i>
+                </span>
             </div>
         );
     }

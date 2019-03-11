@@ -10,7 +10,7 @@ import { ReduxState } from "./redux";
 import Signin from "./views/signin/Signin";
 import { error404 } from "./views/error/error404";
 import { Transition  } from 'react-transition-group';
-import NewsfeedPage from "./components/general/pages/NewsfeedPage";
+import NewsfeedPage from "./components/pages/NewsfeedPage";
 const DEMO = (props:any) => {
     return (<div>DEMO</div>)
 }
@@ -66,7 +66,7 @@ class Main extends React.Component<Props, State> {
                             {this.props.signedIn &&
                                 <>
                                     <Switch location={modal ? this.previousLocation : location}>
-                                        <Route path={Routes.NEWSFEED} component={NewsfeedPage} />
+                                        <Route path={Routes.newsfeedUrl(":contextNaturalKey?", ":contextObjectId?")} component={NewsfeedPage} />
                                         <Route path={Routes.SIGNIN} component={Signin} />
                                         <Route path={Routes.ROOT} exact={true} component={DashCompWithData} />
                                         <Route path={Routes.ANY} component={error404} />

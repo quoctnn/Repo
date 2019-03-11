@@ -12,13 +12,21 @@
         align-items: center;
         padding: 8px 12px;
         flex-shrink: 0;
-
+        .circular-spinner{
+            margin: 0 5px;
+        }
         .module-menu-trigger
         {
             min-width: 30px;
             text-align: center;
-            display: none;
+            visibility: hidden;
             cursor: pointer;
+            .icon-active, .icon-default{
+                transition: opacity .3s, transform .3s;
+            }
+            .icon-active{
+                opacity: 0;
+            }
         }
     }
     &.menu-visible
@@ -27,7 +35,16 @@
         {
             .module-menu-trigger
             {
-                display: block;
+                visibility: visible;
+                .icon-active {
+                    display: inline-block;
+                    transform: rotate(180deg) scale(1);
+                    opacity: 1;
+                }
+                .icon-default {
+                    transform: rotate(180deg) scale(.5);
+                    opacity: 0;
+                }
             }
         }
     }
@@ -35,7 +52,7 @@
     {
         .module-menu-trigger
         {
-            display: block;
+            visibility: visible;
         }
     }
     .module-content 
@@ -62,6 +79,8 @@
         transform-origin: top center;
         transition-property: transform, height !important;
         z-index: 200;
+        padding:8px;
+        overflow-y: auto;
          &.module-menu-entered
         {
             height: auto;
@@ -80,7 +99,7 @@ body.touch .module
         }
     }
 }
-body.RB-Mini, body.RB-Micro 
+body.rb-mini, body.rb-micro 
 {
     .module-menu 
     {

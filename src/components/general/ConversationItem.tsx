@@ -2,7 +2,6 @@ import { Avatar } from './Avatar';
 import * as React from 'react';
 import { Link } from 'react-router-dom';
 import Routes from '../../utilities/Routes';
-import { OverflowList } from './OverflowList';
 import { RootState } from '../../reducers';
 import { connect } from 'react-redux'
 import { getConversationTitle } from '../../utilities/ConversationUtilities';
