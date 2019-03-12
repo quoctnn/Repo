@@ -7,9 +7,8 @@ export interface Props {
     borderWidth?:number,
     borderColor?:string,
     image?:string,
-    stateColor?:AvatarStateColor,
-    className?:string
     images?:string[],
+    stateColor?:AvatarStateColor,
 }
 export enum AvatarStateColor
 {
@@ -35,24 +34,25 @@ export class Avatar extends React.PureComponent<Props & React.HTMLAttributes<HTM
     }
     render() 
     {
-        let images:string[] = []
-        if(this.props.image)
-            images.push(this.props.image)
-        if(this.props.images)
-            images = images.concat( this.props.images )
-        var imgUrls = images/*.map(i => IntraSocialUtilities.appendAuthorizationTokenToUrl(i))*/.slice(0,4)
+        const {image, images, borderColor, borderWidth, size, children, className, stateColor,...rest} = this.props
+        let imgs:string[] = []
+        if(image)
+            imgs.push(image)
+        if(images)
+            imgs = imgs.concat( images )
+        var imgUrls = imgs/*.map(i => IntraSocialUtilities.appendAuthorizationTokenToUrl(i))*/.slice(0,4)
         const length = imgUrls.length
         return(
             
-            <div onClick={this.props.onClick}  className={"avatar" + (this.props.className ? " " + this.props.className : "")} >
-                <div className="image-container" style={{borderWidth:this.props.borderWidth + "px", borderColor:this.props.borderColor, width:this.props.size + "px", height:this.props.size + "px", borderStyle:"solid"}}>
+            <div {...rest} className={"avatar" + (className ? " " + className : "")} >
+                <div className="image-container" style={{borderWidth:borderWidth + "px", borderColor:borderColor, width:size + "px", height:size + "px", borderStyle:"solid"}}>
                     {imgUrls.map((img, index) => {
                         const key = `image_${length}_${index}`
                         return <SecureImage setAsBackground={true} key={img} className={"image multi " + key} url={img}></SecureImage>
                     })}
                 </div>
-                {this.props.children}
-                {this.props.stateColor != AvatarStateColor.NONE && <div className={"avatar-state " + this.props.stateColor}></div>}
+                {children}
+                {stateColor != AvatarStateColor.NONE && <div className={"avatar-state " + stateColor}></div>}
             </div>
         );
     }

@@ -4,7 +4,7 @@ import Constants from '../../../utilities/Constants';
 import { Settings } from '../../../utilities/Settings';
 import { StoreManager } from '../../../managers/StoreManager';
 import { AuthenticationManager } from '../../../managers/AuthenticationManager';
-import { UploadedFile } from '../../../types/intrasocial_types';
+import { UploadedFile } from '../../../types/intrasocial_types2';
 import { IntraSocialUtilities } from '../../../utilities/IntraSocialUtilities';
 require("./FilesUpload.scss");
 

@@ -2,7 +2,7 @@ import { simplePaginator } from './simplePaginator';
 import { combineReducers } from 'redux';
 import { PaginationUtilities } from '../utilities/PaginationUtilities';
 import Constants from '../utilities/Constants';
-import { Conversation } from '../types/intrasocial_types';
+import { Conversation } from '../types/intrasocial_types2';
 
 
 export const conversationReducerKey = "conversations"

@@ -20,7 +20,7 @@ import queue from './queue';
 import { conversations } from './conversations';
 import { messages } from './messages';
 import { statuses } from './statuses';
-import { Status, UserProfile, Message, EmbedlyItem, Conversation, Notification, Group, Community, Project, Task , Event} from '../types/intrasocial_types';
+import { Status, UserProfile, Message, EmbedlyItem, Conversation, Notification, Group, Community, Project, Task , Event} from '../types/intrasocial_types2';
 import { CachePageV2 } from './simplePaginator';
 import { CachePageV3 } from './simpleMultiPaginator';
 import { notifications } from './notifications';

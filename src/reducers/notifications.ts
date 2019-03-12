@@ -2,7 +2,7 @@ import { simplePaginator } from './simplePaginator';
 import { combineReducers } from 'redux';
 import { PaginationUtilities } from '../utilities/PaginationUtilities';
 import Constants from '../utilities/Constants';
-import { Notification } from '../types/intrasocial_types';
+import { Notification } from '../types/intrasocial_types2';
 
 
 export const notificationsReducerKey = "notifications"

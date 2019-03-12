@@ -7,7 +7,7 @@ import { List } from '../../components/general/List';
 import { FullPageComponent } from '../../components/general/FullPageComponent';
 import StatusComponent, { StatusActions } from '../../components/general/status/StatusComponent';
 import { AuthenticationManager } from '../../managers/AuthenticationManager';
-import { Status, UserProfile, UploadedFile, ContextNaturalKey } from '../../types/intrasocial_types';
+import { Status, UserProfile, UploadedFile, ContextNaturalKey } from '../../types/intrasocial_types2';
 import StatusFormContainer from '../../components/general/status/StatusFormContainer';
 import { translate } from '../../components/intl/AutoIntlProvider';
 import ApiClient from '../../network/ApiClient';

@@ -1,7 +1,7 @@
 import * as React from "react";
 import { connect } from 'react-redux'
 import { RootState } from "../../reducers";
-import { Community } from "../../types/intrasocial_types";
+import { Community } from "../../types/intrasocial_types2";
 import { CommunityManager } from "../../managers/CommunityManager";
 import LoadingSpinner from "../../components/general/LoadingSpinner";
 require("./CommunityView.scss");

@@ -1,7 +1,7 @@
 import * as React from "react";
 import { connect } from 'react-redux'
 import { RootState } from "../../reducers";
-import { Task } from "../../types/intrasocial_types";
+import { Task } from "../../types/intrasocial_types2";
 import { TaskManager } from "../../managers/TaskManager";
 import LoadingSpinner from "../../components/general/LoadingSpinner";
 require("./TaskView.scss");

@@ -63,6 +63,13 @@ Array.prototype.isEqual = function<T>(arr2:T[])
     )
     return result
 }
+Array.prototype.toggleElement = function<T>(element:T){
+    const index = this.indexOf(element)
+    if(index > -1)
+        this.splice(index, 1)
+    else 
+        this.push(element)
+}
 Array.prototype.toDictionary = function<T>(indexKey: keyof T) 
 {
     const object: { [key: string]: T } = {}

@@ -1,5 +1,5 @@
 import {Types} from "../utilities/Types"
-import { Task } from "../types/intrasocial_types";
+import { Task } from "../types/intrasocial_types2";
 
 const tasksArray:Task[] = []
 

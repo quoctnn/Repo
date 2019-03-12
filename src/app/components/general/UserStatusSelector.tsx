@@ -67,7 +67,7 @@ class UserStatusSelector extends React.Component<Props, State> {
     }
     renderStatusSelector = () =>
     {
-        if(!this.props.profile)
+        if(!this.props.profile || this.props.profile.is_anonymous)
             return <Link className="btn btn-sm btn-secondary btn-outline-secondary" to={Routes.SIGNIN}>{translate("Sign in")}</Link>
         const currentStatus = this.props.profile.user_status
         let selectable = userStatuses.filter(function(value, _index, _arr){
@@ -78,17 +78,19 @@ class UserStatusSelector extends React.Component<Props, State> {
                 return value
         })
         return (
+            <div className="d-flex">
+                <div className="dropdown margin-right-sm">
+                    <a data-boundary="body" className="dropdown-toggle text-truncate" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        {currentStatus}
+                    </a>
 
-            <div className="dropdown margin-right-sm">
-                <a data-boundary="body" className="dropdown-toggle text-truncate" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    {currentStatus}
-                </a>
-
-                <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                    {selectable.map((status, index) => {
-                        return <a key={index} onClick={this.setUserStatus.bind(this, status)} className="dropdown-item" href="#">{status}</a>
-                    }) }
+                    <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        {selectable.map((status, index) => {
+                            return <a key={index} onClick={this.setUserStatus.bind(this, status)} className="dropdown-item" href="#">{status}</a>
+                        }) }
+                    </div>
                 </div>
+                <Link className="btn btn-sm btn-secondary btn-outline-secondary ml-1" to={Routes.SIGNOUT}>{translate("Sign out")}</Link>
             </div>
         )
     }

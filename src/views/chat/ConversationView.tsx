@@ -18,7 +18,7 @@ import { Mention } from '../../components/input/MentionEditor';
 import { ConversationManager } from '../../managers/ConversationManager';
 import { NotificationCenter } from '../../notifications/NotificationCenter';
 import { ProfileManager } from '../../managers/ProfileManager';
-import { UserProfile, Conversation, Message } from '../../types/intrasocial_types';
+import { UserProfile, Conversation, Message } from '../../types/intrasocial_types2';
 import { getDefaultCachePageV3, CachePageV3 } from '../../reducers/simpleMultiPaginator';
 import { EventStreamMessageType } from '../../app/network/ChannelEventStream';
 

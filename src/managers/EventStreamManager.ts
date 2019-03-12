@@ -4,7 +4,7 @@ import { ProfileManager } from './ProfileManager';
 import { CommunityManager } from './CommunityManager';
 import { RootState } from '../reducers';
 import { AuthenticationManager } from './AuthenticationManager';
-import { UserProfile } from '../types/intrasocial_types';
+import { UserProfile } from '../types/intrasocial_types2';
 import * as Actions from '../actions/Actions';
 import { eventStreamNotificationPrefix, EventStreamMessageType } from '../app/network/ChannelEventStream';
 export abstract class EventStreamManager

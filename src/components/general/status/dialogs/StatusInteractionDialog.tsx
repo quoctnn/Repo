@@ -4,7 +4,7 @@ import LoadingSpinner from '../../LoadingSpinner';
 import ProfileItem from '../../ProfileItem';
 import { ModalBody, Modal, ModalHeader, ModalFooter, Button } from 'reactstrap';
 import { StatusUtilities } from '../../../../utilities/StatusUtilities';
-import { UserProfile } from '../../../../types/intrasocial_types';
+import { UserProfile } from '../../../../types/intrasocial_types2';
 require("./StatusInteractionDialog.scss");
 export interface InteractionDialogProps
 {

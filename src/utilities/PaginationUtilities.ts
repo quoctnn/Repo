@@ -1,4 +1,4 @@
-import { Status } from "../types/intrasocial_types";
+import { Status } from "../types/intrasocial_types2";
 
 export interface NestedPageItem
 {

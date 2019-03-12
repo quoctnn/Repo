@@ -3,7 +3,7 @@ import { RootState } from '../reducers';
 import * as Actions from '../actions/Actions';
 import {StatusContextKeys } from '../reducers/statuses';
 import { NotificationCenter } from '../notifications/NotificationCenter';
-import { Status } from '../types/intrasocial_types';
+import { Status } from '../types/intrasocial_types2';
 import { EventStreamMessageType, canSendOnWebsocket } from '../app/network/ChannelEventStream';
 export abstract class StatusManager
 {

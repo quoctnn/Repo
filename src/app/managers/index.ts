@@ -10,8 +10,10 @@ import { EventManager } from './EventManager';
 import { TaskManager } from './TaskManager';
 import { ContextManager } from './ContextManager';
 import { PermissionManager } from './PermissionManager';
+import { ApplicationManager } from './ApplicationManager';
 const initializeManagers = () => 
 {
+    ApplicationManager.setup()
     EndpointManager.setup()
     AuthenticationManager.setup()
     EventStreamManager.setup()

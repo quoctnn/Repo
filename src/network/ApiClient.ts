@@ -2,7 +2,7 @@ import Constants from "../utilities/Constants";
 import {AjaxRequest} from "./AjaxRequest";
 import { StoreManager } from '../managers/StoreManager';
 var $ = require("jquery")
-import { Status, UserProfile, UploadedFile, Community, Group, Conversation, Project, Message, Event, Task } from '../types/intrasocial_types';
+import { Status, UserProfile, UploadedFile, Community, Group, Conversation, Project, Message, Event, Task } from '../types/intrasocial_types2';
 export type PaginationResult<T> = {results:T[], count:number, previous:string|null, next:string|null}
 export type ApiClientFeedPageCallback<T> = (data: PaginationResult<T>, status:string, error:string|null) => void;
 export type ApiClientCallback<T> = (data: T|null, status:string, error:string|null) => void;

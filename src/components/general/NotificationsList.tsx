@@ -2,7 +2,7 @@ import * as React from "react";
 import { withRouter} from 'react-router-dom'
 import { connect } from 'react-redux'
 import { RootState } from '../../reducers/index';
-import { UserProfile, Notification } from '../../types/intrasocial_types';
+import { UserProfile, Notification } from '../../types/intrasocial_types2';
 import { PaginationUtilities } from '../../utilities/PaginationUtilities';
 import { nullOrUndefined } from "../../utilities/Utilities";
 import LoadingSpinner from "./LoadingSpinner";

@@ -1,6 +1,6 @@
 import storageLocal from 'redux-persist/lib/storage'
 import { persistReducer } from "redux-persist";
-import { UserProfile } from '../../types/intrasocial_types';
+import { UserProfile } from '../types/intrasocial_types';
 import { nullOrUndefined } from '../utilities/Utilities';
 export enum AuthenticationActionTypes {
     SetSignedInToken = 'authentication.set_signed_in_token',
@@ -17,12 +17,12 @@ export interface SetAuthenticationTokenAction{
 }
 export interface SetAuthenticationProfileAction{
     type:string
-    profile:UserProfile
+    profile:UserProfile,
 }
 const INITIAL_STATE:AuthenticationData = {
     token:null, 
     profile:null,
-    signedIn:false
+    signedIn:false,
 }
 export const setAuthenticationTokenAction = (token:string):SetAuthenticationTokenAction => ({
     type: AuthenticationActionTypes.SetSignedInToken,
@@ -30,7 +30,7 @@ export const setAuthenticationTokenAction = (token:string):SetAuthenticationToke
 })
 export const setAuthenticationProfileAction = (profile:UserProfile):SetAuthenticationProfileAction => ({
     type: AuthenticationActionTypes.SetSignedInProfile,
-    profile
+    profile,
 })
 const authentication = (state = INITIAL_STATE, action:SetAuthenticationTokenAction & SetAuthenticationProfileAction):AuthenticationData => {
     switch(action.type) 
@@ -38,7 +38,7 @@ const authentication = (state = INITIAL_STATE, action:SetAuthenticationTokenActi
         case AuthenticationActionTypes.SetSignedInToken:
             return { ...state, token:action.token}
         case AuthenticationActionTypes.SetSignedInProfile:
-        return { ...state, profile:action.profile, signedIn: !nullOrUndefined( action.profile)}
+        return { ...state, profile:action.profile, signedIn: !nullOrUndefined( action.profile) && !action.profile.is_anonymous}
         default:
             return state;
     }

@@ -3,7 +3,7 @@ import { Settings } from '../../../utilities/Settings';
 import { URL_REGEX, URL_WWW_REGEX } from '../../../utilities/Utilities';
 import { Mention } from '../../input/MentionEditor';
 import { IEditorComponent, EditorContent } from '../ChatMessageComposer';
-import { UploadedFile } from '../../../types/intrasocial_types';
+import { UploadedFile } from '../../../types/intrasocial_types2';
 import { CommentForm } from './CommentForm';
 import classNames = require('classnames');
 import { StatusActions } from './StatusComponent';

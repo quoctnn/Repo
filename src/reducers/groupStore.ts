@@ -1,5 +1,5 @@
 import {Types} from "../utilities/Types"
-import { Group } from "../types/intrasocial_types";
+import { Group } from "../types/intrasocial_types2";
 
 const groupsArray:Group[] = []
 

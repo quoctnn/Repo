@@ -6,7 +6,7 @@ import { Button} from 'reactstrap';
 import * as Actions from "../../actions/Actions"
 import Routes from '../../utilities/Routes';
 import { RootState } from '../../reducers/index';
-import { UserProfile } from "../../types/intrasocial_types";
+import { UserProfile } from "../../types/intrasocial_types2";
 import { AuthenticationManager } from '../../managers/AuthenticationManager';
 require("./ProfileStatus.scss");
 

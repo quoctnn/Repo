@@ -32,13 +32,15 @@ class ProjectModule extends React.Component<Props, State> {
             isLoading:false,
             menuData:{
                 project:null,
-                statusFilter: [],
+                state: [],
                 priority: [],
                 assignedTo: null,
                 responsible: null,
                 tags: [],
                 category: null,
                 term: null,
+                creator:null,
+                notAssigned:null,
             }
         }
     }

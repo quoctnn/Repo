@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { Link } from "react-router-dom";
 import { RootState } from "../../reducers";
 import { IntraSocialUtilities } from "../../utilities/IntraSocialUtilities";
-import { UserProfile } from "../../types/intrasocial_types";
+import { UserProfile } from "../../types/intrasocial_types2";
 import Routes from "../../utilities/Routes";
 require("./SimpleUserProfile.scss");
 

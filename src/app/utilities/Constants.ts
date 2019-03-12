@@ -15,6 +15,11 @@ export default  {
         getSubscriptionItem: (id:number) => {
             return `/api/v1/subscription/${id}/`
         },
+        //Dashboards
+        dashboardListEndpoint: "/api/v2/dashboard/",
+        getDashboardItem: (id:number) => {
+            return `/api/v2/dashboard/${id}/`
+        },
 
         // Embedly Cache
         embedlyApiEndpoint: "/api/v2/embedly/",
@@ -29,28 +34,30 @@ export default  {
             return `/api/v1/search/${id}/remove_from_history/`
         },
         // Community URLs
-        myCommunitiesUrl: '/api/v1/community/as-member/',
-        invitedCommunitiesUrl: '/api/v1/community/invitations/',
+        myCommunitiesUrl: '/api/v2/community/as-member/',
+        invitedCommunitiesUrl: '/api/v2/community/invitations/',
         communityMembersUrl: (id:number) => {
             return `/api/v2/community/${id}/members/`
         },
         communityFilesUrl: (id:number) => {
-            return `/api/v1/community/${id}/files/`
+            return `/api/v2/community/${id}/files/`
         },
         communityUrl: (id:number|string) => {
-            return `/api/v1/community/${id}/`
+            return `/api/v2/community/${id}/`
         },
-        communityList:'/api/v1/community/',
+        communityList:'/api/v2/community/',
         // Profile URLs
-        myProfileUrl: '/api/v1/profile/me/',
+        myProfileUrl: '/api/v2/profile/me/',
         profileUrl: (id:string|number) => {
-            return `/api/v1/profile/${id}/`
+            return `/api/v2/profile/${id}/`
         },
-        profilesUrl: '/api/v1/profile/',
-        myBusinessDataUrl:"/api/v1/profile/business_data/",
-        myPersonalDataUrl:"/api/v1/profile/personal_data/",
+        profilesUrl: '/api/v2/profile/',
+
+        myBusinessDataUrl:"/api/v2/profile/business_data/",
+        myPersonalDataUrl:"/api/v2/profile/personal_data/",
         // Friends URLs
-        friendsUrl: '/api/v1/friends/',
+        friendsUrl: '/api/v2/friends/',
+        acquaintancesUrl : '/api/v2/friends/acquaintances/',
 
         // Group URLs
         groupUrl: (id:number|string) => {

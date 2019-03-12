@@ -2,7 +2,7 @@ import * as React from 'react';
 import classNames from "classnames";
 import { StatusInteractionDialog } from './dialogs/StatusInteractionDialog';
 import { ProfileManager } from '../../../managers/ProfileManager';
-import { UserProfile } from '../../../types/intrasocial_types';
+import { UserProfile } from '../../../types/intrasocial_types2';
 require("./ReactionStats.scss");
 
 export interface ReactionStatsProps

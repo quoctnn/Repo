@@ -2,7 +2,7 @@ import {  Store } from 'redux';
 import * as Actions from '../actions/Actions';
 import { RootState } from '../reducers';
 import { AjaxRequest } from '../network/AjaxRequest';
-import { UserProfile, UserStatus } from '../types/intrasocial_types';
+import { UserProfile, UserStatus } from '../types/intrasocial_types2';
 import { sendOnWebsocket, EventStreamMessageType } from '../app/network/ChannelEventStream';
 export abstract class AuthenticationManager
 {

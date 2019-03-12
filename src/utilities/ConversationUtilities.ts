@@ -1,5 +1,5 @@
 import { ProfileManager } from '../managers/ProfileManager';
-import { Conversation } from '../types/intrasocial_types';
+import { Conversation } from '../types/intrasocial_types2';
 export const getConversationTitle = (conversation: Conversation, me:number) => 
 {
     if(conversation.title)

@@ -2,7 +2,7 @@ import StatusPermalinkDialog from './dialogs/StatusPermalinkDialog';
 import * as React from 'react';
 import { translate } from '../../../components/intl/AutoIntlProvider';
 import EditStatusDialog from './dialogs/EditStatusDialog';
-import { Status, UploadedFile } from '../../../types/intrasocial_types';
+import { Status, UploadedFile } from '../../../types/intrasocial_types2';
 import ConfirmDialog from '../dialogs/ConfirmDialog';
 import { StatusActions } from './StatusComponent';
 require("./StatusOptions.scss");

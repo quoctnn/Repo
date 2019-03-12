@@ -9,7 +9,7 @@ import { translate } from '../../intl/AutoIntlProvider';
 import { Link } from 'react-router-dom';
 import Routes from '../../../utilities/Routes';
 import { RootState } from '../../../reducers';
-import { Group } from '../../../types/intrasocial_types';
+import { Group } from '../../../types/intrasocial_types2';
 import { ToastManager } from '../../../managers/ToastManager';
 export interface Props {
     community_id:number,

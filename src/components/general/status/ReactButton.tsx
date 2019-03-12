@@ -2,7 +2,7 @@ import * as React from 'react';
 import classNames from "classnames";
 import ActionTrigger from '../ActionTrigger';
 import {  Popover, PopoverBody } from 'reactstrap';
-import { StatusReaction, StatusReactionUtilities } from '../../../types/intrasocial_types';
+import { StatusReaction, StatusReactionUtilities } from '../../../types/intrasocial_types2';
 import { StatusActions } from './StatusComponent';
 require("./ReactButton.scss");
 

@@ -5,7 +5,7 @@ import { userFullName } from '../../utilities/Utilities';
 import { Avatar } from './Avatar';
 import { Link } from 'react-router-dom';
 import Routes from '../../utilities/Routes';
-import { StatusReactionUtilities, UserProfile } from '../../types/intrasocial_types';
+import { StatusReactionUtilities, UserProfile } from '../../types/intrasocial_types2';
 export interface Props 
 {
     itemClass:string

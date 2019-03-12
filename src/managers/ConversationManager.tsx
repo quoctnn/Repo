@@ -7,7 +7,7 @@ import ApiClient from '../network/ApiClient';
 import { NotificationCenter } from '../notifications/NotificationCenter';
 import { AuthenticationManager } from './AuthenticationManager';
 import { ProfileManager } from './ProfileManager';
-import { Message, UserProfile, Conversation } from '../types/intrasocial_types';
+import { Message, UserProfile, Conversation } from '../types/intrasocial_types2';
 import { ToastManager } from './ToastManager';
 import { EventStreamMessageType, canSendOnWebsocket, sendOnWebsocket } from '../app/network/ChannelEventStream';
 export abstract class ConversationManager 

@@ -1,7 +1,7 @@
 import {  Store } from 'redux';
 import { RootState } from '../reducers';
 import * as Actions from '../actions/Actions';
-import { Group } from '../types/intrasocial_types';
+import { Group } from '../types/intrasocial_types2';
 import ApiClient from '../network/ApiClient';
 export abstract class GroupManager
 {

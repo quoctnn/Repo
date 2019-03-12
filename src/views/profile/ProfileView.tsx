@@ -6,7 +6,7 @@ import { RootState } from '../../reducers/index';
 import ApiClient from '../../network/ApiClient';
 import LoadingSpinner from '../../components/general/LoadingSpinner';
 import { AuthenticationManager } from '../../managers/AuthenticationManager';
-import { UserProfile } from "../../types/intrasocial_types";
+import { UserProfile } from "../../types/intrasocial_types2";
 import { ProfileManager } from "../../managers/ProfileManager";
 require("./ProfileView.scss");
 

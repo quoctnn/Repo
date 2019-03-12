@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import {  Button, ModalBody, Modal, ModalHeader, ModalFooter } from 'reactstrap';
 import { RootState } from "../../reducers";
 import { Avatar } from './Avatar';
-import { UserProfile } from "../../types/intrasocial_types";
+import { UserProfile } from "../../types/intrasocial_types2";
 import "./SelectUsersDialog3.scss"
 
 type DefaultProps = {

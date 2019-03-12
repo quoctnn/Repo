@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import * as Actions from "../../actions/Actions" 
 import { RootState } from '../../reducers/index';
 import { nullOrUndefined } from '../../utilities/Utilities';
-import { EmbedlyItem } from "../../types/intrasocial_types";
+import { EmbedlyItem } from "../../types/intrasocial_types2";
 require("./Embedly.scss");
 export interface OwnProps {
   url: string

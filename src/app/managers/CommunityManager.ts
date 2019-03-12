@@ -9,8 +9,8 @@ export abstract class CommunityManager
     {
     }
     static storeCommunities = (communities:Community[]) => {
-        
-        CommunityManager.getStore().dispatch(addCommunitiesAction(communities))
+        if(communities.length > 0)
+            CommunityManager.getStore().dispatch(addCommunitiesAction(communities))
     }
     static getCommunity = (communityId:string):Community|null => 
     {

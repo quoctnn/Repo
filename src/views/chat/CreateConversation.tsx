@@ -11,7 +11,7 @@ import { withRouter} from 'react-router-dom'
 import Routes from '../../utilities/Routes';
 import { ConversationManager } from '../../managers/ConversationManager';
 import LoadingSpinner from '../../components/general/LoadingSpinner';
-import { UserProfile, Conversation } from '../../types/intrasocial_types';
+import { UserProfile, Conversation } from '../../types/intrasocial_types2';
 import { ToastManager } from '../../managers/ToastManager';
 
 import "./CreateConversation.scss"

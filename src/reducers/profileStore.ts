@@ -1,7 +1,7 @@
 import {Types} from "../utilities/Types"
 import { combineReducers } from 'redux'
 import { RootState } from './index';
-import { UserProfile } from "../types/intrasocial_types";
+import { UserProfile } from "../types/intrasocial_types2";
 
 const addProfiles = (state, action) => {
     let profiles = action.profiles as UserProfile[]

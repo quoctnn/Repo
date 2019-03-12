@@ -9,24 +9,21 @@ import { DashCompWithData } from "./Dashboard";
 import { ReduxState } from "./redux";
 import Signin from "./views/signin/Signin";
 import { error404 } from "./views/error/error404";
-import { Transition  } from 'react-transition-group';
 import NewsfeedPage from "./components/pages/NewsfeedPage";
-const DEMO = (props:any) => {
-    return (<div>DEMO</div>)
-}
+import { Dashboard } from './types/intrasocial_types';
+import ApplicationLoader from "./views/loading/ApplicationLoader";
+import Signout from "./views/signout/Signout";
 
-interface OwnProps
-{
+type OwnProps = {
 }
-interface ReduxStateProps
-{
-  signedIn:boolean
+type ReduxStateProps = {
+    signedIn:boolean
+    loaded:boolean
 }
-interface ReduxDispatchProps
-{
+type ReduxDispatchProps = {
 }
-interface State
-{
+type State = {
+    dashboards:Dashboard[]
 }
 type Props = ReduxStateProps & ReduxDispatchProps & OwnProps & RouteComponentProps<any>
 class Main extends React.Component<Props, State> {
@@ -34,59 +31,34 @@ class Main extends React.Component<Props, State> {
     constructor(props:Props)
     {
         super(props)
-
+        this.state = {
+            dashboards:[]
+        }
     }
     componentWillReceiveProps(nextProps) {
         this.previousLocation = this.props.location;
     }
     render() {
-        const { location } = this.props;
-        const modal = location.state && location.state.to == "modal"
-        const prevModal = this.previousLocation && this.previousLocation.state && this.previousLocation.state.to === "modal"
-        let pos = {};
-        if(modal){
-            pos = location.state.meta.from;
-        }
-        if(prevModal)
-        {
-            pos = this.previousLocation.state.meta.from;
-        }
-        const modalLocation = modal ? location : (this.previousLocation || location)
-        console.log("modal", modal)
         return(
             <div id="main">
                     <div id="main-content">
                         <ToastContainer />
                         <div id="content-block" className="">
-                            {!this.props.signedIn &&
+                        {!this.props.loaded &&
                                 <Switch>
-                                    <Route path={Routes.ANY} component={Signin} />
+                                    <Route path={Routes.ANY} component={ApplicationLoader} />
                                 </Switch>
                             }
-                            {this.props.signedIn &&
-                                <>
-                                    <Switch location={modal ? this.previousLocation : location}>
-                                        <Route path={Routes.newsfeedUrl(":contextNaturalKey?", ":contextObjectId?")} component={NewsfeedPage} />
-                                        <Route path={Routes.SIGNIN} component={Signin} />
-                                        <Route path={Routes.ROOT} exact={true} component={DashCompWithData} />
-                                        <Route path={Routes.ANY} component={error404} />
-                                    </Switch>
-                                    <Transition key={modalLocation.pathname} unmountOnExit={true} mountOnEnter={true} appear={true} in={modal} timeout={{
-                                        enter: 100,
-                                        exit: 450,
-                                    }} >
-                                    {
-                                        (status) => (
-                                            
-                                            <div className={`modal-container modal-${status}`} style={pos}>
-                                                <Switch location={modalLocation}>
-                                                    <Route path="/recipe/:id" component={DEMO} />
-                                                </Switch>
-                                            </div>
-                                    )}
-                                    </Transition>
-                                </>
+                            {this.props.loaded &&
+                                <Switch>
+                                    <Route path={Routes.newsfeedUrl(":contextNaturalKey?", ":contextObjectId?")} component={NewsfeedPage} />
+                                    <Route path={Routes.SIGNIN} component={Signin} />
+                                    <Route path={Routes.SIGNOUT} component={Signout} />
+                                    <Route path={Routes.ROOT} exact={true} component={DashCompWithData} />
+                                    <Route path={Routes.ANY} component={error404} />
+                                </Switch>
                             }
+                            
                         </div>
                     </div>
             </div>
@@ -96,6 +68,7 @@ class Main extends React.Component<Props, State> {
 const mapStateToProps = (state:ReduxState, ownProps: OwnProps):ReduxStateProps => {
     return {
       signedIn:state.authentication.signedIn,
+      loaded:state.application.loaded
     }
 }
 export default withRouter(connect<ReduxStateProps, ReduxDispatchProps, OwnProps>(mapStateToProps, null)(Main))

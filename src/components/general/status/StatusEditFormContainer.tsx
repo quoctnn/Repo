@@ -2,7 +2,7 @@ import * as React from 'react';
 import StatusForm from "./StatusForm";
 import { Mention } from '../../input/MentionEditor';
 import { ProfileManager } from '../../../managers/ProfileManager';
-import { Status, TempStatus, UploadedFile } from '../../../types/intrasocial_types';
+import { Status, TempStatus, UploadedFile } from '../../../types/intrasocial_types2';
 import { EditorContent, IEditorComponent } from '../ChatMessageComposer';
 import { Settings } from '../../../utilities/Settings';
 import { URL_REGEX, URL_WWW_REGEX } from '../../../utilities/IntraSocialUtilities';

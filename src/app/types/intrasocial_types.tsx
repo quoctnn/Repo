@@ -480,6 +480,43 @@ export const UserStatus = strEnum([
     "invisible",
 ])
 export type UserStatus = keyof typeof UserStatus;
+//DASHBOARD
+export type Module = {
+    id:number
+    name:string
+    type:string
+    disabled:boolean
+    properties:string
+}
+export type GridModule = {
+    id:number
+    module:Module
+    title:string
+    column:number
+    row:number
+    width:number
+    height:number
+    grid_layout:number
+}
+export type GridLayout = {
+    id:number
+    grid_modules:[]
+    title:string
+    min_width:300
+}
+export type Dashboard = {
+    id:number
+    grid_layouts:GridLayout[]
+    created_at:string
+    updated_at:string
+    hidden:boolean
+    hidden_reason:string 
+    position:number
+    title:string 
+    slug:string
+    user:number
+}
+//DASHBOARD END
 export interface SimpleUserProfile
 {
     absolute_url: string,
@@ -492,18 +529,21 @@ export interface UserProfile extends SimpleUserProfile{
     email:string|null
     locale:string|null
     timezone:string|null
-    avatar_thumbnail: string,
-    cover: string,
-    cover_cropped: string,
-    username: string,
-    uuid:string|null,
-    user_status:UserStatus,
-    biography:string,
-    slug_name:string,
+    avatar_thumbnail: string
+    cover: string
+    cover_cropped: string
+    username: string
+    uuid:string|null
+    user_status:UserStatus
+    biography:string
+    slug_name:string
     updated_at:number
-    relationship?: string[],
-    mutual_friends?: number[],
-    last_seen?:number,
+    relationship?: string[]
+    mutual_friends?: number[]
+    last_seen?:number
+    is_anonymous:boolean
+    is_staff:boolean
+    is_superuser:boolean
 }
 export const avatarStateColorForUserProfile = (userProfile:UserProfile) => {
     switch(userProfile.user_status)

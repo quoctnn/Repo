@@ -4,7 +4,7 @@ import * as Actions from '../../actions/Actions';
 import { RootState } from '../../reducers/index';
 import { NotificationCenter } from '../../notifications/NotificationCenter';
 import { Store } from 'redux';
-import { UserStatus, UserProfile } from '../../types/intrasocial_types';
+import { UserStatus, UserProfile } from '../../types/intrasocial_types2';
 import { sendOnWebsocket, EventStreamMessageType } from '../../app/network/ChannelEventStream';
 require("./UserStatusSelector.scss");
 

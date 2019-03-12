@@ -1,7 +1,7 @@
 import React = require("react");
 import { NotificationCenter } from "../notifications/NotificationCenter";
 import { ToastManager } from './ToastManager';
-import { Notification } from '../types/intrasocial_types';
+import { Notification } from '../types/intrasocial_types2';
 import { Store } from "redux";
 import * as Actions from '../actions/Actions';
 import { RootState } from "../reducers";

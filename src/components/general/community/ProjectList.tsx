@@ -6,7 +6,7 @@ import * as Actions from "../../../actions/Actions";
 import ApiClient, { ApiClientFeedPageCallback } from '../../../network/ApiClient';
 import { RootState } from '../../../reducers';
 import { CommunityProjects } from '../../../reducers/projectListCache';
-import { Project } from '../../../types/intrasocial_types';
+import { Project } from '../../../types/intrasocial_types2';
 import Routes from '../../../utilities/Routes';
 import { translate } from '../../intl/AutoIntlProvider';
 import LoadingSpinner from '../LoadingSpinner';

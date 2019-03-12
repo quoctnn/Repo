@@ -1,0 +1,11 @@
+@import "../../Config";
+#sign-out
+{
+    @include var(color, primary-text-color);
+    .jumbotron
+    {
+        @include var(background-color, main-content-background);
+        max-width: 500px;
+        margin: 0 auto;
+    }
+}

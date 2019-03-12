@@ -3,7 +3,7 @@ import ReactButton from './ReactButton';
 import StatusOptions from './StatusOptions';
 import { StatusUtilities } from '../../../utilities/StatusUtilities';
 import ReactionStats from './ReactionStats';
-import { Status, UploadedFile, UserProfile } from '../../../types/intrasocial_types';
+import { Status, UploadedFile, UserProfile } from '../../../types/intrasocial_types2';
 import { StatusActions } from './StatusComponent';
 require("./StatusFooterStats.scss");
 

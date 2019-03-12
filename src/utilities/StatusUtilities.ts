@@ -1,5 +1,5 @@
 import Constants from '../utilities/Constants';
-import { Status, UserProfile, UploadedFile } from '../types/intrasocial_types';
+import { Status, UserProfile, UploadedFile } from '../types/intrasocial_types2';
 import { AuthenticationManager } from '../managers/AuthenticationManager';
 import { URL_REGEX, URL_WWW_REGEX } from './IntraSocialUtilities';
 export class StatusUtilities 

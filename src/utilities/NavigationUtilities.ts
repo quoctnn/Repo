@@ -1,4 +1,4 @@
-import { UserProfile } from '../types/intrasocial_types';
+import { UserProfile } from '../types/intrasocial_types2';
 import * as H from 'history';
 import Routes from './Routes';
 import { ProfileManager } from '../managers/ProfileManager';

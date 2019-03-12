@@ -15,7 +15,7 @@ import * as moment from 'moment-timezone';
 import { List } from '../../components/general/List';
 import { NotificationCenter } from '../../notifications/NotificationCenter';
 import { ProfileManager } from '../../managers/ProfileManager';
-import { UserProfile, Conversation } from '../../types/intrasocial_types';
+import { UserProfile, Conversation } from '../../types/intrasocial_types2';
 import { EventStreamMessageType } from '../../app/network/ChannelEventStream';
 let timezone = moment.tz.guess()
 

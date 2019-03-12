@@ -6,7 +6,7 @@ import { DayLine } from './DayLine';
 import { ChatMessageUser } from './ChatMessageUser';
 import LoadingSpinner from './LoadingSpinner';
 import { ProfileManager } from '../../managers/ProfileManager';
-import { Message, UserProfile } from '../../types/intrasocial_types';
+import { Message, UserProfile } from '../../types/intrasocial_types2';
 require("./ChatMessageList.scss");
 let timezone = moment.tz.guess()
 export interface Props {

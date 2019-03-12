@@ -177,6 +177,7 @@ class ChannelEventStream extends React.Component<Props, State> {
                 if (this.stream && (this.stream as any)._shouldReconnect)
                     (this.stream as any)._connect();
             }
+            window.socket = this.stream
         }
     }
     componentDidMount = () => {

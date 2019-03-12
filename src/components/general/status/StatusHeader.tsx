@@ -4,7 +4,7 @@ import * as moment from 'moment-timezone';
 import Moment from "react-moment";
 import {FormattedDate, FormattedTime} from "react-intl";
 import { Avatar } from '../Avatar';
-import { UserProfile, Status, ContextNaturalKey, ICommunity } from '../../../types/intrasocial_types';
+import { UserProfile, Status, ContextNaturalKey, ICommunity } from '../../../types/intrasocial_types2';
 import { Settings } from '../../../utilities/Settings';
 import { StatusActions } from './StatusComponent';
 import Text from '../Text';

@@ -3,7 +3,7 @@ import Embedly from '../components/general/Embedly';
 const processString = require('react-process-string');
 import Routes from './Routes';
 import * as React from 'react';
-import { UserProfile } from '../types/intrasocial_types';
+import { UserProfile } from '../types/intrasocial_types2';
 import { StatusActions } from '../components/general/status/StatusComponent';
 import Text from '../components/general/Text';
 export const getDomainName = (url:string) =>  {

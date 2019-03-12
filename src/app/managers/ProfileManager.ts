@@ -59,7 +59,6 @@ export abstract class ProfileManager
         {
             completion(profile)
         }
-
     }
     static ensureProfilesExists = (profiles:number[], completion:() => void) =>
     {
@@ -126,7 +125,7 @@ export abstract class ProfileManager
         return compareString.toLowerCase().indexOf(query.toLowerCase()) > -1
     }
 
-    static searchProfiles = ( query:string, communityId?:number, maxItems?:number) =>
+    static searchProfiles = ( query:string, communityId?:number, maxItems?:number, includeMe = false) =>
     {
         var searchables:number[] = []
         if(communityId)
@@ -143,7 +142,7 @@ export abstract class ProfileManager
         }
         else
         {
-            searchables = ProfileManager.getContactListIds()
+            searchables = ProfileManager.getContactListIds(includeMe)
         }
         const result = ProfileManager.searchProfilesIds(query, searchables)
         if(maxItems)
@@ -155,8 +154,11 @@ export abstract class ProfileManager
         let users = ProfileManager.getProfiles(profiles || [])
         return users.filter(u => ProfileManager.filterProfile(query,u!))
     }
-    static getContactListIds = () => {
-        return ProfileManager.getStore().getState().contactListCache.contacts
+    static getContactListIds = (includeMe = false) => {
+        const profiles = [...ProfileManager.getStore().getState().contactListCache.contacts]
+        if(includeMe)
+            profiles.unshift(AuthenticationManager.getAuthenticatedUser().id)
+        return profiles
     }
     static storeProfiles = (profiles:UserProfile[]) => {
         ProfileManager.getStore().dispatch(addProfilesAction(profiles))

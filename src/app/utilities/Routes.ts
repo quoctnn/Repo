@@ -4,6 +4,7 @@ export default abstract class Routes {
     static ROOT = "/"
     static PROFILE_UPDATE = "/profile/update"
     static SIGNIN = "/signin"
+    static SIGNOUT = "/signout"
     static DEVELOPER_TOOL = "/developer-tool"
     static CONVERSATIONS = "/conversations/"
     static CONVERSATION_CREATE = "/conversation/create/"

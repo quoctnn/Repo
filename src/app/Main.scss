@@ -25,6 +25,10 @@ body
     @include var(background-color, body-background);
     @include var(font-family, font-family-default);
     @include var(color, primary-text-color);
+    
+}
+body[class^="select-active-"], body[class*=" select-active-"]{
+    position: static !important;
 }
 button{@include var(color, primary-text-color);}
 .btn-xs{

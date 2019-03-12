@@ -1,5 +1,5 @@
 import {Types} from "../utilities/Types"
-import { Community } from "../types/intrasocial_types";
+import { Community } from "../types/intrasocial_types2";
 const communityArray:Community[] = []
 
 const INITIAL_STATE = { communities: communityArray}

@@ -2,7 +2,7 @@ import * as React from "react";
 import { connect } from 'react-redux'
 import { CoverImage } from '../../components/general/CoverImage';
 import { RootState } from "../../reducers";
-import { Event } from '../../types/intrasocial_types';
+import { Event } from '../../types/intrasocial_types2';
 import { EventManager } from "../../managers/EventManager";
 import LoadingSpinner from "../../components/general/LoadingSpinner";
 require("./EventView.scss");

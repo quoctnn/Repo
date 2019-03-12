@@ -1,6 +1,6 @@
 import { Types } from "../utilities/Types";
 import { nullOrUndefined } from '../utilities/Utilities';
-import { UserProfile } from "../types/intrasocial_types";
+import { UserProfile } from "../types/intrasocial_types2";
 import storageLocal from 'redux-persist/lib/storage'
 import { persistReducer } from "redux-persist";
 

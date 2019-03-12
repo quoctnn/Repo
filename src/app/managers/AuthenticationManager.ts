@@ -4,6 +4,14 @@ import { UserProfile, UserStatus } from '../types/intrasocial_types';
 import { sendOnWebsocket, EventStreamMessageType } from '../network/ChannelEventStream';
 import { ReduxState } from '../redux/index';
 import { setAuthenticationProfileAction, setAuthenticationTokenAction } from '../redux/authentication';
+import { NotificationCenter } from '../utilities/NotificationCenter';
+import { ApplicationManager } from './ApplicationManager';
+import { resetCommunitiesAction } from '../redux/communityStore';
+import { resetGroupsAction } from '../redux/groupStore';
+import { resetProfilesAction } from '../redux/profileStore';
+import { contactListResetAction } from '../redux/contactListCache';
+
+export const AuthenticationManagerAuthenticatedUserChangedNotification = "AuthenticationManagerAuthenticatedUserChangedNotification"
 export abstract class AuthenticationManager
 {
     private static lastUserActivity: number = 0;
@@ -21,19 +29,28 @@ export abstract class AuthenticationManager
     {
         return AuthenticationManager.getStore().getState().authentication.token
     }
-    static signIn(token:string|null)
+    static signIn(token:string)
     {
+        AuthenticationManager.getStore().dispatch(setAuthenticationProfileAction(null))
+        AjaxRequest.setup(token)
         AuthenticationManager.getStore().dispatch(setAuthenticationTokenAction(token))
+        ApplicationManager.loadApplication()
+    }
+    static signInCurrent = () => {
+
+        const authToken = AuthenticationManager.getAuthenticationToken()
+        AuthenticationManager.signIn(authToken)
     }
     static setAuthenticatedUser(profile:UserProfile|null)
     {
-        AjaxRequest.setup(AuthenticationManager.getAuthenticationToken())
+        //AjaxRequest.setup(AuthenticationManager.getAuthenticationToken())
         AuthenticationManager.getStore().dispatch(setAuthenticationProfileAction(profile))
         AuthenticationManager.updateProfileStatus(profile)
         if(profile)
         {
             //AuthenticationManager.getStore().dispatch(Actions.setDirtyPagedData())
         }
+        NotificationCenter.push(AuthenticationManagerAuthenticatedUserChangedNotification,[{profile}])
     }
     static setUpdatedProfileStatus = (profile:UserProfile) => {
 
@@ -46,22 +63,21 @@ export abstract class AuthenticationManager
     }
     static signOut()
     {
-        let store = AuthenticationManager.getStore();
 
         // Remove the keepAlive (last_seen) timer and eventListeners
         AuthenticationManager.clearKeepAliveTimer()
         document.removeEventListener('mousedown', AuthenticationManager.resetUserActivityCounter);
         window.removeEventListener('focus', AuthenticationManager.resetUserActivityCounter);
-
+        const store = AuthenticationManager.getStore()
         // Clean up cached data
-        //store.dispatch(Actions.resetCommunityStore());
-        //store.dispatch(Actions.resetGroupStore());
-        //store.dispatch(Actions.resetCommunityGroupsCache());
-        //store.dispatch(Actions.resetProfileStore());
+        store.dispatch(resetCommunitiesAction());
+        store.dispatch(resetGroupsAction());
+        store.dispatch(resetProfilesAction());
+        store.dispatch(contactListResetAction());
+
 
         // Clean up userProfile and token
         AuthenticationManager.signIn(null)
-        AuthenticationManager.setAuthenticatedUser(null);
     }
     static resetUserActivityCounter()
     {

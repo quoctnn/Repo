@@ -1,5 +1,5 @@
 import {Types} from "../utilities/Types"
-import { Project } from "../types/intrasocial_types";
+import { Project } from "../types/intrasocial_types2";
 
 const projectsArray:Project[] = []
 

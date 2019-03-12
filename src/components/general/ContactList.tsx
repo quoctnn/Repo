@@ -1,7 +1,7 @@
 import * as React from "react";
 import { connect } from 'react-redux'
 import { RootState } from '../../reducers/index';
-import { UserProfile, avatarStateColorForUserProfile } from '../../types/intrasocial_types';
+import { UserProfile, avatarStateColorForUserProfile } from '../../types/intrasocial_types2';
 import { List } from "./List";
 import { Link } from "react-router-dom";
 import { Avatar } from "./Avatar";

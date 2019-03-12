@@ -1,7 +1,7 @@
 import {  Store } from 'redux';
 import { RootState } from '../reducers';
 import * as Actions from '../actions/Actions';
-import { Event } from '../types/intrasocial_types';
+import { Event } from '../types/intrasocial_types2';
 import ApiClient from '../network/ApiClient';
 import eventStore from '../reducers/eventStore';
 export abstract class EventManager

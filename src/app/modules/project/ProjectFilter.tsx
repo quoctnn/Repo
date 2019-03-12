@@ -1,9 +1,9 @@
 import * as React from 'react';
-import AsyncSelect from 'react-select/lib/Async'
 import classnames from "classnames"
 import ApiClient from '../../network/ApiClient';
 import { ElasticSearchType, ContextNaturalKey } from '../../types/intrasocial_types';
 import { ContextValue } from '../../components/general/input/ContextFilter';
+import { AsyncSelectIW } from '../../components/general/input/AsyncSelectIW';
 
 
 type OptionType = {options:ContextValue[], label:string}
@@ -45,7 +45,7 @@ export class ProjectFilter extends React.PureComponent<Props & React.HTMLAttribu
         return new Promise((resolve) => {
             return ApiClient.search("*" + text + "*", ProjectFilter.searchTypes,false , true, false, true, 10, 0, (data,status,error) => {
                 const d = data && data.results || []
-                resolve(this.groupResultItems( d.map(r => this.convertResultItem(r)).filter(r => r != null)) )
+                resolve(d.map(r => this.convertResultItem(r)).filter(r => r != null)) 
             })
         });
     }
@@ -66,7 +66,7 @@ export class ProjectFilter extends React.PureComponent<Props & React.HTMLAttribu
         const { selectedValue} = this.state;
         const cn = classnames("context-filter", className)
         return(<div className={cn}>
-                <AsyncSelect 
+                <AsyncSelectIW 
                     styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
                     isClearable={true}
                     value={selectedValue}
@@ -74,7 +74,7 @@ export class ProjectFilter extends React.PureComponent<Props & React.HTMLAttribu
                     cacheOptions={true} 
                     defaultOptions={true} 
                     onChange={this.onChange}
-                    loadOptions={this.searchOptions2} />
+                    loadOptions={this.searchOptions} />
                 </div>
         );
     }

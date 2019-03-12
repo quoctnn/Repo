@@ -1,5 +1,5 @@
 import {Types} from "../utilities/Types"
-import { Event } from "../types/intrasocial_types";
+import { Event } from "../types/intrasocial_types2";
 
 const eventsArray:Event[] = []
 

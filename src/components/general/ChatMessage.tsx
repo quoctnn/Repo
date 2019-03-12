@@ -10,7 +10,7 @@ const processString = require('react-process-string');
 import store from '../../main/OldApp';
 import { FileUtilities } from '../../utilities/FileUtilities';
 import { ProfileManager } from "../../managers/ProfileManager";
-import { Message } from "../../types/intrasocial_types";
+import { Message } from "../../types/intrasocial_types2";
 require("./ChatMessage.scss");
 
 export enum MessagePosition

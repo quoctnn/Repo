@@ -4,7 +4,7 @@ import { AuthenticationManager } from '../managers/AuthenticationManager';
 import Embedly from '../components/general/Embedly';
 import { Link } from 'react-router-dom';
 import Routes from './Routes';
-import { Status, UserProfile, UploadedFile } from '../types/intrasocial_types';
+import { Status, UserProfile, UploadedFile } from '../types/intrasocial_types2';
 
 export const URL_REGEX = /(\b(https?|ftp):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/gim
 export const URL_WWW_REGEX = /(^(\b|\s+)(www)\.[\S]+(\b|$))/gim

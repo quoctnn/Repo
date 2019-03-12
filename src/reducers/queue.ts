@@ -4,7 +4,7 @@ import * as Actions from '../actions/Actions';
 import { RootState } from './index';
 import { StatusContextKeys } from './statuses';
 import ApiClient from '../network/ApiClient';
-import { Status, Message, UploadedFile } from "../types/intrasocial_types";
+import { Status, Message, UploadedFile } from "../types/intrasocial_types2";
 import { sendOnWebsocket, EventStreamMessageType, EventLock } from "../app/network/ChannelEventStream";
 
 var messageQueueWorking = false

@@ -15,15 +15,16 @@ import activeCommunity from './activeCommunity';
 import { eventStore } from './eventStore';
 import {taskStore} from './taskStore';
 import { projectStore } from "./projectStore";
+import application from "./application";
 const rootPersistConfig:PersistConfig = {
     key: 'root',
     storage: storageLocal,
-    blacklist: ['authentication'],
+    blacklist: ['authentication', "application"],
     debug:true,
   }
 const rootReducer = combineReducers({
     authentication, language, theme, endpoint, embedlyStore, communityStore, profileStore, contactListCache,
-    groupStore, activeCommunity, eventStore, taskStore, projectStore
+    groupStore, activeCommunity, eventStore, taskStore, projectStore, application
 })
 export default persistReducer(rootPersistConfig, rootReducer)
 export interface ReduxState
@@ -41,5 +42,6 @@ export interface ReduxState
     taskStore:{ byId: { [id: number]: Task},allIds: number[]}
     contactListCache:{contacts:number[]}
     activeCommunity:{activeCommunity:number}
+    application:{loaded:boolean}
     _persist:any
 }

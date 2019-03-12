@@ -3,7 +3,7 @@ import ApiClient from '../network/ApiClient';
 import { CommunityManager } from './CommunityManager';
 import * as Actions from '../actions/Actions';
 import { RootState } from '../reducers';
-import { UserProfile, ContextNaturalKey } from '../types/intrasocial_types';
+import { UserProfile, ContextNaturalKey } from '../types/intrasocial_types2';
 import { AuthenticationManager } from './AuthenticationManager';
 import { GroupManager } from './GroupManager';
 import { ProjectManager } from './ProjectManager';

@@ -2,7 +2,7 @@ import * as React from 'react';
 import { getTextContent } from '../../../utilities/Utilities';
 import { ProfileManager } from '../../../managers/ProfileManager';
 import ContentGallery from '../gallery/ContentGallery';
-import { Status } from '../../../types/intrasocial_types';
+import { Status } from '../../../types/intrasocial_types2';
 import { StatusActions } from './StatusComponent';
 require("./StatusContent.scss");
 

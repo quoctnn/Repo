@@ -3,7 +3,7 @@ import { Types } from '../utilities/Types';
 import { AjaxRequest } from '../network/AjaxRequest';
 import * as Actions from "../actions/Actions"
 import Constants from '../utilities/Constants';
-import { EmbedlyItem } from '../types/intrasocial_types';
+import { EmbedlyItem } from '../types/intrasocial_types2';
 
 const addPages = (state, action) => {
     let pages = action.pages as EmbedlyItem[]

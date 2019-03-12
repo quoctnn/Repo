@@ -1,6 +1,6 @@
 import { AnyAction } from 'redux'
 import { Types } from '../utilities/Types';
-import { Status } from '../types/intrasocial_types';
+import { Status } from '../types/intrasocial_types2';
 export interface PaginatorAction extends AnyAction
 {
     type:string

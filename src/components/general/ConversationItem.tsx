@@ -6,7 +6,7 @@ import { RootState } from '../../reducers';
 import { connect } from 'react-redux'
 import { getConversationTitle } from '../../utilities/ConversationUtilities';
 import { ProfileManager } from '../../managers/ProfileManager';
-import { Conversation, UserProfile } from '../../types/intrasocial_types';
+import { Conversation, UserProfile } from '../../types/intrasocial_types2';
 import { nullOrUndefined } from '../../utilities/Utilities';
 require("./ConversationItem.scss");
 export interface OwnProps {

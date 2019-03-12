@@ -51,10 +51,13 @@ class ProjectComponent extends React.Component<Props, State> {
     }
     contextDataChanged = (prevData:ProjectMenuData) => {
         const data = this.props.contextData
-        return !prevData.statusFilter.isEqual(data.statusFilter) || 
+        return !prevData.state.isEqual(data.state) || 
                 !prevData.tags.isEqual(data.tags) || 
+                !prevData.priority.isEqual(data.priority) || 
                 prevData.project != data.project || 
                 prevData.assignedTo != data.assignedTo || 
+                prevData.creator != data.creator || 
+                prevData.notAssigned != data.notAssigned ||
                 prevData.category != data.category || 
                 prevData.responsible != data.responsible || 
                 prevData.term != data.term
@@ -103,8 +106,16 @@ class ProjectComponent extends React.Component<Props, State> {
         const { limit } = this.props
         const data = this.props.contextData
         const project = data.project && data.project.id
-        const statusFilter = data.statusFilter
-        ApiClient.getTasks(limit, offset,project, statusFilter,(data, status, error) => {
+        const state = data.state
+        const priority = data.priority
+        const tags = data.tags
+        const assignedTo = data.assignedTo
+        const responsible = data.responsible
+        const category = data.category
+        const term = data.term
+        const creator = data.creator
+        const notAssigned = data.notAssigned
+        ApiClient.getTasks(limit, offset,project, state, priority, tags, assignedTo, responsible, creator, notAssigned, category, term, (data, status, error) => {
             if(data && data.results)
             {
                 let newData = data.results

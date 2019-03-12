@@ -8,6 +8,7 @@ import { EventStreamMessageType, eventStreamNotificationPrefix, WebsocketState }
 import { ReduxState } from '../redux/index';
 export abstract class EventStreamManager
 {
+    static connected:boolean = false
     static setup = () => 
     {
         NotificationCenter.addObserver(eventStreamNotificationPrefix + EventStreamMessageType.STATE, EventStreamManager.eventstreamStateReceived)
@@ -15,7 +16,6 @@ export abstract class EventStreamManager
     }
     static eventstreamSocketStateChanged = (...args:any[]) => 
     {
-        
         console.log("eventstreamSocketStateChanged args", args)
         if(WebsocketState.CLOSED == args[0])
             EventStreamManager.socketDisconnected()
@@ -23,18 +23,16 @@ export abstract class EventStreamManager
     }
     static eventstreamStateReceived = (...args:any[]) => 
     {
+        EventStreamManager.connected = true
         console.log("eventstreamStateReceived", args)
         let state = args[0]
-        let contacts: UserProfile[] = state.contacts || []
-        ProfileManager.storeProfiles(contacts)
-        ProfileManager.setContactListCache(contacts.map(i => i.id))
-        CommunityManager.storeCommunities(state.communities || []);
-        AuthenticationManager.setAuthenticatedUser(state.user)
+        const {anonymous, channel_name} = state
+        EventStreamManager.connected = true
+
     }
     static socketDisconnected = () => 
     {
-        AuthenticationManager.setAuthenticatedUser(null)
-        //EventStreamManager.getStore().dispatch(Actions.setDirtyPagedData())
+        EventStreamManager.connected = false
     }
     private static getStore = ():Store<ReduxState,any> =>
     {

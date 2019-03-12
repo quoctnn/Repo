@@ -4,9 +4,9 @@ import { messagesPaginator, messageReducerKey } from '../reducers/messages';
 import { InsertItemAction } from '../reducers/createPaginator';
 import { statusesPaginator } from '../reducers/statuses';
 import { Status, EmbedlyItem, Message, Conversation, Community,
-         UserProfile, Group, Event, Project, Task } from '../types/intrasocial_types';
+         UserProfile, Group, Event, Project, Task } from '../types/intrasocial_types2';
 import { notificationsPaginator, notificationsReducerKey } from '../reducers/notifications';
-import { Notification } from '../types/intrasocial_types';
+import { Notification } from '../types/intrasocial_types2';
 
 //embedly
 export const requestEmbedlyData = (urls:string[]) => ({

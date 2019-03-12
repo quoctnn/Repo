@@ -2,7 +2,7 @@ import Constants from "../utilities/Constants";
 import {AjaxRequest} from "./AjaxRequest";
 import { EndpointManager } from '../managers/EndpointManager';
 var $ = require("jquery")
-import { Status, UserProfile, UploadedFile, Community, Group, Conversation, Project, Message, Event, Task, ElasticSearchType, ObjectAttributeType, StatusObjectAttribute, EmbedCardItem, ReportTag, ContextNaturalKey, ReportResult, SimpleTask } from '../types/intrasocial_types';
+import { Status, UserProfile, UploadedFile, Community, Group, Conversation, Project, Message, Event, Task, ElasticSearchType, ObjectAttributeType, StatusObjectAttribute, EmbedCardItem, ReportTag, ContextNaturalKey, ReportResult, SimpleTask, Dashboard } from '../types/intrasocial_types';
 import { nullOrUndefined } from '../utilities/Utilities';
 export type PaginationResult<T> = {results:T[], count:number, previous:string|null, next:string|null}
 export type StatusCommentsResult<T> = {results:T[], count:number, parent:T}
@@ -40,6 +40,22 @@ export default class ApiClient
         })
         return arr.join('&');
     }
+    static getAcquaintances(callback:ApiClientFeedPageCallback<UserProfile>) {
+        const url = Constants.apiRoute.acquaintancesUrl + "?" + this.getQueryString({})
+        AjaxRequest.get(url, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
+    static getDashboards(callback:ApiClientFeedPageCallback<Dashboard>){
+        const url = Constants.apiRoute.dashboardListEndpoint + "?" + this.getQueryString({})
+        AjaxRequest.get(url, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }   
     static reportObject(type:string, contextId:number, tags:string[], description:string , callback:ApiClientCallback<ReportResult>){
        
         const endpoint = Constants.apiRoute.reportUrl(type,contextId)
@@ -165,8 +181,31 @@ export default class ApiClient
             callback(null, status, error)
         })
     }
-    static getTasks(limit:number, offset:number, project:number, state:string[], callback:ApiClientFeedPageCallback<SimpleTask>){
-        let url = Constants.apiRoute.taskUrl + "?" + this.getQueryString({limit,offset,project,state})
+    static getTasks(limit:number, 
+                    offset:number, 
+                    project:number, 
+                    state:string[], 
+                    priority:string[], 
+                    tags:string[], 
+                    assigned_to:number, 
+                    responsible:number, 
+                    creator:number, 
+                    not_assigned:boolean,
+                    category:string, 
+                    term:string, 
+                    callback:ApiClientFeedPageCallback<SimpleTask>){
+        let url = Constants.apiRoute.taskUrl + "?" + this.getQueryString({limit,
+                                                                        offset,
+                                                                        project,
+                                                                        state,
+                                                                        priority,
+                                                                        tags,
+                                                                        assigned_to,
+                                                                        responsible, 
+                                                                        creator,
+                                                                        not_assigned,
+                                                                        category, 
+                                                                        term})
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {

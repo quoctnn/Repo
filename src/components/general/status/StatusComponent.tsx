@@ -4,7 +4,7 @@ import { StatusUtilities } from '../../../utilities/StatusUtilities';
 import StatusHeader from './StatusHeader';
 import StatusContent from './StatusContent';
 import { AuthenticationManager } from '../../../managers/AuthenticationManager';
-import { Status } from '../../../types/intrasocial_types';
+import { Status } from '../../../types/intrasocial_types2';
 import StatusFooterStats from './StatusFooterStats';
 require("./StatusComponent.scss");
 export enum StatusActions

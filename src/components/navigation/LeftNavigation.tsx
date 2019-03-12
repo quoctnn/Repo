@@ -1,7 +1,7 @@
 import * as React from "react";
 import { connect } from 'react-redux'
 import { RootState } from "../../reducers";
-import { Community } from "../../types/intrasocial_types";
+import { Community } from "../../types/intrasocial_types2";
 import NotificationsList from "../general/NotificationsList";
 import ContactList from "../general/ContactList";
 import classnames from 'classnames';

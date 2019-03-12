@@ -27,7 +27,7 @@ const contactListCache = (state = INITIAL_STATE, action:ContactListAddAction) =>
     {
         case ContactListActionTypes.SetContacts:
         {
-            return { ...state , contacts: action.contacts}
+            return { ...state , contacts: [...action.contacts]}
         }
         case ContactListActionTypes.AppendContacts:
         {

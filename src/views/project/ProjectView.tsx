@@ -2,7 +2,7 @@ import * as React from "react";
 import { connect } from 'react-redux'
 import { CoverImage } from '../../components/general/CoverImage';
 import { RootState } from "../../reducers";
-import { Project } from "../../types/intrasocial_types";
+import { Project } from "../../types/intrasocial_types2";
 import { ProjectManager } from "../../managers/ProjectManager";
 import LoadingSpinner from "../../components/general/LoadingSpinner";
 require("./ProjectView.scss");

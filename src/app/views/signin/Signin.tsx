@@ -6,34 +6,27 @@ import { connect } from 'react-redux'
 import { AuthenticationManager } from '../../managers/AuthenticationManager'
 import { ToastManager } from '../../managers/ToastManager'
 import { ReduxState } from '../../redux'
-import { setAuthenticationTokenAction } from '../../redux/authentication'
 import { EndpointLoginType } from '../../redux/endpoint'
 import { EndpointManager } from '../../managers/EndpointManager'
 import "./Signin.scss"
 import { translate } from '../../localization/AutoIntlProvider';
 
-interface OwnProps {
+type OwnProps = {
     
 }
-interface ReduxStateProps{
+type ReduxStateProps = {
     apiEndpoint?:number,
     language:number,
 }
-interface ReduxDispatchProps{
-    setAuthorizationData:(token:string) => void,
-}
-type Props = RouteComponentProps<any> & ReduxDispatchProps & ReduxStateProps & OwnProps
+type Props = RouteComponentProps<any> & ReduxStateProps & OwnProps
 class Signin extends React.Component<Props, {}> {
 
     emailInput: HTMLInputElement|null = null
     passwordInput: HTMLInputElement|null = null
-    constructor(props) {
+    constructor(props:Props) {
         super(props);
-        this.doSignin = this.doSignin.bind(this)
-        this.loginCallback = this.loginCallback.bind(this)
     }
-    loginCallback(data:{token:string|null}, status:string, error:string)
-    {
+    loginCallback = (data:{token:string|null}, status:string, error:string) => {
         if(error || status == "error")
         {
             ToastManager.showErrorToast(error || translate("Could not sign in"))
@@ -41,13 +34,11 @@ class Signin extends React.Component<Props, {}> {
         }
         if(data.token)
         {
-            this.props.setAuthorizationData(data.token)
             AuthenticationManager.signIn(data.token)
         }
         this.props.history.push('/')
     }
-    doSignin(e)
-    {
+    doSignin = (e) => {
         
         e.preventDefault()
         let endpoint = EndpointManager.currentEndpoint()
@@ -61,7 +52,7 @@ class Signin extends React.Component<Props, {}> {
 
         }
     }
-    render() {
+    render = () => {
         let endpoint = EndpointManager.currentEndpoint().endpoint
         endpoint = endpoint.replace(/(^\w+:|)\/\//, '');
         endpoint = endpoint.replace(/(:\d+$)/, '');
@@ -94,11 +85,4 @@ const mapStateToProps = (state:ReduxState):ReduxStateProps => {
         language: state.language.language,
     };
 }
-const mapDispatchToProps = (dispatch:any, ownProps: OwnProps):ReduxDispatchProps => {
-    return {
-        setAuthorizationData:(token:string) => {
-            dispatch(setAuthenticationTokenAction(token))
-        }
-    }
-}
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Signin));
+export default withRouter(connect(mapStateToProps, null)(Signin));

@@ -1,7 +1,7 @@
 import * as React from "react";
 import { connect } from 'react-redux'
 import { RootState } from '../../reducers/index';
-import {  Community } from '../../types/intrasocial_types';
+import {  Community } from '../../types/intrasocial_types2';
 import { List } from "./List";
 import CommunityTreeItem from "./community/CommunityTreeItem";
 require("./CommunityList.scss");

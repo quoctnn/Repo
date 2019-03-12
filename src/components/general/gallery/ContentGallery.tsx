@@ -13,7 +13,7 @@ import {
     CarouselCaption
   } from 'reactstrap';
 import { IntraSocialUtilities } from '../../../utilities/IntraSocialUtilities';
-import { UploadedFile } from '../../../types/intrasocial_types';
+import { UploadedFile } from '../../../types/intrasocial_types2';
 require("./ContentGallery.scss");
 export enum GalleryItemType 
 {

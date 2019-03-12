@@ -13,7 +13,7 @@ import emojiPositionSuggestions from "./emojiPositionSuggestion";
 import {defaultTheme} from 'draft-js-emoji-plugin'
 import { Settings } from '../../utilities/Settings';
 import { IntraSocialUtilities } from "../../utilities/IntraSocialUtilities";
-import { UserProfile } from "../../types/intrasocial_types";
+import { UserProfile } from "../../types/intrasocial_types2";
 require("./MentionEditor.scss");
 
 

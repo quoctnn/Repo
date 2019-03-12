@@ -2,7 +2,7 @@ import * as React from 'react';
 import Constants from "../../../utilities/Constants";
 import { ChatMessageComposer, IEditorComponent } from '../ChatMessageComposer';
 import { Mention } from '../../input/MentionEditor';
-import { Status, UploadedFile } from '../../../types/intrasocial_types';
+import { Status, UploadedFile } from '../../../types/intrasocial_types2';
 import { translate } from '../../intl/AutoIntlProvider';
 import classNames = require('classnames');
 
