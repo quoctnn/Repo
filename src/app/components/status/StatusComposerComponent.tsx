@@ -18,10 +18,19 @@ type OwnProps =
     canComment:boolean
     canUpload:boolean
     className?:string
-    statusId:number
     contextObjectId:number 
     contextNaturalKey:string
     communityId:number
+    showEmojiPicker?:boolean
+    placeholder?:string
+    children?:React.ReactNode
+    canPost?:() => boolean
+    refresh?:string
+    onDidType?:(unprocessedText:string) => void
+}
+type DefaultProps = {
+
+    renderPlaceholder:boolean
 }
 type State =
 {
@@ -33,11 +42,14 @@ type State =
     mentions: number[]
     renderPlaceholder:boolean
 }
-type Props = OwnProps
+type Props = OwnProps & DefaultProps
 export class StatusComposerComponent extends React.Component<Props, State> {
     formRef = React.createRef<IEditorComponent & any>();
     element = React.createRef<HTMLDivElement>()
     observer:IntersectionObserver = null
+    static defaultProps:DefaultProps = {
+        renderPlaceholder:true
+    }
     constructor(props:Props) {
         super(props)
 
@@ -48,7 +60,7 @@ export class StatusComposerComponent extends React.Component<Props, State> {
             uploading: false,
             link: null,
             mentions: [],
-            renderPlaceholder:true
+            renderPlaceholder:props.renderPlaceholder
         }
     }
     shouldComponentUpdate = (nextProps:Props, nextState:State) => {
@@ -59,27 +71,29 @@ export class StatusComposerComponent extends React.Component<Props, State> {
                 !nextState.mentions.isEqual(this.state.mentions) || 
                 !nextState.files_ids.isEqual(this.state.files_ids) || 
                 nextState.renderPlaceholder != this.state.renderPlaceholder ||
-                nextProps.className != this.props.className
+                nextProps.className != this.props.className || 
+                nextProps.refresh != this.props.refresh
         return ret;
     }
     componentDidMount = () => {
-        this.observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-              const { isIntersecting } = entry;
-              if (isIntersecting) 
-              {
-                this.setState({renderPlaceholder:false})
-                this.observer.disconnect();
-              }
-            });
-        },
+        if(this.state.renderPlaceholder)
         {
-          //root: document.querySelector(".status-list"),
-          rootMargin: "0px 0px 200px 0px"
-        });
-        this.observer.observe(this.element.current);
-        
-        //this.setState({renderPlaceholder:false})
+            this.observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                  const { isIntersecting } = entry;
+                  if (isIntersecting) 
+                  {
+                    this.setState({renderPlaceholder:false})
+                    this.observer.disconnect();
+                  }
+                });
+            },
+            {
+              //root: document.querySelector(".status-list"),
+              rootMargin: "0px 0px 200px 0px"
+            });
+            this.observer.observe(this.element.current);
+        }
     }
     handleMentionSearch = (search:string, completion:(mentions:Mention[]) => void) => {
         console.log("searching", search)
@@ -93,15 +107,15 @@ export class StatusComposerComponent extends React.Component<Props, State> {
 
     handleSubmit = () => {
         let content = this.getContent()
-        this.setState({text:content.text, mentions: content.mentions}, () => {
-            if (!this.canPost()) {
-                return;
-            }
-            let text = this.state.text.trim();
-            this.props.onActionPress(StatusActions.new, {message:text, mentions:this.state.mentions, files:this.state.files})
-            this.clearStatusState()//maybe not here?
-            this.clearEditor()//maybe not here?
-        })
+        if(this.canPost()){
+            this.setState({text:content.text, mentions: content.mentions}, () => {
+                let text = this.state.text.trim();
+                this.props.onActionPress(StatusActions.new, {message:text, mentions:this.state.mentions, files:this.state.files})
+                this.clearStatusState()//maybe not here?
+                this.clearEditor()//maybe not here?
+            })
+        }
+        
         
     }
 
@@ -119,7 +133,7 @@ export class StatusComposerComponent extends React.Component<Props, State> {
             files: [],
             link: null,
             mentions: []
-        });
+        }, this.canPost);
     }
     findPrimaryLink = () => {
         // Return first url found in text if any.
@@ -139,15 +153,17 @@ export class StatusComposerComponent extends React.Component<Props, State> {
         }
     }
     onDidType = (unprocessedText:string) => {
-        this.setState({text: unprocessedText})
+        const f = this.props.onDidType ? () => this.props.onDidType(unprocessedText) : undefined
+        this.setState({text: unprocessedText}, f)
     }
     canPost = () => {
         let text = this.state.text.trim()
-
-        if (this.state.uploading || text.length > Settings.commentMaxLength) {
-            return false;
-        }
-
+        if (this.state.uploading)
+            return false
+        if(text.length > Settings.commentMaxLength)
+                return false
+        if(this.props.canPost)
+            return this.props.canPost()
         return (text != null && text.length > 0) || this.getFilesCount() > 0
     }
 
@@ -232,7 +248,6 @@ export class StatusComposerComponent extends React.Component<Props, State> {
                     contextNaturalKey={this.props.contextNaturalKey}
                     contextObjectId={this.props.contextObjectId}
                     canUpload={this.props.canUpload}
-                    //onTextChange={this.handleTextChange}
                     canPost={canPost}
                     onSubmit={this.handleSubmit}
                     onFileAdded={this.handleFileAdded}
@@ -243,7 +258,9 @@ export class StatusComposerComponent extends React.Component<Props, State> {
                     canMention={this.props.canMention}
                     className={this.props.className}
                     communityId={this.props.communityId}
-                    />
+                    showEmojiPicker={this.props.showEmojiPicker}
+                    placeholder={this.props.placeholder}
+                    >{this.props.children}</CommentForm>
             );
         } else {
             return null;

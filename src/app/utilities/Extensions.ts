@@ -2,6 +2,7 @@
 
 import * as Immutable from "immutable";
 import { nullOrUndefined } from "./Utilities";
+
 String.prototype.hashCode = function() {
     var hash = 0, i, chr;
     if (this.length === 0) return hash;
@@ -14,10 +15,6 @@ String.prototype.hashCode = function() {
   };
 String.prototype.splice = function(idx, rem, str) {
     return this.slice(0, idx) + str + this.slice(idx + Math.abs(rem));
-};
-function isNumber(value: string | number): boolean
-{
-   return !isNaN(Number(value.toString()));
 }
 String.prototype.isNumber = function(): boolean
 {

@@ -100,20 +100,24 @@ const positionSuggestions = ({ state, props }) => {
   };
 };
 
-interface Props {
+type OwnProps = {
   editorState: EditorState;
   onChange?: (editorState: EditorState) => void;
   filesAdded?:(files:File[]) => void
   mentionSearch:(search:string, completion:(mentions:Mention[]) => void) => void
   onHandleUploadClick?:(event) => void
-  placeholder?:string
+  placeholder?:String
 }
-interface State {
+type DefaultProps = {
+    showEmojiPicker:boolean
+
+}
+type State = {
   suggestions: Mention[]
   emojiSelectOpen: boolean
   search:string
 }
-
+type Props = DefaultProps & OwnProps
 export default class MentionEditor extends React.Component<Props, {}> {
   mentionPlugin: any;
   editor = React.createRef<Editor>();
@@ -130,6 +134,9 @@ export default class MentionEditor extends React.Component<Props, {}> {
   private emojiButton = React.createRef<HTMLButtonElement>();
   private container = React.createRef<HTMLDivElement>();
   private fileUploader = React.createRef<HTMLInputElement>();
+  static defaultProps:DefaultProps = {
+    showEmojiPicker:true
+  }
   constructor(props) {
     super(props);
 
@@ -155,11 +162,6 @@ export default class MentionEditor extends React.Component<Props, {}> {
     if (this.props.onChange) {
       this.props.onChange(editorState);
     }
-  }
-  componentDidUpdate(prevProps:Props, prevState:State)
-  {
-    //if(prevState.search != this.state.search)
-        //this.onSearchChange({value:this.state.search})
   }
   onSearchChange = ({ value }) => {
     this.props.mentionSearch(value, (mentions) => {
@@ -320,13 +322,13 @@ export default class MentionEditor extends React.Component<Props, {}> {
                 </div>
               </div>
               <div className="d-flex align-items-end">
-                <button
+                {this.props.showEmojiPicker && <button
                   ref={this.emojiButton}
                   className="emojiButton editor-button btn btn-default"
                   onMouseUp={this.onEmojiButtonMouseUp}
                   type="button" >
                   <i className="far fa-smile fa-lg"></i>
-                </button>
+                </button>}
                 {(this.props.filesAdded || this.props.onHandleUploadClick) && <button
                   className="upload-button editor-button btn btn-default"
                   type="button" onClick={this.onFileuploadButtonClick} >

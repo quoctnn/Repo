@@ -1,16 +1,21 @@
 import * as React from "react";
-import { ButtonGroup, Button, UncontrolledTooltip, Dropdown, DropdownToggle, DropdownMenu, DropdownItem } from "reactstrap";
+import { ButtonGroup, Button, UncontrolledTooltip, Dropdown, DropdownToggle, DropdownMenu, DropdownItem, DropdownItemProps } from "reactstrap";
 import { translate } from "../../localization/AutoIntlProvider";
 import classnames from 'classnames';
 import { nullOrUndefined } from '../../utilities/Utilities';
 require("./OverflowMenu.scss");
-
+export enum OverflowMenuItemType {
+    option, divider, header
+}
 export type OverflowMenuItem = {
-    onPress:(event:any) => void
-    iconClass:string
-    title:string
+    onPress?:(event:any) => void
+    iconClass?:string
+    title?:string
     id:string
     toggleMenu?:boolean
+    type:OverflowMenuItemType
+    active?:boolean
+    disabled?:boolean
 }
 type Props = {
     fetchItems:() => OverflowMenuItem[]
@@ -101,9 +106,17 @@ export class OverflowMenu extends React.Component<Props, State> {
                             }
                             <DropdownMenu>
                                 {rest.map(i => {
+                                    const props:Partial<DropdownItemProps> = {}
+                                    if(i.type == OverflowMenuItemType.header)
+                                    props.header = true
+                                    else if(i.type == OverflowMenuItemType.divider)
+                                        props.divider = true
+                                    if(i.disabled)
+                                        props.disabled = true
                                     const toggle = nullOrUndefined( i.toggleMenu ) ? true : i.toggleMenu
-                                    return (<DropdownItem toggle={toggle} key={i.id} onClick={i.onPress} className="clickable">
-                                                    <i className={i.iconClass}></i>
+
+                                    return (<DropdownItem active={i.active}  {...props} toggle={toggle} key={i.id} onClick={i.onPress} className="clickable">
+                                                    {i.iconClass && <i className={i.iconClass}></i>}
                                                     {i.title}
                                             </DropdownItem>)
                                 })}

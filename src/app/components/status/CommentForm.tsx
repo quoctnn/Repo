@@ -1,8 +1,8 @@
 import * as React from "react"
-import StatusFormBase from './StatusFormBase';
 import FilesUpload from './FilesUpload';
 import classnames from 'classnames';
 import "./CommentForm.scss"
+import StatusFormBase from "../general/StatusFormBase";
 
 export class CommentForm extends StatusFormBase {
     constructor(props) {
@@ -17,6 +17,7 @@ export class CommentForm extends StatusFormBase {
         const cn = classnames("comment-form", this.props.className)
         return (<div className={cn}>
                     <div className="chat-message-composer-container file-upload-container">
+                        {this.props.children}
                         {this.renderTextArea(this.props.canPost)}
                         {this.state.showDropzone &&
                             <FilesUpload onFileAdded={this.handleFileAdded}

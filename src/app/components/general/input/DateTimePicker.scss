@@ -1,0 +1,22 @@
+.date-time-picker{
+    .r-calendar, .r-time{
+        min-width: 250px;
+        .toolbar{
+            margin: 13px 0;
+            line-height:30px;
+            color:#1385e5;
+            text-align:center;
+            margin-bottom:13px;
+            button{
+                background: none;
+                color:#1385e5;
+                border:0;
+            }
+            .current-date{
+                text-decoration: none;
+                border-bottom: 0;
+            }
+        }
+
+    }
+}

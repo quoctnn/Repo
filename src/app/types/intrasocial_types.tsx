@@ -179,6 +179,19 @@ export enum ObjectAttributeType
     follow = "follow",
     link = "link",
 }
+export namespace ObjectAttributeType {
+    export function iconForType(type: ObjectAttributeType, active = false) {
+        switch(type){
+            case ObjectAttributeType.important: return active ? "fas fa-star" :  "far fa-star"
+            case ObjectAttributeType.reminder: return active ? "far fa-clock" : "far fa-clock"
+            case ObjectAttributeType.attention: return active ? "fas fa-exclamation-triangle" : "fas fa-exclamation-triangle"
+            case ObjectAttributeType.pinned: return active ? "fas fa-thumbtack" : "fas fa-thumbtack"
+            case ObjectAttributeType.follow: return active ? "far fa-bell-slash" : "far fa-bell"
+            case ObjectAttributeType.link: return active ? "fas fa-link" : "fas fa-link"
+            default:return "fas fa-question"
+        }
+    }
+}
 export enum ContextNaturalKey
 {
     GROUP = "group.group",
@@ -369,12 +382,45 @@ export enum TaskPriority{
     medium = "medium",
     high = "high",
 }
+export namespace TaskPriority {
+    export const all = [
+        TaskPriority.low,
+        TaskPriority.medium,
+        TaskPriority.high,
+    ]
+    export function colorForPriority(type: TaskPriority) {
+        switch(type){
+            case TaskPriority.low: return "#61FA6B"
+            case TaskPriority.medium: return "#FA9F61"
+            case TaskPriority.high: return "#FA6161"
+            default:return null
+        }
+    }
+}
 export enum TaskState{
     notStarted = "not-started",
     progress = "progress",
     toVerify = "to-verify",
     notApplicable = "not-applicable",
     completed = "completed"
+}
+export namespace TaskState {
+    export const all = [
+        TaskState.notStarted,
+        TaskState.progress,
+        TaskState.toVerify,
+        TaskState.completed, 
+        TaskState.notApplicable, 
+    ]
+    export function colorForState(type: TaskState) {
+        switch(type){
+            case TaskState.progress: return "#F8CF88"
+            case TaskState.toVerify: return "#FFFFB1"
+            case TaskState.completed: return "#B9E4B4"
+            case TaskState.notApplicable : return "#ebccd1"
+            default:return null
+        }
+    }
 }
 export interface SimpleTask 
 {
@@ -387,6 +433,7 @@ export interface SimpleTask
     creator: SimpleUserProfile
     priority: TaskPriority
     state: TaskState
+    serialization_date:string
 }
 export interface Task extends SimpleTask
 {
@@ -500,9 +547,10 @@ export type GridModule = {
 }
 export type GridLayout = {
     id:number
-    grid_modules:[]
+    grid_modules:GridModule[]
     title:string
-    min_width:300
+    min_width:number
+    fill:boolean
 }
 export type Dashboard = {
     id:number
@@ -517,6 +565,7 @@ export type Dashboard = {
     user:number
 }
 //DASHBOARD END
+
 export interface SimpleUserProfile
 {
     absolute_url: string,
@@ -544,6 +593,19 @@ export interface UserProfile extends SimpleUserProfile{
     is_anonymous:boolean
     is_staff:boolean
     is_superuser:boolean
+    connections?:number[]
+}
+export type Timesheet = {
+    id:number
+    created_at:string
+    updated_at:string
+    user:SimpleUserProfile
+    date:string
+    hours:number
+    minutes:number
+    description:string
+    project:number
+    task:number
 }
 export const avatarStateColorForUserProfile = (userProfile:UserProfile) => {
     switch(userProfile.user_status)
@@ -604,6 +666,15 @@ export interface EmbedCardItem
     type:string
     avatar:string
     subtitle:string
+}
+export enum TaskActions 
+{
+    /**Changes priority for Task: extra:{priority:TaskPriority} */
+    setPriority,
+    setState, 
+    /**add time to Task: extra:{description:string, date:moment.Moment, hours:number, minutes:number} */
+    addTime
+
 }
 export enum StatusActions
 {

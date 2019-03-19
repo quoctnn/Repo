@@ -57,7 +57,6 @@ export default  {
         myPersonalDataUrl:"/api/v2/profile/personal_data/",
         // Friends URLs
         friendsUrl: '/api/v2/friends/',
-        acquaintancesUrl : '/api/v2/friends/acquaintances/',
 
         // Group URLs
         groupUrl: (id:number|string) => {
@@ -75,7 +74,9 @@ export default  {
             return `/api/v2/project/${id}/`
         },
         taskUrl: '/api/v2/task/',
-
+        taskIdUrl: (id:number) => {
+            return `/api/v2/task/${id}/`
+        },
         productsPlans: '/api/v1/products/plan/',
         productsSKU: '/api/v1/products/sku/',
 
@@ -103,12 +104,12 @@ export default  {
         projectFilesUrl: (id:number) => {
             return `/api/v2/project/${id}/files/`
         },
-        timeSheetUrl: '/api/v1/timesheet/',
+        timeSheetUrl: '/api/v2/timesheet/',
         timeSheetDetailUrl: (id:number) => {
-            return `/api/v1/timesheet/${id}/`
+            return `/api/v2/timesheet/${id}/`
         },
         timeSheetRemoveUrl: (id:number) => {
-            return `/api/v1/timesheet/${id}/`
+            return `/api/v2/timesheet/${id}/`
         },
 
         // Event URLs

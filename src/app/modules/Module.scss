@@ -48,7 +48,7 @@
             }
         }
     }
-    .module-header:hover
+    &:hover
     {
         .module-menu-trigger
         {
@@ -65,6 +65,9 @@
     .module-footer 
     {
         flex-shrink: 0;
+        background: white;
+        padding: 3px 12px;
+        font-size: 12px;
     }
     .module-menu 
     {
@@ -99,7 +102,7 @@ body.touch .module
         }
     }
 }
-body.rb-mini, body.rb-micro 
+body.rb-200
 {
     .module-menu 
     {

@@ -20,6 +20,16 @@ export function userFullName(user:UserProfile) {
     }
     return user.username;
 }
+export const parseJSONObject = (param:string) => {
+    try {
+        const data = JSON.parse(param)
+        if(typeof data == "object")
+            return data
+    } catch(e) {
+        return null
+    }
+    return null
+}
 export function userAvatar(user:UserProfile) {
     const def = Constants.staticUrl + Constants.defaultImg.user
     if(user)

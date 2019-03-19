@@ -44,7 +44,7 @@ class Main extends React.Component<Props, State> {
                     <div id="main-content">
                         <ToastContainer />
                         <div id="content-block" className="">
-                        {!this.props.loaded &&
+                            {!this.props.loaded &&
                                 <Switch>
                                     <Route path={Routes.ANY} component={ApplicationLoader} />
                                 </Switch>
@@ -58,7 +58,6 @@ class Main extends React.Component<Props, State> {
                                     <Route path={Routes.ANY} component={error404} />
                                 </Switch>
                             }
-                            
                         </div>
                     </div>
             </div>

@@ -10,7 +10,8 @@ export const ErrorToast = (props:ErrorToastProps) => {
 //////
 interface InfoToastProps {
     message?: string;
+    description?:string
 }
 export const InfoToast = (props:InfoToastProps) => {
-    return <div className="toast-info">{props.message || 'Info'}</div>;
+    return <div className="toast-info">{props.message || 'Info'}{props.description && <div className="toast-info-description">{props.description}</div>}</div>;
 }

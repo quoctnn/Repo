@@ -2,8 +2,9 @@ import Constants from "../utilities/Constants";
 import {AjaxRequest} from "./AjaxRequest";
 import { EndpointManager } from '../managers/EndpointManager';
 var $ = require("jquery")
-import { Status, UserProfile, UploadedFile, Community, Group, Conversation, Project, Message, Event, Task, ElasticSearchType, ObjectAttributeType, StatusObjectAttribute, EmbedCardItem, ReportTag, ContextNaturalKey, ReportResult, SimpleTask, Dashboard } from '../types/intrasocial_types';
+import { Status, UserProfile, UploadedFile, Community, Group, Conversation, Project, Message, Event, Task, ElasticSearchType, ObjectAttributeType, StatusObjectAttribute, EmbedCardItem, ReportTag, ContextNaturalKey, ReportResult, SimpleTask, Dashboard, Timesheet } from '../types/intrasocial_types';
 import { nullOrUndefined } from '../utilities/Utilities';
+import moment = require("moment");
 export type PaginationResult<T> = {results:T[], count:number, previous:string|null, next:string|null}
 export type StatusCommentsResult<T> = {results:T[], count:number, parent:T}
 export type ApiClientFeedPageCallback<T> = (data: PaginationResult<T>, status:string, error:string|null) => void;
@@ -40,14 +41,14 @@ export default class ApiClient
         })
         return arr.join('&');
     }
-    static getAcquaintances(callback:ApiClientFeedPageCallback<UserProfile>) {
-        const url = Constants.apiRoute.acquaintancesUrl + "?" + this.getQueryString({})
-        AjaxRequest.get(url, (data, status, request) => {
+    static createTimesheet(task:number, description:string, date:moment.Moment,  hours:number, minutes:number, callback:ApiClientCallback<Timesheet>){
+        const url = Constants.apiRoute.timeSheetUrl
+        AjaxRequest.postJSON(url,  { task, date:date.format("YYYY-MM-DD"), description, hours, minutes}, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
             callback(null, status, error)
         })
-    }
+    }  
     static getDashboards(callback:ApiClientFeedPageCallback<Dashboard>){
         const url = Constants.apiRoute.dashboardListEndpoint + "?" + this.getQueryString({})
         AjaxRequest.get(url, (data, status, request) => {
@@ -118,9 +119,9 @@ export default class ApiClient
             callback(null, status, error)
         })
     }
-    static newsfeedV2(limit:number,offset:number,context_natural_key:string|null, context_object_id:number|null, parent:number|null, children:number|null,include_sub_context:boolean = true,  callback:ApiClientFeedPageCallback<Status>)
+    static newsfeedV2(limit:number,offset:number,context_natural_key:string, context_object_id:number, parent:number, children:number,attribute:ObjectAttributeType, include_sub_context:boolean = true,  callback:ApiClientFeedPageCallback<Status>)
     {
-        let url = Constants.apiRoute.postUrl + "?" + this.getQueryString({limit,offset,context_natural_key	,context_object_id, parent, children, include_sub_context })
+        let url = Constants.apiRoute.postUrl + "?" + this.getQueryString({limit,offset,context_natural_key	,context_object_id, parent, children, attribute, include_sub_context })
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
@@ -149,6 +150,15 @@ export default class ApiClient
     {
         let url = Constants.apiRoute.postUrl + statusId + "/"
         AjaxRequest.delete(url, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
+    static updateTask(id:number, task:Partial<Task>, callback:ApiClientCallback<Task>)
+    {
+        let url = Constants.apiRoute.taskIdUrl(id)
+        AjaxRequest.patch(url, task, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
             callback(null, status, error)

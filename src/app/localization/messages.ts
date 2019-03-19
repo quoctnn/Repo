@@ -78,6 +78,13 @@ var translations = {
     "task.priority.high":"High",
     "task.priority.medium":"Medium",
     "task.priority.low":"Low",
+    "task.state.not-started":"Pending",
+    "task.state.progress":"In Progress",
+    "task.state.to-verify":"To be verified",
+    "task.state.not-applicable":"Not Applicable",
+    "task.state.completed":"Done",
+    "date.format.hours":"h",
+    "date.format.minutes":"m",
   },
   no: {
     "search.placeholder": "Søk ...",
@@ -158,6 +165,13 @@ var translations = {
     "task.priority.high":"Høy",
     "task.priority.medium":"Medium",
     "task.priority.low":"Lav",
+    "task.state.not-started":"Venter",
+    "task.state.progress":"Pågår",
+    "task.state.to-verify":"Til verifisering",
+    "task.state.not-applicable":"Ikke aktuelt",
+    "task.state.completed":"Ferdig",
+    "date.format.hours":"t",
+    "date.format.minutes":"m",
   },
   en: {
     "search.placeholder": "Search ...",
@@ -238,6 +252,13 @@ var translations = {
     "task.priority.high":"High",
     "task.priority.medium":"Medium",
     "task.priority.low":"Low",
+    "task.state.not-started":"Pending",
+    "task.state.progress":"In Progress",
+    "task.state.to-verify":"To be verified",
+    "task.state.not-applicable":"Not Applicable",
+    "task.state.completed":"Done",
+    "date.format.hours":"h",
+    "date.format.minutes":"m",
   }
 };
 

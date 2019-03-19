@@ -140,6 +140,7 @@ export interface Props
     canSubmit?:boolean
     className?:string
     placeholder?:string
+    showEmojiPicker?:boolean
 }
 interface State
 {
@@ -234,6 +235,7 @@ export class ChatMessageComposer extends React.Component<Props,State> implements
                             ref={this.inputRef} 
                             onChange={this.onChange}
                             placeholder={this.props.placeholder}
+                            showEmojiPicker={this.props.showEmojiPicker}
                             /> 
                         </div>
                         <div className="button-wrap d-flex flex-column-reverse">

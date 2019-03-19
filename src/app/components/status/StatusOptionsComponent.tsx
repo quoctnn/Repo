@@ -5,7 +5,7 @@ import { translate } from '../../localization/AutoIntlProvider';
 import "./StatusOptionsComponent.scss"
 import EditStatusDialog from './dialogs/EditStatusDialog';
 import ConfirmDialog from '../general/dialogs/ConfirmDialog';
-import { OverflowMenuItem, OverflowMenu } from '../general/OverflowMenu';
+import { OverflowMenuItem, OverflowMenu, OverflowMenuItemType } from '../general/OverflowMenu';
 import classnames from 'classnames';
 import { PermissionManager } from '../../managers/PermissionManager';
 import { ToastManager } from '../../managers/ToastManager';
@@ -214,30 +214,30 @@ export default class StatusOptionsComponent extends React.Component<Props, State
         const items:OverflowMenuItem[] = [] 
         if(this.props.isOwner && this.props.canComment)
         {
-            items.push({id:"0", title:translate("Edit"), iconClass:"fa fa-edit", onPress:this.toggleEditModal})
-            items.push({id:"1",title:translate("Delete"), iconClass:"fa fa-trash", onPress:this.toggleDeleteModal})
+            items.push({id:"0", title:translate("Edit"), iconClass:"fa fa-edit", onPress:this.toggleEditModal, type:OverflowMenuItemType.option})
+            items.push({id:"1",title:translate("Delete"), iconClass:"fa fa-trash", onPress:this.toggleDeleteModal, type:OverflowMenuItemType.option})
         }
         if(!this.props.isOwner)
-            items.push({id:"2",title:translate("Report"), iconClass:"fa fa-exclamation-triangle", onPress:this.toggleReportModal})
-        items.push({id:"3",title:translate("Copy link"), iconClass:"fa fa-link", onPress:this.copyLink})
+            items.push({id:"2",title:translate("Report"), iconClass:"fa fa-exclamation-triangle", onPress:this.toggleReportModal, type:OverflowMenuItemType.option})
+        items.push({id:"3",title:translate("Copy link"), iconClass:"fa fa-link", onPress:this.copyLink, type:OverflowMenuItemType.option})
         if(!this.props.isComment)
         {
             //follow
             const following = !!attributes.find(a => a.attribute == ObjectAttributeType.follow)
-            items.push({id:"4",title:translate(following ? "Unfollow": "Follow"), iconClass:following ? "far fa-bell-slash" : "far fa-bell" , onPress:this.toggleFollow, toggleMenu:false})
+            items.push({id:"4",title:translate(following ? "Unfollow": "Follow"), iconClass:ObjectAttributeType.iconForType(ObjectAttributeType.follow, following) , onPress:this.toggleFollow, toggleMenu:false, type:OverflowMenuItemType.option})
             //star
             const starred = !!attributes.find(a => a.attribute == ObjectAttributeType.important)
-            items.push({id:"5",title:translate(starred ? "Unstar item": "Star item"), iconClass:starred ? "fas fa-star" : "far fa-star", onPress:this.toggleStar, toggleMenu:false})
+            items.push({id:"5",title:translate(starred ? "Unstar item": "Star item"), iconClass:ObjectAttributeType.iconForType(ObjectAttributeType.important, starred), onPress:this.toggleStar, toggleMenu:false, type:OverflowMenuItemType.option})
             
             const permission = PermissionManager.permissionForStatus(this.props.status)
             if(permission == Permission.admin)
             {
                 //pinning
                 const pinned = !!attributes.find(a => a.attribute == ObjectAttributeType.pinned)
-                items.push({id:"6",title:translate(pinned ? "Unpin item": "Pin item"), iconClass:pinned ? "fas fa-thumbtack" : "fas fa-thumbtack", onPress:this.togglePinned, toggleMenu:false})
+                items.push({id:"6",title:translate(pinned ? "Unpin item": "Pin item"), iconClass:ObjectAttributeType.iconForType(ObjectAttributeType.pinned, pinned), onPress:this.togglePinned, toggleMenu:false, type:OverflowMenuItemType.option})
                 //attention
                 const attention = !!attributes.find(a => a.attribute == ObjectAttributeType.attention)
-                items.push({id:"7",title:translate(attention ? "Remove attention": "Add attention"), iconClass:attention ? "fas fa-exclamation-triangle" : "fas fa-exclamation-triangle", onPress:this.toggleAttentionModal, toggleMenu:false})
+                items.push({id:"7",title:translate(attention ? "Remove attention": "Add attention"), iconClass:ObjectAttributeType.iconForType(ObjectAttributeType.attention, attention), onPress:this.toggleAttentionModal, toggleMenu:false, type:OverflowMenuItemType.option})
             }
         }
         return items

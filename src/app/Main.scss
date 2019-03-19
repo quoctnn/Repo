@@ -7,6 +7,9 @@
     ::-webkit-scrollbar-thumb:hover {background: #555;background:var(--blue, #555);}
 }
 //standard overrides
+html{
+    height: 100%;
+}
 ul,li{ list-style-type: none; padding: 0;}
 //bootstrap extensions/overrides
 .modal-title {
@@ -31,6 +34,8 @@ body[class^="select-active-"], body[class*=" select-active-"]{
     position: static !important;
 }
 button{@include var(color, primary-text-color);}
+.btn-rounded{
+    border-radius: 10em;}
 .btn-xs{
     padding: 0.25rem 0.5rem;
     font-size: 0.75rem;
@@ -43,6 +48,7 @@ button{@include var(color, primary-text-color);}
     font-weight: 500;
     cursor: pointer;
     display: inline;
+    word-break: break-all;
 }
 .link-text:hover, a:hover, .text.link:hover, .btn-link:hover
 {
@@ -167,4 +173,18 @@ content: "\f1c1";
 .audio .file-icon:before {
     content: "\f1c7";
     color: #FFD00C
+}
+
+body.dash-fill
+{
+    &, #app-root, #main, #main-content, #content-block, .window-responsive-component, #dashboard, .dashboard-components, .module-grid{
+        flex:1;
+        flex-direction: column;
+        display: flex;
+        height: 100%;
+    }
+    .dashboard-components{
+        margin-top: 0 !important;
+        margin-bottom: 0 !important;
+    }
 }

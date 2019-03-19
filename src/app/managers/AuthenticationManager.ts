@@ -31,15 +31,16 @@ export abstract class AuthenticationManager
     }
     static signIn(token:string)
     {
-        AuthenticationManager.getStore().dispatch(setAuthenticationProfileAction(null))
-        AjaxRequest.setup(token)
+        //AjaxRequest.setup(token)
         AuthenticationManager.getStore().dispatch(setAuthenticationTokenAction(token))
+        AjaxRequest.setup(token)
         ApplicationManager.loadApplication()
     }
     static signInCurrent = () => {
 
-        const authToken = AuthenticationManager.getAuthenticationToken()
-        AuthenticationManager.signIn(authToken)
+        const token = AuthenticationManager.getAuthenticationToken()
+        AjaxRequest.setup(token)
+        ApplicationManager.loadApplication()
     }
     static setAuthenticatedUser(profile:UserProfile|null)
     {
@@ -63,7 +64,6 @@ export abstract class AuthenticationManager
     }
     static signOut()
     {
-
         // Remove the keepAlive (last_seen) timer and eventListeners
         AuthenticationManager.clearKeepAliveTimer()
         document.removeEventListener('mousedown', AuthenticationManager.resetUserActivityCounter);
@@ -75,9 +75,12 @@ export abstract class AuthenticationManager
         store.dispatch(resetProfilesAction());
         store.dispatch(contactListResetAction());
 
-
         // Clean up userProfile and token
-        AuthenticationManager.signIn(null)
+        AuthenticationManager.getStore().dispatch(setAuthenticationTokenAction(null))
+        AuthenticationManager.getStore().dispatch(setAuthenticationProfileAction(null))
+        AjaxRequest.setup(null)
+        ApplicationManager.loadApplication()
+
     }
     static resetUserActivityCounter()
     {

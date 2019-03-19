@@ -7,10 +7,10 @@ export abstract class ToastManager
     static setup()
     {
     }
-    static showInfoToast = (message:string, opts?:ToastOptions) => 
+    static showInfoToast = (message:string, description?:string, opts?:ToastOptions) => 
     {
         if(message)
-            toast.info(<InfoToast message={message} />,opts || {hideProgressBar: true});
+            toast.info(<InfoToast message={message} description={description} />,opts || {hideProgressBar: true});
     }
     static showErrorToast = (message:string, preferredMessage?:string, opts?:ToastOptions) => 
     {

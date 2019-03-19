@@ -12,6 +12,8 @@ import { translate } from '../../localization/AutoIntlProvider';
 import CircularLoadingSpinner from '../../components/general/CircularLoadingSpinner';
 import ProjectMenu, { ProjectMenuData } from './ProjectMenu';
 import ProjectComponent from './ProjectComponent';
+import ModuleFooter from '../ModuleFooter';
+import { Badge } from 'reactstrap';
 
 type OwnProps = {
     className?:string
@@ -42,6 +44,13 @@ class ProjectModule extends React.Component<Props, State> {
                 creator:null,
                 notAssigned:null,
             }
+        }
+    }
+    componentDidUpdate = (prevProps:Props) => {
+        //turn off loading spinner if feed is removed
+        if(prevProps.breakpoint != this.props.breakpoint && this.props.breakpoint < ResponsiveBreakpoint.standard && this.state.isLoading)
+        {
+            this.setState({isLoading:false})
         }
     }
     headerClick = (e) => {

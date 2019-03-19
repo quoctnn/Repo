@@ -30,7 +30,7 @@ export class ResizeObserverComponent extends React.Component<Props,State> {
                 }
             }
         });
-        this.observer.observe(document.body);
+        this.observer.observe(this.container);
     }
     componentWillUnmount() {
         if (this.observer) {

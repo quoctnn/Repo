@@ -16,7 +16,6 @@ export namespace ResponsiveBreakpoint {
     ]
     export function parse(width: number): ResponsiveBreakpoint {
         return all.find(e => width > e) || ResponsiveBreakpoint.micro
-        
     }
 }
 type State = 

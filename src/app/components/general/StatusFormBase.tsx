@@ -27,6 +27,9 @@ export interface OwnProps
     mentionSearch:(search:string, completion:(mentions:Mention[]) => void) => void
     className?:string
     communityId:number
+    showEmojiPicker?:boolean
+    placeholder?:string
+    children?:React.ReactNode
 }
 export interface DefaultProps
 {
@@ -75,6 +78,9 @@ export default class StatusFormBase extends React.Component<Props, State> implem
     }
 
     handleUploadClick() {
+
+        if(!this.props.canUpload)
+            return
         // Hide/Show dropzone
         if (this.state.filesCount == 0) {
             this.setState((prevState, currentProps) => {
@@ -127,19 +133,21 @@ export default class StatusFormBase extends React.Component<Props, State> implem
     }
     renderTextArea(canSubmit:boolean) {
         let cn = classNames("secondary-text", this.props.className)
-        const placeholder = translate("Write a comment")
+        const placeholder = this.props.placeholder || translate("Write a comment")
+        const uploadHandler = this.props.canUpload ? this.handleUploadClick : undefined
         return (
             <ChatMessageComposer 
-            className={cn} 
-            canSubmit={canSubmit} 
-            onHandleUploadClick={this.handleUploadClick} 
-            ref={this.inputRef} 
-            content={this.props.content} 
-            mentionSearch={this.props.mentionSearch} 
-            mentions={this.props.mentions} 
-            onSubmit={this.handleSubmit} 
-            onDidType={this.props.onDidType} 
-            placeholder={placeholder}
+                className={cn} 
+                canSubmit={canSubmit} 
+                onHandleUploadClick={uploadHandler} 
+                ref={this.inputRef} 
+                content={this.props.content} 
+                mentionSearch={this.props.mentionSearch} 
+                mentions={this.props.mentions} 
+                onSubmit={this.handleSubmit} 
+                onDidType={this.props.onDidType} 
+                placeholder={placeholder}
+                showEmojiPicker={this.props.showEmojiPicker}
             />                      
         )
     }

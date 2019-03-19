@@ -26,6 +26,7 @@ import ChannelEventStream from "./network/ChannelEventStream";
 import AutoIntlProvider from "./localization/AutoIntlProvider";
 import { BrowserRouter as Router} from "react-router-dom";
 import "./utilities/Extensions"
+import { AuthenticationManager } from "./managers/AuthenticationManager";
 
 
 
@@ -37,14 +38,16 @@ initializeManagers();
 export default store;
 
 const persistor = persistStore(store, {}, () => {
-  //rehydrate complete
-  if (Settings.supportsTheming) {
-    let themeIndex = store.getState().theme.theme || 0;
-    applyTheme(themeIndex);
-  }
+    //rehydrate complete
+    if (Settings.supportsTheming) {
+        let themeIndex = store.getState().theme.theme || 0;
+        applyTheme(themeIndex);
+    }
+    console.log("rehydrate complete")
+    AuthenticationManager.signInCurrent()
 })
 export const App = (props: any) => {
-  return (
+    return (
     <Provider store={store}>
         <>
             <ChannelEventStream />

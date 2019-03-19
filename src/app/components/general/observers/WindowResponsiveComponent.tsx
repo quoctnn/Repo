@@ -3,13 +3,14 @@ import * as React from "react";
 import { ResponsiveBreakpoint } from "./ResponsiveComponent";
 type State = 
 {
-    breakpoint:ResponsiveBreakpoint
+    breakpoint:number
     //scrollbarSize:number
 }
 type OwnProps = 
 {
     render:(state:State) => React.ReactNode
     setClassOnBody?:boolean
+    breakpoints:number[]
 }
 type Props = OwnProps
 export default class WindowResponsiveComponent extends React.Component<Props, State> 
@@ -18,16 +19,16 @@ export default class WindowResponsiveComponent extends React.Component<Props, St
     {
         super(props)
         this.state = {
-            breakpoint:ResponsiveBreakpoint.mini,
+            breakpoint:this.props.breakpoints[this.props.breakpoints.length - 1],
         }
         if(this.props.setClassOnBody)
             this.updateBodyClass(null, this.state.breakpoint)
     }
-    updateBodyClass = (oldBP:ResponsiveBreakpoint, newBP:ResponsiveBreakpoint) => {
+    updateBodyClass = (oldBP:number, newBP:number) => {
         if(oldBP)
-            document.body.classList.remove("rb-" + ResponsiveBreakpoint[oldBP])
+            document.body.classList.remove("rb-" + oldBP)
         if(newBP)
-            document.body.classList.add("rb-" + ResponsiveBreakpoint[newBP])
+            document.body.classList.add("rb-" + newBP)
     }
     componentDidMount()
     {
@@ -38,10 +39,13 @@ export default class WindowResponsiveComponent extends React.Component<Props, St
     {
         window.removeEventListener("resize", this.observeCallback)
     }
+    findBreakpoint = (width: number) => {
+        return this.props.breakpoints.find(e => width > e) || this.props.breakpoints[this.props.breakpoints.length - 1]
+    }
     observeCallback = () => 
     {
         const width = window.innerWidth
-        const bp = ResponsiveBreakpoint.parse(width)
+        const bp = this.findBreakpoint(width)
         if(bp != this.state.breakpoint)
         {
             if(this.props.setClassOnBody)

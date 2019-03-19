@@ -15,7 +15,11 @@ export default class NewsfeedPage extends React.Component<Props & React.HTMLAttr
         const val = u.get("includeSubContext")
         const includeSubContext = val ? val.toLocaleLowerCase() == "true" : true
         return(<div {...rest} className={cn}>
-                    <NewsfeedComponent includeSubContext={includeSubContext} contextNaturalKey={match.params.contextNaturalKey} contextObjectId={match.params.contextObjectId} scrollParent={window} />
+                    <NewsfeedComponent 
+                        includeSubContext={includeSubContext} 
+                        contextNaturalKey={match.params.contextNaturalKey} 
+                        contextObjectId={match.params.contextObjectId} 
+                        scrollParent={window} />
                 </div>
         );
     }

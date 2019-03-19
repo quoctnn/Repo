@@ -10,6 +10,8 @@ import Module from "./modules/Module";
 import ModuleContent from "./modules/ModuleContent";
 import ModuleHeader from "./modules/ModuleHeader";
 import ProjectModule from "./modules/project/ProjectModule";
+import { ApplicationManager } from './managers/ApplicationManager';
+import { Dashboard, GridLayout } from './types/intrasocial_types';
 
 type DemoProps = {
     text?:string
@@ -39,69 +41,46 @@ export namespace DashboardComponents {
         return React.createElement(componentMap[type], props)
     }
 }
-export type DashboardComponent = {
-    id:number
-    component:string
-    position:number
-    props:any
-}
-export type DashboardGridPosition = {
-    id:number
-    columnStart:number
-    columnSpan:number
-    rowStart:number
-    rowSpan:number
-}
-export type DashboardGrid = {
-    mobile:DashboardGridPosition[]
-    desktop:DashboardGridPosition[]
-}
 type Props = 
 {
-    grid:DashboardGrid
-    components:DashboardComponent[]
-    breakpoint:ResponsiveBreakpoint
+    breakpoint:number
+    dashboard:Dashboard
 }
 type State = {
-    defaultGrid:DashboardGridPosition[]
+    defaultGrid:GridLayout
 }
 
-export class Dashboard extends React.Component<Props, State> {
+export class DashboardComponent extends React.Component<Props, State> {
     constructor(props:Props)
     {
         super(props)
-        const l = this.getGridLayoutForBreakpoint(props.grid, ResponsiveBreakpoint.micro, true)
-        const grid = l.map(m => Object.assign({},m))
+        const grid = {...this.findGridLayout(0, false), id:-1, min_width:ResponsiveBreakpoint.standard}
+        grid.grid_modules = grid.grid_modules.map(m => {return {...m, module:{...m.module}}})
         let rowStart = 1
-        grid.forEach((m) => {
-            m.columnStart = 1
-            m.rowStart = rowStart
-            m.columnSpan = 12
-            rowStart += m.rowSpan
+        grid.grid_modules.forEach(m => {
+            m.column = 1
+            m.row = rowStart
+            m.width = 12
+            rowStart += m.height
         })
         this.state = {
-            defaultGrid:grid
+            defaultGrid:grid,
         }
     }
     renderModules = () => 
     {
-        const grid = this.getGridLayoutForBreakpoint(this.props.grid, this.props.breakpoint)
-        return (<Grid breakpoint={this.props.breakpoint} components={this.props.components} grid={grid} enableAnimation={true} />)
+        const grid = this.findGridLayout(this.props.breakpoint, true)
+        const fill = this.props.breakpoint > ResponsiveBreakpoint.standard && grid.fill
+        return (<Grid fill={fill} grid={grid} breakpoint={this.props.breakpoint} enableAnimation={true} />)
     }
-    getGridLayoutForBreakpoint = (grid: DashboardGrid, breakpoint:ResponsiveBreakpoint, useFirstAsFallback:boolean = false):DashboardGridPosition[] =>
-    {
-        let layout:DashboardGridPosition[]
-        if(breakpoint >= ResponsiveBreakpoint.big)
-        {
-            layout = grid.desktop
-            if(layout)
-                return layout
-        }
-        else if(breakpoint >= ResponsiveBreakpoint.standard)
-        {
-            layout = grid.mobile
-        }
-        return layout || (useFirstAsFallback ? grid[Object.keys(grid)[0]] : this.state.defaultGrid)
+    findGridLayout = (breakpoint: number, useDefaultAsFallback:boolean) => {
+
+        let ret = this.props.dashboard.grid_layouts.find(i => {
+            return breakpoint >= i.min_width
+        })
+        ret = ret || (useDefaultAsFallback ? this.state.defaultGrid : this.props.dashboard.grid_layouts[this.props.dashboard.grid_layouts.length - 1])
+        console.log("resolving:", breakpoint,"got:", ret)
+        return ret
     }
     renderContent = () => {
         return (<>
@@ -123,30 +102,19 @@ export class Dashboard extends React.Component<Props, State> {
     }
 }
 export const DashCompWithData = (props:any) => {
-    const grid = { 
-                desktop:[
-                    {id:1, columnStart:1, rowStart:1, columnSpan:6, rowSpan:2},
-                    {id:2, columnStart:7, rowStart:1, columnSpan:6, rowSpan:2},
-                    {id:3, columnStart:1, rowStart:3, columnSpan:6, rowSpan:4},
-                    ],
-                mobile:[
-                    {id:1, columnStart:1, rowStart:1, columnSpan:12, rowSpan:4},
-                    {id:2, columnStart:1, rowStart:5, columnSpan:12, rowSpan:2},
-                    {id:3, columnStart:1, rowStart:7, columnSpan:12, rowSpan:2},
-                    ]
-    }
-    const components = [
-        {id:2, component:"ProjectModule", position:1, props:{text:"22"}},
-        {id:3, component:"DemoComponent", position:2, props:{text:"33"}},
-        {id:1, component:"NewsfeedModule", position:3, props:{text:"1"}},
-    ]
+    const dashboards = ApplicationManager.getDashboards()
+    const dashboard = dashboards[0]
+    dashboard.grid_layouts = dashboard.grid_layouts.sort((a, b) => b.min_width - a.min_width) //descending
+    let breakpoints = dashboard.grid_layouts.map(l => l.min_width).filter(b => b > ResponsiveBreakpoint.standard)
+    breakpoints.push(ResponsiveBreakpoint.standard)
+    breakpoints.push(ResponsiveBreakpoint.mini)
+    breakpoints = breakpoints.sort((a, b) => b - a) //descending
     return (
 
-        <WindowResponsiveComponent setClassOnBody={true} render={({ breakpoint }) => (
-            <Dashboard 
+        <WindowResponsiveComponent breakpoints={breakpoints} setClassOnBody={true} render={({ breakpoint }) => (
+            <DashboardComponent 
+                dashboard={dashboard}
                 breakpoint={breakpoint}
-                grid={grid}
-                components={components}
             />
         )}/>
     );

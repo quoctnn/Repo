@@ -16,7 +16,7 @@ type State = {
     selectedValue:ContextValue
 }
 export class ContextFilter extends React.PureComponent<Props & React.HTMLAttributes<HTMLDivElement>, State> {
-    static searchTypes = [ElasticSearchType.COMMUNITY, ElasticSearchType.GROUP, ElasticSearchType.USER]
+    static searchTypes = [ElasticSearchType.COMMUNITY, ElasticSearchType.GROUP, ElasticSearchType.USER, ElasticSearchType.PROJECT]
     constructor(props:Props)
     {
         super(props)
@@ -28,6 +28,7 @@ export class ContextFilter extends React.PureComponent<Props & React.HTMLAttribu
             case ElasticSearchType.COMMUNITY:return {id:item.django_id, label:item.name, type:ContextNaturalKey.COMMUNITY, value:ContextNaturalKey.COMMUNITY + "_"+ item.django_id}
             case ElasticSearchType.GROUP:return {id:item.django_id, label:item.name, type:ContextNaturalKey.GROUP, value:ContextNaturalKey.GROUP + "_"+ item.django_id}
             case ElasticSearchType.USER:return {id:item.django_id, label:item.user_name, type:ContextNaturalKey.USER, value:ContextNaturalKey.USER + "_"+ item.django_id}
+            case ElasticSearchType.PROJECT:return {id:item.django_id, label:item.name, type:ContextNaturalKey.PROJECT, value:ContextNaturalKey.PROJECT + "_"+ item.django_id}
             default: return null
         }
     }

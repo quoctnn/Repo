@@ -13,10 +13,11 @@ import { ResponsiveBreakpoint } from '../../components/general/observers/Respons
 import NewsfeedComponent from './NewsfeedComponent';
 import { NavigationUtilities } from '../../utilities/NavigationUtilities';
 import { ContextValue } from '../../components/general/input/ContextFilter';
-import { ContextNaturalKey } from '../../types/intrasocial_types';
 import { translate } from '../../localization/AutoIntlProvider';
 import CircularLoadingSpinner from '../../components/general/CircularLoadingSpinner';
 import NewsfeedMenu, { NewsfeedMenuData } from './NewsfeedMenu';
+import { ObjectAttributeType } from '../../types/intrasocial_types';
+import { ButtonGroup, Button } from 'reactstrap';
 
 interface OwnProps 
 {
@@ -35,17 +36,27 @@ interface State
     isLoading:boolean
     selectedContext:ContextValue
     includeSubContext:boolean
+    filter:ObjectAttributeType
 }
 type Props = ReduxStateProps & ReduxDispatchProps & OwnProps & RouteComponentProps<any>
 class NewsfeedModule extends React.Component<Props, State> {     
     tempMenuData:NewsfeedMenuData = null
+    availableFilters = [ObjectAttributeType.important, ObjectAttributeType.pinned]
     constructor(props:Props) {
         super(props);
         this.state = {
             menuVisible:false,
             selectedContext:null,
             includeSubContext:true,
+            filter:null,
             isLoading:false,
+        }
+    }
+    componentDidUpdate = (prevProps:Props) => {
+        //turn off loading spinner if feed is removed
+        if(prevProps.breakpoint != this.props.breakpoint && this.props.breakpoint < ResponsiveBreakpoint.standard && this.state.isLoading)
+        {
+            this.setState({isLoading:false})
         }
     }
     headerClick = (e) => {
@@ -56,14 +67,15 @@ class NewsfeedModule extends React.Component<Props, State> {
         e.preventDefault()
         e.stopPropagation()
         const visible = !this.state.menuVisible
-        const newState:any = {menuVisible:visible}
+        const newState:Partial<State> = {menuVisible:visible}
         if(!visible && this.tempMenuData)
         {
             newState.selectedContext = this.tempMenuData.selectedContext
             newState.includeSubContext = this.tempMenuData.includeSubContext
+            newState.filter = this.tempMenuData.filter
             this.tempMenuData = null
         }
-        this.setState(newState)
+        this.setState(newState as State)
     }
     feedLoadingStateChanged = (isLoading:boolean) => {
         this.setState({isLoading})
@@ -76,6 +88,12 @@ class NewsfeedModule extends React.Component<Props, State> {
     menuDataUpdated = (data:NewsfeedMenuData) => {
         this.tempMenuData = data
     }
+    filterButtonChanged = (filter:ObjectAttributeType) => (event) => {
+
+        const currentFilter = this.state.filter
+        const newFilter = filter == currentFilter ? null : filter
+        this.setState({filter:newFilter})
+    }
     render()
     {
         const {breakpoint, history, match, location, staticContext, className,  ...rest} = this.props
@@ -85,12 +103,22 @@ class NewsfeedModule extends React.Component<Props, State> {
         const contextObjectId = this.state.selectedContext && this.state.selectedContext.id
         const title = this.state.selectedContext ? this.state.selectedContext.label + " - " + translate("Feed") : translate("Newsfeed")
         const headerClass = classnames({link:headerClick})
+        const filter = this.state.filter
         return (<Module {...rest} className={cn}>
                     <ModuleHeader className={headerClass} onClick={headerClick}>
                         <div className="flex-grow-1 text-truncate d-flex align-items-center">
                             <div className="text-truncate">{title}</div>
                             {this.renderLoading()}
                         </div>
+                        {!this.state.menuVisible && 
+                            <ButtonGroup>
+                                {this.availableFilters.map(f => {
+                                    return (<Button size="xs" key={f} active={filter == f} onClick={this.filterButtonChanged(f)} color="light">
+                                                <i className={ObjectAttributeType.iconForType(f)}></i>
+                                            </Button>)
+                                })}
+                            </ButtonGroup>
+                        }
                         <ModuleMenuTrigger onClick={this.menuItemClick} />
                     </ModuleHeader>
                     {breakpoint >= ResponsiveBreakpoint.standard && //do not render for small screens
@@ -100,7 +128,9 @@ class NewsfeedModule extends React.Component<Props, State> {
                                     onLoadingStateChanged={this.feedLoadingStateChanged} 
                                     includeSubContext={this.state.includeSubContext} 
                                     contextNaturalKey={contextNaturalKey} 
-                                    contextObjectId={contextObjectId} />
+                                    contextObjectId={contextObjectId} 
+                                    filter={this.state.filter}
+                                    />
                             </ModuleContent>
                             <ModuleFooter>NewsFeed Footer</ModuleFooter>
                         </>
@@ -109,7 +139,10 @@ class NewsfeedModule extends React.Component<Props, State> {
                         <NewsfeedMenu 
                             onUpdate={this.menuDataUpdated} 
                             selectedContext={this.state.selectedContext} 
-                            includeSubContext={this.state.includeSubContext} />
+                            includeSubContext={this.state.includeSubContext} 
+                            filter={this.state.filter}
+                            availableFilters={this.availableFilters}
+                            />
                     </ModuleMenu>
                 </Module>)
     }

@@ -1,39 +1,71 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import classnames from 'classnames';
-import { DashboardComponents, DashboardComponent, DashboardGridPosition } from "../Dashboard";
+import { DashboardComponents} from "../Dashboard";
 import { ResponsiveBreakpoint } from "./general/observers/ResponsiveComponent";
+import { GridLayout } from "../types/intrasocial_types";
+import { parseJSONObject } from "../utilities/Utilities";
 
-export interface Props {
-    grid:DashboardGridPosition[]
-    components:DashboardComponent[]
-    breakpoint:ResponsiveBreakpoint
-
+type OwnProps = {
+    grid:GridLayout
     className?:string,
     childClassName?:string,
     id?:string
+    fill:boolean
+}
+type DefaultProps = {
+
     enableAnimation:boolean
+    breakpoint:number
 }
 export interface State {
 
     items:React.ReactChild[]
     rects:{[id:number]:DOMRect}
 }
+type Props = OwnProps & DefaultProps
 export class Grid extends React.PureComponent<Props, {}> {
-    static defaultProps:Props = {
-        className:null,
-        grid:null,
-        components:null,
-        id:null,
+    static modeFillClass = "dash-fill"
+    bodyClassAdded = false
+    static defaultProps:DefaultProps = {
         enableAnimation:true,
-        breakpoint:ResponsiveBreakpoint.mini
+        breakpoint:ResponsiveBreakpoint.mini,
     }
     state:State
-    constructor(props) {
+    constructor(props:Props) {
         super(props);
         this.state = {items:[], rects:{}}
     }
-    componentWillReceiveProps(newProps) {
+    componentDidUpdate = (prevProps:Props) => {
+        if(this.props.fill != prevProps.fill && this.props.breakpoint != prevProps.breakpoint)
+        {
+            if(this.props.fill && this.props.breakpoint > ResponsiveBreakpoint.standard)
+            {
+                this.bodyClassAdded = true
+                document.body.classList.add(Grid.modeFillClass)
+            }
+            else 
+            {
+                this.bodyClassAdded = false
+                document.body.classList.remove(Grid.modeFillClass)
+            }
+        }
+        if(this.props.enableAnimation)
+        {
+            var doNeedAnimation = [];
+            this.getKeys().forEach((key) =>  {
+            if(this.doesNeedAnimation(key) === 0) {
+                doNeedAnimation.push(key);
+            }
+            });
+            doNeedAnimation.forEach(this.animateAndTransform);
+        }
+    }
+    componentWillUnmount = () => {
+        if(this.bodyClassAdded)
+            document.body.classList.remove(Grid.modeFillClass)
+    }
+    componentWillReceiveProps = (newProps:Props) => {
         if(this.props.enableAnimation)
         {
             let keys = this.getKeys()
@@ -51,19 +83,6 @@ export class Grid extends React.PureComponent<Props, {}> {
     getKeys = () => 
     {
         return Object.keys(this.refs)
-    }
-    componentDidUpdate(previousProps) 
-    {
-        if(this.props.enableAnimation)
-        {
-            var doNeedAnimation = [];
-            this.getKeys().forEach((key) =>  {
-            if(this.doesNeedAnimation(key) === 0) {
-                doNeedAnimation.push(key);
-            }
-            });
-            doNeedAnimation.forEach(this.animateAndTransform);
-        }
     }
     animateAndDestroy = (key:string, n) =>
     {
@@ -117,20 +136,22 @@ export class Grid extends React.PureComponent<Props, {}> {
     }
     render() 
     {
+        const modules = this.props.grid.grid_modules
         const cn = classnames("module-grid", this.props.className)
+        const rows = modules.reduce((a, b) => Math.max(a, b.height + b.row), 0) - 1
+        const style:React.CSSProperties = this.props.fill ? {gridAutoRows:`minmax(100px, calc(${100 / rows}% - 15px))`} : undefined
         const ccn = classnames("module-grid-item", this.props.className)
         return(
-            <div className={cn} >
-                {this.props.components.map((component, colIndex) => {
-                        const gridPosition = this.props.grid.find(g => g.id == component.position)
-                        const props = component.props
-                        props.key = "module_" + component.id
-                        props.ref = "module_" + component.id
-                        props.className = ccn
-                        props.style = {gridColumn:gridPosition.columnStart + "/ span " + gridPosition.columnSpan, gridRow: gridPosition.rowStart + " / span " + gridPosition.rowSpan}
-                        props.breakpoint = this.props.breakpoint
-                        return DashboardComponents.getComponent(component.component, component.props)
-                    })}
+            <div className={cn} style={style}>
+                {modules.map(m => {
+                    const props:any = parseJSONObject(m.module.properties) || {}
+                    props.key = "module_" + m.module.id
+                    props.ref = "module_" + m.module.id
+                    props.className = ccn
+                    props.style = {gridColumn:m.column + "/ span " + m.width, gridRow: m.row + " / span " + m.height}
+                    props.breakpoint = this.props.breakpoint
+                    return DashboardComponents.getComponent(m.module.type, props)
+                })}
             </div>
         );
     }

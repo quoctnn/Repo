@@ -1,6 +1,28 @@
+@import "../../Config";
 .overflow-menu
 {
+    .dropdown-toggle
+    {
+        border:0;
+    }
     .dropdown-toggle:after{
         content: none;
+    }
+    .dropdown-menu > button {
+        display: block;
+        padding: 8px 20px;
+        clear: both;
+        font-weight: normal;
+        line-height: 1.42857143;
+        color: #333;
+        white-space: nowrap;
+        cursor: pointer;
+        i{
+            margin-right: 5px;
+        }
+    }
+    .dropdown-menu > button:hover
+    {
+        @include var(background, highlight-color);
     }
 }

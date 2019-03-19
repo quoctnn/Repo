@@ -55,9 +55,10 @@ interface OwnProps
     limit:number
     contextNaturalKey?:string
     contextObjectId?:number
-    includeSubContext?:boolean
-    defaultChildrenLimit:number
-    childrenLimit:number
+    includeSubContext?:boolean 
+    filter:ObjectAttributeType
+    defaultChildrenLimit:number//children fetched upfront
+    childrenLimit:number//children when fetching pages
     scrollParent?:any
     onLoadingStateChanged?:(isLoading:boolean) => void
 }
@@ -90,7 +91,8 @@ class NewsfeedComponent extends React.Component<Props, State> {
         limit:30,
         defaultChildrenLimit:5,
         childrenLimit:10,
-        includeSubContext:true
+        includeSubContext:true,
+        filter:null
     }
     constructor(props:Props) {
         super(props);
@@ -106,7 +108,8 @@ class NewsfeedComponent extends React.Component<Props, State> {
     componentDidUpdate = (prevProps:Props, prevState:State) => {
         if(this.props.contextNaturalKey != prevProps.contextNaturalKey || 
             this.props.contextObjectId != prevProps.contextObjectId || 
-            this.props.includeSubContext != prevProps.includeSubContext)
+            this.props.includeSubContext != prevProps.includeSubContext || 
+            this.props.filter != prevProps.filter)
         {
             this.setState({
                 offset: 0,
@@ -173,8 +176,7 @@ class NewsfeedComponent extends React.Component<Props, State> {
     {
         const { items, offset } = this.state
         const { limit, contextNaturalKey, contextObjectId } = this.props
-
-        ApiClient.newsfeedV2(limit,offset,contextNaturalKey, contextObjectId, null, this.props.defaultChildrenLimit,this.props.includeSubContext, (data, status, error) => {
+        ApiClient.newsfeedV2(limit,offset,contextNaturalKey, contextObjectId, null, this.props.defaultChildrenLimit, this.props.filter, this.props.includeSubContext, (data, status, error) => {
             if(data && data.results)
             {
                 let newData = this.flattenData( data.results )
@@ -292,6 +294,7 @@ class NewsfeedComponent extends React.Component<Props, State> {
         if (this.state.isLoading) {
             return (<LoadingSpinner key="loading"/>)
         }
+        return null
     }
     updateItems = (updated:ArrayItem[]) => {
         this.setState(prevState => {
@@ -601,7 +604,6 @@ class NewsfeedComponent extends React.Component<Props, State> {
                     canMention={true}
                     canComment={true}
                     className={color}
-                    statusId={composer.statusId}
                     onActionPress={this.navigateToActionWithId(composer.statusId)}
                     contextNaturalKey={composer.contextNaturalKey}
                     contextObjectId={composer.contextObjectId}
@@ -756,9 +758,8 @@ class NewsfeedComponent extends React.Component<Props, State> {
                             }
                             const isComment = !!s.parent
                             return this.renderStatus(authUser, s, isComment, i, color, breakpoint)
-                        }) }
+                        }).concat(this.renderLoading()) }
                     </List>
-                    {this.renderLoading()}
                 </>
             }}> 
             </ResizeObserverComponent> 
