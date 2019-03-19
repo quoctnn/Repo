@@ -117,21 +117,48 @@
       {
         "From websocket": [
           {
-            "data": "StatusObject",
             "status_id": 1,
             "type": "status.new"
           },
           {
-            "data": "StatusObject",
             "status_id": 1,
             "type": "status.update"
           },
           {
-            "data": {
-              "id": 241
-            },
             "status_id": 241,
             "type": "status.deleted"
+          },
+          {
+            "status_id": 1,
+            "interaction_id": 1,
+            "user_id": 1,
+            "reaction": "like",
+            "type": "status.interaction.new"
+          },
+          {
+            "status_id": 1,
+            "interaction_id": 1,
+            "user_id": 1,
+            "reaction": null,
+            "type": "status.interaction.update"
+          },
+          {
+            "status_id": 1,
+            "attribute_id": 1,
+            "attribute": "pinned",
+            "type": "status.attribute.new"
+          },
+          {
+            "status_id": 1,
+            "attribute_id": 1,
+            "attribute": "pinned",
+            "type": "status.attribute.update"
+          },
+          {
+            "status_id": 1,
+            "attribute_id": 1,
+            "attribute": "pinned",
+            "type": "status.attribute.deleted"
           }
         ]
       }
