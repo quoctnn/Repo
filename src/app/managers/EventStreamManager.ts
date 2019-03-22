@@ -8,26 +8,25 @@ export const EventStreamManagerConnectionChangedEvent = "EventStreamManagerConne
 export abstract class EventStreamManager
 {
     static connected:boolean = false
-    static setup = () => 
+    static setup = () =>
     {
         NotificationCenter.addObserver(eventStreamNotificationPrefix + EventStreamMessageType.STATE, EventStreamManager.eventstreamStateReceived)
         NotificationCenter.addObserver(eventStreamNotificationPrefix + EventStreamMessageType.SOCKET_STATE_CHANGE, EventStreamManager.eventstreamSocketStateChanged)
     }
-    static eventstreamSocketStateChanged = (...args:any[]) => 
+    static eventstreamSocketStateChanged = (...args:any[]) =>
     {
         console.log("eventstreamSocketStateChanged args", args)
         if(WebsocketState.CLOSED == args[0])
             EventStreamManager.socketDisconnected()
-        AuthenticationManager.clearKeepAliveTimer()
     }
-    static eventstreamStateReceived = (...args:any[]) => 
+    static eventstreamStateReceived = (...args:any[]) =>
     {
         EventStreamManager.connected = true
         let state = args[0]
         console.log("eventstreamStateReceived", args)
         NotificationCenter.push(EventStreamManagerConnectionChangedEvent, [])
     }
-    static socketDisconnected = () => 
+    static socketDisconnected = () =>
     {
         EventStreamManager.connected = false
         NotificationCenter.push(EventStreamManagerConnectionChangedEvent, [])
