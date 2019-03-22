@@ -21,6 +21,16 @@ export const availableEndpoints: ApiEndpoint[] = [
         loginType: EndpointLoginType.NATIVE,
         websocket: 'ws://192.168.15.28:8000/socket/'
     },
+    {
+        endpoint: 'https://dev.intra.work',
+        loginType: EndpointLoginType.NATIVE,
+        websocket: 'wss://dev.intra.work/socket/'
+    },
+    {
+        endpoint: 'http://127.0.0.1:8000/',
+        loginType: EndpointLoginType.NATIVE,
+        websocket: 'ws://127.0.0.1:8000/socket/'
+    },
 ]
 export interface SetEndpointAction{
     type:string

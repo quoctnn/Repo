@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { connect } from 'react-redux'
 import { UserStatus, UserProfile } from '../../types/intrasocial_types';
-import { sendOnWebsocket, EventStreamMessageType } from '../../network/ChannelEventStream';
+import { sendOnWebsocket, EventStreamMessageType, getStream } from '../../network/ChannelEventStream';
 import { NotificationCenter } from '../../utilities/NotificationCenter';
 import { ReduxState } from '../../redux/index';
 import { AuthenticationManager } from '../../managers/AuthenticationManager';
@@ -10,6 +10,7 @@ import { Link } from 'react-router-dom';
 import Routes from '../../utilities/Routes';
 import { translate } from '../../localization/AutoIntlProvider';
 import { EventStreamManagerConnectionChangedEvent, EventStreamManager } from '../../managers/EventStreamManager';
+import { StateManager } from 'react-select/lib/stateManager';
 
 export const sendUserStatus = (status: UserStatus) => {
     sendOnWebsocket(
@@ -35,16 +36,20 @@ const getEnumValues = (_enum:any) =>
 }
 const userStatuses:string[] = getEnumValues(UserStatus)
 export interface State {
-    connected:boolean
+    connected:boolean,
+    retry:number,
+    interval: (NodeJS.Timer|null)
 }
 let counter = 1
 class UserStatusSelector extends React.Component<Props, State> {
-    
+
     observers:any[] = []
     constructor(props:Props) {
         super(props);
         this.state = {
-            connected : EventStreamManager.connected
+            connected : EventStreamManager.connected,
+            retry : 0,
+            interval : null
         }
     }
     componentDidMount()
@@ -60,9 +65,24 @@ class UserStatusSelector extends React.Component<Props, State> {
     }
     processEventStreamConnectionChange = (...args:any[]) => {
         const connected = EventStreamManager.connected
-        if(this.state.connected != connected)
+        if(this.state.connected != connected) {
             this.setState({connected})
+            // if (!connected) {
+            //     let stream = getStream()
+            //     let retryTimer = setInterval(
+            //         () => {
+            //             this.setState({retry:stream.retryCount})
+            //         },
+            //         1000  // 1 second refresh rate
+            //     )
+            //     this.setState({interval:retryTimer, connected:connected})
+            // } else {
+            //     clearInterval(this.state.interval)
+            //     this.setState({interval:null, connected:connected, retry:0})
+            // }
+        }
     }
+
     processIncomingUserUpdate = (...args:any[]) => {
         let status = args[0]['status'] as UserStatus;
         if(!this.props.profile)
@@ -91,10 +111,13 @@ class UserStatusSelector extends React.Component<Props, State> {
         return (
             <div className="d-flex">
                 <div className="dropdown margin-right-sm">
+                    { this.state.connected &&
                     <a data-boundary="body" className="dropdown-toggle text-truncate" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         {currentStatus}
                     </a>
-
+                    ||
+                    <span> {UserStatus.unavailable} </span>
+                    }
                     <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
                         {selectable.map((status, index) => {
                             return <a key={index} onClick={this.setUserStatus.bind(this, status)} className="dropdown-item" href="#">{status}</a>
