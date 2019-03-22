@@ -31,16 +31,10 @@ export const parseJSONObject = (param:string) => {
     return null
 }
 export function userAvatar(user:UserProfile) {
-    const def = Constants.staticUrl + Constants.defaultImg.user
-    if(user)
-        return user.avatar_thumbnail || user.avatar || def
-    return def
+    return (user && (user.avatar_thumbnail || user.avatar)) || Constants.resolveUrl( Constants.defaultImg.user )()
 }
 export function communityAvatar(community:Community) {
-    const def = Constants.staticUrl + Constants.defaultImg.group
-    if(community)
-        return community.avatar_thumbnail || community.avatar || def
-    return def
+    return (community && (community.avatar_thumbnail || community.avatar)) || Constants.resolveUrl(Constants.defaultImg.group)()
 }
 
 export const EMAIL_REGEX = /(\b\s+)(([a-zA-Z0-9\-\_\.])+@[a-zA-Z\_]+?(\.[a-zA-Z]{2,6})+)/gm

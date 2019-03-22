@@ -1,7 +1,7 @@
 
 import * as React from 'react';
 import {Editor, EditorState, ContentState, convertToRaw, CompositeDecorator, Modifier, SelectionState, DraftHandleValue} from 'draft-js'
-import { SearcQueryManager, searchDecorators, searchEntities } from "./extensions";
+import { SearcQueryManager, searchDecorators, searchEntities, SearchEntityType, SearchOption } from "./extensions";
 import classnames from "classnames";
 import "./SearchBox.scss"
 
@@ -16,10 +16,14 @@ type Props = {
     className?:string
     id?:string
     onClick?:(event:React.SyntheticEvent<any>) => void
+    allowedSearchOptions:SearchOption[]
 } 
 type State = {
     term:string
     editorState:EditorState
+}
+export type InsertEntity = {
+    type:SearchEntityType, text:string, data:Object, start:number, end:number, appendSpace:boolean
 }
 export class SearchBox extends React.Component<Props, State>{
     search = React.createRef<Editor>();
@@ -28,7 +32,7 @@ export class SearchBox extends React.Component<Props, State>{
         super(props)
 
         const decorator = new CompositeDecorator(searchDecorators);
-        const blocks = SearcQueryManager.convertToContentState(props.term)
+        const blocks = SearcQueryManager.convertToContentState(props.term, this.props.allowedSearchOptions)
         this.state = {
           editorState: EditorState.createWithContent(blocks, decorator),
           term:""
@@ -55,36 +59,41 @@ export class SearchBox extends React.Component<Props, State>{
         editorState = this.appendTextToState(text, editorState, focus)
         this.setState({ editorState: editorState }, () => {this.onChange(editorState)})
     }
-    insertEntity = (type:string, text:string, data:Object, start:number, end:number, appendSpace:boolean) => {
+    insertEntities = (entities:InsertEntity[]) => {
         let editorState = this.state.editorState
         let contentState = editorState.getCurrentContent()
         const contentBlock = editorState.getCurrentContent().getBlockMap().first()
         const blockKey = contentBlock.getKey();
-        const blockSelection = SelectionState
-          .createEmpty(blockKey)
-          .merge({
-          anchorOffset: start,
-          focusOffset: end,
-        }) as SelectionState;
-        const meta = searchEntities[type]
-        const contentStateWithEntity = contentState.createEntity(
-            meta.type,
-            meta.mutability,
-            data
-        )
-        const entityKey = contentStateWithEntity.getLastCreatedEntityKey()
-        contentState = Modifier.applyEntity(
-            contentStateWithEntity,
-            blockSelection,
-            entityKey
-        )
-        contentState = Modifier.replaceText(contentState, blockSelection, text, null, entityKey)
-        editorState = EditorState.push( editorState, contentState, 'insert-characters')
-        if(appendSpace)
-            editorState = this.appendTextToState(" ", editorState, true)
-        else 
-            editorState = EditorState.moveFocusToEnd(editorState)
+        entities.forEach(e => {
+            const blockSelection = SelectionState
+            .createEmpty(blockKey)
+            .merge({
+            anchorOffset: e.start,
+            focusOffset: e.end,
+          }) as SelectionState;
+          const meta = searchEntities[e.type]
+          const contentStateWithEntity = contentState.createEntity(
+              meta.type,
+              meta.mutability,
+              e.data
+          )
+          const entityKey = contentStateWithEntity.getLastCreatedEntityKey()
+          contentState = Modifier.applyEntity(
+              contentStateWithEntity,
+              blockSelection,
+              entityKey
+          )
+          contentState = Modifier.replaceText(contentState, blockSelection, e.text, null, entityKey)
+          editorState = EditorState.push( editorState, contentState, 'insert-characters')
+          if(e.appendSpace)
+              editorState = this.appendTextToState(" ", editorState, true)
+          else 
+              editorState = EditorState.moveFocusToEnd(editorState)
+        })
         this.setState({ editorState: editorState } ,() => {this.onChange(editorState)})
+    }
+    insertEntity = (type:SearchEntityType, text:string, data:Object, start:number, end:number, appendSpace:boolean) => {
+        this.insertEntities([{type, text, data, start, end, appendSpace}])
     }
     getFocusOffset = () => {
         return this.state.editorState.getSelection().getFocusOffset()
@@ -118,12 +127,13 @@ export class SearchBox extends React.Component<Props, State>{
     }
     onChange = (es:EditorState) => {
         const selection = es.getSelection()
-        let editorState = SearcQueryManager.getStateWithEntities(es)
+        let editorState = SearcQueryManager.getStateWithEntities(es, this.props.allowedSearchOptions)
         editorState = EditorState.acceptSelection(editorState, selection)
         const selectionOffset = editorState.getSelection().getFocusOffset()
         let text = editorState.getCurrentContent().getPlainText()
         const oldTerm = this.state.term
         //this.logState()
+        console.log("state", convertToRaw(editorState.getCurrentContent()))
         this.setState({editorState, term:text}, () => {
             if(oldTerm != text)
             {

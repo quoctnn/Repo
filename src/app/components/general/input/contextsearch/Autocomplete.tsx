@@ -21,17 +21,19 @@ export class AutocompleteSection
 export class AutocompleteSectionItem 
 {
     id:string
+    slug:string
     title:string
     subtitle:string
     count:number
     icon:string
     type:string
     avatar:string
-    onItemSelect:(event:React.SyntheticEvent<any>) => void
-    onItemRemove:(event:React.SyntheticEvent<any>) => void
-    constructor(id:string, title:string, subtitle:string, count:number, icon:string, type:string, avatar:string, onItemSelect?:(event:React.SyntheticEvent<any>) => void, onItemRemove?:(event:React.SyntheticEvent<any>) => void)
+    onItemSelect:(event:React.SyntheticEvent<any>, item:AutocompleteSectionItem) => void
+    onItemRemove:(event:React.SyntheticEvent<any>, item:AutocompleteSectionItem) => void
+    constructor(id:string, slug:string, title:string, subtitle:string, count:number, icon:string, type:string, avatar:string, onItemSelect?:(event:React.SyntheticEvent<any>, item:AutocompleteSectionItem) => void, onItemRemove?:(event:React.SyntheticEvent<any>, item:AutocompleteSectionItem) => void)
     {
         this.id = id
+        this.slug = slug
         this.title = title
         this.subtitle = subtitle
         this.count = count
@@ -87,7 +89,7 @@ export default class Autocomplete extends React.Component<Props, State> {
         event.stopPropagation()
         if(item.onItemSelect)
         {
-            item.onItemSelect(event)
+            item.onItemSelect(event, item)
             this.setState({cursor:-1})
             return
         }
@@ -173,6 +175,12 @@ export default class Autocomplete extends React.Component<Props, State> {
             }
         }
     }
+    onItemRemove = (item:AutocompleteSectionItem) => (event) => {
+        item.onItemRemove(event, item)
+    }
+    onItemSelect = (item:AutocompleteSectionItem) => (event) => {
+        item.onItemSelect(event, item)
+    }
     render = () => {
         const cursor = this.state.cursor
         var count = -1
@@ -203,14 +211,14 @@ export default class Autocomplete extends React.Component<Props, State> {
                             count += 1
                             const hasCounter = item.count != null && item.count > 0
                             const hasSubtitle = !nullOrUndefined(item.subtitle)
-                            const cn = classNames("list-item section-list-item", {"active":cursor == count,"has-counter":hasCounter, "has-subtitle":hasSubtitle })
-                            return (<li onMouseEnter={this.onMouseEnter.bind(this, count)} className={cn} key={item.id + section.type} onClick={item.onItemSelect}>
+                            const cn = classNames("list-item section-list-item", {"active highlight-text":cursor == count,"has-counter":hasCounter, "has-subtitle":hasSubtitle })
+                            return (<li onMouseEnter={this.onMouseEnter.bind(this, count)} className={cn} key={item.id + section.type} onClick={this.onItemSelect(item)}>
                                 <div className="list-content">
                                     {item.avatar && <Avatar image={item.avatar} size={30} borderWidth={2} borderColor="white" />}
                                     {!item.avatar && item.icon && <i className={item.icon}></i>}
-                                    {item.title && <span className="text-content text-truncate">{item.title}</span>}
-                                    {hasSubtitle && <span className="text-sub-content text-truncate">{item.subtitle}</span>}
-                                    {!!item.onItemRemove && <span className="section-list-item-clear"  onClick={item.onItemRemove}>
+                                    {item.title && <span className="text-content text-truncate primary-text">{item.title}</span>}
+                                    {hasSubtitle && <span className="text-sub-content text-truncate secondary-text">{item.subtitle}</span>}
+                                    {!!item.onItemRemove && <span className="section-list-item-clear" onClick={this.onItemRemove(item)}>
                                         <i className="fa fa-times-circle searchclear"></i>
                                     </span>}
                                     {hasCounter && <span className="section-list-item-count">{item.count}</span>}

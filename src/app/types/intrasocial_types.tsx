@@ -1,6 +1,7 @@
 import { nullOrUndefined } from "../utilities/Utilities";
 import * as React from 'react';
 import Emoji from "../components/general/Emoji";
+import Constants from "../utilities/Constants";
 
 export interface Verb
 {
@@ -204,6 +205,29 @@ export enum ContextNaturalKey
     TASK = "project.task",
     EVENT = "event.event",
     NEWSFEED = "newsfeed",
+}
+export namespace ContextNaturalKey {
+    export function avatarForKey(key: ContextNaturalKey) {
+        switch(key){
+            case ContextNaturalKey.GROUP: return Constants.resolveUrl(Constants.defaultImg.groupAvatar)()
+            case ContextNaturalKey.COMMUNITY: return Constants.resolveUrl(Constants.defaultImg.communityAvatar)()
+            case ContextNaturalKey.USER: return Constants.resolveUrl(Constants.defaultImg.userAvatar)()
+            case ContextNaturalKey.PROJECT: return Constants.resolveUrl(Constants.defaultImg.projectAvatar)()
+            case ContextNaturalKey.EVENT: return Constants.resolveUrl(Constants.defaultImg.eventAvatar)()
+            default:return null
+        }
+    }
+    export function elasticTypeForKey(key: ContextNaturalKey) {
+        switch(key){
+            case ContextNaturalKey.GROUP: return ElasticSearchType.GROUP
+            case ContextNaturalKey.COMMUNITY: return ElasticSearchType.COMMUNITY
+            case ContextNaturalKey.USER: return ElasticSearchType.USER
+            case ContextNaturalKey.PROJECT: return ElasticSearchType.PROJECT
+            case ContextNaturalKey.EVENT: return ElasticSearchType.EVENT
+            case ContextNaturalKey.TASK: return ElasticSearchType.TASK
+            default:return null
+        }
+    }
 }
 export type ContextItem = {
     label:string

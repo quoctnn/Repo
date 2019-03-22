@@ -2,8 +2,8 @@
 import * as React from 'react';
 import classnames from "classnames";
 import "./ContextSearch.scss"
-import { SearchBox } from './SearchBox';
-import { SearcQueryManager, SearchData, searchEntities, searchOptions } from './extensions';
+import { SearchBox, InsertEntity } from './SearchBox';
+import { SearcQueryManager, SearchData, SearchEntityType, SearchOption } from './extensions';
 import Autocomplete, { AutocompleteSection } from './Autocomplete';
 import { Popover, PopoverBody } from 'reactstrap';
 import { uniqueId } from '../../../../utilities/Utilities';
@@ -16,6 +16,7 @@ type Props = {
     onSearchDataChanged?:(data:SearchData, focusOffset:number, activeSearchType:ElasticSearchType) => void
     onSubmitSearch?:() => void
     sections:AutocompleteSection[]
+    allowedSearchOptions:SearchOption[]
 } 
 type State = {
     searchData:SearchData
@@ -32,16 +33,22 @@ export class ContextSearch extends React.Component<Props, State>{
     {
         super(props)
         this.state = {
-            searchData:SearcQueryManager.parse(props.term || ""),
+            searchData:SearcQueryManager.parse(props.term || "", props.allowedSearchOptions),
             active:false,
             activeSearchType:null,
         }
     }
+    insertAutocompleteEntity = (type:SearchEntityType, text:string, data, start:number, end:number, appendSpace:boolean) => {
+        this.textInput.current.insertEntity(type, text, data, start, end, appendSpace)
+    }
+    insertAutocompleteEntities = (entities:InsertEntity[]) => {
+        this.textInput.current.insertEntities(entities)
+    }
     termChanged = (term:string, selectionOffset:number) => {
-        const searchData = SearcQueryManager.parse(term)
+        const searchData = SearcQueryManager.parse(term, this.props.allowedSearchOptions)
         if(searchData.tokens.length > 0)
         {
-            const activeSearchType = this.getActiveSearchType(searchData, selectionOffset)
+            const activeSearchType = SearcQueryManager.getActiveSearchType(searchData, selectionOffset, this.props.allowedSearchOptions)
             this.setState({ activeSearchType , searchData}, this.sendSearchDataChanged)
         }
         else 
@@ -50,7 +57,7 @@ export class ContextSearch extends React.Component<Props, State>{
         }
     }
     resetSearch = () => {
-        const searchData = SearcQueryManager.parse("")
+        const searchData = SearcQueryManager.parse("", this.props.allowedSearchOptions)
         this.setState({activeSearchType:null, searchData:searchData}, this.sendSearchDataChanged)
     }
     sendSearchDataChanged = () => {
@@ -58,36 +65,6 @@ export class ContextSearch extends React.Component<Props, State>{
     }
     getSearchFieldFocusOffset = () => {
         return (this.textInput.current &&  this.textInput.current.getFocusOffset()) || 0
-    }
-    getActiveSearchType = (searchData:SearchData, selectionOffset):ElasticSearchType => {
-        let activeSearchTypeIndex = searchData.tokens.findIndex(t => t.start <= selectionOffset && t.end >= selectionOffset)
-        if(activeSearchTypeIndex == -1)
-        {
-            const closestTokenLeft = [...searchData.tokens].reverse().find(t => t.end <= selectionOffset)
-            if(closestTokenLeft)
-            {
-                activeSearchTypeIndex = searchData.tokens.indexOf(closestTokenLeft)
-            }
-        }
-        if(activeSearchTypeIndex > -1)
-        {
-            let token = searchData.tokens[activeSearchTypeIndex]
-            if((!token.type && token.accepted) || token.type == searchEntities.ID_OBJECT.type)//connected token
-            {
-                if(activeSearchTypeIndex > 0)
-                    token = searchData.tokens[activeSearchTypeIndex - 1] 
-            }
-            if(token.type == searchEntities.FILTER.type)
-            {
-                const filter = token.token.replace(":","")
-                const so = searchOptions.find(so => so.name == filter)
-                if(so)
-                {
-                    return so.value
-                }
-            }
-        }
-        return null
     }
     onSearchControlEnterKey = (e:React.SyntheticEvent<any>) => {
         e.preventDefault()

@@ -6,7 +6,10 @@ import { Status, UserProfile, UploadedFile, Community, Group, Conversation, Proj
 import { nullOrUndefined } from '../utilities/Utilities';
 import moment = require("moment");
 export type PaginationResult<T> = {results:T[], count:number, previous:string|null, next:string|null}
+export type ElasticSuggestion = {text:string, offset:number, length:number, options:[]}
+export type ElasticExtensionResult = {stats:{suggestions:{[key:string]:ElasticSuggestion}, aggregations:{[key:string]:any}}}
 export type StatusCommentsResult<T> = {results:T[], count:number, parent:T}
+export type ElasticResult<T> = PaginationResult<T> & ElasticExtensionResult
 export type ApiClientFeedPageCallback<T> = (data: PaginationResult<T>, status:string, error:string|null) => void;
 export type ApiClientCallback<T> = (data: T|null, status:string, error:string|null) => void;
 export type ApiStatusCommentsCallback<T> = (data: StatusCommentsResult<T>, status:string, error:string|null) => void;
@@ -111,7 +114,7 @@ export default class ApiClient
                     slim_types:boolean = true, 
                     filters:{[key:string]:string},
                     tags:string[],
-                    callback:ApiClientCallback<any>){
+                    callback:ApiClientCallback<ElasticResult<any>>){
         let url = Constants.apiRoute.searchUrl + "?" + this.getQueryString({limit, offset})
         AjaxRequest.postJSON(url, {term, include_results, include_suggestions, slim_types, types, use_simple_query_string, filters, tags}, (data, status, request) => {
             callback(data, status, null)

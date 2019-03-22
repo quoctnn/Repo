@@ -23,6 +23,6 @@
     }
     .dropdown-menu > button:hover
     {
-        @include var(background, highlight-color);
+        @include var(background, highlight-background-color);
     }
 }

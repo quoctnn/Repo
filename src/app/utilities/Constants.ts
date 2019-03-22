@@ -1,3 +1,10 @@
+import { EndpointManager } from "../managers/EndpointManager";
+
+const resolveAbsolute = (relative:string) => {
+    return () => {
+        return EndpointManager.applyEndpointDomain(relative)
+    }
+}
 export default  {
     apiRoute: {
         login:"/api/v1/auth/oup/login/",
@@ -210,17 +217,19 @@ export default  {
     },
 
     defaultImg: {
-        docs: "img/docs_logo.png",
-        sendDark:"img/icon-send-dark.png",
-        user: 'img/default-widget.jpg',
-        userAvatar: 'img/default-user.png',
-        group: 'img/default-widget.jpg',
-        groupAvatar: 'img/default-group.jpg',
-        community: 'img/default-widget.jpg',
-        communityAvatar: 'img/default-group.jpg',
-        event: 'img/default-widget.jpg',
-        eventAvatar: 'img/default-group.jpg',
-        default: 'img/og_image.jpg'
+        docs: "/static/img/docs_logo.png",
+        sendDark:"/static/img/icon-send-dark.png",
+        user: '/static/img/default-widget.jpg',
+        userAvatar: '/static/img/default-user.png',
+        group: '/static/img/default-widget.jpg',
+        groupAvatar: '/static/img/default-group.jpg',
+        community: '/static/img/default-widget.jpg',
+        communityAvatar: '/static/img/default-group.jpg',
+        event: '/static/img/default-widget.jpg',
+        eventAvatar: '/static/img/default-group.jpg',
+        project: '/static/img/default-widget.jpg',
+        projectAvatar: '/static/img/default-group.jpg',
+        default: '/static/img/og_image.jpg'
     },
-    staticUrl:"/static/",
+    resolveUrl:resolveAbsolute
 };

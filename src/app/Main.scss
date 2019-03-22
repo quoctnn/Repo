@@ -62,6 +62,11 @@ button{@include var(color, primary-text-color);}
 {
     @include var(color, secondary-text-color);
 }
+.highlight-text {
+
+    @include var(background, highlight-background-color);
+    @include var(color, highlight-foreground-color);
+}
 .drop-shadow-large
 {
     box-shadow:map-get($root, drop-shadow-large);
@@ -77,7 +82,7 @@ button{@include var(color, primary-text-color);}
     left: 0px;
     right: 0px;
     bottom: 0px;
-    @include var(background, highlight-color);
+    @include var(background, highlight-background-color);
     opacity: 0;
     transition: all 0.1s ease;
     pointer-events: none;
@@ -86,7 +91,7 @@ button{@include var(color, primary-text-color);}
     opacity: 1;
 }
 .hover-card:hover{
-    @include var(background, highlight-color);
+    @include var(background, highlight-background-color);
     overflow: hidden;
 }
 .transition

@@ -61,7 +61,7 @@ class Embedly extends React.Component<Props, State> {
     }
     renderCard = (image:string, title:string, subtitle:string, description:string, avatar:string, icon:string) => 
     {
-        const bgImage = image || Constants.staticUrl + Constants.defaultImg.default
+        const bgImage = image || Constants.resolveUrl(Constants.defaultImg.default)()
         return (<div className="card card-horizontal card-highlight anim-transition hover-card drop-shadow">
                     <div className="row">
                         <div className="col-4" style={{padding:0}}>
