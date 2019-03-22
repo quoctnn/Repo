@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Status, StatusActions, ObjectAttributeType } from '../../types/intrasocial_types';
+import { Status, StatusActions, ObjectAttributeType, Permission } from '../../types/intrasocial_types';
 import { Avatar } from "../general/Avatar";
 import { userAvatar, userFullName, getTextContent } from '../../utilities/Utilities';
 import Moment from "react-moment";
@@ -27,9 +27,6 @@ interface OwnProps
     onActionPress:(action:StatusActions, extra?:Object, completion?:(success:boolean) => void) => void
     bottomOptionsEnabled:boolean
     addLinkToContext:boolean
-    canMention:boolean
-    canComment:boolean
-    canReact:boolean
     canUpload:boolean
     authorizedUserId:number
     status:Status
@@ -41,6 +38,7 @@ interface State
 {
     renderPlaceholder:boolean
     readMoreActive:boolean
+    refresh:number
 }
 type Props = OwnProps
 
@@ -50,10 +48,11 @@ export class StatusComponent extends React.Component<Props, State> {
     constructor(props:Props)
     {
         super(props)
-        const renderPlaceholder = !!props.status.temporary ? false : true
+        const renderPlaceholder = false// !!props.status.temporary ? false : true
         this.state = {
             renderPlaceholder:renderPlaceholder,
-            readMoreActive:false
+            readMoreActive:false,
+            refresh:0
         }
     }
     componentDidMount = () => {
@@ -90,7 +89,8 @@ export class StatusComponent extends React.Component<Props, State> {
         nextStatus.reaction_count != status.reaction_count ||
         nextState.renderPlaceholder != this.state.renderPlaceholder ||
         nextState.readMoreActive != this.state.readMoreActive ||
-        nextProps.className != this.props.className
+        nextProps.className != this.props.className || 
+        nextState.refresh != this.state.refresh
         //nextStatus.reactions != status.reactions
         //console.log("status id:" + status.id, ret,(status.children_ids || []).length, (nextStatus.children_ids|| []).length, )
         return ret
@@ -114,9 +114,10 @@ export class StatusComponent extends React.Component<Props, State> {
     renderReactButton = () => {
         if (this.props.status.created_at != null) {
             const reaction = StatusUtilities.getStatusReaction(this.props.status, AuthenticationManager.getAuthenticatedUser())
+            const action = this.props.status.permission > Permission.read ? this.props.onActionPress : undefined
             return (
                 <ReactButton reaction={reaction}
-                onActionPress={this.props.onActionPress}/>
+                onActionPress={action}/>
             )
         }
     }
@@ -142,8 +143,19 @@ export class StatusComponent extends React.Component<Props, State> {
         const badgeSettings = this.getAttributeBadgeSettings(status)
         return <StatusBadgeList setting={badgeSettings} />
     }
+    refresh = () => {
+        this.setState((prevState) => {
+            return {refresh: prevState.refresh + 1}
+        })
+    }
+    getMentions = () => {
+        const mentions = this.props.status.mentions
+        if(this.state.refresh > 0)
+            return ProfileManager.getProfiles(mentions)
+        return ProfileManager.getProfilesFetchRest(mentions, this.refresh)
+    }
     render() {
-        const {status, isComment, className, onActionPress, canComment, canMention, canUpload, authorizedUserId, breakpoint} = this.props
+        const {status, isComment, className, onActionPress, canUpload, authorizedUserId, breakpoint} = this.props
         if(this.state.renderPlaceholder)
         {
             let itemClass = classnames("status-component status-component-placeholder", this.props.className, { comment: isComment, temp: status.pending})
@@ -151,7 +163,7 @@ export class StatusComponent extends React.Component<Props, State> {
         }
         const contextObject =  isComment ? null : status.context_object
         const contextObjectAction =  isComment ? null : () => onActionPress(StatusActions.context)
-        const mentions = ProfileManager.getProfiles(status.mentions)
+        const mentions = this.getMentions()
         const truncateLength = this.state.readMoreActive ? 0 : Settings.statusTruncationLength
         const content = getTextContent(status.id.toString(), status.text, mentions, true, onActionPress, truncateLength, Settings.statusLinebreakLimit)
         const {textContent, linkCards, hasMore} = content
@@ -161,6 +173,7 @@ export class StatusComponent extends React.Component<Props, State> {
         const ownerAction = () => onActionPress(StatusActions.user, {profile:status.owner})
         let communityId = status.community && status.community.id ? status.community.id : null
         const footerStyles:React.CSSProperties = {justifyContent: isComment ? "space-between" : "space-around"} 
+        console.log("Render Status ", status.id)
         return(<div className={cn}>
                 <div className="d-flex">
                     <div className="flex-shrink-0 header-left">
@@ -197,8 +210,7 @@ export class StatusComponent extends React.Component<Props, State> {
                                     {breakpoint >= ResponsiveBreakpoint.standard &&
                                         <StatusOptionsComponent 
                                             status={status} 
-                                            canComment={canComment} 
-                                            canMention={canMention} 
+                                            canMention={true} 
                                             canUpload={canUpload} 
                                             onActionPress={onActionPress}
                                             isOwner={status.owner.id == authorizedUserId}
@@ -212,13 +224,11 @@ export class StatusComponent extends React.Component<Props, State> {
                             }
                             {breakpoint >= ResponsiveBreakpoint.standard && 
                                 <div className="flex-shrink-0 d-flex align-content-start info-container">
-                                {this.props.canReact && 
-                                    <div className="reaction-wrapper">
-                                        {this.renderReactButton()}
-                                        <ReactionStats reactions={this.props.status.reactions}
-                                            reactionsCount={this.props.status.reaction_count}/>
-                                    </div>
-                                }
+                                <div className="reaction-wrapper">
+                                    {this.renderReactButton()}
+                                    <ReactionStats reactions={this.props.status.reactions}
+                                        reactionsCount={this.props.status.reaction_count}/>
+                                </div>
                                 {!isComment && 
                                     <div className="comments-count-wrapper">
                                         <i className="far fa-comment"></i><span className="comment-count">{this.props.status.comments}</span>
@@ -237,13 +247,11 @@ export class StatusComponent extends React.Component<Props, State> {
                     {linkCards.length > 0 && linkCards}
                     {breakpoint < ResponsiveBreakpoint.standard && 
                         <div className="status-footer d-flex" style={footerStyles}>
-                            {this.props.canReact && 
-                                <div className="reaction-wrapper">
-                                    {this.renderReactButton()}
-                                    <ReactionStats reactions={this.props.status.reactions}
-                                        reactionsCount={this.props.status.reaction_count}/>
-                                </div>
-                            }
+                            <div className="reaction-wrapper">
+                                {this.renderReactButton()}
+                                <ReactionStats reactions={this.props.status.reactions}
+                                    reactionsCount={this.props.status.reaction_count}/>
+                            </div>
                             {!isComment && 
                                     <div className="comments-count-wrapper">
                                         <i className="far fa-comment"></i><span className="comment-count">{this.props.status.comments}</span>
@@ -251,8 +259,7 @@ export class StatusComponent extends React.Component<Props, State> {
                             }
                             <StatusOptionsComponent 
                                         status={status} 
-                                        canComment={canComment} 
-                                        canMention={canMention} 
+                                        canMention={true} 
                                         canUpload={canUpload} 
                                         onActionPress={onActionPress}
                                         isOwner={status.owner.id == authorizedUserId}

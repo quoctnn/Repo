@@ -1,8 +1,12 @@
 import * as React from "react";
 import { ContextFilter, ContextValue } from "../../components/general/input/ContextFilter";
 import { translate } from "../../localization/AutoIntlProvider";
-import { Label, Input, FormGroup, Badge, Button, ButtonGroup } from 'reactstrap';
-import { ObjectAttributeType } from "../../types/intrasocial_types";
+import { Label, Input, FormGroup, Button, ButtonGroup } from 'reactstrap';
+import { ObjectAttributeType, ElasticSearchType } from "../../types/intrasocial_types";
+import { SearchData, SearcQueryManager } from "../../components/general/input/contextsearch/extensions";
+import { ContextSearch } from "../../components/general/input/contextsearch/ContextSearch";
+import { AutocompleteSection } from "../../components/general/input/contextsearch/Autocomplete";
+import ApiClient from "../../network/ApiClient";
 
 type Props = 
 {
@@ -16,6 +20,8 @@ type State = {
     selectedContext:ContextValue
     includeSubContext:boolean
     filter:ObjectAttributeType
+    selectedSearchContext:SearchData
+    sections:AutocompleteSection[]
 }
 export type NewsfeedMenuData = {
     selectedContext:ContextValue
@@ -23,13 +29,15 @@ export type NewsfeedMenuData = {
     filter:ObjectAttributeType
 }
 export default class NewsfeedMenu extends React.Component<Props, State> {
-    
+    static searchTypes = [ElasticSearchType.TASK,ElasticSearchType.USER, ElasticSearchType.PROJECT, ElasticSearchType.GROUP, ElasticSearchType.EVENT, ElasticSearchType.COMMUNITY]
     constructor(props:Props) {
         super(props);
         this.state = {
             selectedContext: this.props.selectedContext,
             includeSubContext:this.props.includeSubContext,
-            filter:this.props.filter
+            filter:this.props.filter,
+            selectedSearchContext:SearcQueryManager.parse(""),
+            sections:[]
         }
     }
     onContextChange = (context:ContextValue) => {
@@ -47,6 +55,13 @@ export default class NewsfeedMenu extends React.Component<Props, State> {
         const newFilter = filter == currentFilter ? null : filter
         this.setState({filter:newFilter}, this.sendUpdate)
     }
+    onSearchDataChanged = (data:SearchData, focusOffset:number, activeSearchType:ElasticSearchType) => {
+        console.log("data",data)
+        const types = !!activeSearchType ? [activeSearchType] : NewsfeedMenu.searchTypes
+        ApiClient.search(10, 0, data.query, types, false, true, false, true, data.filters, data.tags,(searchResult, status, error) => {
+            console.log("got res", searchResult)
+        })
+    }
     render() {
         const filter = this.state.filter
         return(
@@ -58,6 +73,10 @@ export default class NewsfeedMenu extends React.Component<Props, State> {
                                 </Button>)
                     })}
                 </ButtonGroup>
+                <FormGroup>
+                    <Label>{translate("FeedContext")}</Label>
+                    <ContextSearch onSearchDataChanged={this.onSearchDataChanged} placeholder="Search..." sections={this.state.sections}/>
+                </FormGroup>
                 <FormGroup>
                     <Label>{translate("FeedContext")}</Label>
                     <ContextFilter onValueChange={this.onContextChange} value={this.state.selectedContext} />

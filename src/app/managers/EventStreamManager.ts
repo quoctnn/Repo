@@ -1,11 +1,10 @@
 import {  Store } from 'redux';
-import { ProfileManager } from './ProfileManager';
-import { CommunityManager } from './CommunityManager';
 import { AuthenticationManager } from './AuthenticationManager';
-import { UserProfile } from '../types/intrasocial_types';
 import { NotificationCenter } from '../utilities/NotificationCenter';
 import { EventStreamMessageType, eventStreamNotificationPrefix, WebsocketState } from '../network/ChannelEventStream';
 import { ReduxState } from '../redux/index';
+
+export const EventStreamManagerConnectionChangedEvent = "EventStreamManagerConnectionChangedEvent"
 export abstract class EventStreamManager
 {
     static connected:boolean = false
@@ -24,15 +23,14 @@ export abstract class EventStreamManager
     static eventstreamStateReceived = (...args:any[]) => 
     {
         EventStreamManager.connected = true
-        console.log("eventstreamStateReceived", args)
         let state = args[0]
-        const {anonymous, channel_name} = state
-        EventStreamManager.connected = true
-
+        console.log("eventstreamStateReceived", args)
+        NotificationCenter.push(EventStreamManagerConnectionChangedEvent, [])
     }
     static socketDisconnected = () => 
     {
         EventStreamManager.connected = false
+        NotificationCenter.push(EventStreamManagerConnectionChangedEvent, [])
     }
     private static getStore = ():Store<ReduxState,any> =>
     {

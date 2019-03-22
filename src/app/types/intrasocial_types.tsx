@@ -55,7 +55,7 @@ export interface TempStatus
   privacy: string
   files_ids: number[]
   link: string|null
-  context_natural_key?: string
+  context_natural_key?: ContextNaturalKey
   context_object_id?: number
   parent:number,
   mentions: number[]
@@ -90,6 +90,7 @@ export interface Status extends TempStatus
     highlights?:{[id:string]:[string]}
     attributes:SimpleObjectAttribute[]
     temporary:boolean
+    visibility?:number[]
 }
 
 export interface FileUpload
@@ -140,6 +141,8 @@ export enum ElasticSearchType
     PROJECT = "Project",
     TASK = "Task",
     EVENT = "Event",
+    STATUS = "Status",
+    UPLOADED_FILE = "UploadedFile"
 }
 export type SimpleObjectAttribute = {
     attribute: ObjectAttributeType
@@ -434,6 +437,7 @@ export interface SimpleTask
     priority: TaskPriority
     state: TaskState
     serialization_date:string
+    visibility?:number[]
 }
 export interface Task extends SimpleTask
 {
@@ -673,7 +677,9 @@ export enum TaskActions
     setPriority,
     setState, 
     /**add time to Task: extra:{description:string, date:moment.Moment, hours:number, minutes:number} */
-    addTime
+    addTime,
+    /**Creates a new Status: extra:{message:string, mentions?:number[], files?:UploadedFile[], completion?:(success:boolean) => void} */
+    addStatus,
 
 }
 export enum StatusActions

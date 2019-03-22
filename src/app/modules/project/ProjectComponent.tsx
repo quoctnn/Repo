@@ -2,7 +2,7 @@ import * as React from 'react'
 import classnames from "classnames"
 import { withRouter, RouteComponentProps } from "react-router-dom"
 import "./ProjectComponent.scss"
-import { SimpleTask, TaskActions, Task } from '../../types/intrasocial_types';
+import { SimpleTask, TaskActions, Task, ContextNaturalKey } from '../../types/intrasocial_types';
 import { ToastManager } from '../../managers/ToastManager';
 import ApiClient from '../../network/ApiClient';
 import { List } from '../../components/general/List';
@@ -10,6 +10,7 @@ import TaskListItem from './TaskListItem';
 import { ProjectMenuData } from './ProjectMenu';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import { translate } from '../../localization/AutoIntlProvider';
+import { StatusUtilities } from '../../utilities/StatusUtilities';
 
 type OwnProps = {
     className?:string
@@ -170,41 +171,73 @@ class ProjectComponent extends React.Component<Props, State> {
         {
             case TaskActions.setPriority:
             {
-                ApiClient.updateTask(task.id, {priority:extra.priority}, (data, status, error) => {
-                    if(data)
-                    {
-                        this.updateTaskItem(data)
-                        ToastManager.showInfoToast(translate("task.state.changed"), `${translate("task.priority." + task.priority)} > ${translate("task.priority." + data.priority)}`)
-                    }
-                    ToastManager.showErrorToast(error)
-                })
+                if(task.priority != extra.priority)
+                {
+                    ApiClient.updateTask(task.id, {priority:extra.priority}, (data, status, error) => {
+                        const success = !!data
+                        if(success)
+                        {
+                            this.updateTaskItem(data)
+                            ToastManager.showInfoToast(translate("task.state.changed"), `${translate("task.priority." + task.priority)} > ${translate("task.priority." + data.priority)}`)
+                        }
+                        completion && completion(success)
+                        ToastManager.showErrorToast(error)
+                    })
+                }
+                else {
+                    completion && completion(false)
+                }
                 break;
             }
             case TaskActions.setState:
             {
-                ApiClient.updateTask(task.id, {state:extra.state}, (data, status, error) => {
-                    if(data)
-                    {
-                        this.updateTaskItem(data)
-                        ToastManager.showInfoToast(translate("task.state.changed"), `${translate("task.state." + task.state)} > ${translate("task.state." + data.state)}`)
-                    }
-                    ToastManager.showErrorToast(error)
-                })
+                if(task.state != extra.state)
+                {
+                    ApiClient.updateTask(task.id, {state:extra.state}, (data, status, error) => {
+                        const success = !!data
+                        if(success)
+                        {
+                            this.updateTaskItem(data)
+                            ToastManager.showInfoToast(translate("task.state.changed"), `${translate("task.state." + task.state)} > ${translate("task.state." + data.state)}`)
+                        }
+                        completion && completion(success)
+                        ToastManager.showErrorToast(error)
+                    })
+                }
+                else {
+                    completion && completion(false)
+                }
                 break;
             }
             case TaskActions.addTime:
             {
                 ApiClient.createTimesheet(task.id, extra.description, extra.date, extra.hours, extra.minutes, (timesheet, status, error) => {
-                    
-                    if(!!timesheet)
+                    const success = !!timesheet
+                    if(success)
                     {
                         const taskClone = {...task}
                         this.updateTimeSpent(taskClone, timesheet.hours, timesheet.minutes)
                         this.updateTaskItem(taskClone)
                         ToastManager.showInfoToast(translate("task.timesheet.added"))
                     }
+                    completion && completion(success)
                     ToastManager.showErrorToast(error)
                 })
+                break;
+            }
+            case TaskActions.addStatus:
+            {
+                const tempStatus = StatusUtilities.getStatusPreview(ContextNaturalKey.TASK, task.id, extra.message, extra.mentions, extra.files)
+                ApiClient.createStatus(tempStatus, (newStatus, requestStatus, error) => {
+                    const success = !!newStatus
+                    if(success)
+                    {
+                        ToastManager.showInfoToast(translate("task.status.added"))
+                    }
+                    completion && completion(success)
+                    ToastManager.showErrorToast(error)
+                })
+                break;
             }
             default:logWarn()
         }

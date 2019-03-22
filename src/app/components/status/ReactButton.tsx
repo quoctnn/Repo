@@ -9,7 +9,7 @@ require("./ReactButton.scss");
 export interface Props 
 {
     reaction:string
-    onActionPress:(action:StatusActions, extra?:Object, completion?:(success:boolean) => void) => void
+    onActionPress?:(action:StatusActions, extra?:Object, completion?:(success:boolean) => void) => void
 }
 interface State 
 {
@@ -36,14 +36,12 @@ export default class ReactButton extends React.Component<Props, State>
             reactionsOpen:false,
             popoverOpen:false
         }
-        this.toggleReaction = this.toggleReaction.bind(this)
     }
     shouldComponentUpdate(nextProps:Props, nextState:State) {
         return nextProps.reaction != this.props.reaction || this.state.reactionsOpen != nextState.reactionsOpen || this.state.popoverOpen != nextState.popoverOpen
     }
-    toggleReaction(event?:any)
+    toggleReaction = (event?:any) => 
     {
-        console.log("toggleReaction")
         if(event)
             event.preventDefault()
         let reaction = this.props.reaction == null ? "like" : null
@@ -110,15 +108,39 @@ export default class ReactButton extends React.Component<Props, State>
         let classes = classNames("btn btn-like", {"active": active})
         const reaction = StatusReactionUtilities.parseStatusReaction(this.props.reaction)
         const showBG = reaction != StatusReaction.LIKE
+        const canReact = !!this.props.onActionPress
+        if(!canReact)
+        {
+            return (<button className={classes}>
+                        <StatusReactionUtilities.Component 
+                            reactionStyle={StatusReactionStyle.icon} 
+                            selected={active} 
+                            showBackground={showBG} 
+                            large={false} 
+                            reaction={reaction} />
+                    </button>)
+        }
         return (
             <>
                 <span ref={this.popoverContainerRef}>
                     {this.renderReactionsView()}
                 </span>
-                <HoverLongPressTrigger debug={true} enterTimeoutTouch={500} enterTimeout={500} onClick={this.toggleReaction} onHover={this.onReactionButtonHover} onHoverOut={this.onReactionButtonHoverOut} onLongPress={this.onReactionButtonHover}>
+                <HoverLongPressTrigger 
+                    debug={false} 
+                    enterTimeoutTouch={500} 
+                    enterTimeout={500} 
+                    onClick={this.toggleReaction} 
+                    onHover={this.onReactionButtonHover} 
+                    onHoverOut={this.onReactionButtonHoverOut} 
+                    onLongPress={this.onReactionButtonHover}>
                     <span className="" ref={this.containerRef}>
                         <button ref={this.ref} className={classes}>
-                            <StatusReactionUtilities.Component reactionStyle={StatusReactionStyle.icon} selected={active} showBackground={showBG} large={false} reaction={reaction}></StatusReactionUtilities.Component>
+                        <StatusReactionUtilities.Component 
+                            reactionStyle={StatusReactionStyle.icon} 
+                            selected={active} 
+                            showBackground={showBG} 
+                            large={false} 
+                            reaction={reaction} />
                         </button>
                     </span>
                 </HoverLongPressTrigger>

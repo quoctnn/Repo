@@ -6,7 +6,7 @@ import { withRouter } from 'react-router';
 import * as Immutable from 'immutable';
 import ApiClient from '../../network/ApiClient';
 import { ReduxState } from '../../redux/index';
-import { UserProfile, Status, UploadedFile, ContextNaturalKey, StatusActions, ObjectAttributeType } from '../../types/intrasocial_types';
+import { UserProfile, Status, UploadedFile, ContextNaturalKey, StatusActions, ObjectAttributeType, Permission } from '../../types/intrasocial_types';
 import { nullOrUndefined } from '../../utilities/Utilities';
 import { ToastManager } from '../../managers/ToastManager';
 import { StatusComponent } from '../../components/status/StatusComponent';
@@ -167,7 +167,7 @@ class NewsfeedComponent extends React.Component<Props, State> {
                 }
                 res = res.concat(this.flattenData(c).reverse())
             }
-            if(nullOrUndefined( s.parent ))
+            if(nullOrUndefined( s.parent ) && s.permission >= Permission.post)
                 res.push(new StatusComposer(s.id, s.community && s.community.id, s.context_object_id, s.context_natural_key))
         })
         return res
@@ -395,7 +395,7 @@ class NewsfeedComponent extends React.Component<Props, State> {
         })
     }
     createNewComment = (parent:Status, message:string, mentions?:number[], files?:UploadedFile[], completion?:(success:boolean) => void) => {
-        const status = StatusUtilities.getStatusPreview(parent, message, mentions, files)
+        const status = StatusUtilities.getCommentPreview(parent, message, mentions, files)
         let composerIndex = this.findStatusComposerByStatusId(parent.id)
         if(composerIndex > -1 )
         {
@@ -581,10 +581,7 @@ class NewsfeedComponent extends React.Component<Props, State> {
     renderStatus = (authUser:UserProfile, item:Status, isComment:boolean, index:number, color:string, breakpoint:ResponsiveBreakpoint) => 
     {
         return <StatusComponent 
-                    canMention={true}
-                    canComment={true}
                     canUpload={true}
-                    canReact={true}
                     addLinkToContext={true}
                     key={"status_" + item.id} 
                     status={item} 
@@ -608,6 +605,7 @@ class NewsfeedComponent extends React.Component<Props, State> {
                     contextNaturalKey={composer.contextNaturalKey}
                     contextObjectId={composer.contextObjectId}
                     communityId={composer.communityId}
+                    taggableMembers={this.getStatusTaggableMembers(composer.statusId)}
                 />
             )
     }
@@ -619,6 +617,20 @@ class NewsfeedComponent extends React.Component<Props, State> {
                     className={color} 
                     isLoading={isLoading} 
                     loadMoreComments={this.loadMoreComments(loader)}/>
+    }
+    getStatusTaggableMembers = (statusId:number) => {
+        const status = this.findStatusByStatusId(statusId)
+        return status.visibility
+    }
+    findStatusByStatusId = (statusId:number) => 
+    {
+        return this.state.items.find(o => {
+            if(o.hasOwnProperty('id'))
+            {
+                return (o as Status).id == statusId
+            }
+            return false
+        }) as Status
     }
     findCommentsByStatusId = (statusId:number) => 
     {

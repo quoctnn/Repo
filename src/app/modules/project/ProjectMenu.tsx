@@ -123,13 +123,13 @@ export default class ProjectMenu extends React.Component<Props, State> {
                 <FormGroup>
                     <Label>{translate("project.module.menu.state.title")}</Label>
                     <ButtonGroup className="flex-wrap d-block">
-                        {states.map(s => <Button outline={true} color="secondary" onClick={this.toggleState(s)} key={s} active={this.stateActive(s)}>{translate("task.state." + s)}</Button>)}
+                        {states.map(s => <Button color="light" onClick={this.toggleState(s)} key={s} active={this.stateActive(s)}>{translate("task.state." + s)}</Button>)}
                     </ButtonGroup>
                 </FormGroup>
                 <FormGroup>
                     <Label>{translate("project.module.menu.priority.title")}</Label>
                     <ButtonGroup className="flex-wrap d-block">
-                        {priorities.map(p => <Button outline={true} color="secondary" onClick={this.togglePriority(p)} key={p} active={this.priorityActive(p)}>{translate("task.priority." + p)}</Button>)}
+                        {priorities.map(p => <Button color="light" onClick={this.togglePriority(p)} key={p} active={this.priorityActive(p)}>{translate("task.priority." + p)}</Button>)}
                     </ButtonGroup>
                 </FormGroup>
                 <FormGroup>

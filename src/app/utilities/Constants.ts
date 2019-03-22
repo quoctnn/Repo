@@ -52,6 +52,7 @@ export default  {
             return `/api/v2/profile/${id}/`
         },
         profilesUrl: '/api/v2/profile/',
+        profilesV1Url: '/api/v1/profile/',
 
         myBusinessDataUrl:"/api/v2/profile/business_data/",
         myPersonalDataUrl:"/api/v2/profile/personal_data/",

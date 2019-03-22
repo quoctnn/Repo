@@ -1,11 +1,11 @@
 
 import * as React from 'react';
-import TimePicker from 'react-moment-input/dist/time';
 import 'react-moment-input/dist/css/style.css'
 import * as moment from 'moment-timezone';
 import { translate } from '../../../localization/AutoIntlProvider';
 import { Popover, PopoverBody, Input, InputGroup, Button, InputGroupAddon, ButtonGroup } from 'reactstrap';
 import { uniqueId } from '../../../utilities/Utilities';
+import * as Slider from 'react-input-slider';
 import "./DateTimePicker.scss"
 type Props = {
     onChange?: (value:moment.Moment, name:string) => void,
@@ -289,6 +289,7 @@ class MomentInput extends React.Component<MomentInputProps, MomentInputState> {
                     selected={selected}
                     onSetTime={this.onSetTime}
                     translations={translations}
+                    minuteSteps={15}
                     isAM={format.indexOf("hh")!==-1}
                 />);
             case 2:
@@ -434,5 +435,41 @@ const YearPicker = ({defaults, add, onActiveTab, onClick, isDisabled, translatio
             </tr>))}
             </tbody>
         </table>
+    </div>
+)
+type TimePickerProps = {selected:moment.Moment, onSetTime:(key:string) => void, translations:any, minuteSteps?:number, isAM:boolean}
+const TimePicker = ({selected, onSetTime, translations, minuteSteps, isAM}:TimePickerProps) => (
+    <div className="r-time tab-m is-active" style={{paddingBottom:"10px"}}>
+        <div className="showtime">
+            <span className="time">{selected.format(isAM ? "hh" :"HH")}</span>
+            <span className="separater">:</span>
+            <span className="time">{selected.format("mm")}</span>
+            { isAM && (<span className="separater"></span>) }
+            { isAM && (<span className="time">{Number(selected.format("HH"))>= 12 ? "PM" : "AM"}</span>) }
+
+        </div>
+        <div className="sliders">
+            <div className="time-text">
+                {translations.HOURS || "Hours"}:
+            </div>
+            <Slider
+                className="u-slider u-slider-x u-slider-time"
+                axis="x"
+                x={Number(selected.format('HH'))}
+                xmax={23}
+                onChange={onSetTime('hours')}
+            />
+            <div className="time-text">
+                {translations.MINUTES || "Minutes"}:
+            </div>
+            <Slider
+                className="u-slider u-slider-x u-slider-time"
+                axis="x"
+                xstep={minuteSteps || 1}
+                x={Number(selected.format('mm'))}
+                xmax={59}
+                onChange={onSetTime('minutes')}
+            />
+        </div>
     </div>
 )

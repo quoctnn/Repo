@@ -9,7 +9,6 @@ import { embedlyStore } from "../components/general/embedly/redux";
 import { EmbedCardItem, Community, UserProfile, Group, Project, Event, Task } from '../types/intrasocial_types';
 import { communityStore } from "./communityStore";
 import { profileStore } from './profileStore';
-import contactListCache from './contactListCache';
 import {groupStore} from './groupStore';
 import activeCommunity from './activeCommunity';
 import { eventStore } from './eventStore';
@@ -23,7 +22,7 @@ const rootPersistConfig:PersistConfig = {
     debug:true,
   }
 const rootReducer = combineReducers({
-    authentication, language, theme, endpoint, embedlyStore, communityStore, profileStore, contactListCache,
+    authentication, language, theme, endpoint, embedlyStore, communityStore, profileStore,
     groupStore, activeCommunity, eventStore, taskStore, projectStore, application
 })
 export default persistReducer(rootPersistConfig, rootReducer)
@@ -40,7 +39,6 @@ export interface ReduxState
     profileStore:{ byId: { [id: number]: UserProfile},allIds: number[]}
     eventStore:{ byId: { [id: number]: Event},allIds: number[]}
     taskStore:{ byId: { [id: number]: Task},allIds: number[]}
-    contactListCache:{contacts:number[]}
     activeCommunity:{activeCommunity:number}
     application:{loaded:boolean}
     _persist:any

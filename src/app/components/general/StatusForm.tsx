@@ -9,8 +9,7 @@ export default class StatusForm extends StatusFormBase {
     }
 
     shouldComponentUpdate(nextProps, nextState) {
-        return (nextProps.canMention != this.props.canMention) ||
-            (nextProps.canPost != this.props.canPost) ||
+        return (nextProps.canPost != this.props.canPost) ||
             (nextState.showDropzone != this.state.showDropzone) ||
             (nextState.isSuggestionsVisible != this.state.isSuggestionsVisible) ||
             (nextState.filesCount != this.state.filesCount)

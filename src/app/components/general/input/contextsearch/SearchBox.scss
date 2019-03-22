@@ -1,0 +1,99 @@
+.search-box{
+    position: relative;
+    display: flex;
+    align-items: center;
+    background: white;
+    border-radius: 4px;
+    padding: 0;
+    ::-webkit-scrollbar {
+        width: 0px;
+      }
+    .icon{
+        color:#8e8e8e;
+        position: absolute;
+        margin-left: 12px;
+    }
+    #searchclear, .searchclear {
+        position: absolute;
+        right: 5px;
+        bottom: 0;
+        height: 20px;
+        margin: auto;
+        font-size: 18px;
+        color: #ccc;
+        transform: translate(0, -8px);
+    }
+    .DraftEditor-root
+    {
+        padding: 0 10px;
+        font-size: 18px !important;
+        border: 0;
+        outline: 0;
+        box-shadow: none;
+        width: 100%;
+        padding-right: 25px;
+        background: none;
+        color:#5c5a5c;
+        outline: 0 !important;
+        box-shadow: none !important;
+        padding-left: 40px;
+        &:focus
+        {
+            border-color: #66afe9;
+            outline: 0;
+            box-shadow: 0 0 0 4px rgba(0,132,255,.5) !important;
+        }
+    }
+    .editor {
+        padding: 4px;
+        color: white;
+        border:0;
+        padding-top: 6px;
+    }
+    .public-DraftEditorPlaceholder-inner 
+    {
+        color: gray;
+        position: absolute; pointer-events: none; 
+        padding-left: 3px;
+        padding-right: 3px;
+    }
+    .public-DraftEditor-content {
+        min-height: 20px;
+        overflow-x: auto;
+        overflow-y: hidden;
+        padding-left: 3px;
+        padding-right: 3px;
+    }
+    .search-filter,.search-id-object {
+       background: #363942;
+       padding-left: 3px;
+       padding-right: 3px;
+
+        &:first-child
+        {
+            margin-left: -3px;
+        }
+        color:white;
+        display: inline-block;
+    }
+    .search-filter{
+        border-top-left-radius: 3px;
+        border-bottom-left-radius: 3px;
+    }
+    .search-id-object{
+        border-top-right-radius: 3px;
+        border-bottom-right-radius: 3px;
+    }
+    .DraftEditor-root .public-DraftStyleDefault-block {
+        display: inline-block;
+        min-width: 1px;
+        white-space: nowrap;
+    }
+    .public-DraftEditor-content[contenteditable=true] {
+        -webkit-user-modify: read-write-plaintext-only;
+        display: inline-block;
+    }
+    .public-DraftEditorPlaceholder-root{
+        position: static;   
+    }
+}

@@ -18,7 +18,6 @@ export interface OwnProps
     onChangeMentions?:(mentions: any) => void
     contextObjectId:number 
     contextNaturalKey:string
-    canMention:boolean
     canPost:boolean
     canUpload:boolean
     files?:UploadedFile[]

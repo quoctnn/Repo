@@ -1,10 +1,33 @@
 import Constants from '../utilities/Constants';
-import { Status, UserProfile, UploadedFile } from '../types/intrasocial_types';
+import { Status, UserProfile, UploadedFile, ContextNaturalKey } from '../types/intrasocial_types';
 import { AuthenticationManager } from '../managers/AuthenticationManager';
 import { URL_REGEX, URL_WWW_REGEX } from './IntraSocialUtilities';
 export class StatusUtilities 
 {
-    static getStatusPreview(parent:Status, message:string, mentions?:number[], files?:UploadedFile[]) 
+    static getStatusPreview(contextNaturalKey:ContextNaturalKey, contextObjectId:number,  message:string, mentions?:number[], files?:UploadedFile[], ) 
+    {
+        let d = Date.now()
+        const status = {} as Status
+        status.text = message,
+        status.privacy = "members",
+        status.files_ids = (files || []).map(f => f.id),
+        status.link = StatusUtilities.findPrimaryLink(message),
+        status.context_natural_key = contextNaturalKey,
+        status.context_object_id = contextObjectId,
+        status.mentions = mentions || []
+        status.id = d
+        status.uid = d
+        status.owner = AuthenticationManager.getAuthenticatedUser()!
+        status.reactions = {}
+        status.comments = 0
+        status.children = []
+        status.files = files || []
+        status.pending = true
+        status.reaction_count = 0
+        status.temporary = true
+        return status
+    }
+    static getCommentPreview(parent:Status, message:string, mentions?:number[], files?:UploadedFile[]) 
     {
         let d = Date.now()
         const status = {} as Status

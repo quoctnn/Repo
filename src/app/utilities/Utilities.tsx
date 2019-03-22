@@ -48,6 +48,7 @@ export const URL_REGEX = /(\b(https?|ftp):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-
 export const URL_WWW_REGEX = /(^(\b|\s+)(www)\.[\S]+(\b|$))/gim
 export const HASHTAG_REGEX = /(?:#)(\w(?:(?:\w|(?:\.(?!\.))){0,200}(?:\w))?)/ig
 export const HASHTAG_REGEX_WITH_HIGHLIGHT = /(?:#)((?:\w|(?:<em>))(?:(?:(?:\w|(?:<\/em>))|(?:\.(?!\.))){0,200}(?:(?:\w|(?:<\/em>))))?)/ig
+export const HASHTAG_REGEX_NO_GLOBAL = /\B#(\w[^\s]+)/i
 export const TAG_REGEX = /(<([^>]+)>)/ig
 export const IS_ONLY_LINK_REGEX = /^(\b(https?|ftp):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])$/i
 export const LINEBREAK_REGEX = /\r?\n|\r/g
@@ -272,9 +273,10 @@ ScrollPosition.prototype.prepareFor = function (direction) {
 }
 
 
-export function ProtectNavigation(enabled) {
+export function ProtectNavigation(enabled:boolean) {
     if (enabled) {
         window.onbeforeunload = function(e) {
+            e.preventDefault()
             let dialogText = "Navigating away will remove your typed text, are you sure?";
             e.returnValue = dialogText;
             return dialogText;
@@ -283,7 +285,7 @@ export function ProtectNavigation(enabled) {
         window.onbeforeunload = null
     }
 }
-export function cloneDictKeys(dict)
+export function cloneDictKeys(dict:{})
 {
     let keys = Object.keys(dict)
     let newDict = {}
@@ -307,7 +309,24 @@ export const filterArray = (array, text) => {
     }); 
     return filteredArray;
 }
-  
+
+export function compareObjects(o1:object, o2:object){
+    for(var p in o1){
+        if(o1.hasOwnProperty(p)){
+            if(o1[p] !== o2[p]){
+                return false;
+            }
+        }
+    }
+    for(var p in o2){
+        if(o2.hasOwnProperty(p)){
+            if(o1[p] !== o2[p]){
+                return false;
+            }
+        }
+    }
+    return true;
+}
   
 export const normalizeIndex = (selectedIndex, max) => {
     let index = selectedIndex % max;

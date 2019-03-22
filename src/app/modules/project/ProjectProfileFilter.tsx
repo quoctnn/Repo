@@ -72,7 +72,7 @@ export class ProjectProfileFilter extends React.PureComponent<Props & React.HTML
                 completion(ProfileManager.searchProfiles(text,null, 50, true).map(this.getProfileFilterOption))
             }
             ProfileManager.ensureProfilesExists(profiles, () => {
-                completion(ProfileManager.searchProfilesIds(text, profiles).map(this.getProfileFilterOption))
+                completion(ProfileManager.searchProfileIds(text, profiles).map(this.getProfileFilterOption))
             })
         }
         if(this.props.project)

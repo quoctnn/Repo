@@ -9,6 +9,7 @@ import "./UserStatusSelector.scss"
 import { Link } from 'react-router-dom';
 import Routes from '../../utilities/Routes';
 import { translate } from '../../localization/AutoIntlProvider';
+import { EventStreamManagerConnectionChangedEvent, EventStreamManager } from '../../managers/EventStreamManager';
 
 export const sendUserStatus = (status: UserStatus) => {
     sendOnWebsocket(
@@ -34,6 +35,7 @@ const getEnumValues = (_enum:any) =>
 }
 const userStatuses:string[] = getEnumValues(UserStatus)
 export interface State {
+    connected:boolean
 }
 let counter = 1
 class UserStatusSelector extends React.Component<Props, State> {
@@ -41,16 +43,25 @@ class UserStatusSelector extends React.Component<Props, State> {
     observers:any[] = []
     constructor(props:Props) {
         super(props);
+        this.state = {
+            connected : EventStreamManager.connected
+        }
     }
     componentDidMount()
     {
         this.processIncomingUserUpdate = this.processIncomingUserUpdate.bind(this)
         const observer = NotificationCenter.addObserver('eventstream_' + EventStreamMessageType.CLIENT_STATUS_CHANGE, this.processIncomingUserUpdate)
         this.observers.push(observer)
+        this.observers.push( NotificationCenter.addObserver(EventStreamManagerConnectionChangedEvent, this.processEventStreamConnectionChange ))
     }
     componentWillUnmount()
     {
         this.observers.forEach(o => o.remove())
+    }
+    processEventStreamConnectionChange = (...args:any[]) => {
+        const connected = EventStreamManager.connected
+        if(this.state.connected != connected)
+            this.setState({connected})
     }
     processIncomingUserUpdate = (...args:any[]) => {
         let status = args[0]['status'] as UserStatus;
@@ -63,7 +74,7 @@ class UserStatusSelector extends React.Component<Props, State> {
     setUserStatus = (status:string) =>
     {
         sendUserStatus(status as UserStatus);
-        this.setState({userStatus:status});
+        //this.setState({userStatus:status});
     }
     renderStatusSelector = () =>
     {

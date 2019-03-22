@@ -16,7 +16,6 @@ interface Props
     contextNaturalKey?:string
     contextObjectId?:number
     canMention:boolean
-    canComment:boolean
     canUpload:boolean
 }
 interface State 
@@ -208,7 +207,6 @@ export default class StatusEditFormContainer extends React.Component<Props, Stat
                 onFileError={this.handleFileError}
                 onFileUploaded={this.handleFileUploaded}
                 onFileQueueComplete={this.handleFileQueueComplete}
-                canMention={this.props.canMention}
                 canUpload={this.props.canUpload}
                 contextNaturalKey={this.props.contextNaturalKey}
                 contextObjectId={this.props.contextObjectId}

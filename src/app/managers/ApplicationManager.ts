@@ -7,6 +7,7 @@ import ApiClient, { ListOrdering } from '../network/ApiClient';
 import { ToastManager } from './ToastManager';
 import { CommunityManager } from './CommunityManager';
 import { NotificationCenter } from '../utilities/NotificationCenter';
+import { ProfileManager } from './ProfileManager';
 export type ApplicationData = {
     dashboards:Dashboard[]
     communitiesLoaded:boolean
@@ -45,6 +46,7 @@ export abstract class ApplicationManager
         requests.push({name:"Dashboards", action:ApplicationManager.fetchDashboards})
         requests.push({name:"Communities", action:ApplicationManager.fetchCommunities})
         requests.push({name:"Profile", action:ApplicationManager.fetchProfile})
+        requests.push({name:"Contacts", action:ApplicationManager.fetchContacts})
         let requestsCompleted = 0
         const requestCompleter = (request:RequestObject) => {
             requestsCompleted += 1
@@ -81,6 +83,14 @@ export abstract class ApplicationManager
         ApiClient.getMyProfile((data, status, error) => {
             const profile = data
             AuthenticationManager.setAuthenticatedUser(profile)
+            completion()
+            ToastManager.showErrorToast(error)
+        })
+    }
+    private static fetchContacts = (completion:() => void) => {
+        ApiClient.getProfiles(100, 0, (data, status, error) => {
+            const profiles = (data && data.results) || []
+            ProfileManager.storeProfiles(profiles)
             completion()
             ToastManager.showErrorToast(error)
         })

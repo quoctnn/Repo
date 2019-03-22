@@ -43,7 +43,7 @@ export class ProjectFilter extends React.PureComponent<Props & React.HTMLAttribu
     }
     searchOptions = (text:string) => {
         return new Promise((resolve) => {
-            return ApiClient.search("*" + text + "*", ProjectFilter.searchTypes,false , true, false, true, 10, 0, (data,status,error) => {
+            return ApiClient.search(10, 0, "*" + text + "*", ProjectFilter.searchTypes, false , true, false, true,{}, [], (data,status,error) => {
                 const d = data && data.results || []
                 resolve(d.map(r => this.convertResultItem(r)).filter(r => r != null)) 
             })

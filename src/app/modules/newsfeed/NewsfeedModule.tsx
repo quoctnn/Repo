@@ -41,7 +41,7 @@ interface State
 type Props = ReduxStateProps & ReduxDispatchProps & OwnProps & RouteComponentProps<any>
 class NewsfeedModule extends React.Component<Props, State> {     
     tempMenuData:NewsfeedMenuData = null
-    availableFilters = [ObjectAttributeType.important, ObjectAttributeType.pinned]
+    availableFilters = [ObjectAttributeType.important, ObjectAttributeType.pinned, ObjectAttributeType.reminder, ObjectAttributeType.attention]
     constructor(props:Props) {
         super(props);
         this.state = {

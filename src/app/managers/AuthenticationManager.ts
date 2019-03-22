@@ -9,7 +9,6 @@ import { ApplicationManager } from './ApplicationManager';
 import { resetCommunitiesAction } from '../redux/communityStore';
 import { resetGroupsAction } from '../redux/groupStore';
 import { resetProfilesAction } from '../redux/profileStore';
-import { contactListResetAction } from '../redux/contactListCache';
 
 export const AuthenticationManagerAuthenticatedUserChangedNotification = "AuthenticationManagerAuthenticatedUserChangedNotification"
 export abstract class AuthenticationManager
@@ -73,7 +72,6 @@ export abstract class AuthenticationManager
         store.dispatch(resetCommunitiesAction());
         store.dispatch(resetGroupsAction());
         store.dispatch(resetProfilesAction());
-        store.dispatch(contactListResetAction());
 
         // Clean up userProfile and token
         AuthenticationManager.getStore().dispatch(setAuthenticationTokenAction(null))
@@ -108,7 +106,8 @@ export abstract class AuthenticationManager
             window.addEventListener('focus', AuthenticationManager.resetUserActivityCounter);
 
             AuthenticationManager.keepAlive = setInterval(
-                function() {
+                () => {
+                    console.log("AuthenticationManager.keepAlive",AuthenticationManager.lastUserActivity)
                     AuthenticationManager.lastUserActivity += AuthenticationManager.keepAliveFrequency;
                     sendOnWebsocket(
                         JSON.stringify({

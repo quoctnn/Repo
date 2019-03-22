@@ -101,9 +101,19 @@ export default class ApiClient
             callback(null, status, error)
         })
     }
-    static search(term :string,types:ElasticSearchType[], use_simple_query_string:boolean = true, include_results:boolean = true, include_suggestions:boolean = false, slim_types:boolean = true, limit:number, offset:number, callback:ApiClientCallback<any>){
+    static search(  limit:number, 
+                    offset:number,  
+                    term :string,
+                    types:ElasticSearchType[], 
+                    use_simple_query_string:boolean = true, 
+                    include_results:boolean = true, 
+                    include_suggestions:boolean = false, 
+                    slim_types:boolean = true, 
+                    filters:{[key:string]:string},
+                    tags:string[],
+                    callback:ApiClientCallback<any>){
         let url = Constants.apiRoute.searchUrl + "?" + this.getQueryString({limit, offset})
-        AjaxRequest.postJSON(url, {term, include_results, include_suggestions, slim_types, types, use_simple_query_string}, (data, status, request) => {
+        AjaxRequest.postJSON(url, {term, include_results, include_suggestions, slim_types, types, use_simple_query_string, filters, tags}, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
             callback(null, status, error)
@@ -240,9 +250,18 @@ export default class ApiClient
             callback(null, status, error)
         })
     }
-    static getProfiles(profiles:number[], callback:ApiClientFeedPageCallback<UserProfile>)
+    static getProfilesByIds(profiles:number[], callback:ApiClientFeedPageCallback<UserProfile>)
     {
-        let url = Constants.apiRoute.profilesUrl +  "?id=" + profiles.join()
+        let url = Constants.apiRoute.profilesUrl + "?" + this.getQueryString({limit:profiles.length, id:encodeURIComponent(profiles.join(","))})
+        AjaxRequest.get(url, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
+    static getProfiles(limit:number, offset:number, callback:ApiClientFeedPageCallback<UserProfile>)
+    {
+        let url = Constants.apiRoute.profilesUrl + "?" + this.getQueryString({limit, offset})
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {

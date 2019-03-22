@@ -7,8 +7,19 @@ import { GroupManager } from './GroupManager';
 import { ProjectManager } from './ProjectManager';
 import { ReduxState } from '../redux';
 import { addProfilesAction } from '../redux/profileStore';
-import { contactListSetAction } from '../redux/contactListCache';
 import { userFullName } from '../utilities/Utilities';
+
+export type ProfileManagerSearchInContextProps = {
+    search:string
+    taggableMembers?:number[] | (() => number[])
+    contextObjectId?:number
+    contextNaturalKey?:string
+    completion:(members:UserProfile[]) => void
+}
+type ProfileRequestObject = {
+    profiles:number[]
+    completion:() => void
+}
 export abstract class ProfileManager
 {
     static setup = () =>
@@ -69,7 +80,7 @@ export abstract class ProfileManager
         let requestIds = profiles.filter(id => ids.indexOf(id) == -1)
         if(requestIds.length > 0)
         {
-            ApiClient.getProfiles(requestIds, (data, status, error) => 
+            ApiClient.getProfilesByIds(requestIds, (data, status, error) => 
             {
                 if(data && data.results && data.results.length > 0)
                 {
@@ -119,6 +130,43 @@ export abstract class ProfileManager
         }).filter(u => u != null)
         return userProfiles
     }
+    private static requestObjects:ProfileRequestObject[] = []
+    private static requestDelay = 200
+    private static timeoutTimer:NodeJS.Timer = null
+    private static scheduleRequestIfNeeded = () => {
+
+        if(!ProfileManager.timeoutTimer)
+            ProfileManager.timeoutTimer = setTimeout(ProfileManager.processRequests, ProfileManager.requestDelay)
+    }
+    private static processRequests = () => {
+        const requests = ProfileManager.requestObjects
+        ProfileManager.requestObjects = []
+        ProfileManager.timeoutTimer = null
+        const result:number[] = []
+        const requestIds = requests.reduce((result,request) => result.concat(request.profiles), result).distinct()
+        ApiClient.getProfilesByIds(requestIds,(data) => {
+            if(data && data.results && data.results.length > 0)
+            {
+                ProfileManager.getStore().dispatch(addProfilesAction(data.results))
+            }
+            requests.forEach(r => {
+                r.completion()
+            })
+        })
+    }
+    static getProfilesFetchRest = (profiles:number[], completion:() => void) =>
+    {
+        let state = ProfileManager.getStore().getState()
+        let ids = state.profileStore.allIds.map(id => id)
+        let requestIds = profiles.filter(id => ids.indexOf(id) == -1)
+        if(requestIds.length > 0)
+        {
+            const request:ProfileRequestObject = {profiles:requestIds, completion}
+            ProfileManager.requestObjects.push(request)
+            ProfileManager.scheduleRequestIfNeeded()
+        }
+        return ProfileManager.getProfiles(profiles)
+    }
     private static filterProfile = (query:string, profile:UserProfile) =>
     {
         let compareString = userFullName(profile)
@@ -144,20 +192,21 @@ export abstract class ProfileManager
         {
             searchables = ProfileManager.getContactListIds(includeMe)
         }
-        const result = ProfileManager.searchProfilesIds(query, searchables)
+        const result = ProfileManager.searchProfileIds(query, searchables)
         if(maxItems)
             return result.slice(0, maxItems)
         return result
     }
-    static searchProfilesIds = ( query:string, profiles:number[]) =>
+    static searchProfileIds = ( query:string, profiles:number[]) =>
     {
         let users = ProfileManager.getProfiles(profiles || [])
         return users.filter(u => ProfileManager.filterProfile(query,u!))
     }
     static getContactListIds = (includeMe = false) => {
-        const profiles = [...ProfileManager.getStore().getState().contactListCache.contacts]
+        const authUser = AuthenticationManager.getAuthenticatedUser()
+        const profiles = [...(authUser && authUser.connections || [])]
         if(includeMe)
-            profiles.unshift(AuthenticationManager.getAuthenticatedUser().id)
+            profiles.unshift(authUser.id)
         return profiles
     }
     static storeProfiles = (profiles:UserProfile[]) => {
@@ -166,8 +215,32 @@ export abstract class ProfileManager
     static storeProfile = (profile:UserProfile) => {
         ProfileManager.getStore().dispatch(addProfilesAction([profile]))
     }
-    static setContactListCache = (contacts:number[]) => {
-        ProfileManager.getStore().dispatch(contactListSetAction(contacts))
+    static searchProfileIdsEnsureExists = (query:string, profiles:number[], completion:(profiles:UserProfile[]) => void) => {
+        ProfileManager.ensureProfilesExists(profiles, () => {
+            const result = ProfileManager.searchProfileIds(query, profiles)
+            completion(result)
+        })
+    }
+    static searchProfilesInContext = ({search, taggableMembers, contextObjectId, contextNaturalKey, completion}:ProfileManagerSearchInContextProps) => {
+    
+        if(taggableMembers)
+        {
+            let members = Array.isArray(taggableMembers) ? taggableMembers : taggableMembers()
+            if(members.length == 0) { // Global item, search all available profiles
+                members = ProfileManager.getContactListIds()
+            }
+            ProfileManager.searchProfileIdsEnsureExists(search, members, (profiles) => {
+                completion(profiles)
+            })
+        }
+        else if(contextObjectId && contextNaturalKey){
+            ProfileManager.searchMembersInContext(search, contextObjectId, contextNaturalKey, (members) => {
+                completion(members)
+            })
+        }
+        else {
+            completion([])
+        }
     }
     static searchMembersInContext = (query:string, contextObjectId:number, contextNaturalKey:string, completion:(members:UserProfile[]) => void) => {
         switch(contextNaturalKey)
@@ -178,7 +251,7 @@ export abstract class ProfileManager
                 {
                     let result:UserProfile[] = []
                     if(community)
-                        result = ProfileManager.searchProfilesIds(query, community.members)
+                        result = ProfileManager.searchProfileIds(query, community.members)
                     completion(result)
                 })
                 break;
@@ -193,7 +266,7 @@ export abstract class ProfileManager
                     if(myContacts.length > 0)
                     {
                         ProfileManager.ensureProfilesExists(myContacts, () => {
-                            result = ProfileManager.searchProfilesIds(query, myContacts)
+                            result = ProfileManager.searchProfileIds(query, myContacts)
                             completion(result)
                         })
                     }
@@ -209,7 +282,7 @@ export abstract class ProfileManager
                         if(mutualFriends.length > 0)
                         {
                             ProfileManager.ensureProfilesExists(mutualFriends, () => {
-                                result = ProfileManager.searchProfilesIds(query, mutualFriends)
+                                result = ProfileManager.searchProfileIds(query, mutualFriends)
                                 completion(result)
                             })
                         }
@@ -228,7 +301,7 @@ export abstract class ProfileManager
                 {
                     let result:UserProfile[] = []
                     if(group)
-                        result = ProfileManager.searchProfilesIds(query, group.members)
+                        result = ProfileManager.searchProfileIds(query, group.members)
                     completion(result)
                 })
                 break;
@@ -239,7 +312,7 @@ export abstract class ProfileManager
                 {
                     let result:UserProfile[] = []
                     if(project)
-                        result = ProfileManager.searchProfilesIds(query, project.members)
+                        result = ProfileManager.searchProfileIds(query, project.members)
                     completion(result)
                 })
                 break;

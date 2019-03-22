@@ -11,7 +11,6 @@ export interface Props
     visible:boolean
     status:Status
     canMention:boolean
-    canComment:boolean
     canUpload:boolean
     onSave:(status: Status, files: UploadedFile[]) => void
     didCancel:() => void
@@ -30,7 +29,6 @@ export default class EditStatusDialog extends React.Component<Props, State> {
         
         return (<StatusEditFormContainer 
             communityId={this.props.communityId}
-            canComment={this.props.canComment}
             canUpload={this.props.canUpload}
             status={this.props.status}
             canMention={this.props.canMention || false}

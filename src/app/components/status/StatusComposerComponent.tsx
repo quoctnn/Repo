@@ -27,6 +27,7 @@ type OwnProps =
     canPost?:() => boolean
     refresh?:string
     onDidType?:(unprocessedText:string) => void
+    taggableMembers?:number[] | (() => number[])
 }
 type DefaultProps = {
 
@@ -48,7 +49,7 @@ export class StatusComposerComponent extends React.Component<Props, State> {
     element = React.createRef<HTMLDivElement>()
     observer:IntersectionObserver = null
     static defaultProps:DefaultProps = {
-        renderPlaceholder:true
+        renderPlaceholder:false,
     }
     constructor(props:Props) {
         super(props)
@@ -96,10 +97,16 @@ export class StatusComposerComponent extends React.Component<Props, State> {
         }
     }
     handleMentionSearch = (search:string, completion:(mentions:Mention[]) => void) => {
+        if(!this.props.canMention)
+        {
+            completion([])
+            return
+        }
         console.log("searching", search)
-        ProfileManager.searchMembersInContext(search, this.props.contextObjectId, this.props.contextNaturalKey, (members) => {
-            completion(members.map(u => Mention.fromUser(u)))
-        })
+        const {taggableMembers, contextNaturalKey, contextObjectId} = this.props
+        ProfileManager.searchProfilesInContext({search, taggableMembers, contextNaturalKey, contextObjectId, completion:(profiles) => {
+            completion(profiles.map(u => Mention.fromUser(u)))
+        }})
     }
     handleTextChange = (text:string) => {
         this.setState({text: text})
@@ -255,7 +262,6 @@ export class StatusComposerComponent extends React.Component<Props, State> {
                     onFileUploaded={this.handleFileUploaded}
                     onFileQueueComplete={this.handleFileQueueComplete}
                     onChangeMentions={this.handleMentions}
-                    canMention={this.props.canMention}
                     className={this.props.className}
                     communityId={this.props.communityId}
                     showEmojiPicker={this.props.showEmojiPicker}

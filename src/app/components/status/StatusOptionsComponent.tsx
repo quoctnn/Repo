@@ -1,6 +1,6 @@
 
 import * as React from 'react';
-import { StatusActions, Status, UploadedFile, ObjectAttributeType, SimpleObjectAttribute, Permission, UserProfile } from '../../types/intrasocial_types';
+import { StatusActions, Status, UploadedFile, ObjectAttributeType, SimpleObjectAttribute, Permission } from '../../types/intrasocial_types';
 import { translate } from '../../localization/AutoIntlProvider';
 import "./StatusOptionsComponent.scss"
 import EditStatusDialog from './dialogs/EditStatusDialog';
@@ -18,7 +18,6 @@ import { ProfileManager } from '../../managers/ProfileManager';
 type Props = {
     className?:string
     status:Status
-    canComment:boolean
     canMention:boolean
     canUpload:boolean
     onActionPress:(action:StatusActions, extra?:Object, completion?:(success:boolean) => void) => void
@@ -82,7 +81,7 @@ export default class StatusOptionsComponent extends React.Component<Props, State
         const title = translate("Confirm deletetion")
         const message = this.props.status.parent ? translate("Are you sure you want to delete this comment?") :
                                                    translate("Are you sure you want to delete this status?")
-        const okButtonTitle = translate("Yes")
+        const okButtonTitle = translate("common.yes")
         return <ConfirmDialog visible={visible} title={title} message={message} didComplete={this.onConfirmDelete} okButtonTitle={okButtonTitle}/>
     }
     renderEditDialog = () => {
@@ -94,10 +93,10 @@ export default class StatusOptionsComponent extends React.Component<Props, State
                 communityId={this.props.communityId}
                 didCancel={this.toggleEditModal}
                 canUpload={this.props.canUpload}
-                canComment={this.props.canComment}
                 visible={visible} ref="editStatusDialog"
                 status={this.props.status}
-                onSave={this.save} canMention={this.props.canMention} />
+                onSave={this.save} 
+                canMention={this.props.canMention} />
         )
     }
     renderReportDialog = () => {
@@ -210,9 +209,10 @@ export default class StatusOptionsComponent extends React.Component<Props, State
     }
     fetchItems = () => {
 
-        const attributes = this.props.status.attributes || []
+        const status = this.props.status
+        const attributes = status.attributes || []
         const items:OverflowMenuItem[] = [] 
-        if(this.props.isOwner && this.props.canComment)
+        if(this.props.isOwner && status.permission >= Permission.post)
         {
             items.push({id:"0", title:translate("Edit"), iconClass:"fa fa-edit", onPress:this.toggleEditModal, type:OverflowMenuItemType.option})
             items.push({id:"1",title:translate("Delete"), iconClass:"fa fa-trash", onPress:this.toggleDeleteModal, type:OverflowMenuItemType.option})
