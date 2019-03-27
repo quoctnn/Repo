@@ -21,6 +21,7 @@ class PageHeader extends React.Component<Props, {}> {
         const style: React.CSSProperties = this.props.community && {backgroundImage: `url(${this.props.community.cover_cropped})`}
         return(
             <div id="page-header" style={style}>
+                <div className="circle"></div>
             </div>
         );
     }

@@ -90,7 +90,8 @@ class UserStatusSelector extends React.Component<Props, State> {
         const currentStatus = this.props.profile.user_status
         let selectable = userStatuses.filter(function(value, _index, _arr){
             if (value === "away" ||
-                value === "unavailable")
+                value === "unavailable" ||
+                value === currentStatus)
                 return
             else
                 return value
@@ -100,14 +101,14 @@ class UserStatusSelector extends React.Component<Props, State> {
                 <div className="dropdown margin-right-sm">
                     { this.state.connected &&
                     <a data-boundary="body" className="dropdown-toggle text-truncate" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        {currentStatus}
+                        {translate("user.status." + currentStatus)}
                     </a>
                     ||
                     <span> {UserStatus.unavailable} </span>
                     }
                     <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
                         {selectable.map((status, index) => {
-                            return <a key={index} onClick={this.setUserStatus(status)} className="dropdown-item" href="#">{translate(status)}</a>
+                            return <a key={index} onClick={this.setUserStatus(status)} className="dropdown-item" href="#">{translate("user.status." + status)}</a>
                         }) }
                         <DropdownItem divider={true}/>
                         <Link className="dropdown-item" to={Routes.SIGNOUT}>{translate("Sign out")}</Link>
