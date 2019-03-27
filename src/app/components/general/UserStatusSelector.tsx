@@ -95,7 +95,9 @@ class UserStatusSelector extends React.Component<Props, State> {
                     }
                     <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
                         {selectable.map((status, index) => {
-                            return <a key={index} onClick={this.setUserStatus(status)} className="dropdown-item" href="#">{status.translation()}</a>
+                            return <a key={index} onClick={this.setUserStatus(status)} className="dropdown-item" href="#">
+                                        <div style={{backgroundColor:status.color}} className={"user-state-indicator"}></div>{status.translation()}
+                                    </a>
                         }) }
                         <DropdownItem divider={true}/>
                         <Link className="dropdown-item" to={Routes.SIGNOUT}>{translate("Sign out")}</Link>
