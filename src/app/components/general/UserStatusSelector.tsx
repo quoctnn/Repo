@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { connect } from 'react-redux'
-import { UserStatus, UserProfile } from '../../types/intrasocial_types';
+import { UserStatus, UserProfile, UserStatusItem } from '../../types/intrasocial_types';
 import { sendOnWebsocket, EventStreamMessageType, getStream } from '../../network/ChannelEventStream';
 import { NotificationCenter } from '../../utilities/NotificationCenter';
 import { ReduxState } from '../../redux/index';
@@ -10,7 +10,6 @@ import { Link } from 'react-router-dom';
 import Routes from '../../utilities/Routes';
 import { translate } from '../../localization/AutoIntlProvider';
 import { EventStreamManagerConnectionChangedEvent, EventStreamManager } from '../../managers/EventStreamManager';
-import { StateManager } from 'react-select/lib/stateManager';
 import { DropdownItem } from 'reactstrap';
 
 export const sendUserStatus = (status: UserStatus) => {
@@ -31,11 +30,6 @@ interface ReduxStateProps
     count:number
 }
 type Props = ReduxStateProps & OwnProps
-const getEnumValues = (_enum:any) =>
-{
-    return Object.keys(_enum).map(k => _enum[k])
-}
-const userStatuses:UserStatus[] = getEnumValues(UserStatus)
 export interface State {
     connected:boolean,
     retry:number,
@@ -79,22 +73,16 @@ class UserStatusSelector extends React.Component<Props, State> {
         profile.user_status = status
         AuthenticationManager.setUpdatedProfileStatus(profile)
     }
-    setUserStatus = (status:string) => (event: React.SyntheticEvent<any>) =>
+    setUserStatus = (status:UserStatusItem) => (event: React.SyntheticEvent<any>) =>
     {
-        sendUserStatus(status as UserStatus);
+        sendUserStatus(status.type);
     }
     renderStatusSelector = () =>
     {
         if(!this.props.profile || this.props.profile.is_anonymous)
             return <Link className="btn btn-sm btn-secondary btn-outline-secondary" to={Routes.SIGNIN}>{translate("Sign in")}</Link>
         const currentStatus = this.props.profile.user_status
-        let selectable = userStatuses.filter(function(value, _index, _arr){
-            if (value === "away" ||
-                value === "unavailable")
-                return
-            else
-                return value
-        })
+        let selectable = UserStatus.getSelectableStates()
         return (
             <div className="d-flex">
                 <div className="dropdown margin-right-sm">
@@ -103,11 +91,11 @@ class UserStatusSelector extends React.Component<Props, State> {
                         {currentStatus}
                     </a>
                     ||
-                    <span> {UserStatus.unavailable} </span>
+                    <span> {UserStatus.getObject(UserStatus.unavailable).translation()} </span>
                     }
                     <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
                         {selectable.map((status, index) => {
-                            return <a key={index} onClick={this.setUserStatus(status)} className="dropdown-item" href="#">{translate(status)}</a>
+                            return <a key={index} onClick={this.setUserStatus(status)} className="dropdown-item" href="#">{status.translation()}</a>
                         }) }
                         <DropdownItem divider={true}/>
                         <Link className="dropdown-item" to={Routes.SIGNOUT}>{translate("Sign out")}</Link>
