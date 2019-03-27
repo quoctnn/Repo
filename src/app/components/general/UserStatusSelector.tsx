@@ -81,14 +81,14 @@ class UserStatusSelector extends React.Component<Props, State> {
     {
         if(!this.props.profile || this.props.profile.is_anonymous)
             return <Link className="btn btn-sm btn-secondary btn-outline-secondary" to={Routes.SIGNIN}>{translate("Sign in")}</Link>
-        const currentStatus = this.props.profile.user_status
-        let selectable = UserStatus.getSelectableStates()
+        const currentState = UserStatus.getObject(this.props.profile.user_status)
+        let selectable = UserStatus.getSelectableStates([currentState.type])
         return (
             <div className="d-flex">
                 <div className="dropdown margin-right-sm">
-                    { this.state.connected &&
+                    { this.state.connected && 
                     <a data-boundary="body" className="dropdown-toggle text-truncate" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        {currentStatus}
+                        <div style={{backgroundColor:currentState.color}} className={"user-state-indicator"}></div>{currentState.translation()}
                     </a>
                     ||
                     <span> {UserStatus.getObject(UserStatus.unavailable).translation()} </span>
