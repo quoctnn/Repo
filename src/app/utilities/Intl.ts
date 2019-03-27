@@ -9,6 +9,7 @@ declare global {
         hashCode(): number;
         splice(idx:number, rem:number, str:string):string;
         isNumber():boolean
+        trimLeftCharacters(charlist:string):string;
     }
     interface Array<T> 
     {

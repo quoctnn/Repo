@@ -145,6 +145,21 @@ export enum ElasticSearchType
     STATUS = "Status",
     UPLOADED_FILE = "UploadedFile"
 }
+
+export namespace ElasticSearchType {
+    
+    export function contextNaturalKeyForType(key: ElasticSearchType) {
+        switch(key){
+            case ElasticSearchType.GROUP: return ContextNaturalKey.GROUP
+            case ElasticSearchType.COMMUNITY: return ContextNaturalKey.COMMUNITY
+            case ElasticSearchType.USER: return ContextNaturalKey.USER
+            case ElasticSearchType.PROJECT: return ContextNaturalKey.PROJECT
+            case ElasticSearchType.EVENT: return ContextNaturalKey.EVENT
+            case ElasticSearchType.TASK: return ContextNaturalKey.TASK
+            default:return null
+        }
+    }
+}
 export type SimpleObjectAttribute = {
     attribute: ObjectAttributeType
     datetime: string

@@ -1,55 +1,51 @@
 import * as React from "react";
-import { ContextFilter, ContextValue } from "../../components/general/input/ContextFilter";
 import { translate } from "../../localization/AutoIntlProvider";
 import { Label, Input, FormGroup, Button, ButtonGroup } from 'reactstrap';
-import { ObjectAttributeType, ElasticSearchType, ContextNaturalKey } from "../../types/intrasocial_types";
-import { SearchData, SearcQueryManager, SearchEntityType, SearchOption } from "../../components/general/input/contextsearch/extensions";
+import { ObjectAttributeType, ElasticSearchType } from "../../types/intrasocial_types";
+import { SearcQueryManager, SearchEntityType, SearchOption, InsertEntity, ContextSearchData, SearchToken } from "../../components/general/input/contextsearch/extensions";
 import { ContextSearch } from "../../components/general/input/contextsearch/ContextSearch";
 import { AutocompleteSection, AutocompleteSectionItem } from "../../components/general/input/contextsearch/Autocomplete";
 import ApiClient, { ElasticResult } from "../../network/ApiClient";
 import { nullOrUndefined } from "../../utilities/Utilities";
-import { InsertEntity } from "../../components/general/input/contextsearch/SearchBox";
 
 type Props = 
 {
-    selectedContext:ContextValue
+    selectedSearchContext:ContextSearchData
     includeSubContext:boolean
     filter:ObjectAttributeType
     onUpdate:(data:NewsfeedMenuData) => void
     availableFilters:ObjectAttributeType[]
 }
 type State = {
-    selectedContext:ContextValue
     includeSubContext:boolean
     filter:ObjectAttributeType
-    selectedSearchContext:SearchData
+    selectedSearchContext:ContextSearchData
     sections:AutocompleteSection[]
     focusOffset:number
     activeSearchType:ElasticSearchType
     searchResult:ElasticResult<any>
 }
 export type NewsfeedMenuData = {
-    selectedContext:ContextValue
     includeSubContext:boolean
     filter:ObjectAttributeType
+    selectedSearchContext:ContextSearchData
 }
-const allowedSearchOptions:SearchOption[] = [
-    {name: "community", value:ElasticSearchType.COMMUNITY},
-    {name: "group", value:ElasticSearchType.GROUP},
-    {name: "user", value:ElasticSearchType.USER},
-    {name: "project", value:ElasticSearchType.PROJECT},
-    {name: "task", value:ElasticSearchType.TASK},
-    {name: "event", value:ElasticSearchType.EVENT},
-]
+export const allowedSearchOptions:SearchOption[] = []
+allowedSearchOptions.push(new SearchOption("community", null, 2,  ElasticSearchType.COMMUNITY, ["user", "group", "event", "project", "task", ], "newsfeed.menu.filter.community.description"))
+allowedSearchOptions.push(new SearchOption("group", null, 1, ElasticSearchType.GROUP, []))
+allowedSearchOptions.push(new SearchOption("from", "user", 2, ElasticSearchType.USER, ["community", "group", "event", "project", "task", ]))
+allowedSearchOptions.push(new SearchOption("project", null, 1, ElasticSearchType.PROJECT, ["task", ]))
+allowedSearchOptions.push(new SearchOption("task", null, 1, ElasticSearchType.TASK, []))
+allowedSearchOptions.push(new SearchOption("event", null, 1,  ElasticSearchType.EVENT, []))
+
 const allowedSearchTypes = allowedSearchOptions.map(k => k.value)
 export default class NewsfeedMenu extends React.Component<Props, State> {
     contextSearch = React.createRef<ContextSearch>()
-    allowMultipleFilters = false
+    allowMultipleFilters = true
     constructor(props:Props) {
         super(props);
-        const searchContext = SearcQueryManager.parse("", allowedSearchOptions)
+        const searchContext = this.props.selectedSearchContext
         this.state = {
-            selectedContext: this.props.selectedContext,
             includeSubContext:this.props.includeSubContext,
             filter:this.props.filter,
             selectedSearchContext:searchContext,
@@ -59,46 +55,57 @@ export default class NewsfeedMenu extends React.Component<Props, State> {
             searchResult:null,
         }
     }
-    componentDidMount = () => {
-        this.onSearchDataChanged(this.state.selectedSearchContext, this.state.focusOffset, this.state.activeSearchType)
-    }
-    onContextChange = (context:ContextValue) => {
-        this.setState({selectedContext:context}, this.sendUpdate)
-    }
     includeSubContextChanged = (event:any) => {
         this.setState({includeSubContext:event.target.checked}, this.sendUpdate)
     }
     sendUpdate = () => {
-        this.props.onUpdate({selectedContext:this.state.selectedContext, includeSubContext:this.state.includeSubContext, filter:this.state.filter})
+        this.props.onUpdate({ includeSubContext:this.state.includeSubContext, filter:this.state.filter, selectedSearchContext:this.state.selectedSearchContext })
     }
     filterButtonChanged = (filter:ObjectAttributeType) => (event) => {
-
         const currentFilter = this.state.filter
         const newFilter = filter == currentFilter ? null : filter
         this.setState({filter:newFilter}, this.sendUpdate)
     }
-    onSearchDataChanged = (data:SearchData, focusOffset:number, activeSearchType:ElasticSearchType) => {
-        console.log("data",data, focusOffset, activeSearchType)
-        const types = !!activeSearchType ? [activeSearchType] : allowedSearchTypes
-        const q = data.query.length > 0 ? "*" + data.query + "*" : data.query
-        const searchForbidden = this.searchForbidden(data)
+    getAllowedSearchOptions = (searchData:ContextSearchData, allowedSearchOptions:SearchOption[]) => {
+        const filterKeys = Object.keys(searchData.filters).map(s => allowedSearchOptions.find(so => so.getName() == s)).filter(so => !nullOrUndefined(so)).map(so => so.allowedWithOptions)
+        let allowed = allowedSearchOptions.map(so => so.getName())
+        filterKeys.forEach(arr => {
+            const intersections = allowed.filter(x => arr.contains(x))
+            allowed = intersections
+        })
+        return allowedSearchOptions.filter(so => allowed.contains(so.getName()))
+    }
+    getRealFilters = (filters:{[key:string]:string}) => {
+        const clone = {...filters}
+        const keysToAlter = allowedSearchOptions.filter(f => !nullOrUndefined( f.name ))
+        keysToAlter.forEach(k => {
+            const val = clone[k.name]
+            if(val)
+                delete Object.assign(clone, {[k.key]: val })[k.name]
+        })
+        return clone
+    }
+    onSearchDataChanged = (data:ContextSearchData, focusOffset:number, activeSearchType:ElasticSearchType) => {
+        const hasActiveSearchType = !!activeSearchType
+        const types = hasActiveSearchType ? [activeSearchType] : this.getAllowedSearchOptions(data, allowedSearchOptions).map(so => so.value)
+        const q = hasActiveSearchType ? "" : data.query.length > 0 ? "*" + data.query + "*" : data.query
+        const searchForbidden = types.length == 0 || this.isSearchForbidden(data)
         const sections = searchForbidden ? [] : this.getAutocompleteSections(data, focusOffset, this.state.searchResult)
-        this.setState({selectedSearchContext:data, sections, focusOffset, activeSearchType})
+        this.setState({selectedSearchContext:data, sections, focusOffset, activeSearchType}, this.sendUpdate)
         if(searchForbidden)
             return;
-        ApiClient.search(10, 0, q, types, false, true, false, true, data.filters, data.tags,(searchResult, status, error) => {
-            console.log("got res", searchResult)
+        ApiClient.search(10, 0, q, types, false, true, false, true, this.getRealFilters(data.filters), data.tags,(searchResult, status, error) => {
             const sections = this.getAutocompleteSections(data, focusOffset, searchResult)
             this.setState({selectedSearchContext:data, sections, focusOffset, activeSearchType, searchResult})
         })
     }
     onSearchResultItemSelected = (event: React.SyntheticEvent<any>, item: AutocompleteSectionItem) => {
         const focusOffset = this.state.focusOffset
-        const searchData = this.state.selectedSearchContext
-        const slug = item.slug || item.id
+        const slug = !!item.slug ? "@" + item.slug : item.id.toString()
+        const fn = allowedSearchOptions.find(so => so.value == item.type).getName()
         if(this.state.activeSearchType)
         {
-            const activeToken = SearcQueryManager.getActiveSearchToken(this.state.selectedSearchContext, focusOffset)
+            const activeToken = SearcQueryManager.getActiveSearchToken(this.state.selectedSearchContext.tokens, focusOffset)
             let start = 0
             let end = 0
             if(activeToken)
@@ -113,28 +120,31 @@ export default class NewsfeedMenu extends React.Component<Props, State> {
                 }
                 end = activeToken.end
             }
-            this.contextSearch.current.insertAutocompleteEntity(SearchEntityType.ID_OBJECT, "@"+slug, {slug:slug, id:item.id}, start, end, true)
+            let state = this.contextSearch.current.editorState()
+            state = SearcQueryManager.insertEntities([{type:SearchEntityType.ID_OBJECT, text:slug, data:{name:slug, id:parseInt(item.id), key:fn, title:item.title}, start, end, appendSpace:true}], state)
+            this.contextSearch.current.applyState(state)
         }
         else 
         {
+            let state = this.contextSearch.current.editorState()
+            state = SearcQueryManager.removeNonEntities(state)
+            state = SearcQueryManager.appendText(" ", true, state)
+            let focusOffset = state.getSelection().getFocusOffset()
             const entities:InsertEntity[] = []
-            //create both filter and id_object
-            const searchQuery = SearcQueryManager.getActiveSearchQueryNotEntityConnected(searchData, focusOffset)
-            const start = Math.max(0 , focusOffset - searchQuery.length)
-            const filterName = allowedSearchOptions.find(so => so.value == item.type).name + ":"
-            entities.push({type:SearchEntityType.FILTER, text:filterName, data:{name:filterName}, start, end:focusOffset, appendSpace:false})
+            const filterName = fn + ":"
+            entities.push({type:SearchEntityType.FILTER, text:filterName, data:{name:filterName, id:-1, key:fn, title:null}, start:focusOffset, end:focusOffset, appendSpace:false})
             //id
             const pos = focusOffset + filterName.length
-            const text = "@"+slug
-            entities.push({type:SearchEntityType.ID_OBJECT, text:text, data:{slug:slug, id:item.id}, start:pos, end:pos, appendSpace:true})
+            entities.push({type:SearchEntityType.ID_OBJECT, text:slug, data:{name:slug, id:parseInt(item.id), key:fn, title:item.title}, start:pos, end:pos, appendSpace:true})
 
-            this.contextSearch.current.insertAutocompleteEntities(entities)
+            state = SearcQueryManager.insertEntities(entities, state)
+            this.contextSearch.current.applyState(state)
         }
     }
-    searchForbidden = (searchData:SearchData) => {
+    isSearchForbidden = (searchData:ContextSearchData) => {
         return !this.allowMultipleFilters && !!searchData.tokens.find(t => t.type == SearchEntityType.ID_OBJECT)
     }
-    getAutocompleteSections = (searchData:SearchData, focusOffset:number, searchResult:ElasticResult<any>) => {
+    getAutocompleteSections = (searchData:ContextSearchData, focusOffset:number, searchResult:ElasticResult<any>) => {
         const sections:AutocompleteSection[] = []
         const autoFilters = this.getSearchFiltersAutocompleteSection(searchData, focusOffset)
         sections.push(...autoFilters)
@@ -144,24 +154,30 @@ export default class NewsfeedMenu extends React.Component<Props, State> {
         sections.push(...resultSections)
         return sections
     }
-    getSearchFiltersAutocompleteSection = (searchData:SearchData, focusOffset:number) => {
+    getSearchFiltersAutocompleteSection = (searchData:ContextSearchData, focusOffset:number) => {
         const searchQuery = SearcQueryManager.getActiveSearchQueryNotEntityConnected(searchData, focusOffset)
-        console.log("searchQuery", searchQuery)
         if(!nullOrUndefined( searchQuery ))
         {
-            const appliedFilters = Object.keys( searchData.filters )
-            const filters = allowedSearchOptions.filter(f => appliedFilters.indexOf(f.name) == -1 && f.name.indexOf(searchQuery.toLowerCase()) > -1)
+            const filters = this.getAllowedSearchOptions(searchData, allowedSearchOptions).filter(f => f.getName().indexOf(searchQuery.toLowerCase()) > -1)
+            // allowedSearchOptions.filter(f => appliedFilters.indexOf(f.getName()) == -1 && f.getName().indexOf(searchQuery.toLowerCase()) > -1)
             let trans = translate("search.options.title")
             let items = filters.map(f => {
-                const filterName = f.name + ":"
-                return new AutocompleteSectionItem(f.name, f.name, filterName, null, 0, null, null,null, (e) => {
+                const fn = f.getName() 
+                const filterName = fn + ":"
+                return new AutocompleteSectionItem(fn, fn, filterName, f.description && translate( f.description ), 0, null, null,null, (e) => {
                     const start = Math.max(0 , focusOffset - searchQuery.length)
-                    this.contextSearch.current.insertAutocompleteEntity(SearchEntityType.FILTER, filterName, {name:filterName}, start, focusOffset, false)
+
+                    let state = this.contextSearch.current.editorState()
+                    state = SearcQueryManager.insertEntities([{type:SearchEntityType.FILTER, text:filterName, data:{name:filterName, id:-1, key:filterName, title:null}, start, end:focusOffset, appendSpace:false}], state)
+                    this.contextSearch.current.applyState(state)
                 })
             })
             return [new AutocompleteSection("search_options", trans, items, false, true)]
         }
         return []
+    }
+    onAutocompleteToggle = (visible:boolean) => {
+        
     }
     render() {
         const filter = this.state.filter
@@ -176,11 +192,15 @@ export default class NewsfeedMenu extends React.Component<Props, State> {
                 </ButtonGroup>
                 <FormGroup>
                     <Label>{translate("FeedContext")}</Label>
-                    <ContextSearch allowedSearchOptions={allowedSearchOptions} ref={this.contextSearch} onSearchDataChanged={this.onSearchDataChanged} placeholder="Search..." sections={this.state.sections}/>
-                </FormGroup>
-                <FormGroup>
-                    <Label>{translate("FeedContext")}</Label>
-                    <ContextFilter onValueChange={this.onContextChange} value={this.state.selectedContext} />
+                    <ContextSearch 
+                        onAutocompleteToggle={this.onAutocompleteToggle}
+                        searchData={this.props.selectedSearchContext} 
+                        allowedSearchOptions={allowedSearchOptions} 
+                        ref={this.contextSearch} 
+                        onSearchDataChanged={this.onSearchDataChanged} 
+                        placeholder="Search..." 
+                        sections={this.state.sections}
+                        />
                 </FormGroup>
                 <FormGroup check={true}>
                     <Label check={true}>
@@ -191,3 +211,4 @@ export default class NewsfeedMenu extends React.Component<Props, State> {
         );
     }
 }
+

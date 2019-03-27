@@ -1,14 +1,14 @@
 
 import * as React from 'react';
 import {Editor, EditorState, ContentState, convertToRaw, CompositeDecorator, Modifier, SelectionState, DraftHandleValue} from 'draft-js'
-import { SearcQueryManager, searchDecorators, searchEntities, SearchEntityType, SearchOption } from "./extensions";
+import { SearcQueryManager, searchDecorators, searchEntities, SearchEntityType, SearchOption, InsertEntity, ContextSearchData } from "./extensions";
 import classnames from "classnames";
 import "./SearchBox.scss"
 
 type Props = {
-    termChanged:(term:string, offset:number) => void
+    onChange:(es:EditorState) => void
     placeholder?:string
-    term:string
+    data:ContextSearchData
     onBlur?:(event:React.SyntheticEvent<any>) => void
     onFocus?:(event:React.SyntheticEvent<any>) => void
     onEnter?:(event:React.SyntheticEvent<any>) => void
@@ -17,13 +17,11 @@ type Props = {
     id?:string
     onClick?:(event:React.SyntheticEvent<any>) => void
     allowedSearchOptions:SearchOption[]
+    multiline:boolean
 } 
 type State = {
-    term:string
     editorState:EditorState
-}
-export type InsertEntity = {
-    type:SearchEntityType, text:string, data:Object, start:number, end:number, appendSpace:boolean
+    text:string
 }
 export class SearchBox extends React.Component<Props, State>{
     search = React.createRef<Editor>();
@@ -32,68 +30,22 @@ export class SearchBox extends React.Component<Props, State>{
         super(props)
 
         const decorator = new CompositeDecorator(searchDecorators);
-        const blocks = SearcQueryManager.convertToContentState(props.term, this.props.allowedSearchOptions)
+        const contentState = SearcQueryManager.convertToContentState(props.data, this.props.allowedSearchOptions)
         this.state = {
-          editorState: EditorState.createWithContent(blocks, decorator),
-          term:""
+            editorState: EditorState.createWithContent(contentState, decorator),
+            text:""
         }
     }
-    appendTextToState = (text:string, editorState:EditorState, focus:boolean) => {
-        let state = editorState
-        state = EditorState.moveSelectionToEnd(state)
-        let contentState = state.getCurrentContent()
-        const selectionState = state.getSelection()
-        contentState = Modifier.insertText(contentState, selectionState, text) 
+    componentDidMount = () => {
 
-        state = EditorState.push(
-            state,
-            contentState,
-            'insert-characters'
-        )
-        if(focus)
-            state = EditorState.moveFocusToEnd(state)
-        return state
+        const editorState = EditorState.moveSelectionToEnd(this.state.editorState)
+        this.setState({editorState})
     }
-    appendText = (text:string, focus:boolean) =>{
-        let editorState = this.state.editorState
-        editorState = this.appendTextToState(text, editorState, focus)
-        this.setState({ editorState: editorState }, () => {this.onChange(editorState)})
+    editorState = () => {
+        return this.state.editorState
     }
-    insertEntities = (entities:InsertEntity[]) => {
-        let editorState = this.state.editorState
-        let contentState = editorState.getCurrentContent()
-        const contentBlock = editorState.getCurrentContent().getBlockMap().first()
-        const blockKey = contentBlock.getKey();
-        entities.forEach(e => {
-            const blockSelection = SelectionState
-            .createEmpty(blockKey)
-            .merge({
-            anchorOffset: e.start,
-            focusOffset: e.end,
-          }) as SelectionState;
-          const meta = searchEntities[e.type]
-          const contentStateWithEntity = contentState.createEntity(
-              meta.type,
-              meta.mutability,
-              e.data
-          )
-          const entityKey = contentStateWithEntity.getLastCreatedEntityKey()
-          contentState = Modifier.applyEntity(
-              contentStateWithEntity,
-              blockSelection,
-              entityKey
-          )
-          contentState = Modifier.replaceText(contentState, blockSelection, e.text, null, entityKey)
-          editorState = EditorState.push( editorState, contentState, 'insert-characters')
-          if(e.appendSpace)
-              editorState = this.appendTextToState(" ", editorState, true)
-          else 
-              editorState = EditorState.moveFocusToEnd(editorState)
-        })
-        this.setState({ editorState: editorState } ,() => {this.onChange(editorState)})
-    }
-    insertEntity = (type:SearchEntityType, text:string, data:Object, start:number, end:number, appendSpace:boolean) => {
-        this.insertEntities([{type, text, data, start, end, appendSpace}])
+    applyState = (editorState:EditorState, forceOnChange = false) => {
+        this.setState({ editorState: editorState } ,() => {this.onChange(editorState, forceOnChange)})
     }
     getFocusOffset = () => {
         return this.state.editorState.getSelection().getFocusOffset()
@@ -119,41 +71,49 @@ export class SearchBox extends React.Component<Props, State>{
     clearTerm = (event:React.SyntheticEvent<any>) => {
         event.preventDefault()
         event.stopPropagation()
-        let editorState = EditorState.push(this.state.editorState, ContentState.createFromText(''), 'remove-range');
-        editorState = EditorState.moveFocusToEnd(editorState)
-        this.setState({ editorState }, () => {
-            this.props.termChanged("", 0)
-        });
+        this.props.onClick && this.props.onClick(event)
+        let editorState = SearcQueryManager.clearState(this.state.editorState)
+        this.applyState(editorState, true)
     }
-    onChange = (es:EditorState) => {
+    logState(editorState:EditorState){
+        const content = editorState.getCurrentContent()
+        console.log("state", convertToRaw(content))
+    }
+    onChange = (es:EditorState, forceOnChange = false) => {
         const selection = es.getSelection()
         let editorState = SearcQueryManager.getStateWithEntities(es, this.props.allowedSearchOptions)
         editorState = EditorState.acceptSelection(editorState, selection)
-        const selectionOffset = editorState.getSelection().getFocusOffset()
-        let text = editorState.getCurrentContent().getPlainText()
-        const oldTerm = this.state.term
-        //this.logState()
-        console.log("state", convertToRaw(editorState.getCurrentContent()))
-        this.setState({editorState, term:text}, () => {
-            if(oldTerm != text)
+        this.logState(editorState)
+        const newText = es.getCurrentContent().getPlainText()
+        const sendOnChange = forceOnChange || newText != this.state.text
+        this.setState({editorState:editorState, text:newText}, () => {
+            if(sendOnChange)
             {
-                this.props.termChanged(text, selectionOffset)
+                this.props.onChange(this.state.editorState)
             }
         })
     }
+    onFocus = (event: React.SyntheticEvent<any>) => {
+        this.props.onFocus && this.props.onFocus(event)
+        this.props.onChange(this.state.editorState)
+    }
+    onBlur = (event: React.SyntheticEvent<any>) => {
+        this.props.onBlur && this.props.onBlur(event)
+    }
     render() {
-        let clearVisible = this.props.term.length > 0
+        let clearVisible = this.state.editorState.getCurrentContent().getPlainText().length > 0
         let cl = clearVisible ? "fa fa-times-circle searchclear" : "hidden searchclear"
         const cn = classnames("search-box anim-transition", this.props.className)
+        const editorClass = classnames("editor form-control", {"multiline": this.props.multiline})
         return (
           <div onClick={this.props.onClick} id={this.props.id} className={cn}>
-            <div className="editor form-control" onClick={this.focus}>
+            <div className={editorClass} onClick={this.focus}>
                 <span className="icon"><i className="fa fa-search fa-lg"></i></span>
                 <Editor
                     editorState={this.state.editorState}
                     onChange={this.onChange}
-                    onFocus={this.props.onFocus} 
-                    onBlur={this.props.onBlur} 
+                    onFocus={this.onFocus} 
+                    onBlur={this.onBlur} 
                     handleReturn={this.handleReturn}
                     placeholder={this.props.placeholder}
                     ref={this.search} 

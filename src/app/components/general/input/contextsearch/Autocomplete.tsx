@@ -70,7 +70,6 @@ export default class Autocomplete extends React.Component<Props, State> {
         this.state = { 
             cursor:this.getInitialCursor(props),
         }
-        
     }
     getInitialCursor = (props) => {
         return -1
@@ -193,7 +192,7 @@ export default class Autocomplete extends React.Component<Props, State> {
                     onMouseDown={this.onListMouseDown} 
                     onMouseLeave={this.onComponentMouseLeave}
                     >
-                    {isEmpty && this.props.emptyContent}
+                    {isEmpty && <div className="no-options">{this.props.emptyContent}</div>}
                     {!isEmpty && <ul className="list" >
                     {this.props.sections.map((section, index) => 
                     {
@@ -215,9 +214,12 @@ export default class Autocomplete extends React.Component<Props, State> {
                             return (<li onMouseEnter={this.onMouseEnter.bind(this, count)} className={cn} key={item.id + section.type} onClick={this.onItemSelect(item)}>
                                 <div className="list-content">
                                     {item.avatar && <Avatar image={item.avatar} size={30} borderWidth={2} borderColor="white" />}
-                                    {!item.avatar && item.icon && <i className={item.icon}></i>}
-                                    {item.title && <span className="text-content text-truncate primary-text">{item.title}</span>}
-                                    {hasSubtitle && <span className="text-sub-content text-truncate secondary-text">{item.subtitle}</span>}
+                                    <div className="content-body text-truncate">
+                                        {!item.avatar && item.icon && <i className={item.icon}></i>}
+                                        {item.title && <span className="text-content text-truncate primary-text">{item.title}</span>}
+                                        {hasSubtitle && <span className="text-sub-content text-truncate secondary-text">{item.subtitle}</span>}
+                                    </div>
+
                                     {!!item.onItemRemove && <span className="section-list-item-clear" onClick={this.onItemRemove(item)}>
                                         <i className="fa fa-times-circle searchclear"></i>
                                     </span>}
