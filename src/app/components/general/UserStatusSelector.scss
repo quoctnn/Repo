@@ -3,4 +3,11 @@
 {
     cursor: pointer;
     @include var(color, title-color);
+    .user-state-indicator{
+        display: inline-block;
+        border-radius: 50%;
+        width: 12px;
+        height: 12px;
+        border:2px solid white;
+    }
 }

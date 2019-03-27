@@ -2,6 +2,7 @@ import { nullOrUndefined } from "../utilities/Utilities";
 import * as React from 'react';
 import Emoji from "../components/general/Emoji";
 import Constants from "../utilities/Constants";
+import { translate } from "../localization/AutoIntlProvider";
 
 export interface Verb
 {
@@ -561,15 +562,50 @@ export abstract class StatusReactionUtilities
         return StatusReactionUtilities.emojiForReaction(props)
     }
 }
-export const UserStatus = strEnum([
-    "active",
-    "away",
-    "unavailable",
-    "dnd",
-    "vacation",
-    "invisible",
-])
-export type UserStatus = keyof typeof UserStatus;
+export enum AvatarStateColor
+{
+    GREEN = "green",
+    ORANGE = "orange",
+    RED = "red",
+    GRAY = "gray",
+    NONE = "none",
+}
+export enum UserStatus {
+    active = "active",
+    away = "away",
+    unavailable = "unavailable",
+    dnd = "dnd",
+    vacation = "vacation", 
+    invisible = "invisible",
+}
+export type UserStatusItem = {
+    type:UserStatus
+    color:string 
+    translation:() => string
+}
+const UserStatusObjects:{[key:string]:UserStatusItem} = {
+    active:{type:UserStatus.active, color:AvatarStateColor.GREEN, translation:() => UserStatus.getTranslation(UserStatus.active)},
+    away:{type:UserStatus.away, color:AvatarStateColor.ORANGE, translation:() => UserStatus.getTranslation(UserStatus.away)},
+    unavailable:{type:UserStatus.unavailable, color:AvatarStateColor.NONE, translation:() => UserStatus.getTranslation(UserStatus.unavailable)},
+    dnd:{type:UserStatus.dnd, color:AvatarStateColor.RED, translation:() => UserStatus.getTranslation(UserStatus.dnd)},
+    vacation:{type:UserStatus.vacation, color:AvatarStateColor.GRAY, translation:() => UserStatus.getTranslation(UserStatus.vacation)},
+    invisible:{type:UserStatus.invisible, color:AvatarStateColor.NONE, translation:() => UserStatus.getTranslation(UserStatus.invisible)},
+}
+export namespace UserStatus {
+    
+    export function getObject(status: UserStatus) {
+        return UserStatusObjects[status]
+    }
+    export function getTranslation(status: UserStatus) {
+        return translate("user.status." + status)
+    }
+    export function getSelectableStates(excludes?:UserStatus[]) {
+        let selectables = [UserStatus.active, UserStatus.dnd, UserStatus.vacation, UserStatus.invisible]
+        if(excludes)
+            selectables = selectables.filter(s => !excludes.contains(s))
+        return selectables.map(s => UserStatusObjects[s])
+    }
+}
 //DASHBOARD
 export type Module = {
     id:number
@@ -649,34 +685,6 @@ export type Timesheet = {
     description:string
     project:number
     task:number
-}
-export const avatarStateColorForUserProfile = (userProfile:UserProfile) => {
-    switch(userProfile.user_status)
-    {
-        case UserStatus.active: return AvatarStateColor.GREEN;
-        case UserStatus.away: return AvatarStateColor.ORANGE;
-        case UserStatus.dnd: return AvatarStateColor.RED;
-        case UserStatus.vacation: return AvatarStateColor.GRAY;
-        default: return AvatarStateColor.NONE
-    }
-}
-export const userStatusTextForUserProfile = (userProfile:UserProfile) => {
-    switch(userProfile.user_status)
-    {
-        case UserStatus.active: return "Active";
-        case UserStatus.away: return "Away";
-        case UserStatus.dnd: return "Do not disturb";
-        case UserStatus.vacation: return "Vacation";
-        default: return "Unknown"
-    }
-}
-export enum AvatarStateColor
-{
-    GREEN = "green",
-    ORANGE = "orange",
-    RED = "red",
-    GRAY = "gray",
-    NONE = "none",
 }
 export interface EmbedMedia
 {
