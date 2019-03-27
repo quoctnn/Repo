@@ -102,6 +102,12 @@ var translations = {
     "task.timesheet.added":"Time registered",
     "contextsearch.dropdown.empty.title":"No options",
     "search.options.title":"Search options",
+    "user.status.active":"Online",
+    "user.status.away":"Away",
+    "user.status.unavailable":"Unavailable",
+    "user.status.dnd":"Do not Disturb",
+    "user.status.vacation":"Vacation",
+    "user.status.invisible":"Invisible",
   },
   no: {
     "search.placeholder": "Søk ...",
@@ -206,6 +212,12 @@ var translations = {
     "task.timesheet.added":"Tid registrert",
     "contextsearch.dropdown.empty.title":"Ingen valg tilgjengelig",
     "search.options.title":"Søkealternativer",
+    "user.status.active":"Online",
+    "user.status.away":"Borte",
+    "user.status.unavailable":"Utilgjengelig",
+    "user.status.dnd":"Ikke forstyrr",
+    "user.status.vacation":"Ferie",
+    "user.status.invisible":"Usynlig",
   },
   en: {
     "search.placeholder": "Search ...",
@@ -311,7 +323,13 @@ var translations = {
     "task.timesheet.added":"Time registered",
     "contextsearch.dropdown.empty.title":"No options",
     "search.options.title":"Search options",
-    "newsfeed.menu.filter.community.description":"Community filter description"
+    "newsfeed.menu.filter.community.description":"Community filter description",
+    "user.status.active":"Online",
+    "user.status.away":"Away",
+    "user.status.unavailable":"Unavailable",
+    "user.status.dnd":"Do not Disturb",
+    "user.status.vacation":"Vacation",
+    "user.status.invisible":"Invisible",
   }
 };
 

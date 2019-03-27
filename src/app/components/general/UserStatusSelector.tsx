@@ -11,6 +11,7 @@ import Routes from '../../utilities/Routes';
 import { translate } from '../../localization/AutoIntlProvider';
 import { EventStreamManagerConnectionChangedEvent, EventStreamManager } from '../../managers/EventStreamManager';
 import { StateManager } from 'react-select/lib/stateManager';
+import { DropdownItem } from 'reactstrap';
 
 export const sendUserStatus = (status: UserStatus) => {
     sendOnWebsocket(
@@ -34,7 +35,7 @@ const getEnumValues = (_enum:any) =>
 {
     return Object.keys(_enum).map(k => _enum[k])
 }
-const userStatuses:string[] = getEnumValues(UserStatus)
+const userStatuses:UserStatus[] = getEnumValues(UserStatus)
 export interface State {
     connected:boolean,
     retry:number,
@@ -78,7 +79,7 @@ class UserStatusSelector extends React.Component<Props, State> {
         profile.user_status = status
         AuthenticationManager.setUpdatedProfileStatus(profile)
     }
-    setUserStatus = (status:string) =>
+    setUserStatus = (status:string) => (event: React.SyntheticEvent<any>) =>
     {
         sendUserStatus(status as UserStatus);
     }
@@ -106,8 +107,9 @@ class UserStatusSelector extends React.Component<Props, State> {
                     }
                     <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
                         {selectable.map((status, index) => {
-                            return <a key={index} onClick={this.setUserStatus.bind(this, status)} className="dropdown-item" href="#">{status}</a>
+                            return <a key={index} onClick={this.setUserStatus(status)} className="dropdown-item" href="#">{translate(status)}</a>
                         }) }
+                        <DropdownItem divider={true}/>
                         <Link className="dropdown-item" to={Routes.SIGNOUT}>{translate("Sign out")}</Link>
                     </div>
                 </div>
