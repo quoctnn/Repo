@@ -5,27 +5,15 @@
     left:0;
     right: 0;
     height: 200px;
-    background: linear-gradient(136deg, #ff6348, #ff6348, #428bca, #428bca, #428bca, #428bca);
-    background-size: 1200% 1200%;
-
-    -webkit-animation: AnimationName 45s ease infinite;
-    -moz-animation: AnimationName 45s ease infinite;
-    animation: AnimationName 45s ease infinite;
-
-    @-webkit-keyframes AnimationName {
-        0%{background-position:0% 28%}
-        50%{background-position:100% 73%}
-        100%{background-position:0% 28%}
-    }
-    @-moz-keyframes AnimationName {
-        0%{background-position:0% 28%}
-        50%{background-position:100% 73%}
-        100%{background-position:0% 28%}
-    }
-    @keyframes AnimationName {
-        0%{background-position:0% 28%}
-        50%{background-position:100% 73%}
-        100%{background-position:0% 28%}
-    }
+    background-repeat: no-repeat;
+    background-size: 100%;
+    background-color: #428bca;
     z-index: -1;
 }
+
+/*
+height: 0;
+padding-top: 56.25%;
+
+
+calc(591.44 / 1127.34 * 100%);*/

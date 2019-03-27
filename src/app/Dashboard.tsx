@@ -1,5 +1,5 @@
 import * as React from "react";
-import { PageHeader } from "./components/PageHeader";
+import PageHeader from "./components/PageHeader";
 import PageTopNavigation from "./components/PageTopNavigation";
 import "./Dashboard.scss"
 import { ResponsiveBreakpoint } from "./components/general/observers/ResponsiveComponent";
@@ -41,7 +41,7 @@ export namespace DashboardComponents {
         return React.createElement(componentMap[type], props)
     }
 }
-type Props = 
+type Props =
 {
     breakpoint:number
     dashboard:Dashboard
@@ -67,7 +67,7 @@ export class DashboardComponent extends React.Component<Props, State> {
             defaultGrid:grid,
         }
     }
-    renderModules = () => 
+    renderModules = () =>
     {
         const grid = this.findGridLayout(this.props.breakpoint, true)
         const fill = this.props.breakpoint > ResponsiveBreakpoint.standard && grid.fill
@@ -92,12 +92,12 @@ export class DashboardComponent extends React.Component<Props, State> {
                 </>)
     }
     render() {
-        
+
         return(
             <div id="dashboard">
                     {this.renderContent()}
             </div>
-            
+
         );
     }
 }
@@ -112,7 +112,7 @@ export const DashCompWithData = (props:any) => {
     return (
 
         <WindowResponsiveComponent breakpoints={breakpoints} setClassOnBody={true} render={({ breakpoint }) => (
-            <DashboardComponent 
+            <DashboardComponent
                 dashboard={dashboard}
                 breakpoint={breakpoint}
             />

@@ -67,19 +67,6 @@ class UserStatusSelector extends React.Component<Props, State> {
         const connected = EventStreamManager.connected
         if(this.state.connected != connected) {
             this.setState({connected})
-            // if (!connected) {
-            //     let stream = getStream()
-            //     let retryTimer = setInterval(
-            //         () => {
-            //             this.setState({retry:stream.retryCount})
-            //         },
-            //         1000  // 1 second refresh rate
-            //     )
-            //     this.setState({interval:retryTimer, connected:connected})
-            // } else {
-            //     clearInterval(this.state.interval)
-            //     this.setState({interval:null, connected:connected, retry:0})
-            // }
         }
     }
 
@@ -94,7 +81,6 @@ class UserStatusSelector extends React.Component<Props, State> {
     setUserStatus = (status:string) =>
     {
         sendUserStatus(status as UserStatus);
-        //this.setState({userStatus:status});
     }
     renderStatusSelector = () =>
     {
@@ -122,9 +108,9 @@ class UserStatusSelector extends React.Component<Props, State> {
                         {selectable.map((status, index) => {
                             return <a key={index} onClick={this.setUserStatus.bind(this, status)} className="dropdown-item" href="#">{status}</a>
                         }) }
+                        <Link className="dropdown-item" to={Routes.SIGNOUT}>{translate("Sign out")}</Link>
                     </div>
                 </div>
-                <Link className="btn btn-sm btn-secondary btn-outline-secondary ml-1" to={Routes.SIGNOUT}>{translate("Sign out")}</Link>
             </div>
         )
     }
