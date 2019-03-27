@@ -1,5 +1,17 @@
+$width: 500px;
+
 #page-header
 {
+    .circle{
+        background: #483000;
+        margin-left: -$width/3.5;
+        margin-top: -$width/2.5;
+        width: 500px;
+        height: 500px;
+        border-radius: 50%;
+        z-index: 0;
+        opacity: 0.5;
+    }
     position: absolute;
     top:0;
     left:0;
