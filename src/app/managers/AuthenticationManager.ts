@@ -107,7 +107,6 @@ export abstract class AuthenticationManager
 
             AuthenticationManager.keepAlive = setInterval(
                 () => {
-                    console.log("AuthenticationManager.keepAlive",AuthenticationManager.lastUserActivity)
                     AuthenticationManager.lastUserActivity += AuthenticationManager.keepAliveFrequency;
                     sendOnWebsocket(
                         JSON.stringify({
