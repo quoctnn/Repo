@@ -18,6 +18,7 @@ import "./NewsfeedComponent.scss"
 import { ResizeObserverComponent } from '../../components/general/observers/ResizeObserverComponent';
 import { ResponsiveBreakpoint } from '../../components/general/observers/ResponsiveComponent';
 import classnames = require('classnames');
+import { translate } from '../../localization/AutoIntlProvider';
 class StatusComposer
 {
     statusId:number
@@ -83,6 +84,8 @@ interface State
     isLoading: boolean
     isRefreshing: boolean
     hasMore:boolean
+    hasContextError:boolean
+    hasLoaded:boolean
 }
 type Props = ReduxStateProps & ReduxDispatchProps & OwnProps & RouteProps
 class NewsfeedComponent extends React.Component<Props, State> {
@@ -103,7 +106,13 @@ class NewsfeedComponent extends React.Component<Props, State> {
             items:[],
             offset:0,
             hasMore:true,
+            hasContextError:false,
+            hasLoaded:false
         }
+    }
+    hasContextError = () => {
+        return (!!this.props.contextNaturalKey && !this.props.contextObjectId) || (!this.props.contextNaturalKey && !!this.props.contextObjectId)
+
     }
     componentDidUpdate = (prevProps:Props, prevState:State) => {
         if(this.props.contextNaturalKey != prevProps.contextNaturalKey || 
@@ -111,12 +120,16 @@ class NewsfeedComponent extends React.Component<Props, State> {
             this.props.includeSubContext != prevProps.includeSubContext || 
             this.props.filter != prevProps.filter)
         {
+            const hasContextError = this.hasContextError()
+            const action = hasContextError ? undefined : this.loadStatuses
             this.setState({
                 offset: 0,
-                isRefreshing: true,
-                isLoading: true,
+                isRefreshing: !hasContextError,
+                isLoading: !hasContextError,
                 items:[],
-            }, this.loadStatuses);
+                hasContextError,
+                hasLoaded:false
+            }, action);
         }
         if(this.props.onLoadingStateChanged && prevState.isLoading != this.state.isLoading)
         {
@@ -168,7 +181,7 @@ class NewsfeedComponent extends React.Component<Props, State> {
                 res = res.concat(this.flattenData(c).reverse())
             }
             if(nullOrUndefined( s.parent ) && s.permission >= Permission.post)
-                res.push(new StatusComposer(s.id, s.community && s.community.id, s.context_object_id, s.context_natural_key))
+                res.push(new StatusComposer(s.id, s.community && s.community.id, s.context_object_id , s.context_natural_key))
         })
         return res
     }
@@ -184,7 +197,8 @@ class NewsfeedComponent extends React.Component<Props, State> {
                     items: offset == 0 ?  newData :  [...items, ...newData],
                     isRefreshing: false,
                     hasMore:data.next != null,
-                    isLoading:false
+                    isLoading:false,
+                    hasLoaded:true
                 });
             }
             ToastManager.showErrorToast(error)
@@ -739,6 +753,20 @@ class NewsfeedComponent extends React.Component<Props, State> {
         this.isOdd = !this.isOdd 
         return c
     }
+    renderError = () => {
+        if(this.state.hasContextError)
+        {
+            return <div className="module-content-error">{translate("common.context.error")}</div>
+        }
+        return null
+    }
+    renderEmpty = () => {
+        if(!this.state.isLoading && this.state.hasLoaded && this.state.items.length == 0)
+        {
+            return <div className="module-content-empty">{translate("common.module.empty")}</div>
+        }
+        return null
+    }
     render() {
         let authUser = this.props.authenticatedProfile
         if(!authUser)
@@ -772,6 +800,8 @@ class NewsfeedComponent extends React.Component<Props, State> {
                             return this.renderStatus(authUser, s, isComment, i, color, breakpoint)
                         }).concat(this.renderLoading()) }
                     </List>
+                    {this.renderError()}
+                    {this.renderEmpty()}
                 </>
             }}> 
             </ResizeObserverComponent> 

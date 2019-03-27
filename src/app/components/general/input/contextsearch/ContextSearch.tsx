@@ -2,24 +2,29 @@
 import * as React from 'react';
 import classnames from "classnames";
 import "./ContextSearch.scss"
-import { SearchBox, InsertEntity } from './SearchBox';
-import { SearcQueryManager, SearchData, SearchEntityType, SearchOption } from './extensions';
+import { SearchBox } from './SearchBox';
+import { SearcQueryManager, SearchOption, ContextSearchData } from './extensions';
 import Autocomplete, { AutocompleteSection } from './Autocomplete';
 import { Popover, PopoverBody } from 'reactstrap';
 import { uniqueId } from '../../../../utilities/Utilities';
 import { ElasticSearchType } from '../../../../types/intrasocial_types';
+import { EditorState } from 'draft-js';
+import { translate } from '../../../../localization/AutoIntlProvider';
+import { allowedSearchOptions } from '../../../../modules/newsfeed/NewsfeedMenu';
 
 type Props = {
     placeholder?:string
     term?:string
     className?:string
-    onSearchDataChanged?:(data:SearchData, focusOffset:number, activeSearchType:ElasticSearchType) => void
+    onSearchDataChanged?:(data:ContextSearchData, focusOffset:number, activeSearchType:ElasticSearchType) => void
     onSubmitSearch?:() => void
     sections:AutocompleteSection[]
     allowedSearchOptions:SearchOption[]
+    searchData:ContextSearchData
+    onAutocompleteToggle?:(visible:boolean) => void
 } 
 type State = {
-    searchData:SearchData
+    searchData:ContextSearchData
     active:boolean
     activeSearchType:ElasticSearchType
 }
@@ -33,32 +38,26 @@ export class ContextSearch extends React.Component<Props, State>{
     {
         super(props)
         this.state = {
-            searchData:SearcQueryManager.parse(props.term || "", props.allowedSearchOptions),
+            searchData:props.searchData,
             active:false,
             activeSearchType:null,
         }
     }
-    insertAutocompleteEntity = (type:SearchEntityType, text:string, data, start:number, end:number, appendSpace:boolean) => {
-        this.textInput.current.insertEntity(type, text, data, start, end, appendSpace)
+    editorState = () => {
+        return this.textInput.current.editorState()
     }
-    insertAutocompleteEntities = (entities:InsertEntity[]) => {
-        this.textInput.current.insertEntities(entities)
+    applyState = (editorState:EditorState) => {
+        this.textInput.current.applyState(editorState)
     }
-    termChanged = (term:string, selectionOffset:number) => {
-        const searchData = SearcQueryManager.parse(term, this.props.allowedSearchOptions)
-        if(searchData.tokens.length > 0)
-        {
-            const activeSearchType = SearcQueryManager.getActiveSearchType(searchData, selectionOffset, this.props.allowedSearchOptions)
-            this.setState({ activeSearchType , searchData}, this.sendSearchDataChanged)
-        }
-        else 
-        {
-            this.resetSearch()
-        }
+    onChange = (editorState:EditorState) => {
+        const searchData = SearcQueryManager.getContextSearchData(editorState, allowedSearchOptions)
+        const activeSearchType = SearcQueryManager.getActiveSearchType(searchData, editorState.getSelection().getFocusOffset(), this.props.allowedSearchOptions)
+        this.setState({ activeSearchType , searchData}, this.sendSearchDataChanged)
     }
-    resetSearch = () => {
-        const searchData = SearcQueryManager.parse("", this.props.allowedSearchOptions)
-        this.setState({activeSearchType:null, searchData:searchData}, this.sendSearchDataChanged)
+    resetSearch = (editorState:EditorState) => {
+        //const state = SearcQueryManager.clearState(editorState)
+        //this.textInput.current.applyState(state)
+        //this.setState({activeSearchType:null, searchData:searchData}, this.sendSearchDataChanged)
     }
     sendSearchDataChanged = () => {
         this.props.onSearchDataChanged && this.props.onSearchDataChanged(this.state.searchData, this.getSearchFieldFocusOffset(), this.state.activeSearchType)
@@ -88,6 +87,7 @@ export class ContextSearch extends React.Component<Props, State>{
         if (active)
         {
             this.setState({ active:active }, () => {
+                this.props.onAutocompleteToggle && this.props.onAutocompleteToggle(active)
                 //this.addBackDrop()
                 //this.textInput.current.getWrappedInstance().focus()
             })
@@ -95,6 +95,7 @@ export class ContextSearch extends React.Component<Props, State>{
         else 
         {
             this.setState({ active:active }, () => {
+                this.props.onAutocompleteToggle && this.props.onAutocompleteToggle(active)
                 //this.removeBackDrop()
                 this.textInput.current.blur()
             })
@@ -152,7 +153,7 @@ export class ContextSearch extends React.Component<Props, State>{
                         <Autocomplete ref={this.autocomplete}
                                 onClose={this.onAutocompleteClose}
                                 sections={sections} 
-                                emptyContent="Empty"
+                                emptyContent={translate("contextsearch.dropdown.empty.title")}
                                 />
                     </PopoverBody>
                 </Popover>)
@@ -160,15 +161,17 @@ export class ContextSearch extends React.Component<Props, State>{
     renderSearchBox = () => {
         const cn = classnames("border-1",{"active":this.state.active})
         return (<SearchBox id={this.componentId} className={cn} 
-            onEnter={this.onSearchControlEnterKey} 
-            onFocus={this.onSearchFocus} 
-            onBlur={this.onSearchBlur} 
-            ref={this.textInput} 
-            {...this.props} 
-            termChanged={this.termChanged} 
-            placeholder={this.props.placeholder} 
-            onClick={this.showAutocomplete}
-            term={this.state.searchData.originalText} />)
+                    onEnter={this.onSearchControlEnterKey} 
+                    onFocus={this.onSearchFocus} 
+                    onBlur={this.onSearchBlur} 
+                    ref={this.textInput} 
+                    {...this.props} 
+                    onChange={this.onChange} 
+                    placeholder={this.props.placeholder} 
+                    onClick={this.showAutocomplete}
+                    data={this.state.searchData}
+                    multiline={true}
+             />)
     }
     render() {
         const cn = classnames("context-search", this.props.className)

@@ -1,7 +1,7 @@
 
 import * as React from 'react';
-import { convertFromRaw, SelectionState, Modifier, EditorState, RawDraftContentState, DraftEntityMutability } from 'draft-js';
-import { HASHTAG_REGEX_NO_GLOBAL } from '../../../../../utilities/Utilities';
+import { convertFromRaw, SelectionState, Modifier, EditorState, RawDraftContentState, DraftEntityMutability, ContentState, Entity } from 'draft-js';
+import { HASHTAG_REGEX_NO_GLOBAL, nullOrUndefined } from '../../../../../utilities/Utilities';
 import Constants from '../../../../../utilities/Constants';
 import { ElasticSearchType, ContextNaturalKey } from '../../../../../types/intrasocial_types';
 import { AutocompleteSection, AutocompleteSectionItem } from '../Autocomplete';
@@ -12,6 +12,14 @@ export const SearchBoxSearchFilter = (props:any) => {
 export const SearchBoxSearchIdObject = (props:any) => {
     return <span className="search-id-object">{props.children}</span>;
 }
+export type InsertEntity = {
+    type:SearchEntityType, 
+    text:string, 
+    data:TokenData, 
+    start:number, 
+    end:number, 
+    appendSpace:boolean
+}
 export type SearchType = {
     type:ElasticSearchType 
     class:string
@@ -19,6 +27,7 @@ export type SearchType = {
     titleProp:string
     defaultAvatar?:() => string
 }
+
 export const supportedSearchTypes:{[key:string]:SearchType} = {
     Status:{type:ElasticSearchType.STATUS, class:"fa fa-comment-o", listInAutocomplete:false, titleProp:"object_type"},
     Task:{type:ElasticSearchType.TASK, class:"fa fa-tasks", listInAutocomplete:false, titleProp:"title"},
@@ -30,13 +39,28 @@ export const supportedSearchTypes:{[key:string]:SearchType} = {
     Community:{type:ElasticSearchType.COMMUNITY, class:"fa fa-group", listInAutocomplete:true, titleProp:"name", defaultAvatar:Constants.resolveUrl(Constants.defaultImg.communityAvatar)},
     Project:{type:ElasticSearchType.PROJECT, class:"fa fa-folder-open", listInAutocomplete:true, titleProp:"name", defaultAvatar:Constants.resolveUrl(Constants.defaultImg.projectAvatar)},
 }
-export type SearchOption = {
+export class SearchOption {
     name:string 
+    key:string
+    resolveOrder:number
     value:ElasticSearchType
+    allowedWithOptions:string[]
+    description?:string
+    constructor(key:string, name:string, resolveOrder:number, value:ElasticSearchType, allowedWithOptions:string[], description?:string){
+        this.key = key
+        this.name = name
+        this.resolveOrder = resolveOrder
+        this.value = value
+        this.allowedWithOptions = allowedWithOptions
+        this.description = description
+    }
+    getName = () => {
+        return this.name || this.key
+    }
 }
-const SEARCHFILTER_REGEX_GENERATOR = (searchOptions:SearchOption[]) => RegExp("(" + searchOptions.map(o => o.name).join("|") + "):\\w*","i")
+const SEARCHFILTER_REGEX_GENERATOR = (searchOptions:SearchOption[]) => RegExp("(" + searchOptions.map(o => o.getName()).join("|") + "):\\w*","i")
 export const ID_OBJECT_REGEX = /\B@(\w[^\s]+)/gi
-export const ID_OBJECT_REGEX_NO_GLOBAL = /\B@(\w[^\s]+)/i
+export const ID_OBJECT_REGEX_NO_GLOBAL = /^([0-9]*)$|^\B@(\w[^\s]+)$/i
 
 export type SearchEntity = {
     type:SearchEntityType 
@@ -52,27 +76,78 @@ export const searchEntities:{[key:string]:SearchEntity} = {
     FILTER:{type: SearchEntityType.FILTER, mutability:"IMMUTABLE", component:SearchBoxSearchFilter, regex:(args) => SEARCHFILTER_REGEX_GENERATOR(args)},
     ID_OBJECT:{type: SearchEntityType.ID_OBJECT, mutability:"IMMUTABLE", component:SearchBoxSearchIdObject, regex:() => ID_OBJECT_REGEX_NO_GLOBAL},
 }
-export type SearchData = {
-    filters: {}
-    query: string
-    tags: string[]
-    tokens: SearchToken[]
-    originalText: string
+type ContextObject = {
+    contextNaturalKey:ContextNaturalKey
+    id:number
+    resolveOrder:number
+    value:string
 }
-export type SearchToken = {
-    token:string
+export class ContextSearchData{
+    tokens:SearchToken[]
+    stateTokens:SearchToken[]
+    query:string
+    tags:string[]
+    filters: {[key:string]:string}
+    originalText: string
+    constructor(data:{filters:{[key:string]:string}, query: string, tags: string[], tokens: SearchToken[], stateTokens:SearchToken[], originalText: string}) {
+        this.filters = data.filters
+        this.query = data.query
+        this.tags = data.tags
+        this.tokens = data.tokens
+        this.originalText = data.originalText
+        this.stateTokens = data.stateTokens
+    }
+    contextObject = (searchOptions:SearchOption[]):ContextObject => {
+
+       let fk:ContextObject[] = Object.keys(this.filters).map(k => 
+            {
+                const so = searchOptions.find(so => so.getName() == k)
+                if(so)
+                {
+                    const index = this.tokens.findIndex(o => o.token == so.getName()+":")
+                    const valueToken = this.tokens[index + 1]
+                    const value = (valueToken && valueToken.data && valueToken.data.title) || this.filters[k] 
+                    return {contextNaturalKey: so && ElasticSearchType.contextNaturalKeyForType(so.value), value:value, resolveOrder:so.resolveOrder * 100 - index, id:valueToken && valueToken.data && valueToken.data.id}
+                }
+            })
+            .filter(o => !nullOrUndefined( o.contextNaturalKey) && !o.value.startsWith("*"))
+
+        if(fk.length > 0)
+        {
+            fk = fk.sort((a, b) =>  a.resolveOrder - b.resolveOrder)
+            return fk[0]
+        }
+        return null
+    }
+}
+type DraftEntity = {
+    entityKey: string,
+    blockKey: string,
+    entity:Draft.EntityInstance
     start:number
     end:number
-    data?:{name:string}
+}
+export type TokenData = {name:string, id:number, key:string, title:string}
+export type SearchToken = {
+    start:number
+    end:number
+    data?:TokenData
     type?:SearchEntityType
     accepted?:boolean
+    token:string
 }
 export class SearcQueryManager
 {
     static isWhiteSpace(ch){ return " \t\n\r\v".indexOf(ch) != -1 }
     static isFilterEndChar(ch){ return ch == ":" }
 
-    static convertToRaw(text:string, searchOptions:SearchOption[]){
+    static convertToContentState2(text:string, searchOptions:SearchOption[])
+    {
+        const raw = SearcQueryManager.convertToRaw2(text, searchOptions)
+        const state = convertFromRaw(raw)
+        return state
+    }
+    static convertToRaw2(text:string, searchOptions:SearchOption[]){
         const parsed = SearcQueryManager.parse(text, searchOptions)
         const raw:RawDraftContentState = {entityMap:{}, blocks:[{key:"7fubk", text:text, type:"unstyled", depth:0, inlineStyleRanges:[], entityRanges:[]}]}
         console.log("parsed", parsed)
@@ -89,13 +164,27 @@ export class SearcQueryManager
         });
         return raw
     }
-    static convertToContentState(text:string, searchOptions:SearchOption[])
-    {
-        const raw = SearcQueryManager.convertToRaw(text, searchOptions)
+    static convertToRaw(data:ContextSearchData, searchOptions:SearchOption[]){
+        const raw:RawDraftContentState = {entityMap:{}, blocks:[{key:"7fubk", text:data.originalText, type:"unstyled", depth:0, inlineStyleRanges:[], entityRanges:[]}]}
+        console.log("raw", raw)
+        let index = 0
+        data.tokens.forEach(token => {
+            if(token.type && (token.type == SearchEntityType.FILTER || token.accepted) )
+            {
+                const meta = searchEntities[token.type]
+                raw.entityMap[index] = {type:token.type, mutability:meta.mutability, data:token.data}
+                raw.blocks[0].entityRanges.push({offset:token.start, length:token.end - token.start, key:index})
+                index++
+            }
+        });
+        return raw
+    }
+    static convertToContentState(data:ContextSearchData, searchOptions:SearchOption[]){
+        const raw = SearcQueryManager.convertToRaw(data, searchOptions)
         const state = convertFromRaw(raw)
         return state
     }
-    static parse(text:string, searchOptions:SearchOption[]):SearchData 
+    static parse(text:string, searchOptions:SearchOption[]):ContextSearchData 
     {
         const SEARCHFILTER_REGEX = SEARCHFILTER_REGEX_GENERATOR(searchOptions)
         //extract tokens
@@ -105,14 +194,14 @@ export class SearcQueryManager
             if(currentToken.length > 0)
             {
                 const start = end - currentToken.length
-                const extra:{data?:{name:string},type?:string} = {}
+                const extra:{data?:TokenData,type?:string} = {}
                 const searchableEntitiesKeys = Object.keys(searchEntities)
                 for (let index = 0; index < searchableEntitiesKeys.length; index++) {
                     const se = searchEntities[searchableEntitiesKeys[index]]
                     if(se.regex(searchOptions).test(currentToken))
                     {
                         extra.type = se.type
-                        extra.data = {name:currentToken}
+                        extra.data = {name:currentToken, id:-1, key:null, title:null}
                         break;
                     }
                 }
@@ -171,25 +260,61 @@ export class SearcQueryManager
             else 
                 queryText += " " + t.token + ""
         })
-        return {filters:acceptedFilters,query:queryText, tags:tags, tokens:tokens, originalText:text }
+        return new ContextSearchData({filters:acceptedFilters,query:queryText,tags,tokens,originalText:text, stateTokens:[]})
     }
-    static getEntities(editorState, entityType = null){
+    static getFilters = (tokens:SearchToken[]) => {
+        const filters = {}
+        const tokenLength = tokens.length
+        for (var i = 0; i < tokenLength; i++) 
+        {
+            const token = tokens[i]
+            if(token.accepted)
+                continue;
+            if(token.type == SearchEntityType.FILTER && tokenLength > i + 1)
+            {
+                const filterName = token.token.replace(":","")
+                const nextToken = tokens[i + 1]
+                const nextTokenValue = nextToken.token
+                if(nextToken.type == SearchEntityType.ID_OBJECT)
+                {
+                    nextToken.accepted = true
+                    filters[filterName] = nextTokenValue
+                }
+                else if(!nextToken.type)
+                {
+                    nextToken.accepted = true
+                    const appendTilde = !HASHTAG_REGEX_NO_GLOBAL.test(nextTokenValue)
+                    filters[filterName] = appendTilde ?  "*" + nextTokenValue + "*" : nextTokenValue
+                }
+            }
+        }
+        return filters
+    }
+    static getEntities(editorState:EditorState, entityType = null, ignoreNonEntities = false ){
         const content = editorState.getCurrentContent();
-        const entities = []
+        const entities:DraftEntity[] = []
         content.getBlocksAsArray().forEach((block) => {
-            let selectedEntity = null;
+            let selectedEntity:DraftEntity = null;
             block.findEntityRanges(
                 (character) => {
+                    const blockKey = block.getKey()
                     if (character.getEntity() !== null) {
                         const entity = content.getEntity(character.getEntity());
+                        
                         if (!entityType || (entityType && entity.getType() === entityType)) {
                             selectedEntity = {
                                 entityKey: character.getEntity(),
-                                blockKey: block.getKey(),
-                                entity: content.getEntity(character.getEntity()),
+                                blockKey,
+                                entity,
+                                start:-1,
+                                end:-1
                             };
                             return true
                         }
+                    }
+                    else if(!ignoreNonEntities) {
+                        selectedEntity = {entityKey:null, blockKey, entity:null, start:-1, end:-1}
+                        return true
                     }
                     return false
                 },
@@ -199,51 +324,206 @@ export class SearcQueryManager
         });
         return entities
     }
-    static getStateWithEntities(editorState, searchOptions:SearchOption[])
-    {
-        console.log("need to fix this. id_objects are not immutable. Check if prev objects are the same as new objects before creating objects")
-        let contentState = editorState.getCurrentContent()
-        //only one block allowed for now(single line)
-        const contentBlock = editorState.getCurrentContent().getBlockMap().first()
-        const text = editorState.getCurrentContent().getPlainText()
-        const searchData = SearcQueryManager.parse(text, searchOptions)
-        const prevEntities = SearcQueryManager.getEntities(editorState)
-        const nextEntities = searchData.tokens.filter(t => t.type && (t.type == SearchEntityType.FILTER || t.accepted))
-        const blockKey = contentBlock.getKey();
-        prevEntities.forEach(pe => { // remove
+    static appendTextToState = (text:string, focus:boolean, editorState:EditorState) => {
+        let state = editorState
+        state = EditorState.moveSelectionToEnd(state)
+        let contentState = state.getCurrentContent()
+        const selectionState = state.getSelection()
+        contentState = Modifier.insertText(contentState, selectionState, text) 
+
+        state = EditorState.push(
+            state,
+            contentState,
+            'insert-characters'
+        )
+        if(focus)
+            state = EditorState.moveFocusToEnd(state)
+        return state
+    }
+    static appendText = (text:string, focus:boolean, editorState:EditorState) =>{
+        let state = editorState
+        state = SearcQueryManager.appendTextToState(text, focus, state)
+        return state
+    }
+    static clearState = (editorState:EditorState) => {
+        let state = editorState
+        state = EditorState.push(state, ContentState.createFromText(''), 'remove-range');
+        state = EditorState.moveFocusToEnd(state)
+        return state
+    }
+    static removeNonEntities = (editorState:EditorState) => {
+        let state = editorState
+        let contentState = state.getCurrentContent()
+        let entities:{start:number, end:number, blockKey:string}[] = []
+        contentState.getBlocksAsArray().forEach((block) => {
+
+            const blockKey = block.getKey();
+            block.findEntityRanges(
+                (character) => {
+                    return character.getEntity() == null;
+                },
+                (start, end) => {
+                    entities.push({start, end, blockKey});
+                })
+        })
+        entities = entities.sort((a, b) => b.end - a.end)
+        entities.forEach(e => {
             const blockSelection = SelectionState
-                .createEmpty(blockKey)
+                .createEmpty(e.blockKey)
                 .merge({
-                anchorOffset: pe.start,
-                focusOffset: pe.end,
-            });
-            contentState = Modifier.applyEntity(
+                anchorOffset: e.start,
+                focusOffset: e.end,
+            }) as SelectionState;
+            contentState = Modifier.removeRange(
                 contentState,
-                blockSelection as SelectionState,
-                null
+                blockSelection,
+                "forward"
             )
+            state = EditorState.push(
+                state,
+                contentState,
+                'remove-range'
+            )
+            console.log("remove range", blockSelection)
         })
-        nextEntities.forEach(ne => { // add
+        state = EditorState.moveFocusToEnd(state)
+        return state
+    }
+    static insertEntities = (entities:InsertEntity[], editorState:EditorState) => {
+        let state = editorState
+        let contentState = state.getCurrentContent()
+        const contentBlock = state.getCurrentContent().getBlockMap().first()
+        const blockKey = contentBlock.getKey();
+        entities.forEach(e => {
             const blockSelection = SelectionState
-                .createEmpty(blockKey)
-                .merge({
-                anchorOffset: ne.start,
-                focusOffset: ne.end,
-                });
-            const key = ne.token
-            const meta = searchEntities[ne.type]
-            const contentStateWithEntity = contentState.createEntity(
-                meta.type,
-                meta.mutability,
-                {name: key}
-            )
-            const entityKey = contentStateWithEntity.getLastCreatedEntityKey()
-            contentState = Modifier.applyEntity(
-                contentStateWithEntity,
-                blockSelection as SelectionState,
-                entityKey
-            )
+            .createEmpty(blockKey)
+            .merge({
+            anchorOffset: e.start,
+            focusOffset: e.end,
+          }) as SelectionState;
+          const meta = searchEntities[e.type]
+          const contentStateWithEntity = contentState.createEntity(
+              meta.type,
+              meta.mutability,
+              e.data
+          )
+          const entityKey = contentStateWithEntity.getLastCreatedEntityKey()
+          contentState = Modifier.applyEntity(
+              contentStateWithEntity,
+              blockSelection,
+              entityKey
+          )
+          contentState = Modifier.replaceText(contentState, blockSelection, e.text, null, entityKey)
+          state = EditorState.push( state, contentState, 'insert-characters')
+          if(e.appendSpace)
+              state = SearcQueryManager.appendTextToState(" ", true, state)
+          else 
+              state = EditorState.moveFocusToEnd(state)
         })
+        return state
+    }
+    static getTokens = (editorState:EditorState, ignoreNonEntities?:boolean) => {
+        const entities = SearcQueryManager.getEntities(editorState, null, ignoreNonEntities)
+        const tokens:SearchToken[] = []
+        entities.forEach(e => {
+            tokens.push({token:null, start:e.start, end:e.end, data:e.entity && e.entity.getData(), type: e.entity && e.entity.getType() as SearchEntityType})
+        })
+        return tokens
+    }
+    static getContextSearchData = (editorState:EditorState, searchOptions:SearchOption[]) => {
+        let text = editorState.getCurrentContent().getPlainText()
+        let tokens = SearcQueryManager.getTokens(editorState, true)
+        tokens.forEach(t => {
+            t.token = text.slice(t.start, t.end)
+        })
+        const parsed = SearcQueryManager.parse(text, searchOptions)
+        tokens.map(t => {
+            const parsedToken = parsed.tokens.find(pt => pt.start == t.start && pt.end == t.end)
+            if(parsedToken)
+                parsedToken.data = t.data
+        })
+        const data = new ContextSearchData({tokens:parsed.tokens, query:parsed.query, tags:parsed.tags, filters:parsed.filters, stateTokens:tokens, originalText:text})
+        return data
+    }
+    static getStateWithEntities(editorState:EditorState, searchOptions:SearchOption[])
+    {
+        const contentBlock = editorState.getCurrentContent().getBlockMap().first()
+        let contentState = editorState.getCurrentContent()
+        const stateData = SearcQueryManager.getContextSearchData(editorState, searchOptions)
+        const parsedEntities = stateData.tokens.filter(t => !!t.type)
+        const stateEntities = stateData.stateTokens.filter(t => !!t.type)
+        const blockKey = contentBlock.getKey();
+        //copy keys 
+        //remove old ones
+        //add new ones
+        //resolve unresolved entities when idle
+
+        /*if(parsedEntities.length > stateEntities.length)
+        {
+            parsedEntities.forEach(ne => { // add
+                const blockSelection = SelectionState
+                    .createEmpty(blockKey)
+                    .merge({
+                    anchorOffset: ne.start,
+                    focusOffset: ne.end,
+                    });
+                const key = ne.data.name
+                const meta = searchEntities[ne.type]
+                const contentStateWithEntity = contentState.createEntity(
+                    meta.type,
+                    meta.mutability,
+                    {name: key}
+                )
+                const entityKey = contentStateWithEntity.getLastCreatedEntityKey()
+                contentState = Modifier.applyEntity(
+                    contentStateWithEntity,
+                    blockSelection as SelectionState,
+                    entityKey
+                )
+            })
+            console.warn("stuff pasted")
+            return EditorState.push( editorState, contentState, "apply-entity") 
+        }
+        return editorState*/
+        console.warn("need to fix this. id_objects are not immutable. Check if prev objects are the same as new objects before creating objects")
+        //only one block allowed for now(single line)
+        if(true)//parsedEntities.length > stateEntities.length)
+        {
+            stateEntities.forEach(pe => { // remove
+                const blockSelection = SelectionState
+                    .createEmpty(blockKey)
+                    .merge({
+                    anchorOffset: pe.start,
+                    focusOffset: pe.end,
+                });
+                contentState = Modifier.applyEntity(
+                    contentState,
+                    blockSelection as SelectionState,
+                    null
+                )
+            })
+            parsedEntities.forEach(ne => { // add
+                const blockSelection = SelectionState
+                    .createEmpty(blockKey)
+                    .merge({
+                    anchorOffset: ne.start,
+                    focusOffset: ne.end,
+                    });
+                const meta = searchEntities[ne.type]
+                const contentStateWithEntity = contentState.createEntity(
+                    meta.type,
+                    meta.mutability,
+                    ne.data
+                )
+                const entityKey = contentStateWithEntity.getLastCreatedEntityKey()
+                contentState = Modifier.applyEntity(
+                    contentStateWithEntity,
+                    blockSelection as SelectionState,
+                    entityKey
+                )
+            })
+        }
+        
         
         return EditorState.push( editorState, contentState, "apply-entity") 
     }
@@ -261,7 +541,8 @@ export class SearcQueryManager
             );
         }
     }
-    static getActiveSearchType = (searchData:SearchData, selectionOffset:number, searchOptions:SearchOption[]):ElasticSearchType => {
+
+    static getActiveSearchType = (searchData:ContextSearchData, selectionOffset:number, searchOptions:SearchOption[]):ElasticSearchType => {
         let activeSearchTypeIndex = searchData.tokens.findIndex(t => t.start <= selectionOffset && t.end >= selectionOffset)
         if(activeSearchTypeIndex == -1)
         {
@@ -282,7 +563,7 @@ export class SearcQueryManager
             if(token.type == SearchEntityType.FILTER)
             {
                 const filter = token.token.replace(":","")
-                const so = searchOptions.find(so => so.name == filter)
+                const so = searchOptions.find(so => so.getName() == filter)
                 if(so)
                 {
                     return so.value
@@ -291,20 +572,20 @@ export class SearcQueryManager
         }
         return null
     }
-    static getActiveSearchToken(searchData:SearchData, selectionOffset:number)
+    static getActiveSearchToken(tokens:SearchToken[], selectionOffset:number)
     {
-        const activeSearchTypeIndex = searchData.tokens.findIndex(t => t.start <= selectionOffset && t.end >= selectionOffset)
+        const activeSearchTypeIndex = tokens.findIndex(t => t.start <= selectionOffset && t.end >= selectionOffset)
         if(activeSearchTypeIndex == -1)
         {
-            const token = [...searchData.tokens].reverse().find(t => t.end <= selectionOffset)
+            const token = [...tokens].reverse().find(t => t.end <= selectionOffset)
             return token
         }
         else
         {
-            return searchData.tokens[activeSearchTypeIndex]
+            return tokens[activeSearchTypeIndex]
         }
     }
-    static getActiveSearchQueryNotEntityConnected = (searchData:SearchData, selectionOffset:number) => {
+    static getActiveSearchQueryNotEntityConnected = (searchData:ContextSearchData, selectionOffset:number) => {
         const activeSearchTypeIndex = searchData.tokens.findIndex(t => t.start <= selectionOffset && t.end >= selectionOffset)
         if(activeSearchTypeIndex > -1)
         {

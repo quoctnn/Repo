@@ -16,6 +16,11 @@ String.prototype.hashCode = function() {
 String.prototype.splice = function(idx, rem, str) {
     return this.slice(0, idx) + str + this.slice(idx + Math.abs(rem));
 }
+String.prototype.trimLeftCharacters = function(charlist:string){
+    if (charlist === undefined)
+        charlist = "\s";
+    return this.replace(new RegExp("^[" + charlist + "]+"), "")
+}
 String.prototype.isNumber = function(): boolean
 {
    return !isNaN(Number(this.toString()));

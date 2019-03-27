@@ -14,17 +14,12 @@
         margin-left: 12px;
     }
     #searchclear, .searchclear {
-        position: absolute;
-        right: 5px;
-        bottom: 0;
-        height: 20px;
-        margin: auto;
         font-size: 18px;
         color: #ccc;
-        transform: translate(0, -8px);
     }
     .DraftEditor-root
     {
+        line-height: 30px;
         padding: 0 10px;
         font-size: 18px !important;
         border: 0;
@@ -48,14 +43,18 @@
         padding: 4px;
         color: white;
         border:0;
-        padding-top: 6px;
+        display: block;
+        align-items: center;
     }
+    
     .public-DraftEditorPlaceholder-inner 
     {
         color: gray;
-        position: absolute; pointer-events: none; 
+        position: absolute; 
+        pointer-events: none; 
         padding-left: 3px;
         padding-right: 3px;
+        line-height: 1.7em;
     }
     .public-DraftEditor-content {
         min-height: 20px;
@@ -95,5 +94,40 @@
     }
     .public-DraftEditorPlaceholder-root{
         position: static;   
+    }
+    .editor:not(.multiline){
+        .icon{
+            top: 8px;
+        }
+        #searchclear, .searchclear{
+            position: absolute;
+            right: 5px;
+            bottom: 0;
+            height: 20px;
+            margin: auto;
+            transform: translate(0, -10px);
+        }
+        .public-DraftEditor-content[contenteditable=true] {
+            display: block;
+        }
+    }
+    .editor.multiline {
+        height: auto;
+        display: flex;
+        .search-filter,.search-id-object {
+            display: inline;
+            line-height: 1.7em;
+        }
+        .DraftEditor-editorContainer
+        {
+            overflow-y:visible;
+        }
+        .DraftEditor-root .public-DraftStyleDefault-block {
+            white-space: normal;
+            word-break: break-word;
+        }
+        .public-DraftEditor-content[contenteditable=true] {
+            display: block;
+        }
     }
 }
