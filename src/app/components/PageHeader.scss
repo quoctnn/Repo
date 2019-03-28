@@ -3,7 +3,8 @@ $width: 500px;
 #page-header
 {
     .circle{
-        background: #483000;
+        background: rgb(66,139,202);
+        background: linear-gradient(50deg, rgba(66,139,202,1) 40%, rgba(0,212,255,1) 90%);
         margin-left: -$width/3.5;
         margin-top: -$width/2.5;
         width: 500px;
