@@ -30,13 +30,13 @@ class PageTopNavigation extends React.Component<Props, {}> {
                 <div className="flex-grow-0 left text-truncate">
                     <div className="community-box d-flex align-items-center mb-2">
                         <Avatar className="" image={communityAvatar(community)} size={45}/>
-                        <div className="text-truncate ml-2 ">
+                        <div className="text-truncate ml-2">
                             <div className="community-name text-truncate">{ communityName }</div>
                         </div>
                     </div>
-                    <div className="profile-box d-flex align-items-center">
+                    <div className="profile-box d-flex align-items-center ml-1">
                         <Avatar className="" image={userAvatar(profile)} size={35}/>
-                        <div className="text-truncate ml-2 ">
+                        <div className="text-truncate ml-2">
                             <div className="profile-name text-truncate">{userFullName( profile ) }</div>
                         </div>
                         <UserStatusSelector />
