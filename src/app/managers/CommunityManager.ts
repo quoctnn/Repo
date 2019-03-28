@@ -81,26 +81,38 @@ export abstract class CommunityManager
         }).filter(u => u != null)
         return communities
     }
-    static setInitialCommunity = () => {
+    static setInitialCommunity = (communityId?:number) => {
         console.log("setInitialCommunity")
         const state = CommunityManager.getStore().getState()
-        const activeCommunity = state.activeCommunity.activeCommunity
-        const communityIds = state.communityStore.allIds
-        if(!communityIds.contains(activeCommunity))
+        const currentActiveCommunityId = state.activeCommunity.activeCommunity
+        if(communityId)
         {
-            const active = communityIds[0]
-            if(active)
-                CommunityManager.setActiveCommunity(active)
-            else 
-                console.error("NO COMMUNITY AVAILABLE")
+            const community = CommunityManager.getCommunityById(communityId)
+            if(community && communityId != currentActiveCommunityId)
+            {
+                CommunityManager.setActiveCommunity(communityId)
+                return
+            }
+        } 
+        //fallback current active community
+        const currentActiveCommunity = CommunityManager.getCommunityById(currentActiveCommunityId)
+        if(currentActiveCommunity)
+        {
+            return
         }
-        CommunityManager.applyCommunityTheme(CommunityManager.getActiveCommunity())
+        //fallback first community
+        const communityIds = state.communityStore.allIds
+        const active = communityIds[0]
+        if(active)
+            CommunityManager.setActiveCommunity(active)
+        else 
+            console.error("NO COMMUNITY AVAILABLE")
     }
     static getActiveCommunity = () => {
         const state = CommunityManager.getStore().getState()
         return state.communityStore.byId[state.activeCommunity.activeCommunity]
     }
-    private static applyCommunityTheme = (community:Community) =>
+    static applyCommunityTheme = (community:Community) =>
     {
         if(!community)
             return

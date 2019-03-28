@@ -676,6 +676,7 @@ export interface UserProfile extends SimpleUserProfile{
     is_staff:boolean
     is_superuser:boolean
     connections?:number[]
+    active_community?:number
 }
 export type Timesheet = {
     id:number

@@ -75,7 +75,6 @@ export abstract class ApplicationManager
         ApiClient.getCommunities(true, ListOrdering.ALPHABETICAL, 100, 0, (data, status, error) => {
             const communities = (data && data.results) || []
             CommunityManager.storeCommunities(communities)
-            CommunityManager.setInitialCommunity()
             completion()
             ToastManager.showErrorToast(error)
         })
@@ -97,6 +96,9 @@ export abstract class ApplicationManager
         })
     }
     private static setApplicationLoaded = () => {
+        const authUser = AuthenticationManager.getAuthenticatedUser()
+        CommunityManager.setInitialCommunity(authUser.active_community)
+        CommunityManager.applyCommunityTheme(CommunityManager.getActiveCommunity())
         ApplicationManager.getStore().dispatch(setApplicationLoadedAction(true))
     }
     private static getStore = ():Store<ReduxState,any> =>
