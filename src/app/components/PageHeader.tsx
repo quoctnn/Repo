@@ -23,7 +23,7 @@ class PageHeader extends React.Component<Props, {}> {
         const coverImage = this.props.community.cover_cropped
         return(
             <div id="page-header">
-                <CoverImage src={coverImage}>
+                <CoverImage id="page-header-cover-image" src={coverImage}>
                     {this.props.children}
                 </CoverImage>
                 <div className="circle"></div>

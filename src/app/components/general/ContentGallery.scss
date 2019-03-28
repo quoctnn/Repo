@@ -11,7 +11,7 @@
         max-width: initial;
         max-height: 100%;
     }
-    .gallery-container 
+    .gallery-container
     {
         margin:3px auto;
     }
@@ -55,7 +55,7 @@
         }
         .poster-container
         {
-            display: flex;  
+            display: flex;
             justify-content: center;
             align-content: center;
             > img
@@ -66,7 +66,7 @@
                 right:0;
                 bottom:0;
             }
-            > .play-button 
+            > .play-button
             {
                 z-index: 2;
                 color: white;
@@ -81,7 +81,7 @@
         {
             font-size: 30px;
         }
-       
+
     }
     .gallery-item:first-child
     {
@@ -99,7 +99,7 @@
     {
         align-items: center;
     }
-    .gallery-item:hover 
+    .gallery-item:hover
     {
         .poster-container
         {
@@ -133,7 +133,7 @@
             flex-basis: 100%;
         }
     }
-    
+
 }
 .content-gallery-lightbox
 {
@@ -148,7 +148,7 @@
     {
         color:white;
     }
-    .carousel 
+    .carousel
     {
         position: absolute;
         top: 0;
@@ -164,9 +164,9 @@
         .carousel-control-next,
         .carousel-control-prev
         {
-            @include var(color, primary-color);
+            @include var(color, primary-theme-color);
         }
-        .carousel-control-next > span::after, 
+        .carousel-control-next > span::after,
         .carousel-control-prev > span::after
         {
             content: "";
@@ -234,7 +234,7 @@
     flex-wrap: nowrap;
     .img-responsive
     {
-        max-height: 100%;    
+        max-height: 100%;
         margin: auto;
         max-width: 100%;
     }
@@ -251,7 +251,7 @@
     }
     .gallery-item-link
     {
-        .embedly 
+        .embedly
         {
             margin: auto;
             max-width: 70%;

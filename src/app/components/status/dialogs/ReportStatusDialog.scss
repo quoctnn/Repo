@@ -6,7 +6,7 @@
             display: inline-block;
             margin: 5px;
             border-radius: 25%;
-            @include var(background, primary-color);
+            @include var(background, primary-theme-color);
             height: 32px;
             border-radius: 16px;
             line-height: 32px;

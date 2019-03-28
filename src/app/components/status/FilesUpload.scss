@@ -22,7 +22,7 @@ div.filepicker {
 }
 
 div.filepicker .fa {
-  @include var(color, primary-color);
+  @include var(color, primary-theme-color);
 }
 
 /* Icon */

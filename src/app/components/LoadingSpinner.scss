@@ -8,7 +8,7 @@
   & > div {
     width: 12px;
     height: 12px;
-    @include var(background-color, primary-color);
+    @include var(background-color, primary-theme-color);
 
     border-radius: 100%;
     display: inline-block;
