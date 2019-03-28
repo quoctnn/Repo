@@ -15,8 +15,10 @@ $circleWidth: 400px;
         top: 0;
     }
     position: relative;
-    background: linear-gradient(to bottom, #{map-get($root, primary-theme-color)} 90%, rgba(0,0,0,0) 100%);
-    background: linear-gradient(to bottom, var(--primary-theme-color) 90%, rgba(0,0,0,0) 100%);
+    &.no-image {
+        background: linear-gradient(to bottom, #{map-get($root, primary-theme-color)} 90%, rgba(0,0,0,0) 100%);
+        background: linear-gradient(to bottom, var(--primary-theme-color) 90%, rgba(0,0,0,0) 100%);
+    }
 }
 #page-header-cover-image {
     -webkit-mask-image:-webkit-gradient(linear, left 90%, left bottom, from(rgba(0,0,0,1)), to(rgba(0,0,0,0)));
