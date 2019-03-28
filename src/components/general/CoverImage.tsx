@@ -13,7 +13,7 @@ export class CoverImage extends React.Component<Props, {}> {
     }
     render()
     {
-        let url = IntraSocialUtilities.appendAuthorizationTokenToUrl(this.props.src)
+        let url = this.props.src && IntraSocialUtilities.appendAuthorizationTokenToUrl(this.props.src)
         return (<div className="cover-image">
                     <span style={{backgroundImage:"url(" + url + ")"}}></span>
                     {this.props.children}

@@ -84,8 +84,9 @@ export class DashboardComponent extends React.Component<Props, State> {
     }
     renderContent = () => {
         return (<>
-                    <PageHeader />
-                    <PageTopNavigation />
+                    <PageHeader>
+                        <PageTopNavigation />
+                    </PageHeader>
                     <div className="dashboard-components m-2 m-sm-3 m-md-4">
                         {this.renderModules()}
                     </div>

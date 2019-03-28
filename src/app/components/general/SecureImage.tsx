@@ -44,10 +44,11 @@ export class SecureImage extends React.PureComponent<Props & React.HTMLAttribute
     {
         const {data, status} = this.state
         const {setAsBackground,setBearer, label, url, ...rest} = this.props
-        const imgUrl = setBearer ? IntraSocialUtilities.appendAuthorizationTokenToUrl(url) : url
-        return(<>
-            {setAsBackground && <div {...rest} style={{backgroundImage:"url("+imgUrl+")"}} ></div>}
-            {!setAsBackground && <img {...rest} src={imgUrl} alt={label} />}
-        </>)
+        const imgUrl = setBearer && url ? IntraSocialUtilities.appendAuthorizationTokenToUrl(url) : url
+        if(setAsBackground)
+        {
+            return <div {...rest} style={{backgroundImage:"url("+imgUrl+")"}} >{this.props.children}</div>
+        }
+        return(<img {...rest} src={imgUrl} alt={label} />)
     }
 }

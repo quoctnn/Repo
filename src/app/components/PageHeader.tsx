@@ -3,6 +3,7 @@ import "./PageHeader.scss"
 import { ReduxState } from "../redux";
 import { Community } from "../types/intrasocial_types";
 import { connect } from "react-redux";
+import { CoverImage } from "./general/CoverImage";
 
 interface OwnProps
 {
@@ -18,9 +19,12 @@ type Props = ReduxStateProps & ReduxDispatchProps & OwnProps
 
 class PageHeader extends React.Component<Props, {}> {
     render() {
-        const style: React.CSSProperties = this.props.community && {backgroundImage: `url(${this.props.community.cover_cropped})`}
+        const coverImage = this.props.community.cover_cropped
         return(
-            <div id="page-header" style={style}>
+            <div id="page-header">
+                <CoverImage src={coverImage}>
+                    {this.props.children}
+                </CoverImage>
                 <div className="circle"></div>
             </div>
         );

@@ -26,7 +26,7 @@ class PageTopNavigation extends React.Component<Props, {}> {
         const community = this.props.community
         const communityName = (community && community.name) || translate("community.active.empty")
         return(
-            <div id="page-top-navigation" className="d-flex m-2 m-sm-3 m-md-4">
+            <div id="page-top-navigation" className="d-flex p-2 p-sm-3 p-md-4">
                 <div className="flex-grow-0 left text-truncate">
                     <div className="community-box d-flex align-items-center mb-2">
                         <Avatar className="" image={communityAvatar(community)} size={70}/>
