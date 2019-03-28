@@ -3,6 +3,7 @@ import { Community } from '../types/intrasocial_types';
 import ApiClient from '../network/ApiClient';
 import { ReduxState } from '../redux';
 import { addCommunitiesAction } from '../redux/communityStore';
+import { setActiveCommunityAction } from '../redux/activeCommunity';
 export abstract class CommunityManager
 {
     static setup = () => 
@@ -70,7 +71,7 @@ export abstract class CommunityManager
     static searchCommunityIds = ( query:string, communityIds:number[]) =>
     {
         let communities = CommunityManager.getCommunities(communityIds || [])
-        return communities.filter(c => CommunityManager.filterGroup(query,c!))
+        return communities.filter(c => CommunityManager.filterCommunity(query,c!))
     }
     static getCommunities = (communityIds:number[]) =>
     {
@@ -80,7 +81,40 @@ export abstract class CommunityManager
         }).filter(u => u != null)
         return communities
     }
-    private static filterGroup = (query:string, community:Community) =>
+    static setInitialCommunity = () => {
+        console.log("setInitialCommunity")
+        const state = CommunityManager.getStore().getState()
+        const activeCommunity = state.activeCommunity.activeCommunity
+        const communityIds = state.communityStore.allIds
+        if(!communityIds.contains(activeCommunity))
+        {
+            const active = communityIds[0]
+            if(active)
+                CommunityManager.setActiveCommunity(active)
+            else 
+                console.error("NO COMMUNITY AVAILABLE")
+        }
+        CommunityManager.applyCommunityTheme(CommunityManager.getActiveCommunity())
+    }
+    static getActiveCommunity = () => {
+        const state = CommunityManager.getStore().getState()
+        return state.communityStore.byId[state.activeCommunity.activeCommunity]
+    }
+    private static applyCommunityTheme = (community:Community) =>
+    {
+        if(!community)
+            return
+        let root = document.querySelector(':root') as HTMLElement
+        if(root) {
+            root.style.setProperty("--primary-theme-color",community.primary_color)
+            root.style.setProperty("--secondary-theme-color",community.secondary_color)
+        }
+    }
+    private static setActiveCommunity = (community:number) =>
+    {
+        CommunityManager.getStore().dispatch(setActiveCommunityAction(community))
+    }
+    private static filterCommunity = (query:string, community:Community) =>
     {
         let compareString = community.name
         return compareString.toLowerCase().indexOf(query.toLowerCase()) > -1

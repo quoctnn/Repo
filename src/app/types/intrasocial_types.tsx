@@ -46,10 +46,13 @@ export interface Community extends ICommunity
     avatar_thumbnail: string
     cover: string
     cover_cropped: string
+    cover_thumbnail: string
     members: number[]
     relationship: any
     updated_at:string
     permission:number
+    primary_color:string
+    secondary_color:string
 }
 export interface TempStatus
 {

@@ -8,14 +8,14 @@ export interface SetActiveCommunityAction{
     type:string
     activeCommunity:number
 }
-export const SetActiveCommunityAction = (index: number):SetActiveCommunityAction => ({
+export const setActiveCommunityAction = (index: number):SetActiveCommunityAction => ({
     type: ActiveCommunityActionTypes.SetActiveCommunity,
     activeCommunity: index
 })
 const activeCommunity = (state = INITIAL_STATE, action:SetActiveCommunityAction) => {
   switch (action.type) {
     case ActiveCommunityActionTypes.SetActiveCommunity:
-      return { ...state, language: action.activeCommunity }
+      return { ...state, activeCommunity: action.activeCommunity }
     default:
       return state
   }

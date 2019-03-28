@@ -75,6 +75,7 @@ export abstract class ApplicationManager
         ApiClient.getCommunities(true, ListOrdering.ALPHABETICAL, 100, 0, (data, status, error) => {
             const communities = (data && data.results) || []
             CommunityManager.storeCommunities(communities)
+            CommunityManager.setInitialCommunity()
             completion()
             ToastManager.showErrorToast(error)
         })
