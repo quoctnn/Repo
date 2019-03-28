@@ -7,16 +7,16 @@ import { UserProfile, Community } from '../types/intrasocial_types';
 import { userFullName, userAvatar, communityAvatar } from "../utilities/Utilities";
 import UserStatusSelector from "./general/UserStatusSelector";
 import { translate } from "../localization/AutoIntlProvider";
-export interface OwnProps 
+export interface OwnProps
 {
 }
-interface ReduxStateProps 
+interface ReduxStateProps
 {
     profile:UserProfile
     activeCommunity:number
     community:Community
 }
-interface ReduxDispatchProps 
+interface ReduxDispatchProps
 {
 }
 type Props = ReduxStateProps & ReduxDispatchProps & OwnProps
@@ -26,20 +26,20 @@ class PageTopNavigation extends React.Component<Props, {}> {
         const community = this.props.community
         const communityName = (community && community.name) || translate("community.active.empty")
         return(
-            <div id="page-top-navigation" className="d-flex p-2 p-sm-3 p-md-4">
+            <div id="page-top-navigation" className="d-flex p-2 p-sm-3 p-md-3">
                 <div className="flex-grow-0 left text-truncate">
                     <div className="community-box d-flex align-items-center mb-2">
-                        <Avatar className="" image={communityAvatar(community)} size={70}/>
+                        <Avatar className="" image={communityAvatar(community)} size={45}/>
                         <div className="text-truncate ml-2 ">
                             <div className="community-name text-truncate">{ communityName }</div>
                         </div>
                     </div>
                     <div className="profile-box d-flex align-items-center">
-                        <Avatar className="" image={userAvatar(profile)} size={60}/>
+                        <Avatar className="" image={userAvatar(profile)} size={35}/>
                         <div className="text-truncate ml-2 ">
                             <div className="profile-name text-truncate">{userFullName( profile ) }</div>
-                            <UserStatusSelector />
                         </div>
+                        <UserStatusSelector />
                     </div>
                 </div>
                 <div className="flex-grow-1 right">
@@ -55,7 +55,7 @@ const mapStateToProps = (state:ReduxState, ownProps: OwnProps):ReduxStateProps =
             community = state.communityStore.byId[state.communityStore.allIds[0]]
       return {
         profile:state.authentication.profile,
-        community, 
+        community,
         activeCommunity
       }
   }

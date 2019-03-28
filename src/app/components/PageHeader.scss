@@ -1,12 +1,12 @@
 @import "../Config";
-$circleWidth: 500px;
+$circleWidth: 400px;
 #page-header
 {
     .circle{
         @include var(background, primary-theme-color);
         background: linear-gradient(50deg, #{map-get($root, primary-theme-color)} 30%, #{map-get($root, secondary-theme-color)} 70%);
-        margin-left: -$circleWidth/3.5;
-        margin-top: -$circleWidth/2.5;
+        margin-left: -$circleWidth/6;
+        margin-top: -$circleWidth/3.5;
         width: $circleWidth;
         height: $circleWidth;
         border-radius: 50%;
