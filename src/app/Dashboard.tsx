@@ -29,8 +29,6 @@ class DemoComponent extends React.Component<DemoProps, {}> {
                 </Module>
     }
 }
-
-//this should be fetched from server soon :-)
 export namespace DashboardComponents {
     export const componentMap = {
         "DemoComponent": DemoComponent,
