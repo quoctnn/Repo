@@ -4,16 +4,14 @@ import PageTopNavigation from "./components/PageTopNavigation";
 import "./Dashboard.scss"
 import { ResponsiveBreakpoint } from "./components/general/observers/ResponsiveComponent";
 import { Grid } from './components/Grid';
-import WindowResponsiveComponent from "./components/general/observers/WindowResponsiveComponent";
 import NewsfeedModule from './modules/newsfeed/NewsfeedModule';
 import Module from "./modules/Module";
 import ModuleContent from "./modules/ModuleContent";
 import ModuleHeader from "./modules/ModuleHeader";
-import ProjectModule from "./modules/project/ProjectModule";
-import { ApplicationManager } from './managers/ApplicationManager';
 import { Dashboard, GridLayout, Community } from './types/intrasocial_types';
 import { connect } from "react-redux";
 import { ReduxState } from "./redux";
+import TasksModule from "./modules/tasks/TasksModule";
 
 type DemoProps = {
     text?:string
@@ -36,7 +34,7 @@ export namespace DashboardComponents {
     export const componentMap = {
         "DemoComponent": DemoComponent,
         "NewsfeedModule":NewsfeedModule,
-        "ProjectModule": ProjectModule
+        "ProjectModule": TasksModule
     }
     export function getComponent(type: string, props:any) {
         return React.createElement(componentMap[type], props)

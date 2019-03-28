@@ -1,13 +1,13 @@
 import * as React from 'react'
 import classnames from "classnames"
 import { withRouter, RouteComponentProps } from "react-router-dom"
-import "./ProjectComponent.scss"
+import "./TaskListComponent.scss"
 import { SimpleTask, TaskActions, Task, ContextNaturalKey } from '../../types/intrasocial_types';
 import { ToastManager } from '../../managers/ToastManager';
 import ApiClient from '../../network/ApiClient';
 import { List } from '../../components/general/List';
 import TaskListItem from './TaskListItem';
-import { ProjectMenuData } from './ProjectMenu';
+import { TasksMenuData } from './TasksMenu';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import { translate } from '../../localization/AutoIntlProvider';
 import { StatusUtilities } from '../../utilities/StatusUtilities';
@@ -15,7 +15,7 @@ import { StatusUtilities } from '../../utilities/StatusUtilities';
 type OwnProps = {
     className?:string
     onLoadingStateChanged?:(isLoading:boolean) => void
-    contextData:ProjectMenuData
+    contextData:TasksMenuData
     limit?:number
     scrollParent?:any
 }
@@ -27,7 +27,7 @@ type State = {
     hasMore:boolean
 }
 type Props = OwnProps & RouteComponentProps<any>
-class ProjectComponent extends React.Component<Props, State> {  
+class TaskListComponent extends React.Component<Props, State> {  
     static defaultProps:OwnProps = {
         limit:30,
         contextData:null,
@@ -52,7 +52,7 @@ class ProjectComponent extends React.Component<Props, State> {
             isLoading: true
         }, this.loadTasks);
     }
-    contextDataChanged = (prevData:ProjectMenuData) => {
+    contextDataChanged = (prevData:TasksMenuData) => {
         const data = this.props.contextData
         return !prevData.state.isEqual(data.state) || 
                 !prevData.tags.isEqual(data.tags) || 
@@ -265,10 +265,10 @@ class ProjectComponent extends React.Component<Props, State> {
     }
     render()
     {
-        const cn = classnames("project-component")
+        const cn = classnames("task-list-component")
         return (<div className={cn}>
                 {this.renderTasks()}
                 </div>)
     }
 }
-export default withRouter(ProjectComponent)
+export default withRouter(TaskListComponent)

@@ -8,7 +8,7 @@ import { ProfileManager } from "../../managers/ProfileManager";
 import { userFullName, userAvatar } from '../../utilities/Utilities';
 import { ProjectProfileFilter, ProfileFilterOption } from "./ProjectProfileFilter";
 
-export type ProjectMenuData = {
+export type TasksMenuData = {
     project:ContextValue
     state:string[]
     priority:string[]
@@ -22,13 +22,13 @@ export type ProjectMenuData = {
 }
 type Props = 
 {
-    data:ProjectMenuData
-    onUpdate:(data:ProjectMenuData) => void
+    data:TasksMenuData
+    onUpdate:(data:TasksMenuData) => void
 }
 type State = {
-    data:ProjectMenuData
+    data:TasksMenuData
 }
-export default class ProjectMenu extends React.Component<Props, State> {
+export default class TaskMenu extends React.Component<Props, State> {
     
     constructor(props:Props) {
         super(props);
@@ -115,33 +115,33 @@ export default class ProjectMenu extends React.Component<Props, State> {
         const creatorValue = creator && this.getProfileFilterOption(creator)
 
         return(
-            <div className="project-menu">
+            <div className="tasks-menu">
                 <FormGroup>
-                    <Label>{translate("project.module.menu.projectfilter.title")}</Label>
+                    <Label>{translate("task.module.menu.projectfilter.title")}</Label>
                     <ProjectFilter onValueChange={this.onContextChange} value={this.state.data.project} />
                 </FormGroup>
                 <FormGroup>
-                    <Label>{translate("project.module.menu.state.title")}</Label>
+                    <Label>{translate("task.module.menu.state.title")}</Label>
                     <ButtonGroup className="flex-wrap d-block">
                         {states.map(s => <Button color="light" onClick={this.toggleState(s)} key={s} active={this.stateActive(s)}>{translate("task.state." + s)}</Button>)}
                     </ButtonGroup>
                 </FormGroup>
                 <FormGroup>
-                    <Label>{translate("project.module.menu.priority.title")}</Label>
+                    <Label>{translate("task.module.menu.priority.title")}</Label>
                     <ButtonGroup className="flex-wrap d-block">
                         {priorities.map(p => <Button color="light" onClick={this.togglePriority(p)} key={p} active={this.priorityActive(p)}>{translate("task.priority." + p)}</Button>)}
                     </ButtonGroup>
                 </FormGroup>
                 <FormGroup>
-                    <Label>{translate("project.module.menu.assigned_to.title")}</Label>
+                    <Label>{translate("task.module.menu.assigned_to.title")}</Label>
                     <ProjectProfileFilter project={this.state.data.project && this.state.data.project.id} value={assignedToValue} onValueChange={this.onAssignedChange} />
                 </FormGroup>
                 <FormGroup>
-                    <Label>{translate("project.module.menu.responsible.title")}</Label>
+                    <Label>{translate("task.module.menu.responsible.title")}</Label>
                     <ProjectProfileFilter project={this.state.data.project && this.state.data.project.id} value={responsibleValue} onValueChange={this.onResponsibleChange} />
                 </FormGroup>
                 <FormGroup>
-                    <Label>{translate("project.module.menu.creator.title")}</Label>
+                    <Label>{translate("task.module.menu.creator.title")}</Label>
                     <ProjectProfileFilter project={this.state.data.project && this.state.data.project.id} value={creatorValue} onValueChange={this.onCreatorChange} />
                 </FormGroup>
                 

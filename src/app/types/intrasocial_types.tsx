@@ -571,7 +571,7 @@ export enum AvatarStateColor
     ORANGE = "orange",
     RED = "red",
     GRAY = "gray",
-    NONE = "none",
+    NONE = "inherit",
 }
 export enum UserStatus {
     active = "active",

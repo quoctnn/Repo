@@ -4,16 +4,14 @@ import Module from '../Module';
 import ModuleHeader from '../ModuleHeader';
 import ModuleContent from '../ModuleContent';
 import classnames from "classnames"
-import "./ProjectModule.scss"
+import "./TasksModule.scss"
 import ModuleMenu from '../ModuleMenu';
 import ModuleMenuTrigger from '../ModuleMenuTrigger';
 import { ResponsiveBreakpoint } from '../../components/general/observers/ResponsiveComponent';
 import { translate } from '../../localization/AutoIntlProvider';
 import CircularLoadingSpinner from '../../components/general/CircularLoadingSpinner';
-import ProjectMenu, { ProjectMenuData } from './ProjectMenu';
-import ProjectComponent from './ProjectComponent';
-import ModuleFooter from '../ModuleFooter';
-import { Badge } from 'reactstrap';
+import TaskMenu, { TasksMenuData } from './TasksMenu';
+import TaskListComponent from './TaskListComponent';
 
 type OwnProps = {
     className?:string
@@ -22,11 +20,11 @@ type OwnProps = {
 type State = {
     menuVisible:boolean
     isLoading:boolean
-    menuData:ProjectMenuData
+    menuData:TasksMenuData
 }
 type Props = OwnProps & RouteComponentProps<any>
-class ProjectModule extends React.Component<Props, State> {  
-    tempMenuData:ProjectMenuData = null   
+class TasksModule extends React.Component<Props, State> {  
+    tempMenuData:TasksMenuData = null   
     constructor(props:Props) {
         super(props);
         this.state = {
@@ -77,20 +75,20 @@ class ProjectModule extends React.Component<Props, State> {
             return (<CircularLoadingSpinner borderWidth={3} size={20} key="loading"/>)
         }
     }
-    menuDataUpdated = (data:ProjectMenuData) => {
+    menuDataUpdated = (data:TasksMenuData) => {
         this.tempMenuData = data
     }
     render()
     {
         const {breakpoint, history, match, location, staticContext, className,  ...rest} = this.props
-        const cn = classnames("project-module", className, {"menu-visible":this.state.menuVisible})
+        const cn = classnames("tasks-module", className, {"menu-visible":this.state.menuVisible})
         const headerClick = breakpoint < ResponsiveBreakpoint.standard ? this.headerClick : undefined
         const headerClass = classnames({link:headerClick})
         const headerSubtitle = this.state.menuData.project && this.state.menuData.project.label
         return (<Module {...rest} className={cn}>
                     <ModuleHeader className={headerClass} onClick={headerClick}>
                         <div className="flex-grow-1 text-truncate d-flex align-items-center">
-                            <div className="text-truncate module-header-title-left">{translate("project.module.title")}</div>
+                            <div className="text-truncate module-header-title-left">{translate("task.module.title")}</div>
                             {this.renderLoading()}
                             <div className="spacer flex-grow-1 flex-shrink-1"></div>
                             {!!headerSubtitle && 
@@ -102,7 +100,7 @@ class ProjectModule extends React.Component<Props, State> {
                     {breakpoint >= ResponsiveBreakpoint.standard && //do not render for small screens
                         <>
                             <ModuleContent>
-                                <ProjectComponent 
+                                <TaskListComponent 
                                     onLoadingStateChanged={this.feedLoadingStateChanged}  
                                     contextData={this.state.menuData}
                                     />
@@ -110,11 +108,11 @@ class ProjectModule extends React.Component<Props, State> {
                         </>
                     }
                     <ModuleMenu visible={this.state.menuVisible}>
-                        <ProjectMenu 
+                        <TaskMenu 
                             data={this.state.menuData}
                             onUpdate={this.menuDataUpdated}  />
                     </ModuleMenu>
                 </Module>)
     }
 }
-export default withRouter(ProjectModule)
+export default withRouter(TasksModule)

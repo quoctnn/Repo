@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { connect } from 'react-redux'
-import { UserStatus, UserProfile, UserStatusItem } from '../../types/intrasocial_types';
+import { UserStatus, UserProfile, UserStatusItem, AvatarStateColor } from '../../types/intrasocial_types';
 import { sendOnWebsocket, EventStreamMessageType, getStream } from '../../network/ChannelEventStream';
 import { NotificationCenter } from '../../utilities/NotificationCenter';
 import { ReduxState } from '../../redux/index';
@@ -86,7 +86,7 @@ class UserStatusSelector extends React.Component<Props, State> {
         return (
             <div className="d-flex ml-2">
                 <div className="dropdown margin-right-sm">
-                    { this.state.connected &&
+                    {this.state.connected &&
                     <a data-boundary="body" className="dropdown-toggle text-truncate" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <div style={{backgroundColor:currentState.color}} className={"user-state-indicator mr-1"}></div>{currentState.translation()}
                     </a>
@@ -96,7 +96,7 @@ class UserStatusSelector extends React.Component<Props, State> {
                     <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
                         {selectable.map((status, index) => {
                             return <a key={index} onClick={this.setUserStatus(status)} className="dropdown-item" href="#">
-                                        <div style={{backgroundColor:status.color}} className={"user-state-indicator mr-1"}></div>{status.translation()}
+                                        <div  style={{backgroundColor:status.color}} className={"user-state-indicator mr-1"}></div>{status.translation()}
                                     </a>
                         }) }
                         <DropdownItem divider={true}/>

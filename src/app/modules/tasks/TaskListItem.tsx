@@ -88,8 +88,8 @@ export default class TaskListItem extends React.Component<Props, State> {
         const visible = this.state.showConfirmCloseDialog
         if(!visible)
             return null
-        const title = translate("project.module.task.preventclose.title")
-        const message = translate("project.module.task.preventclose.description")
+        const title = translate("task.module.task.preventclose.title")
+        const message = translate("task.module.task.preventclose.description")
         const okButtonTitle = translate("common.yes")
         return <ConfirmDialog visible={visible} title={title} message={message} didComplete={this.onConfirmClose} okButtonTitle={okButtonTitle}/>
     }
@@ -153,7 +153,7 @@ export default class TaskListItem extends React.Component<Props, State> {
                     <CollapseComponent visible={this.state.open}>
                         <div className="collapse-body p-2">
                             <FormGroup>
-                                <Label>{translate("project.module.menu.addtime.title")}</Label>
+                                <Label>{translate("task.module.menu.addtime.title")}</Label>
                                 <StatusComposerComponent 
                                     ref={this.timecomposer} 
                                     canUpload={false}
@@ -166,7 +166,7 @@ export default class TaskListItem extends React.Component<Props, State> {
                                     communityId={this.props.communityId}
                                     renderPlaceholder={false}
                                     showEmojiPicker={true}
-                                    placeholder={translate("project.module.menu.addtime.placeholder")}
+                                    placeholder={translate("task.module.menu.addtime.placeholder")}
                                     taggableMembers={[]/* tagging not available*/}
                                     refresh={refresh}
                                 >
@@ -181,13 +181,13 @@ export default class TaskListItem extends React.Component<Props, State> {
                                 </StatusComposerComponent>
                             </FormGroup>
                             <FormGroup>
-                                <Label>{translate("project.module.menu.setstate.title")}</Label>
+                                <Label>{translate("task.module.menu.setstate.title")}</Label>
                                 <ButtonGroup className="flex-wrap d-block">
                                     {states.map(s => <Button outline={true} size="xs" color="secondary" onClick={this.setTaskState(s)} key={s} active={this.stateActive(s)}>{translate("task.state." + s)}</Button>)}
                                 </ButtonGroup>
                             </FormGroup>
                             <FormGroup>
-                                <Label>{translate("project.module.menu.addstatus.title")}</Label>
+                                <Label>{translate("task.module.menu.addstatus.title")}</Label>
                                 <StatusComposerComponent 
                                     ref={this.statuscomposer} 
                                     canUpload={true}
@@ -196,7 +196,7 @@ export default class TaskListItem extends React.Component<Props, State> {
                                     onActionPress={this.onAddStatusActionPress}
                                     contextNaturalKey={ContextNaturalKey.TASK}
                                     contextObjectId={task.id}
-                                    placeholder={translate("project.module.menu.addstatus.placeholder")}
+                                    placeholder={translate("task.module.menu.addstatus.placeholder")}
                                     communityId={this.props.communityId}
                                     renderPlaceholder={false}
                                     taggableMembers={task.visibility}
