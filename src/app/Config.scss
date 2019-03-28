@@ -2,7 +2,7 @@
 //let hasRootSupport = window.CSS && window.CSS.supports && window.CSS.supports('--a', 0)
 //root = document.querySelector(':root')
 //root.className = currentTheme
-@function str-replace($string, $search, $replace: '') 
+@function str-replace($string, $search, $replace: '')
 {
     $index: str-index($string, $search);
     @if $index {
@@ -36,7 +36,8 @@ $root: (
     button-hover-background-color: #4c555d,
 
     default-color: #fff,
-    primary-color: #428bca,
+    primary-theme-color: #428bca,
+    secondary-theme-color: #7eb9ed,
     info-color: #5bc0de,
     danger-color: #d9534f,
     success-color: #5cb85c,

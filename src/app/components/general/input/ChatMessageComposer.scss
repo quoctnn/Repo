@@ -37,7 +37,7 @@
     .btn-submit > .fas {
         font-size: 1em;
         font-weight: bold;
-        @include var(color, primary-color);
+        @include var(color, primary-theme-color);
         padding: 0 1px;
         margin-right: 4px;
         transform:rotate(45deg);

@@ -6,12 +6,12 @@
 
   .btn-like:hover,
   .btn-like.active {
-    @include var(color, primary-color);
+    @include var(color, primary-theme-color);
     cursor: pointer;
   }
 
   .reactions-count.active {
-    @include var(color, primary-color);
+    @include var(color, primary-theme-color);
   }
   .reactions-count.active:hover,
   .reactions-count.active:focus {
@@ -35,7 +35,7 @@
 .reactions-panel
 {
     font-size: 2em;
-    .emoji 
+    .emoji
     {
         padding: 4px;
     }
@@ -60,8 +60,8 @@
             background: black;
         }
         .arrow:after{
-            border-bottom-color:black; 
-            border-top-color:black; 
+            border-bottom-color:black;
+            border-top-color:black;
         }
     }
 }
