@@ -96,6 +96,9 @@ export abstract class ApplicationManager
         })
     }
     private static setApplicationLoaded = () => {
+        const authUser = AuthenticationManager.getAuthenticatedUser()
+        CommunityManager.setInitialCommunity(authUser.active_community)
+        CommunityManager.applyCommunityTheme(CommunityManager.getActiveCommunity())
         ApplicationManager.getStore().dispatch(setApplicationLoadedAction(true))
     }
     private static getStore = ():Store<ReduxState,any> =>

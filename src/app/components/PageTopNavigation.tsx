@@ -50,9 +50,7 @@ class PageTopNavigation extends React.Component<Props, {}> {
 }
 const mapStateToProps = (state:ReduxState, ownProps: OwnProps):ReduxStateProps => {
         const activeCommunity = state.activeCommunity.activeCommunity
-        let community = state.communityStore.byId[activeCommunity]
-        if(!community && state.communityStore.allIds.length > 0)
-            community = state.communityStore.byId[state.communityStore.allIds[0]]
+        const community = state.communityStore.byId[activeCommunity]
       return {
         profile:state.authentication.profile,
         community,
