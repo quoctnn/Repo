@@ -10,13 +10,19 @@ $circleWidth: 400px;
         width: $circleWidth;
         height: $circleWidth;
         border-radius: 50%;
-        opacity: 0.8;
+        opacity: 0.9;
         position: absolute;
         top: 0;
     }
     position: relative;
-    background: linear-gradient(to bottom, #{map-get($root, primary-theme-color)} 90%, rgba(0,0,0,0) 100%);
-    background: linear-gradient(to bottom, var(--primary-theme-color) 90%, rgba(0,0,0,0) 100%);
+    &.no-image {
+        background: linear-gradient(to bottom, #{map-get($root, primary-theme-color)} 90%, rgba(0,0,0,0) 100%);
+        background: linear-gradient(to bottom, var(--primary-theme-color) 90%, rgba(0,0,0,0) 100%);
+    }
+    &.fallback {
+        background: linear-gradient(to bottom, #{map-get($root, primary-theme-color)} 80%, rgba(0,0,0,0) 90%);
+        background: linear-gradient(to bottom, var(--primary-theme-color) 80%, rgba(0,0,0,0) 90%);
+    }
 }
 #page-header-cover-image {
     -webkit-mask-image:-webkit-gradient(linear, left 90%, left bottom, from(rgba(0,0,0,1)), to(rgba(0,0,0,0)));

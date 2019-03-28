@@ -8,7 +8,7 @@ import { AutocompleteSection, AutocompleteSectionItem } from "../../components/g
 import ApiClient, { ElasticResult } from "../../network/ApiClient";
 import { nullOrUndefined } from "../../utilities/Utilities";
 
-type Props = 
+type Props =
 {
     selectedSearchContext:ContextSearchData
     includeSubContext:boolean
@@ -32,11 +32,11 @@ export type NewsfeedMenuData = {
 }
 export const allowedSearchOptions:SearchOption[] = []
 allowedSearchOptions.push(new SearchOption("community", null, 2,  ElasticSearchType.COMMUNITY, ["user", "group", "event", "project", "task", ], "newsfeed.menu.filter.community.description"))
-allowedSearchOptions.push(new SearchOption("group", null, 1, ElasticSearchType.GROUP, []))
-allowedSearchOptions.push(new SearchOption("from", "user", 2, ElasticSearchType.USER, ["community", "group", "event", "project", "task", ]))
-allowedSearchOptions.push(new SearchOption("project", null, 1, ElasticSearchType.PROJECT, ["task", ]))
-allowedSearchOptions.push(new SearchOption("task", null, 1, ElasticSearchType.TASK, []))
-allowedSearchOptions.push(new SearchOption("event", null, 1,  ElasticSearchType.EVENT, []))
+allowedSearchOptions.push(new SearchOption("group", null, 1, ElasticSearchType.GROUP, [], "newsfeed.menu.filter.group.description"))
+allowedSearchOptions.push(new SearchOption("from", "user", 2, ElasticSearchType.USER, ["community", "group", "event", "project", "task", ], "newsfeed.menu.filter.user.description"))
+allowedSearchOptions.push(new SearchOption("project", null, 1, ElasticSearchType.PROJECT, ["task", ], "newsfeed.menu.filter.project.description"))
+allowedSearchOptions.push(new SearchOption("task", null, 1, ElasticSearchType.TASK, [], "newsfeed.menu.filter.task.description"))
+allowedSearchOptions.push(new SearchOption("event", null, 1,  ElasticSearchType.EVENT, [], "newsfeed.menu.filter.event.description"))
 
 const allowedSearchTypes = allowedSearchOptions.map(k => k.value)
 export default class NewsfeedMenu extends React.Component<Props, State> {
@@ -114,7 +114,7 @@ export default class NewsfeedMenu extends React.Component<Props, State> {
                 {
                     start = activeToken.end
                 }
-                else 
+                else
                 {
                     start = activeToken.start
                 }
@@ -124,7 +124,7 @@ export default class NewsfeedMenu extends React.Component<Props, State> {
             state = SearcQueryManager.insertEntities([{type:SearchEntityType.ID_OBJECT, text:slug, data:{name:slug, id:parseInt(item.id), key:fn, title:item.title}, start, end, appendSpace:true}], state)
             this.contextSearch.current.applyState(state)
         }
-        else 
+        else
         {
             let state = this.contextSearch.current.editorState()
             state = SearcQueryManager.removeNonEntities(state)
@@ -162,7 +162,7 @@ export default class NewsfeedMenu extends React.Component<Props, State> {
             // allowedSearchOptions.filter(f => appliedFilters.indexOf(f.getName()) == -1 && f.getName().indexOf(searchQuery.toLowerCase()) > -1)
             let trans = translate("search.options.title")
             let items = filters.map(f => {
-                const fn = f.getName() 
+                const fn = f.getName()
                 const filterName = fn + ":"
                 return new AutocompleteSectionItem(fn, fn, filterName, f.description && translate( f.description ), 0, null, null,null, (e) => {
                     const start = Math.max(0 , focusOffset - searchQuery.length)
@@ -177,7 +177,7 @@ export default class NewsfeedMenu extends React.Component<Props, State> {
         return []
     }
     onAutocompleteToggle = (visible:boolean) => {
-        
+
     }
     render() {
         const filter = this.state.filter
@@ -192,13 +192,13 @@ export default class NewsfeedMenu extends React.Component<Props, State> {
                 </ButtonGroup>
                 <FormGroup>
                     <Label>{translate("FeedContext")}</Label>
-                    <ContextSearch 
+                    <ContextSearch
                         onAutocompleteToggle={this.onAutocompleteToggle}
-                        searchData={this.props.selectedSearchContext} 
-                        allowedSearchOptions={allowedSearchOptions} 
-                        ref={this.contextSearch} 
-                        onSearchDataChanged={this.onSearchDataChanged} 
-                        placeholder="Search..." 
+                        searchData={this.props.selectedSearchContext}
+                        allowedSearchOptions={allowedSearchOptions}
+                        ref={this.contextSearch}
+                        onSearchDataChanged={this.onSearchDataChanged}
+                        placeholder="Search..."
                         sections={this.state.sections}
                         />
                 </FormGroup>

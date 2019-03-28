@@ -84,11 +84,11 @@ class UserStatusSelector extends React.Component<Props, State> {
         const currentState = UserStatus.getObject(this.props.profile.user_status)
         let selectable = UserStatus.getSelectableStates([currentState.type])
         return (
-            <div className="d-flex">
+            <div className="d-flex ml-2">
                 <div className="dropdown margin-right-sm">
-                    { this.state.connected && 
+                    { this.state.connected &&
                     <a data-boundary="body" className="dropdown-toggle text-truncate" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <div style={{backgroundColor:currentState.color}} className={"user-state-indicator"}></div>{currentState.translation()}
+                        <div style={{backgroundColor:currentState.color}} className={"user-state-indicator mr-1"}></div>{currentState.translation()}
                     </a>
                     ||
                     <span> {UserStatus.getObject(UserStatus.unavailable).translation()} </span>
@@ -96,7 +96,7 @@ class UserStatusSelector extends React.Component<Props, State> {
                     <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
                         {selectable.map((status, index) => {
                             return <a key={index} onClick={this.setUserStatus(status)} className="dropdown-item" href="#">
-                                        <div style={{backgroundColor:status.color}} className={"user-state-indicator"}></div>{status.translation()}
+                                        <div style={{backgroundColor:status.color}} className={"user-state-indicator mr-1"}></div>{status.translation()}
                                     </a>
                         }) }
                         <DropdownItem divider={true}/>
