@@ -7,14 +7,14 @@ import { UserProfile, Community } from '../types/intrasocial_types';
 import { userFullName, userAvatar, communityAvatar } from "../utilities/Utilities";
 import UserStatusSelector from "./general/UserStatusSelector";
 import { translate } from "../localization/AutoIntlProvider";
+import PageMenu from "./PageMenu";
 export interface OwnProps
 {
+    community:Community
 }
 interface ReduxStateProps
 {
     profile:UserProfile
-    activeCommunity:number
-    community:Community
 }
 interface ReduxDispatchProps
 {
@@ -41,6 +41,7 @@ class PageTopNavigation extends React.Component<Props, {}> {
                         </div>
                         <UserStatusSelector />
                     </div>
+                    <PageMenu />
                 </div>
                 <div className="flex-grow-1 right">
                 </div>
@@ -49,12 +50,8 @@ class PageTopNavigation extends React.Component<Props, {}> {
     }
 }
 const mapStateToProps = (state:ReduxState, ownProps: OwnProps):ReduxStateProps => {
-        const activeCommunity = state.activeCommunity.activeCommunity
-        const community = state.communityStore.byId[activeCommunity]
       return {
         profile:state.authentication.profile,
-        community,
-        activeCommunity
       }
   }
   const mapDispatchToProps = (dispatch:any, ownProps: OwnProps):ReduxDispatchProps => {

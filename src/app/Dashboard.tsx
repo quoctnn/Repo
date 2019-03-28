@@ -11,11 +11,14 @@ import ModuleContent from "./modules/ModuleContent";
 import ModuleHeader from "./modules/ModuleHeader";
 import ProjectModule from "./modules/project/ProjectModule";
 import { ApplicationManager } from './managers/ApplicationManager';
-import { Dashboard, GridLayout } from './types/intrasocial_types';
+import { Dashboard, GridLayout, Community } from './types/intrasocial_types';
+import { connect } from "react-redux";
+import { ReduxState } from "./redux";
 
 type DemoProps = {
     text?:string
 }
+
 class DemoComponent extends React.Component<DemoProps, {}> {
 
     constructor(props:DemoProps){
@@ -39,7 +42,7 @@ export namespace DashboardComponents {
         return React.createElement(componentMap[type], props)
     }
 }
-type Props =
+type OwnProps =
 {
     breakpoint:number
     dashboard:Dashboard
@@ -47,8 +50,16 @@ type Props =
 type State = {
     defaultGrid:GridLayout
 }
-
-export class DashboardComponent extends React.Component<Props, State> {
+interface ReduxStateProps
+{
+    activeCommunity:number
+    community:Community
+}
+interface ReduxDispatchProps
+{
+}
+type Props = ReduxStateProps & ReduxDispatchProps & OwnProps
+class DashboardComponent extends React.Component<Props, State> {
     constructor(props:Props)
     {
         super(props)
@@ -82,8 +93,8 @@ export class DashboardComponent extends React.Component<Props, State> {
     }
     renderContent = () => {
         return (<>
-                    <PageHeader>
-                        <PageTopNavigation />
+                    <PageHeader community={this.props.community}>
+                        <PageTopNavigation community={this.props.community} />
                     </PageHeader>
                     <div className="dashboard-components m-2 m-sm-3 m-md-3">
                         {this.renderModules()}
@@ -100,21 +111,17 @@ export class DashboardComponent extends React.Component<Props, State> {
         );
     }
 }
-export const DashCompWithData = (props:any) => {
-    const dashboards = ApplicationManager.getDashboards()
-    const dashboard = dashboards[0]
-    dashboard.grid_layouts = dashboard.grid_layouts.sort((a, b) => b.min_width - a.min_width) //descending
-    let breakpoints = dashboard.grid_layouts.map(l => l.min_width).filter(b => b > ResponsiveBreakpoint.standard)
-    breakpoints.push(ResponsiveBreakpoint.standard)
-    breakpoints.push(ResponsiveBreakpoint.mini)
-    breakpoints = breakpoints.sort((a, b) => b - a) //descending
-    return (
-
-        <WindowResponsiveComponent breakpoints={breakpoints} setClassOnBody={true} render={({ breakpoint }) => (
-            <DashboardComponent
-                dashboard={dashboard}
-                breakpoint={breakpoint}
-            />
-        )}/>
-    );
+const mapStateToProps = (state:ReduxState, ownProps: OwnProps):ReduxStateProps => {
+    const activeCommunity = state.activeCommunity.activeCommunity
+    const community = state.communityStore.byId[activeCommunity]
+  return {
+    activeCommunity,
+    community
   }
+}
+const mapDispatchToProps = (dispatch:any, ownProps: OwnProps):ReduxDispatchProps => {
+    return {
+    }
+}
+export default connect<ReduxStateProps, ReduxDispatchProps, OwnProps>(mapStateToProps, mapDispatchToProps)(DashboardComponent)
+
