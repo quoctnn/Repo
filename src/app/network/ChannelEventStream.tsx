@@ -83,7 +83,7 @@ class EventQueueLock
       return Object.keys(this.eventStreamLocks).length
     }
     popEvent()
-    {   
+    {
         return this.eventQueue.pop()
     }
     queueEvent(object:any)
@@ -108,6 +108,7 @@ interface State
 type Props = OwnProps & ReduxDispatchProps & ReduxStateProps
 class ChannelEventStream extends React.Component<Props, State> {
     stream: ReconnectingWebSocket|null = null
+    oldStream: ReconnectingWebSocket|null = null
     queueEvents = false
     constructor(props:Props) {
         super(props)
@@ -145,7 +146,7 @@ class ChannelEventStream extends React.Component<Props, State> {
     connectStream = () => {
         this.closeStream();
         if (this.props.endpoint) {
-            console.log('Setting up WebSocket');
+            console.log('Setting up WebSocket to', this.props.endpoint);
             this.stream = new ReconnectingWebSocket(
                 this.props.endpoint,
                 [],
@@ -194,20 +195,17 @@ class ChannelEventStream extends React.Component<Props, State> {
     updateConnection = () =>
     {
         const isOnline = this.canSend()
-        const canConnect = !!this.props.endpoint // && !!this.props.token 
-        if(isOnline)
+        const canConnect = !!this.props.endpoint && !this.stream // && !!this.props.token
+        if(isOnline && !canConnect)
         {
-            if(!canConnect)
-            {
-                this.closeStream()
-            }
+            this.closeStream()
         }
-        else
+        else if (canConnect)
         {
-            if(canConnect)
-            {
-                this.connectStream()
-            }
+            this.connectStream()
+        }
+        else {
+            this.authorize()
         }
     }
     componentWillUnmount = () => {
@@ -215,8 +213,8 @@ class ChannelEventStream extends React.Component<Props, State> {
     }
     closeStream = () => {
         if (this.stream) {
-            console.log('Closing WebSocket');
-            this.stream.close();
+            console.log('Discarding WebSocket');
+            this.stream.close()
             this.stream = null;
             publicStream = null;
         }
