@@ -9,7 +9,7 @@ import { ReduxState } from "./redux";
 import Signin from "./views/signin/Signin";
 import { error404 } from "./views/error/error404";
 import NewsfeedPage from "./components/pages/NewsfeedPage";
-import { Dashboard } from './types/intrasocial_types';
+import { Dashboard, Community } from './types/intrasocial_types';
 import ApplicationLoader from "./views/loading/ApplicationLoader";
 import Signout from "./views/signout/Signout";
 import CommunityPage from "./components/pages/CommunityPage";
@@ -17,6 +17,8 @@ import { ApplicationManager } from "./managers/ApplicationManager";
 import { ResponsiveBreakpoint } from "./components/general/observers/ResponsiveComponent";
 import WindowResponsiveComponent from "./components/general/observers/WindowResponsiveComponent";
 import DashboardComponent from "./Dashboard";
+import { nullOrUndefined } from "../utilities/Utilities";
+import { CommunityManager } from "./managers/CommunityManager";
 
 type OwnProps = {
 }
@@ -51,6 +53,7 @@ export const DashCompWithData = (props:any) => {
 }
 class Main extends React.Component<Props, State> {
     previousLocation:any
+    currentCommunityLoading:string = null
     constructor(props:Props)
     {
         super(props)
@@ -60,6 +63,42 @@ class Main extends React.Component<Props, State> {
     }
     componentWillReceiveProps(nextProps) {
         this.previousLocation = this.props.location;
+    }
+    componentDidMount = () => {
+        this.checkCurrentCommunity()
+    }
+    componentDidUpdate = () => {
+        this.checkCurrentCommunity()
+    }
+    checkCurrentCommunity = () => {
+        if(this.props.loaded)
+        {
+            const { location } = this.props
+            const segments = location.pathname.split("/").filter(f => !nullOrUndefined(f) && f != "")
+            if(segments.length > 1 && segments[0] == "community")
+            {
+                const communityId = segments[1]
+                const community = CommunityManager.getCommunity(communityId)
+                if(!community && this.currentCommunityLoading == communityId)
+                {
+                    this.currentCommunityLoading = communityId
+                    CommunityManager.ensureCommunityExists(communityId, (community) => {
+                        this.currentCommunityLoading = null
+                        this.setCommunityTheme(community)
+                    })
+                }
+                else {
+                    this.setCommunityTheme(community)
+                }
+            }
+            else {
+                this.setCommunityTheme(CommunityManager.getActiveCommunity())
+            }
+        }
+    }
+    setCommunityTheme = (community:Community) => {
+        if(community)
+            CommunityManager.applyCommunityTheme(community)
     }
     render() {
         return(

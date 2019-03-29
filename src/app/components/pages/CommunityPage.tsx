@@ -21,30 +21,19 @@ interface ReduxDispatchProps
 }
 interface State 
 {
-    loading:boolean
 }
 type Props = ReduxStateProps & ReduxDispatchProps & OwnProps
 class CommunityPage extends React.Component<Props, State> 
 {
-    constructor(props) {
+    constructor(props:Props) {
         super(props);
         this.state = {
             loading:false
         }
     }
-    componentDidMount = () => {
-        if(!this.props.community)
-        {
-            this.setState({loading:true}, () => {
-                CommunityManager.ensureCommunityExists(this.props.id, () => {
-                    this.setState({loading:false})
-                })
-            })
-        }
-    }
     renderLoading = () => 
     {
-        if (this.state.loading) {
+        if (!this.props.community) {
             return (<LoadingSpinner />)
         }
     }

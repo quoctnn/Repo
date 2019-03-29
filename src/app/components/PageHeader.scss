@@ -10,7 +10,7 @@ $headerMinHeight:240px;
     padding:$padding;
     height: $headerHeight;
     min-height: $headerMinHeight;
-
+    z-index: -1;
     #page-header-cover-image {
         margin-left: $circleWidth/1.23;
     }

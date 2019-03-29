@@ -35,7 +35,7 @@ export abstract class CommunityManager
     {
         return CommunityManager.getStore().getState().communityStore.byId[communityId]
     }
-    static ensureCommunityExists = (communityId:string|number, completion:(community:Community) => void) => 
+    static ensureCommunityExists = (communityId:string|number, completion?:(community:Community) => void) => 
     {
         const id = communityId.toString()
         let community = CommunityManager.getCommunity(id)
@@ -50,12 +50,12 @@ export abstract class CommunityManager
                 {
                     console.log("error fetching community", error)
                 }
-                completion(data)
+                completion && completion(data)
             })
         }
         else 
         {
-            completion(community)
+            completion && completion(community)
         }
 
     }
@@ -116,6 +116,7 @@ export abstract class CommunityManager
     {
         if(!community)
             return
+        console.warn("Applying theme for community", community.name)
         let root = document.querySelector(':root') as HTMLElement
         if(root) {
             root.style.setProperty("--primary-theme-color",community.primary_color)
