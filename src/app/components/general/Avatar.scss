@@ -15,31 +15,6 @@
         overflow: hidden;
         background-color: #E1E2DD;
     }
-    .avatar-state
-    {
-        border-radius: 50%;
-        width: 12px;
-        height: 12px;
-        border:2px solid white;
-        position: absolute;
-        top: 4px;
-    }
-    .avatar-state.green
-    {
-        background-color: green;
-    }
-    .avatar-state.orange
-    {
-        background-color: orange;
-    }
-    .avatar-state.red
-    {
-        background-color: red;
-    }
-    .avatar-state.gray
-    {
-        background-color: gray;
-    }
     $size2left :calc(50% + 1px ) ;
     .image_1_0{
         top:0;
@@ -104,5 +79,11 @@
     .multi{
         position:absolute;
         overflow:hidden;
+    }
+    .user-status-indicator
+    {
+        position: absolute;
+        bottom: 4px;
+        right:0
     }
 }

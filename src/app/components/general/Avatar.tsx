@@ -1,5 +1,7 @@
 import * as React from 'react';
 import { SecureImage } from './SecureImage';
+import { AvatarStateColor } from '../../types/intrasocial_types';
+import { UserStatusIndicator } from './UserStatusIndicator';
 require("./Avatar.scss");
 
 export interface Props {
@@ -8,15 +10,7 @@ export interface Props {
     borderColor?:string,
     image?:string,
     images?:string[],
-    stateColor?:AvatarStateColor,
-}
-export enum AvatarStateColor
-{
-    GREEN = "green",
-    ORANGE = "orange",
-    RED = "red", 
-    GRAY = "gray",
-    NONE = "none",
+    statusColor?:AvatarStateColor,
 }
 export class Avatar extends React.PureComponent<Props & React.HTMLAttributes<HTMLElement>, {}> {
     static defaultProps:Props = {
@@ -24,7 +18,7 @@ export class Avatar extends React.PureComponent<Props & React.HTMLAttributes<HTM
         borderWidth:0,
         borderColor:"none",
         image:null,
-        stateColor:AvatarStateColor.NONE,
+        statusColor:AvatarStateColor.NONE,
         
     }
     imageStyles:{[key:string]:React.CSSProperties} = {}
@@ -34,7 +28,7 @@ export class Avatar extends React.PureComponent<Props & React.HTMLAttributes<HTM
     }
     render() 
     {
-        const {image, images, borderColor, borderWidth, size, children, className, stateColor,...rest} = this.props
+        const {image, images, borderColor, borderWidth, size, children, className, statusColor,...rest} = this.props
         let imgs:string[] = []
         if(image)
             imgs.push(image)
@@ -52,7 +46,9 @@ export class Avatar extends React.PureComponent<Props & React.HTMLAttributes<HTM
                     })}
                 </div>
                 {children}
-                {stateColor != AvatarStateColor.NONE && <div className={"avatar-state " + stateColor}></div>}
+                {statusColor != AvatarStateColor.NONE && 
+                    <UserStatusIndicator size={15} borderColor="white" statusColor={statusColor} borderWidth={2}/>
+                }
             </div>
         );
     }

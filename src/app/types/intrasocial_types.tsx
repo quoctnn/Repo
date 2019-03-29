@@ -567,7 +567,7 @@ export abstract class StatusReactionUtilities
 }
 export enum AvatarStateColor
 {
-    GREEN = "green",
+    GREEN = "#01d100",
     ORANGE = "orange",
     RED = "red",
     GRAY = "gray",
@@ -583,7 +583,7 @@ export enum UserStatus {
 }
 export type UserStatusItem = {
     type:UserStatus
-    color:string 
+    color:AvatarStateColor 
     translation:() => string
 }
 const UserStatusObjects:{[key:string]:UserStatusItem} = {

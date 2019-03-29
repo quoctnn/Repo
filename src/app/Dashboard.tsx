@@ -1,6 +1,5 @@
 import * as React from "react";
 import PageHeader from "./components/PageHeader";
-import PageTopNavigation from "./components/PageTopNavigation";
 import "./Dashboard.scss"
 import { ResponsiveBreakpoint } from "./components/general/observers/ResponsiveComponent";
 import { Grid } from './components/Grid';
@@ -91,9 +90,7 @@ class DashboardComponent extends React.Component<Props, State> {
     }
     renderContent = () => {
         return (<>
-                    <PageHeader community={this.props.community}>
-                        <PageTopNavigation community={this.props.community} />
-                    </PageHeader>
+                    <PageHeader community={this.props.community} />
                     <div className="dashboard-components m-2 m-sm-3 m-md-3">
                         {this.renderModules()}
                     </div>

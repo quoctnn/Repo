@@ -11,6 +11,7 @@ import Routes from '../../utilities/Routes';
 import { translate } from '../../localization/AutoIntlProvider';
 import { EventStreamManagerConnectionChangedEvent, EventStreamManager } from '../../managers/EventStreamManager';
 import { DropdownItem } from 'reactstrap';
+import { UserStatusIndicator } from './UserStatusIndicator';
 
 export const sendUserStatus = (status: UserStatus) => {
     sendOnWebsocket(
@@ -88,7 +89,7 @@ class UserStatusSelector extends React.Component<Props, State> {
                 <div className="dropdown margin-right-sm">
                     {this.state.connected &&
                     <a data-boundary="body" className="dropdown-toggle text-truncate" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <div style={{backgroundColor:currentState.color}} className={"user-state-indicator mr-1"}></div>{currentState.translation()}
+                        {currentState.translation()}
                     </a>
                     ||
                     <span> {UserStatus.getObject(UserStatus.unavailable).translation()} </span>
@@ -96,7 +97,7 @@ class UserStatusSelector extends React.Component<Props, State> {
                     <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
                         {selectable.map((status, index) => {
                             return <a key={index} onClick={this.setUserStatus(status)} className="dropdown-item" href="#">
-                                        <div  style={{backgroundColor:status.color}} className={"user-state-indicator mr-1"}></div>{status.translation()}
+                                        <UserStatusIndicator size={12} borderColor="white" statusColor={status.color} borderWidth={2} />{status.translation()}
                                     </a>
                         }) }
                         <DropdownItem divider={true}/>

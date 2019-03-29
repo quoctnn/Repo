@@ -5,6 +5,7 @@ import { Community } from "../types/intrasocial_types";
 import { connect } from "react-redux";
 import { CoverImage } from "./general/CoverImage";
 import classnames = require("classnames");
+import PageTopNavigation from "./PageTopNavigation";
 
 interface OwnProps
 {
@@ -25,7 +26,7 @@ class PageHeader extends React.Component<Props, {}> {
         return(
             <div id="page-header" className={cn}>
                 <CoverImage id="page-header-cover-image" src={coverImage}>
-                    {this.props.children}
+                    <PageTopNavigation community={this.props.community} />
                 </CoverImage>
                 <div className="circle"></div>
             </div>

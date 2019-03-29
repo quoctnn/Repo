@@ -1,11 +1,23 @@
 @import "../Config";
-$circleWidth: 605px;
+$circleWidth: 32vw;
+$circleMinWidth:375px;
+$padding:1vw;
+$minPadding:10px;
+$headerHeight:14.5vw;
+$headerMinHeight:240px;
 #page-header
 {
+    padding:$padding;
+    height: $headerHeight;
+    min-height: $headerMinHeight;
+
+    #page-header-cover-image {
+        margin-left: $circleWidth/1.23;
+    }
     .circle{
-        background: linear-gradient(50deg, #{map-get($root, primary-theme-color)} 30%, #{map-get($root, secondary-theme-color)} 70%);
-        background: linear-gradient(50deg, var(--primary-theme-color) 30%, var(--secondary-theme-color) 70%);
-        margin-left: -$circleWidth/10;
+        background: linear-gradient(50deg, #{map-get($root, secondary-theme-color)} 30%, #{map-get($root, primary-theme-color)} 70%);
+        background: linear-gradient(50deg, var(--secondary-theme-color) 30%, var(--primary-theme-color) 70%);
+        margin-left: -$circleWidth/9;
         margin-top: -$circleWidth/4.5;
         width: $circleWidth;
         height: $circleWidth;
@@ -15,14 +27,29 @@ $circleWidth: 605px;
     }
     position: relative;
     &.no-image {
-        background: linear-gradient(to bottom, #{map-get($root, primary-theme-color)} 90%, rgba(0,0,0,0) 100%);
-        background: linear-gradient(to bottom, var(--primary-theme-color) 90%, rgba(0,0,0,0) 100%);
+        @include var(background-color,primary-theme-color);
     }
-    &.fallback {
-        background: linear-gradient(to bottom, #{map-get($root, primary-theme-color)} 80%, rgba(0,0,0,0) 90%);
-        background: linear-gradient(to bottom, var(--primary-theme-color) 80%, rgba(0,0,0,0) 90%);
+    #page-top-navigation{
+        .left{
+            width: $circleWidth - $circleWidth/9;
+            padding-right: $padding;
+        }
     }
-}
-#page-header-cover-image {
-    margin-left: $circleWidth/1.35;
+    @media only screen and (max-width : 1200px) {
+
+        padding:$minPadding;
+        .circle{
+            width: $circleMinWidth;
+            height: $circleMinWidth;
+            margin-left: -$circleMinWidth/9;
+            margin-top: -$circleMinWidth/4.5;
+        }
+        .left{
+            width: $circleMinWidth - $circleMinWidth/9 !important;
+            padding-right: $minPadding;
+        }
+        #page-header-cover-image {
+            margin-left: $circleMinWidth/1.23;
+        }
+    }
 }
