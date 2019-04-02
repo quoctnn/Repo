@@ -1,13 +1,14 @@
 import * as React from "react";
 import { connect } from 'react-redux'
-import "./CommunityPage.scss"
-import { Community } from "../../types/intrasocial_types";
-import { CommunityManager } from "../../managers/CommunityManager";
+import "./ProjectPage.scss"
+import { Project, Community } from "../../types/intrasocial_types";
 import LoadingSpinner from "../LoadingSpinner";
 import { ReduxState } from "../../redux";
 import PageHeader from "../PageHeader";
 import { DashboardWithData } from "../../DashboardWithData";
-import { Error404 } from '../../views/error/Error404';
+import { ProjectManager } from "../../managers/ProjectManager";
+import { CommunityManager } from "../../managers/CommunityManager";
+import { Error404 } from "../../views/error/Error404";
 import { communityAvatar, communityName, communityCover } from "../../utilities/Utilities";
 export interface OwnProps 
 {
@@ -15,9 +16,11 @@ export interface OwnProps
 }
 interface ReduxStateProps 
 {
-    communityid:string
     community:Community
     communityResolved:number
+    projectid:string
+    project:Project
+    projectResolved:number
 }
 interface ReduxDispatchProps 
 {
@@ -26,7 +29,7 @@ interface State
 {
 }
 type Props = ReduxStateProps & ReduxDispatchProps & OwnProps
-class CommunityPage extends React.Component<Props, State> 
+class ProjectPage extends React.Component<Props, State> 
 {
     constructor(props:Props) {
         super(props);
@@ -51,9 +54,9 @@ class CommunityPage extends React.Component<Props, State>
         return <Error404 />
     }
     render() {
-        const {community, communityResolved} = this.props
-        const hasData = !!community
-        const isLoading = !community && !communityResolved
+        const { project, projectResolved, community, communityResolved} = this.props
+        const hasData = !!project && !!community
+        const isLoading = (!project && !projectResolved) || (!community && !communityResolved)
         return(
             <div id="project-page" className="dashboard-container">
                 {isLoading && this.renderLoading()}
@@ -61,7 +64,7 @@ class CommunityPage extends React.Component<Props, State>
                 {hasData && 
                     <div className="content dashboard-container">
                         {this.renderHeader(community)}
-                        <DashboardWithData category="community" />
+                        <DashboardWithData category="project" />
                     </div>
                 }
             </div>
@@ -69,13 +72,19 @@ class CommunityPage extends React.Component<Props, State>
     }
 }
 const mapStateToProps = (state:ReduxState, ownProps:OwnProps) => {
+    const projectid:string = ownProps.match.params.projectname
+    const project = ProjectManager.getProject(projectid)
+    const projectResolved = state.resolvedContext.projectResolved
+
     const communityid:string = ownProps.match.params.communityname
     const community = CommunityManager.getCommunity(communityid)
     const communityResolved = state.resolvedContext.communityResolved
     return {
         community,
-        communityid,
-        communityResolved
+        communityResolved,
+        projectid,
+        project,
+        projectResolved,
     }
 }
-export default connect<ReduxStateProps, null, OwnProps>(mapStateToProps, null)(CommunityPage);
+export default connect<ReduxStateProps, null, OwnProps>(mapStateToProps, null)(ProjectPage);

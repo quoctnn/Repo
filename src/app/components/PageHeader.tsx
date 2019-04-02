@@ -9,36 +9,23 @@ import PageTopNavigation from "./PageTopNavigation";
 
 interface OwnProps
 {
-    community:Community
+    coverImage:string
+    primaryItemImage:string 
+    primaryItemTitle:string
 }
-interface ReduxStateProps
-{
-}
-interface ReduxDispatchProps
-{
-}
-type Props = ReduxStateProps & ReduxDispatchProps & OwnProps
+type Props = OwnProps
 
-class PageHeader extends React.Component<Props, {}> {
+export default class PageHeader extends React.Component<Props, {}> {
     render() {
-        const coverImage = this.props.community.cover_cropped;
+        const { coverImage } = this.props
         const cn = classnames({"no-image": !coverImage}, {"fallback": coverImage});
         return(
             <div id="page-header" className={cn}>
                 <CoverImage id="page-header-cover-image" src={coverImage}>
-                    <PageTopNavigation community={this.props.community} />
                 </CoverImage>
+                <PageTopNavigation primaryItemImage={this.props.primaryItemImage} primaryItemTitle={this.props.primaryItemTitle} />
                 <div className="circle"></div>
             </div>
         );
     }
 }
-const mapStateToProps = (state:ReduxState, ownProps: OwnProps):ReduxStateProps => {
-  return {
-  }
-}
-const mapDispatchToProps = (dispatch:any, ownProps: OwnProps):ReduxDispatchProps => {
-  return {
-}
-}
-export default connect<ReduxStateProps, ReduxDispatchProps, OwnProps>(mapStateToProps, mapDispatchToProps)(PageHeader)

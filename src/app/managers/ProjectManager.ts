@@ -29,11 +29,11 @@ export abstract class ProjectManager
         }
         return null
     }
-    static ensureProjectExists = (projectId:number, completion:(project:Project) => void) => 
+    static ensureProjectExists = (projectId:string|number, completion:(project:Project) => void) => 
     {
         const id = projectId.toString()
-        let group = ProjectManager.getProject(id)
-        if(!group)
+        let project = ProjectManager.getProject(id)
+        if(!project)
         {
             ApiClient.getProject(id, (data, status, error) => {
                 if(data)
@@ -49,7 +49,7 @@ export abstract class ProjectManager
         }
         else 
         {
-            completion(group)
+            completion(project)
         }
 
     }

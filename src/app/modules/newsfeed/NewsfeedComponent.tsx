@@ -62,6 +62,7 @@ interface OwnProps
     childrenLimit:number//children when fetching pages
     scrollParent?:any
     onLoadingStateChanged?:(isLoading:boolean) => void
+    isResolvingContext?:boolean
 }
 interface RouteProps
 {
@@ -84,7 +85,6 @@ interface State
     isLoading: boolean
     isRefreshing: boolean
     hasMore:boolean
-    hasContextError:boolean
     hasLoaded:boolean
 }
 type Props = ReduxStateProps & ReduxDispatchProps & OwnProps & RouteProps
@@ -101,33 +101,32 @@ class NewsfeedComponent extends React.Component<Props, State> {
         super(props);
         this.state = {
             activeCommentLoaders:{},
-            isLoading:false,
+            isLoading: false,
             isRefreshing:false,
             items:[],
             offset:0,
             hasMore:true,
-            hasContextError:false,
             hasLoaded:false
         }
     }
-    hasContextError = () => {
-        return (!!this.props.contextNaturalKey && !this.props.contextObjectId) || (!this.props.contextNaturalKey && !!this.props.contextObjectId)
+    hasContextError = (props:Props) => {
+        return (!!props.contextNaturalKey && !props.contextObjectId) || (!props.contextNaturalKey && !!props.contextObjectId)
 
     }
     componentDidUpdate = (prevProps:Props, prevState:State) => {
         if(this.props.contextNaturalKey != prevProps.contextNaturalKey || 
             this.props.contextObjectId != prevProps.contextObjectId || 
             this.props.includeSubContext != prevProps.includeSubContext || 
+            this.props.isResolvingContext != prevProps.isResolvingContext || 
             this.props.filter != prevProps.filter)
         {
-            const hasContextError = this.hasContextError()
+            const hasContextError = this.hasContextError(this.props)
             const action = hasContextError ? undefined : this.loadStatuses
             this.setState({
                 offset: 0,
                 isRefreshing: !hasContextError,
                 isLoading: !hasContextError,
                 items:[],
-                hasContextError,
                 hasLoaded:false
             }, action);
         }
@@ -142,9 +141,14 @@ class NewsfeedComponent extends React.Component<Props, State> {
         {
             this.props.scrollParent.addEventListener("scroll", this.onScroll)
         }
-        this.setState({
-            isLoading: true
-        }, this.loadStatuses);
+        
+        const hasContextError = this.hasContextError(this.props)
+        if(!hasContextError)
+        {
+            this.setState({
+                isLoading: true
+            }, this.loadStatuses);
+        }
     }
     componentWillUnmount = () =>
     {
@@ -206,7 +210,7 @@ class NewsfeedComponent extends React.Component<Props, State> {
     }
     handleRefresh = () => 
     {
-        if(this.state.isLoading)
+        if(this.state.isLoading || this.hasContextError(this.props))
         { // cancel current
             return
         }
@@ -295,7 +299,7 @@ class NewsfeedComponent extends React.Component<Props, State> {
     }
     handleLoadMore = () => 
     {
-        if(!this.state.hasMore || this.state.isLoading)
+        if(!this.state.hasMore || this.state.isLoading || this.hasContextError(this.props))
         {
             return
         }
@@ -305,7 +309,7 @@ class NewsfeedComponent extends React.Component<Props, State> {
         }, this.loadStatuses);
     }
     renderLoading = () => {
-        if (this.state.isLoading) {
+        if (this.state.isLoading || this.props.isResolvingContext) {
             return (<LoadingSpinner key="loading"/>)
         }
         return null
@@ -754,7 +758,7 @@ class NewsfeedComponent extends React.Component<Props, State> {
         return c
     }
     renderError = () => {
-        if(this.state.hasContextError)
+        if(!this.props.isResolvingContext && this.hasContextError(this.props) )
         {
             return <div className="module-content-error">{translate("common.context.error")}</div>
         }

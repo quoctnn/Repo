@@ -1,17 +1,20 @@
+$headerHeight:40px;
 .module
 {
     position: relative;
     flex: 1;
-    border-radius: 10px;
+    border-radius: 25px;
     background-color: #E1E2DD;
     .module-header 
     {
         background: white;
-        height: 40px;
+        height: $headerHeight;
         display: flex;
         align-items: center;
-        padding: 8px 12px;
+        padding: 0.5em 0.7em;
         flex-shrink: 0;
+        color:#000000;
+        font-size: 25px;
         .circular-spinner{
             margin: 0 5px;
         }
@@ -72,7 +75,7 @@
     .module-menu 
     {
         position: absolute;
-        top: 40px;
+        top: $headerHeight;
         bottom: 0;
         left: 0;
         right: 0;

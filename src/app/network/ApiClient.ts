@@ -33,13 +33,13 @@ export default class ApiClient
                 {
                     val.forEach(v => {
                         if(!nullOrUndefined( v ))
-                            arr.push(key + '=' + v)
+                            arr.push(key + '=' + encodeURIComponent( v ))
                     })
                 }
             }
             else if(!nullOrUndefined( val ))
             {
-                arr.push(key + '=' + val)
+                arr.push(key + '=' + encodeURIComponent(val))
             }
         })
         return arr.join('&');

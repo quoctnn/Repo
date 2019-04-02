@@ -173,7 +173,7 @@ export class StatusComponent extends React.Component<Props, State> {
         const ownerAction = () => onActionPress(StatusActions.user, {profile:status.owner})
         let communityId = status.community && status.community.id ? status.community.id : null
         const footerStyles:React.CSSProperties = {justifyContent: isComment ? "space-between" : "space-around"} 
-        console.log("Render Status ", status.id)
+        //console.log("Render Status ", status.id)
         return(<div className={cn}>
                 <div className="d-flex">
                     <div className="flex-shrink-0 header-left">

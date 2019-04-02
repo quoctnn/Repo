@@ -1,7 +1,7 @@
 import {EventEmitter, EventSubscription} from "fbemitter"
 export abstract class NotificationCenter {
     static emitter = new EventEmitter()
-    static debug = true
+    static debug = false
     static push(event:string, payload:any[])
     {
         if(this.debug)

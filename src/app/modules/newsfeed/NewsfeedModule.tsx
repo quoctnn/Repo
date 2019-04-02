@@ -20,14 +20,23 @@ import { translate } from '../../localization/AutoIntlProvider';
 import ApiClient from '../../network/ApiClient';
 import { ToastManager } from '../../managers/ToastManager';
 import { convertElasticResultItem, ContextValue } from '../../components/general/input/ContextFilter';
+import { ReduxState } from '../../redux';
+import { ResolvedContext } from '../../redux/resolvedContext';
 
-interface OwnProps 
-{
+type OwnProps = {
     className?:string
     breakpoint:ResponsiveBreakpoint
+    contextNaturalKey?:ContextNaturalKey
+    contextObjectId:number
+}
+type DefaultProps = {
+
+    includeSubContext:boolean
 }
 interface ReduxStateProps 
 {
+    contextObjectId:number
+    isResolvingContext:boolean
 }
 interface ReduxDispatchProps 
 {
@@ -40,13 +49,38 @@ interface State
     includeSubContext:boolean
     filter:ObjectAttributeType
 
-    contextNaturalKey:string,
+    contextNaturalKey:ContextNaturalKey,
     contextObjectId:number
     contextTitle:string
     contextResolveError:string
 }
-type Props = ReduxStateProps & ReduxDispatchProps & OwnProps & RouteComponentProps<any>
+type Props = ReduxStateProps & ReduxDispatchProps & OwnProps & DefaultProps & RouteComponentProps<any>
+
+export type ResolvedContextObject = {
+    contextNaturalKey:ContextNaturalKey
+    contextObjectId:number
+    resolved:number
+}
+export const resolveContextObject = (resolvedContext:ResolvedContext, contextNaturalKey:ContextNaturalKey):ResolvedContextObject => {
+    if(!contextNaturalKey)
+        return null
+    if(contextNaturalKey == ContextNaturalKey.COMMUNITY)
+        return {contextNaturalKey, contextObjectId:resolvedContext.communityId, resolved:resolvedContext.communityResolved}
+    if(contextNaturalKey == ContextNaturalKey.PROJECT)
+        return {contextNaturalKey, contextObjectId:resolvedContext.projectId, resolved:resolvedContext.projectResolved}
+    if(contextNaturalKey == ContextNaturalKey.TASK)
+        return {contextNaturalKey, contextObjectId:resolvedContext.taskId, resolved:resolvedContext.taskResolved}
+    if(contextNaturalKey == ContextNaturalKey.GROUP)
+        return {contextNaturalKey, contextObjectId:resolvedContext.groupId, resolved:resolvedContext.groupResolved}
+    if(contextNaturalKey == ContextNaturalKey.USER)
+        return {contextNaturalKey, contextObjectId:resolvedContext.profileId, resolved:resolvedContext.profileResolved}
+    console.warn("resolveContextObject does not handle '"+contextNaturalKey+"'")
+    return null
+}
 class NewsfeedModule extends React.Component<Props, State> {     
+    static defaultProps:DefaultProps = {
+        includeSubContext:true
+    }
     tempMenuData:NewsfeedMenuData = null
     availableFilters = [ObjectAttributeType.important, ObjectAttributeType.pinned, ObjectAttributeType.reminder, ObjectAttributeType.attention]
     constructor(props:Props) {
@@ -54,14 +88,15 @@ class NewsfeedModule extends React.Component<Props, State> {
         this.state = {
             menuVisible:false,
             selectedSearchContext: new ContextSearchData({tokens:[], query:"", tags:[], filters:{}, stateTokens:[], originalText:""}),
-            includeSubContext:true,
+            includeSubContext:props.includeSubContext,
             filter:null,
             isLoading:false,
             contextNaturalKey:undefined,
             contextObjectId:undefined,
             contextTitle:undefined,
-            contextResolveError:undefined
+            contextResolveError:undefined,
         }
+        console.log("NewsfeedModule props", this.props)
     }
     componentDidUpdate = (prevProps:Props) => {
         //turn off loading spinner if feed is removed
@@ -69,6 +104,23 @@ class NewsfeedModule extends React.Component<Props, State> {
         {
             this.setState({isLoading:false})
         }
+    }
+    shouldComponentUpdate = (nextProps:Props, nextState:State) => {
+        return nextProps.breakpoint != this.props.breakpoint || 
+                nextProps.contextNaturalKey != this.props.contextNaturalKey || 
+                nextProps.contextObjectId != this.props.contextObjectId || 
+                nextProps.isResolvingContext != this.props.isResolvingContext || 
+                nextProps.includeSubContext != this.props.includeSubContext || 
+                //state
+                nextState.contextNaturalKey != this.state.contextNaturalKey ||
+                nextState.contextObjectId != this.state.contextObjectId ||
+                nextState.contextTitle != this.state.contextTitle ||
+                nextState.contextResolveError != this.state.contextResolveError ||
+                nextState.isLoading != this.state.isLoading ||
+                nextState.filter != this.state.filter ||
+                nextState.includeSubContext != this.state.includeSubContext ||
+                nextState.selectedSearchContext != this.state.selectedSearchContext ||
+                nextState.menuVisible != this.state.menuVisible
     }
     headerClick = (e) => {
         const context = this.state.selectedSearchContext
@@ -121,7 +173,7 @@ class NewsfeedModule extends React.Component<Props, State> {
         this.setState({isLoading})
     }
     renderLoading = () => {
-        if (this.state.isLoading) {
+        if (this.state.isLoading || this.props.isResolvingContext) {
             return (<CircularLoadingSpinner borderWidth={3} size={20} key="loading"/>)
         }
     }
@@ -136,10 +188,12 @@ class NewsfeedModule extends React.Component<Props, State> {
     }
     render()
     {
-        const {breakpoint, history, match, location, staticContext, className,  ...rest} = this.props
+        const {breakpoint, history, match, location, staticContext, className, contextNaturalKey, contextObjectId, includeSubContext, isResolvingContext, ...rest} = this.props
         const cn = classnames("newsfeed-module", className, {"menu-visible":this.state.menuVisible})
         const headerClick = breakpoint < ResponsiveBreakpoint.standard ? this.headerClick : undefined
-        const {contextNaturalKey,contextObjectId, contextTitle}  = this.state
+        const {contextTitle}  = this.state
+        const resolvedContextNaturalKey = this.state.contextNaturalKey || this.props.contextNaturalKey
+        const resolvedContextObjectId =  this.state.contextObjectId || this.props.contextObjectId
         const title = contextTitle ? contextTitle + " - " + translate("Feed") : translate("Newsfeed")
         const headerClass = classnames({link:headerClick})
         const filter = this.state.filter
@@ -166,8 +220,9 @@ class NewsfeedModule extends React.Component<Props, State> {
                                 <NewsfeedComponent 
                                     onLoadingStateChanged={this.feedLoadingStateChanged} 
                                     includeSubContext={this.state.includeSubContext} 
-                                    contextNaturalKey={contextNaturalKey} 
-                                    contextObjectId={contextObjectId} 
+                                    contextNaturalKey={resolvedContextNaturalKey} 
+                                    contextObjectId={resolvedContextObjectId}
+                                    isResolvingContext={this.props.isResolvingContext} 
                                     filter={this.state.filter}
                                     />
                             </ModuleContent>
@@ -186,11 +241,17 @@ class NewsfeedModule extends React.Component<Props, State> {
                 </Module>)
     }
 }
-const mapStateToProps = (state:any, ownProps: OwnProps):ReduxStateProps => {
+const mapStateToProps = (state:ReduxState, ownProps: OwnProps):ReduxStateProps => {
+
+    const resolveContext = state.resolvedContext
+    const resolvedContext = resolveContextObject(resolveContext, ownProps.contextNaturalKey)
+    const isResolvingContext = resolvedContext && (!resolvedContext.contextObjectId && !resolvedContext.resolved)
     return {
+        contextObjectId:resolvedContext && resolvedContext.contextObjectId,
+        isResolvingContext
     }
 }
-const mapDispatchToProps = (dispatch:any, ownProps: OwnProps):ReduxDispatchProps => {
+const mapDispatchToProps = (dispatch:ReduxState, ownProps: OwnProps):ReduxDispatchProps => {
     return {
     }
 }

@@ -6,19 +6,12 @@ import * as React from 'react';
 import { UserProfile, StatusActions, Community } from '../types/intrasocial_types';
 import Text from '../components/general/Text';
 import Constants from '../utilities/Constants';
+import { translate } from '../localization/AutoIntlProvider';
 export const getDomainName = (url:string) =>  {
     var url_parts = url.split("/")
     var domain_name_parts = url_parts[2].split(":")
     var domain_name = domain_name_parts[0]
     return domain_name
-}
-export function userFullName(user:UserProfile) {
-    if(!user)
-        return "Anonymous"
-    if (user.first_name) {
-        return `${user.first_name} ${user.last_name}`;
-    }
-    return user.username;
 }
 export const parseJSONObject = (param:string) => {
     try {
@@ -33,8 +26,25 @@ export const parseJSONObject = (param:string) => {
 export function userAvatar(user:UserProfile) {
     return (user && (user.avatar_thumbnail || user.avatar)) || Constants.resolveUrl( Constants.defaultImg.user )()
 }
+export function userFullName(user:UserProfile) {
+    if(!user)
+        return "Anonymous"
+    if (user.first_name) {
+        return `${user.first_name} ${user.last_name}`;
+    }
+    return user.username;
+}
+export function userCover(user:UserProfile) {
+    return (user && (user.cover_cropped || user.cover)) || Constants.resolveUrl(Constants.defaultImg.user)()
+}
+export function communityCover(community:Community) {
+    return (community && (community.cover_cropped || community.cover)) || Constants.resolveUrl(Constants.defaultImg.community)()
+}
 export function communityAvatar(community:Community) {
-    return (community && (community.avatar_thumbnail || community.avatar)) || Constants.resolveUrl(Constants.defaultImg.group)()
+    return (community && (community.avatar_thumbnail || community.avatar)) || Constants.resolveUrl(Constants.defaultImg.communityAvatar)()
+}
+export function communityName(community:Community) {
+    return (community && community.name) || translate("community.active.empty")
 }
 
 export const EMAIL_REGEX = /(\b\s+)(([a-zA-Z0-9\-\_\.])+@[a-zA-Z\_]+?(\.[a-zA-Z]{2,6})+)/gm

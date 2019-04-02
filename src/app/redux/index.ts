@@ -15,6 +15,7 @@ import { eventStore } from './eventStore';
 import {taskStore} from './taskStore';
 import { projectStore } from "./projectStore";
 import application from "./application";
+import resolvedContext, { ResolvedContext } from "./resolvedContext";
 const rootPersistConfig:PersistConfig = {
     key: 'root',
     storage: storageLocal,
@@ -23,7 +24,7 @@ const rootPersistConfig:PersistConfig = {
   }
 const rootReducer = combineReducers({
     authentication, language, theme, endpoint, embedlyStore, communityStore, profileStore,
-    groupStore, activeCommunity, eventStore, taskStore, projectStore, application
+    groupStore, activeCommunity, eventStore, taskStore, projectStore, application, resolvedContext,
 })
 export default persistReducer(rootPersistConfig, rootReducer)
 export interface ReduxState
@@ -41,5 +42,6 @@ export interface ReduxState
     taskStore:{ byId: { [id: number]: Task},allIds: number[]}
     activeCommunity:{activeCommunity:number}
     application:{loaded:boolean}
+    resolvedContext:ResolvedContext
     _persist:any
 }

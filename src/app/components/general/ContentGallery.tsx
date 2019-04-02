@@ -195,14 +195,14 @@ export default class ContentGallery extends React.Component<Props, State> {
             totalWidth += w
             points.push({width:w, height:targetHeight})
         })
-        console.log("calc", points, totalWidth, "target:", targetWidth, targetHeight)
+        //console.log("calc", points, totalWidth, "target:", targetWidth, targetHeight)
         //rescale
         const scale = totalWidth / targetWidth  
         const newPoints:Point[] = points.map(p => {
             return {width:p.width / scale, height:p.height / scale}
         })
         const maxWidth = Math.min( targetWidth * scale , targetWidth) 
-        console.log("rescale", newPoints, scale, maxWidth)
+        //console.log("rescale", newPoints, scale, maxWidth)
         return {points:newPoints, maxWidth:maxWidth, width:targetWidth, height:targetHeight / scale }
     }
     renderModal = () => 

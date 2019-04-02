@@ -11,16 +11,22 @@ export abstract class TaskManager
     static storeTasks = (tasks:Task[]) => {
         TaskManager.getStore().dispatch(addTasksAction(tasks))
     }
-    static getTask = (taskId:number):Task|null => 
+    static getTask = (taskId:number|string):Task|null => 
     {
         return TaskManager.getStore().getState().taskStore.byId[taskId]
     }
-    static ensureTaskExists = (taskId:number, completion:(task:Task) => void) => 
+    static ensureTaskExists = (taskId:number|string, completion:(task:Task) => void) => 
     {
+        if(!taskId.isNumber())
+        {
+            completion(null)
+            return
+        }
         let task = TaskManager.getTask(taskId)
         if(!task)
         {
-            ApiClient.getTask(taskId, (data, status, error) => {
+            const id = parseInt(taskId.toString())
+            ApiClient.getTask(id, (data, status, error) => {
                 if(data)
                 {
                     TaskManager.storeTasks([data])

@@ -163,7 +163,11 @@ export class ChatMessageComposer extends React.Component<Props,State> implements
     }
     shouldComponentUpdate(nextProps:Props, nextState:State)
     {
-        return nextProps.canSubmit != this.props.canSubmit || nextState.editorState != this.state.editorState || nextProps.content != this.props.content || (nextProps.mentions || []).length != (this.props.mentions || []).length
+        return nextProps.canSubmit != this.props.canSubmit || 
+                nextState.editorState != this.state.editorState || 
+                nextProps.content != this.props.content || 
+                nextProps.className != this.props.className ||
+                (nextProps.mentions || []).length != (this.props.mentions || []).length
     }
     clearEditorContent = () => {
 

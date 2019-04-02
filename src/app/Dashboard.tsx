@@ -1,5 +1,4 @@
 import * as React from "react";
-import PageHeader from "./components/PageHeader";
 import "./Dashboard.scss"
 import { ResponsiveBreakpoint } from "./components/general/observers/ResponsiveComponent";
 import { Grid } from './components/Grid';
@@ -7,9 +6,7 @@ import NewsfeedModule from './modules/newsfeed/NewsfeedModule';
 import Module from "./modules/Module";
 import ModuleContent from "./modules/ModuleContent";
 import ModuleHeader from "./modules/ModuleHeader";
-import { Dashboard, GridLayout, Community } from './types/intrasocial_types';
-import { connect } from "react-redux";
-import { ReduxState } from "./redux";
+import { Dashboard, GridLayout } from './types/intrasocial_types';
 import TasksModule from "./modules/tasks/TasksModule";
 
 type DemoProps = {
@@ -36,7 +33,13 @@ export namespace DashboardComponents {
         "ProjectModule": TasksModule
     }
     export function getComponent(type: string, props:any) {
-        return React.createElement(componentMap[type], props)
+        const comp = componentMap[type]
+        if(comp)
+            return React.createElement(comp, props)
+        else {
+            console.error("Module '"+ type +"' is not a valid module type")
+            return null
+        }
     }
 }
 type OwnProps =
@@ -47,16 +50,8 @@ type OwnProps =
 type State = {
     defaultGrid:GridLayout
 }
-interface ReduxStateProps
-{
-    activeCommunity:number
-    community:Community
-}
-interface ReduxDispatchProps
-{
-}
-type Props = ReduxStateProps & ReduxDispatchProps & OwnProps
-class DashboardComponent extends React.Component<Props, State> {
+type Props = OwnProps
+export default class DashboardComponent extends React.Component<Props, State> {
     constructor(props:Props)
     {
         super(props)
@@ -90,7 +85,6 @@ class DashboardComponent extends React.Component<Props, State> {
     }
     renderContent = () => {
         return (<>
-                    <PageHeader community={this.props.community} />
                     <div className="dashboard-components m-2 m-sm-3 m-md-3">
                         {this.renderModules()}
                     </div>
@@ -106,17 +100,3 @@ class DashboardComponent extends React.Component<Props, State> {
         );
     }
 }
-const mapStateToProps = (state:ReduxState, ownProps: OwnProps):ReduxStateProps => {
-    const activeCommunity = state.activeCommunity.activeCommunity
-    const community = state.communityStore.byId[activeCommunity]
-  return {
-    activeCommunity,
-    community
-  }
-}
-const mapDispatchToProps = (dispatch:any, ownProps: OwnProps):ReduxDispatchProps => {
-    return {
-    }
-}
-export default connect<ReduxStateProps, ReduxDispatchProps, OwnProps>(mapStateToProps, mapDispatchToProps)(DashboardComponent)
-

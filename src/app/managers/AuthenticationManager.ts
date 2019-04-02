@@ -33,13 +33,13 @@ export abstract class AuthenticationManager
         //AjaxRequest.setup(token)
         AuthenticationManager.getStore().dispatch(setAuthenticationTokenAction(token))
         AjaxRequest.setup(token)
-        ApplicationManager.loadApplication()
+        ApplicationManager.loadApplication(true)
     }
     static signInCurrent = () => {
 
         const token = AuthenticationManager.getAuthenticationToken()
         AjaxRequest.setup(token)
-        ApplicationManager.loadApplication()
+        ApplicationManager.loadApplication(false)
     }
     static setAuthenticatedUser(profile:UserProfile|null)
     {
@@ -67,17 +67,12 @@ export abstract class AuthenticationManager
         AuthenticationManager.clearKeepAliveTimer()
         document.removeEventListener('mousedown', AuthenticationManager.resetUserActivityCounter);
         window.removeEventListener('focus', AuthenticationManager.resetUserActivityCounter);
-        const store = AuthenticationManager.getStore()
-        // Clean up cached data
-        store.dispatch(resetCommunitiesAction());
-        store.dispatch(resetGroupsAction());
-        store.dispatch(resetProfilesAction());
 
         // Clean up userProfile and token
         AuthenticationManager.getStore().dispatch(setAuthenticationTokenAction(null))
         AuthenticationManager.getStore().dispatch(setAuthenticationProfileAction(null))
         AjaxRequest.setup(null)
-        ApplicationManager.loadApplication()
+        ApplicationManager.loadApplication(true)
 
     }
     static resetUserActivityCounter()

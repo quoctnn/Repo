@@ -8,6 +8,9 @@ import { ToastManager } from './ToastManager';
 import { CommunityManager } from './CommunityManager';
 import { NotificationCenter } from '../utilities/NotificationCenter';
 import { ProfileManager } from './ProfileManager';
+import { resetCommunitiesAction } from '../redux/communityStore';
+import { resetGroupsAction } from '../redux/groupStore';
+import { resetProfilesAction } from '../redux/profileStore';
 export type ApplicationData = {
     dashboards:Dashboard[]
     communitiesLoaded:boolean
@@ -28,18 +31,29 @@ export abstract class ApplicationManager
     private static applicationData:ApplicationData = null
     static setup = () =>
     {
-        ApplicationManager.resetData()
+        ApplicationManager.resetData(false)
     }
-    private static resetData = () => {
+    private static resetData = (resetCachedData:boolean) => {
         
         ApplicationManager.applicationData = {dashboards:[], communitiesLoaded:false, profileLoaded:false, contactsLoaded:false}
+        if(resetCachedData)
+        {
+            const store = ApplicationManager.getStore()
+            // Clean up cached data
+            store.dispatch(resetCommunitiesAction());
+            store.dispatch(resetGroupsAction());
+            store.dispatch(resetProfilesAction());
+        }
     }
-    static getDashboards = () => {
-        return ApplicationManager.applicationData.dashboards
+    static getDashboards = (category:string) => {
+        const all = ApplicationManager.applicationData.dashboards
+        const dashboards = all.filter(d => d.category == category)
+        dashboards.forEach(db => db.grid_layouts.sort((a, b) => b.min_width - a.min_width))
+        return dashboards
     }
-    static loadApplication = () => {
+    static loadApplication = (resetCachedData:boolean) => {
         console.log("loadApplication")
-        ApplicationManager.resetData()
+        ApplicationManager.resetData(resetCachedData)
         ApplicationManager.getStore().dispatch(setApplicationLoadedAction(false))
 
         const requests:RequestObject[] = []

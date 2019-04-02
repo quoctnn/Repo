@@ -11,6 +11,7 @@ import { TaskManager } from './TaskManager';
 import { ContextManager } from './ContextManager';
 import { PermissionManager } from './PermissionManager';
 import { ApplicationManager } from './ApplicationManager';
+import { WindowManager } from './WindowManager';
 const initializeManagers = () => 
 {
     ApplicationManager.setup()
@@ -26,5 +27,6 @@ const initializeManagers = () =>
     TaskManager.setup()
     ContextManager.setup()
     PermissionManager.setup()
+    WindowManager.setup()
 }
 export default initializeManagers

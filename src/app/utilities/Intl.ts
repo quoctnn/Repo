@@ -1,9 +1,10 @@
 
 import * as ReactIntl from "react-intl";
 import ReconnectingWebSocket from "reconnecting-websocket";
+import { AppWindowObject } from "../managers/WindowManager";
 declare global {
     interface DocumentTouch {}
-    interface Window { app: any; ReactIntlLocaleData:Array<any>, Intl:any, CSS:CSS, store:any, socket:ReconnectingWebSocket, DocumentTouch:DocumentTouch}
+    interface Window { app: AppWindowObject; ReactIntlLocaleData:Array<any>, Intl:any, CSS:CSS, store:any, socket:ReconnectingWebSocket, DocumentTouch:DocumentTouch}
     interface Navigator { browserLanguage: string; }
     interface String {
         hashCode(): number;

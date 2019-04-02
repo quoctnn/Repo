@@ -22,7 +22,7 @@ export class NavigationUtilities {
     {
         ProfileManager.ensureProfilesExists([profile],() => {
            const p = ProfileManager.getProfileById(profile)
-           history.push(Routes.profileUrl(p.slug_name))
+           history.push(Routes.profileUrl(p.slug_name || p.id))
         })
     }
     static navigateToUrl = (history: H.History, url:string) => 

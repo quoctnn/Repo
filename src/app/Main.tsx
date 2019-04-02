@@ -7,18 +7,26 @@ import { connect } from 'react-redux'
 import "./Main.scss"
 import { ReduxState } from "./redux";
 import Signin from "./views/signin/Signin";
-import { error404 } from "./views/error/error404";
+import { Error404 } from "./views/error/Error404";
 import NewsfeedPage from "./components/pages/NewsfeedPage";
 import { Dashboard, Community } from './types/intrasocial_types';
 import ApplicationLoader from "./views/loading/ApplicationLoader";
 import Signout from "./views/signout/Signout";
 import CommunityPage from "./components/pages/CommunityPage";
-import { ApplicationManager } from "./managers/ApplicationManager";
-import { ResponsiveBreakpoint } from "./components/general/observers/ResponsiveComponent";
-import WindowResponsiveComponent from "./components/general/observers/WindowResponsiveComponent";
-import DashboardComponent from "./Dashboard";
 import { nullOrUndefined } from "../utilities/Utilities";
 import { CommunityManager } from "./managers/CommunityManager";
+import DashboardPage from "./components/pages/DashboardPage";
+import { ResolvedContext, setResolvedContextAction, resetResolvedContext } from "./redux/resolvedContext";
+import { ProjectManager } from "./managers/ProjectManager";
+import ProjectPage from "./components/pages/ProjectPage";
+import { ToastManager } from "./managers/ToastManager";
+import { translate } from "./localization/AutoIntlProvider";
+import { TaskManager } from "./managers/TaskManager";
+import TaskPage from "./components/pages/TaskPage";
+import GroupPage from "./components/pages/GroupPage";
+import { GroupManager } from "./managers/GroupManager";
+import ProfilePage from "./components/pages/ProfilePage";
+import { ProfileManager } from "./managers/ProfileManager";
 
 type OwnProps = {
 }
@@ -27,33 +35,16 @@ type ReduxStateProps = {
     loaded:boolean
 }
 type ReduxDispatchProps = {
+    setResolvedContext:(context:ResolvedContext) => void
+    resetResolvedContext:() => void
 }
 type State = {
     dashboards:Dashboard[]
 }
 type Props = ReduxStateProps & ReduxDispatchProps & OwnProps & RouteComponentProps<any>
 
-export const DashCompWithData = (props:any) => {
-    const dashboards = ApplicationManager.getDashboards()
-    const dashboard = dashboards[0]
-    dashboard.grid_layouts = dashboard.grid_layouts.sort((a, b) => b.min_width - a.min_width) //descending
-    let breakpoints = dashboard.grid_layouts.map(l => l.min_width).filter(b => b > ResponsiveBreakpoint.standard)
-    breakpoints.push(ResponsiveBreakpoint.standard)
-    breakpoints.push(ResponsiveBreakpoint.mini)
-    breakpoints = breakpoints.sort((a, b) => b - a) //descending
-    return (
-
-        <WindowResponsiveComponent breakpoints={breakpoints} setClassOnBody={true} render={({ breakpoint }) => (
-            <DashboardComponent
-                dashboard={dashboard}
-                breakpoint={breakpoint}
-            />
-        )}/>
-    );
-}
 class Main extends React.Component<Props, State> {
     previousLocation:any
-    currentCommunityLoading:string = null
     constructor(props:Props)
     {
         super(props)
@@ -71,29 +62,129 @@ class Main extends React.Component<Props, State> {
         this.checkCurrentCommunity()
     }
     checkCurrentCommunity = () => {
+    
         if(this.props.loaded)
         {
+            this.props.resetResolvedContext()
             const { location } = this.props
             const segments = location.pathname.split("/").filter(f => !nullOrUndefined(f) && f != "")
-            if(segments.length > 1 && segments[0] == "community")
+            if(segments.length > 1)
             {
-                const communityId = segments[1]
-                const community = CommunityManager.getCommunity(communityId)
-                if(!community && this.currentCommunityLoading == communityId)
+                const resolvedContext:ResolvedContext = {}
+                if(segments[0] == "community")
                 {
-                    this.currentCommunityLoading = communityId
-                    CommunityManager.ensureCommunityExists(communityId, (community) => {
-                        this.currentCommunityLoading = null
-                        this.setCommunityTheme(community)
-                    })
+                    //community
+                    let communityId = segments[1]
+                    const community = CommunityManager.getCommunity(communityId)
+                    if(community)
+                    {
+                        if(community)
+                        {
+                            this.setCommunityTheme(community)
+                        }
+                        resolvedContext.communityId = community.id
+                    }
+                    else 
+                        resolvedContext.communitySlug = communityId
+                    //project
+                    if(segments.length > 3 && segments[2] == "project")
+                    {
+                        let projectId = segments[3]
+                        const project = ProjectManager.getProject(projectId)
+                        if(project)
+                        {
+                            resolvedContext.projectId = project.id
+                        }
+                        else 
+                            resolvedContext.projectSlug = projectId
+                    }
+                    //group
+                    else if(segments.length > 3 && segments[2] == "group")
+                    {
+                        let groupId = segments[3]
+                        const group = GroupManager.getGroup(groupId)
+                        if(group)
+                        {
+                            resolvedContext.groupId = group.id
+                        }
+                        else 
+                            resolvedContext.groupSlug = groupId
+                    }
+                    //task
+                    if(segments.length > 5 && segments[4] == "task")
+                    {
+                        let taskId = segments[5]
+                        const task = TaskManager.getTask(taskId)
+                        if(task)
+                        {
+                            resolvedContext.taskId = task.id
+                        }
+                        else 
+                            resolvedContext.taskSlug = taskId
+                    }
                 }
-                else {
-                    this.setCommunityTheme(community)
+                else if(segments[0] == "profile")
+                {
+                    //profile
+                    let profileId = segments[1]
+                    const profile = ProfileManager.getProfile(profileId)
+                    if(profile)
+                    {
+                        resolvedContext.profileId = profile.id
+                    }
+                    else 
+                        resolvedContext.profileSlug = profileId
                 }
+                //store
+                this.props.setResolvedContext(resolvedContext)
+                this.resolveObjects(resolvedContext)
             }
             else {
                 this.setCommunityTheme(CommunityManager.getActiveCommunity())
             }
+        }
+    }
+    resolveObjects = (resolvedContext:ResolvedContext) => {
+        if(resolvedContext.communitySlug)
+        {
+            CommunityManager.ensureCommunityExists(resolvedContext.communitySlug, (community) => {
+                if(!community)
+                    ToastManager.showErrorToast(translate("context.resolve.community.error"))
+                this.props.setResolvedContext({communityId:community && community.id, communityResolved:new Date().getTime()})
+                this.setCommunityTheme(community)
+            })
+        }
+        if(resolvedContext.projectSlug)
+        {
+            ProjectManager.ensureProjectExists(resolvedContext.projectSlug, (project) => {
+                if(!project)
+                    ToastManager.showErrorToast(translate("context.resolve.project.error"))
+                this.props.setResolvedContext({projectId:project && project.id, projectResolved:new Date().getTime()})
+            })
+        }
+        if(resolvedContext.taskSlug)
+        {
+            TaskManager.ensureTaskExists(resolvedContext.taskSlug, (task) => {
+                if(!task)
+                    ToastManager.showErrorToast(translate("context.resolve.task.error"))
+                this.props.setResolvedContext({taskId:task && task.id, taskResolved:new Date().getTime()})
+            })
+        }
+        if(resolvedContext.groupSlug)
+        {
+            GroupManager.ensureGroupExists(resolvedContext.groupSlug, (group) => {
+                if(!group)
+                    ToastManager.showErrorToast(translate("context.resolve.group.error"))
+                this.props.setResolvedContext({groupId:group && group.id, groupResolved:new Date().getTime()})
+            })
+        }
+        if(resolvedContext.profileSlug)
+        {
+            GroupManager.ensureGroupExists(resolvedContext.profileSlug, (profile) => {
+                if(!profile)
+                    ToastManager.showErrorToast(translate("context.resolve.profile.error"))
+                this.props.setResolvedContext({profileId:profile && profile.id, profileResolved:new Date().getTime()})
+            })
         }
     }
     setCommunityTheme = (community:Community) => {
@@ -113,12 +204,16 @@ class Main extends React.Component<Props, State> {
                             }
                             {this.props.loaded &&
                                 <Switch>
+                                    <Route path={Routes.taskUrl(":communityname", ":projectname", ":taskid")} component={TaskPage} />
+                                    <Route path={Routes.projectUrl(":communityname", ":projectname")} component={ProjectPage} exact={true} />
+                                    <Route path={Routes.groupUrl(":communityname", ":groupname")} component={GroupPage} exact={true} />
+                                    <Route path={Routes.profileUrl(":profilename")} component={ProfilePage} />
                                     <Route path={Routes.communityUrl(":communityname")} component={CommunityPage} exact={true} />
                                     <Route path={Routes.newsfeedUrl(":contextNaturalKey?", ":contextObjectId?")} component={NewsfeedPage} />
                                     <Route path={Routes.SIGNIN} component={Signin} />
                                     <Route path={Routes.SIGNOUT} component={Signout} />
-                                    <Route path={Routes.ROOT} exact={true} component={DashCompWithData} />
-                                    <Route path={Routes.ANY} component={error404} />
+                                    <Route path={Routes.ROOT} exact={true} component={DashboardPage} />
+                                    <Route path={Routes.ANY} component={Error404} />
                                 </Switch>
                             }
                         </div>
@@ -133,4 +228,14 @@ const mapStateToProps = (state:ReduxState, ownProps: OwnProps):ReduxStateProps =
       loaded:state.application.loaded
     }
 }
-export default withRouter(connect<ReduxStateProps, ReduxDispatchProps, OwnProps>(mapStateToProps, null)(Main))
+const mapDispatchToProps = (dispatch:any, ownProps: OwnProps):ReduxDispatchProps => {
+    return {
+        setResolvedContext:(context:ResolvedContext) => {
+          dispatch(setResolvedContextAction(context))
+        },
+        resetResolvedContext:() => {
+            dispatch(resetResolvedContext())
+        }
+  }
+}
+export default withRouter(connect<ReduxStateProps, ReduxDispatchProps, OwnProps>(mapStateToProps, mapDispatchToProps)(Main))

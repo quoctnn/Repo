@@ -645,6 +645,7 @@ export type Dashboard = {
     title:string 
     slug:string
     user:number
+    category:string
 }
 //DASHBOARD END
 

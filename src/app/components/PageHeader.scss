@@ -5,51 +5,56 @@ $padding:1vw;
 $minPadding:10px;
 $headerHeight:14.5vw;
 $headerMinHeight:240px;
+$circleOutsideLeftPart:8;
+$coverMarginLeftPart:1.62;
 #page-header
 {
-    padding:$padding;
     height: $headerHeight;
     min-height: $headerMinHeight;
-    z-index: -1;
     #page-header-cover-image {
-        margin-left: $circleWidth/1.23;
+        margin-left: $circleWidth/$coverMarginLeftPart;
     }
     .circle{
         background: linear-gradient(50deg, #{map-get($root, secondary-theme-color)} 30%, #{map-get($root, primary-theme-color)} 70%);
         background: linear-gradient(50deg, var(--secondary-theme-color) 30%, var(--primary-theme-color) 70%);
-        margin-left: -$circleWidth/9;
+        margin-left: -$circleWidth/$circleOutsideLeftPart;
         margin-top: -$circleWidth/4.5;
         width: $circleWidth;
         height: $circleWidth;
         border-radius: 50%;
         position: absolute;
         top: 0;
+        z-index: -1;
     }
     position: relative;
     &.no-image {
         @include var(background-color,primary-theme-color);
     }
     #page-top-navigation{
+        padding:$padding;
         .left{
-            width: $circleWidth - $circleWidth/9;
+            width: $circleWidth - $circleWidth/$circleOutsideLeftPart;
             padding-right: $padding;
         }
     }
     @media only screen and (max-width : 1200px) {
 
-        padding:$minPadding;
         .circle{
             width: $circleMinWidth;
             height: $circleMinWidth;
-            margin-left: -$circleMinWidth/9;
+            margin-left: -$circleMinWidth/$circleOutsideLeftPart;
             margin-top: -$circleMinWidth/4.5;
         }
-        .left{
-            width: $circleMinWidth - $circleMinWidth/9 !important;
-            padding-right: $minPadding;
+        #page-top-navigation{
+            padding:$minPadding;
+            .left{
+                width: $circleMinWidth - $circleMinWidth/$circleOutsideLeftPart !important;
+                padding-right: $minPadding;
+            }
         }
+        
         #page-header-cover-image {
-            margin-left: $circleMinWidth/1.23;
+            margin-left: $circleMinWidth/$coverMarginLeftPart;
         }
     }
 }

@@ -141,12 +141,28 @@ export class Grid extends React.PureComponent<Props, {}> {
         const rows = modules.reduce((a, b) => Math.max(a, b.height + b.row), 0) - 1
         const style:React.CSSProperties = this.props.fill ? {gridAutoRows:`minmax(100px, calc(${100 / rows}% - 15px))`} : undefined
         const ccn = classnames("module-grid-item", this.props.className)
+        const dict:{[key:string]:number} = {}
+        const fixKey = (key:string) => {
+            let dk = dict[key]
+            if(!dk)
+            {
+                dict[key] = 1
+                return key
+            }
+            else {
+                dk += 1
+                dict[key] = dk
+                return key + "_" + dk
+            }
+            
+        }
         return(
             <div className={cn} style={style}>
                 {modules.map(m => {
+                    const key = fixKey("module_" + m.module.id)
                     const props:any = parseJSONObject(m.module.properties) || {}
-                    props.key = "module_" + m.module.id
-                    props.ref = "module_" + m.module.id
+                    props.key = key
+                    props.ref = key
                     props.className = ccn
                     props.style = {gridColumn:m.column + "/ span " + m.width, gridRow: m.row + " / span " + m.height}
                     props.breakpoint = this.props.breakpoint

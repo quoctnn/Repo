@@ -182,7 +182,7 @@ content: "\f1c1";
 
 body.dash-fill
 {
-    &, #app-root, #main, #main-content, #content-block, .window-responsive-component, #dashboard, .dashboard-components, .module-grid{
+    &, #app-root, #main, #main-content, #content-block, .window-responsive-component,.dashboard-container, #dashboard-page, #dashboard, .dashboard-components, .module-grid{
         flex:1;
         flex-direction: column;
         display: flex;
