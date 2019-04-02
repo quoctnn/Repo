@@ -1,7 +1,7 @@
 import * as React from "react";
 import { connect } from 'react-redux'
 import "./ProfilePage.scss"
-import { UserProfile, Community } from "../../types/intrasocial_types";
+import { UserProfile } from "../../types/intrasocial_types";
 import LoadingSpinner from "../LoadingSpinner";
 import { ReduxState } from "../../redux";
 import PageHeader from "../PageHeader";

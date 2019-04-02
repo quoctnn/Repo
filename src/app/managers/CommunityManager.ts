@@ -114,13 +114,18 @@ export abstract class CommunityManager
     }
     static applyCommunityTheme = (community:Community) =>
     {
-        if(!community)
-            return
-        console.warn("Applying theme for community", community.name)
         let root = document.querySelector(':root') as HTMLElement
         if(root) {
-            root.style.setProperty("--primary-theme-color",community.primary_color)
-            root.style.setProperty("--secondary-theme-color",community.secondary_color)
+            if(community){
+                console.warn("Applying theme for community", community.name)
+                root.style.setProperty("--primary-theme-color",community.primary_color)
+                root.style.setProperty("--secondary-theme-color",community.secondary_color)
+            }
+            else {
+                console.warn("Removing community theme")
+                root.style.removeProperty("--primary-theme-color")
+                root.style.removeProperty("--secondary-theme-color")
+            }
         }
     }
     private static setActiveCommunity = (community:number) =>

@@ -125,6 +125,7 @@ class Main extends React.Component<Props, State> {
                 }
                 else if(segments[0] == "profile")
                 {
+                    this.setCommunityTheme(null)
                     //profile
                     let profileId = segments[1]
                     const profile = ProfileManager.getProfile(profileId)
@@ -188,8 +189,7 @@ class Main extends React.Component<Props, State> {
         }
     }
     setCommunityTheme = (community:Community) => {
-        if(community)
-            CommunityManager.applyCommunityTheme(community)
+        CommunityManager.applyCommunityTheme(community)
     }
     render() {
         return(
