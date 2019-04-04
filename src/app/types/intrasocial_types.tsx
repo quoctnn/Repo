@@ -138,6 +138,12 @@ export enum Permission{
     update = 70,
     superuser = 99,
 }
+export namespace Permission {
+    
+    export function usesElevatedPrivileges(permission: Permission) {
+        return permission == Permission.moderate || permission == Permission.admin || permission == Permission.superuser
+    }
+}
 export enum ElasticSearchType 
 {
     GROUP = "Group",

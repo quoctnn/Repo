@@ -27,10 +27,12 @@ import AutoIntlProvider from "./localization/AutoIntlProvider";
 import { BrowserRouter as Router} from "react-router-dom";
 import "./utilities/Extensions"
 import { AuthenticationManager } from "./managers/AuthenticationManager";
-
+import { activateCrosstabAuthenticationSync } from "./redux/crosstabAuthenticationSync";
 
 
 const store = createStore(appReducer, applyMiddleware(...middleWares));
+activateCrosstabAuthenticationSync()
+
 window.store = store;
 //initialize managers
 initializeManagers();

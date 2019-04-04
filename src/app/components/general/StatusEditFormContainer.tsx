@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Status, TempStatus, UploadedFile } from '../../types/intrasocial_types';
+import { Status, TempStatus, UploadedFile, ContextNaturalKey } from '../../types/intrasocial_types';
 import { IEditorComponent, EditorContent } from './input/ChatMessageComposer';
 import { Settings } from '../../utilities/Settings';
 import { URL_REGEX, URL_WWW_REGEX } from '../../utilities/IntraSocialUtilities';
@@ -13,7 +13,7 @@ interface Props
     communityId?:number
     status:Status
     onStatusSubmit?:(status:TempStatus, files:UploadedFile[]) => void
-    contextNaturalKey?:string
+    contextNaturalKey?:ContextNaturalKey
     contextObjectId?:number
     canMention:boolean
     canUpload:boolean

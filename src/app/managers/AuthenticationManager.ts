@@ -6,9 +6,6 @@ import { ReduxState } from '../redux/index';
 import { setAuthenticationProfileAction, setAuthenticationTokenAction } from '../redux/authentication';
 import { NotificationCenter } from '../utilities/NotificationCenter';
 import { ApplicationManager } from './ApplicationManager';
-import { resetCommunitiesAction } from '../redux/communityStore';
-import { resetGroupsAction } from '../redux/groupStore';
-import { resetProfilesAction } from '../redux/profileStore';
 
 export const AuthenticationManagerAuthenticatedUserChangedNotification = "AuthenticationManagerAuthenticatedUserChangedNotification"
 export abstract class AuthenticationManager
@@ -28,7 +25,11 @@ export abstract class AuthenticationManager
     {
         return AuthenticationManager.getStore().getState().authentication.token
     }
-    static signIn(token:string)
+    static get isSignedIn() 
+    {
+        return AuthenticationManager.getStore().getState().authentication.signedIn
+    }
+    static signIn = (token:string) => 
     {
         //AjaxRequest.setup(token)
         AuthenticationManager.getStore().dispatch(setAuthenticationTokenAction(token))

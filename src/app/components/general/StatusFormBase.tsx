@@ -29,6 +29,8 @@ export interface OwnProps
     showEmojiPicker?:boolean
     placeholder?:string
     children?:React.ReactNode
+    onBlur?(e: React.SyntheticEvent<{}>): void
+    onFocus?(e: React.SyntheticEvent<{}>): void
 }
 export interface DefaultProps
 {
@@ -147,6 +149,8 @@ export default class StatusFormBase extends React.Component<Props, State> implem
                 onDidType={this.props.onDidType} 
                 placeholder={placeholder}
                 showEmojiPicker={this.props.showEmojiPicker}
+                onBlur={this.props.onBlur}
+                onFocus={this.props.onFocus}
             />                      
         )
     }

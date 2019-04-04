@@ -13,7 +13,7 @@ export type ProfileManagerSearchInContextProps = {
     search:string
     taggableMembers?:number[] | (() => number[])
     contextObjectId?:number
-    contextNaturalKey?:string
+    contextNaturalKey?:ContextNaturalKey
     completion:(members:UserProfile[]) => void
 }
 type ProfileRequestObject = {

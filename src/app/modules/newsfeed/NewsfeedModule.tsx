@@ -10,10 +10,10 @@ import "./NewsfeedModule.scss"
 import ModuleMenu from '../ModuleMenu';
 import ModuleMenuTrigger from '../ModuleMenuTrigger';
 import { ResponsiveBreakpoint } from '../../components/general/observers/ResponsiveComponent';
-import NewsfeedComponent from './NewsfeedComponent';
+import NewsfeedComponentRouted, { NewsfeedComponent } from './NewsfeedComponent';
 import CircularLoadingSpinner from '../../components/general/CircularLoadingSpinner';
 import NewsfeedMenu, { NewsfeedMenuData, allowedSearchOptions } from './NewsfeedMenu';
-import { ObjectAttributeType, ContextNaturalKey } from '../../types/intrasocial_types';
+import { ObjectAttributeType, ContextNaturalKey, StatusActions } from '../../types/intrasocial_types';
 import { ButtonGroup, Button } from 'reactstrap';
 import { ContextSearchData } from '../../components/general/input/contextsearch/extensions';
 import { translate } from '../../localization/AutoIntlProvider';
@@ -22,6 +22,7 @@ import { ToastManager } from '../../managers/ToastManager';
 import { convertElasticResultItem, ContextValue } from '../../components/general/input/ContextFilter';
 import { ReduxState } from '../../redux';
 import { ResolvedContext } from '../../redux/resolvedContext';
+import { StatusComposerComponent } from '../../components/status/StatusComposerComponent';
 
 type OwnProps = {
     className?:string
@@ -53,6 +54,8 @@ interface State
     contextObjectId:number
     contextTitle:string
     contextResolveError:string
+
+    statusComposerFocus:boolean
 }
 type Props = ReduxStateProps & ReduxDispatchProps & OwnProps & DefaultProps & RouteComponentProps<any>
 
@@ -81,6 +84,8 @@ class NewsfeedModule extends React.Component<Props, State> {
     static defaultProps:DefaultProps = {
         includeSubContext:true
     }
+    statuscomposer = React.createRef<HTMLDivElement>();
+    newsfeedComponent:any = null;
     tempMenuData:NewsfeedMenuData = null
     availableFilters = [ObjectAttributeType.important, ObjectAttributeType.pinned, ObjectAttributeType.reminder, ObjectAttributeType.attention]
     constructor(props:Props) {
@@ -95,6 +100,7 @@ class NewsfeedModule extends React.Component<Props, State> {
             contextObjectId:undefined,
             contextTitle:undefined,
             contextResolveError:undefined,
+            statusComposerFocus:false
         }
         console.log("NewsfeedModule props", this.props)
     }
@@ -120,7 +126,8 @@ class NewsfeedModule extends React.Component<Props, State> {
                 nextState.filter != this.state.filter ||
                 nextState.includeSubContext != this.state.includeSubContext ||
                 nextState.selectedSearchContext != this.state.selectedSearchContext ||
-                nextState.menuVisible != this.state.menuVisible
+                nextState.menuVisible != this.state.menuVisible || 
+                nextState.statusComposerFocus != this.state.statusComposerFocus
     }
     headerClick = (e) => {
         const context = this.state.selectedSearchContext
@@ -153,7 +160,7 @@ class NewsfeedModule extends React.Component<Props, State> {
                     newState.contextTitle = contextObject.value
                 }
                 else {
-                    //resolve if contextObject is uncomplete
+                    //resolve if contextObject is incomplete
                     const term = contextObject.value.isNumber() ? "django_id:" + contextObject.value : "slug:"+ contextObject.value.trimLeftCharacters("@")
                     ApiClient.search(1, 0, term, [ContextNaturalKey.elasticTypeForKey(contextObject.contextNaturalKey)],false, true,false,true,{}, [], (data, status, error) => {
                         let resolvedData:ContextValue = null
@@ -186,10 +193,23 @@ class NewsfeedModule extends React.Component<Props, State> {
         const newFilter = filter == currentFilter ? null : filter
         this.setState({filter:newFilter})
     }
+    onAddStatusActionPress = (action: StatusActions, extra?: any, completion?: (success: boolean) => void) => {
+        console.log("onAddStatusActionPress", action, extra)
+        this.blurStatusComposer()
+        const instance = this.newsfeedComponent.wrappedInstance as NewsfeedComponent
+        if(instance)
+            instance.createNewStatus(extra.message, extra.mentions, extra.files, completion )
+    }
+    blurStatusComposer = () => {
+        this.setState({statusComposerFocus:false})
+    }
+    onStatusComposerFocus = (e: React.SyntheticEvent<{}>) => {
+        this.setState({statusComposerFocus:true})
+    }
     render()
     {
         const {breakpoint, history, match, location, staticContext, className, contextNaturalKey, contextObjectId, includeSubContext, isResolvingContext, ...rest} = this.props
-        const cn = classnames("newsfeed-module", className, {"menu-visible":this.state.menuVisible})
+        const cn = classnames("newsfeed-module", className, {"menu-visible":this.state.menuVisible, "status-composer-focus":this.state.statusComposerFocus})
         const headerClick = breakpoint < ResponsiveBreakpoint.standard ? this.headerClick : undefined
         const {contextTitle}  = this.state
         const resolvedContextNaturalKey = this.state.contextNaturalKey || this.props.contextNaturalKey
@@ -197,6 +217,7 @@ class NewsfeedModule extends React.Component<Props, State> {
         const title = contextTitle ? contextTitle + " - " + translate("Feed") : translate("Newsfeed")
         const headerClass = classnames({link:headerClick})
         const filter = this.state.filter
+        const r = {wrappedComponentRef:(c) => this.newsfeedComponent = c}
         return (<Module {...rest} className={cn}>
                     <ModuleHeader className={headerClass} onClick={headerClick}>
                         <div className="flex-grow-1 text-truncate d-flex align-items-center">
@@ -217,7 +238,24 @@ class NewsfeedModule extends React.Component<Props, State> {
                     {breakpoint >= ResponsiveBreakpoint.standard && //do not render for small screens
                         <>
                             <ModuleContent>
-                                <NewsfeedComponent 
+                            {!!resolvedContextNaturalKey && !!resolvedContextObjectId && 
+                                <div ref={this.statuscomposer} className="feed-composer-container">
+                                    <div className="status-composer-backdrop" onMouseDown={this.blurStatusComposer}></div>
+                                    <StatusComposerComponent 
+                                        canUpload={true}
+                                        canMention={true}
+                                        canComment={true}
+                                        onActionPress={this.onAddStatusActionPress}
+                                        contextNaturalKey={resolvedContextNaturalKey}
+                                        contextObjectId={resolvedContextObjectId}
+                                        placeholder={translate("newsfeed.module.addstatus.placeholder")}
+                                        communityId={-1}
+                                        renderPlaceholder={false}
+                                        onFocus={this.onStatusComposerFocus}
+                                        //taggableMembers={task.visibility}
+                                    />
+                                </div>}
+                                <NewsfeedComponentRouted {...r}
                                     onLoadingStateChanged={this.feedLoadingStateChanged} 
                                     includeSubContext={this.state.includeSubContext} 
                                     contextNaturalKey={resolvedContextNaturalKey} 

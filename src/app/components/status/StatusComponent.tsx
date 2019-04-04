@@ -32,7 +32,6 @@ interface OwnProps
     status:Status
     className?:string
     isComment:boolean
-    breakpoint:ResponsiveBreakpoint
 }
 interface State 
 {
@@ -73,16 +72,11 @@ export class StatusComponent extends React.Component<Props, State> {
             this.observer.observe(this.element.current);
         }
     }
-    breakpointChanged = (nextBreakpoint:ResponsiveBreakpoint) => {
-        return (nextBreakpoint >= ResponsiveBreakpoint.standard && this.props.breakpoint < ResponsiveBreakpoint.standard) ||
-        (nextBreakpoint < ResponsiveBreakpoint.standard && this.props.breakpoint >= ResponsiveBreakpoint.standard)
-    }
     shouldComponentUpdate(nextProps:Props, nextState:State) 
     {
         const nextStatus = nextProps.status
         const status = this.props.status
-        let ret:boolean = this.breakpointChanged(nextProps.breakpoint) ||
-        nextStatus.id != status.id || 
+        let ret:boolean =  nextStatus.id != status.id || 
         nextStatus.comments != status.comments ||
         nextStatus.updated_at != status.updated_at || 
         nextStatus.serialization_date != status.serialization_date ||
@@ -155,7 +149,7 @@ export class StatusComponent extends React.Component<Props, State> {
         return ProfileManager.getProfilesFetchRest(mentions, this.refresh)
     }
     render() {
-        const {status, isComment, className, onActionPress, canUpload, authorizedUserId, breakpoint} = this.props
+        const {status, isComment, className, onActionPress, canUpload, authorizedUserId} = this.props
         if(this.state.renderPlaceholder)
         {
             let itemClass = classnames("status-component status-component-placeholder", this.props.className, { comment: isComment, temp: status.pending})
@@ -204,72 +198,40 @@ export class StatusComponent extends React.Component<Props, State> {
                                 }
                             </div>
                         </div>
-                        <div className="d-flex">
-                            {(isComment || breakpoint >= ResponsiveBreakpoint.standard) && 
-                                <div className="flex-grow-1 text-content">
-                                    {breakpoint >= ResponsiveBreakpoint.standard &&
-                                        <StatusOptionsComponent 
-                                            status={status} 
-                                            canMention={true} 
-                                            canUpload={canUpload} 
-                                            onActionPress={onActionPress}
-                                            isOwner={status.owner.id == authorizedUserId}
-                                            communityId={communityId}
-                                            maxVisible={0}
-                                            isComment={this.props.isComment}
-                                        />
-                                    }
-                                    {this.renderTextContent(textContent, hasMore)}
-                                </div>
-                            }
-                            {breakpoint >= ResponsiveBreakpoint.standard && 
-                                <div className="flex-shrink-0 d-flex align-content-start info-container">
-                                <div className="reaction-wrapper">
-                                    {this.renderReactButton()}
-                                    <ReactionStats reactions={this.props.status.reactions}
-                                        reactionsCount={this.props.status.reaction_count}/>
-                                </div>
-                                {!isComment && 
-                                    <div className="comments-count-wrapper">
-                                        <i className="far fa-comment"></i><span className="comment-count">{this.props.status.comments}</span>
-                                    </div>
-                                }
-                                </div>
-                            }
-                        </div>
+                        {isComment && <div className="d-flex status-content-inner">{this.renderTextContent(textContent, hasMore)}
+                            {files.length > 0 && <ContentGallery files={files}/>}
+                            {linkCards.length > 0 && linkCards}
+                        </div>}
                     </div>
                 </div>
                 <div className="status-content">
-                    {!isComment && breakpoint < ResponsiveBreakpoint.standard && 
-                        this.renderTextContent(textContent, hasMore)
-                    }
+                    {!isComment && <div className="status-content-inner">{this.renderTextContent(textContent, hasMore)}
                     {files.length > 0 && <ContentGallery files={files}/>}
                     {linkCards.length > 0 && linkCards}
-                    {breakpoint < ResponsiveBreakpoint.standard && 
-                        <div className="status-footer d-flex" style={footerStyles}>
-                            <div className="reaction-wrapper">
-                                {this.renderReactButton()}
-                                <ReactionStats reactions={this.props.status.reactions}
-                                    reactionsCount={this.props.status.reaction_count}/>
-                            </div>
-                            {!isComment && 
-                                    <div className="comments-count-wrapper">
-                                        <i className="far fa-comment"></i><span className="comment-count">{this.props.status.comments}</span>
-                                    </div>
-                            }
-                            <StatusOptionsComponent 
-                                        status={status} 
-                                        canMention={true} 
-                                        canUpload={canUpload} 
-                                        onActionPress={onActionPress}
-                                        isOwner={status.owner.id == authorizedUserId}
-                                        communityId={communityId}
-                                        maxVisible={0}
-                                        isComment={this.props.isComment}
-                                        overflowButtonClass="fas fa-ellipsis-h fa-2x"
-                                />
+                    </div>}
+                    <div className="status-footer d-flex" style={footerStyles}>
+                        <div className="reaction-wrapper">
+                            {this.renderReactButton()}
+                            <ReactionStats reactions={this.props.status.reactions}
+                                reactionsCount={this.props.status.reaction_count}/>
                         </div>
-                    }
+                        {!isComment && 
+                                <div className="comments-count-wrapper">
+                                    <i className="far fa-comment"></i><span className="comment-count">{this.props.status.comments}</span>
+                                </div>
+                        }
+                        <StatusOptionsComponent 
+                                    status={status} 
+                                    canMention={true} 
+                                    canUpload={canUpload} 
+                                    onActionPress={onActionPress}
+                                    isOwner={status.owner.id == authorizedUserId}
+                                    communityId={communityId}
+                                    maxVisible={0}
+                                    isComment={this.props.isComment}
+                                    overflowButtonClass="fas fa-ellipsis-h fa-2x"
+                            />
+                    </div>
                 </div>
             </div>
         );

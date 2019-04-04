@@ -10,6 +10,7 @@ export enum OverflowMenuItemType {
 export type OverflowMenuItem = {
     onPress?:(event:any) => void
     iconClass?:string
+    iconStackClass?:string
     title?:string
     id:string
     toggleMenu?:boolean
@@ -83,9 +84,14 @@ export class OverflowMenu extends React.Component<Props, State> {
                 <ButtonGroup>
                     {allItems.map(i => {
                         const id = "overflowmenuitem_" + i.id
+                        const useStackedIcons = !!i.iconStackClass && !!i.iconClass
                         return (<React.Fragment key={"overflowmenuitem_fragment" + i.id}>
                                     <Button color="light" id={id} size="xs" key={"overflowmenuitem_button" + i.id} onClick={i.onPress} title={i.title}>
-                                        <i className={i.iconClass}></i>
+                                        {!useStackedIcons && i.iconClass && <i className={i.iconClass}></i>}
+                                        {useStackedIcons && <span className="fa-stack">
+                                            <i className={i.iconClass + " fa-stack-2x"}></i>
+                                            <i className={i.iconStackClass + " fa-stack-1x"}></i>
+                                        </span>}
                                     </Button>
                                     {this.showTooltip && 
                                         <UncontrolledTooltip delay={0} key={"overflowmenuitem_tooltip" + i.id} placement="top" target={id}>
@@ -106,6 +112,7 @@ export class OverflowMenu extends React.Component<Props, State> {
                             }
                             <DropdownMenu>
                                 {rest.map(i => {
+                                    const useStackedIcons = !!i.iconStackClass && !!i.iconClass
                                     const props:Partial<DropdownItemProps> = {}
                                     if(i.type == OverflowMenuItemType.header)
                                     props.header = true
@@ -116,7 +123,11 @@ export class OverflowMenu extends React.Component<Props, State> {
                                     const toggle = nullOrUndefined( i.toggleMenu ) ? true : i.toggleMenu
 
                                     return (<DropdownItem active={i.active}  {...props} toggle={toggle} key={i.id} onClick={i.onPress} className="clickable">
-                                                    {i.iconClass && <i className={i.iconClass}></i>}
+                                                    {!useStackedIcons && i.iconClass && <i className={i.iconClass}></i>}
+                                                    {useStackedIcons && <span className="fa-menu-icon-stack">
+                                                        <i className={i.iconClass}></i>
+                                                        <i className={i.iconStackClass + " fa-menu-icon-stacked"}></i>
+                                                    </span>}
                                                     {i.title}
                                             </DropdownItem>)
                                 })}

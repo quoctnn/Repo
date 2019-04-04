@@ -30,7 +30,7 @@ export namespace DashboardComponents {
     export const componentMap = {
         "DemoComponent": DemoComponent,
         "NewsfeedModule":NewsfeedModule,
-        "ProjectModule": TasksModule
+        "TaskModule": TasksModule
     }
     export function getComponent(type: string, props:any) {
         const comp = componentMap[type]

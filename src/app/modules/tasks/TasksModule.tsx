@@ -12,17 +12,31 @@ import { translate } from '../../localization/AutoIntlProvider';
 import CircularLoadingSpinner from '../../components/general/CircularLoadingSpinner';
 import TaskMenu, { TasksMenuData } from './TasksMenu';
 import TaskListComponent from './TaskListComponent';
+import { ContextNaturalKey } from '../../types/intrasocial_types';
+import { ReduxState } from '../../redux';
+import { connect } from 'react-redux';
+import { resolveContextObject, ResolvedContextObject } from '../newsfeed/NewsfeedModule';
+import { ProjectManager } from '../../managers/ProjectManager';
 
 type OwnProps = {
     className?:string
     breakpoint:ResponsiveBreakpoint
+    contextNaturalKey?:ContextNaturalKey
 }
 type State = {
     menuVisible:boolean
     isLoading:boolean
     menuData:TasksMenuData
 }
-type Props = OwnProps & RouteComponentProps<any>
+
+type ReduxStateProps = {
+    contextObjectId:number
+    isResolvingContext:boolean
+    resolvedContext: ResolvedContextObject
+}
+type ReduxDispatchProps = {
+}
+type Props = OwnProps & RouteComponentProps<any> & ReduxDispatchProps & ReduxStateProps
 class TasksModule extends React.Component<Props, State> {  
     tempMenuData:TasksMenuData = null   
     constructor(props:Props) {
@@ -78,13 +92,31 @@ class TasksModule extends React.Component<Props, State> {
     menuDataUpdated = (data:TasksMenuData) => {
         this.tempMenuData = data
     }
+    getContextData = () => {
+        if(this.props.contextObjectId)
+        {
+            const data = this.state.menuData
+            if(!data.project)
+            {
+                const resolvedId = this.props.resolvedContext && this.props.resolvedContext.contextObjectId
+                let name = ""
+                if(resolvedId)
+                    name = ProjectManager.getProject(resolvedId.toString()).name
+
+                data.project = {label:`[${name}]`, id:this.props.contextObjectId, type:this.props.contextNaturalKey, value:this.props.contextNaturalKey + "_" + this.props.contextObjectId}
+            }
+            return data
+        }
+        return this.state.menuData
+    }
     render()
     {
-        const {breakpoint, history, match, location, staticContext, className,  ...rest} = this.props
+        const {breakpoint, history, match, location, staticContext, className, isResolvingContext, contextObjectId, contextNaturalKey, resolvedContext, ...rest} = this.props
         const cn = classnames("tasks-module", className, {"menu-visible":this.state.menuVisible})
         const headerClick = breakpoint < ResponsiveBreakpoint.standard ? this.headerClick : undefined
         const headerClass = classnames({link:headerClick})
         const headerSubtitle = this.state.menuData.project && this.state.menuData.project.label
+        const contextData = this.getContextData()
         return (<Module {...rest} className={cn}>
                     <ModuleHeader className={headerClass} onClick={headerClick}>
                         <div className="flex-grow-1 text-truncate d-flex align-items-center">
@@ -102,7 +134,7 @@ class TasksModule extends React.Component<Props, State> {
                             <ModuleContent>
                                 <TaskListComponent 
                                     onLoadingStateChanged={this.feedLoadingStateChanged}  
-                                    contextData={this.state.menuData}
+                                    contextData={contextData}
                                     />
                             </ModuleContent>
                         </>
@@ -115,4 +147,19 @@ class TasksModule extends React.Component<Props, State> {
                 </Module>)
     }
 }
-export default withRouter(TasksModule)
+const mapStateToProps = (state:ReduxState, ownProps: OwnProps):ReduxStateProps => {
+
+    const resolveContext = state.resolvedContext
+    const resolvedContext = resolveContextObject(resolveContext, ownProps.contextNaturalKey)
+    const isResolvingContext = resolvedContext && (!resolvedContext.contextObjectId && !resolvedContext.resolved)
+    return {
+        contextObjectId:resolvedContext && resolvedContext.contextObjectId,
+        isResolvingContext,
+        resolvedContext
+    }
+}
+const mapDispatchToProps = (dispatch:ReduxState, ownProps: OwnProps):ReduxDispatchProps => {
+    return {
+    }
+}
+export default withRouter(connect<ReduxStateProps, ReduxDispatchProps, OwnProps>(mapStateToProps, mapDispatchToProps)(TasksModule))

@@ -1,6 +1,6 @@
 import { combineReducers } from "redux";
 import { persistReducer, PersistConfig } from "redux-persist";
-import storageLocal from 'redux-persist/lib/storage';
+import storage from 'redux-persist/lib/storage';
 import language from './language';
 import { theme } from "./theme";
 import endpoint from './endpoint';
@@ -18,7 +18,7 @@ import application from "./application";
 import resolvedContext, { ResolvedContext } from "./resolvedContext";
 const rootPersistConfig:PersistConfig = {
     key: 'root',
-    storage: storageLocal,
+    storage: storage,
     blacklist: ['authentication', "application"],
     debug:true,
   }

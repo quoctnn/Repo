@@ -1,4 +1,4 @@
-import storageLocal from 'redux-persist/lib/storage'
+import storage from 'redux-persist/lib/storage'
 import { persistReducer } from "redux-persist";
 import { UserProfile } from '../types/intrasocial_types';
 import { nullOrUndefined } from '../utilities/Utilities';
@@ -38,14 +38,14 @@ const authentication = (state = INITIAL_STATE, action:SetAuthenticationTokenActi
         case AuthenticationActionTypes.SetSignedInToken:
             return { ...state, token:action.token}
         case AuthenticationActionTypes.SetSignedInProfile:
-        return { ...state, profile:action.profile, signedIn: !nullOrUndefined( action.profile) && !action.profile.is_anonymous}
+            return { ...state, profile:action.profile, signedIn: !nullOrUndefined( action.profile) && !action.profile.is_anonymous}
         default:
             return state;
     }
 }
 const persistConfig = {
     key: "authentication",
-    storage: storageLocal,
+    storage: storage,
     blacklist: ["signedIn"]
   };
 export default persistReducer(persistConfig, authentication)

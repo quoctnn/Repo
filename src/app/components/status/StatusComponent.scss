@@ -113,6 +113,11 @@
         margin: 0 10px;
         word-break: break-word;
     }
+    .status-content-inner{
+        border-radius: 8px;
+        background-color: #f6f6f6;
+        padding:4px 8px;
+    }
     &.comment {
         padding-left: 5px;
         .header-center 

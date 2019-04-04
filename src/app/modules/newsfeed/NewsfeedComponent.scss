@@ -1,8 +1,7 @@
 @import "../../Config";
 .newsfeed-component
 {
-    height: 100%;
-    display: flex;
+    display: contents;
     flex-direction: column;
     .status-list
     {
@@ -21,6 +20,9 @@
                     }
                 }
             }
+        }
+        .status-component, .comment-form, .status-comment-loader-container{
+            background-color: white;
         }
     }
     .odd-color

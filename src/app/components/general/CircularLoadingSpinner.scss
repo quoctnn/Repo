@@ -1,8 +1,10 @@
+@import "../../Config";
 .circular-spinner {
     animation: spin 2s linear infinite;
     border-radius: 50%;
     display: inline-block;
     flex-shrink: 0;
+    @include var(border-color, primary-theme-color);
 }
 
 @keyframes spin {

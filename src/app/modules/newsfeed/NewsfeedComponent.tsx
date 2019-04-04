@@ -15,8 +15,6 @@ import { StatusCommentLoader as CommentLoader } from '../../components/status/St
 import LoadingSpinner from '../../components/LoadingSpinner';
 import { List } from '../../components/general/List';
 import "./NewsfeedComponent.scss"
-import { ResizeObserverComponent } from '../../components/general/observers/ResizeObserverComponent';
-import { ResponsiveBreakpoint } from '../../components/general/observers/ResponsiveComponent';
 import classnames = require('classnames');
 import { translate } from '../../localization/AutoIntlProvider';
 class StatusComposer
@@ -24,8 +22,8 @@ class StatusComposer
     statusId:number
     communityId:number
     contextObjectId:number 
-    contextNaturalKey:string
-    constructor(statusId:number, communityId:number, contextObjectId:number, contextNaturalKey:string)
+    contextNaturalKey:ContextNaturalKey
+    constructor(statusId:number, communityId:number, contextObjectId:number, contextNaturalKey:ContextNaturalKey)
     {
         this.statusId = statusId
         this.communityId = communityId
@@ -54,7 +52,7 @@ type ArrayItem =
 interface OwnProps 
 {
     limit:number
-    contextNaturalKey?:string
+    contextNaturalKey?:ContextNaturalKey
     contextObjectId?:number
     includeSubContext?:boolean 
     filter:ObjectAttributeType
@@ -88,7 +86,7 @@ interface State
     hasLoaded:boolean
 }
 type Props = ReduxStateProps & ReduxDispatchProps & OwnProps & RouteProps
-class NewsfeedComponent extends React.Component<Props, State> {
+export class NewsfeedComponent extends React.Component<Props, State> {
     isOdd:boolean = false
     static defaultProps:OwnProps = {
         limit:30,
@@ -412,6 +410,25 @@ class NewsfeedComponent extends React.Component<Props, State> {
             ToastManager.showErrorToast(error)
         })
     }
+    createNewStatus = (message:string, mentions?:number[], files?:UploadedFile[], completion?:(success:boolean) => void) => {
+        if(!this.props.contextNaturalKey || !this.props.contextObjectId)
+            return
+        const tempStatus = StatusUtilities.getStatusPreview(this.props.contextNaturalKey, this.props.contextObjectId, message, mentions, files)
+        this.insertObject(tempStatus,0)
+        ApiClient.createStatus(tempStatus, (newStatus, requestStatus, error) => {
+            const success = !!newStatus
+            if(success)
+            {
+                const newStatusIndex = this.findIndexByStatusId(tempStatus.id)
+                newStatus.temporary = true
+                const updateArray:ArrayItem[] = []
+                updateArray.push({index:newStatusIndex, object:newStatus})
+                this.updateItems(updateArray)
+            }
+            completion && completion(success)
+            ToastManager.showErrorToast(error)
+        })
+    }
     createNewComment = (parent:Status, message:string, mentions?:number[], files?:UploadedFile[], completion?:(success:boolean) => void) => {
         const status = StatusUtilities.getCommentPreview(parent, message, mentions, files)
         let composerIndex = this.findStatusComposerByStatusId(parent.id)
@@ -419,14 +436,14 @@ class NewsfeedComponent extends React.Component<Props, State> {
         {
             this.insertObject(status,composerIndex)
             ApiClient.createStatus(status, (newObject, responseStatusCode, error) => {
-                newObject.temporary = true
                 const success = !nullOrUndefined(newObject)
                 if(success)
                 {
+                    newObject.temporary = true
                     //update parent comment_count & commentsloader data
-                    let updateArray:ArrayItem[] = []
-                    let newStatus = newObject as Status
-                    let newStatusIndex = this.findIndexByStatusId(status.id)
+                    const updateArray:ArrayItem[] = []
+                    const newStatus = newObject as Status
+                    const newStatusIndex = this.findIndexByStatusId(status.id)
                     updateArray.push({index:newStatusIndex, object:newStatus})
                     let updatedParent = this.getClonedStatus(parent)
                     updatedParent.comments += 1
@@ -596,7 +613,7 @@ class NewsfeedComponent extends React.Component<Props, State> {
         let status = this.state.items[index] as Status
         this.navigateToAction(status, action, extra, completion)
     }
-    renderStatus = (authUser:UserProfile, item:Status, isComment:boolean, index:number, color:string, breakpoint:ResponsiveBreakpoint) => 
+    renderStatus = (authUser:UserProfile, item:Status, isComment:boolean, index:number, color:string) => 
     {
         return <StatusComponent 
                     canUpload={true}
@@ -608,10 +625,9 @@ class NewsfeedComponent extends React.Component<Props, State> {
                     isComment={isComment}
                     onActionPress={this.navigateToActionWithId(item.id)}
                     className={color}
-                    breakpoint={breakpoint}
                 />
     }
-    renderStatusComposer = (composer:StatusComposer, index:number, color:string, breakpoint:ResponsiveBreakpoint) => {
+    renderStatusComposer = (composer:StatusComposer, index:number, color:string) => {
             return (
                 <StatusComposerComponent
                     key={"statuscomposer_" + composer.statusId}
@@ -627,7 +643,7 @@ class NewsfeedComponent extends React.Component<Props, State> {
                 />
             )
     }
-    renderCommentLoader =  (loader: StatusCommentLoader, index:number, color:string, breakpoint:ResponsiveBreakpoint) => 
+    renderCommentLoader =  (loader: StatusCommentLoader, index:number, color:string) => 
     {
         const isLoading = this.state.activeCommentLoaders[loader.statusId] != undefined
         return <CommentLoader 
@@ -753,6 +769,7 @@ class NewsfeedComponent extends React.Component<Props, State> {
     
     }
     getNextColor = () => {
+        return null
         const c = this.isOdd ? "odd-color" : "even-color"
         this.isOdd = !this.isOdd 
         return c
@@ -780,35 +797,31 @@ class NewsfeedComponent extends React.Component<Props, State> {
         this.isOdd = false
         let color = this.getNextColor()
         const scroll = this.props.scrollParent ? undefined : this.onScroll
+        const cn = classnames("status-list vertical-scroll")//, "rb-" + ResponsiveBreakpoint[breakpoint])
         return(
-            <ResizeObserverComponent className="newsfeed-component" render={({breakpoint}) => {
-                console.log("new breakpoint", breakpoint)
-                const cn = classnames("status-list vertical-scroll", "rb-" + ResponsiveBreakpoint[breakpoint])
-                return <>
-                    <List 
+            <div className="newsfeed-component">
+                <List 
                     enableAnimation={false} 
                     onScroll={scroll} 
                     className={cn}>
                         {this.state.items.map((s, i) => {
                             if(s instanceof StatusComposer)
                             {
-                                const comp = this.renderStatusComposer(s, i, color, breakpoint)
+                                const comp = this.renderStatusComposer(s, i, color)
                                 color = this.getNextColor()
                                 return comp
                             }
                             else if(s instanceof StatusCommentLoader)
                             {
-                                return this.renderCommentLoader(s, i, color, breakpoint)
+                                return this.renderCommentLoader(s, i, color)
                             }
                             const isComment = !!s.parent
-                            return this.renderStatus(authUser, s, isComment, i, color, breakpoint)
+                            return this.renderStatus(authUser, s, isComment, i, color)
                         }).concat(this.renderLoading()) }
                     </List>
                     {this.renderError()}
                     {this.renderEmpty()}
-                </>
-            }}> 
-            </ResizeObserverComponent> 
+            </div> 
         );
     }
 }
@@ -822,4 +835,4 @@ const mapDispatchToProps = (dispatch:any, ownProps: OwnProps):ReduxDispatchProps
     return {
     }
 }
-export default withRouter(connect<ReduxStateProps, ReduxDispatchProps, OwnProps>(mapStateToProps, mapDispatchToProps)(NewsfeedComponent));
+export default withRouter(connect<ReduxStateProps, ReduxDispatchProps, OwnProps>(mapStateToProps, mapDispatchToProps, null, { withRef: true })(NewsfeedComponent))

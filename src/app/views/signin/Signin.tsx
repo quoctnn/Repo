@@ -36,7 +36,8 @@ class Signin extends React.Component<Props, {}> {
         {
             AuthenticationManager.signIn(data.token)
         }
-        this.props.history.push('/')
+        const { from } = this.props.location.state || { from: { pathname: '/' } }
+        this.props.history.push(from)
     }
     doSignin = (e) => {
         

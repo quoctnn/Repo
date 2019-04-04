@@ -106,10 +106,12 @@ type OwnProps = {
   filesAdded?:(files:File[]) => void
   mentionSearch:(search:string, completion:(mentions:Mention[]) => void) => void
   onHandleUploadClick?:(event) => void
-  placeholder?:String
+  placeholder?:string
 }
 type DefaultProps = {
     showEmojiPicker:boolean
+    onBlur?(e: React.SyntheticEvent<{}>): void
+    onFocus?(e: React.SyntheticEvent<{}>): void
 
 }
 type State = {
@@ -312,11 +314,13 @@ export default class MentionEditor extends React.Component<Props, {}> {
               <div className="flex-grow-1 editor-container">
                 <div className="editor-inner-container">
                     <Editor
-                      editorState={this.props.editorState}
-                      onChange={this.onChange}
-                      plugins={plugins}
-                      ref={this.editor}
-                      placeholder={this.props.placeholder}
+                        editorState={this.props.editorState}
+                        onChange={this.onChange}
+                        plugins={plugins}
+                        ref={this.editor}
+                        onBlur={this.props.onBlur}
+                        onFocus={this.props.onFocus}
+                        placeholder={this.props.placeholder}
                     />
                     <EmojiSuggestions />
                 </div>

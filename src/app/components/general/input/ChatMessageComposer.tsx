@@ -60,13 +60,6 @@ const getBlocks = (contentState:ContentState) => {
         offset += length + 1
     })
     return blocks
-  };
-
-interface DraftEntity
-{
-    type:string 
-    mutability:string 
-    data:any
 }
 const generateContentState = (content:string, mentions:Mention[]):ContentState => 
 {
@@ -141,6 +134,8 @@ export interface Props
     className?:string
     placeholder?:string
     showEmojiPicker?:boolean
+    onBlur?(e: React.SyntheticEvent<{}>): void
+    onFocus?(e: React.SyntheticEvent<{}>): void
 }
 interface State
 {
@@ -240,6 +235,8 @@ export class ChatMessageComposer extends React.Component<Props,State> implements
                             onChange={this.onChange}
                             placeholder={this.props.placeholder}
                             showEmojiPicker={this.props.showEmojiPicker}
+                            onBlur={this.props.onBlur}
+                            onFocus={this.props.onFocus}
                             /> 
                         </div>
                         <div className="button-wrap d-flex flex-column-reverse">

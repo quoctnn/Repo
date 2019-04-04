@@ -1,5 +1,5 @@
 import * as React from "react";
-import { StatusActions, UploadedFile } from "../../types/intrasocial_types";
+import { StatusActions, UploadedFile, ContextNaturalKey } from "../../types/intrasocial_types";
 import classnames from 'classnames';
 import { Settings } from '../../utilities/Settings';
 import { URL_REGEX, URL_WWW_REGEX } from '../../utilities/Utilities';
@@ -19,7 +19,7 @@ type OwnProps =
     canUpload:boolean
     className?:string
     contextObjectId:number 
-    contextNaturalKey:string
+    contextNaturalKey:ContextNaturalKey
     communityId:number
     showEmojiPicker?:boolean
     placeholder?:string
@@ -28,6 +28,8 @@ type OwnProps =
     refresh?:string
     onDidType?:(unprocessedText:string) => void
     taggableMembers?:number[] | (() => number[])
+    onBlur?(e: React.SyntheticEvent<{}>): void
+    onFocus?(e: React.SyntheticEvent<{}>): void
 }
 type DefaultProps = {
 
@@ -266,7 +268,11 @@ export class StatusComposerComponent extends React.Component<Props, State> {
                     communityId={this.props.communityId}
                     showEmojiPicker={this.props.showEmojiPicker}
                     placeholder={this.props.placeholder}
-                    >{this.props.children}</CommentForm>
+                    onBlur={this.props.onBlur}
+                    onFocus={this.props.onFocus}
+                    >
+                    {this.props.children}
+                    </CommentForm>
             );
         } else {
             return null;

@@ -13,7 +13,6 @@ import { Dashboard, Community } from './types/intrasocial_types';
 import ApplicationLoader from "./views/loading/ApplicationLoader";
 import Signout from "./views/signout/Signout";
 import CommunityPage from "./components/pages/CommunityPage";
-import { nullOrUndefined } from "../utilities/Utilities";
 import { CommunityManager } from "./managers/CommunityManager";
 import DashboardPage from "./components/pages/DashboardPage";
 import { ResolvedContext, setResolvedContextAction, resetResolvedContext } from "./redux/resolvedContext";
@@ -27,6 +26,8 @@ import GroupPage from "./components/pages/GroupPage";
 import { GroupManager } from "./managers/GroupManager";
 import ProfilePage from "./components/pages/ProfilePage";
 import { ProfileManager } from "./managers/ProfileManager";
+import { PrivateRoute } from "./components/router/PrivateRoute";
+import { nullOrUndefined } from "./utilities/Utilities";
 
 type OwnProps = {
 }
@@ -207,7 +208,7 @@ class Main extends React.Component<Props, State> {
                                     <Route path={Routes.taskUrl(":communityname", ":projectname", ":taskid")} component={TaskPage} />
                                     <Route path={Routes.projectUrl(":communityname", ":projectname")} component={ProjectPage} exact={true} />
                                     <Route path={Routes.groupUrl(":communityname", ":groupname")} component={GroupPage} exact={true} />
-                                    <Route path={Routes.profileUrl(":profilename")} component={ProfilePage} />
+                                    <PrivateRoute path={Routes.profileUrl(":profilename")} component={ProfilePage} />
                                     <Route path={Routes.communityUrl(":communityname")} component={CommunityPage} exact={true} />
                                     <Route path={Routes.newsfeedUrl(":contextNaturalKey?", ":contextObjectId?")} component={NewsfeedPage} />
                                     <Route path={Routes.SIGNIN} component={Signin} />
