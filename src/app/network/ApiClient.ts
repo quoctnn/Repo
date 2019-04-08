@@ -2,7 +2,7 @@ import Constants from "../utilities/Constants";
 import {AjaxRequest} from "./AjaxRequest";
 import { EndpointManager } from '../managers/EndpointManager';
 var $ = require("jquery")
-import { Status, UserProfile, UploadedFile, Community, Group, Conversation, Project, Message, Event, Task, ElasticSearchType, ObjectAttributeType, StatusObjectAttribute, EmbedCardItem, ReportTag, ContextNaturalKey, ReportResult, SimpleTask, Dashboard, Timesheet } from '../types/intrasocial_types';
+import { Status, UserProfile, UploadedFile, Community, Group, Conversation, Project, Message, Event, Task, ElasticSearchType, ObjectAttributeType, StatusObjectAttribute, EmbedCardItem, ReportTag, ContextNaturalKey, ReportResult, Dashboard, Timesheet } from '../types/intrasocial_types';
 import { nullOrUndefined } from '../utilities/Utilities';
 import moment = require("moment");
 export type PaginationResult<T> = {results:T[], count:number, previous:string|null, next:string|null}
@@ -216,7 +216,7 @@ export default class ApiClient
                     not_assigned:boolean,
                     category:string, 
                     term:string, 
-                    callback:ApiClientFeedPageCallback<SimpleTask>){
+                    callback:ApiClientFeedPageCallback<Task>){
         let url = Constants.apiRoute.taskUrl + "?" + this.getQueryString({limit,
                                                                         offset,
                                                                         project,

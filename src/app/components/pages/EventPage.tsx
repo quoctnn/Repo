@@ -1,15 +1,15 @@
 import * as React from "react";
 import { connect } from 'react-redux'
-import "./ProjectPage.scss"
-import { Project, Community } from "../../types/intrasocial_types";
+import "./EventPage.scss"
+import { Event, Community } from "../../types/intrasocial_types";
 import LoadingSpinner from "../LoadingSpinner";
 import { ReduxState } from "../../redux";
 import PageHeader from "../PageHeader";
 import { DashboardWithData } from "../../DashboardWithData";
-import { ProjectManager } from "../../managers/ProjectManager";
 import { CommunityManager } from "../../managers/CommunityManager";
 import { Error404 } from "../../views/error/Error404";
-import { communityAvatar, communityName, communityCover, projectCover } from "../../utilities/Utilities";
+import { communityAvatar, communityName, eventCover } from "../../utilities/Utilities";
+import { EventManager } from "../../managers/EventManager";
 export interface OwnProps 
 {
     match:any,
@@ -18,9 +18,9 @@ interface ReduxStateProps
 {
     community:Community
     communityResolved:number
-    projectid:string
-    project:Project
-    projectResolved:number
+    eventid:string
+    event:Event
+    eventResolved:number
 }
 interface ReduxDispatchProps 
 {
@@ -29,7 +29,7 @@ interface State
 {
 }
 type Props = ReduxStateProps & ReduxDispatchProps & OwnProps
-class ProjectPage extends React.Component<Props, State> 
+class EventPage extends React.Component<Props, State> 
 {
     constructor(props:Props) {
         super(props);
@@ -41,10 +41,10 @@ class ProjectPage extends React.Component<Props, State>
     {
         return (<LoadingSpinner />)
     }
-    renderHeader(project:Project, community:Community)
+    renderHeader(event:Event, community:Community)
     {
         return (<PageHeader 
-                    coverImage={projectCover(project)} 
+                    coverImage={eventCover(event)} 
                     primaryItemImage={communityAvatar(community, true)} 
                     primaryItemTitle={communityName(community)}  
                     />
@@ -54,17 +54,17 @@ class ProjectPage extends React.Component<Props, State>
         return <Error404 />
     }
     render() {
-        const { project, projectResolved, community, communityResolved} = this.props
-        const hasData = !!project && !!community
-        const isLoading = (!project && !projectResolved) || (!community && !communityResolved)
+        const {event, eventResolved, community, communityResolved} = this.props
+        const hasData = !!event && !!community
+        const isLoading = (!event && !eventResolved) || (!community && !communityResolved)
         return(
-            <div id="project-page" className="dashboard-container">
+            <div id="event-page" className="dashboard-container">
                 {isLoading && this.renderLoading()}
                 {!isLoading && !hasData && this.renderNotFound()}
                 {hasData && 
                     <div className="content dashboard-container">
-                        {this.renderHeader(project, community)}
-                        <DashboardWithData category="project" />
+                        {this.renderHeader(event, community)}
+                        <DashboardWithData category="event" />
                     </div>
                 }
             </div>
@@ -72,9 +72,9 @@ class ProjectPage extends React.Component<Props, State>
     }
 }
 const mapStateToProps = (state:ReduxState, ownProps:OwnProps) => {
-    const projectid:string = ownProps.match.params.projectname
-    const project = ProjectManager.getProject(projectid)
-    const projectResolved = state.resolvedContext.projectResolved
+    const eventid:string = ownProps.match.params.eventname
+    const event = EventManager.getEvent(eventid)
+    const eventResolved = state.resolvedContext.eventResolved
 
     const communityid:string = ownProps.match.params.communityname
     const community = CommunityManager.getCommunity(communityid)
@@ -82,9 +82,9 @@ const mapStateToProps = (state:ReduxState, ownProps:OwnProps) => {
     return {
         community,
         communityResolved,
-        projectid,
-        project,
-        projectResolved,
+        eventid,
+        event,
+        eventResolved,
     }
 }
-export default connect<ReduxStateProps, null, OwnProps>(mapStateToProps, null)(ProjectPage);
+export default connect<ReduxStateProps, null, OwnProps>(mapStateToProps, null)(EventPage);

@@ -7,7 +7,7 @@ export interface Props {
     id?:string
     onScroll?:(event:React.UIEvent<any>) => void
     enableAnimation:boolean
-    children:JSX.Element[]
+    children:React.ReactNode
 }
 export interface State {
 

@@ -252,6 +252,8 @@ class NewsfeedModule extends React.Component<Props, State> {
                                         communityId={-1}
                                         renderPlaceholder={false}
                                         onFocus={this.onStatusComposerFocus}
+                                        showEmojiPicker={this.state.statusComposerFocus}
+                                        showSubmitButton={this.state.statusComposerFocus}
                                         //taggableMembers={task.visibility}
                                     />
                                 </div>}

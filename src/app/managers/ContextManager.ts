@@ -17,7 +17,7 @@ export abstract class ContextManager
         {
             r.push({
                 type:ContextNaturalKey.USER, 
-                items:ProfileManager.searchProfiles(query, null, maxGroupItems).map(u => { return {id:u.id, label:userFullName(u), type:ContextNaturalKey.USER, image:userAvatar(u)} })
+                items:ProfileManager.searchProfiles(query, null, maxGroupItems).map(u => { return {id:u.id, label:userFullName(u), type:ContextNaturalKey.USER, image:userAvatar(u, true)} })
                 })
         }
         if(!contextNaturalKey || contextNaturalKey == ContextNaturalKey.GROUP)
@@ -31,7 +31,7 @@ export abstract class ContextManager
         {
             r.push({
                 type:ContextNaturalKey.COMMUNITY, 
-                items:CommunityManager.searchCommunities(query, maxGroupItems).map(c => { return {id:c.id, label:c.name, type:ContextNaturalKey.COMMUNITY, image:communityAvatar(c)} })
+                items:CommunityManager.searchCommunities(query, maxGroupItems).map(c => { return {id:c.id, label:c.name, type:ContextNaturalKey.COMMUNITY, image:communityAvatar(c, true)} })
                 })
         }
         completion(r)

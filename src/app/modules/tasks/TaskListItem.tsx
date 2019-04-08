@@ -1,7 +1,7 @@
 import * as React from 'react'
 import classnames from "classnames"
 import "./TaskListItem.scss"
-import { SimpleTask, TaskPriority, TaskActions, TaskState, StatusActions, ContextNaturalKey, UploadedFile } from '../../types/intrasocial_types';
+import { Task, TaskPriority, TaskActions, TaskState, StatusActions, ContextNaturalKey } from '../../types/intrasocial_types';
 import { translate } from '../../localization/AutoIntlProvider';
 import {ButtonGroup, Button, FormGroup, Label } from 'reactstrap';
 import { StatusComposerComponent } from '../../components/status/StatusComposerComponent';
@@ -13,7 +13,7 @@ let timezone = moment.tz.guess()
 
 type OwnProps = {
     communityId:number
-    task:SimpleTask
+    task:Task
     onActionPress:(action:TaskActions, extra?:Object, completion?:(success:boolean) => void) => void
 }
 type State = {
@@ -181,7 +181,7 @@ export default class TaskListItem extends React.Component<Props, State> {
                                 </StatusComposerComponent>
                             </FormGroup>
                             <FormGroup>
-                                <Label>{translate("task.module.menu.setstate.title")}</Label>
+                                <Label>{translate("task.module.menu.setstate.title") + task.state}</Label>
                                 <ButtonGroup className="flex-wrap d-block">
                                     {states.map(s => <Button outline={true} size="xs" color="secondary" onClick={this.setTaskState(s)} key={s} active={this.stateActive(s)}>{translate("task.state." + s)}</Button>)}
                                 </ButtonGroup>

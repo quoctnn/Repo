@@ -8,6 +8,8 @@ import ModuleContent from "./modules/ModuleContent";
 import ModuleHeader from "./modules/ModuleHeader";
 import { Dashboard, GridLayout } from './types/intrasocial_types';
 import TasksModule from "./modules/tasks/TasksModule";
+import GroupsModule from "./modules/groups/GroupsModule";
+import ProjectsModule from "./modules/projects/ProjectsModule";
 
 type DemoProps = {
     text?:string
@@ -30,7 +32,9 @@ export namespace DashboardComponents {
     export const componentMap = {
         "DemoComponent": DemoComponent,
         "NewsfeedModule":NewsfeedModule,
-        "TaskModule": TasksModule
+        "TaskModule": TasksModule,
+        "GroupsModule":GroupsModule,
+        "ProjectsModule":ProjectsModule
     }
     export function getComponent(type: string, props:any) {
         const comp = componentMap[type]

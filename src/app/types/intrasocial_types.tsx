@@ -32,28 +32,6 @@ export interface Notification
     absolute_url:string
     actors:number[]
 }
-export interface ICommunity
-{
-  absolute_url:string
-  deactivated:boolean
-  id:number
-  name:string
-  slug_name:string
-}
-export interface Community extends ICommunity
-{
-    avatar: string
-    avatar_thumbnail: string
-    cover: string
-    cover_cropped: string
-    cover_thumbnail: string
-    members: number[]
-    relationship: any
-    updated_at:string
-    permission:number
-    primary_color:string
-    secondary_color:string
-}
 export interface TempStatus
 {
   text: string
@@ -66,8 +44,9 @@ export interface TempStatus
   mentions: number[]
   pending?:boolean
 }
-export interface ContextObject
-{absolute_url:string, name:string}
+export type ContextObject = {
+     name:string 
+} & Linkable
 export interface Status extends TempStatus
 {
     [key:string]: any
@@ -375,14 +354,70 @@ export class Conversation
         this.updated_at = updated_at
     }
 }
-export interface Group {
+export type AvatarAndCover = {
+
+    avatar:string
+    avatar_thumbnail:string
+    cover: string
+    cover_cropped: string
+    cover_thumbnail: string
+}
+export type Linkable = {
+    uri:string
+}
+export enum IntraSocialType{
+    community, profile, project, group, event, task
+}
+export type ICommunity = {
+    cover_thumbnail: string
+    avatar_thumbnail:string
+    deactivated:boolean
+    id:number
+    name:string
+    slug_name:string
+    primary_color:string
+    secondary_color:string
+} & Linkable
+
+export type Community = {
+    members: number[]
+    relationship: any
+    updated_at:string
+    permission:number
+} & ICommunity & AvatarAndCover
+
+export type SimpleUserProfile = {
+    absolute_url: string,
+    avatar: string,
+    first_name: string,
+    last_name: string,
+    id: number,
+}
+export type UserProfile = {
+    email:string|null
+    locale:string|null
+    timezone:string|null
+    username: string
+    uuid:string|null
+    user_status:UserStatus
+    biography:string
+    slug_name:string
+    updated_at:number
+    relationship?: string[]
+    mutual_friends?: number[]
+    last_seen?:number
+    is_anonymous:boolean
+    is_staff:boolean
+    is_superuser:boolean
+    connections?:number[]
+    active_community?:number
+} & SimpleUserProfile & AvatarAndCover & Linkable
+
+export type Group = {
     id: number
     name: string
     slug: string
-    cover: string
     community: number
-    cover_cropped: string
-    cover_thumbnail: string
     description: string
     creator: UserProfile
     privacy: string
@@ -391,15 +426,13 @@ export interface Group {
     created_at: string
     parent: number
     updated_at: string
-}
-export interface Event {
+} & AvatarAndCover & Linkable
+
+export type Event = {
     id: number
     name: string
     slug: string
-    cover: string
     community: number
-    cover_cropped: string
-    cover_thumbnail: string
     description: string
     creator: UserProfile
     privacy: string
@@ -409,15 +442,13 @@ export interface Event {
     created_at: string
     group: Group
     updated_at: string
-}
-export interface Project {
+} & AvatarAndCover & Linkable
+
+export type Project = {
     id: number
     name: string
     slug: string
-    cover: string
     community: number
-    cover_cropped: string
-    cover_thumbnail: string
     description: string
     creator: UserProfile
     privacy: string
@@ -428,7 +459,28 @@ export interface Project {
     created_at: string
     group: Group
     updated_at: string
-}
+    task_count: number
+    tasks_assigned: number
+    tasks_attention: number
+    tasks_completed: number
+    tasks_responsible: number
+
+} & AvatarAndCover & Linkable
+
+export type Task = {
+    id: number
+    updated_at: string
+    project:number
+    title:string
+    absolute_url: string
+    category: string
+    creator: SimpleUserProfile
+    priority: TaskPriority
+    state: TaskState
+    serialization_date:string
+    visibility?:number[]
+} & Linkable
+
 export enum TaskPriority{
     low = "low",
     medium = "medium",
@@ -473,24 +525,6 @@ export namespace TaskState {
             default:return null
         }
     }
-}
-export interface SimpleTask 
-{
-    id: number
-    updated_at: string
-    project:number
-    title:string
-    absolute_url: string
-    category: string
-    creator: SimpleUserProfile
-    priority: TaskPriority
-    state: TaskState
-    serialization_date:string
-    visibility?:number[]
-}
-export interface Task extends SimpleTask
-{
-    
 }
 function strEnum<T extends string>(o: Array<T>): {[K in T]: K} {
     return o.reduce((res, key) => {
@@ -655,36 +689,7 @@ export type Dashboard = {
 }
 //DASHBOARD END
 
-export interface SimpleUserProfile
-{
-    absolute_url: string,
-    avatar: string,
-    first_name: string,
-    last_name: string,
-    id: number,
-}
-export interface UserProfile extends SimpleUserProfile{
-    email:string|null
-    locale:string|null
-    timezone:string|null
-    avatar_thumbnail: string
-    cover: string
-    cover_cropped: string
-    username: string
-    uuid:string|null
-    user_status:UserStatus
-    biography:string
-    slug_name:string
-    updated_at:number
-    relationship?: string[]
-    mutual_friends?: number[]
-    last_seen?:number
-    is_anonymous:boolean
-    is_staff:boolean
-    is_superuser:boolean
-    connections?:number[]
-    active_community?:number
-}
+
 export type Timesheet = {
     id:number
     created_at:string

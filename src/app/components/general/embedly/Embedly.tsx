@@ -8,6 +8,7 @@ import "./Embedly.scss"
 import LoadingSpinner from "../../LoadingSpinner";
 import Constants from "../../../utilities/Constants";
 import { Avatar } from "../Avatar";
+import { Settings } from "../../../utilities/Settings";
 export interface OwnProps {
     url: string
 }
@@ -109,7 +110,8 @@ class Embedly extends React.Component<Props, State> {
         }
     }
     render = () => {
-        return (<a href={this.props.url} className="is-embed-card" target="_blank">
+        const title = Settings.renderLinkTitle ? this.props.data && this.props.data.title : undefined
+        return (<a href={this.props.url} className="is-embed-card" target="_blank" title={title}>
                 {this.props.isLoading && <LoadingSpinner/>}
                 {this.props.data && this.renderCardData()}
                 </a>)

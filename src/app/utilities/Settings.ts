@@ -28,6 +28,7 @@ export interface ISettings
     isTouchDevice:boolean
     statusTruncationLength:number
     statusLinebreakLimit:number
+    renderLinkTitle:boolean
 }
 export const Settings:ISettings = {
     isProduction : process.env.NODE_ENV === "production",
@@ -45,5 +46,6 @@ export const Settings:ISettings = {
     maxStatusPreviewItems:5,
     isTouchDevice:isTouchDevice(),
     statusTruncationLength:200,
-    statusLinebreakLimit:5
+    statusLinebreakLimit:5,
+    renderLinkTitle:true,
 }

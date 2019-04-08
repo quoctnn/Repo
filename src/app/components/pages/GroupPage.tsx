@@ -9,7 +9,7 @@ import { DashboardWithData } from "../../DashboardWithData";
 import { CommunityManager } from "../../managers/CommunityManager";
 import { Error404 } from "../../views/error/Error404";
 import { GroupManager } from "../../managers/GroupManager";
-import { communityAvatar, communityName, communityCover } from "../../utilities/Utilities";
+import { communityAvatar, communityName, communityCover, groupCover } from "../../utilities/Utilities";
 import { translate } from "../../localization/AutoIntlProvider";
 export interface OwnProps 
 {
@@ -42,11 +42,11 @@ class ProjectPage extends React.Component<Props, State>
     {
         return (<LoadingSpinner />)
     }
-    renderHeader(community:Community)
+    renderHeader(group:Group, community:Community)
     {
         return (<PageHeader 
-                    coverImage={communityCover(community)} 
-                    primaryItemImage={communityAvatar(community)} 
+                    coverImage={groupCover(group)} 
+                    primaryItemImage={communityAvatar(community, true)} 
                     primaryItemTitle={communityName(community)}  
                     />
                 )
@@ -64,7 +64,7 @@ class ProjectPage extends React.Component<Props, State>
                 {!isLoading && !hasData && this.renderNotFound()}
                 {hasData && 
                     <div className="content dashboard-container">
-                        {this.renderHeader(community)}
+                        {this.renderHeader(group, community)}
                         <DashboardWithData category="group" />
                     </div>
                 }

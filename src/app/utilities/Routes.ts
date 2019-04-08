@@ -19,6 +19,7 @@ export default abstract class Routes {
     private static TASK = "/task/"
     private static GROUP = "/group/"
     private static EVENT = "/event/"
+    private static ERROR_NOT_FOUND = "/error404/"
 
     static searchUrl = (query:string) => {
         if(query)
@@ -35,6 +36,9 @@ export default abstract class Routes {
         if(query.length > 0)
             ret += "?" + query
         return ret
+    }
+    static errorNotFound = () => {
+        return `${Routes.ERROR_NOT_FOUND}`
     }
     static profileUrl = (profile:string|number) => {
         return `${Routes.PROFILE}${profile}/`

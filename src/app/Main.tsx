@@ -28,6 +28,8 @@ import ProfilePage from "./components/pages/ProfilePage";
 import { ProfileManager } from "./managers/ProfileManager";
 import { PrivateRoute } from "./components/router/PrivateRoute";
 import { nullOrUndefined } from "./utilities/Utilities";
+import EventPage from "./components/pages/EventPage";
+import { EventManager } from "./managers/EventManager";
 
 type OwnProps = {
 }
@@ -111,6 +113,18 @@ class Main extends React.Component<Props, State> {
                         else 
                             resolvedContext.groupSlug = groupId
                     }
+                    //event
+                    else if(segments.length > 3 && segments[2] == "event")
+                    {
+                        let eventId = segments[3]
+                        const event = EventManager.getEvent(eventId)
+                        if(event)
+                        {
+                            resolvedContext.eventId = event.id
+                        }
+                        else 
+                            resolvedContext.eventSlug = eventId
+                    }
                     //task
                     if(segments.length > 5 && segments[4] == "task")
                     {
@@ -188,6 +202,14 @@ class Main extends React.Component<Props, State> {
                 this.props.setResolvedContext({profileId:profile && profile.id, profileResolved:new Date().getTime()})
             })
         }
+        if(resolvedContext.eventSlug)
+        {
+            EventManager.ensureEventExists(resolvedContext.eventSlug, (event) => {
+                if(!event)
+                    ToastManager.showErrorToast(translate("context.resolve.event.error"))
+                this.props.setResolvedContext({eventId:event && event.id, eventResolved:new Date().getTime()})
+            })
+        }
     }
     setCommunityTheme = (community:Community) => {
         CommunityManager.applyCommunityTheme(community)
@@ -206,6 +228,7 @@ class Main extends React.Component<Props, State> {
                             {this.props.loaded &&
                                 <Switch>
                                     <Route path={Routes.taskUrl(":communityname", ":projectname", ":taskid")} component={TaskPage} />
+                                    <Route path={Routes.eventUrl(":communityname", ":eventname")} component={EventPage} exact={true} />
                                     <Route path={Routes.projectUrl(":communityname", ":projectname")} component={ProjectPage} exact={true} />
                                     <Route path={Routes.groupUrl(":communityname", ":groupname")} component={GroupPage} exact={true} />
                                     <PrivateRoute path={Routes.profileUrl(":profilename")} component={ProfilePage} />

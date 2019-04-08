@@ -99,7 +99,7 @@ export default class TaskMenu extends React.Component<Props, State> {
         this.setState({data}, this.sendUpdate)
     }
     getProfileFilterOption = (profile:UserProfile):ProfileFilterOption => {
-        return {value:profile.slug_name, label:userFullName(profile), id:profile.id, icon:userAvatar(profile)}
+        return {value:profile.slug_name, label:userFullName(profile), id:profile.id, icon:userAvatar(profile, true)}
     }
     render() {
         const states:TaskState[] = TaskState.all

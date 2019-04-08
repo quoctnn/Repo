@@ -14,7 +14,7 @@ interface State
     state:CollapseState
     contentVisible:boolean
 }
-export default class CollapseComponent extends React.Component<Props & React.HTMLAttributes<HTMLDivElement>, State> 
+export default class CollapseComponent extends React.PureComponent<Props & React.HTMLAttributes<HTMLDivElement>, State> 
 {     
     animationDuration = 250
     container = React.createRef<HTMLDivElement>();
@@ -26,12 +26,12 @@ export default class CollapseComponent extends React.Component<Props & React.HTM
             contentVisible:false,
         }
     }
-    shouldComponentUpdate = (nextProps:Props, nextState:State) => {
+    /*shouldComponentUpdate = (nextProps:Props, nextState:State) => {
         return nextProps.visible != this.props.visible || 
                 nextState.contentVisible != this.state.contentVisible || 
                 nextState.state != this.state.state
 
-    }
+    }*/
     componentDidUpdate = (prevProps:Props, prevState:State) => {
         //open -> sh -> none
         //close -> sh -> 0

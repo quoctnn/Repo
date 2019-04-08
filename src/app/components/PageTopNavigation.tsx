@@ -34,7 +34,7 @@ class PageTopNavigation extends React.Component<Props, {}> {
                         </div>
                     </div>
                     <div className="profile-box d-flex align-items-center ml-1">
-                        <Avatar className="" image={userAvatar(profile)} size={63} statusColor={currentState && currentState.color} >
+                        <Avatar className="" image={userAvatar(profile, true)} size={63} statusColor={currentState && currentState.color} >
                         </Avatar>
                         <div className="text-truncate ml-2">
                             <div className="profile-name text-truncate">{userFullName( profile ) }</div>

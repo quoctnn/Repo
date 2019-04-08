@@ -20,6 +20,9 @@
             display: flex;
             flex-direction: row-reverse;
         }
+        &.hover-card:hover:after{
+            opacity:0.3 ;
+        }
     }
     .card-content{
         padding-top:8px;

@@ -121,13 +121,13 @@ export default  {
         },
 
         // Event URLs
-        upcomingEventsUrl: '/api/v1/event/upcoming/',
-        eventsUrl: '/api/v1/event/',
+        upcomingEventsUrl: '/api/v2/event/upcoming/',
+        eventsUrl: '/api/v2/event/',
         eventDetailUrl: (id:number|string) => {
-            return `/api/v1/event/${id}/`
+            return `/api/v2/event/${id}/`
         },
         eventFilesUrl: (id:number) => {
-            return `/api/v1/event/${id}/files/`
+            return `/api/v2/event/${id}/files/`
         },
 
         // Notification URLs

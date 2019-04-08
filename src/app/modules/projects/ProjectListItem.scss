@@ -1,0 +1,47 @@
+.project-list-item{
+    margin:10px 12px;
+    margin-top: 0;
+    &:hover{
+        text-decoration: none;
+    }
+    .drop-shadow{
+
+        border-radius: 15px;
+        overflow: hidden;
+    }
+    .img, .bottom{
+        height:40px;
+    }
+    .img{
+        opacity: 0.25;
+    }
+    .top{
+        position: relative;
+    }
+    .bottom, .title-row{
+        padding: 0 8px;
+    }
+    .title{
+        padding-left: 8px;
+    }
+    .title-row{
+        position: absolute;
+        top:0;
+        left:0;
+        right:0;
+        bottom:0;
+    }
+    .item{
+        line-height: 1em;
+        align-items: center;
+        align-content: center;
+        display: flex;
+        flex-direction: column;
+        .item-top{
+            font-size: 16px;
+        }
+        .item-bottom{
+            font-size: 10px;
+        }
+    }
+}

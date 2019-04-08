@@ -22,6 +22,7 @@ type OwnProps =
     contextNaturalKey:ContextNaturalKey
     communityId:number
     showEmojiPicker?:boolean
+    showSubmitButton?:boolean
     placeholder?:string
     children?:React.ReactNode
     canPost?:() => boolean
@@ -67,7 +68,6 @@ export class StatusComposerComponent extends React.Component<Props, State> {
         }
     }
     shouldComponentUpdate = (nextProps:Props, nextState:State) => {
-        const a = nextState.files_ids.isEqual(this.state.files_ids)
         const ret = nextState.text != this.state.text ||
                 nextState.uploading != this.state.uploading || 
                 nextState.link != this.state.link || 
@@ -75,7 +75,9 @@ export class StatusComposerComponent extends React.Component<Props, State> {
                 !nextState.files_ids.isEqual(this.state.files_ids) || 
                 nextState.renderPlaceholder != this.state.renderPlaceholder ||
                 nextProps.className != this.props.className || 
-                nextProps.refresh != this.props.refresh
+                nextProps.refresh != this.props.refresh || 
+                nextProps.showEmojiPicker != this.props.showEmojiPicker ||
+                nextProps.showSubmitButton != this.props.showSubmitButton
         return ret;
     }
     componentDidMount = () => {
@@ -270,6 +272,7 @@ export class StatusComposerComponent extends React.Component<Props, State> {
                     placeholder={this.props.placeholder}
                     onBlur={this.props.onBlur}
                     onFocus={this.props.onFocus}
+                    showSubmitButton={this.props.showSubmitButton}
                     >
                     {this.props.children}
                     </CommentForm>

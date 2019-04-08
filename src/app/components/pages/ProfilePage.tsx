@@ -41,7 +41,7 @@ class ProfilePage extends React.Component<Props, State>
     renderHeader(profile:UserProfile)
     {
         return (
-                <PageHeader coverImage={userCover(profile)} primaryItemImage={userAvatar(profile)} primaryItemTitle={userFullName(profile)}  />
+                <PageHeader coverImage={userCover(profile)} primaryItemImage={userAvatar(profile, true)} primaryItemTitle={userFullName(profile)}  />
             )
     }
     renderNotFound = () => {

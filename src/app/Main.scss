@@ -67,6 +67,15 @@ button{@include var(color, primary-text-color);}
     @include var(background, highlight-background-color);
     @include var(color, highlight-foreground-color);
 }
+.theme-bg-gradient{
+    background-image: linear-gradient(to left, #{map-get($root, secondary-theme-color)}, #{map-get($root, primary-theme-color)});
+    background-image: linear-gradient(to left, var(--secondary-theme-color), var(--primary-theme-color));
+}
+.theme-box{
+    color:white;
+    border-radius: 8px;
+    padding: 0 4px
+}
 .drop-shadow-large
 {
     box-shadow:map-get($root, drop-shadow-large);

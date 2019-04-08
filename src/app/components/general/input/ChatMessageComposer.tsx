@@ -121,8 +121,7 @@ const generateContentState = (content:string, mentions:Mention[]):ContentState =
     })
     return contentState
 }
-export interface Props
-{
+type Props = {
     onSubmit:(text:string, mentions:number[]) => void,
     onDidType:(unprocessedText:string) => void
     filesAdded?:(files:File[]) => void
@@ -137,14 +136,21 @@ export interface Props
     onBlur?(e: React.SyntheticEvent<{}>): void
     onFocus?(e: React.SyntheticEvent<{}>): void
 }
+type DefaultProps = {
+    showSubmitButton:boolean 
+}
+
 interface State
 {
     plainText:string
     editorState:EditorState
 }
-export class ChatMessageComposer extends React.Component<Props,State> implements IEditorComponent {
+export class ChatMessageComposer extends React.Component<Props & DefaultProps,State> implements IEditorComponent {
     
     private inputRef = React.createRef<any>()
+    static defaultProps:DefaultProps = {
+        showSubmitButton:true
+    }
     constructor(props) {
         super(props)
         this.state = {plainText:"", editorState:EditorState.createWithContent(generateContentState(this.props.content, this.props.mentions))}
@@ -239,11 +245,13 @@ export class ChatMessageComposer extends React.Component<Props,State> implements
                             onFocus={this.props.onFocus}
                             /> 
                         </div>
-                        <div className="button-wrap d-flex flex-column-reverse">
-                            <button disabled={!canSubmit} className="btn btn-submit btn-default align-items-end message-send-button">
-                                <i className="fas fa-location-arrow" />
-                            </button>
-                        </div>
+                        {this.props.showSubmitButton && 
+                            <div className="button-wrap d-flex flex-column-reverse">
+                                <button disabled={!canSubmit} className="btn btn-submit btn-default align-items-end message-send-button">
+                                    <i className="fas fa-location-arrow" />
+                                </button>
+                            </div>
+                        }
                     </div>
                 </form>
             </div>

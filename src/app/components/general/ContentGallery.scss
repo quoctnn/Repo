@@ -81,7 +81,9 @@
         {
             font-size: 30px;
         }
-
+        &.hover-card:hover:after{
+            opacity:0.3 ;
+        }
     }
     .gallery-item:first-child
     {

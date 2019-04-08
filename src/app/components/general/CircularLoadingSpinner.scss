@@ -5,6 +5,7 @@
     display: inline-block;
     flex-shrink: 0;
     @include var(border-color, primary-theme-color);
+    background: transparent;
 }
 
 @keyframes spin {

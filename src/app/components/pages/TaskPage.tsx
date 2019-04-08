@@ -51,7 +51,7 @@ class TaskPage extends React.Component<Props, State>
     {
         return (<PageHeader 
                     coverImage={communityCover(community)} 
-                    primaryItemImage={communityAvatar(community)} 
+                    primaryItemImage={communityAvatar(community, true)} 
                     primaryItemTitle={communityName(community)}  
                     />
                 )

@@ -15,29 +15,30 @@ import { UserProfile } from "../../../types/intrasocial_types";
 import { IntraSocialUtilities } from "../../../utilities/IntraSocialUtilities";
 import { Settings } from "../../../utilities/Settings";
 import { SecureImage } from '../SecureImage';
+import { userFullName } from "../../../utilities/Utilities";
 require("./MentionEditor.scss");
 
 
 let theme = {...defaultTheme, emojiSelectPopover:"emojiSelectPopover " + defaultTheme.emojiSelectPopover}
 
 export class Mention {
-  name: string;
-  key: string;
-  avatar: string;
-  id: number;
-  constructor(name: string, key: string, avatar: string, id: number) {
-    this.name = name;
-    this.avatar = avatar;
-    this.key = key;
-    this.id = id;
-  }
-  static fromUser(user:UserProfile)
-  {
-    return new Mention(user.first_name + " " + user.last_name,
-    user.username,
-    IntraSocialUtilities.appendAuthorizationTokenToUrl(user.avatar || user.avatar_thumbnail),
-    user.id)
-  }
+    name: string;
+    key: string;
+    avatar: string;
+    id: number;
+    constructor(name: string, key: string, avatar: string, id: number) {
+        this.name = name;
+        this.avatar = avatar;
+        this.key = key;
+        this.id = id;
+    }
+    static fromUser(user:UserProfile)
+    {
+        return new Mention(userFullName(user),
+        user.username,
+        IntraSocialUtilities.appendAuthorizationTokenToUrl(user.avatar || user.avatar_thumbnail),
+        user.id)
+    }
 }
 interface EntryProps {
   mention: Mention;

@@ -3,6 +3,7 @@ import {  Button, ModalBody, Modal, ModalHeader, ModalFooter, FormGroup, Label, 
 import { UserProfile } from "../../../types/intrasocial_types";
 import { Avatar } from "../Avatar";
 import { translate } from "../../../localization/AutoIntlProvider";
+import { userFullName } from "../../../utilities/Utilities";
 
 require("./SelectUsersDialog.scss");
 
@@ -18,7 +19,7 @@ export const UserInfo = (props:UserInfoProps) => {
         <Avatar image={props.user.avatar} className="flex-shrink-0" />
         <div className="flex-truncate-container flex-shrink-1 flex-grow-1">
             <div className="user-info-name text-truncate">
-                {props.user.first_name + " " + props.user.last_name}
+                {userFullName(props.user)}
             </div>
             <div className="user-info-username text-truncate">
                 {props.user.username}

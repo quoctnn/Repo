@@ -63,7 +63,7 @@ export class ProjectProfileFilter extends React.PureComponent<Props & React.HTML
         this.props.onValueChange(value)
     }
     getProfileFilterOption = (profile:UserProfile):ProfileFilterOption => {
-        return {value:profile.slug_name, label:userFullName(profile), id:profile.id, icon:userAvatar(profile)}
+        return {value:profile.slug_name, label:userFullName(profile), id:profile.id, icon:userAvatar(profile, true)}
     }
     getProfiles = (text:string, completion:(options:ProfileFilterOption[]) => void) => {
         const resp = (profiles:number[]) => {

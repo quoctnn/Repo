@@ -3,10 +3,11 @@ import Embedly from '../components/general/embedly/Embedly';
 const processString = require('react-process-string');
 import Routes from './Routes';
 import * as React from 'react';
-import { UserProfile, StatusActions, Community } from '../types/intrasocial_types';
-import Text from '../components/general/Text';
+import { UserProfile, StatusActions, Community, Project, Group, Event, IntraSocialType } from '../types/intrasocial_types';
+import {Text} from '../components/general/Text';
 import Constants from '../utilities/Constants';
 import { translate } from '../localization/AutoIntlProvider';
+import { IntraSocialLink } from '../components/general/IntraSocialLink';
 export const getDomainName = (url:string) =>  {
     var url_parts = url.split("/")
     var domain_name_parts = url_parts[2].split(":")
@@ -23,9 +24,7 @@ export const parseJSONObject = (param:string) => {
     }
     return null
 }
-export function userAvatar(user:UserProfile) {
-    return (user && (user.avatar_thumbnail || user.avatar)) || Constants.resolveUrl( Constants.defaultImg.user )()
-}
+
 export function userFullName(user:UserProfile) {
     if(!user)
         return "Anonymous"
@@ -34,19 +33,38 @@ export function userFullName(user:UserProfile) {
     }
     return user.username;
 }
-export function userCover(user:UserProfile) {
-    return (user && (user.cover_cropped || user.cover)) || Constants.resolveUrl(Constants.defaultImg.user)()
-}
-export function communityCover(community:Community) {
-    return (community && (community.cover_cropped || community.cover)) || Constants.resolveUrl(Constants.defaultImg.community)()
-}
-export function communityAvatar(community:Community) {
-    return (community && (community.avatar_thumbnail || community.avatar)) || Constants.resolveUrl(Constants.defaultImg.communityAvatar)()
-}
 export function communityName(community:Community) {
     return (community && community.name) || translate("community.active.empty")
 }
 
+export function userAvatar(user:UserProfile, thumbnail = false) {
+    return (user && (thumbnail ? user.avatar_thumbnail : user.avatar)) || Constants.resolveUrl( Constants.defaultImg.user )()
+}
+export function communityAvatar(community:Community, thumbnail = false) {
+    return (community && (thumbnail ? community.avatar_thumbnail : community.avatar)) || Constants.resolveUrl(Constants.defaultImg.communityAvatar)()
+}
+export function groupAvatar(group:Group, thumbnail = false) {
+    return (group && (thumbnail ? group.avatar_thumbnail : group.avatar)) || Constants.resolveUrl(Constants.defaultImg.groupAvatar)()
+}
+export function projectAvatar(project:Project, thumbnail = false) {
+    return (project && (thumbnail ? project.avatar_thumbnail : project.avatar_thumbnail || project.avatar)) || Constants.resolveUrl(Constants.defaultImg.projectAvatar)()
+}
+
+export function userCover(user:UserProfile, thumbnail = false) {
+    return (user && (thumbnail ? user.cover_thumbnail : user.cover_cropped || user.cover)) || Constants.resolveUrl(Constants.defaultImg.user)()
+}
+export function communityCover(community:Community, thumbnail = false) {
+    return (community && (thumbnail ? community.cover_thumbnail : community.cover_cropped || community.cover)) || Constants.resolveUrl(Constants.defaultImg.community)()
+}
+export function projectCover(project:Project, thumbnail = false) {
+    return (project && (thumbnail ? project.cover_thumbnail : project.cover_cropped || project.cover)) || Constants.resolveUrl(Constants.defaultImg.project)()
+}
+export function groupCover(group:Group, thumbnail = false) {
+    return (group && (thumbnail ? group.cover_thumbnail : group.cover_cropped || group.cover)) || Constants.resolveUrl(Constants.defaultImg.group)()
+}
+export function eventCover(event:Event, thumbnail = false) {
+    return (event && (thumbnail ? event.cover_thumbnail : event.cover_cropped || event.cover)) || Constants.resolveUrl(Constants.defaultImg.event)()
+}
 export const EMAIL_REGEX = /(\b\s+)(([a-zA-Z0-9\-\_\.])+@[a-zA-Z\_]+?(\.[a-zA-Z]{2,6})+)/gm
 export const URL_REGEX = /(\b(https?|ftp):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/gim
 export const URL_WWW_REGEX = /(^(\b|\s+)(www)\.[\S]+(\b|$))/gim
@@ -83,7 +101,7 @@ export function getTextContent(prefixId:string,
             {
                 embedlyArr[result[0]] = <Embedly key={getKey("embedly_" + result[0])} url={result[0]} />
             }
-            return (<Text key={getKey("link_" + result[0])} onPress={() => onLinkPress(StatusActions.link, {link:result[0]} )}>{truncate(result[0], 50 )}</Text>)
+            return (<Text key={getKey("link_" + result[0])} title={result[0]} href={result[0]}>{truncate(result[0], 50 )}</Text>)
         }
     }
     config.push(embedlies)
@@ -92,7 +110,8 @@ export function getTextContent(prefixId:string,
             regex: HASHTAG_REGEX_WITH_HIGHLIGHT,
             fn: (key, result) => 
             {
-                return (<Text key={getKey("hashtag" + result[0])} onPress={() => onLinkPress(StatusActions.search, {query:result[0]} )}>{result[0]}</Text>)
+                const href = Routes.searchUrl(result[0])//result[1] == without #
+                return (<Text title={translate("search.for") + " " +  result[0]} key={getKey("hashtag" + result[0])} href={href}>{result[0]}</Text>)
             }
         }
         config.push(hashtags)
@@ -109,7 +128,7 @@ export function getTextContent(prefixId:string,
         return {
             regex:new RegExp("@" + user.username.replace("+","\\+"), 'g'),
             fn: (key, result) => {
-                return <Text key={getKey(key)} onPress={() => onLinkPress(StatusActions.user,{profile:user} )}>{user.first_name + " " + user.last_name}</Text>
+                return <IntraSocialLink key={getKey(key)} to={user} type={IntraSocialType.profile}>{userFullName(user)}</IntraSocialLink>
             }
         }
     }).filter(o => o)

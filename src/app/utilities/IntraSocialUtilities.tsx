@@ -1,10 +1,5 @@
-import processString from 'react-process-string'
-import * as React from 'react';
 import { AuthenticationManager } from '../managers/AuthenticationManager';
-import { Link } from 'react-router-dom';
-import Routes from './Routes';
 import { Status, UserProfile, UploadedFile } from '../types/intrasocial_types';
-import Embedly from '../components/general/embedly/Embedly';
 
 export const URL_REGEX = /(\b(https?|ftp):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/gim
 export const URL_WWW_REGEX = /(^(\b|\s+)(www)\.[\S]+(\b|$))/gim
@@ -86,58 +81,6 @@ export class IntraSocialUtilities
             let k = 5
         }
         return IntraSocialUtilities.appendAuthorizationTokenToUrl(user.avatar_thumbnail || user.avatar)
-    }
-    static getTextString = (text:string, mentions:UserProfile[]) =>
-    {
-        var processed:any = null
-        var config:any[] = []
-        let mentionSearch = mentions.map(user => {
-            return {
-                regex:new RegExp("@" + user.username.replace("+","\\+"), 'g'),
-                fn: (key:string, result:any) => {
-                    return user.first_name + " " + user.last_name
-                }
-            }
-        }).filter(o => o)
-        config = config.concat(mentionSearch)
-        processed = processString(config)(text)
-        if(typeof processed == "string")
-            return processed
-        else
-        {
-            let a = processed as any[]
-            return a.join("")
-        }
-    }
-    static getTextContent = (text:string, mentions:UserProfile[], includeEmbedlies:boolean, maxNumberOfEmbedlies:number) =>
-    {
-        var processed:any = null
-        var config = []
-        let embedlies:{[id:string]:any} = {}
-        let k = {
-            regex: URL_REGEX,
-            fn: (key:string, result:any) =>
-            {
-                if(includeEmbedlies && Object.keys( embedlies).length < maxNumberOfEmbedlies)
-                {
-                    embedlies[result[0]] = <Embedly key={IntraSocialUtilities.uniqueId()} url={result[0]} />
-                }
-                return (<a key={IntraSocialUtilities.uniqueId()} href={result[0]} target="_blank"  data-toggle="tooltip" title={result[0]}>{IntraSocialUtilities.truncateText(result[0], 50 )}</a>)
-            }
-        }
-        config.push(k)
-        let mentionSearch = mentions.map(user => {
-            return {
-                regex:new RegExp("@" + user.username.replace("+","\\+"), 'g'),
-                fn: (key:string, result:any) => {
-                    return <Link key={key} to={Routes.profileUrl(user.slug_name)}>{user.first_name + " " + user.last_name}</Link>;
-                }
-            }
-        }).filter(o => o)
-        config = config.concat(mentionSearch)
-        processed = processString(config)(text);
-
-        return {textContent:processed, embedlies:embedlies}
     }
     static uniqueId = () =>  {
         return Math.random().toString(36).substr(2, 16);

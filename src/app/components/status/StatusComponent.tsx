@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Status, StatusActions, ObjectAttributeType, Permission } from '../../types/intrasocial_types';
+import { Status, StatusActions, ObjectAttributeType, Permission, IntraSocialType, ContextNaturalKey } from '../../types/intrasocial_types';
 import { Avatar } from "../general/Avatar";
 import { userAvatar, userFullName, getTextContent } from '../../utilities/Utilities';
 import Moment from "react-moment";
@@ -14,13 +14,13 @@ import { AuthenticationManager } from "../../managers/AuthenticationManager";
 import ContentGallery from '../general/ContentGallery';
 
 import "./StatusComponent.scss"
-import Text from "../general/Text";
+import {Text} from "../general/Text";
 import StatusOptionsComponent from "./StatusOptionsComponent";
-import { ResponsiveBreakpoint } from '../general/observers/ResponsiveComponent';
 import { Settings } from '../../utilities/Settings';
 import classnames = require("classnames");
 import { StatusBadgeList, ObjectAttributeTypeExtension } from "./StatusBadgeList";
 import ReactButton from "./ReactButton";
+import { IntraSocialLink } from "../general/IntraSocialLink";
 
 interface OwnProps 
 {
@@ -118,7 +118,7 @@ export class StatusComponent extends React.Component<Props, State> {
     renderTextContent = (textContent: JSX.Element[], hasMore:boolean) => {
         return  (<>
                     {textContent}
-                    {hasMore && <span>...&nbsp;<Text onPress={this.onReadMore}>{translate("read more")}</Text></span>}
+                    {hasMore && <span>...&nbsp;<Text title={translate("read more")} onPress={this.onReadMore}>{translate("read more")}</Text></span>}
                 </>)
     }
     getAttributeBadgeSettings = (status:Status) => {
@@ -149,14 +149,13 @@ export class StatusComponent extends React.Component<Props, State> {
         return ProfileManager.getProfilesFetchRest(mentions, this.refresh)
     }
     render() {
-        const {status, isComment, className, onActionPress, canUpload, authorizedUserId} = this.props
+        const {status, isComment, className, onActionPress, canUpload, authorizedUserId, addLinkToContext} = this.props
         if(this.state.renderPlaceholder)
         {
             let itemClass = classnames("status-component status-component-placeholder", this.props.className, { comment: isComment, temp: status.pending})
             return <div ref={this.element} className={itemClass}></div>
         }
-        const contextObject =  isComment ? null : status.context_object
-        const contextObjectAction =  isComment ? null : () => onActionPress(StatusActions.context)
+        const contextObject =  isComment || !addLinkToContext ? null : status.context_object
         const mentions = this.getMentions()
         const truncateLength = this.state.readMoreActive ? 0 : Settings.statusTruncationLength
         const content = getTextContent(status.id.toString(), status.text, mentions, true, onActionPress, truncateLength, Settings.statusLinebreakLimit)
@@ -164,24 +163,23 @@ export class StatusComponent extends React.Component<Props, State> {
         const cn = classnames("status-component", className, "sid-" + status.id, {comment:isComment})
         const avatarSize = isComment ? 40 : 50
         const files = status.files || []
-        const ownerAction = () => onActionPress(StatusActions.user, {profile:status.owner})
         let communityId = status.community && status.community.id ? status.community.id : null
         const footerStyles:React.CSSProperties = {justifyContent: isComment ? "space-between" : "space-around"} 
         //console.log("Render Status ", status.id)
         return(<div className={cn}>
                 <div className="d-flex">
                     <div className="flex-shrink-0 header-left">
-                        <Text onPress={ownerAction}>
-                            <Avatar size={avatarSize} image={userAvatar(status.owner)}/>
-                        </Text>
+                        <IntraSocialLink to={this.props.status.owner} type={IntraSocialType.profile}>
+                            <Avatar size={avatarSize} image={userAvatar(status.owner, true)}/>
+                        </IntraSocialLink>
                     </div>
                     <div className="d-flex header-center flex-grow-1">
                         <div className="d-flex header-center-content text-truncate">
                             <div className="text-truncate flex-grow-1 d-flex flex-wrap header-center-left">
                                 <div className="text-truncate">
-                                    <Text onPress={ownerAction}>
+                                    <IntraSocialLink to={this.props.status.owner} type={IntraSocialType.profile}>
                                         <div className="title text-truncate">{userFullName(this.props.status.owner)}</div>
-                                    </Text>
+                                    </IntraSocialLink>
                                 </div>
                                 <div className="text-truncate">
                                     <div className="date text-truncate secondary-text">
@@ -193,12 +191,16 @@ export class StatusComponent extends React.Component<Props, State> {
                             <div className="text-truncate  flex-grow-0 flex-shrink-0 header-center-right">
                                 {contextObject && 
                                     <div className="text-truncate">
-                                        <div className="context text-truncate"><Text onPress={contextObjectAction}>{contextObject.name}</Text></div>
+                                        <div className="context text-truncate">
+                                            <IntraSocialLink to={contextObject} title={contextObject.name}>
+                                                {contextObject.name}
+                                            </IntraSocialLink>
+                                        </div>
                                     </div>
                                 }
                             </div>
                         </div>
-                        {isComment && <div className="d-flex status-content-inner">{this.renderTextContent(textContent, hasMore)}
+                        {isComment && <div className="status-content-inner">{this.renderTextContent(textContent, hasMore)}
                             {files.length > 0 && <ContentGallery files={files}/>}
                             {linkCards.length > 0 && linkCards}
                         </div>}

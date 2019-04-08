@@ -19,6 +19,10 @@ export type ResolvedContext = {
     groupSlug?:string
     groupId?:number
     groupResolved?:number
+    //event
+    eventSlug?:string
+    eventId?:number
+    eventResolved?:number
     //profile
     profileSlug?:string
     profileId?:number

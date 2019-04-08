@@ -27,6 +27,7 @@ export interface OwnProps
     className?:string
     communityId:number
     showEmojiPicker?:boolean
+    showSubmitButton?:boolean
     placeholder?:string
     children?:React.ReactNode
     onBlur?(e: React.SyntheticEvent<{}>): void
@@ -151,6 +152,7 @@ export default class StatusFormBase extends React.Component<Props, State> implem
                 showEmojiPicker={this.props.showEmojiPicker}
                 onBlur={this.props.onBlur}
                 onFocus={this.props.onFocus}
+                showSubmitButton={this.props.showSubmitButton}
             />                      
         )
     }
