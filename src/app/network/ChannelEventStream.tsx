@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
-import ReconnectingWebSocket from 'reconnecting-websocket';
+import ReconnectingWebSocket, { Message } from 'reconnecting-websocket';
 import { ReduxState } from '../redux/index';
 import { availableEndpoints } from '../redux/endpoint';
 import { uniqueId, nullOrUndefined } from '../utilities/Utilities';
@@ -28,7 +28,7 @@ export enum WebsocketState {
     CLOSED
 }
 var publicStream: ReconnectingWebSocket|null = null;
-export const sendOnWebsocket = (data: string) => {
+export const sendOnWebsocket = (data: Message) => {
     if (canSendOnWebsocket()) {
         //console.log('Sending Websocket', data);
         publicStream!.send(data);
@@ -178,7 +178,7 @@ class ChannelEventStream extends React.Component<Props, State> {
                 if (this.stream && (this.stream as any)._shouldReconnect)
                     (this.stream as any)._connect();
             }
-            window.socket = this.stream
+            window.app.socket = this.stream
         }
     }
     componentDidMount = () => {
