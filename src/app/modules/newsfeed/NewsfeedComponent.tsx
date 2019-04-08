@@ -818,9 +818,10 @@ export class NewsfeedComponent extends React.Component<Props, State> {
                             const isComment = !!s.parent
                             return this.renderStatus(authUser, s, isComment, i, color)
                         }).concat(this.renderLoading()) }
+                        {this.renderEmpty()}                    
+                        {this.renderError()}
                     </List>
-                    {this.renderError()}
-                    {this.renderEmpty()}
+
             </div> 
         );
     }

@@ -181,7 +181,7 @@ export default class TaskListItem extends React.Component<Props, State> {
                                 </StatusComposerComponent>
                             </FormGroup>
                             <FormGroup>
-                                <Label>{translate("task.module.menu.setstate.title") + task.state}</Label>
+                                <Label>{translate("task.module.menu.setstate.title")}</Label>
                                 <ButtonGroup className="flex-wrap d-block">
                                     {states.map(s => <Button outline={true} size="xs" color="secondary" onClick={this.setTaskState(s)} key={s} active={this.stateActive(s)}>{translate("task.state." + s)}</Button>)}
                                 </ButtonGroup>
