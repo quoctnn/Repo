@@ -11,6 +11,7 @@
         display: flex;
         flex-direction: column;
         -webkit-overflow-scrolling: touch;
+        flex: 1;
         &.rb-mini{
             .status-component:not(.comment){
                 .header-center {
