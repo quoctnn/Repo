@@ -3,6 +3,7 @@ import "./PageMenu.scss"
 import { ReduxState } from "../redux";
 import { Community } from "../types/intrasocial_types";
 import { connect } from "react-redux";
+import { Link } from "react-router-dom";
 
 interface OwnProps
 {
@@ -21,7 +22,9 @@ class PageMenu extends React.Component<Props, {}> {
     render() {
         return(
             <div id="page-menu">
-                <div className="p-2">Menu Stuff</div>
+                <Link to={"/"}>
+                  <div className="p-2">Home</div>
+                </Link>
             </div>
         );
     }

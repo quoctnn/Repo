@@ -13,7 +13,7 @@ config.module.rules.unshift(
       {
         loader: MiniCssExtractPlugin.loader,
         options: {
-          publicPath: '/dist/'
+          publicPath: '../dist/'
         }
       },
       'css-loader',
