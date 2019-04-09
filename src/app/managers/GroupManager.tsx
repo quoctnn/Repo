@@ -11,6 +11,10 @@ export abstract class GroupManager
     static storeGroups = (groups:Group[]) => {
         GroupManager.getStore().dispatch(addGroupsAction(groups))
     }
+    static getGroupById = (groupId:number):Group|null => 
+    {
+        return GroupManager.getStore().getState().groupStore.byId[groupId]
+    }
     static getGroup = (groupId:string):Group|null => 
     {
         const groupStore = GroupManager.getStore().getState().groupStore

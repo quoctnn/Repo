@@ -11,6 +11,10 @@ export abstract class ProjectManager
     static storeProjects = (projects:Project[]) => {
         ProjectManager.getStore().dispatch(addProjectsAction(projects))
     }
+    static getProjectById = (projectId:number):Project|null => 
+    {
+        return ProjectManager.getStore().getState().projectStore.byId[projectId]
+    }
     static getProject = (projectId:string):Project|null => 
     {
         const projectStore = ProjectManager.getStore().getState().projectStore

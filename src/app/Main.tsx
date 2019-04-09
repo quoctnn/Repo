@@ -30,6 +30,9 @@ import { PrivateRoute } from "./components/router/PrivateRoute";
 import { nullOrUndefined } from "./utilities/Utilities";
 import EventPage from "./components/pages/EventPage";
 import { EventManager } from "./managers/EventManager";
+import { Settings } from "../utilities/Settings";
+import DevTool from "./components/dev/DevTool";
+import DevToolTrigger from "./components/dev/DevToolTrigger";
 
 type OwnProps = {
 }
@@ -219,14 +222,17 @@ class Main extends React.Component<Props, State> {
             <div id="main">
                     <div id="main-content">
                         <ToastContainer />
+                        <DevToolTrigger /> 
                         <div id="content-block" className="">
                             {!this.props.loaded &&
                                 <Switch>
+                                    {!Settings.isProduction && <Route path={Routes.DEVELOPER_TOOL} component={DevTool} /> }
                                     <Route path={Routes.ANY} component={ApplicationLoader} />
                                 </Switch>
                             }
                             {this.props.loaded &&
                                 <Switch>
+                                    {!Settings.isProduction && <Route path={Routes.DEVELOPER_TOOL} component={DevTool} /> }
                                     <Route path={Routes.taskUrl(":communityname", ":projectname", ":taskid")} component={TaskPage} />
                                     <Route path={Routes.eventUrl(":communityname", ":eventname")} component={EventPage} exact={true} />
                                     <Route path={Routes.projectUrl(":communityname", ":projectname")} component={ProjectPage} exact={true} />

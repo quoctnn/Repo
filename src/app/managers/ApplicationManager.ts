@@ -11,6 +11,9 @@ import { ProfileManager } from './ProfileManager';
 import { resetCommunitiesAction } from '../redux/communityStore';
 import { resetGroupsAction } from '../redux/groupStore';
 import { resetProfilesAction } from '../redux/profileStore';
+import { resetProjectsAction } from '../redux/projectStore';
+import { resetEventsAction } from '../redux/eventStore';
+import { resetTasksAction } from '../redux/taskStore';
 export type ApplicationData = {
     dashboards:Dashboard[]
     communitiesLoaded:boolean
@@ -40,9 +43,13 @@ export abstract class ApplicationManager
         {
             const store = ApplicationManager.getStore()
             // Clean up cached data
-            store.dispatch(resetCommunitiesAction());
-            store.dispatch(resetGroupsAction());
-            store.dispatch(resetProfilesAction());
+            store.dispatch(resetCommunitiesAction())
+            store.dispatch(resetGroupsAction())
+            store.dispatch(resetProfilesAction())
+
+            store.dispatch(resetProjectsAction())
+            store.dispatch(resetEventsAction())
+            store.dispatch(resetTasksAction())
         }
     }
     static getDashboards = (category:string) => {
