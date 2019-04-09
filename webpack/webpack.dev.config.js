@@ -11,8 +11,8 @@ try {
   // Not local domain specified, shared on localhost
   //localDomain = "192.168.15.14";
   //localDomain = "10.0.1.2"
-  localDomain = 'localhost';
-  //localDomain = '192.168.15.28';
+  //localDomain = 'localhost';
+  localDomain = '192.168.15.28';
   //localDomain = "alesund-dev.intra.work";
 }
 
