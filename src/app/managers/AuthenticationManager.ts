@@ -11,7 +11,7 @@ export const AuthenticationManagerAuthenticatedUserChangedNotification = "Authen
 export abstract class AuthenticationManager
 {
     private static lastUserActivity: number = 0;
-    private static keepAliveFrequency: number = 60; // How often do we send keepAlive message (in seconds)
+    private static keepAliveFrequency: number = 5; // How often do we send keepAlive message (in seconds)
     private static keepAlive: (NodeJS.Timer|null);
 
     static setup = () =>
@@ -25,11 +25,11 @@ export abstract class AuthenticationManager
     {
         return AuthenticationManager.getStore().getState().authentication.token
     }
-    static get isSignedIn() 
+    static get isSignedIn()
     {
         return AuthenticationManager.getStore().getState().authentication.signedIn
     }
-    static signIn = (token:string) => 
+    static signIn = (token:string) =>
     {
         //AjaxRequest.setup(token)
         AuthenticationManager.getStore().dispatch(setAuthenticationTokenAction(token))

@@ -1,6 +1,7 @@
 import ApiClient from '../network/ApiClient';
 export default abstract class Routes {
     static ANY = "*"
+    static ELECTRON = "/**/electron.html"
     static ROOT = "/"
     static PROFILE_UPDATE = "/profile/update"
     static SIGNIN = "/signin"
@@ -11,7 +12,7 @@ export default abstract class Routes {
     static SEARCH = "/search/"
     static UPDATE_TOOL = "/app-update"
     static NEWSFEED = "/newsfeed/"
-    
+
     private static PROFILE = "/profile/"
     private static COMMUNITY = "/community/"
     private static CONVERSATION = "/conversation/"

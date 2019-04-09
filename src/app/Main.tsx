@@ -1,6 +1,6 @@
 import "intersection-observer"
 import * as React from "react";
-import { Route, Switch, withRouter, RouteComponentProps } from "react-router-dom";
+import { Route, Switch, withRouter, RouteComponentProps, Link } from "react-router-dom";
 import { ToastContainer } from 'react-toastify';
 import Routes from "./utilities/Routes";
 import { connect } from 'react-redux'
@@ -68,7 +68,7 @@ class Main extends React.Component<Props, State> {
         this.checkCurrentCommunity()
     }
     checkCurrentCommunity = () => {
-    
+
         if(this.props.loaded)
         {
             this.props.resetResolvedContext()
@@ -90,7 +90,7 @@ class Main extends React.Component<Props, State> {
                         }
                         resolvedContext.communityId = community.id
                     }
-                    else 
+                    else
                         resolvedContext.communitySlug = communityId
                     //project
                     if(segments.length > 3 && segments[2] == "project")
@@ -101,7 +101,7 @@ class Main extends React.Component<Props, State> {
                         {
                             resolvedContext.projectId = project.id
                         }
-                        else 
+                        else
                             resolvedContext.projectSlug = projectId
                     }
                     //group
@@ -113,7 +113,7 @@ class Main extends React.Component<Props, State> {
                         {
                             resolvedContext.groupId = group.id
                         }
-                        else 
+                        else
                             resolvedContext.groupSlug = groupId
                     }
                     //event
@@ -125,7 +125,7 @@ class Main extends React.Component<Props, State> {
                         {
                             resolvedContext.eventId = event.id
                         }
-                        else 
+                        else
                             resolvedContext.eventSlug = eventId
                     }
                     //task
@@ -137,7 +137,7 @@ class Main extends React.Component<Props, State> {
                         {
                             resolvedContext.taskId = task.id
                         }
-                        else 
+                        else
                             resolvedContext.taskSlug = taskId
                     }
                 }
@@ -151,7 +151,7 @@ class Main extends React.Component<Props, State> {
                     {
                         resolvedContext.profileId = profile.id
                     }
-                    else 
+                    else
                         resolvedContext.profileSlug = profileId
                 }
                 //store
@@ -243,6 +243,7 @@ class Main extends React.Component<Props, State> {
                                     <Route path={Routes.SIGNIN} component={Signin} />
                                     <Route path={Routes.SIGNOUT} component={Signout} />
                                     <Route path={Routes.ROOT} exact={true} component={DashboardPage} />
+                                    <Route path={Routes.ELECTRON} component={DashboardPage} />
                                     <Route path={Routes.ANY} component={Error404} />
                                 </Switch>
                             }
