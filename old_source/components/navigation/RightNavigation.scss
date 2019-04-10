@@ -1,0 +1,64 @@
+@import "../../main/Config";
+#right-navigation
+{
+    border:0;
+    @include var(background, nav-background-color);
+    @include var(border-left-width, nav-border-width);
+    @include var(border-left-color, nav-border-color);
+    border-style: solid;
+
+    .avatar-profile
+    {
+        .typing-indicator:after,.typing-indicator:before
+        {
+            display: none;
+
+        }
+        .typing-indicator
+        {
+            padding: 5px;
+            margin-top: 0;
+        }
+        .typing-indicator-container
+        {
+            position: absolute;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            background-color: #a09c9c80;
+            border-radius: 50%;
+            top: 0;
+        }
+    }
+    #notifications-list
+    {
+        min-height: 50%;
+        display: flex;
+        flex: 1 1 0;
+        .list{
+            overflow: hidden;
+            overflow-y: auto;
+        }
+    }
+    #contact-list
+    {
+        display: flex;
+        overflow: hidden;
+        .list{
+            overflow: hidden;
+            overflow-y: auto;
+            justify-content: space-evenly;
+            display: flex;
+            flex-wrap: wrap;
+            padding-top: 5px;
+            li
+            {
+                display: inline-flex;
+                padding:0;
+                padding-bottom: 5px;
+            }
+        }
+    }
+}

@@ -1,0 +1,40 @@
+@import "../../main/Config";
+#contact-list {
+    > ul {
+        overflow-y: auto;
+        height:100%;
+    }
+    .avatar-profile
+    {
+        .avatar {
+            margin-right: 5px;
+        }
+        .right-text-rows
+        {
+            justify-content: center;
+            align-items: center;
+        }
+        .typing-indicator:after,.typing-indicator:before
+        {
+            display: none;
+
+        }
+        .typing-indicator
+        {
+            padding: 5px;
+            margin-top: 0;
+        }
+        .typing-indicator-container
+        {
+            position: absolute;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            background-color: #a09c9c80;
+            border-radius: 50%;
+            top: 0;
+        }
+    }
+}

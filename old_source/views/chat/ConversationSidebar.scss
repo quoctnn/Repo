@@ -1,0 +1,10 @@
+#conversation-sidebar
+{
+    margin: 0 5px;
+    display: flex;
+    flex-direction: column;
+    > * 
+    {
+        flex-shrink: 0;
+    }
+}

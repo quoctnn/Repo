@@ -1,0 +1,66 @@
+@import "../../main/Config";
+#conversation-view
+{
+    @include var(background-color, main-content-background);
+    @include var(color, primary-text-color);
+
+    .card-body
+    {
+        padding: 0;
+    }
+    .chat-message-composer
+    {
+        position: relative;
+        &:before {
+            content: "";
+            left: 0;
+            right: 0;
+            top: 0;
+            position: absolute;
+            @include var(border-top-color, border-color-default);
+            margin: 0 15px;
+            border-top-style: solid;
+            border-top-width: thin;
+          }
+    }
+    .is-typing-container
+    {
+        position: -webkit-sticky;
+        position: -moz-sticky;
+        position: -o-sticky;
+        position: sticky;
+        @include var(background-color, main-content-background);
+        bottom: 0px;
+        padding: 5px 5px 5px 15px;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        flex-shrink: 0;
+        > *
+        {
+            margin-right: 5px;
+        }
+    }
+    .drop-zone
+    {
+        border-width: 2px;
+        border-style: dashed;
+        @include var(border-color, border-color-default);
+    }
+    .btn {
+        @include var(background, button-background-color);
+        @include var(color, button-color);
+        @include var(border-color, button-border-color);
+    }
+    .btn:hover {
+        @include var(background, button-hover-background-color); }
+
+    .btn:disabled {
+        @include var(background, button-disabled-background-color);
+        @include var(color, button-disabled-text-color); }
+
+}
+.column-left
+{
+    padding-right: 5px !important;
+}

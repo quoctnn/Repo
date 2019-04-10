@@ -1,0 +1,160 @@
+@import "../../main/Config";
+.mention-editor
+{
+    box-sizing: border-box;
+    cursor: text;
+    min-height: calc(2.25rem + 2px);
+    font-size: 1rem;
+}
+mention {
+    color: #4a85bb;
+    text-decoration: none;
+  }
+
+  .mentionSuggestions {
+    border-top: 1px solid #eee;
+    background: #fff;
+    border-radius: 2px;
+    cursor: pointer;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    transform-origin: 50% 0%;
+    transform: scaleY(0);
+    margin: -16px;
+  }
+
+  .mentionSuggestionsEntryContainer {
+    display: table;
+    width: 100%;
+  }
+
+  .mentionSuggestionsEntryContainerLeft,
+  .mentionSuggestionsEntryContainerRight {
+    display: table-cell;
+    vertical-align: middle;
+  }
+
+  .mentionSuggestionsEntryContainerRight {
+    width: 100%;
+    padding-left: 8px;
+    max-width:0;
+  }
+
+  .mentionSuggestionsEntry {
+    padding: 7px 10px 3px 10px;
+    transition: background-color 0.4s cubic-bezier(.27,1.27,.48,.56);
+  }
+
+  .mentionSuggestionsEntry:active {
+    background-color: #cce7ff;
+  }
+
+  .mentionSuggestionsEntryFocused {
+    padding: 7px 10px 3px 10px;
+    transition: background-color 0.4s cubic-bezier(.27,1.27,.48,.56);
+    background-color: #e6f3ff;
+  }
+
+  .mentionSuggestionsEntryText,
+  .mentionSuggestionsEntryTitle {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .mentionSuggestionsEntryTitle {
+    font-size: 80%;
+    color: #a7a7a7;
+  }
+
+  .mentionSuggestionsEntryAvatar {
+    display: block;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+  }
+.emoji-backdrop
+{
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 999;
+}
+.emoji-picker-container {
+  position: absolute;
+  right: -12px;
+  z-index: 20000;
+}
+.emojiSelectPopover
+{
+  position: relative !important;
+}
+.context-positioning-element
+{
+    z-index: 2000;
+}
+.modal-open
+{
+  .context-positioning-element
+  {
+      z-index: 20000;
+  }
+  .emoji-backdrop
+  {
+      z-index: 1999;
+  }
+}
+.emojiButton
+{
+  border: 0;
+}
+.editor-button
+{
+  background: 0 !important;
+  border: 0 !important;
+  width: 39px;
+  height:39px;
+  margin-right: 5px;
+  color:inherit;
+  padding: 0;
+  input[type=file],
+  input[type=file]::-webkit-file-upload-button
+   {
+      bottom: 0;
+      cursor: inherit;
+      margin: 0;
+      opacity: 0;
+      padding: 0;
+      position: absolute;
+      right: 0;
+      display: none;
+   }
+}
+.upload-button
+{
+  position: relative;
+}
+.DraftEditor-root
+{
+  word-break: break-all;
+}
+.public-DraftEditorPlaceholder-root
+{
+  position: absolute;
+}
+.DraftEditor-editorContainer
+{
+  overflow-y: auto;
+  max-height: 200px;
+}
+.editor-container
+{
+  display: grid;
+  align-items: center;
+  @include var(color, primary-text-color);
+}

@@ -1,0 +1,14 @@
+.notification-item
+{
+    background: transparent;
+    border: 0;
+    display: flex;
+    .avatar{
+        margin-right: 10px;
+        flex-shrink: 0;
+    }
+    .name
+    {
+        word-break: break-word;
+    }
+}

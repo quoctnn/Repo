@@ -1,0 +1,23 @@
+.collapsible
+{
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 1 !important;
+    min-height: 31px;
+    margin: 5px 0;
+    &:not(.open){
+        
+    }
+    .collapsing  {
+    }
+    .collapse.show{
+        display: flex;
+        flex-direction: column;
+        flex-shrink: 1;
+    }
+    .toggle-button
+    {
+        flex-shrink: 0;
+        align-items: center;
+    }
+}

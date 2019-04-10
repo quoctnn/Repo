@@ -1,0 +1,46 @@
+.chat-user
+{
+    margin-bottom: 0px;
+    position: relative;
+    .chat-user-inner
+    {
+        display: flex;
+        .avatar
+        {
+            flex-shrink: 0;
+        }
+        .text
+        {
+            font-size: 12px;
+        }
+    }
+}
+.chat-user.left {
+    margin-top: 20px;
+    .chat-user-inner
+    {
+        text-align: left;
+        flex-direction: row;
+        margin: 0 5px -9px 15px;
+        .avatar 
+        {
+            margin-right: 5px;
+        }
+        
+    }
+    
+}
+  
+.chat-user.right 
+{
+    .chat-user-inner
+    {
+        text-align: right;
+        flex-direction: row-reverse;
+        margin:5px 15px 0 5px;
+        .avatar 
+        {
+        }
+    }
+    
+}
