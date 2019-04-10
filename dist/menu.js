@@ -105,7 +105,7 @@ if (process.platform === 'darwin') {
       }
     ]
   })
-  template[1].submenu.push(
+  template[0].submenu.push(
     {
       type: 'separator'
     },
@@ -121,7 +121,7 @@ if (process.platform === 'darwin') {
       ]
     }
   )
-  template[3].submenu = [
+  template[1].submenu = [
     {
       label: i18n.__('Close'),
       accelerator: 'CmdOrCtrl+W',
