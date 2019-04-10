@@ -7,19 +7,15 @@
                      img-src *;
                      style-src 'self' https://fonts.googleapis.com/;
                      font-src 'self' https://fonts.gstatic.com/;
-                     default-src https://dev.intra.work/ wss://dev.intra.work/ https://cdn.embedly.com/"/>
+                     default-src http://alesund-dev.intra.work:8000/ ws://alesund-dev.intra.work:8000/ https://cdn.embedly.com/"/>
         <title>intraSocial client v1.0a</title>
-        <link rel="stylesheet" href="dist/main.css" type="text/css"/>
+        <link rel="stylesheet" href="main.css" type="text/css"/>
     </head>
     <body>
         <div id="app-root"></div>
 
-        <!-- Dependencies -->
-        <script src="node_modules/react/umd/react.development.js"></script>
-        <script src="node_modules/react-dom/umd/react-dom.development.js"></script>
-
         <!-- Main -->
-        <script src="dist/bundle.js"></script>
+        <script src="bundle.js"></script>
     </body>
 </html>
 

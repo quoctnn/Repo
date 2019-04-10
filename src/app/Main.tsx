@@ -30,7 +30,7 @@ import { PrivateRoute } from "./components/router/PrivateRoute";
 import { nullOrUndefined } from "./utilities/Utilities";
 import EventPage from "./components/pages/EventPage";
 import { EventManager } from "./managers/EventManager";
-import { Settings } from "../utilities/Settings";
+import { Settings } from "./utilities/Settings";
 import DevTool from "./components/dev/DevTool";
 import DevToolTrigger from "./components/dev/DevToolTrigger";
 
