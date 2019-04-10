@@ -23,7 +23,7 @@ export const availableEndpoints: ApiEndpoint[] = [
     },
     {
         endpoint: 'https://dev.intra.work',
-        loginType: EndpointLoginType.NATIVE,
+        loginType: EndpointLoginType.API,
         websocket: 'wss://dev.intra.work/socket/'
     },
     {
@@ -46,7 +46,7 @@ const INITIAL_STATE = {
 const endpoint = (state = INITIAL_STATE, action:SetEndpointAction) => {
     switch (action.type) {
         case EndpointActionTypes.SetEndpoint:
-            return { ...state, apiEndpoint: action.endpoint }
+            return { ...state, endpoint: action.endpoint }
         default:
             return state;
     }

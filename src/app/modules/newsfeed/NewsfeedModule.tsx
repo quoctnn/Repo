@@ -13,7 +13,7 @@ import { ResponsiveBreakpoint } from '../../components/general/observers/Respons
 import NewsfeedComponentRouted, { NewsfeedComponent } from './NewsfeedComponent';
 import CircularLoadingSpinner from '../../components/general/CircularLoadingSpinner';
 import NewsfeedMenu, { NewsfeedMenuData, allowedSearchOptions } from './NewsfeedMenu';
-import { ObjectAttributeType, ContextNaturalKey, StatusActions } from '../../types/intrasocial_types';
+import { ObjectAttributeType, ContextNaturalKey, StatusActions, Permission } from '../../types/intrasocial_types';
 import { ButtonGroup, Button } from 'reactstrap';
 import { ContextSearchData } from '../../components/general/input/contextsearch/extensions';
 import { translate } from '../../localization/AutoIntlProvider';
@@ -23,6 +23,11 @@ import { convertElasticResultItem, ContextValue } from '../../components/general
 import { ReduxState } from '../../redux';
 import { ResolvedContext } from '../../redux/resolvedContext';
 import { StatusComposerComponent } from '../../components/status/StatusComposerComponent';
+import { CommunityManager } from '../../managers/CommunityManager';
+import { ProjectManager } from '../../managers/ProjectManager';
+import { TaskManager } from '../../managers/TaskManager';
+import { GroupManager } from '../../managers/GroupManager';
+import { ProfileManager } from '../../managers/ProfileManager';
 
 type OwnProps = {
     className?:string
@@ -38,6 +43,7 @@ interface ReduxStateProps
 {
     contextObjectId:number
     isResolvingContext:boolean
+    contextObject:any
 }
 interface ReduxDispatchProps 
 {
@@ -78,6 +84,22 @@ export const resolveContextObject = (resolvedContext:ResolvedContext, contextNat
     if(contextNaturalKey == ContextNaturalKey.USER)
         return {contextNaturalKey, contextObjectId:resolvedContext.profileId, resolved:resolvedContext.profileResolved}
     console.warn("resolveContextObject does not handle '"+contextNaturalKey+"'")
+    return null
+}
+export const getContextObject = (contextNaturalKey:ContextNaturalKey, contextObjectId:number):any => {
+    if(!contextNaturalKey || !contextObjectId)
+        return null
+    if(contextNaturalKey == ContextNaturalKey.COMMUNITY)
+        return CommunityManager.getCommunityById(contextObjectId)
+    if(contextNaturalKey == ContextNaturalKey.PROJECT)
+        return ProjectManager.getProjectById(contextObjectId)
+    if(contextNaturalKey == ContextNaturalKey.TASK)
+        return TaskManager.getTask(contextObjectId)
+    if(contextNaturalKey == ContextNaturalKey.GROUP)
+        return GroupManager.getGroupById(contextObjectId)
+    if(contextNaturalKey == ContextNaturalKey.USER)
+        return ProfileManager.getProfileById(contextObjectId)
+    console.warn("getContextObject does not handle '"+contextNaturalKey+"'")
     return null
 }
 class NewsfeedModule extends React.Component<Props, State> {     
@@ -208,7 +230,7 @@ class NewsfeedModule extends React.Component<Props, State> {
     }
     render()
     {
-        const {breakpoint, history, match, location, staticContext, className, contextNaturalKey, contextObjectId, includeSubContext, isResolvingContext, ...rest} = this.props
+        const {breakpoint, history, match, location, staticContext, className, contextNaturalKey, contextObjectId, contextObject, includeSubContext, isResolvingContext, ...rest} = this.props
         const cn = classnames("newsfeed-module", className, {"menu-visible":this.state.menuVisible, "status-composer-focus":this.state.statusComposerFocus})
         const headerClick = breakpoint < ResponsiveBreakpoint.standard ? this.headerClick : undefined
         const {contextTitle}  = this.state
@@ -218,6 +240,7 @@ class NewsfeedModule extends React.Component<Props, State> {
         const headerClass = classnames({link:headerClick})
         const filter = this.state.filter
         const r = {wrappedComponentRef:(c) => this.newsfeedComponent = c}
+        const canPost = (contextObject && contextObject.permission >= Permission.post) || false
         return (<Module {...rest} className={cn}>
                     <ModuleHeader className={headerClass} onClick={headerClick}>
                         <div className="flex-grow-1 text-truncate d-flex align-items-center">
@@ -238,7 +261,7 @@ class NewsfeedModule extends React.Component<Props, State> {
                     {breakpoint >= ResponsiveBreakpoint.standard && //do not render for small screens
                         <>
                             <ModuleContent>
-                            {!!resolvedContextNaturalKey && !!resolvedContextObjectId && 
+                            {canPost && 
                                 <div ref={this.statuscomposer} className="feed-composer-container">
                                     <div className="status-composer-backdrop" onMouseDown={this.blurStatusComposer}></div>
                                     <StatusComposerComponent 
@@ -286,8 +309,11 @@ const mapStateToProps = (state:ReduxState, ownProps: OwnProps):ReduxStateProps =
     const resolveContext = state.resolvedContext
     const resolvedContext = resolveContextObject(resolveContext, ownProps.contextNaturalKey)
     const isResolvingContext = resolvedContext && (!resolvedContext.contextObjectId && !resolvedContext.resolved)
+    const contextObjectId = resolvedContext && resolvedContext.contextObjectId
+    const contextObject = resolvedContext && getContextObject(resolvedContext.contextNaturalKey, resolvedContext.contextObjectId)
     return {
-        contextObjectId:resolvedContext && resolvedContext.contextObjectId,
+        contextObject,
+        contextObjectId,
         isResolvingContext
     }
 }
