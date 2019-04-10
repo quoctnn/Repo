@@ -3,6 +3,7 @@ const merge = require('webpack-merge');
 var BundleTracker = require('webpack-bundle-tracker');
 var config = require('./webpack.base.config.js');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const OptimizeCSSAssetsPlugin = require("optimize-css-assets-webpack-plugin");
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
 config.module.rules.unshift(
@@ -48,8 +49,7 @@ module.exports = merge(config, {
       append: '//# sourceMappingURL=[url]'
     }),
     new MiniCssExtractPlugin({
-      filename: '[name].css',
-      chunkFilename: '[id].css'
+      filename: '[name].css'
     })
   ],
   devtool: 'cheap-module-source-map',
@@ -64,7 +64,8 @@ module.exports = merge(config, {
             comments: false
           }
         }
-      })
+      }),
+      new OptimizeCSSAssetsPlugin({})
     ]
   }
 });
