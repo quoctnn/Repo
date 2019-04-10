@@ -16,7 +16,7 @@ import Main from "./Main";
 import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
 import { persistStore } from "redux-persist";
-import { Settings } from "../utilities/Settings";
+import { Settings } from "./utilities/Settings";
 import { createStore, applyMiddleware } from "redux";
 import appReducer from "./redux/index";
 import { middleWares } from "./redux/middleware";
