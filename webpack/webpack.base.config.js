@@ -4,7 +4,7 @@ module.exports = {
   entry: path.resolve(__dirname, '../src/app/App.tsx'),
   output: {
     filename: 'bundle.js',
-    path: path.resolve(__dirname, '../dist')
+    path: path.resolve(__dirname, '../app')
   },
 
   // Enable sourcemaps for debugging webpack's output.
@@ -25,7 +25,7 @@ module.exports = {
             loader: 'file-loader',
             options: {
               name: '[name].[ext]',
-              path: path.resolve(__dirname, '../dist')
+              path: path.resolve(__dirname, '../app')
             }
           }
         ]
