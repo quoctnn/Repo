@@ -8,6 +8,8 @@ import { ProjectManager } from './ProjectManager';
 import { ReduxState } from '../redux';
 import { addProfilesAction } from '../redux/profileStore';
 import { userFullName } from '../utilities/Utilities';
+import { NotificationCenter } from '../utilities/NotificationCenter';
+import { EventStreamMessageType } from '../network/ChannelEventStream';
 
 export type ProfileManagerSearchInContextProps = {
     search:string

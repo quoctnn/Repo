@@ -1,0 +1,69 @@
+@import "./../../Config";
+$leftcolorstop1: #ee7286;
+$leftcolorstop2: #a980cb;
+
+$rightcolorstop1: #f3dca2;
+$rightcolorstop2: #cb98ce;
+
+#application-loader{
+    .stop1{
+        stop-color: $leftcolorstop1;
+    }
+    .stop2{
+        stop-color: $leftcolorstop2;
+    }
+    .wave, .right, .left{
+        z-index: -1;
+    }
+    .wave, .right{
+        background-image: linear-gradient(to bottom, $rightcolorstop1, $rightcolorstop2);
+    }
+    .wave {
+        position:fixed; 
+        top: 0;
+        height: 100%;
+        width: 300px;
+        margin: 0 auto;
+        left: calc(50% - 150px);
+    }
+    .left{
+        position:fixed; 
+        left:0;
+        right: 50%;
+        top:0;
+        bottom: 0;
+        background-image: linear-gradient(to bottom, $leftcolorstop1, $leftcolorstop2);
+    }
+    .right{
+        position:fixed; 
+        left:50%;
+        right: 0;
+        top:0;
+        bottom: 0;
+    }
+    .logo{
+        max-width: 300px;
+        margin-bottom: 20px;
+        .background{
+            fill:white;
+        }
+        .foreground{
+            @include var(fill, primary-theme-color);
+        }
+    }
+    .splash-content{
+        color:white;  
+        font-weight: 300;
+        text-transform: uppercase;
+        font-size: 24px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        top: 0;
+        justify-content: center;
+    }
+}

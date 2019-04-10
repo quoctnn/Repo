@@ -1,4 +1,3 @@
-import { nullOrUndefined } from "../utilities/Utilities";
 import * as React from 'react';
 import Emoji from "../components/general/Emoji";
 import Constants from "../utilities/Constants";
@@ -32,8 +31,7 @@ export interface Notification
     absolute_url:string
     actors:number[]
 }
-export interface TempStatus
-{
+export type TempStatus = {
   text: string
   privacy: string
   files_ids: number[]
@@ -47,8 +45,7 @@ export interface TempStatus
 export type ContextObject = {
      name:string 
 } & Linkable
-export interface Status extends TempStatus
-{
+export type Status = {
     [key:string]: any
     can_comment:boolean
     children:Status[]
@@ -64,7 +61,6 @@ export interface Status extends TempStatus
     reactions:{ [id: string]: number[] }
     reaction_count:number
     owner:UserProfile
-    permission:number
     permission_set:number[]
     poll:any
     read:boolean
@@ -75,7 +71,7 @@ export interface Status extends TempStatus
     attributes:SimpleObjectAttribute[]
     temporary:boolean
     visibility?:number[]
-}
+} & TempStatus & Permissible
 
 export interface FileUpload
 {
@@ -321,6 +317,21 @@ export const documentIcon = (extension:string):FileIcon => {
         default: return {name:"file-alt", color:"#4A87EC"}
     }
 }
+
+export type Permissible = {
+    permission:number
+}
+export type Linkable = {
+    uri:string
+}
+export type AvatarAndCover = {
+
+    avatar:string
+    avatar_thumbnail:string
+    cover: string
+    cover_cropped: string
+    cover_thumbnail: string
+}
 export class Conversation
 {
     id:number
@@ -354,17 +365,6 @@ export class Conversation
         this.updated_at = updated_at
     }
 }
-export type AvatarAndCover = {
-
-    avatar:string
-    avatar_thumbnail:string
-    cover: string
-    cover_cropped: string
-    cover_thumbnail: string
-}
-export type Linkable = {
-    uri:string
-}
 export enum IntraSocialType{
     community, profile, project, group, event, task
 }
@@ -383,8 +383,7 @@ export type Community = {
     members: number[]
     relationship: any
     updated_at:string
-    permission:number
-} & ICommunity & AvatarAndCover
+} & ICommunity & AvatarAndCover & Permissible
 
 export type SimpleUserProfile = {
     absolute_url: string,
@@ -411,7 +410,7 @@ export type UserProfile = {
     is_superuser:boolean
     connections?:number[]
     active_community?:number
-} & SimpleUserProfile & AvatarAndCover & Linkable
+} & SimpleUserProfile & AvatarAndCover & Linkable & Permissible
 
 export type Group = {
     id: number
@@ -426,7 +425,7 @@ export type Group = {
     created_at: string
     parent: number
     updated_at: string
-} & AvatarAndCover & Linkable
+} & AvatarAndCover & Linkable & Permissible
 
 export type Event = {
     id: number
@@ -442,7 +441,7 @@ export type Event = {
     created_at: string
     group: Group
     updated_at: string
-} & AvatarAndCover & Linkable
+} & AvatarAndCover & Linkable & Permissible
 
 export type Project = {
     id: number
@@ -464,8 +463,7 @@ export type Project = {
     tasks_attention: number
     tasks_completed: number
     tasks_responsible: number
-
-} & AvatarAndCover & Linkable
+} & AvatarAndCover & Linkable & Permissible
 
 export type Task = {
     id: number
@@ -479,7 +477,7 @@ export type Task = {
     state: TaskState
     serialization_date:string
     visibility?:number[]
-} & Linkable
+} & Linkable & Permissible
 
 export enum TaskPriority{
     low = "low",

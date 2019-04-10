@@ -1,7 +1,7 @@
 @import "../../Config";
 .newsfeed-component
 {
-    display: contents;
+    display: flex;
     flex-direction: column;
     .status-list
     {

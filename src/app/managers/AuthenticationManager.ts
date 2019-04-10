@@ -16,6 +16,16 @@ export abstract class AuthenticationManager
 
     static setup = () =>
     {
+        NotificationCenter.addObserver('eventstream_' + EventStreamMessageType.CLIENT_STATUS_CHANGE, AuthenticationManager.processIncomingUserUpdate)
+    }
+    static processIncomingUserUpdate = (...args:any[]) => {
+        let status = args[0]['status'] as UserStatus;
+        const currentProfile = AuthenticationManager.getAuthenticatedUser()
+        if(!currentProfile)
+            return
+        let profile = Object.assign({}, currentProfile)
+        profile.user_status = status
+        AuthenticationManager.setUpdatedProfileStatus(profile)
     }
     static getAuthenticatedUser = () =>
     {

@@ -22,5 +22,11 @@
     .btn:disabled {
         @include var(background, button-disabled-background-color);
         @include var(color, button-disabled-text-color); }
-
+    .explain{
+        font-size: 10px;
+    }
+}
+.dev-tool-infoBox{
+    max-height: 120px;
+    overflow-y: auto;
 }

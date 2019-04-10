@@ -1,6 +1,6 @@
 import * as React from "react";
 import { connect } from "react-redux";
-import { Form, Button } from "reactstrap";
+import { Form, Button, Popover, PopoverBody } from "reactstrap";
 import "./DevTool.scss"
 import { translate } from "../../localization/AutoIntlProvider";
 import { availableLanguages, setLanguageAction } from "../../redux/language";
@@ -15,6 +15,8 @@ import { resetProjectsAction } from "../../redux/projectStore";
 import { resetTasksAction } from "../../redux/taskStore";
 import { resetProfilesAction } from "../../redux/profileStore";
 import { AuthenticationManager } from "../../managers/AuthenticationManager";
+import { parseJSONObject } from "../../utilities/Utilities";
+import * as websocketInfo from "../../../../docs/Websocket messages.json"
 type Props = {
     language: number;
     theme: number;
@@ -32,7 +34,10 @@ type Props = {
 type State = {
     accessToken: string;
     websocketData: string;
+    websocketInboundData: string;
     dialogVisible:boolean
+    info:string
+    infoTarget:HTMLElement
 }
 class DevTool extends React.PureComponent<Props, State> {
     constructor(props) {
@@ -40,7 +45,10 @@ class DevTool extends React.PureComponent<Props, State> {
         this.state = {
         accessToken: this.props.accessToken,
         websocketData: "",
-        dialogVisible:false
+        websocketInboundData:"",
+        dialogVisible:false,
+        info:undefined,
+        infoTarget:undefined
         };
     }
     componentDidMount()
@@ -112,6 +120,23 @@ class DevTool extends React.PureComponent<Props, State> {
         </div>
         );
     }
+    hideInfoBox = () => {
+        this.setState({info:undefined, infoTarget:undefined})
+    }
+    renderInfoBox = () => 
+    {
+        const data = this.state.info
+        const target = this.state.infoTarget
+        if (!data || !target)
+        {
+            return null
+        }
+        return <Popover trigger="legacy" placement="top" hideArrow={false} isOpen={!!data} target={target} toggle={this.hideInfoBox}>
+                    <PopoverBody className="dev-tool-infoBox">
+                        {data}
+                    </PopoverBody>
+                </Popover>
+    }
     renderEndpointSelector() {
         return (
         <div className="dropdown">
@@ -145,30 +170,68 @@ class DevTool extends React.PureComponent<Props, State> {
         </div>
         );
     }
+    
     renderSendOnWebSocket() {
         return (
-        <div className="input-group">
-            <input
-            value={this.state.websocketData}
-            onChange={e => {
-                this.setState({ websocketData: e.target.value });
-            }}
-            type="text"
-            className="form-control"
-            placeholder="data"
-            />
-            <div className="input-group-append">
-            <button
-                onClick={() => {
-                this.props.sendOnWebsocket(this.state.websocketData);
-                }}
-                className="btn btn-outline-secondary"
-                type="button"
-            >
-                {translate("Send")}
-            </button>
-            </div>
-        </div>
+        <>
+            <div className="input-group">
+                <input
+                    value={this.state.websocketData}
+                    onChange={e => {
+                        this.setState({ websocketData: e.target.value });
+                    }}
+                    type="text"
+                    className="form-control"
+                    placeholder="data"
+                />
+                <div className="input-group-append">
+                    <button
+                        onClick={() => {
+                        this.props.sendOnWebsocket(this.state.websocketData);
+                        }}
+                        className="btn btn-outline-secondary"
+                        type="button"
+                    >
+                        {translate("Send")}
+                    </button>
+                </div>
+                </div>
+            <i className="fas fa-info-circle" onClick={this.setInboundSocketInfo}></i>
+        </>
+        );
+    }
+    setInboundSocketInfo = (e:React.SyntheticEvent<any>) => {
+        this.setState({info:JSON.stringify( websocketInfo ), infoTarget:e.currentTarget})
+    }
+    renderSendInboundOnWebSocket = () => {
+        return (
+            <> 
+                <div className="input-group">
+                    <input 
+                        value={this.state.websocketInboundData}
+                        onChange={e => {
+                            this.setState({ websocketInboundData: e.target.value });
+                        }}
+                        type="text"
+                        className="form-control"
+                        placeholder="data"
+                    />
+                    <div className="input-group-append">
+                        <button
+                            onClick={() => {
+                                const data = this.state.websocketInboundData
+                                const object = parseJSONObject(data)
+                                window.app.sendInboundOnSocket(object)
+                            }}
+                            className="btn btn-outline-secondary"
+                            type="button"
+                        >
+                            {translate("Send")}
+                        </button>
+                    </div>
+                </div>
+            <i className="fas fa-info-circle" onClick={this.setInboundSocketInfo}></i>
+        </>
         );
     }
     renderAccessTokenInput() {
@@ -287,6 +350,14 @@ class DevTool extends React.PureComponent<Props, State> {
                     </div>
                 </div>
                 <div className="form-group row">
+                    <label htmlFor="sendInboundSocket" className="col-sm-4 col-form-label">
+                    {translate("Send Inbound WebSocket")}
+                    </label>
+                    <div className="col-sm-8" id="sendInboundSocket">
+                    {this.renderSendInboundOnWebSocket()}
+                    </div>
+                </div>
+                <div className="form-group row">
                     <label htmlFor="clearStore" className="col-sm-4 col-form-label">
                     {translate("Local Storage")}
                     </label>
@@ -305,6 +376,7 @@ class DevTool extends React.PureComponent<Props, State> {
                 </Form>
             </div>
             </div>
+            {this.renderInfoBox()}
         </div>
         );
     }

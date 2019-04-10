@@ -6,6 +6,8 @@ import { resetEventsAction } from '../redux/eventStore';
 import ReconnectingWebSocket from "reconnecting-websocket";
 import { sendOnWebsocket, eventStreamNotificationPrefix } from '../network/ChannelEventStream';
 import { NotificationCenter } from '../utilities/NotificationCenter';
+import { ToastManager } from './ToastManager';
+import { translate } from '../localization/AutoIntlProvider';
 export type AppWindowObject = {
     deleteCommunity:(id:number) => void
     resetProjectStore:() => void
@@ -13,7 +15,7 @@ export type AppWindowObject = {
     user_locale?:string
     socket?:ReconnectingWebSocket
     sendOutgoingOnSocket:(data:object) => void
-    sendIncomingOnSocket:(data:{type:string, data:any}) => void
+    sendInboundOnSocket:(data:{type:string, data:any}) => void
 }
 export abstract class WindowAppManager
 {
@@ -24,7 +26,7 @@ export abstract class WindowAppManager
             resetProjectStore:WindowAppManager.resetProjectStore, 
             resetEventStore:WindowAppManager.resetEventStore,
             sendOutgoingOnSocket:WindowAppManager.sendOutgoingOnSocket,
-            sendIncomingOnSocket:WindowAppManager.sendIncomingOnSocket
+            sendInboundOnSocket:WindowAppManager.sendInboundOnSocket
         }
     }
     static resetEventStore = () => {
@@ -39,7 +41,12 @@ export abstract class WindowAppManager
     static sendOutgoingOnSocket = (data:object) => {
         sendOnWebsocket(JSON.stringify(data))
     }
-    static sendIncomingOnSocket = (data:{type:string, data:any}) => {
+    static sendInboundOnSocket = (data:{type:string, data:any}) => {
+        if(!data || !data.type)
+        {
+            ToastManager.showErrorToast(translate("common.data.error"))
+            return
+        }
         NotificationCenter.push(eventStreamNotificationPrefix + data.type,[data.data])
     }
     private static getStore = ():Store<ReduxState,any> =>

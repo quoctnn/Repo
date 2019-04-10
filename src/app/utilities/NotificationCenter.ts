@@ -1,12 +1,15 @@
 import {EventEmitter, EventSubscription} from "fbemitter"
+import { Settings } from "./Settings";
 export abstract class NotificationCenter {
     static emitter = new EventEmitter()
-    static debug = false
+    static debug = true
     static push(event:string, payload:any[])
     {
-        if(this.debug)
+        if(!Settings.isProduction)
         {
-            console.log("listeners", this.emitter.listeners(event))
+            const listeners = this.emitter.listeners(event)
+            if(listeners.length == 0)
+                console.warn("no listeners for event '" + event + "'")
         }
         this.emitter.emit(event, ...payload)
     }

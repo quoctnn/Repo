@@ -50,9 +50,6 @@ class UserStatusSelector extends React.Component<Props, State> {
     }
     componentDidMount()
     {
-        this.processIncomingUserUpdate = this.processIncomingUserUpdate.bind(this)
-        const observer = NotificationCenter.addObserver('eventstream_' + EventStreamMessageType.CLIENT_STATUS_CHANGE, this.processIncomingUserUpdate)
-        this.observers.push(observer)
         this.observers.push( NotificationCenter.addObserver(EventStreamManagerConnectionChangedEvent, this.processEventStreamConnectionChange ))
     }
     componentWillUnmount()
@@ -64,15 +61,6 @@ class UserStatusSelector extends React.Component<Props, State> {
         if(this.state.connected != connected) {
             this.setState({connected})
         }
-    }
-
-    processIncomingUserUpdate = (...args:any[]) => {
-        let status = args[0]['status'] as UserStatus;
-        if(!this.props.profile)
-            return
-        let profile = Object.assign({}, this.props.profile)
-        profile.user_status = status
-        AuthenticationManager.setUpdatedProfileStatus(profile)
     }
     setUserStatus = (status:UserStatusItem) => (event: React.SyntheticEvent<any>) =>
     {

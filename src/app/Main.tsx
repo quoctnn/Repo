@@ -222,7 +222,7 @@ class Main extends React.Component<Props, State> {
             <div id="main">
                     <div id="main-content">
                         <ToastContainer />
-                        <DevToolTrigger /> 
+                        {!Settings.isProduction && <DevToolTrigger /> }
                         <div id="content-block" className="">
                             {!this.props.loaded &&
                                 <Switch>

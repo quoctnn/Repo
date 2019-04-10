@@ -13,7 +13,7 @@ import { ResponsiveBreakpoint } from '../../components/general/observers/Respons
 import NewsfeedComponentRouted, { NewsfeedComponent } from './NewsfeedComponent';
 import CircularLoadingSpinner from '../../components/general/CircularLoadingSpinner';
 import NewsfeedMenu, { NewsfeedMenuData, allowedSearchOptions } from './NewsfeedMenu';
-import { ObjectAttributeType, ContextNaturalKey, StatusActions, Permission } from '../../types/intrasocial_types';
+import { ObjectAttributeType, ContextNaturalKey, StatusActions, Permission, Permissible } from '../../types/intrasocial_types';
 import { ButtonGroup, Button } from 'reactstrap';
 import { ContextSearchData } from '../../components/general/input/contextsearch/extensions';
 import { translate } from '../../localization/AutoIntlProvider';
@@ -43,7 +43,7 @@ interface ReduxStateProps
 {
     contextObjectId:number
     isResolvingContext:boolean
-    contextObject:any
+    contextObject:Permissible
 }
 interface ReduxDispatchProps 
 {
@@ -86,7 +86,7 @@ export const resolveContextObject = (resolvedContext:ResolvedContext, contextNat
     console.warn("resolveContextObject does not handle '"+contextNaturalKey+"'")
     return null
 }
-export const getContextObject = (contextNaturalKey:ContextNaturalKey, contextObjectId:number):any => {
+export const getContextObject = (contextNaturalKey:ContextNaturalKey, contextObjectId:number):Permissible => {
     if(!contextNaturalKey || !contextObjectId)
         return null
     if(contextNaturalKey == ContextNaturalKey.COMMUNITY)
