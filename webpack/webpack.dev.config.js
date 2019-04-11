@@ -6,14 +6,11 @@ var config = require('./webpack.base.config.js');
 var localDomain;
 
 try {
-  localDomain = require('./local.domain');
+  localDomain = require('os').hostname().toLowerCase()
+  //localDomain = require('./local.domain');
 } catch (e) {
   // Not local domain specified, shared on localhost
-  //localDomain = "192.168.15.14";
-  //localDomain = "10.0.1.2"
-  //localDomain = 'localhost';
-  localDomain = '192.168.15.28';
-  //localDomain = "alesund-dev.intra.work";
+  localDomain = 'localhost';
 }
 
 config.entry = {

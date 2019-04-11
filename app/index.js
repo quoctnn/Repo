@@ -9,8 +9,8 @@ function webViewLoadFailed() {
 
 function createWindow() {
     win = new BrowserWindow({
-        width: 800,
-        height: 600,
+        width: 1440,
+        height: 900,
         icon: path.join(__dirname, 'assets/icons/png/64x64.png'),
         backgroundColor: 'f3f3f3',
         webPreferences: {
@@ -35,7 +35,7 @@ function createWindow() {
     });
 
     // Open devtools
-    win.webContents.openDevTools();
+    // win.webContents.openDevTools();
 
     win.on('closed', () => {
         win = null;
