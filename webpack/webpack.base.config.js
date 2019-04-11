@@ -25,19 +25,19 @@ module.exports = {
             loader: 'file-loader',
             options: {
               name: '[name].[ext]',
-              path: path.resolve(__dirname, '../app/assets/fonts')
+              outputPath: '../app/assets/fonts'
             }
           }
         ]
       },
       {
-        test: /\.(svg|gif|png)(\?v=\d+\.\d+\.\d+)?$/,
+        test: /\.(svg|gif|png|jpg)(\?v=\d+\.\d+\.\d+)?$/,
         use: [
           {
             loader: 'file-loader',
             options: {
               name: '[name].[ext]',
-              path: path.resolve(__dirname, '../app/assets/img')
+              outputPath: '../app/assets/img'
             }
           }
         ]
