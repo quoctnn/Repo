@@ -10,7 +10,7 @@ export type Props =
 export default class Module extends React.Component<Props, {}> {
     render() {
         const {children, className, ...rest} = this.props
-        const cn = classNames("module drop-shadow", className)
+        const cn = classNames("module main-content-background drop-shadow", className)
         return(
             <div {...rest} className={cn}>
                 {children}

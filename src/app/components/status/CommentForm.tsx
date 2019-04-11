@@ -16,7 +16,7 @@ export class CommentForm extends StatusFormBase {
     render() {
         const cn = classnames("comment-form", this.props.className)
         return (<div className={cn}>
-                    <div className="chat-message-composer-container file-upload-container">
+                    <div className="chat-message-composer-container file-upload-container drop-shadow main-content-secondary-background">
                         {this.props.children}
                         {this.renderTextArea(this.props.canPost)}
                         {this.state.showDropzone &&

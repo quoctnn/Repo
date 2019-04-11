@@ -82,7 +82,7 @@ export abstract class CommunityManager
         return communities
     }
     static setInitialCommunity = (communityId?:number) => {
-        console.log("setInitialCommunity")
+        console.log("setInitialCommunity", communityId)
         const state = CommunityManager.getStore().getState()
         const currentActiveCommunityId = state.activeCommunity.activeCommunity
         if(communityId)
@@ -115,6 +115,7 @@ export abstract class CommunityManager
     static applyCommunityTheme = (community:Community) =>
     {
         let root = document.querySelector(':root') as HTMLElement
+        console.log("applyCommunityTheme", root)
         if(root) {
             if(community){
                 console.warn("Applying theme for community", community.name)

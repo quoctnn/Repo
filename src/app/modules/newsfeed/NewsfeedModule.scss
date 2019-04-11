@@ -6,12 +6,9 @@
     .module-content{
         .feed-composer-container{
             flex:0;
-            background-color: white;
+            z-index: 301 !important;
             > .comment-form{
                 position: relative;
-                background: white;
-                z-index: 301 !important;
-
                 .DraftEditor-editorContainer
                 {
                     transition:min-height 200ms ease-in-out;

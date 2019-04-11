@@ -118,7 +118,7 @@ $root: (
     --body-background: #10171e;
     --main-content-background: #1c2938;
     --main-content-border: #404040;
-    --main-content-secondary-background:#A0AAAF;
+    --main-content-secondary-background:#2C2A39;
     --main-content-secondary-border:#4488FF;
 
     --default-color: rgb(221,221,221);
@@ -131,5 +131,8 @@ $root: (
     --button-background-color: #4c555d;
     --button-border-color: rgb(108, 117, 125);
     --button-hover-background-color: #6c757d;
+
+    --drop-shadow-large: 0px 0px 20px 0px rgba(231, 229, 229, 0.5);
+    --drop-shadow: 0px 0px 10px -3px rgba(231, 229, 229,0.6);
 
 }

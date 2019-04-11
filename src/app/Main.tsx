@@ -1,6 +1,6 @@
 import "intersection-observer"
 import * as React from "react";
-import { Route, Switch, withRouter, RouteComponentProps, Link } from "react-router-dom";
+import { Route, Switch, withRouter, RouteComponentProps, Link, Redirect } from "react-router-dom";
 import { ToastContainer } from 'react-toastify';
 import Routes from "./utilities/Routes";
 import { connect } from 'react-redux'
@@ -62,18 +62,19 @@ class Main extends React.Component<Props, State> {
         this.previousLocation = this.props.location;
     }
     componentDidMount = () => {
-        this.checkCurrentCommunity()
+        this.resolveContextObjects()
     }
     componentDidUpdate = () => {
-        this.checkCurrentCommunity()
+        this.resolveContextObjects()
     }
-    checkCurrentCommunity = () => {
+    resolveContextObjects = () => {
 
         if(this.props.loaded)
         {
             this.props.resetResolvedContext()
             const { location } = this.props
             const segments = location.pathname.split("/").filter(f => !nullOrUndefined(f) && f != "")
+            console.log("resolveContextObjects for URL ", location.pathname)
             if(segments.length > 1)
             {
                 const resolvedContext:ResolvedContext = {}
@@ -232,6 +233,7 @@ class Main extends React.Component<Props, State> {
                             }
                             {this.props.loaded &&
                                 <Switch>
+                                    <Redirect from={Routes.ELECTRON} to={Routes.ROOT} />
                                     {!Settings.isProduction && <Route path={Routes.DEVELOPER_TOOL} component={DevTool} /> }
                                     <Route path={Routes.taskUrl(":communityname", ":projectname", ":taskid")} component={TaskPage} />
                                     <Route path={Routes.eventUrl(":communityname", ":eventname")} component={EventPage} exact={true} />

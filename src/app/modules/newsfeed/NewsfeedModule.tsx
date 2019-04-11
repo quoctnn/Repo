@@ -262,8 +262,9 @@ class NewsfeedModule extends React.Component<Props, State> {
                         <>
                             <ModuleContent>
                             {canPost && 
-                                <div ref={this.statuscomposer} className="feed-composer-container">
-                                    <div className="status-composer-backdrop" onMouseDown={this.blurStatusComposer}></div>
+                                <>
+                                <div className="status-composer-backdrop" onMouseDown={this.blurStatusComposer}></div>
+                                <div ref={this.statuscomposer} className="feed-composer-container main-content-background">
                                     <StatusComposerComponent 
                                         canUpload={true}
                                         canMention={true}
@@ -279,7 +280,7 @@ class NewsfeedModule extends React.Component<Props, State> {
                                         showSubmitButton={this.state.statusComposerFocus}
                                         //taggableMembers={task.visibility}
                                     />
-                                </div>}
+                                </div></>}
                                 <NewsfeedComponentRouted {...r}
                                     onLoadingStateChanged={this.feedLoadingStateChanged} 
                                     includeSubContext={this.state.includeSubContext} 
