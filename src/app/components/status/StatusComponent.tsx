@@ -200,14 +200,14 @@ export class StatusComponent extends React.Component<Props, State> {
                                 }
                             </div>
                         </div>
-                        {isComment && <div className="status-content-inner">{this.renderTextContent(textContent, hasMore)}
+                        {isComment && <div className="status-content-inner main-content-secondary-background">{this.renderTextContent(textContent, hasMore)}
                             {files.length > 0 && <ContentGallery files={files}/>}
                             {linkCards.length > 0 && linkCards}
                         </div>}
                     </div>
                 </div>
                 <div className="status-content">
-                    {!isComment && <div className="status-content-inner">{this.renderTextContent(textContent, hasMore)}
+                    {!isComment && <div className="status-content-inner main-content-secondary-background">{this.renderTextContent(textContent, hasMore)}
                     {files.length > 0 && <ContentGallery files={files}/>}
                     {linkCards.length > 0 && linkCards}
                     </div>}

@@ -75,7 +75,7 @@ class Embedly extends React.Component<Props, State> {
                                 <h4 className="card-title text-uppercase text-truncate">
                                 {avatar && <Avatar size={24} image={avatar} className="" />}                                
                                 {icon && <i className={icon}></i>}
-                                <div className="text-truncate">{title}</div>
+                                    <div className="text-truncate">{title}</div>
                                 </h4>
                                 {subtitle && <p className="card-subtitle font-italic text-muted">{subtitle}</p>}
                                 <p className="card-text" dangerouslySetInnerHTML={{__html: description}}></p>
@@ -111,7 +111,8 @@ class Embedly extends React.Component<Props, State> {
     }
     render = () => {
         const title = Settings.renderLinkTitle ? this.props.data && this.props.data.title : undefined
-        return (<a href={this.props.url} className="is-embed-card" target="_blank" title={title}>
+        const url = (this.props.data && this.props.data.url) || this.props.url
+        return (<a href={url} className="is-embed-card" target="_blank" title={title}>
                 {this.props.isLoading && <LoadingSpinner/>}
                 {this.props.data && this.renderCardData()}
                 </a>)
