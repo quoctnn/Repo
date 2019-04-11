@@ -1,4 +1,5 @@
 var webpack = require('webpack');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 const merge = require('webpack-merge');
 var BundleTracker = require('webpack-bundle-tracker');
 var config = require('./webpack.base.config.js');
@@ -56,7 +57,10 @@ module.exports = merge(config, {
     }),
     new MiniCssExtractPlugin({
       filename: '[name].css'
-    })
+    }),
+    new CopyWebpackPlugin([{
+      from: 'electron/'
+    }])
   ],
   devtool: 'cheap-module-source-map',
   optimization: {

@@ -48,6 +48,7 @@
     "@types/react-transition-group": "^2.0.15",
     "@types/webpack": "^4.4.9",
     "bootstrap": "^4.1.3",
+    "copy-webpack-plugin": "^5.0.2",
     "css-loader": "^1.0.0",
     "draft-js": "^0.10.5",
     "draft-js-emoji-plugin": "^2.1.1",
