@@ -1,8 +1,7 @@
 @import "../../Config";
 .newsfeed-component
 {
-    display: flex;
-    flex-direction: column;
+    display: contents;
     .status-list
     {
         overflow-y: auto;

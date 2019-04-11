@@ -16,7 +16,7 @@ export default class ModuleMenu extends React.Component<Props, {}> {
         return(
             <Transition appear={true} unmountOnExit={true} mountOnEnter={true} in={this.props.visible} timeout={{enter:0, exit:duration}}>
                 {(status) => (
-                <div className={`module-menu module-menu-${status}`} style={style} >
+                <div className={`module-menu module-menu-${status} main-content-background`} style={style} >
                     {status != "exited" && this.props.children}
                 </div>
                 )}

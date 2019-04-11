@@ -115,7 +115,6 @@ export abstract class CommunityManager
     static applyCommunityTheme = (community:Community) =>
     {
         let root = document.querySelector(':root') as HTMLElement
-        console.log("applyCommunityTheme", root)
         if(root) {
             if(community){
                 console.warn("Applying theme for community", community.name)
