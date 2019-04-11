@@ -9,8 +9,8 @@ function webViewLoadFailed() {
 
 function createWindow() {
     win = new BrowserWindow({
-        width: 800,
-        height: 600,
+        width: 1440,
+        height: 900,
         webPreferences: {
             nodeIntegration: false,
             contextIsolation: true
@@ -33,7 +33,7 @@ function createWindow() {
     });
 
     // Open devtools
-    win.webContents.openDevTools();
+    //win.webContents.openDevTools();
 
     win.on('closed', () => {
         win = null;
