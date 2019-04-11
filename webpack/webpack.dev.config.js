@@ -6,7 +6,7 @@ var config = require('./webpack.base.config.js');
 var localDomain;
 
 try {
-  localDomain = require('os').hostname().toLowerCase()
+  localDomain = require('ip').address();
   //localDomain = require('./local.domain');
 } catch (e) {
   // Not local domain specified, shared on localhost
