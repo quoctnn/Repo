@@ -5,3 +5,4 @@ webpack/webpack-stats-dev.json
 intraSocial-linux-x64/
 intraSocial-darwin-x64/
 app/
+!src/app/
