@@ -11,6 +11,8 @@ function createWindow() {
     win = new BrowserWindow({
         width: 800,
         height: 600,
+        icon: path.join(__dirname, 'assets/icons/png/64x64.png'),
+        backgroundColor: 'f3f3f3',
         webPreferences: {
             nodeIntegration: false,
             contextIsolation: true
