@@ -120,6 +120,11 @@ var translations = {
     "common.event": "Event",
     "common.profile": "Profile",
     "common.task": "Task",
+    "common.description": "Description",
+    "common.member": "member",
+    "common.members": "members",
+    "common.see.all": "See all",
+    "common.see.more": "See more",
     "search.for":"Search for",
   },
   no: {
@@ -243,6 +248,11 @@ var translations = {
     "common.event": "Arrangement",
     "common.profile": "Profil",
     "common.task": "Oppgave",
+    "common.description": "Description",
+    "common.member": "member",
+    "common.members": "members",
+    "common.see.all": "See all",
+    "common.see.more": "See more",
     "search.for":"Søk etter",
   },
   en: {
@@ -373,6 +383,11 @@ var translations = {
     "common.event": "Event",
     "common.profile": "Profile",
     "common.task": "Task",
+    "common.description": "Description",
+    "common.member": "member",
+    "common.members": "members",
+    "common.see.all": "See all",
+    "common.see.more": "See more",
     "search.for":"Search for",
   }
 };

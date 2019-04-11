@@ -9,6 +9,7 @@ import ModuleHeader from "./modules/ModuleHeader";
 import { Dashboard, GridLayout } from './types/intrasocial_types';
 import TasksModule from "./modules/tasks/TasksModule";
 import GroupsModule from "./modules/groups/GroupsModule";
+import GroupDetailsModule from "./modules/groups/GroupDetailsModule";
 import ProjectsModule from "./modules/projects/ProjectsModule";
 
 type DemoProps = {
@@ -34,7 +35,8 @@ export namespace DashboardComponents {
         "NewsfeedModule":NewsfeedModule,
         "TaskModule": TasksModule,
         "GroupsModule":GroupsModule,
-        "ProjectsModule":ProjectsModule
+        "GroupDetailsModule":GroupDetailsModule,
+        "ProjectsModule":ProjectsModule,
     }
     export function getComponent(type: string, props:any) {
         const comp = componentMap[type]
