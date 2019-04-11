@@ -3,3 +3,4 @@ node_modules/
 .vscode/
 webpack/webpack-stats-dev.json
 intraSocial-linux-x64/
+app/
