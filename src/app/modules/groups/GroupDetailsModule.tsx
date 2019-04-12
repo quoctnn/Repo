@@ -3,20 +3,20 @@ import { withRouter, RouteComponentProps, Link } from "react-router-dom";
 import Module from '../Module';
 import ModuleHeader from '../ModuleHeader';
 import ModuleContent from '../ModuleContent';
+import ModuleFooter from '../ModuleFooter';
+import ModuleMenuTrigger from '../ModuleMenuTrigger';
 import "./GroupDetailsModule.scss"
-import ModuleMenu from '../ModuleMenu';
 import { ResponsiveBreakpoint } from '../../components/general/observers/ResponsiveComponent';
 import { translate } from '../../localization/AutoIntlProvider';
-import CircularLoadingSpinner from '../../components/general/CircularLoadingSpinner';
-import { Group, Community } from '../../types/intrasocial_types';
+import { Group, Community, ContextNaturalKey } from '../../types/intrasocial_types';
 import { IntraSocialUtilities } from '../../utilities/IntraSocialUtilities';
 import { connect } from 'react-redux';
 import { ReduxState } from '../../redux';
 import { CommunityManager } from '../../managers/CommunityManager';
+import CircularLoadingSpinner from '../../components/general/CircularLoadingSpinner';
 import LoadingSpinner from '../../components/LoadingSpinner';
-import { ContextNaturalKey } from '../../../../old_source/types/intrasocial_types2';
 import { getContextObject, resolveContextObject } from '../newsfeed/NewsfeedModule';
-import ModuleFooter from '../ModuleFooter';
+import StackedAvatars from '../../components/general/StackedAvatars';
 type OwnProps = {
     breakpoint:ResponsiveBreakpoint
     contextNaturalKey: ContextNaturalKey
@@ -47,6 +47,20 @@ class GroupDetailsModule extends React.Component<Props, State> {
             this.setState({isLoading:false})
         }
     }
+    menuItemClick = (e) => {
+        console.log("menuItemClick")
+        e.preventDefault()
+        e.stopPropagation()
+        const visible = !this.state.menuVisible
+        const newState:any = {menuVisible:visible}
+        if(!visible)
+        {
+            /* TODO: Close the modal dialog with the group settings */
+        } else {
+            /* TODO: Show a modal dialog with the group settings */
+        }
+        this.setState(newState)
+    }
     feedLoadingStateChanged = (isLoading:boolean) => {
         this.setState({isLoading})
     }
@@ -62,9 +76,8 @@ class GroupDetailsModule extends React.Component<Props, State> {
                     <span className="details-field-name">{translate("common.community")}: </span>
                     <span className="details-field-value"><Link to={community.uri}>{community.name}</Link></span>
                 </div>
-                <div>
-                    <span className="details-field-name">{translate("common.description")}: </span>
-                    <span className="details-field-value">{IntraSocialUtilities.truncateText(IntraSocialUtilities.htmlToText(group.description), 150)}</span>
+                <div className="details-description">
+                    <span className="details-field-value">{IntraSocialUtilities.truncateText(IntraSocialUtilities.htmlToText(group.description), 200)}</span>
                 </div>
             </div>
         )
@@ -79,8 +92,7 @@ class GroupDetailsModule extends React.Component<Props, State> {
                      {/* TODO: Members page */}
                 </div>
                 <div>
-                    {/* TODO: 5x Profile avatars*/}
-                    {group.members}
+                    <StackedAvatars userIds={group.members} />
                 </div>
             </div>
         )
@@ -95,6 +107,7 @@ class GroupDetailsModule extends React.Component<Props, State> {
                             {this.renderLoading()}
                             <div className="spacer flex-grow-1 flex-shrink-1"></div>
                         </div>
+                        <ModuleMenuTrigger onClick={this.menuItemClick} />
                     </ModuleHeader>
                     {breakpoint >= ResponsiveBreakpoint.standard && //do not render for small screens
                         <>
