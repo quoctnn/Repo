@@ -8,15 +8,14 @@ import ModuleMenuTrigger from '../ModuleMenuTrigger';
 import "./ProjectDetailsModule.scss"
 import { ResponsiveBreakpoint } from '../../components/general/observers/ResponsiveComponent';
 import { translate } from '../../localization/AutoIntlProvider';
-import { Project, Community, ContextNaturalKey } from '../../types/intrasocial_types';
-import { IntraSocialUtilities } from '../../utilities/IntraSocialUtilities';
+import { Project, Community, ContextNaturalKey, Permission } from '../../types/intrasocial_types';
 import { connect } from 'react-redux';
 import { ReduxState } from '../../redux';
 import { CommunityManager } from '../../managers/CommunityManager';
-import CircularLoadingSpinner from '../../components/general/CircularLoadingSpinner';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import { getContextObject, resolveContextObject } from '../newsfeed/NewsfeedModule';
-import StackedAvatars from '../../components/general/StackedAvatars';
+import { DetailsMembers } from '../../components/details/DetailsMembers';
+import { DetailsContent } from '../../components/details/DetailsContent';
 type OwnProps = {
     breakpoint:ResponsiveBreakpoint
     contextNaturalKey: ContextNaturalKey
@@ -64,34 +63,6 @@ class ProjectDetailsModule extends React.Component<Props, State> {
     feedLoadingStateChanged = (isLoading:boolean) => {
         this.setState({isLoading})
     }
-    renderDetails = (project:Project, community:Community) =>  {
-        return (
-            <div className="details-module details-content">
-                <div className="text-truncate">
-                    <span className="details-field-name">{translate("common.community")}: </span>
-                    <span className="details-field-value"><Link to={community.uri}>{community.name}</Link></span>
-                </div>
-                <div className="details-description">
-                    <span className="details-field-value">{IntraSocialUtilities.truncateText(IntraSocialUtilities.htmlToText(project.description), 200)}</span>
-                </div>
-            </div>
-        )
-    }
-    renderMembers = (project:Project) =>  {
-        return (
-            <div className="details-module details-members">
-                <div>
-                    {project.members_count}&nbsp;
-                    {(project.members_count > 1) ? translate("common.members") : translate("common.member")}&nbsp;-&nbsp;
-                    <Link to="#">{translate("common.see.all")}</Link>
-                     {/* TODO: Members page */}
-                </div>
-                <div>
-                    <StackedAvatars userIds={project.members} />
-                </div>
-            </div>
-        )
-    }
     render()
     {
         const {breakpoint, history, match, location, staticContext, project, projectId, community, contextNaturalKey, ...rest} = this.props
@@ -102,13 +73,22 @@ class ProjectDetailsModule extends React.Component<Props, State> {
                     {breakpoint >= ResponsiveBreakpoint.standard && //do not render for small screens
                         <>
                             <ModuleContent>
-                                {!project && <LoadingSpinner key="loading"/>}
-                                {project && community && this.renderDetails(project, community)}
+                            { project &&
+                                <div>
+                                    { project.permission >= Permission.read &&
+                                        <DetailsContent community={community} description={project.description}/>
+                                    }
+                                </div>
+                                ||
+                                <LoadingSpinner key="loading"/>
+                            }
                             </ModuleContent>
                         </>
                     }
                     <ModuleFooter>
-                        {project && this.renderMembers(project)}
+                    { project && project.permission >= Permission.read &&
+                            <DetailsMembers members={project.members} />
+                        }
                     </ModuleFooter>
                 </Module>)
     }

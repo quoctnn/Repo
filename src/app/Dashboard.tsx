@@ -14,6 +14,7 @@ import ProjectsModule from "./modules/projects/ProjectsModule";
 import EventsModule from "./modules/events/EventsModule";
 import LocationModule from "./modules/location/LocationModule";
 import ProjectDetailsModule from "./modules/projects/ProjectDetailsModule";
+import EventDetailsModule from "./modules/events/EventDetailsModule";
 
 type DemoProps = {
     text?:string
@@ -42,6 +43,7 @@ export namespace DashboardComponents {
         "ProjectsModule":ProjectsModule,
         "ProjectDetailsModule":ProjectDetailsModule,
         "EventsModule":EventsModule,
+        "EventDetailsModule":EventDetailsModule,
         "LocationModule":LocationModule,
     }
     export function getComponent(type: string, props:any) {
