@@ -17,6 +17,7 @@ import LoadingSpinner from '../../components/LoadingSpinner';
 import { getContextObject, resolveContextObject } from '../newsfeed/NewsfeedModule';
 import { DetailsContent } from '../../components/details/DetailsContent';
 import { DetailsMembers } from '../../components/details/DetailsMembers';
+import { stringToDate, DateFormat } from '../../utilities/Utilities';
 type OwnProps = {
     breakpoint:ResponsiveBreakpoint
     contextNaturalKey: ContextNaturalKey
@@ -81,7 +82,22 @@ class EventDetailsModule extends React.Component<Props, State> {
                             { event &&
                                 <div>
                                     { event.permission >= Permission.read &&
-                                        <DetailsContent community={community} description={event.description}/>
+                                        <DetailsContent community={community} description={event.description}>
+                                            <div className="text-truncate">
+                                                <span className="details-field-name">{translate("event.start")}: </span>
+                                                <span className="details-field-value">
+                                                    {stringToDate( event.start , DateFormat.day)}&nbsp;
+                                                    {stringToDate( event.start , DateFormat.time)}
+                                                </span>
+                                            </div>
+                                            <div className="text-truncate">
+                                                <span className="details-field-name">{translate("event.end")}: </span>
+                                                <span className="details-field-value">
+                                                    {stringToDate( event.end , DateFormat.day)}&nbsp;
+                                                    {stringToDate( event.end , DateFormat.time)}
+                                                </span>
+                                            </div>
+                                        </DetailsContent>
                                     }
                                 </div>
                                 ||

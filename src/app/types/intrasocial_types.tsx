@@ -43,7 +43,7 @@ export type TempStatus = {
   pending?:boolean
 }
 export type ContextObject = {
-     name:string 
+     name:string
 } & Linkable
 export type Status = {
     [key:string]: any
@@ -114,12 +114,12 @@ export enum Permission{
     superuser = 99,
 }
 export namespace Permission {
-    
+
     export function usesElevatedPrivileges(permission: Permission) {
         return permission == Permission.moderate || permission == Permission.admin || permission == Permission.superuser
     }
 }
-export enum ElasticSearchType 
+export enum ElasticSearchType
 {
     GROUP = "Group",
     COMMUNITY = "Community",
@@ -132,7 +132,7 @@ export enum ElasticSearchType
 }
 
 export namespace ElasticSearchType {
-    
+
     export function contextNaturalKeyForType(key: ElasticSearchType) {
         switch(key){
             case ElasticSearchType.GROUP: return ContextNaturalKey.GROUP
@@ -445,9 +445,10 @@ export type Event = {
     created_at: string
     group: Group
     updated_at: string
+    start:string
     end:string
     location:Coordinate
-    
+
 } & AvatarAndCover & Linkable & Permissible
 
 export type Project = {
@@ -518,8 +519,8 @@ export namespace TaskState {
         TaskState.notStarted,
         TaskState.progress,
         TaskState.toVerify,
-        TaskState.completed, 
-        TaskState.notApplicable, 
+        TaskState.completed,
+        TaskState.notApplicable,
     ]
     export function colorForState(type: TaskState) {
         switch(type){
@@ -623,12 +624,12 @@ export enum UserStatus {
     away = "away",
     unavailable = "unavailable",
     dnd = "dnd",
-    vacation = "vacation", 
+    vacation = "vacation",
     invisible = "invisible",
 }
 export type UserStatusItem = {
     type:UserStatus
-    color:AvatarStateColor 
+    color:AvatarStateColor
     translation:() => string
 }
 const UserStatusObjects:{[key:string]:UserStatusItem} = {
@@ -640,7 +641,7 @@ const UserStatusObjects:{[key:string]:UserStatusItem} = {
     invisible:{type:UserStatus.invisible, color:AvatarStateColor.NONE, translation:() => UserStatus.getTranslation(UserStatus.invisible)},
 }
 export namespace UserStatus {
-    
+
     export function getObject(status: UserStatus) {
         return UserStatusObjects[status]
     }
@@ -685,9 +686,9 @@ export type Dashboard = {
     created_at:string
     updated_at:string
     hidden:boolean
-    hidden_reason:string 
+    hidden_reason:string
     position:number
-    title:string 
+    title:string
     slug:string
     user:number
     category:string
@@ -715,7 +716,7 @@ export interface EmbedMedia
     html:string
 }
 export type EmbedImage = {
-    
+
     caption: string,
     height: number,
     width: number,
@@ -739,11 +740,11 @@ export interface EmbedCardItem
     avatar:string
     subtitle:string
 }
-export enum TaskActions 
+export enum TaskActions
 {
     /**Changes priority for Task: extra:{priority:TaskPriority} */
     setPriority,
-    setState, 
+    setState,
     /**add time to Task: extra:{description:string, date:moment.Moment, hours:number, minutes:number} */
     addTime,
     /**Creates a new Status: extra:{message:string, mentions?:number[], files?:UploadedFile[], completion?:(success:boolean) => void} */

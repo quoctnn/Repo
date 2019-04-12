@@ -32,6 +32,7 @@ export class DetailsContent extends React.Component<Props, State> {
                         <span className="details-field-value"><Link to={this.props.community.uri}>{this.props.community.name}</Link></span>
                     </div>
                 }
+                {this.props.children}
                 { this.props.description &&
                     <div className="details-description">
                         <span className="details-field-value">{IntraSocialUtilities.truncateText(IntraSocialUtilities.htmlToText(this.props.description), this.props.truncate)}</span>

@@ -127,6 +127,8 @@ var translations = {
     "common.see.more": "See more",
     "search.for":"Search for",
     "events.module.title":"Events",
+    "event.start": "Start",
+    "event.end": "End",
     "location.module.title":"Location",
   },
   no: {
@@ -250,13 +252,15 @@ var translations = {
     "common.event": "Arrangement",
     "common.profile": "Profil",
     "common.task": "Oppgave",
-    "common.description": "Description",
-    "common.member": "member",
-    "common.members": "members",
-    "common.see.all": "See all",
-    "common.see.more": "See more",
+    "common.description": "Beskrivelse",
+    "common.member": "medlem",
+    "common.members": "medlemmer",
+    "common.see.all": "Se alt",
+    "common.see.more": "Se mer",
     "search.for":"Søk etter",
     "events.module.title":"Arrangement",
+    "event.start": "Start",
+    "event.end": "Slutt",
     "location.module.title":"Plassering",
   },
   en: {
@@ -394,6 +398,8 @@ var translations = {
     "common.see.more": "See more",
     "search.for":"Search for",
     "events.module.title":"Events",
+    "event.start": "Start",
+    "event.end": "End",
     "location.module.title":"Location",
   }
 };

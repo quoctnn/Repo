@@ -12,11 +12,11 @@ type OwnProps = {
 type State = {
 }
 type Props = OwnProps & React.HTMLAttributes<HTMLElement>
-export default class EventListItem extends React.Component<Props, State> {  
+export default class EventListItem extends React.Component<Props, State> {
     constructor(props:Props) {
         super(props);
         this.state = {
-            
+
         }
     }
     shouldComponentUpdate = (nextProps:Props, nextState:State) => {
@@ -34,7 +34,7 @@ export default class EventListItem extends React.Component<Props, State> {
                         <SecureImage className="top img" setBearer={true} setAsBackground={true} url={cover}>
                             <div className="flex-grow-1"></div>
                             <div className="event-date theme-box theme-bg-gradient">
-                                {stringToDate( event.end , DateFormat.day)}
+                                {stringToDate( event.start , DateFormat.day)}
                             </div>
                         </SecureImage>
                         <div className="bottom d-flex align-items-center flex-row">
