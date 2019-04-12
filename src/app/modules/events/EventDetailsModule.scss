@@ -1,0 +1,15 @@
+.event-footer {
+    display: flex;
+    flex-direction: row;
+    margin: 10px;
+}
+.event-footer .event-date-big {
+    flex-shrink: 1;
+    font-size: 22px;
+    line-height: 22px;
+    text-align: center;
+}
+.event-footer .event-start-end {
+    flex-grow: 1;
+    text-align: right;
+}
