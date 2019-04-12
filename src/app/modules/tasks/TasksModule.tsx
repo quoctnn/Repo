@@ -1,15 +1,9 @@
 import * as React from 'react';
 import { withRouter, RouteComponentProps } from "react-router-dom";
-import Module from '../Module';
-import ModuleHeader from '../ModuleHeader';
-import ModuleContent from '../ModuleContent';
 import classnames from "classnames"
 import "./TasksModule.scss"
-import ModuleMenu from '../ModuleMenu';
-import ModuleMenuTrigger from '../ModuleMenuTrigger';
 import { ResponsiveBreakpoint } from '../../components/general/observers/ResponsiveComponent';
 import { translate } from '../../localization/AutoIntlProvider';
-import CircularLoadingSpinner from '../../components/general/CircularLoadingSpinner';
 import TaskMenu, { TasksMenuData } from './TasksMenu';
 import { ContextNaturalKey, TaskActions, Task } from '../../types/intrasocial_types';
 import { ReduxState } from '../../redux';

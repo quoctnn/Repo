@@ -1,15 +1,9 @@
 import * as React from 'react';
 import { withRouter, RouteComponentProps } from "react-router-dom";
-import Module from '../Module';
-import ModuleHeader from '../ModuleHeader';
-import ModuleContent from '../ModuleContent';
 import classnames from "classnames"
 import "./EventsModule.scss"
-import ModuleMenu from '../ModuleMenu';
-import ModuleMenuTrigger from '../ModuleMenuTrigger';
 import { ResponsiveBreakpoint } from '../../components/general/observers/ResponsiveComponent';
 import { translate } from '../../localization/AutoIntlProvider';
-import CircularLoadingSpinner from '../../components/general/CircularLoadingSpinner';
 import { ContextNaturalKey, Event, Community } from '../../types/intrasocial_types';
 import EventsMenu, { EventsMenuData } from './EventsMenu';
 import ListComponent from '../../components/general/ListComponent';
