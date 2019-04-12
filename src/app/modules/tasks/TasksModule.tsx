@@ -94,11 +94,6 @@ class TasksModule extends React.Component<Props, State> {
     feedLoadingStateChanged = (isLoading:boolean) => {
         this.setState({isLoading})
     }
-    renderLoading = () => {
-        if (this.state.isLoading) {
-            return (<CircularLoadingSpinner borderWidth={3} size={20} key="loading"/>)
-        }
-    }
     menuDataUpdated = (data:TasksMenuData) => {
         this.tempMenuData = data
     }

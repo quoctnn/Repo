@@ -68,11 +68,6 @@ class LocationModule extends React.Component<Props, State> {
     headerClick = (e) => {
         //NavigationUtilities.navigateToNewsfeed(this.props.history, context && context.type, context && context.id, this.state.includeSubContext)
     }
-    renderLoading = () => {
-        if (this.state.isLoading) {
-            return (<CircularLoadingSpinner borderWidth={3} size={20} key="loading"/>)
-        }
-    }
     renderContentLoading = () => {
         if (this.state.isResolvingAddress) {
             return (<LoadingSpinner key="loading1"/>)
@@ -91,12 +86,7 @@ class LocationModule extends React.Component<Props, State> {
         const addressComponents = address && address.split(",").filter(f => !nullOrUndefined(f) && f != "").map(s => s.trim()) || []
         const resolvedLocation = this.getCoordinate()
         return (<Module {...rest} className={cn}>
-                    <ModuleHeader className={headerClass} onClick={headerClick}>
-                        <div className="flex-grow-1 text-truncate d-flex align-items-center">
-                            <div className="text-truncate module-header-title-left">{translate("location.module.title")}</div>
-                            {this.renderLoading()}
-                            <div className="spacer flex-grow-1 flex-shrink-1"></div>
-                        </div>
+                    <ModuleHeader className={headerClass} onClick={headerClick} loading={this.state.isLoading} title={translate("location.module.title")} >
                     </ModuleHeader>
                     {breakpoint >= ResponsiveBreakpoint.standard && //do not render for small screens
                         <ModuleContent>

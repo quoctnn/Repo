@@ -80,11 +80,6 @@ class EventsModule extends React.Component<Props, State> {
     feedLoadingStateChanged = (isLoading:boolean) => {
         this.setState({isLoading})
     }
-    renderLoading = () => {
-        if (this.state.isLoading) {
-            return (<CircularLoadingSpinner borderWidth={3} size={20} key="loading"/>)
-        }
-    }
     menuDataUpdated = (data:EventsMenuData) => {
         this.tempMenuData = data
     }
@@ -105,12 +100,7 @@ class EventsModule extends React.Component<Props, State> {
         const headerClick = breakpoint < ResponsiveBreakpoint.standard ? this.headerClick : undefined
         const headerClass = classnames({link:headerClick})
         return (<Module {...rest} className={cn}>
-                    <ModuleHeader className={headerClass} onClick={headerClick}>
-                        <div className="flex-grow-1 text-truncate d-flex align-items-center">
-                            <div className="text-truncate module-header-title-left">{translate("events.module.title")}</div>
-                            {this.renderLoading()}
-                            <div className="spacer flex-grow-1 flex-shrink-1"></div>
-                        </div>
+                    <ModuleHeader className={headerClass} onClick={headerClick} loading={this.state.isLoading} title={translate("events.module.title")}>
                         <ModuleMenuTrigger onClick={this.menuItemClick} />
                     </ModuleHeader>
                     {breakpoint >= ResponsiveBreakpoint.standard && //do not render for small screens
