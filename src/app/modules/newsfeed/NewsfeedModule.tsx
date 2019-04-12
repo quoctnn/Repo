@@ -39,16 +39,16 @@ type DefaultProps = {
 
     includeSubContext:boolean
 }
-interface ReduxStateProps 
+interface ReduxStateProps
 {
     contextObjectId:number
     isResolvingContext:boolean
     contextObject:Permissible
 }
-interface ReduxDispatchProps 
+interface ReduxDispatchProps
 {
 }
-interface State 
+interface State
 {
     menuVisible:boolean
     isLoading:boolean
@@ -102,7 +102,7 @@ export const getContextObject = (contextNaturalKey:ContextNaturalKey, contextObj
     console.warn("getContextObject does not handle '"+contextNaturalKey+"'")
     return null
 }
-class NewsfeedModule extends React.Component<Props, State> {     
+class NewsfeedModule extends React.Component<Props, State> {
     static defaultProps:DefaultProps = {
         includeSubContext:true
     }
@@ -134,11 +134,11 @@ class NewsfeedModule extends React.Component<Props, State> {
         }
     }
     shouldComponentUpdate = (nextProps:Props, nextState:State) => {
-        return nextProps.breakpoint != this.props.breakpoint || 
-                nextProps.contextNaturalKey != this.props.contextNaturalKey || 
-                nextProps.contextObjectId != this.props.contextObjectId || 
-                nextProps.isResolvingContext != this.props.isResolvingContext || 
-                nextProps.includeSubContext != this.props.includeSubContext || 
+        return nextProps.breakpoint != this.props.breakpoint ||
+                nextProps.contextNaturalKey != this.props.contextNaturalKey ||
+                nextProps.contextObjectId != this.props.contextObjectId ||
+                nextProps.isResolvingContext != this.props.isResolvingContext ||
+                nextProps.includeSubContext != this.props.includeSubContext ||
                 //state
                 nextState.contextNaturalKey != this.state.contextNaturalKey ||
                 nextState.contextObjectId != this.state.contextObjectId ||
@@ -148,7 +148,7 @@ class NewsfeedModule extends React.Component<Props, State> {
                 nextState.filter != this.state.filter ||
                 nextState.includeSubContext != this.state.includeSubContext ||
                 nextState.selectedSearchContext != this.state.selectedSearchContext ||
-                nextState.menuVisible != this.state.menuVisible || 
+                nextState.menuVisible != this.state.menuVisible ||
                 nextState.statusComposerFocus != this.state.statusComposerFocus
     }
     headerClick = (e) => {
@@ -242,12 +242,8 @@ class NewsfeedModule extends React.Component<Props, State> {
         const r = {wrappedComponentRef:(c) => this.newsfeedComponent = c}
         const canPost = (contextObject && contextObject.permission >= Permission.post) || false
         return (<Module {...rest} className={cn}>
-                    <ModuleHeader className={headerClass} onClick={headerClick}>
-                        <div className="flex-grow-1 text-truncate d-flex align-items-center">
-                            <div className="text-truncate">{title}</div>
-                            {this.renderLoading()}
-                        </div>
-                        {!this.state.menuVisible && 
+                    <ModuleHeader title={title} loading={this.state.isLoading} className={headerClass} onClick={headerClick}>
+                        {!this.state.menuVisible &&
                             <ButtonGroup>
                                 {this.availableFilters.map(f => {
                                     return (<Button size="xs" key={f} active={filter == f} onClick={this.filterButtonChanged(f)} color="light">
@@ -261,11 +257,11 @@ class NewsfeedModule extends React.Component<Props, State> {
                     {breakpoint >= ResponsiveBreakpoint.standard && //do not render for small screens
                         <>
                             <ModuleContent>
-                            {canPost && 
+                            {canPost &&
                                 <>
                                 <div className="status-composer-backdrop" onMouseDown={this.blurStatusComposer}></div>
                                 <div ref={this.statuscomposer} className="feed-composer-container main-content-background">
-                                    <StatusComposerComponent 
+                                    <StatusComposerComponent
                                         canUpload={true}
                                         canMention={true}
                                         canComment={true}
@@ -282,11 +278,11 @@ class NewsfeedModule extends React.Component<Props, State> {
                                     />
                                 </div></>}
                                 <NewsfeedComponentRouted {...r}
-                                    onLoadingStateChanged={this.feedLoadingStateChanged} 
-                                    includeSubContext={this.state.includeSubContext} 
-                                    contextNaturalKey={resolvedContextNaturalKey} 
+                                    onLoadingStateChanged={this.feedLoadingStateChanged}
+                                    includeSubContext={this.state.includeSubContext}
+                                    contextNaturalKey={resolvedContextNaturalKey}
                                     contextObjectId={resolvedContextObjectId}
-                                    isResolvingContext={this.props.isResolvingContext} 
+                                    isResolvingContext={this.props.isResolvingContext}
                                     filter={this.state.filter}
                                     />
                             </ModuleContent>
@@ -294,10 +290,10 @@ class NewsfeedModule extends React.Component<Props, State> {
                         </>
                     }
                     <ModuleMenu visible={this.state.menuVisible}>
-                        <NewsfeedMenu 
-                            onUpdate={this.menuDataUpdated} 
-                            selectedSearchContext={this.state.selectedSearchContext} 
-                            includeSubContext={this.state.includeSubContext} 
+                        <NewsfeedMenu
+                            onUpdate={this.menuDataUpdated}
+                            selectedSearchContext={this.state.selectedSearchContext}
+                            includeSubContext={this.state.includeSubContext}
                             filter={this.state.filter}
                             availableFilters={this.availableFilters}
                             />

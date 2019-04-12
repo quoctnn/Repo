@@ -63,7 +63,7 @@ class StackedAvatars extends React.Component<Props, State> {
             <div className="avatar-stacked">
                 {
                     !this.state.isLoading &&
-                        profiles.map((profile) => {
+                        profiles.slice(0,5).map((profile) => {
                         return(this.renderAvatar(profile))
                     })
                     ||
