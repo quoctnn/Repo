@@ -33,6 +33,7 @@ import { EventManager } from "./managers/EventManager";
 import { Settings } from "./utilities/Settings";
 import DevTool from "./components/dev/DevTool";
 import DevToolTrigger from "./components/dev/DevToolTrigger";
+import { Modal, ModalHeader, ModalBody, ModalFooter } from "reactstrap";
 
 type OwnProps = {
 }
@@ -46,6 +47,7 @@ type ReduxDispatchProps = {
 }
 type State = {
     dashboards:Dashboard[]
+    developerToolVisible:boolean
 }
 type Props = ReduxStateProps & ReduxDispatchProps & OwnProps & RouteComponentProps<any>
 
@@ -55,7 +57,8 @@ class Main extends React.Component<Props, State> {
     {
         super(props)
         this.state = {
-            dashboards:[]
+            dashboards:[],
+            developerToolVisible:false
         }
     }
     componentWillReceiveProps(nextProps) {
@@ -218,23 +221,52 @@ class Main extends React.Component<Props, State> {
     setCommunityTheme = (community:Community) => {
         CommunityManager.applyCommunityTheme(community)
     }
+    toggleDeveloperTool = (e?:React.SyntheticEvent<any>) => {
+        if(e)
+        {
+            e.preventDefault()
+            e.stopPropagation()
+        }
+        this.setState((prevState) => {
+                return {developerToolVisible: !prevState.developerToolVisible}
+        })
+    }
+    renderDeveloperTool = () => {
+        if(this.state.developerToolVisible)
+        {
+            return (<Modal toggle={this.toggleDeveloperTool} id="status-permalink-dialog" zIndex={1070} isOpen={this.state.developerToolVisible} >
+                    <ModalHeader>
+                        {translate("Developer Tool")}
+                        <button type="button" className="close pull-right" onClick={this.toggleDeveloperTool}>
+                            <span aria-hidden="true">&times;</span>
+                            <span className="sr-only">{translate("common.close")}</span>
+                        </button>
+                    </ModalHeader>
+                    <ModalBody className="vertical-scroll">
+                        <DevTool />
+                    </ModalBody>
+                    <ModalFooter>
+                    </ModalFooter>
+                </Modal>)
+        }
+        return null;
+    }
     render() {
         return(
             <div id="main">
                     <div id="main-content">
                         <ToastContainer />
-                        {!Settings.isProduction && <DevToolTrigger /> }
+                        {this.renderDeveloperTool()}
+                        {!Settings.isProduction && <DevToolTrigger onClick={this.toggleDeveloperTool} /> }
                         <div id="content-block" className="">
                             {!this.props.loaded &&
                                 <Switch>
-                                    {!Settings.isProduction && <Route path={Routes.DEVELOPER_TOOL} component={DevTool} /> }
                                     <Route path={Routes.ANY} component={ApplicationLoader} />
                                 </Switch>
                             }
                             {this.props.loaded &&
                                 <Switch>
                                     <Redirect from={Routes.ELECTRON} to={Routes.ROOT} />
-                                    {!Settings.isProduction && <Route path={Routes.DEVELOPER_TOOL} component={DevTool} /> }
                                     <Route path={Routes.taskUrl(":communityname", ":projectname", ":taskid")} component={TaskPage} />
                                     <Route path={Routes.eventUrl(":communityname", ":eventname")} component={EventPage} exact={true} />
                                     <Route path={Routes.projectUrl(":communityname", ":projectname")} component={ProjectPage} exact={true} />

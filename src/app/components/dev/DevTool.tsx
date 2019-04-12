@@ -17,19 +17,23 @@ import { resetProfilesAction } from "../../redux/profileStore";
 import { AuthenticationManager } from "../../managers/AuthenticationManager";
 import { parseJSONObject } from "../../utilities/Utilities";
 import * as websocketInfo from "../../../../docs/Websocket messages.json"
-type Props = {
+type ReduxStateProps = {
     language: number;
     theme: number;
-    setLanguage?: (index: number) => void;
     apiEndpoint?: number;
-    setApiEndpoint?: (index: number) => void;
     accessToken?: string;
+}
+type ReduxDispatchProps = {
+    setLanguage?: (index: number) => void;
+    setApiEndpoint?: (index: number) => void;
     setAccessTokenOverride: (accessToken: string) => void;
     sendOnWebsocket: (data: string) => void;
-    disableWebsocket: (state: boolean) => void;
+    //disableWebsocket: (state: boolean) => void;
     setTheme?: (index: number) => void;
     clearDataStore: () => void;
     enablePushNotifications: () => void;
+}
+type OwnProps = {
 }
 type State = {
     accessToken: string;
@@ -39,6 +43,7 @@ type State = {
     info:string
     infoTarget:HTMLElement
 }
+type Props = OwnProps & ReduxStateProps & ReduxDispatchProps
 class DevTool extends React.PureComponent<Props, State> {
     constructor(props) {
         super(props);
@@ -422,5 +427,5 @@ const mapDispatchToProps = dispatch => {
             Notification.requestPermission();
         }
     };
-};
-export default connect(mapStateToProps, mapDispatchToProps)(DevTool);
+}
+export default connect<ReduxStateProps, ReduxDispatchProps, OwnProps>(mapStateToProps, mapDispatchToProps)(DevTool);

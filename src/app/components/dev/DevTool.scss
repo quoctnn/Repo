@@ -1,4 +1,5 @@
 @import "../../Config";
+
 #dev-tool
 {
     min-width: 700px;
@@ -29,4 +30,7 @@
 .dev-tool-infoBox{
     max-height: 120px;
     overflow-y: auto;
+}
+.modal #dev-tool{
+    min-width: initial;
 }
