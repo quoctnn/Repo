@@ -22,6 +22,7 @@ import { ToastManager } from '../../managers/ToastManager';
 import TaskListItem from './TaskListItem';
 import { StatusUtilities } from '../../utilities/StatusUtilities';
 import LoadingSpinner from '../../components/LoadingSpinner';
+import SimpleModule from '../SimpleModule';
 
 type OwnProps = {
     className?:string
@@ -78,18 +79,6 @@ class TasksModule extends React.Component<Props, State> {
     headerClick = (e) => {
         const context = this.state.menuData.project
         //NavigationUtilities.navigateToNewsfeed(this.props.history, context && context.type, context && context.id, this.state.includeSubContext)
-    }
-    menuItemClick = (e) => {
-        e.preventDefault()
-        e.stopPropagation()
-        const visible = !this.state.menuVisible
-        const newState:any = {menuVisible:visible}
-        if(!visible && this.tempMenuData)
-        {
-            newState.menuData = this.tempMenuData
-            this.tempMenuData = null
-        }
-        this.setState(newState)
     }
     feedLoadingStateChanged = (isLoading:boolean) => {
         this.setState({isLoading})
@@ -248,34 +237,39 @@ class TasksModule extends React.Component<Props, State> {
                 communityId={-1}
                 key={"task_"+task.id} />
     }
+    renderContent = () => {
+        const {isResolvingContext} = this.props 
+        return <>
+            {isResolvingContext && <LoadingSpinner key="loading"/>}
+            {!isResolvingContext && <ListComponent<Task> ref={this.taskList} onLoadingStateChanged={this.feedLoadingStateChanged} fetchData={this.fetchTasks} renderItem={this.renderTask} />}
+            </>
+    }
+    onMenuToggle = (visible:boolean) => {
+        console.log("menu open", visible)
+        const newState:Partial<State> = {}
+        if(!visible && this.tempMenuData) // update menudata
+        {
+            newState.menuData = this.tempMenuData
+            this.tempMenuData = null
+        }
+        this.setState(newState as State)
+    }
     render()
     {
-        const {breakpoint, history, match, location, staticContext, className, isResolvingContext, contextObjectId, contextNaturalKey, resolvedContext, ...rest} = this.props
-        const cn = classnames("tasks-module", className, {"menu-visible":this.state.menuVisible})
-        const headerClick = breakpoint < ResponsiveBreakpoint.standard ? this.headerClick : undefined
-        const headerClass = classnames({link:headerClick})
-        const headerSubtitle = this.state.menuData.project && this.state.menuData.project.label
-        return (<Module {...rest} className={cn}>
-                    <ModuleHeader title={translate("task.module.title")} loading={this.state.isLoading} className={headerClass} onClick={headerClick}>
-                        {!!headerSubtitle &&
-                            <div className="module-header-title-right text-truncate">{headerSubtitle}</div>
-                        }
-                        <ModuleMenuTrigger onClick={this.menuItemClick} />
-                    </ModuleHeader>
-                    {breakpoint >= ResponsiveBreakpoint.standard && //do not render for small screens
-                        <>
-                            <ModuleContent>
-                                {isResolvingContext && <LoadingSpinner key="loading"/>}
-                                {!isResolvingContext && <ListComponent<Task> ref={this.taskList} onLoadingStateChanged={this.feedLoadingStateChanged} fetchData={this.fetchTasks} renderItem={this.renderTask} />}
-                            </ModuleContent>
-                        </>
-                    }
-                    <ModuleMenu visible={this.state.menuVisible}>
-                        <TaskMenu
-                            data={this.state.menuData}
-                            onUpdate={this.menuDataUpdated}  />
-                    </ModuleMenu>
-                </Module>)
+        const {history, match, location, staticContext, contextNaturalKey, isResolvingContext, contextObjectId, resolvedContext, ...rest} = this.props
+        const {breakpoint, className} = this.props
+        const cn = classnames("tasks-module", className)
+        const menu = <TaskMenu data={this.state.menuData} onUpdate={this.menuDataUpdated}  />
+        return (<SimpleModule {...rest} 
+                    className={cn} 
+                    headerClick={this.headerClick} 
+                    breakpoint={breakpoint} 
+                    isLoading={this.state.isLoading} 
+                    onMenuToggle={this.onMenuToggle}
+                    menu={menu}
+                    title={translate("task.module.title")}>
+                {this.renderContent()}
+                </SimpleModule>)
     }
 }
 const mapStateToProps = (state:ReduxState, ownProps: OwnProps):ReduxStateProps => {

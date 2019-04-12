@@ -1,15 +1,9 @@
 import * as React from 'react';
 import { withRouter, RouteComponentProps } from "react-router-dom";
-import Module from '../Module';
-import ModuleHeader from '../ModuleHeader';
-import ModuleContent from '../ModuleContent';
 import classnames from "classnames"
 import "./ProjectsModule.scss"
-import ModuleMenu from '../ModuleMenu';
-import ModuleMenuTrigger from '../ModuleMenuTrigger';
 import { ResponsiveBreakpoint } from '../../components/general/observers/ResponsiveComponent';
 import { translate } from '../../localization/AutoIntlProvider';
-import CircularLoadingSpinner from '../../components/general/CircularLoadingSpinner';
 import { ContextNaturalKey, Community, Project } from '../../types/intrasocial_types';
 import ListComponent from '../../components/general/ListComponent';
 import ApiClient, { PaginationResult } from '../../network/ApiClient';
@@ -19,8 +13,8 @@ import { ReduxState } from '../../redux';
 import { CommunityManager } from '../../managers/CommunityManager';
 import ProjectsMenu, { ProjectsMenuData } from './ProjectsMenu';
 import ProjectListItem from './ProjectListItem';
-import { NavigationUtilities } from '../../utilities/NavigationUtilities';
 import LoadingSpinner from '../../components/LoadingSpinner';
+import SimpleModule from '../SimpleModule';
 type OwnProps = {
     className?:string
     breakpoint:ResponsiveBreakpoint
@@ -66,18 +60,6 @@ class ProjectsModule extends React.Component<Props, State> {
         const context = this.state.menuData
         //NavigationUtilities.navigateToNewsfeed(this.props.history, context && context.type, context && context.id, this.state.includeSubContext)
     }
-    menuItemClick = (e) => {
-        e.preventDefault()
-        e.stopPropagation()
-        const visible = !this.state.menuVisible
-        const newState:any = {menuVisible:visible}
-        if(!visible && this.tempMenuData) // update menudata
-        {
-            newState.menuData = this.tempMenuData
-            this.tempMenuData = null
-        }
-        this.setState(newState)
-    }
     feedLoadingStateChanged = (isLoading:boolean) => {
         this.setState({isLoading})
     }
@@ -94,30 +76,38 @@ class ProjectsModule extends React.Component<Props, State> {
     renderProject = (project:Project) =>  {
         return <ProjectListItem key={project.id} project={project} />
     }
+    onMenuToggle = (visible:boolean) => {
+
+        const newState:Partial<State> = {}
+        if(!visible && this.tempMenuData) // update menudata
+        {
+            newState.menuData = this.tempMenuData
+            this.tempMenuData = null
+        }
+        this.setState(newState as State)
+    }
+    renderContent = () => {
+        return <>
+            {!this.props.community && <LoadingSpinner key="loading"/>}
+            {this.props.community && <ListComponent<Project> ref={this.projectsList} onLoadingStateChanged={this.feedLoadingStateChanged} fetchData={this.fetchProjects} renderItem={this.renderProject} />}
+            </>
+    }
     render()
     {
-        const {breakpoint, history, match, location, staticContext, className, contextNaturalKey, community, ...rest} = this.props
-        const cn = classnames("projects-module", className, {"menu-visible":this.state.menuVisible})
-        const headerClick = breakpoint < ResponsiveBreakpoint.standard ? this.headerClick : undefined
-        const headerClass = classnames({link:headerClick})
-        return (<Module {...rest} className={cn}>
-                    <ModuleHeader className={headerClass} onClick={headerClick} title={translate("projects.module.title")} loading={this.state.isLoading}>
-                        <ModuleMenuTrigger onClick={this.menuItemClick} />
-                    </ModuleHeader>
-                    {breakpoint >= ResponsiveBreakpoint.standard && //do not render for small screens
-                        <>
-                            <ModuleContent>
-                                {!this.props.community && <LoadingSpinner key="loading"/>}
-                                {this.props.community && <ListComponent<Project> ref={this.projectsList} onLoadingStateChanged={this.feedLoadingStateChanged} fetchData={this.fetchProjects} renderItem={this.renderProject} />}
-                            </ModuleContent>
-                        </>
-                    }
-                    <ModuleMenu visible={this.state.menuVisible}>
-                        <ProjectsMenu 
-                            data={this.state.menuData}
-                            onUpdate={this.menuDataUpdated}  />
-                    </ModuleMenu>
-                </Module>)
+        const {history, match, location, staticContext, contextNaturalKey, community, ...rest} = this.props
+        const {breakpoint, className} = this.props
+        const cn = classnames("projects-module", className)
+        const menu = <ProjectsMenu data={this.state.menuData} onUpdate={this.menuDataUpdated}  />
+        return (<SimpleModule {...rest} 
+                    className={cn} 
+                    headerClick={this.headerClick} 
+                    breakpoint={breakpoint} 
+                    isLoading={this.state.isLoading} 
+                    onMenuToggle={this.onMenuToggle}
+                    menu={menu}
+                    title={translate("projects.module.title")}>
+                {this.renderContent()}
+                </SimpleModule>)
     }
 }
 const mapStateToProps = (state:ReduxState, ownProps: OwnProps):ReduxStateProps => {

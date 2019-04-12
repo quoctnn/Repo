@@ -1,13 +1,8 @@
 import * as React from 'react';
 import { withRouter, RouteComponentProps } from "react-router-dom";
-import Module from '../Module';
-import ModuleHeader from '../ModuleHeader';
-import ModuleContent from '../ModuleContent';
 import classnames from "classnames"
 import "./LocationModule.scss"
 import { ResponsiveBreakpoint } from '../../components/general/observers/ResponsiveComponent';
-import { translate } from '../../localization/AutoIntlProvider';
-import CircularLoadingSpinner from '../../components/general/CircularLoadingSpinner';
 import { ContextNaturalKey, Coordinate } from '../../types/intrasocial_types';
 import { connect } from 'react-redux';
 import { ReduxState } from '../../redux';
@@ -17,6 +12,8 @@ import { Feature, Layer } from 'react-mapbox-gl';
 import MapboxMapComponent, { mapLayout, mapImages } from '../../components/general/map/MapboxMapComponent';
 import ApiClient from '../../network/ApiClient';
 import LoadingSpinner from '../../components/LoadingSpinner';
+import SimpleModule from '../SimpleModule';
+import { translate } from '../../localization/AutoIntlProvider';
 type OwnProps = {
     className?:string
     breakpoint:ResponsiveBreakpoint
@@ -77,36 +74,41 @@ class LocationModule extends React.Component<Props, State> {
         const coordinate = coordinateIsValid(this.props.coordinate) && this.props.coordinate || coordinateIsValid(this.state.resolvedCoordinate) && this.state.resolvedCoordinate
         return coordinate
     }
-    render()
-    {
-        const {breakpoint, history, match, location, staticContext, className, contextNaturalKey, address, coordinate, ...rest} = this.props
-        const cn = classnames("location-module", className)
-        const headerClick = breakpoint < ResponsiveBreakpoint.standard ? this.headerClick : undefined
-        const headerClass = classnames({link:headerClick})
+    renderContent = () => {
+
+        const {address} = this.props
         const addressComponents = address && address.split(",").filter(f => !nullOrUndefined(f) && f != "").map(s => s.trim()) || []
         const resolvedLocation = this.getCoordinate()
-        return (<Module {...rest} className={cn}>
-                    <ModuleHeader className={headerClass} onClick={headerClick} loading={this.state.isLoading} title={translate("location.module.title")} >
-                    </ModuleHeader>
-                    {breakpoint >= ResponsiveBreakpoint.standard && //do not render for small screens
-                        <ModuleContent>
-                        {addressComponents.map(c => {
-                            return <div key={c} className="address">{c}</div>
-                        })}
-                        {resolvedLocation && 
-                            <MapboxMapComponent zoom={[15]} interactive={false} center={[resolvedLocation.lon, resolvedLocation.lat]} style="mapbox://styles/mapbox/streets-v9">
-                            <Layer
-                                type="symbol"
-                                id="marker"
-                                layout={mapLayout} images={mapImages} >
-                                <Feature  coordinates={[resolvedLocation.lon, resolvedLocation.lat]}/>
-                                </Layer>
-                            </MapboxMapComponent>
-                        }
-                        {this.renderContentLoading()}
-                        </ModuleContent>
-                    }
-                </Module>)
+        return <>
+            {addressComponents.map(c => {
+                return <div key={c} className="address">{c}</div>
+            })}
+            {resolvedLocation && 
+                <MapboxMapComponent zoom={[15]} interactive={false} center={[resolvedLocation.lon, resolvedLocation.lat]} style="mapbox://styles/mapbox/streets-v9">
+                <Layer
+                    type="symbol"
+                    id="marker"
+                    layout={mapLayout} images={mapImages} >
+                    <Feature  coordinates={[resolvedLocation.lon, resolvedLocation.lat]}/>
+                    </Layer>
+                </MapboxMapComponent>
+            }
+            {this.renderContentLoading()}
+            </>
+    }
+    render()
+    {
+        const {history, match, location, staticContext, contextNaturalKey, address, coordinate, ...rest} = this.props
+        const {breakpoint, className} = this.props
+        const cn = classnames("location-module", className)
+        return (<SimpleModule {...rest} 
+                    className={cn} 
+                    headerClick={this.headerClick} 
+                    breakpoint={breakpoint} 
+                    isLoading={this.state.isLoading} 
+                    title={translate("location.module.title")}>
+                {this.renderContent()}
+                </SimpleModule>)
     }
 }
 const mapStateToProps = (state:ReduxState, ownProps: OwnProps):ReduxStateProps => {

@@ -20,6 +20,7 @@ import { ReduxState } from '../../redux';
 import { CommunityManager } from '../../managers/CommunityManager';
 import EventListItem from './EventListItem';
 import LoadingSpinner from '../../components/LoadingSpinner';
+import SimpleModule from '../SimpleModule';
 type OwnProps = {
     className?:string
     breakpoint:ResponsiveBreakpoint
@@ -65,18 +66,6 @@ class EventsModule extends React.Component<Props, State> {
         const context = this.state.menuData
         //NavigationUtilities.navigateToNewsfeed(this.props.history, context && context.type, context && context.id, this.state.includeSubContext)
     }
-    menuItemClick = (e) => {
-        e.preventDefault()
-        e.stopPropagation()
-        const visible = !this.state.menuVisible
-        const newState:any = {menuVisible:visible}
-        if(!visible && this.tempMenuData) // update menudata
-        {
-            newState.menuData = this.tempMenuData
-            this.tempMenuData = null
-        }
-        this.setState(newState)
-    }
     feedLoadingStateChanged = (isLoading:boolean) => {
         this.setState({isLoading})
     }
@@ -93,30 +82,38 @@ class EventsModule extends React.Component<Props, State> {
     renderEvent = (event:Event) =>  {
         return <EventListItem key={event.id} event={event} />
     }
+    onMenuToggle = (visible:boolean) => {
+
+        const newState:Partial<State> = {}
+        if(!visible && this.tempMenuData) // update menudata
+        {
+            newState.menuData = this.tempMenuData
+            this.tempMenuData = null
+        }
+        this.setState(newState as State)
+    }
+    renderContent = () => {
+        return <>
+            {!this.props.community && <LoadingSpinner key="loading"/>}
+            {this.props.community && <ListComponent<Event> ref={this.eventsList} onLoadingStateChanged={this.feedLoadingStateChanged} fetchData={this.fetchEvents} renderItem={this.renderEvent} />}
+            </>
+    }
     render()
     {
-        const {breakpoint, history, match, location, staticContext, className, contextNaturalKey, community, ...rest} = this.props
-        const cn = classnames("events-module", className, {"menu-visible":this.state.menuVisible})
-        const headerClick = breakpoint < ResponsiveBreakpoint.standard ? this.headerClick : undefined
-        const headerClass = classnames({link:headerClick})
-        return (<Module {...rest} className={cn}>
-                    <ModuleHeader className={headerClass} onClick={headerClick} loading={this.state.isLoading} title={translate("events.module.title")}>
-                        <ModuleMenuTrigger onClick={this.menuItemClick} />
-                    </ModuleHeader>
-                    {breakpoint >= ResponsiveBreakpoint.standard && //do not render for small screens
-                        <>
-                            <ModuleContent>
-                                {!this.props.community && <LoadingSpinner key="loading"/>}
-                                {this.props.community && <ListComponent<Event> ref={this.eventsList} onLoadingStateChanged={this.feedLoadingStateChanged} fetchData={this.fetchEvents} renderItem={this.renderEvent} />}
-                            </ModuleContent>
-                        </>
-                    }
-                    <ModuleMenu visible={this.state.menuVisible}>
-                        <EventsMenu 
-                            data={this.state.menuData}
-                            onUpdate={this.menuDataUpdated}  />
-                    </ModuleMenu>
-                </Module>)
+        const {history, match, location, staticContext, contextNaturalKey, community, ...rest} = this.props
+        const {breakpoint, className} = this.props
+        const cn = classnames("events-module", className)
+        const menu = <EventsMenu data={this.state.menuData} onUpdate={this.menuDataUpdated}  />
+        return (<SimpleModule {...rest} 
+                    className={cn} 
+                    headerClick={this.headerClick} 
+                    breakpoint={breakpoint} 
+                    isLoading={this.state.isLoading} 
+                    onMenuToggle={this.onMenuToggle}
+                    menu={menu}
+                    title={translate("events.module.title")}>
+                {this.renderContent()}
+                </SimpleModule>)
     }
 }
 const mapStateToProps = (state:ReduxState, ownProps: OwnProps):ReduxStateProps => {

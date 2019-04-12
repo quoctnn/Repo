@@ -1,12 +1,7 @@
 import * as React from 'react';
 import { withRouter, RouteComponentProps } from "react-router-dom";
-import Module from '../Module';
-import ModuleHeader from '../ModuleHeader';
-import ModuleContent from '../ModuleContent';
 import classnames from "classnames"
 import "./GroupsModule.scss"
-import ModuleMenu from '../ModuleMenu';
-import ModuleMenuTrigger from '../ModuleMenuTrigger';
 import { ResponsiveBreakpoint } from '../../components/general/observers/ResponsiveComponent';
 import { translate } from '../../localization/AutoIntlProvider';
 import CircularLoadingSpinner from '../../components/general/CircularLoadingSpinner';
@@ -20,14 +15,13 @@ import { ReduxState } from '../../redux';
 import { CommunityManager } from '../../managers/CommunityManager';
 import GroupListItem from './GroupListItem';
 import LoadingSpinner from '../../components/LoadingSpinner';
-import { NavigationUtilities } from '../../utilities/NavigationUtilities';
+import SimpleModule from '../SimpleModule';
 type OwnProps = {
     className?:string
     breakpoint:ResponsiveBreakpoint
     contextNaturalKey?:ContextNaturalKey
 }
 type State = {
-    menuVisible:boolean
     isLoading:boolean
     menuData:GroupsMenuData
 }
@@ -43,7 +37,6 @@ class GroupsModule extends React.Component<Props, State> {
     constructor(props:Props) {
         super(props);
         this.state = {
-            menuVisible:false,
             isLoading:false,
             menuData:{
             }
@@ -66,18 +59,6 @@ class GroupsModule extends React.Component<Props, State> {
         const context = this.state.menuData
         //NavigationUtilities.navigateToNewsfeed(this.props.history, context && context.type, context && context.id, this.state.includeSubContext)
     }
-    menuItemClick = (e) => {
-        e.preventDefault()
-        e.stopPropagation()
-        const visible = !this.state.menuVisible
-        const newState:any = {menuVisible:visible}
-        if(!visible && this.tempMenuData) // update menudata
-        {
-            newState.menuData = this.tempMenuData
-            this.tempMenuData = null
-        }
-        this.setState(newState)
-    }
     feedLoadingStateChanged = (isLoading:boolean) => {
         this.setState({isLoading})
     }
@@ -99,30 +80,38 @@ class GroupsModule extends React.Component<Props, State> {
     renderGroup = (group:Group) =>  {
         return <GroupListItem key={group.id} group={group} />
     }
+    renderContent = () => {
+        return <>
+            {!this.props.community && <LoadingSpinner key="loading"/>}
+            {this.props.community && <ListComponent<Group> ref={this.groupsList} onLoadingStateChanged={this.feedLoadingStateChanged} fetchData={this.fetchGroups} renderItem={this.renderGroup} />}
+            </>
+    }
+    onMenuToggle = (visible:boolean) => {
+        console.log("menu open", visible)
+        const newState:Partial<State> = {}
+        if(!visible && this.tempMenuData) // update menudata
+        {
+            newState.menuData = this.tempMenuData
+            this.tempMenuData = null
+        }
+        this.setState(newState as State)
+    }
     render()
     {
-        const {breakpoint, history, match, location, staticContext, className, contextNaturalKey, community, ...rest} = this.props
-        const cn = classnames("groups-module", className, {"menu-visible":this.state.menuVisible})
-        const headerClick = breakpoint < ResponsiveBreakpoint.standard ? this.headerClick : undefined
-        const headerClass = classnames({link:headerClick})
-        return (<Module {...rest} className={cn}>
-                    <ModuleHeader className={headerClass} onClick={headerClick} title={translate("groups.module.title")} loading={this.state.isLoading}>
-                        <ModuleMenuTrigger onClick={this.menuItemClick} />
-                    </ModuleHeader>
-                    {breakpoint >= ResponsiveBreakpoint.standard && //do not render for small screens
-                        <>
-                            <ModuleContent>
-                                {!this.props.community && <LoadingSpinner key="loading"/>}
-                                {this.props.community && <ListComponent<Group> ref={this.groupsList} onLoadingStateChanged={this.feedLoadingStateChanged} fetchData={this.fetchGroups} renderItem={this.renderGroup} />}
-                            </ModuleContent>
-                        </>
-                    }
-                    <ModuleMenu visible={this.state.menuVisible}>
-                        <GroupsMenu 
-                            data={this.state.menuData}
-                            onUpdate={this.menuDataUpdated}  />
-                    </ModuleMenu>
-                </Module>)
+        const {history, match, location, staticContext, contextNaturalKey, community, ...rest} = this.props
+        const {breakpoint, className} = this.props
+        const cn = classnames("groups-module", className)
+        const menu = <GroupsMenu data={this.state.menuData} onUpdate={this.menuDataUpdated}  />
+        return (<SimpleModule {...rest} 
+                    className={cn} 
+                    headerClick={this.headerClick} 
+                    breakpoint={breakpoint} 
+                    isLoading={this.state.isLoading} 
+                    onMenuToggle={this.onMenuToggle}
+                    menu={menu}
+                    title={translate("groups.module.title")}>
+                {this.renderContent()}
+                </SimpleModule>)
     }
 }
 const mapStateToProps = (state:ReduxState, ownProps: OwnProps):ReduxStateProps => {
