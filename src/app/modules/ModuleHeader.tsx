@@ -15,18 +15,18 @@ export default class ModuleHeader extends React.Component<Props & React.HTMLAttr
         }
     }
     render() {
-        const {className,...rest} = this.props
+        const {className, title, loading, children, ...rest} = this.props
         const cn = classnames("module-header", className)
         return(
             <div {...rest} className={cn}>
                     <div className="flex-grow-1 text-truncate d-flex align-items-center">
-                    { this.props.title &&
-                        <div className="text-truncate module-header-title-left">{this.props.title}</div>
+                    {title &&
+                        <div className="text-truncate module-header-title-left">{title}</div>
                     }
                     {this.renderLoading()}
                     <div className="spacer flex-grow-1 flex-shrink-1"></div>
                 </div>
-            {this.props.children}
+            {children}
             </div>
         );
     }
