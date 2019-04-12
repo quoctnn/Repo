@@ -19,7 +19,6 @@ import { ProjectManager } from '../../managers/ProjectManager';
 import ListComponent from '../../components/general/ListComponent';
 import ApiClient, { PaginationResult } from '../../network/ApiClient';
 import { ToastManager } from '../../managers/ToastManager';
-import { uniqueId } from '../../utilities/Utilities';
 import TaskListItem from './TaskListItem';
 import { StatusUtilities } from '../../utilities/StatusUtilities';
 import LoadingSpinner from '../../components/LoadingSpinner';
