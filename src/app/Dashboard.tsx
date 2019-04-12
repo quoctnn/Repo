@@ -9,9 +9,11 @@ import ModuleHeader from "./modules/ModuleHeader";
 import { Dashboard, GridLayout } from './types/intrasocial_types';
 import TasksModule from "./modules/tasks/TasksModule";
 import GroupsModule from "./modules/groups/GroupsModule";
+import GroupDetailsModule from "./modules/groups/GroupDetailsModule";
 import ProjectsModule from "./modules/projects/ProjectsModule";
 import EventsModule from "./modules/events/EventsModule";
 import LocationModule from "./modules/location/LocationModule";
+import ProjectDetailsModule from "./modules/projects/ProjectDetailsModule";
 
 type DemoProps = {
     text?:string
@@ -25,7 +27,7 @@ class DemoComponent extends React.Component<DemoProps, {}> {
     render = () => {
         const {text, ...rest} = this.props
         return <Module {...rest}>
-                <ModuleHeader>Header</ModuleHeader>
+                <ModuleHeader title={"Header"}></ModuleHeader>
                 <ModuleContent>{this.props.text || "Test"}</ModuleContent>
                 </Module>
     }
@@ -36,9 +38,11 @@ export namespace DashboardComponents {
         "NewsfeedModule":NewsfeedModule,
         "TaskModule": TasksModule,
         "GroupsModule":GroupsModule,
+        "GroupDetailsModule":GroupDetailsModule,
         "ProjectsModule":ProjectsModule,
+        "ProjectDetailsModule":ProjectDetailsModule,
         "EventsModule":EventsModule,
-        "LocationModule":LocationModule, 
+        "LocationModule":LocationModule,
     }
     export function getComponent(type: string, props:any) {
         const comp = componentMap[type]

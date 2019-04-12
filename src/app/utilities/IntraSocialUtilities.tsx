@@ -88,6 +88,12 @@ export class IntraSocialUtilities
     static truncateText = (text:string, maxChars:number) => {
         return text && text.length > (maxChars - 3) ? text.substring(0, maxChars - 3) + '...' : text;
     }
+    static htmlToText = (html:string) =>
+    {
+        var div = document.createElement("div");
+        div.innerHTML = html;
+        return div.textContent || div.innerText || "";
+    }
     static groupFiles = (files:UploadedFile[]) =>
     {
         let dict:{[type:string]:UploadedFile[]} = {}
