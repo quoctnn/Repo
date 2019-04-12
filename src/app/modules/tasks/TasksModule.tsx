@@ -42,8 +42,8 @@ type ReduxStateProps = {
 type ReduxDispatchProps = {
 }
 type Props = OwnProps & RouteComponentProps<any> & ReduxDispatchProps & ReduxStateProps
-class TasksModule extends React.Component<Props, State> {  
-    tempMenuData:TasksMenuData = null   
+class TasksModule extends React.Component<Props, State> {
+    tempMenuData:TasksMenuData = null
     taskList = React.createRef<ListComponent<Task>>()
     constructor(props:Props) {
         super(props);
@@ -104,16 +104,16 @@ class TasksModule extends React.Component<Props, State> {
     }
     contextDataChanged = (prevData:TasksMenuData, prevProps:Props) => {
         const data = this.state.menuData
-        return !prevData.state.isEqual(data.state) || 
-                !prevData.tags.isEqual(data.tags) || 
-                !prevData.priority.isEqual(data.priority) || 
-                prevData.project != data.project || 
-                prevData.assignedTo != data.assignedTo || 
-                prevData.creator != data.creator || 
+        return !prevData.state.isEqual(data.state) ||
+                !prevData.tags.isEqual(data.tags) ||
+                !prevData.priority.isEqual(data.priority) ||
+                prevData.project != data.project ||
+                prevData.assignedTo != data.assignedTo ||
+                prevData.creator != data.creator ||
                 prevData.notAssigned != data.notAssigned ||
-                prevData.category != data.category || 
-                prevData.responsible != data.responsible || 
-                prevData.term != data.term || 
+                prevData.category != data.category ||
+                prevData.responsible != data.responsible ||
+                prevData.term != data.term ||
                 prevProps.contextObjectId != this.props.contextObjectId
     }
     getContextData = () => {
@@ -133,7 +133,7 @@ class TasksModule extends React.Component<Props, State> {
         }
         return this.state.menuData
     }
-    updateTaskItem = (task:Task) => 
+    updateTaskItem = (task:Task) =>
     {
         task.serialization_date = new Date().toISOString()
         this.taskList.current.updateItem(task)
@@ -143,9 +143,9 @@ class TasksModule extends React.Component<Props, State> {
         task.updated_at = new Date().toISOString()
         task.serialization_date = new Date().toISOString()
     }
-    navigateToAction = (task:Task, action:TaskActions, extra?:any, completion?:(success:boolean) => void) => 
+    navigateToAction = (task:Task, action:TaskActions, extra?:any, completion?:(success:boolean) => void) =>
     {
-        const logWarn = () => 
+        const logWarn = () =>
         {
             console.warn("Missing Action handler for: ", action, extra)
         }
@@ -224,7 +224,7 @@ class TasksModule extends React.Component<Props, State> {
             default:logWarn()
         }
     }
-    navigateToActionWithTask = (taskId:number) => (action:TaskActions, extra?:any, completion?:(success:boolean) => void) => 
+    navigateToActionWithTask = (taskId:number) => (action:TaskActions, extra?:any, completion?:(success:boolean) => void) =>
     {
         const task = this.taskList.current.getItemById(taskId)
         this.navigateToAction(task, action, extra, completion)
@@ -247,7 +247,7 @@ class TasksModule extends React.Component<Props, State> {
         })
     }
     renderTask = (task:Task) =>  {
-        return <TaskListItem  
+        return <TaskListItem
                 onActionPress={this.navigateToActionWithTask(task.id)}
                 task={task}
                 communityId={-1}
@@ -261,15 +261,10 @@ class TasksModule extends React.Component<Props, State> {
         const headerClass = classnames({link:headerClick})
         const headerSubtitle = this.state.menuData.project && this.state.menuData.project.label
         return (<Module {...rest} className={cn}>
-                    <ModuleHeader className={headerClass} onClick={headerClick}>
-                        <div className="flex-grow-1 text-truncate d-flex align-items-center">
-                            <div className="text-truncate module-header-title-left">{translate("task.module.title")}</div>
-                            {this.renderLoading()}
-                            <div className="spacer flex-grow-1 flex-shrink-1"></div>
-                            {!!headerSubtitle && 
-                                <div className="module-header-title-right text-truncate">{headerSubtitle}</div>
-                            }
-                        </div>
+                    <ModuleHeader title={translate("task.module.title")} loading={this.state.isLoading} className={headerClass} onClick={headerClick}>
+                        {!!headerSubtitle &&
+                            <div className="module-header-title-right text-truncate">{headerSubtitle}</div>
+                        }
                         <ModuleMenuTrigger onClick={this.menuItemClick} />
                     </ModuleHeader>
                     {breakpoint >= ResponsiveBreakpoint.standard && //do not render for small screens
@@ -281,7 +276,7 @@ class TasksModule extends React.Component<Props, State> {
                         </>
                     }
                     <ModuleMenu visible={this.state.menuVisible}>
-                        <TaskMenu 
+                        <TaskMenu
                             data={this.state.menuData}
                             onUpdate={this.menuDataUpdated}  />
                     </ModuleMenu>
