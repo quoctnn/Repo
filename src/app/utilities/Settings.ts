@@ -29,6 +29,7 @@ export interface ISettings
     statusTruncationLength:number
     statusLinebreakLimit:number
     renderLinkTitle:boolean
+    mapboxAccessToken:string
 }
 export const Settings:ISettings = {
     isProduction : process.env.NODE_ENV === "production",
@@ -48,4 +49,5 @@ export const Settings:ISettings = {
     statusTruncationLength:200,
     statusLinebreakLimit:5,
     renderLinkTitle:true,
+    mapboxAccessToken:"pk.eyJ1IjoiaW50cmFob3VzZSIsImEiOiJjaXJsc3lmc3gwMDJyaGpuaHdvb2oxYnM5In0.2Um0WFRpufTR55w9_6ALDQ",
 }

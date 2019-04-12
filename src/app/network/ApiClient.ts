@@ -2,9 +2,10 @@ import Constants from "../utilities/Constants";
 import {AjaxRequest} from "./AjaxRequest";
 import { EndpointManager } from '../managers/EndpointManager';
 var $ = require("jquery")
-import { Status, UserProfile, UploadedFile, Community, Group, Conversation, Project, Message, Event, Task, ElasticSearchType, ObjectAttributeType, StatusObjectAttribute, EmbedCardItem, ReportTag, ContextNaturalKey, ReportResult, Dashboard, Timesheet } from '../types/intrasocial_types';
+import { Status, UserProfile, UploadedFile, Community, Group, Conversation, Project, Message, Event, Task, ElasticSearchType, ObjectAttributeType, StatusObjectAttribute, EmbedCardItem, ReportTag, ContextNaturalKey, ReportResult, Dashboard, Timesheet, Coordinate } from '../types/intrasocial_types';
 import { nullOrUndefined } from '../utilities/Utilities';
 import moment = require("moment");
+import { Settings } from "../utilities/Settings";
 export type PaginationResult<T> = {results:T[], count:number, previous:string|null, next:string|null}
 export type ElasticSuggestion = {text:string, offset:number, length:number, options:[]}
 export type ElasticExtensionResult = {stats:{suggestions:{[key:string]:ElasticSuggestion}, aggregations:{[key:string]:any}}}
@@ -43,6 +44,20 @@ export default class ApiClient
             }
         })
         return arr.join('&');
+    }
+    static forwardGeocode(address:string, callback:ApiClientCallback<Coordinate>){
+        const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(address)}.json?types=address&access_token=${Settings.mapboxAccessToken}`
+        AjaxRequest.get(url, (data:{features:[{center:number[]}]}, status, request) => {
+            let location:Coordinate = null
+            const feature = data && data.features && data.features[0]
+            if(feature && feature.center && feature.center.length == 2)
+            {
+                location = {lat:feature.center[1], lon:feature.center[0]}
+            }
+            callback(location, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
     }
     static createTimesheet(task:number, description:string, date:moment.Moment,  hours:number, minutes:number, callback:ApiClientCallback<Timesheet>){
         const url = Constants.apiRoute.timeSheetUrl

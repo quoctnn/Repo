@@ -96,11 +96,8 @@ class GroupsModule extends React.Component<Props, State> {
             ToastManager.showErrorToast(error)
         })
     }
-    onGroupClick = (groupId:number) => (event:React.SyntheticEvent<any>) => {
-        NavigationUtilities.navigateToGroup(this.props.history, groupId)
-    }
     renderGroup = (group:Group) =>  {
-        return <GroupListItem key={group.id} group={group} onClick={this.onGroupClick(group.id)} />
+        return <GroupListItem key={group.id} group={group} />
     }
     render()
     {

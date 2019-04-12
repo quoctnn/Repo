@@ -96,11 +96,8 @@ class ProjectsModule extends React.Component<Props, State> {
             ToastManager.showErrorToast(error)
         })
     }
-    onProjectClick = (projectId:number) => (event:React.SyntheticEvent<any>) => {
-        NavigationUtilities.navigateToProject(this.props.history, projectId)
-    }
     renderProject = (project:Project) =>  {
-        return <ProjectListItem key={project.id} project={project} onClick={this.onProjectClick(project.id)} />
+        return <ProjectListItem key={project.id} project={project} />
     }
     render()
     {

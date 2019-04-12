@@ -121,6 +121,8 @@ var translations = {
     "common.profile": "Profile",
     "common.task": "Task",
     "search.for":"Search for",
+    "events.module.title":"Events",
+    "location.module.title":"Location",
   },
   no: {
     "search.placeholder": "Søk ...",
@@ -244,6 +246,8 @@ var translations = {
     "common.profile": "Profil",
     "common.task": "Oppgave",
     "search.for":"Søk etter",
+    "events.module.title":"Arrangement",
+    "location.module.title":"Plassering",
   },
   en: {
     "search.placeholder": "Search ...",
@@ -374,6 +378,8 @@ var translations = {
     "common.profile": "Profile",
     "common.task": "Task",
     "search.for":"Search for",
+    "events.module.title":"Events",
+    "location.module.title":"Location",
   }
 };
 

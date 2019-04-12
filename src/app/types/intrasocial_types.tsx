@@ -427,6 +427,10 @@ export type Group = {
     updated_at: string
 } & AvatarAndCover & Linkable & Permissible
 
+export type Coordinate = {
+    lat:number
+    lon:number
+}
 export type Event = {
     id: number
     name: string
@@ -441,6 +445,9 @@ export type Event = {
     created_at: string
     group: Group
     updated_at: string
+    end:string
+    location:Coordinate
+    
 } & AvatarAndCover & Linkable & Permissible
 
 export type Project = {

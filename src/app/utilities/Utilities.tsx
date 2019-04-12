@@ -3,11 +3,14 @@ import Embedly from '../components/general/embedly/Embedly';
 const processString = require('react-process-string');
 import Routes from './Routes';
 import * as React from 'react';
-import { UserProfile, StatusActions, Community, Project, Group, Event, IntraSocialType } from '../types/intrasocial_types';
+import { UserProfile, StatusActions, Community, Project, Group, Event, IntraSocialType, Coordinate } from '../types/intrasocial_types';
 import {Text} from '../components/general/Text';
 import Constants from '../utilities/Constants';
 import { translate } from '../localization/AutoIntlProvider';
 import { IntraSocialLink } from '../components/general/IntraSocialLink';
+import * as moment from 'moment-timezone';
+import { availableLanguages } from '../redux/language';
+let timezone = moment.tz.guess()
 export const getDomainName = (url:string) =>  {
     var url_parts = url.split("/")
     var domain_name_parts = url_parts[2].split(":")
@@ -64,6 +67,17 @@ export function groupCover(group:Group, thumbnail = false) {
 }
 export function eventCover(event:Event, thumbnail = false) {
     return (event && (thumbnail ? event.cover_thumbnail : event.cover_cropped || event.cover)) || Constants.resolveUrl(Constants.defaultImg.event)()
+}
+export const coordinateIsValid = (coordinate:Coordinate) => {
+    return coordinate && coordinate.lat && coordinate.lon
+}
+export enum DateFormat {
+    date = "L LT",
+    day = "L", 
+    time = "LT"
+}
+export const stringToDate = (string:string, format?:DateFormat ) => {
+    return moment(string).tz(timezone).format(format || DateFormat.date)
 }
 export const EMAIL_REGEX = /(\b\s+)(([a-zA-Z0-9\-\_\.])+@[a-zA-Z\_]+?(\.[a-zA-Z]{2,6})+)/gm
 export const URL_REGEX = /(\b(https?|ftp):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/gim

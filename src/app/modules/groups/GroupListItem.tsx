@@ -4,7 +4,6 @@ import "./GroupListItem.scss"
 import { Group, IntraSocialType } from '../../types/intrasocial_types';
 import { groupCover } from '../../utilities/Utilities';
 import { SecureImage } from '../../components/general/SecureImage';
-import { Link } from 'react-router-dom';
 import { IntraSocialLink } from '../../components/general/IntraSocialLink';
 
 type OwnProps = {

@@ -28,6 +28,7 @@ import { ProjectManager } from '../../managers/ProjectManager';
 import { TaskManager } from '../../managers/TaskManager';
 import { GroupManager } from '../../managers/GroupManager';
 import { ProfileManager } from '../../managers/ProfileManager';
+import { EventManager } from '../../managers/EventManager';
 
 type OwnProps = {
     className?:string
@@ -83,6 +84,8 @@ export const resolveContextObject = (resolvedContext:ResolvedContext, contextNat
         return {contextNaturalKey, contextObjectId:resolvedContext.groupId, resolved:resolvedContext.groupResolved}
     if(contextNaturalKey == ContextNaturalKey.USER)
         return {contextNaturalKey, contextObjectId:resolvedContext.profileId, resolved:resolvedContext.profileResolved}
+    if(contextNaturalKey == ContextNaturalKey.EVENT)
+        return {contextNaturalKey, contextObjectId:resolvedContext.eventId, resolved:resolvedContext.eventResolved}
     console.warn("resolveContextObject does not handle '"+contextNaturalKey+"'")
     return null
 }
@@ -99,6 +102,8 @@ export const getContextObject = (contextNaturalKey:ContextNaturalKey, contextObj
         return GroupManager.getGroupById(contextObjectId)
     if(contextNaturalKey == ContextNaturalKey.USER)
         return ProfileManager.getProfileById(contextObjectId)
+    if(contextNaturalKey == ContextNaturalKey.EVENT)
+        return EventManager.getEventById(contextObjectId)
     console.warn("getContextObject does not handle '"+contextNaturalKey+"'")
     return null
 }
