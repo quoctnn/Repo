@@ -8,15 +8,15 @@ import ModuleMenuTrigger from '../ModuleMenuTrigger';
 import "./GroupDetailsModule.scss"
 import { ResponsiveBreakpoint } from '../../components/general/observers/ResponsiveComponent';
 import { translate } from '../../localization/AutoIntlProvider';
-import { Group, Community, ContextNaturalKey } from '../../types/intrasocial_types';
-import { IntraSocialUtilities } from '../../utilities/IntraSocialUtilities';
+import { Group, Community, ContextNaturalKey, Permission } from '../../types/intrasocial_types';
 import { connect } from 'react-redux';
 import { ReduxState } from '../../redux';
 import { CommunityManager } from '../../managers/CommunityManager';
 import CircularLoadingSpinner from '../../components/general/CircularLoadingSpinner';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import { getContextObject, resolveContextObject } from '../newsfeed/NewsfeedModule';
-import StackedAvatars from '../../components/general/StackedAvatars';
+import { DetailsContent } from '../../components/details/DetailsContent';
+import { DetailsMembers } from '../../components/details/DetailsMembers';
 type OwnProps = {
     breakpoint:ResponsiveBreakpoint
     contextNaturalKey: ContextNaturalKey
@@ -69,34 +69,6 @@ class GroupDetailsModule extends React.Component<Props, State> {
             return (<CircularLoadingSpinner borderWidth={3} size={20} key="loading"/>)
         }
     }
-    renderDetails = (group:Group, community:Community) =>  {
-        return (
-            <div className="details-module details-content">
-                <div className="text-truncate">
-                    <span className="details-field-name">{translate("common.community")}: </span>
-                    <span className="details-field-value"><Link to={community.uri}>{community.name}</Link></span>
-                </div>
-                <div className="details-description">
-                    <span className="details-field-value">{IntraSocialUtilities.truncateText(IntraSocialUtilities.htmlToText(group.description), 200)}</span>
-                </div>
-            </div>
-        )
-    }
-    renderMembers = (group:Group) =>  {
-        return (
-            <div className="details-module details-members">
-                <div>
-                    {group.members_count}&nbsp;
-                    {(group.members_count > 1) ? translate("common.members") : translate("common.member")}&nbsp;-&nbsp;
-                    <Link to="#">{translate("common.see.all")}</Link>
-                     {/* TODO: Members page */}
-                </div>
-                <div>
-                    <StackedAvatars userIds={group.members} />
-                </div>
-            </div>
-        )
-    }
     render()
     {
         const {breakpoint, history, match, location, staticContext, group, groupId, community, contextNaturalKey, ...rest} = this.props
@@ -105,15 +77,22 @@ class GroupDetailsModule extends React.Component<Props, State> {
                         <ModuleMenuTrigger onClick={this.menuItemClick} />
                     </ModuleHeader>
                     {breakpoint >= ResponsiveBreakpoint.standard && //do not render for small screens
-                        <>
-                            <ModuleContent>
-                                {!group && <LoadingSpinner key="loading"/>}
-                                {group && community && this.renderDetails(group, community)}
-                            </ModuleContent>
-                        </>
+                        <ModuleContent>
+                            { group &&
+                                <div>
+                                    { group.permission >= Permission.read &&
+                                        <DetailsContent community={community} description={group.description}/>
+                                    }
+                                </div>
+                                ||
+                                <LoadingSpinner key="loading"/>
+                            }
+                        </ModuleContent>
                     }
                     <ModuleFooter>
-                        {group && this.renderMembers(group)}
+                        { group && group.permission >= Permission.read &&
+                            <DetailsMembers members={group.members} />
+                        }
                     </ModuleFooter>
                 </Module>)
     }
