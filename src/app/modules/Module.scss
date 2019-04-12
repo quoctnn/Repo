@@ -4,7 +4,7 @@ $headerHeight:40px;
     position: relative;
     flex: 1;
     border-radius: 25px;
-    .module-header 
+    .module-header
     {
         height: $headerHeight;
         display: flex;
@@ -55,20 +55,20 @@ $headerHeight:40px;
             visibility: visible;
         }
     }
-    .module-content 
+    .module-content
     {
         min-height: 0px;
         display: flex;
         flex-direction: column;
         flex:1;
     }
-    .module-footer 
+    .module-footer
     {
         flex-shrink: 0;
         padding: 3px 12px;
         font-size: 12px;
     }
-    .module-menu 
+    .module-menu
     {
         position: absolute;
         top: $headerHeight;
@@ -102,7 +102,7 @@ body.touch .module
 }
 body.rb-200
 {
-    .module-menu 
+    .module-menu
     {
         position:initial;
         height: 0;
@@ -111,4 +111,4 @@ body.rb-200
             height: 200px;
         }
     }
-} 
+}

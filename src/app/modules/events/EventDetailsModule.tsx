@@ -18,6 +18,7 @@ import { getContextObject, resolveContextObject } from '../newsfeed/NewsfeedModu
 import { DetailsContent } from '../../components/details/DetailsContent';
 import { DetailsMembers } from '../../components/details/DetailsMembers';
 import { stringToDate, DateFormat } from '../../utilities/Utilities';
+const shortMonth:string[] = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 type OwnProps = {
     breakpoint:ResponsiveBreakpoint
     contextNaturalKey: ContextNaturalKey
@@ -73,6 +74,7 @@ class EventDetailsModule extends React.Component<Props, State> {
     render()
     {
         const {breakpoint, history, match, location, staticContext, event, eventId, community, contextNaturalKey, ...rest} = this.props
+        const startDate = event ? new Date(event.start) : null
         return (<Module {...rest}>
                     <ModuleHeader title={event && event.name || translate("detail.module.title")} loading={this.state.isLoading}>
                         <ModuleMenuTrigger onClick={this.menuItemClick} />
@@ -83,20 +85,6 @@ class EventDetailsModule extends React.Component<Props, State> {
                                 <div>
                                     { event.permission >= Permission.read &&
                                         <DetailsContent community={community} description={event.description}>
-                                            <div className="text-truncate">
-                                                <span className="details-field-name">{translate("event.start")}: </span>
-                                                <span className="details-field-value">
-                                                    {stringToDate( event.start , DateFormat.day)}&nbsp;
-                                                    {stringToDate( event.start , DateFormat.time)}
-                                                </span>
-                                            </div>
-                                            <div className="text-truncate">
-                                                <span className="details-field-name">{translate("event.end")}: </span>
-                                                <span className="details-field-value">
-                                                    {stringToDate( event.end , DateFormat.day)}&nbsp;
-                                                    {stringToDate( event.end , DateFormat.time)}
-                                                </span>
-                                            </div>
                                         </DetailsContent>
                                     }
                                 </div>
@@ -107,7 +95,25 @@ class EventDetailsModule extends React.Component<Props, State> {
                     }
                     <ModuleFooter>
                         { event && event.permission >= Permission.read &&
-                            <DetailsMembers members={event.attending} />
+                            <DetailsMembers>
+                                { startDate &&
+                                <div className="event-footer">
+                                    <div className="event-date-big">
+                                            <span>
+                                                {shortMonth[startDate.getMonth()].toUpperCase()}<br/>
+                                                {startDate.getDate()}
+                                            </span>
+                                    </div>
+                                    <div className="event-start-end text-truncate">
+                                        <div className="details-field-value">
+                                            {stringToDate(event.start, DateFormat.date)}
+                                            &nbsp;-<br/>
+                                            {stringToDate(event.end, DateFormat.date)}
+                                        </div>
+                                    </div>
+                                </div>
+                                }
+                            </DetailsMembers>
                         }
                     </ModuleFooter>
                 </Module>)

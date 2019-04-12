@@ -23,18 +23,21 @@ export class DetailsMembers extends React.Component<Props, State> {
     }
     render()
     {
-        const members = this.props.members
+        const members = this.props.members.length > 0 ? this.props.members : null
         return (
-            <div className="details-module details-members">
+            <div className="details-module">
                 { members &&
-                <div>
-                    {members.length}&nbsp;
-                    {(members.length > 1) ? translate("common.members") : translate("common.member")}&nbsp;-&nbsp;
-                    <Link to="#">{translate("common.see.all")}</Link>
-                    {/* TODO: Members page */}
-                    <StackedAvatars userIds={members} />
+                    <div className="details-members">
+                    <div>
+                        {members.length}&nbsp;
+                        {(members.length > 1) ? translate("common.members") : translate("common.member")}&nbsp;-&nbsp;
+                        <Link to="#">{translate("common.see.all")}</Link>
+                        {/* TODO: Members page */}
+                        <StackedAvatars userIds={members} />
+                    </div>
                 </div>
                 }
+                { this.props.children }
             </div>
         )
     }
