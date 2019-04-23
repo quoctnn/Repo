@@ -210,6 +210,15 @@ export default class ApiClient
             callback(null, status, error)
         })
     }
+    static getCommunityFiles(communityId:string|number, limit:number, offset:number, callback:ApiClientFeedPageCallback<UploadedFile>)
+    {
+        let url = Constants.apiRoute.communityFilesUrl(communityId) + "?" + this.getQueryString({limit, offset})
+        AjaxRequest.get(url, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
     static getProject(projectId:string|number, callback:ApiClientCallback<Project>)
     {
         let url = Constants.apiRoute.projectDetailUrl(projectId)
@@ -369,6 +378,15 @@ export default class ApiClient
     static getGroup(groupId:string, callback:ApiClientCallback<Group>)
     {
         let url = Constants.apiRoute.groupUrl(groupId)
+        AjaxRequest.get(url, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
+    static getTimesheets(user:number, project:number, task:number, limit:number, offset:number,callback:ApiClientFeedPageCallback<Timesheet>)
+    {
+        let url = Constants.apiRoute.timeSheetUrl + "?" + this.getQueryString({user, project, task, limit, offset})
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {

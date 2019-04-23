@@ -6,6 +6,8 @@ var config = require('./webpack.base.config.js');
 var localDomain;
 
 try {
+  
+  //localDomain = '192.168.15.24';
   localDomain = require('ip').address();
   //localDomain = require('./local.domain');
 } catch (e) {

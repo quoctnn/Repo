@@ -3,7 +3,7 @@ import Embedly from '../components/general/embedly/Embedly';
 const processString = require('react-process-string');
 import Routes from './Routes';
 import * as React from 'react';
-import { UserProfile, StatusActions, Community, Project, Group, Event, IntraSocialType, Coordinate } from '../types/intrasocial_types';
+import { UserProfile, StatusActions, Community, Project, Group, Event, IntraSocialType, Coordinate, SimpleUserProfile } from '../types/intrasocial_types';
 import {Text} from '../components/general/Text';
 import Constants from '../utilities/Constants';
 import { translate } from '../localization/AutoIntlProvider';
@@ -28,13 +28,16 @@ export const parseJSONObject = (param:string) => {
     return null
 }
 
-export function userFullName(user:UserProfile) {
+export function userFullName(user:SimpleUserProfile | UserProfile) {
     if(!user)
         return "Anonymous"
     if (user.first_name) {
         return `${user.first_name} ${user.last_name}`;
     }
-    return user.username;
+    return (user as UserProfile).username || "No name";
+}
+export function isAdmin(user:UserProfile) {
+    return user && (user.is_superuser || user.is_staff)
 }
 export function communityName(community:Community) {
     return (community && community.name) || translate("community.active.empty")

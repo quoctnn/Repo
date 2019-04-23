@@ -1,15 +1,17 @@
 @import "../Config";
-#page-top-navigation
+#page-main-navigation
 {
     position: relative;
+    color:white;
+    a{
+        color:white;
+    }
     .profile-name{
         padding-left: 5px;
         font-size: 20px;
-        @include var(color, title-color);
     }
     .community-name{
         font-size: 23px;
         font-weight: 100;
-        @include var(color, title-color);
     }
 }

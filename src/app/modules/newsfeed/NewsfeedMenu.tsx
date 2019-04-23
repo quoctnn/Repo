@@ -55,7 +55,7 @@ export default class NewsfeedMenu extends React.Component<Props, State> {
             searchResult:null,
         }
     }
-    includeSubContextChanged = (event:any) => {
+    includeSubContextChanged = (event:React.ChangeEvent<HTMLInputElement>) => {
         this.setState({includeSubContext:event.target.checked}, this.sendUpdate)
     }
     sendUpdate = () => {

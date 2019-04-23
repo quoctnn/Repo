@@ -1,0 +1,42 @@
+.file-list-item{
+    padding: 8px;
+    text-decoration: none;
+    .file-content{
+        border-radius: 10px;
+        overflow: hidden;
+        position: relative;
+        &.hover-card:hover:after{
+            opacity:0.3 ;
+        }
+    }
+    &:hover{
+        text-decoration: none;
+    }
+    
+    .img-container{
+        width:80px;
+        height: 60px;
+        position: relative;
+        margin-right: 8px;
+        flex-shrink: 0;
+        display: flex;    
+        align-items: center;
+        justify-content: center;
+        i.file-icon{
+
+            font-size: 40px;
+        }
+        .sec-img{
+            position: absolute;
+            top: 0;
+            bottom:0;
+            left:0;
+            right:0;
+            background-size: cover;
+        }
+    }
+    .content-container{
+
+        justify-content: center;
+    }
+}

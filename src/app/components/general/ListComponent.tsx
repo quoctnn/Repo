@@ -4,6 +4,7 @@ import "./ListComponent.scss"
 import { PaginationResult } from '../../network/ApiClient';
 import { List } from '../../components/general/List';
 import LoadingSpinner from '../../components/LoadingSpinner';
+import { translate } from '../../localization/AutoIntlProvider';
 
 type Props<T> = {
     className?:string
@@ -11,6 +12,8 @@ type Props<T> = {
     scrollParent?:any
     fetchData:(offset:number, completion:(items:PaginationResult<T>) => void) => void
     renderItem:(item:T) => React.ReactNode
+    renderEmpty?:() => React.ReactNode
+    renderError?:() => React.ReactNode
     reloadContext?:string
 }
 type State<T> = {
@@ -19,6 +22,8 @@ type State<T> = {
     isRefreshing: boolean
     hasMore:boolean
     requestId:number
+    hasReceivedData:boolean
+    hasError:boolean
 }
 interface IdentifiableObject {
     id: number
@@ -32,6 +37,8 @@ export default class ListComponent<T extends IdentifiableObject> extends React.C
             items:[],
             hasMore:true,
             requestId:0,
+            hasReceivedData:false,
+            hasError:false
         }
     }
     getItemById = (id:number) => {
@@ -48,7 +55,8 @@ export default class ListComponent<T extends IdentifiableObject> extends React.C
             isRefreshing: true,
             isLoading: true,
             items:[],
-            requestId:prevState.requestId + 1
+            requestId:prevState.requestId + 1,
+            hasReceivedData:false,
         }), this.loadData)
     }
     componentDidMount = () => 
@@ -57,7 +65,7 @@ export default class ListComponent<T extends IdentifiableObject> extends React.C
         {
             this.props.scrollParent.addEventListener("scroll", this.onScroll)
         }
-        this.setState(prevState => ({
+        this.setState(prevState => ({ // first load
             isLoading: true,
             requestId:prevState.requestId + 1
         }), this.loadData)
@@ -112,13 +120,26 @@ export default class ListComponent<T extends IdentifiableObject> extends React.C
                 let newData = data.results
                 if(requestId == this.state.requestId)
                 {
+                    const d = offset == 0 ?  newData :  [...items, ...newData]
                     this.setState({
-                        items: offset == 0 ?  newData :  [...items, ...newData],
+                        items: d,
                         isRefreshing: false,
                         hasMore:data.next != null,
-                        isLoading:false
+                        isLoading:false,
+                        hasReceivedData:true,
+                        hasError:false,
                     });
                 }
+            }
+            else {
+                this.setState({
+                    items: [],
+                    isRefreshing: false,
+                    hasMore:false,
+                    isLoading:false,
+                    hasReceivedData:true,
+                    hasError:true,
+                });
             }
         })
     }
@@ -129,7 +150,7 @@ export default class ListComponent<T extends IdentifiableObject> extends React.C
         return null
     }
     renderItems = () => {
-        const cn = classnames("list-component-list vertical-scroll")
+        const cn = classnames("list-component-list vertical-scroll", this.props.className)
         const scroll = this.props.scrollParent ? undefined : this.onScroll
         const items = this.state.items.map(i => {
                             return this.props.renderItem(i)
@@ -141,11 +162,31 @@ export default class ListComponent<T extends IdentifiableObject> extends React.C
                 </List>)
         
     }
+    renderError = () => {
+        if(this.state.hasError && !this.state.isLoading && this.state.hasReceivedData)
+        {
+            if(this.props.renderError)
+                return this.props.renderError()
+            return <div>{translate("generic.list.error")}</div>
+        }
+        return null
+    }
+    renderEmpty = () => {
+        if(!this.state.hasError && !this.state.isLoading && this.state.hasReceivedData && this.state.items.length == 0)
+        {
+            if(this.props.renderEmpty)
+                return this.props.renderEmpty()
+            return <div>{translate("generic.list.empty")}</div>
+        }
+        return null
+    }
     render()
     {
         const cn = classnames("list-component")
         return (<div className={cn}>
                 {this.renderItems()}
+                {this.renderEmpty()}
+                {this.renderError()}
                 </div>)
     }
 }

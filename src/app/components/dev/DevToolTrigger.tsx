@@ -15,7 +15,7 @@ class DevToolTrigger extends React.Component<Props, {}> {
         return prevProps.history.location.pathname != this.props.location.pathname
     }
     render() {
-        const isDeveloperTool = this.props.location.pathname == Routes.DEVELOPER_TOOL
+        const isDeveloperTool = this.props.location.pathname == Routes.DEVELOPER_TOOL.path
         const linkLocation:History.LocationDescriptor<any> = isDeveloperTool ? this.props.location.state || Routes.ROOT : { pathname:Routes.DEVELOPER_TOOL, state:this.props.location.pathname} 
         const icon = isDeveloperTool ? "far fa-arrow-alt-circle-left" : "fas fa-cog"
         return(

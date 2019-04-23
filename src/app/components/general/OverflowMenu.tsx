@@ -17,6 +17,7 @@ export type OverflowMenuItem = {
     type:OverflowMenuItemType
     active?:boolean
     disabled?:boolean
+    children?:React.ReactElement<any> | React.ReactElement<any>[]
 }
 type Props = {
     fetchItems:() => OverflowMenuItem[]
@@ -29,6 +30,27 @@ type State = {
     dropdownOpen:boolean, 
     items:OverflowMenuItem[]
     needsUpdate:boolean
+}
+export const createDropdownItem = (item:OverflowMenuItem) => {
+    const useStackedIcons = !!item.iconStackClass && !!item.iconClass
+    const props:Partial<DropdownItemProps> = {}
+    if(item.type == OverflowMenuItemType.header)
+    props.header = true
+    else if(item.type == OverflowMenuItemType.divider)
+        props.divider = true
+    if(item.disabled)
+        props.disabled = true
+    const toggle = nullOrUndefined( item.toggleMenu ) ? true : item.toggleMenu
+
+    return (<DropdownItem active={item.active}  {...props} toggle={toggle} key={item.id} onClick={item.onPress} className="clickable">
+                    {!useStackedIcons && item.iconClass && <i className={item.iconClass}></i>}
+                    {useStackedIcons && <span className="fa-menu-icon-stack">
+                        <i className={item.iconClass}></i>
+                        <i className={item.iconStackClass + " fa-menu-icon-stacked"}></i>
+                    </span>}
+                    {item.children}
+                    {item.title}
+            </DropdownItem>)
 }
 export class OverflowMenu extends React.Component<Props, State> {
     showTooltip = false
@@ -112,24 +134,7 @@ export class OverflowMenu extends React.Component<Props, State> {
                             }
                             <DropdownMenu>
                                 {rest.map(i => {
-                                    const useStackedIcons = !!i.iconStackClass && !!i.iconClass
-                                    const props:Partial<DropdownItemProps> = {}
-                                    if(i.type == OverflowMenuItemType.header)
-                                    props.header = true
-                                    else if(i.type == OverflowMenuItemType.divider)
-                                        props.divider = true
-                                    if(i.disabled)
-                                        props.disabled = true
-                                    const toggle = nullOrUndefined( i.toggleMenu ) ? true : i.toggleMenu
-
-                                    return (<DropdownItem active={i.active}  {...props} toggle={toggle} key={i.id} onClick={i.onPress} className="clickable">
-                                                    {!useStackedIcons && i.iconClass && <i className={i.iconClass}></i>}
-                                                    {useStackedIcons && <span className="fa-menu-icon-stack">
-                                                        <i className={i.iconClass}></i>
-                                                        <i className={i.iconStackClass + " fa-menu-icon-stacked"}></i>
-                                                    </span>}
-                                                    {i.title}
-                                            </DropdownItem>)
+                                    return createDropdownItem(i)
                                 })}
                             </DropdownMenu>
                         </Dropdown>

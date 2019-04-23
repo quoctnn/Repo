@@ -17,6 +17,7 @@ import { resetProfilesAction } from "../../redux/profileStore";
 import { AuthenticationManager } from "../../managers/AuthenticationManager";
 import { parseJSONObject } from "../../utilities/Utilities";
 import * as websocketInfo from "../../../../docs/Websocket messages.json"
+
 type ReduxStateProps = {
     language: number;
     theme: number;
@@ -34,6 +35,7 @@ type ReduxDispatchProps = {
     enablePushNotifications: () => void;
 }
 type OwnProps = {
+    showTitle?:boolean
 }
 type State = {
     accessToken: string;
@@ -45,6 +47,9 @@ type State = {
 }
 type Props = OwnProps & ReduxStateProps & ReduxDispatchProps
 class DevTool extends React.PureComponent<Props, State> {
+    static defaultProps:OwnProps = {
+        showTitle:true
+    }
     constructor(props) {
         super(props);
         this.state = {
@@ -136,7 +141,7 @@ class DevTool extends React.PureComponent<Props, State> {
         {
             return null
         }
-        return <Popover trigger="legacy" placement="top" hideArrow={false} isOpen={!!data} target={target} toggle={this.hideInfoBox}>
+        return <Popover className="dev-tool-infoBox-container" trigger="legacy" placement="top" hideArrow={false} isOpen={!!data} target={target} toggle={this.hideInfoBox}>
                     <PopoverBody className="dev-tool-infoBox">
                         {data}
                     </PopoverBody>
@@ -308,7 +313,7 @@ class DevTool extends React.PureComponent<Props, State> {
         return (
         <div id="dev-tool">
             <div className="jumbotron">
-            <h1 className="display-4">{translate("Developer Tool")}</h1>
+            {this.props.showTitle && <h1 className="display-4">{translate("admin.developertool")}</h1>}
             <div>
                 <Form>
                 <div className="form-group row">

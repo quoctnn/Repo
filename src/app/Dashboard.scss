@@ -1,7 +1,7 @@
 #dashboard
 {
     > .dashboard-components{
-        margin-top: 0;
+        margin-top: -10px !important;
         .module-grid
         {
             display: grid;
@@ -29,7 +29,7 @@
 .dashboard-container{
     #page-header + *{
         position: relative;
-        margin-top: -30px !important;
+        /*margin-top: -30px !important;*/
     }
 }
 body.rb-200

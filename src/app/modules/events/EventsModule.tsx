@@ -89,7 +89,8 @@ class EventsModule extends React.Component<Props, State> {
     renderContent = () => {
         return <>
             {!this.props.community && <LoadingSpinner key="loading"/>}
-            {this.props.community && <ListComponent<Event> ref={this.eventsList} onLoadingStateChanged={this.feedLoadingStateChanged} fetchData={this.fetchEvents} renderItem={this.renderEvent} />}
+            {this.props.community && <ListComponent<Event> 
+                ref={this.eventsList} onLoadingStateChanged={this.feedLoadingStateChanged} fetchData={this.fetchEvents} renderItem={this.renderEvent} />}
             </>
     }
     render()

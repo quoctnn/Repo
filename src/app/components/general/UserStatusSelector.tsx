@@ -12,6 +12,7 @@ import { translate } from '../../localization/AutoIntlProvider';
 import { EventStreamManagerConnectionChangedEvent, EventStreamManager } from '../../managers/EventStreamManager';
 import { DropdownItem } from 'reactstrap';
 import { UserStatusIndicator } from './UserStatusIndicator';
+import { OverflowMenuItem, OverflowMenuItemType, createDropdownItem } from './OverflowMenu';
 
 export const sendUserStatus = (status: UserStatus) => {
     sendOnWebsocket(
@@ -71,10 +72,19 @@ class UserStatusSelector extends React.Component<Props, State> {
         if(!this.props.profile || this.props.profile.is_anonymous)
             return <Link className="btn btn-sm btn-secondary btn-outline-secondary" to={Routes.SIGNIN}>{translate("Sign in")}</Link>
         const currentState = UserStatus.getObject(this.props.profile.user_status)
-        let selectable = UserStatus.getSelectableStates([currentState.type])
+        const selectable = UserStatus.getSelectableStates([currentState.type])
+        const selectableDropdownItems:OverflowMenuItem[] = selectable.map((s, i) => {
+         return {id:"status_" + i, 
+                type:OverflowMenuItemType.option, 
+                title:s.translation(), 
+                onPress:this.setUserStatus(s), 
+                toggleMenu:false, 
+                children:<UserStatusIndicator size={12} borderColor="white" statusColor={s.color} borderWidth={2} />
+            }
+        })
         return (
-            <div className="d-flex ml-2">
-                <div className="dropdown margin-right-sm">
+            <div className="m-2">
+                <div className="dropdown margin-right-sm d-flex">
                     {this.state.connected &&
                     <a data-boundary="body" className="dropdown-toggle text-truncate" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         {currentState.translation()}
@@ -83,10 +93,8 @@ class UserStatusSelector extends React.Component<Props, State> {
                     <span> {UserStatus.getObject(UserStatus.unavailable).translation()} </span>
                     }
                     <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                        {selectable.map((status, index) => {
-                            return <a key={index} onClick={this.setUserStatus(status)} className="dropdown-item" href="#">
-                                        <UserStatusIndicator size={12} borderColor="white" statusColor={status.color} borderWidth={2} />{status.translation()}
-                                    </a>
+                        {selectableDropdownItems.map((dd, index) => {
+                            return createDropdownItem(dd)
                         }) }
                         <DropdownItem divider={true}/>
                         <Link className="dropdown-item" to={Routes.SIGNOUT}>{translate("Sign out")}</Link>
@@ -98,7 +106,8 @@ class UserStatusSelector extends React.Component<Props, State> {
     render()
     {
         return(
-            <div id="user-status-selector">
+            <div id="user-status-selector" className="d-flex">
+                <div className="flex-grow-1"></div>
                 {this.renderStatusSelector()}
             </div>
         );

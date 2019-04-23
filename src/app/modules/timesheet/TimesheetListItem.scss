@@ -1,0 +1,22 @@
+.timesheet-list-item{
+    text-decoration: none;
+    color:#000000;
+    font-size: 14px;
+    border-radius: 10px;
+    &:hover{
+        text-decoration: none;
+        color:#000000;
+    }
+    &:not(:last-child){
+        margin-bottom: 6px;
+    }
+    &:nth-child(odd) {
+        background: #f3f3f3;
+    }
+    &:nth-child(even) {
+        background: #FAD5FB;
+    }
+    .user{
+        font-size: 16px;
+    }
+}

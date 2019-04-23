@@ -38,7 +38,7 @@ export default  {
         getSearchHistoryUrl: '/api/v1/search/history/',//GET
         createSearchHistoryUrl: '/api/v1/search/history/', //POST
         removeSearchHistoryUrl: (id:number) => {
-            return `/api/v1/search/${id}/remove_from_history/`
+            return `/api/v2/search/${id}/remove_from_history/`
         },
         // Community URLs
         myCommunitiesUrl: '/api/v2/community/as-member/',
@@ -46,8 +46,8 @@ export default  {
         communityMembersUrl: (id:number) => {
             return `/api/v2/community/${id}/members/`
         },
-        communityFilesUrl: (id:number) => {
-            return `/api/v2/community/${id}/files/`
+        communityFilesUrl: (id:number|string) => {
+            return `/api/v1/community/${id}/files/`
         },
         communityUrl: (id:number|string) => {
             return `/api/v2/community/${id}/`
@@ -179,9 +179,9 @@ export default  {
 
         //report
         reportUrl: (context_type:string, context_object_id:number) => {
-            return `/api/v1/${context_type}/${context_object_id}/report/`
+            return `/api/v2/${context_type}/${context_object_id}/report/`
         },
-        reportTags:'/api/v1/report/tags/',
+        reportTags:'/api/v2/report/tags/',
     },
 
     urlsRoute: {

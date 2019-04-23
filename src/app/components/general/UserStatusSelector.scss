@@ -1,8 +1,6 @@
-@import "../../Config";
-#user-status-selector a
+#user-status-selector button
 {
     cursor: pointer;
-    @include var(color, title-color);
     .user-status-indicator{
         margin-right: 4px;
     }

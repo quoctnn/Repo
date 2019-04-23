@@ -9,8 +9,9 @@ $circleOutsideLeftPart:8;
 $coverMarginLeftPart:1.62;
 #page-header
 {
-    height: $headerHeight;
     min-height: $headerMinHeight;
+    position: relative;
+    padding-bottom: 10px;
     #page-header-cover-image {
         margin-left: $circleWidth/$coverMarginLeftPart;
     }
@@ -26,15 +27,25 @@ $coverMarginLeftPart:1.62;
         top: 0;
         z-index: -1;
     }
-    position: relative;
+    .page-top-navigation{
+        padding:$padding;
+        display: flex;
+        position: relative;
+    }
     &.no-image {
         @include var(background-color,primary-theme-color);
     }
-    #page-top-navigation{
+    #page-main-navigation{
         padding:$padding;
         .left{
             width: $circleWidth - $circleWidth/$circleOutsideLeftPart;
             padding-right: $padding;
+        }
+    }
+    .intrawork-logo{
+        height: 50px;
+        .background{
+            fill:white;
         }
     }
     @media only screen and (max-width : 1200px) {
@@ -45,14 +56,16 @@ $coverMarginLeftPart:1.62;
             margin-left: -$circleMinWidth/$circleOutsideLeftPart;
             margin-top: -$circleMinWidth/4.5;
         }
-        #page-top-navigation{
+        .page-top-navigation{
+            padding:$minPadding;
+        }
+        #page-main-navigation{
             padding:$minPadding;
             .left{
                 width: $circleMinWidth - $circleMinWidth/$circleOutsideLeftPart !important;
                 padding-right: $minPadding;
             }
         }
-        
         #page-header-cover-image {
             margin-left: $circleMinWidth/$coverMarginLeftPart;
         }

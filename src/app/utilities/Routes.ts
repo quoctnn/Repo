@@ -1,4 +1,9 @@
 import ApiClient from '../network/ApiClient';
+import { translate } from '../localization/AutoIntlProvider';
+type RouteEntry = {
+    path:string 
+    title:() => string
+}
 export default abstract class Routes {
     static ANY = "*"
     static ELECTRON = "/**/electron.html"
@@ -6,12 +11,13 @@ export default abstract class Routes {
     static PROFILE_UPDATE = "/profile/update"
     static SIGNIN = "/signin"
     static SIGNOUT = "/signout"
-    static DEVELOPER_TOOL = "/developer-tool"
     static CONVERSATIONS = "/conversations/"
     static CONVERSATION_CREATE = "/conversation/create/"
     static SEARCH = "/search/"
     static UPDATE_TOOL = "/app-update"
     static NEWSFEED = "/newsfeed/"
+    static DEVELOPER_TOOL = {path:"/developer-tool", title:() => {return translate("admin.developertool")}}
+    static ADMIN_DASHBOARD_BUILDER:RouteEntry = {path:"/admin/dashboard-builder/", title:() => {return translate("admin.dashboard.builder")}}
 
     private static PROFILE = "/profile/"
     private static COMMUNITY = "/community/"

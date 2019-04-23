@@ -31,6 +31,9 @@
     max-height: 120px;
     overflow-y: auto;
 }
+.dev-tool-infoBox-container{
+    z-index: 10000;
+}
 .modal #dev-tool{
     min-width: initial;
 }

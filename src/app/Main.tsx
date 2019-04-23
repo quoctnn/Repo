@@ -9,7 +9,7 @@ import { ReduxState } from "./redux";
 import Signin from "./views/signin/Signin";
 import { Error404 } from "./views/error/Error404";
 import NewsfeedPage from "./components/pages/NewsfeedPage";
-import { Dashboard, Community } from './types/intrasocial_types';
+import { Dashboard, Community, UserProfile } from './types/intrasocial_types';
 import ApplicationLoader from "./views/loading/ApplicationLoader";
 import Signout from "./views/signout/Signout";
 import CommunityPage from "./components/pages/CommunityPage";
@@ -27,19 +27,17 @@ import { GroupManager } from "./managers/GroupManager";
 import ProfilePage from "./components/pages/ProfilePage";
 import { ProfileManager } from "./managers/ProfileManager";
 import { PrivateRoute } from "./components/router/PrivateRoute";
-import { nullOrUndefined } from "./utilities/Utilities";
+import { nullOrUndefined, isAdmin } from "./utilities/Utilities";
 import EventPage from "./components/pages/EventPage";
 import { EventManager } from "./managers/EventManager";
-import { Settings } from "./utilities/Settings";
-import DevTool from "./components/dev/DevTool";
-import DevToolTrigger from "./components/dev/DevToolTrigger";
-import { Modal, ModalHeader, ModalBody, ModalFooter } from "reactstrap";
+import DashboardBuilderPage from "./components/pages/admin/DashboardBuilderPage";
 
 type OwnProps = {
 }
 type ReduxStateProps = {
     signedIn:boolean
     loaded:boolean
+    profile:UserProfile
 }
 type ReduxDispatchProps = {
     setResolvedContext:(context:ResolvedContext) => void
@@ -221,43 +219,13 @@ class Main extends React.Component<Props, State> {
     setCommunityTheme = (community:Community) => {
         CommunityManager.applyCommunityTheme(community)
     }
-    toggleDeveloperTool = (e?:React.SyntheticEvent<any>) => {
-        if(e)
-        {
-            e.preventDefault()
-            e.stopPropagation()
-        }
-        this.setState((prevState) => {
-                return {developerToolVisible: !prevState.developerToolVisible}
-        })
-    }
-    renderDeveloperTool = () => {
-        if(this.state.developerToolVisible)
-        {
-            return (<Modal toggle={this.toggleDeveloperTool} id="status-permalink-dialog" zIndex={1070} isOpen={this.state.developerToolVisible} >
-                    <ModalHeader>
-                        {translate("Developer Tool")}
-                        <button type="button" className="close pull-right" onClick={this.toggleDeveloperTool}>
-                            <span aria-hidden="true">&times;</span>
-                            <span className="sr-only">{translate("common.close")}</span>
-                        </button>
-                    </ModalHeader>
-                    <ModalBody className="vertical-scroll">
-                        <DevTool />
-                    </ModalBody>
-                    <ModalFooter>
-                    </ModalFooter>
-                </Modal>)
-        }
-        return null;
-    }
     render() {
+        const {profile} = this.props
+        const userIsAdmin = isAdmin(profile)
         return(
             <div id="main">
                     <div id="main-content">
                         <ToastContainer />
-                        {this.renderDeveloperTool()}
-                        {!Settings.isProduction && <DevToolTrigger onClick={this.toggleDeveloperTool} /> }
                         <div id="content-block" className="">
                             {!this.props.loaded &&
                                 <Switch>
@@ -266,6 +234,9 @@ class Main extends React.Component<Props, State> {
                             }
                             {this.props.loaded &&
                                 <Switch>
+                                    {userIsAdmin && 
+                                        <Route path={Routes.ADMIN_DASHBOARD_BUILDER.path} component={DashboardBuilderPage} />
+                                    }
                                     <Redirect from={Routes.ELECTRON} to={Routes.ROOT} />
                                     <Route path={Routes.taskUrl(":communityname", ":projectname", ":taskid")} component={TaskPage} />
                                     <Route path={Routes.eventUrl(":communityname", ":eventname")} component={EventPage} exact={true} />
@@ -290,7 +261,8 @@ class Main extends React.Component<Props, State> {
 const mapStateToProps = (state:ReduxState, ownProps: OwnProps):ReduxStateProps => {
     return {
       signedIn:state.authentication.signedIn,
-      loaded:state.application.loaded
+      loaded:state.application.loaded,
+      profile:state.authentication.profile
     }
 }
 const mapDispatchToProps = (dispatch:any, ownProps: OwnProps):ReduxDispatchProps => {
