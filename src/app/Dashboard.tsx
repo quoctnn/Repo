@@ -17,6 +17,7 @@ import ProjectDetailsModule from "./modules/projects/ProjectDetailsModule";
 import EventDetailsModule from "./modules/events/EventDetailsModule";
 import TimesheetModule from "./modules/timesheet/TimesheetModule";
 import FilesModule from "./modules/files/FilesModule";
+import CommunitiesModule from "./modules/communities/CommunitiesModule";
 
 type DemoProps = {
     text?:string
@@ -39,6 +40,7 @@ export namespace DashboardComponents {
     export const componentMap = {
         "DemoComponent": DemoComponent,
         "NewsfeedModule":NewsfeedModule,
+        "CommunitiesModule":CommunitiesModule,
         "TaskModule": TasksModule,
         "GroupsModule":GroupsModule,
         "GroupDetailsModule":GroupDetailsModule,

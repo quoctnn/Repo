@@ -136,6 +136,7 @@ var translations = {
     "splash.subtitle":"CONTACTS ● DASHBOARDS ● COMMUNITIES",
     "timesheet.module.title":"Timesheet",
     "files.module.title":"Files",
+    "communities.module.title":"Communities",
   },
   no: {
     "search.placeholder": "Søk ...",
@@ -274,6 +275,7 @@ var translations = {
     "splash.subtitle":"CONTACTS ● DASHBOARDS ● COMMUNITIES",
     "timesheet.module.title":"Timesheet",
     "files.module.title":"Filer",
+    "communities.module.title":"Community",
   },
   en: {
     "search.placeholder": "Search ...",
@@ -419,6 +421,7 @@ var translations = {
     "splash.subtitle":"CONTACTS ● DASHBOARDS ● COMMUNITIES",
     "timesheet.module.title":"Timesheet",
     "files.module.title":"Files",
+    "communities.module.title":"Communities",
   }
 };
 

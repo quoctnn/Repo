@@ -1,0 +1,22 @@
+.community-list-item{
+    margin:10px 12px;
+    margin-top: 0;
+    &:hover{
+        text-decoration: none;
+    }
+
+    .drop-shadow{
+
+        border-radius: 15px;
+        overflow: hidden;
+    }
+    .top, .bottom{
+        height:40px;
+    }
+    .bottom{
+        padding: 0 8px;
+    }
+    .title{
+        padding-left: 8px;
+    }
+}
