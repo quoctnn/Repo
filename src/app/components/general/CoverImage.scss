@@ -19,4 +19,13 @@
     position: absolute;
     top: 0;
     bottom: -0px;
+    .shadow-overlay{
+        right: 0;
+        background: linear-gradient(rgba(0,0,0,0) 51%, rgba(0,0,0, .53));
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        z-index: -1;
+    }
 }

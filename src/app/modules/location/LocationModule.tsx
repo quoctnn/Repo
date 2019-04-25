@@ -6,7 +6,6 @@ import { ResponsiveBreakpoint } from '../../components/general/observers/Respons
 import { ContextNaturalKey, Coordinate } from '../../types/intrasocial_types';
 import { connect } from 'react-redux';
 import { ReduxState } from '../../redux';
-import { resolveContextObject, getContextObject } from '../newsfeed/NewsfeedModule';
 import { nullOrUndefined, coordinateIsValid } from '../../utilities/Utilities';
 import { Feature, Layer } from 'react-mapbox-gl';
 import MapboxMapComponent, { mapLayout, mapImages } from '../../components/general/map/MapboxMapComponent';
@@ -14,6 +13,7 @@ import ApiClient from '../../network/ApiClient';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import SimpleModule from '../SimpleModule';
 import { translate } from '../../localization/AutoIntlProvider';
+import { ContextManager } from '../../managers/ContextManager';
 type OwnProps = {
     className?:string
     breakpoint:ResponsiveBreakpoint
@@ -111,11 +111,9 @@ class LocationModule extends React.Component<Props, State> {
                 </SimpleModule>)
     }
 }
-const mapStateToProps = (state:ReduxState, ownProps: OwnProps):ReduxStateProps => {
+const mapStateToProps = (state:ReduxState, ownProps: OwnProps & RouteComponentProps<any>):ReduxStateProps => {
 
-    const resolveContext = state.resolvedContext
-    const resolvedContext = resolveContextObject(resolveContext, ownProps.contextNaturalKey)
-    const contextObject:any = resolvedContext && getContextObject(resolvedContext.contextNaturalKey, resolvedContext.contextObjectId)
+    const contextObject = ContextManager.getContextObject(ownProps.location.pathname, ownProps.contextNaturalKey) as any
     const address:string = contextObject && contextObject.address
     const location:Coordinate = contextObject && contextObject.location
     return {

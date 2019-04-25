@@ -3,10 +3,9 @@ import { withRouter, RouteComponentProps } from "react-router-dom";
 import classnames from "classnames"
 import "./FilesModule.scss"
 import { ResponsiveBreakpoint } from '../../components/general/observers/ResponsiveComponent';
-import { ContextNaturalKey, Permissible, UploadedFile, Community } from '../../types/intrasocial_types';
+import { ContextNaturalKey, Permissible, UploadedFile, Community, IdentifiableObject } from '../../types/intrasocial_types';
 import { connect } from 'react-redux';
 import { ReduxState } from '../../redux';
-import { resolveContextObject, getContextObject } from '../newsfeed/NewsfeedModule';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import SimpleModule from '../SimpleModule';
 import { translate } from '../../localization/AutoIntlProvider';
@@ -14,7 +13,7 @@ import ListComponent from '../../components/general/ListComponent';
 import ApiClient, { PaginationResult } from '../../network/ApiClient';
 import { ToastManager } from '../../managers/ToastManager';
 import FileListItem from './FileListItem';
-import { CommunityManager } from '../../managers/CommunityManager';
+import { ContextManager } from '../../managers/ContextManager';
 type OwnProps = {
     className?:string
     breakpoint:ResponsiveBreakpoint
@@ -24,9 +23,7 @@ type State = {
     isLoading:boolean
 }
 type ReduxStateProps = {
-    contextObject:Permissible & {id:number}
-    contextNaturalKey:ContextNaturalKey
-    community:Community
+    contextObject:Permissible & IdentifiableObject
 }
 type ReduxDispatchProps = {
 }
@@ -60,12 +57,7 @@ class FilesModule extends React.Component<Props, State> {
     }
     fetchFiles = (offset:number, completion:(items:PaginationResult<UploadedFile>) => void ) => {
         const contextId = (this.props.contextObject && this.props.contextObject.id) || undefined
-        const userId = this.props.contextNaturalKey == ContextNaturalKey.USER ? contextId : undefined
-        const projectId = this.props.contextNaturalKey == ContextNaturalKey.PROJECT ? contextId : undefined
-        const taskId = this.props.contextNaturalKey == ContextNaturalKey.TASK ? contextId : undefined
-        const communityId = this.props.community && this.props.community.id
-        //should get files from v2/files, but currently that endpoint does not support filtering on context, and does not have all fields needed(thumb etc)
-        ApiClient.getCommunityFiles(communityId, 10, offset, (data, status, error) => {
+        ApiClient.getFiles(this.props.contextNaturalKey, contextId, 10, offset, (data, status, error) => {
             completion(data)
             ToastManager.showErrorToast(error)
         })
@@ -100,17 +92,11 @@ class FilesModule extends React.Component<Props, State> {
                 </SimpleModule>)
     }
 }
-const mapStateToProps = (state:ReduxState, ownProps: OwnProps):ReduxStateProps => {
+const mapStateToProps = (state:ReduxState, ownProps: OwnProps & RouteComponentProps<any>):ReduxStateProps => {
 
-    const resolveContext = state.resolvedContext
-    const resolvedContext = resolveContextObject(resolveContext, ownProps.contextNaturalKey)
-    const contextObject:any = resolvedContext && getContextObject(resolvedContext.contextNaturalKey, resolvedContext.contextObjectId)
-
-    const community = resolveContext && !!resolveContext.communityId ? CommunityManager.getCommunity(resolveContext.communityId.toString()) : undefined
+    const contextObject = ContextManager.getContextObject(ownProps.location.pathname, ownProps.contextNaturalKey)
     return {
         contextObject,
-        contextNaturalKey:resolvedContext && resolvedContext.contextNaturalKey,
-        community
     }
 }
 const mapDispatchToProps = (dispatch:ReduxState, ownProps: OwnProps):ReduxDispatchProps => {

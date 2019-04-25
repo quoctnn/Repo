@@ -14,10 +14,10 @@ import { ReduxState } from '../../redux';
 import { CommunityManager } from '../../managers/CommunityManager';
 import CircularLoadingSpinner from '../../components/general/CircularLoadingSpinner';
 import LoadingSpinner from '../../components/LoadingSpinner';
-import { getContextObject, resolveContextObject } from '../newsfeed/NewsfeedModule';
 import { DetailsContent } from '../../components/details/DetailsContent';
 import { DetailsMembers } from '../../components/details/DetailsMembers';
 import { stringToDate, DateFormat } from '../../utilities/Utilities';
+import { ContextManager } from '../../managers/ContextManager';
 const shortMonth:string[] = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 type OwnProps = {
     breakpoint:ResponsiveBreakpoint
@@ -30,7 +30,6 @@ type State = {
 type ReduxStateProps = {
     community: Community
     event: Event
-    eventId: number
 }
 type ReduxDispatchProps = {
 }
@@ -73,7 +72,7 @@ class EventDetailsModule extends React.Component<Props, State> {
     }
     render()
     {
-        const {breakpoint, history, match, location, staticContext, event, eventId, community, contextNaturalKey, ...rest} = this.props
+        const {breakpoint, history, match, location, staticContext, event, community, contextNaturalKey, ...rest} = this.props
         const startDate = event ? new Date(event.start) : null
         return (<Module {...rest}>
                     <ModuleHeader title={event && event.name || translate("detail.module.title")} loading={this.state.isLoading}>
@@ -119,17 +118,12 @@ class EventDetailsModule extends React.Component<Props, State> {
                 </Module>)
     }
 }
-const mapStateToProps = (state:ReduxState, ownProps: OwnProps):ReduxStateProps => {
-
-    const resolveContext = state.resolvedContext
-    const resolvedContext = resolveContextObject(resolveContext, ownProps.contextNaturalKey)
-    const eventId = resolvedContext && resolvedContext.contextObjectId
-    const event = resolvedContext && getContextObject(resolvedContext.contextNaturalKey, resolvedContext.contextObjectId) as Event
-    const community = resolveContext && !!resolveContext.communityId ? CommunityManager.getCommunity(resolveContext.communityId.toString()) : undefined
+const mapStateToProps = (state:ReduxState, ownProps: OwnProps & RouteComponentProps<any>):ReduxStateProps => {
+    const event = ContextManager.getContextObject(ownProps.location.pathname, ownProps.contextNaturalKey) as Event
+    const community = ContextManager.getContextObject(ownProps.location.pathname, ContextNaturalKey.COMMUNITY) as Community
     return {
         community,
         event,
-        eventId
     }
 }
 const mapDispatchToProps = (dispatch:ReduxState, ownProps: OwnProps):ReduxDispatchProps => {

@@ -3,10 +3,9 @@ import { withRouter, RouteComponentProps } from "react-router-dom";
 import classnames from "classnames"
 import "./TimesheetModule.scss"
 import { ResponsiveBreakpoint } from '../../components/general/observers/ResponsiveComponent';
-import { ContextNaturalKey, Permissible, Timesheet } from '../../types/intrasocial_types';
+import { ContextNaturalKey, Permissible, Timesheet, IdentifiableObject } from '../../types/intrasocial_types';
 import { connect } from 'react-redux';
 import { ReduxState } from '../../redux';
-import { resolveContextObject, getContextObject } from '../newsfeed/NewsfeedModule';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import SimpleModule from '../SimpleModule';
 import { translate } from '../../localization/AutoIntlProvider';
@@ -14,6 +13,7 @@ import ListComponent from '../../components/general/ListComponent';
 import TimesheetListItem from './TimesheetListItem';
 import ApiClient, { PaginationResult } from '../../network/ApiClient';
 import { ToastManager } from '../../managers/ToastManager';
+import { ContextManager } from '../../managers/ContextManager';
 type OwnProps = {
     className?:string
     breakpoint:ResponsiveBreakpoint
@@ -23,8 +23,7 @@ type State = {
     isLoading:boolean
 }
 type ReduxStateProps = {
-    contextObject:Permissible & {id:number}
-    contextNaturalKey:ContextNaturalKey
+    contextObject:Permissible & IdentifiableObject
 }
 type ReduxDispatchProps = {
 }
@@ -100,14 +99,11 @@ class TimesheetModule extends React.Component<Props, State> {
                 </SimpleModule>)
     }
 }
-const mapStateToProps = (state:ReduxState, ownProps: OwnProps):ReduxStateProps => {
+const mapStateToProps = (state:ReduxState, ownProps: OwnProps & RouteComponentProps<any>):ReduxStateProps => {
 
-    const resolveContext = state.resolvedContext
-    const resolvedContext = resolveContextObject(resolveContext, ownProps.contextNaturalKey)
-    const contextObject:any = resolvedContext && getContextObject(resolvedContext.contextNaturalKey, resolvedContext.contextObjectId)
+    const contextObject = ContextManager.getContextObject(ownProps.location.pathname, ownProps.contextNaturalKey)
     return {
         contextObject,
-        contextNaturalKey:resolvedContext && resolvedContext.contextNaturalKey
     }
 }
 const mapDispatchToProps = (dispatch:ReduxState, ownProps: OwnProps):ReduxDispatchProps => {

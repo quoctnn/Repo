@@ -118,7 +118,7 @@ export abstract class ApplicationManager
     }
     private static setApplicationLoaded = () => {
         const authUser = AuthenticationManager.getAuthenticatedUser()
-        CommunityManager.setInitialCommunity(authUser.active_community)
+        authUser && CommunityManager.setInitialCommunity(authUser.active_community)
         ApplicationManager.getStore().dispatch(setApplicationLoadedAction(true))
     }
     private static getStore = ():Store<ReduxState,any> =>

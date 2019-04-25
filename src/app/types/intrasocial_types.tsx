@@ -9,6 +9,9 @@ export interface Verb
     infinitive:string
     past_tense:string
 }
+export type IdentifiableObject = {
+    id: number
+}
 export interface SimpleNotification
 {
     absolute_url:string
@@ -206,6 +209,27 @@ export enum ContextNaturalKey
     EVENT = "event.event",
     NEWSFEED = "newsfeed",
 }
+export enum ContextSegmentKey
+{
+    GROUP = "group",
+    COMMUNITY = "community",
+    USER = "profile",
+    PROJECT = "project",
+    TASK = "task",
+    EVENT = "event",
+}
+export namespace ContextSegmentKey {
+    export function keyForNaturalKey(key: ContextNaturalKey) {
+        switch(key){
+            case ContextNaturalKey.GROUP: return ContextSegmentKey.GROUP
+            case ContextNaturalKey.COMMUNITY: return ContextSegmentKey.COMMUNITY
+            case ContextNaturalKey.USER: return ContextSegmentKey.USER
+            case ContextNaturalKey.PROJECT: return ContextSegmentKey.PROJECT
+            case ContextNaturalKey.EVENT: return ContextSegmentKey.EVENT
+            default:return null
+        }
+    }
+}
 export namespace ContextNaturalKey {
     export function avatarForKey(key: ContextNaturalKey) {
         switch(key){
@@ -247,7 +271,7 @@ export enum UploadedFileType
     AUDIO = "audio",
 }
 
-export interface UploadedFile
+export type UploadedFile = 
 {
     id:number
     user:number
@@ -261,7 +285,7 @@ export interface UploadedFile
     thumbnail:string
     size:number
     created_at:string
-}
+} & IdentifiableObject
 type FileIcon = {name:string, color:string}
 export const fileIcon = (file:UploadedFile) =>
 {
@@ -372,12 +396,11 @@ export type ICommunity = {
     cover_thumbnail: string
     avatar_thumbnail:string
     deactivated:boolean
-    id:number
     name:string
     slug_name:string
     primary_color:string
     secondary_color:string
-} & Linkable
+} & Linkable & IdentifiableObject
 
 export type Community = {
     members: number[]
@@ -390,8 +413,8 @@ export type SimpleUserProfile = {
     avatar: string,
     first_name: string,
     last_name: string,
-    id: number,
-}
+} & IdentifiableObject
+
 export type UserProfile = {
     email:string|null
     locale:string|null
@@ -413,7 +436,6 @@ export type UserProfile = {
 } & SimpleUserProfile & AvatarAndCover & Linkable & Permissible
 
 export type Group = {
-    id: number
     name: string
     slug: string
     community: number
@@ -425,14 +447,13 @@ export type Group = {
     created_at: string
     parent: number
     updated_at: string
-} & AvatarAndCover & Linkable & Permissible
+} & AvatarAndCover & Linkable & Permissible & IdentifiableObject
 
 export type Coordinate = {
     lat:number
     lon:number
 }
 export type Event = {
-    id: number
     name: string
     slug: string
     community: number
@@ -448,11 +469,11 @@ export type Event = {
     start:string
     end:string
     location:Coordinate
+    address:string
 
-} & AvatarAndCover & Linkable & Permissible
+} & AvatarAndCover & Linkable & Permissible & IdentifiableObject
 
 export type Project = {
-    id: number
     name: string
     slug: string
     community: number
@@ -471,7 +492,7 @@ export type Project = {
     tasks_attention: number
     tasks_completed: number
     tasks_responsible: number
-} & AvatarAndCover & Linkable & Permissible
+} & AvatarAndCover & Linkable & Permissible & IdentifiableObject
 
 export type Task = {
     id: number
@@ -485,7 +506,7 @@ export type Task = {
     state: TaskState
     serialization_date:string
     visibility?:number[]
-} & Linkable & Permissible
+} & Linkable & Permissible & IdentifiableObject
 
 export enum TaskPriority{
     low = "low",

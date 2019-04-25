@@ -14,4 +14,9 @@
         font-size: 23px;
         font-weight: 100;
     }
+    .menu-row{
+        display: grid;
+        grid-gap: 15px;
+        grid-template-columns: repeat(12, 1fr);
+    }
 }

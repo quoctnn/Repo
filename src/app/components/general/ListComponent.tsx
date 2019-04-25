@@ -5,6 +5,7 @@ import { PaginationResult } from '../../network/ApiClient';
 import { List } from '../../components/general/List';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import { translate } from '../../localization/AutoIntlProvider';
+import { IdentifiableObject } from '../../types/intrasocial_types';
 
 type Props<T> = {
     className?:string
@@ -24,9 +25,6 @@ type State<T> = {
     requestId:number
     hasReceivedData:boolean
     hasError:boolean
-}
-interface IdentifiableObject {
-    id: number
 }
 export default class ListComponent<T extends IdentifiableObject> extends React.Component<Props<T>, State<T>> {  
     constructor(props:Props<T>) {

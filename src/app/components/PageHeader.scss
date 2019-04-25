@@ -12,6 +12,16 @@ $coverMarginLeftPart:1.62;
     min-height: $headerMinHeight;
     position: relative;
     padding-bottom: 10px;
+    text-shadow: 0 0 3px rgba(0, 0, 0, .8);
+    #page-top-menu > button{
+        text-shadow: 0 0 3px rgba(0, 0, 0, .8);
+    }
+    .cover-image
+    {
+        .shadow-overlay{
+            left:$circleWidth/$coverMarginLeftPart;
+        }
+    }
     #page-header-cover-image {
         margin-left: $circleWidth/$coverMarginLeftPart;
     }

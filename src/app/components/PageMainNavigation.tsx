@@ -7,6 +7,11 @@ import { UserProfile, UserStatus } from '../types/intrasocial_types';
 import { userFullName, userAvatar } from "../utilities/Utilities";
 import UserStatusSelector from "./general/UserStatusSelector";
 import PageMainMenu from "./PageMainMenu";
+import { Link, withRouter, RouteComponentProps } from "react-router-dom";
+import Routes from "../utilities/Routes";
+import { translate } from "../localization/AutoIntlProvider";
+import { CommunityManager } from "../managers/CommunityManager";
+import { NavigationUtilities } from "../utilities/NavigationUtilities";
 export interface OwnProps
 {
     primaryItemImage:string 
@@ -19,8 +24,16 @@ interface ReduxStateProps
 interface ReduxDispatchProps
 {
 }
-type Props = ReduxStateProps & ReduxDispatchProps & OwnProps
+type Props = ReduxStateProps & ReduxDispatchProps & OwnProps & RouteComponentProps<any>
 class PageTopNavigation extends React.Component<Props, {}> {
+    navigateToCommunity = (event:React.SyntheticEvent<any>) => {
+        event.preventDefault()
+        const community = CommunityManager.getActiveCommunity()
+        if(community)
+        {
+            NavigationUtilities.navigateToCommunity(this.props.history, community.id)
+        }
+    }
     render() {
         const profile = this.props.profile
         const currentState = UserStatus.getObject(this.props.profile.user_status)
@@ -37,10 +50,14 @@ class PageTopNavigation extends React.Component<Props, {}> {
                     </div>
                     <div className="center flex-grow-1"></div>
                 </div>
-                <div className="d-flex align-items-center" >
-                    <PageMainMenu />
-                    <div className="center flex-grow-1"></div>
-                    <div className="right">
+                <div className="menu-row" > 
+                    <PageMainMenu className="d-flex justify-content-center align-items-end" style={{gridArea: "1 / 1 / span 1 / span 3"}}/>
+                    <div className="center flex-grow-1 d-flex justify-content-around align-items-end" style={{gridArea: "1 / 4 / span 1 / span 6"}}>
+                        <Link onClick={this.navigateToCommunity} to="#">{translate("Community")}</Link>
+                        <Link to={Routes.ROOT}>{translate("Dashboard")}</Link>
+                        <Link to={Routes.CONVERSATIONS}>{translate("Messages")}</Link>
+                    </div>
+                    <div className="right" style={{gridArea: "1 / 10 / span 1 / span 3"}}>
                         <div className="profile-box d-flex align-items-center mr-1  flex-row-reverse">
                             <Avatar className="" image={userAvatar(profile, true)} size={63} statusColor={currentState && currentState.color} >
                             </Avatar>
@@ -64,4 +81,4 @@ const mapStateToProps = (state:ReduxState, ownProps: OwnProps):ReduxStateProps =
       return {
     }
   }
-  export default connect<ReduxStateProps, ReduxDispatchProps, OwnProps>(mapStateToProps, mapDispatchToProps)(PageTopNavigation)
+  export default withRouter(connect<ReduxStateProps, ReduxDispatchProps, OwnProps>(mapStateToProps, mapDispatchToProps)(PageTopNavigation))

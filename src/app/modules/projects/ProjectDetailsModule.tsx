@@ -13,9 +13,9 @@ import { connect } from 'react-redux';
 import { ReduxState } from '../../redux';
 import { CommunityManager } from '../../managers/CommunityManager';
 import LoadingSpinner from '../../components/LoadingSpinner';
-import { getContextObject, resolveContextObject } from '../newsfeed/NewsfeedModule';
 import { DetailsMembers } from '../../components/details/DetailsMembers';
 import { DetailsContent } from '../../components/details/DetailsContent';
+import { ContextManager } from '../../managers/ContextManager';
 type OwnProps = {
     breakpoint:ResponsiveBreakpoint
     contextNaturalKey: ContextNaturalKey
@@ -27,7 +27,6 @@ type State = {
 type ReduxStateProps = {
     community: Community
     project: Project
-    projectId: number
 }
 type ReduxDispatchProps = {
 }
@@ -65,7 +64,7 @@ class ProjectDetailsModule extends React.Component<Props, State> {
     }
     render()
     {
-        const {breakpoint, history, match, location, staticContext, project, projectId, community, contextNaturalKey, ...rest} = this.props
+        const {breakpoint, history, match, location, staticContext, project, community, contextNaturalKey, ...rest} = this.props
         return (<Module {...rest}>
                     <ModuleHeader title={project && project.name || translate("detail.module.title")} loading={this.state.isLoading}>
                         <ModuleMenuTrigger onClick={this.menuItemClick} />
@@ -93,17 +92,13 @@ class ProjectDetailsModule extends React.Component<Props, State> {
                 </Module>)
     }
 }
-const mapStateToProps = (state:ReduxState, ownProps: OwnProps):ReduxStateProps => {
+const mapStateToProps = (state:ReduxState, ownProps: OwnProps & RouteComponentProps<any>):ReduxStateProps => {
 
-    const resolveContext = state.resolvedContext
-    const resolvedContext = resolveContextObject(resolveContext, ownProps.contextNaturalKey)
-    const projectId = resolvedContext && resolvedContext.contextObjectId
-    const project = resolvedContext && getContextObject(resolvedContext.contextNaturalKey, resolvedContext.contextObjectId) as Project
-    const community = resolveContext && !!resolveContext.communityId ? CommunityManager.getCommunity(resolveContext.communityId.toString()) : undefined
+    const project = ContextManager.getContextObject(ownProps.location.pathname, ownProps.contextNaturalKey) as Project
+    const community = ContextManager.getContextObject(ownProps.location.pathname, ContextNaturalKey.COMMUNITY) as Community
     return {
         community,
         project,
-        projectId
     }
 }
 const mapDispatchToProps = (dispatch:ReduxState, ownProps: OwnProps):ReduxDispatchProps => {

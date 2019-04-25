@@ -21,14 +21,9 @@ import ApiClient from '../../network/ApiClient';
 import { ToastManager } from '../../managers/ToastManager';
 import { convertElasticResultItem, ContextValue } from '../../components/general/input/ContextFilter';
 import { ReduxState } from '../../redux';
-import { ResolvedContext } from '../../redux/resolvedContext';
 import { StatusComposerComponent } from '../../components/status/StatusComposerComponent';
-import { CommunityManager } from '../../managers/CommunityManager';
-import { ProjectManager } from '../../managers/ProjectManager';
-import { TaskManager } from '../../managers/TaskManager';
-import { GroupManager } from '../../managers/GroupManager';
-import { ProfileManager } from '../../managers/ProfileManager';
-import { EventManager } from '../../managers/EventManager';
+import { ContextManager } from '../../managers/ContextManager';
+import { string } from 'prop-types';
 
 type OwnProps = {
     className?:string
@@ -43,7 +38,6 @@ type DefaultProps = {
 interface ReduxStateProps
 {
     contextObjectId:number
-    isResolvingContext:boolean
     contextObject:Permissible
 }
 interface ReduxDispatchProps
@@ -66,47 +60,6 @@ interface State
 }
 type Props = ReduxStateProps & ReduxDispatchProps & OwnProps & DefaultProps & RouteComponentProps<any>
 
-export type ResolvedContextObject = {
-    contextNaturalKey:ContextNaturalKey
-    contextObjectId:number
-    resolved:number
-}
-export const resolveContextObject = (resolvedContext:ResolvedContext, contextNaturalKey:ContextNaturalKey):ResolvedContextObject => {
-    if(!contextNaturalKey)
-        return null
-    if(contextNaturalKey == ContextNaturalKey.COMMUNITY)
-        return {contextNaturalKey, contextObjectId:resolvedContext.communityId, resolved:resolvedContext.communityResolved}
-    if(contextNaturalKey == ContextNaturalKey.PROJECT)
-        return {contextNaturalKey, contextObjectId:resolvedContext.projectId, resolved:resolvedContext.projectResolved}
-    if(contextNaturalKey == ContextNaturalKey.TASK)
-        return {contextNaturalKey, contextObjectId:resolvedContext.taskId, resolved:resolvedContext.taskResolved}
-    if(contextNaturalKey == ContextNaturalKey.GROUP)
-        return {contextNaturalKey, contextObjectId:resolvedContext.groupId, resolved:resolvedContext.groupResolved}
-    if(contextNaturalKey == ContextNaturalKey.USER)
-        return {contextNaturalKey, contextObjectId:resolvedContext.profileId, resolved:resolvedContext.profileResolved}
-    if(contextNaturalKey == ContextNaturalKey.EVENT)
-        return {contextNaturalKey, contextObjectId:resolvedContext.eventId, resolved:resolvedContext.eventResolved}
-    console.warn("resolveContextObject does not handle '"+contextNaturalKey+"'")
-    return null
-}
-export const getContextObject = (contextNaturalKey:ContextNaturalKey, contextObjectId:number):Permissible => {
-    if(!contextNaturalKey || !contextObjectId)
-        return null
-    if(contextNaturalKey == ContextNaturalKey.COMMUNITY)
-        return CommunityManager.getCommunityById(contextObjectId)
-    if(contextNaturalKey == ContextNaturalKey.PROJECT)
-        return ProjectManager.getProjectById(contextObjectId)
-    if(contextNaturalKey == ContextNaturalKey.TASK)
-        return TaskManager.getTask(contextObjectId)
-    if(contextNaturalKey == ContextNaturalKey.GROUP)
-        return GroupManager.getGroupById(contextObjectId)
-    if(contextNaturalKey == ContextNaturalKey.USER)
-        return ProfileManager.getProfileById(contextObjectId)
-    if(contextNaturalKey == ContextNaturalKey.EVENT)
-        return EventManager.getEventById(contextObjectId)
-    console.warn("getContextObject does not handle '"+contextNaturalKey+"'")
-    return null
-}
 class NewsfeedModule extends React.Component<Props, State> {
     static defaultProps:DefaultProps = {
         includeSubContext:true
@@ -142,7 +95,6 @@ class NewsfeedModule extends React.Component<Props, State> {
         return nextProps.breakpoint != this.props.breakpoint ||
                 nextProps.contextNaturalKey != this.props.contextNaturalKey ||
                 nextProps.contextObjectId != this.props.contextObjectId ||
-                nextProps.isResolvingContext != this.props.isResolvingContext ||
                 nextProps.includeSubContext != this.props.includeSubContext ||
                 //state
                 nextState.contextNaturalKey != this.state.contextNaturalKey ||
@@ -207,7 +159,7 @@ class NewsfeedModule extends React.Component<Props, State> {
         this.setState({isLoading})
     }
     renderLoading = () => {
-        if (this.state.isLoading || this.props.isResolvingContext) {
+        if (this.state.isLoading) {
             return (<CircularLoadingSpinner borderWidth={3} size={20} key="loading"/>)
         }
     }
@@ -235,7 +187,7 @@ class NewsfeedModule extends React.Component<Props, State> {
     }
     render()
     {
-        const {breakpoint, history, match, location, staticContext, className, contextNaturalKey, contextObjectId, contextObject, includeSubContext, isResolvingContext, ...rest} = this.props
+        const {breakpoint, history, match, location, staticContext, className, contextNaturalKey, contextObjectId, contextObject, includeSubContext, ...rest} = this.props
         const cn = classnames("newsfeed-module", className, {"menu-visible":this.state.menuVisible, "status-composer-focus":this.state.statusComposerFocus})
         const headerClick = breakpoint < ResponsiveBreakpoint.standard ? this.headerClick : undefined
         const {contextTitle}  = this.state
@@ -287,7 +239,6 @@ class NewsfeedModule extends React.Component<Props, State> {
                                     includeSubContext={this.state.includeSubContext}
                                     contextNaturalKey={resolvedContextNaturalKey}
                                     contextObjectId={resolvedContextObjectId}
-                                    isResolvingContext={this.props.isResolvingContext}
                                     filter={this.state.filter}
                                     />
                             </ModuleContent>
@@ -306,17 +257,12 @@ class NewsfeedModule extends React.Component<Props, State> {
                 </Module>)
     }
 }
-const mapStateToProps = (state:ReduxState, ownProps: OwnProps):ReduxStateProps => {
+const mapStateToProps = (state:ReduxState, ownProps: OwnProps & RouteComponentProps<any>):ReduxStateProps => {
 
-    const resolveContext = state.resolvedContext
-    const resolvedContext = resolveContextObject(resolveContext, ownProps.contextNaturalKey)
-    const isResolvingContext = resolvedContext && (!resolvedContext.contextObjectId && !resolvedContext.resolved)
-    const contextObjectId = resolvedContext && resolvedContext.contextObjectId
-    const contextObject = resolvedContext && getContextObject(resolvedContext.contextNaturalKey, resolvedContext.contextObjectId)
+    const resolved = ContextManager.getContextObject(ownProps.location.pathname, ownProps.contextNaturalKey)
     return {
-        contextObject,
-        contextObjectId,
-        isResolvingContext
+        contextObject:resolved,
+        contextObjectId:resolved && resolved.id,
     }
 }
 const mapDispatchToProps = (dispatch:ReduxState, ownProps: OwnProps):ReduxDispatchProps => {

@@ -5,10 +5,9 @@ import "./TasksModule.scss"
 import { ResponsiveBreakpoint } from '../../components/general/observers/ResponsiveComponent';
 import { translate } from '../../localization/AutoIntlProvider';
 import TaskMenu, { TasksMenuData } from './TasksMenu';
-import { ContextNaturalKey, TaskActions, Task } from '../../types/intrasocial_types';
+import { ContextNaturalKey, TaskActions, Task, Permissible, IdentifiableObject, Project } from '../../types/intrasocial_types';
 import { ReduxState } from '../../redux';
 import { connect } from 'react-redux';
-import { resolveContextObject, ResolvedContextObject } from '../newsfeed/NewsfeedModule';
 import { ProjectManager } from '../../managers/ProjectManager';
 import ListComponent from '../../components/general/ListComponent';
 import ApiClient, { PaginationResult } from '../../network/ApiClient';
@@ -17,6 +16,7 @@ import TaskListItem from './TaskListItem';
 import { StatusUtilities } from '../../utilities/StatusUtilities';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import SimpleModule from '../SimpleModule';
+import { ResolvedContextObject, ContextManager } from '../../managers/ContextManager';
 
 type OwnProps = {
     className?:string
@@ -30,9 +30,7 @@ type State = {
 }
 
 type ReduxStateProps = {
-    contextObjectId:number
-    isResolvingContext:boolean
-    resolvedContext: ResolvedContextObject
+    contextObject:Permissible & IdentifiableObject
 }
 type ReduxDispatchProps = {
 }
@@ -60,7 +58,7 @@ class TasksModule extends React.Component<Props, State> {
         }
     }
     componentDidUpdate = (prevProps:Props, prevState:State) => {
-        if(!this.props.isResolvingContext && this.contextDataChanged(prevState.menuData, prevProps))
+        if(this.contextDataChanged(prevState.menuData, prevProps))
         {
             this.taskList.current.reload()
         }
@@ -92,24 +90,18 @@ class TasksModule extends React.Component<Props, State> {
                 prevData.category != data.category ||
                 prevData.responsible != data.responsible ||
                 prevData.term != data.term ||
-                prevProps.contextObjectId != this.props.contextObjectId
+                prevProps.contextObject && !this.props.contextObject || 
+                !prevProps.contextObject && this.props.contextObject || 
+                prevProps.contextObject && this.props.contextObject && prevProps.contextObject.id != this.props.contextObject.id
     }
     getContextData = () => {
-        if(this.props.contextObjectId)
+        const data = this.state.menuData
+        if(!data.project && this.props.contextNaturalKey == ContextNaturalKey.PROJECT && this.props.contextObject)
         {
-            const data = this.state.menuData
-            if(!data.project)
-            {
-                const resolvedId = this.props.resolvedContext && this.props.resolvedContext.contextObjectId
-                let name = ""
-                if(resolvedId)
-                    name = ProjectManager.getProject(resolvedId.toString()).name
-
-                data.project = {label:`[${name}]`, id:this.props.contextObjectId, type:this.props.contextNaturalKey, value:this.props.contextNaturalKey + "_" + this.props.contextObjectId}
-            }
-            return data
+            const project = this.props.contextObject as Project
+            data.project = {label:`[${project.name}]`, id:project.id, type:this.props.contextNaturalKey, value:this.props.contextNaturalKey + "_" + project.id}
         }
-        return this.state.menuData
+        return data
     }
     updateTaskItem = (task:Task) =>
     {
@@ -232,11 +224,7 @@ class TasksModule extends React.Component<Props, State> {
                 key={"task_"+task.id} />
     }
     renderContent = () => {
-        const {isResolvingContext} = this.props 
-        return <>
-            {isResolvingContext && <LoadingSpinner key="loading"/>}
-            {!isResolvingContext && <ListComponent<Task> ref={this.taskList} onLoadingStateChanged={this.feedLoadingStateChanged} fetchData={this.fetchTasks} renderItem={this.renderTask} />}
-            </>
+        return <ListComponent<Task> ref={this.taskList} onLoadingStateChanged={this.feedLoadingStateChanged} fetchData={this.fetchTasks} renderItem={this.renderTask} />
     }
     onMenuToggle = (visible:boolean) => {
         console.log("menu open", visible)
@@ -250,7 +238,7 @@ class TasksModule extends React.Component<Props, State> {
     }
     render()
     {
-        const {history, match, location, staticContext, contextNaturalKey, isResolvingContext, contextObjectId, resolvedContext, ...rest} = this.props
+        const {history, match, location, staticContext, contextNaturalKey, contextObject, ...rest} = this.props
         const {breakpoint, className} = this.props
         const cn = classnames("tasks-module", className)
         const menu = <TaskMenu data={this.state.menuData} onUpdate={this.menuDataUpdated}  />
@@ -266,15 +254,11 @@ class TasksModule extends React.Component<Props, State> {
                 </SimpleModule>)
     }
 }
-const mapStateToProps = (state:ReduxState, ownProps: OwnProps):ReduxStateProps => {
+const mapStateToProps = (state:ReduxState, ownProps: OwnProps & RouteComponentProps<any>):ReduxStateProps => {
 
-    const resolveContext = state.resolvedContext
-    const resolvedContext = resolveContextObject(resolveContext, ownProps.contextNaturalKey)
-    const isResolvingContext = resolvedContext && (!resolvedContext.contextObjectId && !resolvedContext.resolved)
+    const contextObject = ContextManager.getContextObject(ownProps.location.pathname, ownProps.contextNaturalKey)
     return {
-        contextObjectId:resolvedContext && resolvedContext.contextObjectId,
-        isResolvingContext,
-        resolvedContext
+        contextObject
     }
 }
 const mapDispatchToProps = (dispatch:ReduxState, ownProps: OwnProps):ReduxDispatchProps => {

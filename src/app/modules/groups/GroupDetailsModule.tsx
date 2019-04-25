@@ -14,9 +14,9 @@ import { ReduxState } from '../../redux';
 import { CommunityManager } from '../../managers/CommunityManager';
 import CircularLoadingSpinner from '../../components/general/CircularLoadingSpinner';
 import LoadingSpinner from '../../components/LoadingSpinner';
-import { getContextObject, resolveContextObject } from '../newsfeed/NewsfeedModule';
 import { DetailsContent } from '../../components/details/DetailsContent';
 import { DetailsMembers } from '../../components/details/DetailsMembers';
+import { ContextManager } from '../../managers/ContextManager';
 type OwnProps = {
     breakpoint:ResponsiveBreakpoint
     contextNaturalKey: ContextNaturalKey
@@ -28,7 +28,6 @@ type State = {
 type ReduxStateProps = {
     community: Community
     group: Group
-    groupId: number
 }
 type ReduxDispatchProps = {
 }
@@ -71,7 +70,7 @@ class GroupDetailsModule extends React.Component<Props, State> {
     }
     render()
     {
-        const {breakpoint, history, match, location, staticContext, group, groupId, community, contextNaturalKey, ...rest} = this.props
+        const {breakpoint, history, match, location, staticContext, group, community, contextNaturalKey, ...rest} = this.props
         return (<Module {...rest}>
                     <ModuleHeader title={group && group.name || translate("detail.module.title")} loading={this.state.isLoading}>
                         <ModuleMenuTrigger onClick={this.menuItemClick} />
@@ -97,17 +96,13 @@ class GroupDetailsModule extends React.Component<Props, State> {
                 </Module>)
     }
 }
-const mapStateToProps = (state:ReduxState, ownProps: OwnProps):ReduxStateProps => {
+const mapStateToProps = (state:ReduxState, ownProps: OwnProps & RouteComponentProps<any>):ReduxStateProps => {
 
-    const resolveContext = state.resolvedContext
-    const resolvedContext = resolveContextObject(resolveContext, ownProps.contextNaturalKey)
-    const groupId = resolvedContext && resolvedContext.contextObjectId
-    const group = resolvedContext && getContextObject(resolvedContext.contextNaturalKey, resolvedContext.contextObjectId) as Group
-    const community = resolveContext && !!resolveContext.communityId ? CommunityManager.getCommunity(resolveContext.communityId.toString()) : undefined
+    const group = ContextManager.getContextObject(ownProps.location.pathname, ownProps.contextNaturalKey) as Group
+    const community = ContextManager.getContextObject(ownProps.location.pathname, ContextNaturalKey.COMMUNITY) as Community
     return {
         community,
         group,
-        groupId
     }
 }
 const mapDispatchToProps = (dispatch:ReduxState, ownProps: OwnProps):ReduxDispatchProps => {

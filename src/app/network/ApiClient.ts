@@ -147,7 +147,7 @@ export default class ApiClient
             callback(null, status, error)
         })
     }
-    static newsfeedV2(limit:number,offset:number,context_natural_key:string, context_object_id:number, parent:number, children:number,attribute:ObjectAttributeType, include_sub_context:boolean = true,  callback:ApiClientFeedPageCallback<Status>)
+    static newsfeedV2(limit:number,offset:number,context_natural_key:ContextNaturalKey, context_object_id:number, parent:number, children:number,attribute:ObjectAttributeType, include_sub_context:boolean = true,  callback:ApiClientFeedPageCallback<Status>)
     {
         let url = Constants.apiRoute.postUrl + "?" + this.getQueryString({limit,offset,context_natural_key	,context_object_id, parent, children, attribute, include_sub_context })
         AjaxRequest.get(url, (data, status, request) => {
@@ -204,6 +204,14 @@ export default class ApiClient
     static getCommunity(communityId:string|number, callback:ApiClientCallback<Community>)
     {
         let url = Constants.apiRoute.communityUrl(communityId)
+        AjaxRequest.get(url, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
+    static getFiles(context_natural_key:ContextNaturalKey, context_object_id:number, limit:number, offset:number, callback:ApiClientFeedPageCallback<UploadedFile>){
+        let url = Constants.apiRoute.fileUploadUrl + "?" + this.getQueryString({context_natural_key,context_object_id, limit, offset})
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {

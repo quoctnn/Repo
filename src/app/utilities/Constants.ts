@@ -164,7 +164,7 @@ export default  {
         postReaction: (id:number) => {
             return `/api/v2/status/${id}/react/`
         },
-        fileUploadUrl: '/api/v1/file-upload/',
+        fileUploadUrl: '/api/v2/file-upload/',
         conversationMessagesUrl: (id:number) => {
             return `/api/v2/conversation/${id}/messages/`
         },
