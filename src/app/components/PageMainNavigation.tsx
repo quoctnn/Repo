@@ -53,7 +53,7 @@ class PageTopNavigation extends React.Component<Props, {}> {
                 <div className="menu-row" > 
                     <PageMainMenu className="d-flex justify-content-center align-items-end" style={{gridArea: "1 / 1 / span 1 / span 3"}}/>
                     <div className="center flex-grow-1 d-flex justify-content-around align-items-end" style={{gridArea: "1 / 4 / span 1 / span 6"}}>
-                        <Link onClick={this.navigateToCommunity} to="#">{translate("Community")}</Link>
+                        <a onClick={this.navigateToCommunity} href="#">{translate("Community")}</a>
                         <Link to={Routes.ROOT}>{translate("Dashboard")}</Link>
                         <Link to={Routes.CONVERSATIONS}>{translate("Messages")}</Link>
                     </div>

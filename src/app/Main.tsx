@@ -59,15 +59,16 @@ class WithLoading extends React.Component<PathLoaderProps , {loading:boolean}> {
             {
                 history.replace(resolvedData.resolvedPath)
             }
-            CommunityManager.applyCommunityTheme(resolvedData && resolvedData.community)
+            CommunityManager.applyCommunityTheme((resolvedData && resolvedData.community) || CommunityManager.getActiveCommunity())
             this.setState({loading:false})
         })
     }
     render() {
       const { loading } = this.state
-      return loading ? <LoadingSpinner /> : <Component {...this.props} />
+      return loading ? <LoadingSpinner /> : <Component ref={location.pathname} {...this.props} />
     }
 }
+/*
 const PathLoadedProfilePage = PathLoader(ProfilePage)
 const PathLoadedCommunityPage = PathLoader(CommunityPage)
 const PathLoadedGroupPage = PathLoader(GroupPage)
@@ -75,6 +76,7 @@ const PathLoadedProjectPage = PathLoader(ProjectPage)
 const PathLoadedEventPage = PathLoader(EventPage)
 const PathLoadedTaskPage = PathLoader(TaskPage)
 const PathLoadedDashboardPage = PathLoader(DashboardPage)
+*/
 
 type Props = ReduxStateProps & ReduxDispatchProps & OwnProps & RouteComponentProps<any>
 class Main extends React.Component<Props, State> {
@@ -110,17 +112,17 @@ class Main extends React.Component<Props, State> {
                                     }
                                     <Redirect from={Routes.ELECTRON} to={Routes.ROOT} />
                                     <Route path={Routes.DEVELOPER_TOOL.path} component={DevTool} />
-                                    <Route path={Routes.taskUrl(":communityname", ":projectname", ":taskid")} component={PathLoadedTaskPage} />
-                                    <Route path={Routes.eventUrl(":communityname", ":eventname")} component={PathLoadedEventPage} exact={true} />
-                                    <Route path={Routes.projectUrl(":communityname", ":projectname")} component={PathLoadedProjectPage} exact={true} />
-                                    <Route path={Routes.groupUrl(":communityname", ":groupname")} component={PathLoadedGroupPage} exact={true} />
-                                    <PrivateRoute path={Routes.profileUrl(":profilename")} component={PathLoadedProfilePage} />
-                                    <Route path={Routes.communityUrl(":communityname")} component={PathLoadedCommunityPage} exact={true} />
+                                    <Route path={Routes.taskUrl(":communityname", ":projectname", ":taskid")} component={PathLoader(TaskPage)} />
+                                    <Route path={Routes.eventUrl(":communityname", ":eventname")} component={PathLoader(EventPage)} exact={true} />
+                                    <Route path={Routes.projectUrl(":communityname", ":projectname")} component={PathLoader(ProjectPage)} exact={true} />
+                                    <Route path={Routes.groupUrl(":communityname", ":groupname")} component={PathLoader(GroupPage)} exact={true} />
+                                    <PrivateRoute path={Routes.profileUrl(":profilename")} component={PathLoader(ProfilePage)} />
+                                    <Route path={Routes.communityUrl(":communityname")} component={PathLoader(CommunityPage)} exact={true} />
                                     <Route path={Routes.newsfeedUrl(":contextNaturalKey?", ":contextObjectId?")} component={NewsfeedPage} />
                                     <Route path={Routes.SIGNIN} component={Signin} />
                                     <Route path={Routes.SIGNOUT} component={Signout} />
-                                    <Route path={Routes.ROOT} exact={true} component={PathLoadedDashboardPage} />
-                                    <Route path={Routes.ELECTRON} component={PathLoadedDashboardPage} />
+                                    <Route path={Routes.ROOT} exact={true} component={PathLoader(DashboardPage)} />
+                                    <Route path={Routes.ELECTRON} component={PathLoader(DashboardPage)} />
                                     <Route path={Routes.ANY} component={Error404} />
                                 </Switch>
                             }
