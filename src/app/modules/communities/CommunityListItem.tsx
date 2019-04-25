@@ -34,7 +34,10 @@ export default class CommunityListItem extends React.Component<Props, State> {
                         <SecureImage className="img top" setBearer={true} setAsBackground={true} url={cover}/>
                         <div className="bottom d-flex align-items-center flex-row">
                             <div className="theme-box theme-bg-gradient flex-shrink-0">
-                                {community.members.length || "--"}&nbsp;
+                                {community.members &&
+                                 community.members.length ||
+                                 "--"
+                                }&nbsp;
                                 <i className="fa fa-user"></i>
                             </div>
                             <div className="title text-truncate">{community.name}</div>
