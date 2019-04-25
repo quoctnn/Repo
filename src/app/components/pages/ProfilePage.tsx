@@ -15,9 +15,7 @@ export interface OwnProps
 }
 interface ReduxStateProps 
 {
-    profileid:string
     profile:UserProfile
-    profileResolved:number
 }
 interface ReduxDispatchProps 
 {
@@ -48,13 +46,11 @@ class ProfilePage extends React.Component<Props, State>
         return <Error404 />
     }
     render() {
-        const {profile, profileResolved} = this.props
+        const {profile} = this.props
         const hasData = !!profile
-        const isLoading = !profile && !profileResolved
         return(
             <div id="project-page" className="dashboard-container">
-                {isLoading && this.renderLoading()}
-                {!isLoading && !hasData && this.renderNotFound()}
+                {!hasData && this.renderNotFound()}
                 {hasData && 
                     <div className="content dashboard-container">
                         {this.renderHeader(profile)}
@@ -68,11 +64,8 @@ class ProfilePage extends React.Component<Props, State>
 const mapStateToProps = (state:ReduxState, ownProps:OwnProps) => {
     const profileid:string = ownProps.match.params.profilename
     const profile = ProfileManager.getProfile(profileid)
-    const profileResolved = state.resolvedContext.profileResolved
     return {
-        profileid,
         profile,
-        profileResolved
     }
 }
 export default connect<ReduxStateProps, null, OwnProps>(mapStateToProps, null)(ProfilePage);

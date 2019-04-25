@@ -18,15 +18,8 @@ export interface OwnProps
 interface ReduxStateProps 
 {
     community:Community
-    communityResolved:number
-
     project:Project
-    projectResolved:number
-
-    taskid:string
     task:Task
-    taskResolved:number
-
 }
 interface ReduxDispatchProps 
 {
@@ -60,13 +53,11 @@ class TaskPage extends React.Component<Props, State>
         return <Error404 />
     }
     render() {
-        const { task, taskResolved ,project, projectResolved, community, communityResolved} = this.props
+        const { task ,project, community} = this.props
         const hasData = !!task && !!project && !!community
-        const isLoading = (!task && !taskResolved) || (!project && !projectResolved) || (!community && !communityResolved)
         return(
             <div id="task-page" className="dashboard-container">
-                {isLoading && this.renderLoading()}
-                {!isLoading && !hasData && this.renderNotFound()}
+                {!hasData && this.renderNotFound()}
                 {hasData && 
                     <div className="content dashboard-container">
                         {this.renderHeader(community)}
@@ -80,23 +71,16 @@ class TaskPage extends React.Component<Props, State>
 const mapStateToProps = (state:ReduxState, ownProps:OwnProps) => {
     const projectid:string = ownProps.match.params.projectname
     const project = ProjectManager.getProject(projectid)
-    const projectResolved = state.resolvedContext.projectResolved
 
     const communityid:string = ownProps.match.params.communityname
     const community = CommunityManager.getCommunity(communityid)
-    const communityResolved = state.resolvedContext.communityResolved
 
     const taskid:string = ownProps.match.params.taskid
     const task = TaskManager.getTask(taskid)
-    const taskResolved = state.resolvedContext.taskResolved
     return {
         community,
-        communityResolved,
         project,
-        projectResolved,
-        taskid,
         task,
-        taskResolved,
     }
 }
 export default connect<ReduxStateProps, null, OwnProps>(mapStateToProps, null)(TaskPage);

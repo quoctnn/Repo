@@ -17,10 +17,7 @@ export interface OwnProps
 interface ReduxStateProps 
 {
     community:Community
-    communityResolved:number
-    projectid:string
     project:Project
-    projectResolved:number
 }
 interface ReduxDispatchProps 
 {
@@ -54,13 +51,11 @@ class ProjectPage extends React.Component<Props, State>
         return <Error404 />
     }
     render() {
-        const { project, projectResolved, community, communityResolved} = this.props
+        const { project, community} = this.props
         const hasData = !!project && !!community
-        const isLoading = (!project && !projectResolved) || (!community && !communityResolved)
         return(
             <div id="project-page" className="dashboard-container">
-                {isLoading && this.renderLoading()}
-                {!isLoading && !hasData && this.renderNotFound()}
+                {!hasData && this.renderNotFound()}
                 {hasData && 
                     <div className="content dashboard-container">
                         {this.renderHeader(project, community)}
@@ -74,17 +69,12 @@ class ProjectPage extends React.Component<Props, State>
 const mapStateToProps = (state:ReduxState, ownProps:OwnProps) => {
     const projectid:string = ownProps.match.params.projectname
     const project = ProjectManager.getProject(projectid)
-    const projectResolved = state.resolvedContext.projectResolved
 
     const communityid:string = ownProps.match.params.communityname
     const community = CommunityManager.getCommunity(communityid)
-    const communityResolved = state.resolvedContext.communityResolved
     return {
         community,
-        communityResolved,
-        projectid,
         project,
-        projectResolved,
     }
 }
 export default connect<ReduxStateProps, null, OwnProps>(mapStateToProps, null)(ProjectPage);

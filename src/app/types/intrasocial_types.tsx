@@ -226,6 +226,7 @@ export namespace ContextSegmentKey {
             case ContextNaturalKey.USER: return ContextSegmentKey.USER
             case ContextNaturalKey.PROJECT: return ContextSegmentKey.PROJECT
             case ContextNaturalKey.EVENT: return ContextSegmentKey.EVENT
+            case ContextNaturalKey.TASK: return ContextSegmentKey.TASK
             default:return null
         }
     }

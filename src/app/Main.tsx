@@ -1,6 +1,6 @@
 import "intersection-observer"
 import * as React from "react";
-import { Route, Switch, withRouter, RouteComponentProps, Link, Redirect } from "react-router-dom";
+import { Route, Switch, withRouter, RouteComponentProps, Redirect } from "react-router-dom";
 import { ToastContainer } from 'react-toastify';
 import Routes from "./utilities/Routes";
 import { connect } from 'react-redux'

@@ -17,10 +17,7 @@ export interface OwnProps
 interface ReduxStateProps 
 {
     community:Community
-    communityResolved:number
-    eventid:string
     event:Event
-    eventResolved:number
 }
 interface ReduxDispatchProps 
 {
@@ -54,13 +51,11 @@ class EventPage extends React.Component<Props, State>
         return <Error404 />
     }
     render() {
-        const {event, eventResolved, community, communityResolved} = this.props
+        const {event, community} = this.props
         const hasData = !!event && !!community
-        const isLoading = (!event && !eventResolved) || (!community && !communityResolved)
         return(
             <div id="event-page" className="dashboard-container">
-                {isLoading && this.renderLoading()}
-                {!isLoading && !hasData && this.renderNotFound()}
+                {!hasData && this.renderNotFound()}
                 {hasData && 
                     <div className="content dashboard-container">
                         {this.renderHeader(event, community)}
@@ -74,17 +69,12 @@ class EventPage extends React.Component<Props, State>
 const mapStateToProps = (state:ReduxState, ownProps:OwnProps) => {
     const eventid:string = ownProps.match.params.eventname
     const event = EventManager.getEvent(eventid)
-    const eventResolved = state.resolvedContext.eventResolved
 
     const communityid:string = ownProps.match.params.communityname
     const community = CommunityManager.getCommunity(communityid)
-    const communityResolved = state.resolvedContext.communityResolved
     return {
         community,
-        communityResolved,
-        eventid,
         event,
-        eventResolved,
     }
 }
 export default connect<ReduxStateProps, null, OwnProps>(mapStateToProps, null)(EventPage);

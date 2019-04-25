@@ -9,8 +9,7 @@ import { DashboardWithData } from "../../DashboardWithData";
 import { CommunityManager } from "../../managers/CommunityManager";
 import { Error404 } from "../../views/error/Error404";
 import { GroupManager } from "../../managers/GroupManager";
-import { communityAvatar, communityName, communityCover, groupCover } from "../../utilities/Utilities";
-import { translate } from "../../localization/AutoIntlProvider";
+import { communityAvatar, communityName, groupCover } from "../../utilities/Utilities";
 export interface OwnProps 
 {
     match:any,
@@ -18,10 +17,7 @@ export interface OwnProps
 interface ReduxStateProps 
 {
     community:Community
-    communityResolved:number
-    groupid:string
     group:Group
-    groupResolved:number
 }
 interface ReduxDispatchProps 
 {
@@ -55,13 +51,11 @@ class ProjectPage extends React.Component<Props, State>
         return <Error404 />
     }
     render() {
-        const {group, groupResolved, community, communityResolved} = this.props
+        const {group, community} = this.props
         const hasData = !!group && !!community
-        const isLoading = (!group && !groupResolved) || (!community && !communityResolved)
         return(
             <div id="group-page" className="dashboard-container">
-                {isLoading && this.renderLoading()}
-                {!isLoading && !hasData && this.renderNotFound()}
+                {!hasData && this.renderNotFound()}
                 {hasData && 
                     <div className="content dashboard-container">
                         {this.renderHeader(group, community)}
@@ -75,17 +69,12 @@ class ProjectPage extends React.Component<Props, State>
 const mapStateToProps = (state:ReduxState, ownProps:OwnProps) => {
     const groupid:string = ownProps.match.params.groupname
     const group = GroupManager.getGroup(groupid)
-    const groupResolved = state.resolvedContext.groupResolved
 
     const communityid:string = ownProps.match.params.communityname
     const community = CommunityManager.getCommunity(communityid)
-    const communityResolved = state.resolvedContext.communityResolved
     return {
         community,
-        communityResolved,
-        groupid,
         group,
-        groupResolved,
     }
 }
 export default connect<ReduxStateProps, null, OwnProps>(mapStateToProps, null)(ProjectPage);

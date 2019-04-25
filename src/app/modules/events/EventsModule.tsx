@@ -15,6 +15,7 @@ import { CommunityManager } from '../../managers/CommunityManager';
 import EventListItem from './EventListItem';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import SimpleModule from '../SimpleModule';
+import { ContextManager } from '../../managers/ContextManager';
 type OwnProps = {
     className?:string
     breakpoint:ResponsiveBreakpoint
@@ -111,10 +112,9 @@ class EventsModule extends React.Component<Props, State> {
                 </SimpleModule>)
     }
 }
-const mapStateToProps = (state:ReduxState, ownProps: OwnProps):ReduxStateProps => {
+const mapStateToProps = (state:ReduxState, ownProps: OwnProps & RouteComponentProps<any>):ReduxStateProps => {
 
-    const resolveContext = state.resolvedContext
-    const community = resolveContext && !!resolveContext.communityId ? CommunityManager.getCommunity(resolveContext.communityId.toString()) : undefined
+    const community = ContextManager.getContextObject(ownProps.location.pathname, ContextNaturalKey.COMMUNITY) as Community
     return {
         community
     }
