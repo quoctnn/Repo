@@ -66,7 +66,7 @@ export default class ApiClient
         }, (request, status, error) => {
             callback(null, status, error)
         })
-    }  
+    }
     static getDashboards(callback:ApiClientFeedPageCallback<Dashboard>){
         const url = Constants.apiRoute.dashboardListEndpoint + "?" + this.getQueryString({})
         AjaxRequest.get(url, (data, status, request) => {
@@ -74,9 +74,9 @@ export default class ApiClient
         }, (request, status, error) => {
             callback(null, status, error)
         })
-    }   
+    }
     static reportObject(type:string, contextId:number, tags:string[], description:string , callback:ApiClientCallback<ReportResult>){
-       
+
         const endpoint = Constants.apiRoute.reportUrl(type,contextId)
         AjaxRequest.postJSON(endpoint,  { description, tags}, (data, status, request) => {
             callback(data, status, null)
@@ -119,14 +119,14 @@ export default class ApiClient
             callback(null, status, error)
         })
     }
-    static search(  limit:number, 
-                    offset:number,  
+    static search(  limit:number,
+                    offset:number,
                     term :string,
-                    types:ElasticSearchType[], 
-                    use_simple_query_string:boolean = true, 
-                    include_results:boolean = true, 
-                    include_suggestions:boolean = false, 
-                    slim_types:boolean = true, 
+                    types:ElasticSearchType[],
+                    use_simple_query_string:boolean = true,
+                    include_results:boolean = true,
+                    include_suggestions:boolean = false,
+                    slim_types:boolean = true,
                     filters:{[key:string]:string},
                     tags:string[],
                     callback:ApiClientCallback<ElasticResult<any>>){
@@ -210,6 +210,15 @@ export default class ApiClient
             callback(null, status, error)
         })
     }
+    static setMainCommunity(communityId:string|number, callback:ApiClientCallback<Community>)
+    {
+        let url = Constants.apiRoute.setMainCommunityUrl(communityId)
+        AjaxRequest.get(url, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
     static getFiles(context_natural_key:ContextNaturalKey, context_object_id:number, limit:number, offset:number, callback:ApiClientFeedPageCallback<UploadedFile>){
         let url = Constants.apiRoute.fileUploadUrl + "?" + this.getQueryString({context_natural_key,context_object_id, limit, offset})
         AjaxRequest.get(url, (data, status, request) => {
@@ -236,18 +245,18 @@ export default class ApiClient
             callback(null, status, error)
         })
     }
-    static getTasks(limit:number, 
-                    offset:number, 
-                    project:number, 
-                    state:string[], 
-                    priority:string[], 
-                    tags:string[], 
-                    assigned_to:number, 
-                    responsible:number, 
-                    creator:number, 
+    static getTasks(limit:number,
+                    offset:number,
+                    project:number,
+                    state:string[],
+                    priority:string[],
+                    tags:string[],
+                    assigned_to:number,
+                    responsible:number,
+                    creator:number,
                     not_assigned:boolean,
-                    category:string, 
-                    term:string, 
+                    category:string,
+                    term:string,
                     callback:ApiClientFeedPageCallback<Task>){
         let url = Constants.apiRoute.taskUrl + "?" + this.getQueryString({limit,
                                                                         offset,
@@ -256,10 +265,10 @@ export default class ApiClient
                                                                         priority,
                                                                         tags,
                                                                         assigned_to,
-                                                                        responsible, 
+                                                                        responsible,
                                                                         creator,
                                                                         not_assigned,
-                                                                        category, 
+                                                                        category,
                                                                         term})
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)

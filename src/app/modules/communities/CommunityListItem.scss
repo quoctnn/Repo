@@ -18,5 +18,11 @@
     }
     .title{
         padding-left: 8px;
+        flex-grow: 1;
+    }
+    .set-main{
+        flex-shrink: 0;
+        margin-right: 8px;
+        border: none;
     }
 }
