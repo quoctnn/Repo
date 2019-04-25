@@ -27,7 +27,7 @@ export abstract class ProfileManager
     static setup = () =>
     {
     }
-    static getProfile = (profileId:string):UserProfile|null => 
+    static getProfile = (profileId:string):UserProfile|null =>
     {
         const state = ProfileManager.getStore().getState()
         const isNumber = profileId.isNumber()
@@ -50,7 +50,7 @@ export abstract class ProfileManager
         }
         return profile
     }
-    static ensureProfileExists = (profileId:string|number, completion:(profile:UserProfile) => void) => 
+    static ensureProfileExists = (profileId:string|number, completion:(profile:UserProfile) => void) =>
     {
         const id = profileId.toString()
         let profile = ProfileManager.getProfile(id)
@@ -61,14 +61,14 @@ export abstract class ProfileManager
                 {
                     ProfileManager.storeProfile(data)
                 }
-                else 
+                else
                 {
                     console.log("error fetching group", error)
                 }
                 completion(data)
             })
         }
-        else 
+        else
         {
             completion(profile)
         }
@@ -79,10 +79,13 @@ export abstract class ProfileManager
         let state = store.getState()
         let ids = state.profileStore.allIds.map(id => id)
         ids.push(state.authentication.profile!.id)
-        let requestIds = profiles.filter(id => ids.indexOf(id) == -1)
+        let requestIds = []
+        if (profiles) {
+            requestIds = profiles.filter(id => ids.indexOf(id) == -1)
+        }
         if(requestIds.length > 0)
         {
-            ApiClient.getProfilesByIds(requestIds, (data, status, error) => 
+            ApiClient.getProfilesByIds(requestIds, (data, status, error) =>
             {
                 if(data && data.results && data.results.length > 0)
                 {
@@ -224,7 +227,7 @@ export abstract class ProfileManager
         })
     }
     static searchProfilesInContext = ({search, taggableMembers, contextObjectId, contextNaturalKey, completion}:ProfileManagerSearchInContextProps) => {
-    
+
         if(taggableMembers)
         {
             let members = Array.isArray(taggableMembers) ? taggableMembers : taggableMembers()
@@ -247,9 +250,9 @@ export abstract class ProfileManager
     static searchMembersInContext = (query:string, contextObjectId:number, contextNaturalKey:string, completion:(members:UserProfile[]) => void) => {
         switch(contextNaturalKey)
         {
-            case ContextNaturalKey.COMMUNITY: 
+            case ContextNaturalKey.COMMUNITY:
             {
-                CommunityManager.ensureCommunityExists(contextObjectId, (community) => 
+                CommunityManager.ensureCommunityExists(contextObjectId, (community) =>
                 {
                     let result:UserProfile[] = []
                     if(community)
@@ -258,7 +261,7 @@ export abstract class ProfileManager
                 })
                 break;
             }
-            case ContextNaturalKey.USER: 
+            case ContextNaturalKey.USER:
             {
                 const me = AuthenticationManager.getAuthenticatedUser().id
                 let result:UserProfile[] = []
@@ -272,7 +275,7 @@ export abstract class ProfileManager
                             completion(result)
                         })
                     }
-                    else 
+                    else
                     {
                         completion(result)
                     }
@@ -288,18 +291,18 @@ export abstract class ProfileManager
                                 completion(result)
                             })
                         }
-                        else 
+                        else
                         {
                             completion(result)
                         }
-                        
+
                     })
                 }
                 break;
             }
-            case ContextNaturalKey.GROUP: 
+            case ContextNaturalKey.GROUP:
             {
-                GroupManager.ensureGroupExists(contextObjectId, (group) => 
+                GroupManager.ensureGroupExists(contextObjectId, (group) =>
                 {
                     let result:UserProfile[] = []
                     if(group)
@@ -308,9 +311,9 @@ export abstract class ProfileManager
                 })
                 break;
             }
-            case ContextNaturalKey.PROJECT: 
+            case ContextNaturalKey.PROJECT:
             {
-                ProjectManager.ensureProjectExists(contextObjectId, (project) => 
+                ProjectManager.ensureProjectExists(contextObjectId, (project) =>
                 {
                     let result:UserProfile[] = []
                     if(project)
