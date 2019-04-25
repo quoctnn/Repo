@@ -4,7 +4,6 @@ import { ProfileManager } from '../managers/ProfileManager';
 import {  nullOrUndefined } from '../utilities/Utilities';
 import { GroupManager } from '../managers/GroupManager';
 import { CommunityManager } from '../managers/CommunityManager';
-import { ResolvedContext, setResolvedContextAction, resetResolvedContext } from '../redux/resolvedContext';
 import { EventManager } from './EventManager';
 import { TaskManager } from './TaskManager';
 import { ProjectManager } from './ProjectManager';
@@ -164,12 +163,6 @@ export abstract class ContextManager
     static getParentContextObject = (pathname:string) => {
 
     } 
-    static resetResolvedContext = () => {
-        ContextManager.getStore().dispatch(resetResolvedContext())
-    }
-    static setResolvedContext = (context:ResolvedContext) => {
-        ContextManager.getStore().dispatch(setResolvedContextAction(context))
-    }
     private static getStore = ():Store<ReduxState,any> =>
     {
         return window.store 
