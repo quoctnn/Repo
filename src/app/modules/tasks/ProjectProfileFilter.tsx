@@ -26,7 +26,7 @@ const ProfileOptionComponent = (props:OptionProps<ProfileFilterOption>) => {
         >
         <div className="Select-value-label d-flex">
             {avatar && <Avatar size={24} image={avatar} style={{paddingRight:"8px", display:"inline"}}/>}
-            {props.children} 
+            {props.children}
         </div>
     </div>)
 }
@@ -70,10 +70,11 @@ export class ProjectProfileFilter extends React.PureComponent<Props & React.HTML
             if(!profiles)
             {
                 completion(ProfileManager.searchProfiles(text,null, 50, true).map(this.getProfileFilterOption))
+            } else {
+                ProfileManager.ensureProfilesExists(profiles, () => {
+                    completion(ProfileManager.searchProfileIds(text, profiles).map(this.getProfileFilterOption))
+                })
             }
-            ProfileManager.ensureProfilesExists(profiles, () => {
-                completion(ProfileManager.searchProfileIds(text, profiles).map(this.getProfileFilterOption))
-            })
         }
         if(this.props.project)
         {
@@ -94,7 +95,7 @@ export class ProjectProfileFilter extends React.PureComponent<Props & React.HTML
             })
         })
     }
-    render() 
+    render()
     {
         const {className} = this.props
         const { value} = this.props;
@@ -104,9 +105,9 @@ export class ProjectProfileFilter extends React.PureComponent<Props & React.HTML
                     styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
                     isClearable={true}
                     value={value}
-                    menuPortalTarget={document.body} 
-                    cacheOptions={false} 
-                    defaultOptions={true} 
+                    menuPortalTarget={document.body}
+                    cacheOptions={false}
+                    defaultOptions={true}
                     onChange={this.onChange}
                     components={{ Option: ProfileOptionComponent, SingleValue:ProfileSingleValueComponent }}
                     loadOptions={this.searchOptions} />
