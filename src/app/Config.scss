@@ -35,6 +35,12 @@ $root: (
     button-border-color: #cccccc,
     button-hover-background-color: #4c555d,
 
+    /* List item colors */
+    list-item-background-color: white,
+    list-item-color: #5d5d5d,
+    list-item-background-hover-color: #CFD5DE,
+    list-item-hover-color: #4d4d4d,
+
     default-color: #fff,
     primary-theme-color: #428bca,
     secondary-theme-color: #7eb9ed,
@@ -131,6 +137,11 @@ $root: (
     --button-background-color: #4c555d;
     --button-border-color: rgb(108, 117, 125);
     --button-hover-background-color: #6c757d;
+
+    --list-item-background-color: #252330;
+    --list-item-color: #DFDFDF;
+    --list-item-background-hover-color: #454350;
+    --list-item-hover-color: #10171e;
 
     --drop-shadow-large: 0px 0px 20px 0px rgba(231, 229, 229, 0.5);
     --drop-shadow: 0px 0px 10px -3px rgba(231, 229, 229,0.6);

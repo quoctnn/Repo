@@ -1,3 +1,5 @@
+@import "../../Config.scss";
+
 $margin:8px;
 .file-list-item{
     padding: 8px;
@@ -6,6 +8,9 @@ $margin:8px;
         border-radius: 10px;
         overflow: hidden;
         position: relative;
+        &.hover-card .content-container:hover{
+            @include var(color, list-item-hover-color);
+        }
         &.hover-card:hover:after{
             opacity:0.3 ;
         }
@@ -13,18 +18,17 @@ $margin:8px;
     &:hover{
         text-decoration: none;
     }
-    
+
     .img-container{
         width:80px;
         height: 60px;
         position: relative;
         margin-right: $margin;
         flex-shrink: 0;
-        display: flex;    
+        display: flex;
         align-items: center;
         justify-content: center;
         i.file-icon{
-
             font-size: 40px;
         }
         .sec-img{
@@ -37,7 +41,6 @@ $margin:8px;
         }
     }
     .content-container{
-
         justify-content: center;
         margin-right: $margin;
         min-width: 0;
