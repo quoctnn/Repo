@@ -17,16 +17,12 @@ export enum EventStreamMessageType {
     STATUS_NEW = "status.new",
     STATUS_UPDATE = "status.update",
     STATUS_DELETED = "status.deleted",
+    STATUS_INTERACTION_UPDATE = "status.interaction.update",
     NOTIFICATION_NEW = "notification.new",
     SOCKET_STATE_CHANGE = "socket.state.change"
+
 }
 export const eventStreamNotificationPrefix = "eventstream_"
-export enum WebsocketState {
-    CONNECTING = 0,
-    OPEN,
-    CLOSING,
-    CLOSED
-}
 var publicStream: ReconnectingWebSocket|null = null;
 export const sendOnWebsocket = (data: Message) => {
     if (canSendOnWebsocket()) {
@@ -35,7 +31,7 @@ export const sendOnWebsocket = (data: Message) => {
     }
 }
 export const canSendOnWebsocket = () => {
-    return publicStream && publicStream.readyState == WebsocketState.OPEN
+    return publicStream && publicStream.readyState == ReconnectingWebSocket.OPEN
 }
 export const getStream = () => {
     return publicStream;
@@ -43,7 +39,7 @@ export const getStream = () => {
 const socket_options = {
     maxRetries: 20,
     maxReconnectionDelay: 256000,
-    minReconnectionDelay: 8000,
+    minReconnectionDelay: 1000,
     reconnectionDelayGrowFactor: 6.0,
     connectionTimeout: 8000,
 }
@@ -110,8 +106,11 @@ class ChannelEventStream extends React.Component<Props, State> {
     stream: ReconnectingWebSocket|null = null
     oldStream: ReconnectingWebSocket|null = null
     queueEvents = false
+    authorized:boolean = false
     constructor(props:Props) {
         super(props)
+        this.state = {
+        }
         EventLock.popCallback = this.handleEventQueuePop
         EventLock.didChangeLockStatus = this.handleEventQueueLockStatusChanged
     }
@@ -130,13 +129,15 @@ class ChannelEventStream extends React.Component<Props, State> {
     }
     authorize = () => {
         if (this.canSend()) {
+
+            this.authorized = true
             let data = { type: 'authorization', data: { token: this.props.token } };
             console.log('Sending Authorization on WebSocket', data);
             this.stream!.send(JSON.stringify(data));
         }
     }
     canSend = () => {
-        return this.stream && this.stream.readyState == WebsocketState.OPEN;
+        return this.stream && this.stream.readyState == ReconnectingWebSocket.OPEN;
     }
     playEvent = (event:any) =>
     {
@@ -144,8 +145,8 @@ class ChannelEventStream extends React.Component<Props, State> {
         NotificationCenter.push(eventStreamNotificationPrefix + event.type,[event.data])
     }
     connectStream = () => {
-        this.closeStream();
-        if (this.props.endpoint) {
+        
+        if (this.props.endpoint && (!this.stream || this.stream.readyState == ReconnectingWebSocket.CLOSED || this.stream.readyState == ReconnectingWebSocket.CLOSING) )  {
             console.log('Setting up WebSocket to', this.props.endpoint);
             this.stream = new ReconnectingWebSocket(
                 this.props.endpoint,
@@ -156,7 +157,8 @@ class ChannelEventStream extends React.Component<Props, State> {
             this.stream.onopen = () => {
                 NotificationCenter.push(eventStreamNotificationPrefix + EventStreamMessageType.SOCKET_STATE_CHANGE,[this.stream.readyState])
                 console.log('WebSocket OPEN');
-                this.authorize();
+                (this.stream as any)._options.minReconnectionDelay = 8000
+                this.sendAuthorization()
             }
             this.stream.onmessage = e => {
                 let data = JSON.parse(e.data);
@@ -181,31 +183,26 @@ class ChannelEventStream extends React.Component<Props, State> {
             window.app.socket = this.stream
         }
     }
+    sendAuthorization = () => {
+        if(!this.authorized)
+        {
+            this.authorize()
+        }
+    }
     componentDidMount = () => {
-        this.updateConnection()
+        this.connectStream()
     }
     componentDidUpdate = (prevProps:Props) =>
     {
+        if(prevProps.endpoint != this.props.endpoint)
+        {
+            this.closeStream()
+        }
+        this.connectStream()
         if(prevProps.token != this.props.token)
         {
-            this.closeStream()
-        }
-        this.updateConnection()
-    }
-    updateConnection = () =>
-    {
-        const isOnline = this.canSend()
-        const canConnect = !!this.props.endpoint && !this.stream // && !!this.props.token
-        if(isOnline && !canConnect)
-        {
-            this.closeStream()
-        }
-        else if (canConnect)
-        {
-            this.connectStream()
-        }
-        else {
-            this.authorize()
+            this.authorized = false
+            this.sendAuthorization()
         }
     }
     componentWillUnmount = () => {
@@ -217,6 +214,7 @@ class ChannelEventStream extends React.Component<Props, State> {
             this.stream.close()
             this.stream = null;
             publicStream = null;
+            this.authorized = false
         }
     }
     render = () => {

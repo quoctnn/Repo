@@ -1,8 +1,9 @@
 import {  Store } from 'redux';
 import { AuthenticationManager } from './AuthenticationManager';
 import { NotificationCenter } from '../utilities/NotificationCenter';
-import { EventStreamMessageType, eventStreamNotificationPrefix, WebsocketState } from '../network/ChannelEventStream';
+import { EventStreamMessageType, eventStreamNotificationPrefix } from '../network/ChannelEventStream';
 import { ReduxState } from '../redux/index';
+import ReconnectingWebSocket from 'reconnecting-websocket';
 
 export const EventStreamManagerConnectionChangedEvent = "EventStreamManagerConnectionChangedEvent"
 export abstract class EventStreamManager
@@ -16,7 +17,7 @@ export abstract class EventStreamManager
     static eventstreamSocketStateChanged = (...args:any[]) =>
     {
         console.log("eventstreamSocketStateChanged args", args)
-        if(WebsocketState.CLOSED == args[0])
+        if(ReconnectingWebSocket.CLOSED == args[0])
             EventStreamManager.socketDisconnected()
     }
     static eventstreamStateReceived = (...args:any[]) =>

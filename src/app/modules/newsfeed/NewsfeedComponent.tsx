@@ -87,10 +87,16 @@ interface State
     hasMore:boolean
     hasLoaded:boolean
 }
-type IncomingUpdateItem = {
+interface IncomingUpdateItem{
     type:string 
     status_id:number 
     parent_id?:number
+
+}
+interface IncomingInteractionItem extends IncomingUpdateItem {
+    interaction_id:number
+    reaction:string
+    user_id:number
 }
 type Props = ReduxStateProps & ReduxDispatchProps & OwnProps & RouteProps
 export class NewsfeedComponent extends React.Component<Props, State> {
@@ -153,10 +159,9 @@ export class NewsfeedComponent extends React.Component<Props, State> {
     private processIncomingStatusNew = (...args:any[]) => {
         const object = args[0]
         const id = object && object.status_id
-        const parentId = object && object.parent_id
         if(id)
         {
-            const update:IncomingUpdateItem = {type:EventStreamMessageType.STATUS_NEW, status_id:object.status_id, parent_id:parentId} 
+            const update:IncomingUpdateItem = {type:EventStreamMessageType.STATUS_NEW, ...object} 
             this.processIncomingUpdate(update)
         }
     }
@@ -195,15 +200,8 @@ export class NewsfeedComponent extends React.Component<Props, State> {
         const id = object && object.status_id
         if(id)
         {
-            //fetch & update if feed contains status
-            const oldStatus = this.findStatusByStatusId(id)
-            if(oldStatus)
-            {
-                ApiClient.getStatus(id, (status, reqStatus, error) => {
-                    if(status)
-                        this.updateStatusItem(status)
-                })  
-            }
+            const update:IncomingUpdateItem = {type:EventStreamMessageType.STATUS_UPDATE, ...object} 
+            this.processIncomingUpdate(update)
         }
     }
     private processIncomingUpdate = (update:IncomingUpdateItem) => {
@@ -220,6 +218,10 @@ export class NewsfeedComponent extends React.Component<Props, State> {
             this.executeStatusDelete(update)
         else if(update.type == EventStreamMessageType.STATUS_NEW)
             this.extecuteStatusNew(update)
+        else if(update.type == EventStreamMessageType.STATUS_UPDATE)
+            this.executeStatusUpdate(update)
+        else if(update.type == EventStreamMessageType.STATUS_INTERACTION_UPDATE)
+            this.executeInteractionUpdate(update as IncomingInteractionItem)
     }
     private extecuteStatusNew = (update:IncomingUpdateItem) => {
         if(update.parent_id)
@@ -239,6 +241,33 @@ export class NewsfeedComponent extends React.Component<Props, State> {
             }, this.fetchUpdates);
         }
     }
+    private executeInteractionUpdate = (update:IncomingInteractionItem) => {
+        const oldStatus = this.findStatusByStatusId(update.status_id)
+        if(oldStatus)
+        {
+            const status = this.getClonedStatus(oldStatus)
+            status.serialization_date = new Date().toISOString()
+            const oldReaction = StatusUtilities.getStatusReaction(status, update.user_id)
+            const reactions = status.reactions || {}
+            const data = StatusUtilities.applyReaction(oldReaction, update.reaction, reactions, status.reaction_count, update.user_id)
+            status.reactions = data.reactions
+            status.reaction_count = data.reactionsCount
+            this.updateStatusItem(status)
+        }
+        
+    }
+    private executeStatusUpdate = (update:IncomingUpdateItem) => {
+            //fetch & update if feed contains status
+            const oldStatus = this.findStatusByStatusId(update.status_id)
+            if(oldStatus)
+            {
+                ApiClient.getStatus(update.status_id, (status, reqStatus, error) => {
+                    if(status)
+                        this.updateStatusItem(status)
+                })  
+            }
+        
+    }
     private executeStatusDelete = (update:IncomingUpdateItem) => {
 
         const status = this.findStatusByStatusId(update.status_id)
@@ -250,7 +279,16 @@ export class NewsfeedComponent extends React.Component<Props, State> {
         const id = object && object.status_id
         if(id)
         {
-            const update:IncomingUpdateItem = {type:EventStreamMessageType.STATUS_DELETED, status_id:object.status_id} 
+            const update:IncomingUpdateItem = {type:EventStreamMessageType.STATUS_DELETED, ...object} 
+            this.processIncomingUpdate(update)
+        }
+    }
+    private processIncomingStatusInteractionUpdate = (...args:any[]) => {
+        const object = args[0]
+        const id = object && object.status_id
+        if(id)
+        {
+            const update:IncomingInteractionItem = {type:EventStreamMessageType.STATUS_INTERACTION_UPDATE, ...object} 
             this.processIncomingUpdate(update)
         }
     }
@@ -262,7 +300,8 @@ export class NewsfeedComponent extends React.Component<Props, State> {
         this.observers.push(obs2)
         const obs3 = NotificationCenter.addObserver('eventstream_' + EventStreamMessageType.STATUS_DELETED, this.processIncomingStatusDeleted)
         this.observers.push(obs3)
-
+        const obs4 = NotificationCenter.addObserver('eventstream_' + EventStreamMessageType.STATUS_INTERACTION_UPDATE, this.processIncomingStatusInteractionUpdate)
+        this.observers.push(obs4)
         if(this.props.scrollParent)
         {
             this.props.scrollParent.addEventListener("scroll", this.onScroll)
@@ -364,7 +403,7 @@ export class NewsfeedComponent extends React.Component<Props, State> {
         }
         const newStatus = clone ? this.getClonedStatus(status) : status
         let stateItems = this.state.items
-        stateItems[i!] = newStatus
+        stateItems[i] = newStatus
         this.setState({items:stateItems})
         return newStatus
     }
@@ -406,7 +445,7 @@ export class NewsfeedComponent extends React.Component<Props, State> {
         clone.serialization_date = new Date().toISOString()
         let index = this.findIndexByStatusId(clone.id)
         let me = this.props.authenticatedProfile
-        let oldReaction = StatusUtilities.getStatusReaction(clone, me)
+        let oldReaction = StatusUtilities.getStatusReaction(clone, me.id)
         let rCount = clone.reaction_count
         let r = clone.reactions || {}
         let userId = me.id
