@@ -87,10 +87,17 @@ interface State
     hasMore:boolean
     hasLoaded:boolean
 }
+type IncomingUpdateItem = {
+    type:string 
+    status_id:number 
+    parent_id?:number
+}
 type Props = ReduxStateProps & ReduxDispatchProps & OwnProps & RouteProps
 export class NewsfeedComponent extends React.Component<Props, State> {
-    isOdd:boolean = false
-    observers:EventSubscription[] = []
+    private isOdd:boolean = false
+    private observers:EventSubscription[] = []
+    private stashIncomingUpdates = false 
+    private incomingUpdateCache:IncomingUpdateItem[] = []
     static defaultProps:OwnProps = {
         limit:30,
         defaultChildrenLimit:5,
@@ -109,7 +116,15 @@ export class NewsfeedComponent extends React.Component<Props, State> {
             hasLoaded:false
         }
     }
-
+    setStashUpdates = (stash:boolean) => {
+        this.stashIncomingUpdates = stash
+        if(!stash)
+        {
+            const arr = this.incomingUpdateCache
+            this.incomingUpdateCache = [] 
+            arr.forEach(this.runIncomingUpdate)
+        }
+    }
     hasContextError = (props:Props) => {
         return (!!props.contextNaturalKey && !props.contextObjectId) || (!props.contextNaturalKey && !!props.contextObjectId)
 
@@ -139,49 +154,17 @@ export class NewsfeedComponent extends React.Component<Props, State> {
         const object = args[0]
         const id = object && object.status_id
         const parentId = object && object.parent_id
-        if(id && parentId)
+        if(id)
         {
-            const parent = this.findStatusByStatusId(parentId)
-            if(parent)
-            {
-                this.setState({
-                    isLoading: true
-                }, this.fetchComment(id));
-            }
-        }
-        else if(id)
-        {
-            this.setState({
-                isLoading: true
-            }, this.fetchUpdates);
+            const update:IncomingUpdateItem = {type:EventStreamMessageType.STATUS_NEW, status_id:object.status_id, parent_id:parentId} 
+            this.processIncomingUpdate(update)
         }
     }
     private fetchComment = (id:number) => () => {
         ApiClient.getStatus(id, (comment, requestStatus, error) => {
             if(comment)
             {
-                const parent = this.findStatusByStatusId(comment.parent)
-                const composerIndex = this.findStatusComposerByStatusId(comment.parent)
-                if(composerIndex > -1 )
-                {
-                    this.insertObject(comment,composerIndex)
-                    comment.temporary = true
-                    //update parent comment_count & commentsloader data
-                    const updateArray:ArrayItem[] = []
-                    let updatedParent = this.getClonedStatus(parent)
-                    updatedParent.comments += 1
-                    let updatedParentIndex = this.findIndexByStatusId(parent.id)
-                    updateArray.push({index:updatedParentIndex, object:updatedParent})
-                    let commentsLoaderIndex = this.findStatusCommentLoaderByStatusId(parent.id)
-                    let commentLoader = this.state.items[commentsLoaderIndex] as StatusCommentLoader
-                    if(commentLoader)
-                    {
-                        commentLoader.currentCommentsCount += 1
-                        commentLoader.totalCommentsCount += 1
-                        updateArray.push({index:commentsLoaderIndex, object:commentLoader})
-                    }
-                    this.updateItems(updateArray)
-                }
+                this.insertOrUpdateComment(comment)
             }
             this.setState({ isLoading: false })//TODO: do this in this.updateItems or here?
             ToastManager.showErrorToast(error)
@@ -223,14 +206,52 @@ export class NewsfeedComponent extends React.Component<Props, State> {
             }
         }
     }
+    private processIncomingUpdate = (update:IncomingUpdateItem) => {
+        if(this.stashIncomingUpdates)
+        {
+            this.incomingUpdateCache.push(update)
+        }
+        else {
+            this.runIncomingUpdate(update)
+        }
+    }
+    private runIncomingUpdate = (update:IncomingUpdateItem) => {
+        if(update.type == EventStreamMessageType.STATUS_DELETED)
+            this.executeStatusDelete(update)
+        else if(update.type == EventStreamMessageType.STATUS_NEW)
+            this.extecuteStatusNew(update)
+    }
+    private extecuteStatusNew = (update:IncomingUpdateItem) => {
+        if(update.parent_id)
+        {
+            const parent = this.findStatusByStatusId(update.parent_id)
+            if(parent)
+            {
+                this.setState({
+                    isLoading: true
+                }, this.fetchComment(update.status_id));
+            }
+        }
+        else
+        {
+            this.setState({
+                isLoading: true
+            }, this.fetchUpdates);
+        }
+    }
+    private executeStatusDelete = (update:IncomingUpdateItem) => {
+
+        const status = this.findStatusByStatusId(update.status_id)
+        if(status)
+            this.postDeleteStatus(status)
+    }
     private processIncomingStatusDeleted = (...args:any[]) => {
         const object = args[0]
         const id = object && object.status_id
         if(id)
         {
-            const status = this.findStatusByStatusId(id)
-            if(status)
-                this.postDeleteStatus(status)
+            const update:IncomingUpdateItem = {type:EventStreamMessageType.STATUS_DELETED, status_id:object.status_id} 
+            this.processIncomingUpdate(update)
         }
     }
     componentDidMount = () => 
@@ -419,19 +440,28 @@ export class NewsfeedComponent extends React.Component<Props, State> {
         }
         return null
     }
-    updateItems = (updated:ArrayItem[]) => {
+    updateItems = (updated:ArrayItem[], completion?:() => void) => {
         this.setState(prevState => {
             const items = prevState.items
             updated.forEach(u => items[u.index] = u.object)
             return ({
                 items: items,
               })
-        })
+        }, completion)
     }
     insertObject = (object:FeedListItem, index:number) => {
         this.setState(prevState => {
             const items = prevState.items
             items.splice(index,0,object)
+            return ({
+                items: items,
+              })
+        })
+    }
+    insertObjects = (objects:FeedListItem[], index:number) => {
+        this.setState(prevState => {
+            const items = prevState.items
+            items.splice(index,0,...objects)
             return ({
                 items: items,
               })
@@ -500,13 +530,14 @@ export class NewsfeedComponent extends React.Component<Props, State> {
     }
     deleteStatus = (status:Status) => {
         console.log("deleteStatus", status.id)
-        
+        this.setStashUpdates(true)
         ApiClient.deleteStatus(status.id, (data, st, error) => {
             if(nullOrUndefined(error))
             {
                 this.postDeleteStatus(status)
             }
             ToastManager.showErrorToast(error)
+            this.setStashUpdates(false)
         })
     }
     updateStatus = (statusId:number, status:Status, files?:UploadedFile[], completion?:(success:boolean) => void) => {
@@ -527,6 +558,7 @@ export class NewsfeedComponent extends React.Component<Props, State> {
             return
         const tempStatus = StatusUtilities.getStatusPreview(this.props.contextNaturalKey, this.props.contextObjectId, message, mentions, files)
         this.insertObject(tempStatus,0)
+        this.setStashUpdates(true)
         ApiClient.createStatus(tempStatus, (newStatus, requestStatus, error) => {
             const success = !!newStatus
             if(success)
@@ -536,45 +568,84 @@ export class NewsfeedComponent extends React.Component<Props, State> {
                 const updateArray:ArrayItem[] = []
                 updateArray.push({index:newStatusIndex, object:newStatus})
                 this.updateItems(updateArray)
+                if(newStatus.permission >= Permission.post)
+                {
+                    const composer = new StatusComposer(newStatus.id, newStatus.community && newStatus.community.id, newStatus.context_object_id , newStatus.context_natural_key)
+                    this.insertObject(composer, newStatusIndex + 1)
+                }
             }
             completion && completion(success)
             ToastManager.showErrorToast(error)
+            this.setStashUpdates(false)
         })
     }
+    insertOrUpdateComment = (comment:Status, tempId?:number) => {
+        comment.temporary = true
+        const parent = this.findStatusByStatusId(comment.parent)
+        const oldCommentIndex = this.findIndexByStatusId(comment.id)
+        const tempIndex = tempId ? this.findIndexByStatusId(tempId) : -1
+        const updateArray:ArrayItem[] = []
+        let completion:() => void = undefined
+        const updateParent = () => {
+            let updatedParent = this.getClonedStatus(parent)
+            updatedParent.comments += 1
+            let updatedParentIndex = this.findIndexByStatusId(parent.id)
+            updateArray.push({index:updatedParentIndex, object:updatedParent})
+
+            let commentsLoaderIndex = this.findStatusCommentLoaderByStatusId(parent.id)
+            let commentLoader = this.state.items[commentsLoaderIndex] as StatusCommentLoader
+            if(commentLoader)
+            {
+                commentLoader.currentCommentsCount += 1
+                commentLoader.totalCommentsCount += 1
+                updateArray.push({index:commentsLoaderIndex, object:commentLoader})
+            }
+        }
+        //tempid && !old 
+        if(tempIndex > -1 && oldCommentIndex == -1) // update parent
+        {
+            updateArray.push({index:tempIndex, object:comment})
+            updateParent()
+        }
+        //!tempid && old 
+        else if(tempIndex == -1 && oldCommentIndex > -1)
+        {
+            updateArray.push({index:oldCommentIndex, object:comment})
+        }
+        //tempid && old
+        else if(tempIndex > -1 && oldCommentIndex > -1)
+        {
+            updateArray.push({index:oldCommentIndex, object:comment})
+            completion = () => {
+                this.removeObjectsAtIndexes([tempIndex])
+            }
+        }
+        //!tempid && !old
+        else // update parent
+        {
+            const composerIndex = this.findStatusComposerByStatusId(comment.parent)
+            this.insertObject(comment, composerIndex)
+            updateParent()
+        }
+        this.updateItems(updateArray, completion)
+    }
     createNewComment = (parent:Status, message:string, mentions?:number[], files?:UploadedFile[], completion?:(success:boolean) => void) => {
-        const status = StatusUtilities.getCommentPreview(parent, message, mentions, files)
+        const tempStatus = StatusUtilities.getCommentPreview(parent, message, mentions, files)
         let composerIndex = this.findStatusComposerByStatusId(parent.id)
         if(composerIndex > -1 )
         {
-            this.insertObject(status,composerIndex)
-            ApiClient.createStatus(status, (newObject, responseStatusCode, error) => {
+            this.insertObject(tempStatus, composerIndex)
+            this.setStashUpdates(true)
+            ApiClient.createStatus(tempStatus, (newObject, responseStatusCode, error) => {
                 const success = !nullOrUndefined(newObject)
                 if(success)
                 {
-                    newObject.temporary = true
-                    //update parent comment_count & commentsloader data
-                    const updateArray:ArrayItem[] = []
-                    const newStatus = newObject as Status
-                    const newStatusIndex = this.findIndexByStatusId(status.id)
-                    updateArray.push({index:newStatusIndex, object:newStatus})
-                    let updatedParent = this.getClonedStatus(parent)
-                    updatedParent.comments += 1
-                    let updatedParentIndex = this.findIndexByStatusId(parent.id)
-                    updateArray.push({index:updatedParentIndex, object:updatedParent})
-                    let commentsLoaderIndex = this.findStatusCommentLoaderByStatusId(parent.id)
-                    let commentLoader = this.state.items[commentsLoaderIndex] as StatusCommentLoader
-                    if(commentLoader)
-                    {
-                        commentLoader.currentCommentsCount += 1
-                        commentLoader.totalCommentsCount += 1
-                        updateArray.push({index:commentsLoaderIndex, object:commentLoader})
-                    }
-                    this.updateItems(updateArray)
+                    this.insertOrUpdateComment(newObject, tempStatus.id)
                 }
-                console.log("status created----- replace temp", newObject )
                 if(completion)
                     completion(success)
                 ToastManager.showErrorToast(error)
+                this.setStashUpdates(false)
             })
         }
     }
