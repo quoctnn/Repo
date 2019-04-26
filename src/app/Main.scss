@@ -108,16 +108,16 @@ button{@include var(color, primary-text-color);}
     left: 0px;
     right: 0px;
     bottom: 0px;
-    @include var(background, highlight-background-color);
+    @include var(background, highlight-foreground-color);
     opacity: 0;
     transition: all 0.1s ease;
     pointer-events: none;
 }
 .hover-card:hover:after {
-    opacity: 0.3;
+    opacity: 0.1;
 }
 .hover-card:hover{
-    @include var(background, highlight-background-color);
+    //@include var(background, highlight-background-color);
     overflow: hidden;
 }
 .transition

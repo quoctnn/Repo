@@ -69,7 +69,7 @@ $root: (
     bg-trans-blue-dark: rgba(1, 0, 54, 0.9),
     bg-trans-black: rgba(0, 0, 0, 0.5),
     bg-trans-black-light: rgba(0, 0, 0, 0.25),
-    highlight-background-color:#DEEBFF,
+    highlight-background-color:#757575,
     highlight-foreground-color:#5d5d5d,
 
 
@@ -145,5 +145,7 @@ $root: (
 
     --drop-shadow-large: 0px 0px 20px 0px rgba(231, 229, 229, 0.5);
     --drop-shadow: 0px 0px 10px -3px rgba(231, 229, 229,0.6);
+    --highlight-foreground-color:#605c79;
+    --highlight-background-color:red;
 
 }
