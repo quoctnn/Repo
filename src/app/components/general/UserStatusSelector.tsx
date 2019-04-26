@@ -1,10 +1,9 @@
 import * as React from 'react';
 import { connect } from 'react-redux'
-import { UserStatus, UserProfile, UserStatusItem, AvatarStateColor } from '../../types/intrasocial_types';
-import { sendOnWebsocket, EventStreamMessageType, getStream } from '../../network/ChannelEventStream';
+import { UserStatus, UserProfile, UserStatusItem } from '../../types/intrasocial_types';
+import { sendOnWebsocket, EventStreamMessageType } from '../../network/ChannelEventStream';
 import { NotificationCenter } from '../../utilities/NotificationCenter';
 import { ReduxState } from '../../redux/index';
-import { AuthenticationManager } from '../../managers/AuthenticationManager';
 import "./UserStatusSelector.scss"
 import { Link } from 'react-router-dom';
 import Routes from '../../utilities/Routes';
@@ -67,6 +66,11 @@ class UserStatusSelector extends React.Component<Props, State> {
     {
         sendUserStatus(status.type);
     }
+    signOut = () => (event: React.SyntheticEvent<any>) =>
+    {
+        // navigate to Route SignOut
+        window.location.replace(Routes.SIGNOUT)
+    }
     renderStatusSelector = () =>
     {
         if(!this.props.profile || this.props.profile.is_anonymous)
@@ -74,11 +78,11 @@ class UserStatusSelector extends React.Component<Props, State> {
         const currentState = UserStatus.getObject(this.props.profile.user_status)
         const selectable = UserStatus.getSelectableStates([currentState.type])
         const selectableDropdownItems:OverflowMenuItem[] = selectable.map((s, i) => {
-         return {id:"status_" + i, 
-                type:OverflowMenuItemType.option, 
-                title:s.translation(), 
-                onPress:this.setUserStatus(s), 
-                toggleMenu:false, 
+         return {id:"status_" + i,
+                type:OverflowMenuItemType.option,
+                title:s.translation(),
+                onPress:this.setUserStatus(s),
+                toggleMenu:false,
                 children:<UserStatusIndicator size={12} borderColor="white" statusColor={s.color} borderWidth={2} />
             }
         })
@@ -97,7 +101,7 @@ class UserStatusSelector extends React.Component<Props, State> {
                             return createDropdownItem(dd)
                         }) }
                         <DropdownItem divider={true}/>
-                        <Link className="dropdown-item" to={Routes.SIGNOUT}>{translate("Sign out")}</Link>
+                        <DropdownItem title={translate("Sign out")} toggle={false} onClick={this.signOut()}>{translate("Sign out")}</DropdownItem>
                     </div>
                 </div>
             </div>
