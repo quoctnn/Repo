@@ -42,7 +42,6 @@ const socket_options = {
     minReconnectionDelay: 1000,
     reconnectionDelayGrowFactor: 6.0,
     connectionTimeout: 8000,
-    debug:true,
 }
 class EventQueueLock
 {
