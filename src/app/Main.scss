@@ -1,12 +1,12 @@
 @import "./Config";
-.scrollbar, .vertical-scroll 
+.scrollbar, .vertical-scroll
 {
     &::-webkit-scrollbar {
-         width: 5px;  
+         width: 5px;
          height: 5px;
     }
     &::-webkit-scrollbar-track { background: transparent; }
-    &::-webkit-scrollbar-thumb { 
+    &::-webkit-scrollbar-thumb {
         @include var(background, secondary-theme-color);
         border-radius:50vw;
     }
@@ -24,7 +24,17 @@ ul,li{ list-style-type: none; padding: 0;}
     display: block;
     width: 100%;
 }
-//borders 
+.modal-content {
+    @include var(background, main-content-background);
+    @include var(color, primary-text-color);
+}
+.close {
+    @include var(color, button-color);
+}
+.close:not(:disabled):not(.disabled):hover {
+    @include var(color, utton-hover-background-color);
+}
+//borders
 .border-1{
     @include var(border-color, border-color-default);
     border-width: 1px;
@@ -36,7 +46,7 @@ body
     @include var(background-color, body-background);
     @include var(font-family, font-family-default);
     @include var(color, primary-text-color);
-    
+
 }
 body[class^="select-active-"], body[class*=" select-active-"]{
     position: static !important;
@@ -141,7 +151,6 @@ button{@include var(color, primary-text-color);}
     left: 0;
     height: 100vh;
     width: 100vw;
-    background: white;
     z-index: 1200;
     display: none;
     &.modal-entering, &.modal-entered, &.modal-exiting  {

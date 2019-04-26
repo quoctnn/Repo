@@ -13,15 +13,15 @@
         @include var(background-color, main-content-background);
     }
     .btn {
-        @include var(background, button-background-color);
+        @include var(background-color, button-background-color);
         @include var(color, button-color);
         @include var(border-color, button-border-color);
     }
     .btn:hover {
-        @include var(background, button-hover-background-color); }
+        @include var(background-color, button-hover-background-color); }
 
     .btn:disabled {
-        @include var(background, button-disabled-background-color);
+        @include var(background-color, button-disabled-background-color);
         @include var(color, button-disabled-text-color); }
     .explain{
         font-size: 10px;

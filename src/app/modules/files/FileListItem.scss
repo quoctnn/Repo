@@ -8,9 +8,6 @@ $margin:8px;
         border-radius: 10px;
         overflow: hidden;
         position: relative;
-        &.hover-card .content-container:hover{
-            @include var(color, list-item-hover-color);
-        }
         &.hover-card:hover:after{
             opacity:0.3 ;
         }
