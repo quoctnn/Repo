@@ -8,6 +8,7 @@ import { NotificationCenter } from '../../utilities/NotificationCenter';
 import { ApplicationManagerLoadingProgressNotification, LoadingProgress } from '../../managers/ApplicationManager';
 import Logo from '../../components/general/Logo';
 import { translate } from '../../localization/AutoIntlProvider';
+import { EventSubscription } from 'fbemitter';
 
 interface OwnProps {
     
@@ -18,7 +19,7 @@ interface ReduxStateProps{
 type Props = RouteComponentProps<any> & ReduxStateProps & OwnProps
 class ApplicationLoader extends React.Component<Props, {progress:LoadingProgress}> {
 
-    observers:any[] = []
+    observers:EventSubscription[] = []
     constructor(props:Props) {
         super(props);
         const observer = NotificationCenter.addObserver(ApplicationManagerLoadingProgressNotification, this.processProgressUpdate)

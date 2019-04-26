@@ -17,6 +17,9 @@ import { List } from '../../components/general/List';
 import "./NewsfeedComponent.scss"
 import classnames = require('classnames');
 import { translate } from '../../localization/AutoIntlProvider';
+import { NotificationCenter } from '../../utilities/NotificationCenter';
+import { EventStreamMessageType } from '../../network/ChannelEventStream';
+import { EventSubscription } from 'fbemitter';
 class StatusComposer
 {
     statusId:number
@@ -79,7 +82,6 @@ interface State
 {
     activeCommentLoaders:{[index:number]:StatusCommentLoader}
     items:FeedListItem[]
-    offset:number
     isLoading: boolean
     isRefreshing: boolean
     hasMore:boolean
@@ -88,6 +90,7 @@ interface State
 type Props = ReduxStateProps & ReduxDispatchProps & OwnProps & RouteProps
 export class NewsfeedComponent extends React.Component<Props, State> {
     isOdd:boolean = false
+    observers:EventSubscription[] = []
     static defaultProps:OwnProps = {
         limit:30,
         defaultChildrenLimit:5,
@@ -102,11 +105,11 @@ export class NewsfeedComponent extends React.Component<Props, State> {
             isLoading: false,
             isRefreshing:false,
             items:[],
-            offset:0,
             hasMore:true,
             hasLoaded:false
         }
     }
+
     hasContextError = (props:Props) => {
         return (!!props.contextNaturalKey && !props.contextObjectId) || (!props.contextNaturalKey && !!props.contextObjectId)
 
@@ -121,7 +124,6 @@ export class NewsfeedComponent extends React.Component<Props, State> {
             const hasContextError = this.hasContextError(this.props)
             const action = hasContextError ? undefined : this.loadStatuses
             this.setState({
-                offset: 0,
                 isRefreshing: !hasContextError,
                 isLoading: !hasContextError,
                 items:[],
@@ -133,8 +135,113 @@ export class NewsfeedComponent extends React.Component<Props, State> {
             this.props.onLoadingStateChanged(this.state.isLoading)
         }
     }
+    private processIncomingStatusNew = (...args:any[]) => {
+        const object = args[0]
+        const id = object && object.status_id
+        const parentId = object && object.parent_id
+        if(id && parentId)
+        {
+            const parent = this.findStatusByStatusId(parentId)
+            if(parent)
+            {
+                this.setState({
+                    isLoading: true
+                }, this.fetchComment(id));
+            }
+        }
+        else if(id)
+        {
+            this.setState({
+                isLoading: true
+            }, this.fetchUpdates);
+        }
+    }
+    private fetchComment = (id:number) => () => {
+        ApiClient.getStatus(id, (comment, requestStatus, error) => {
+            if(comment)
+            {
+                const parent = this.findStatusByStatusId(comment.id)
+                const composerIndex = this.findStatusComposerByStatusId(comment.id)
+                if(composerIndex > -1 )
+                {
+                    this.insertObject(comment,composerIndex)
+                    comment.temporary = true
+                    //update parent comment_count & commentsloader data
+                    const updateArray:ArrayItem[] = []
+                    let updatedParent = this.getClonedStatus(parent)
+                    updatedParent.comments += 1
+                    let updatedParentIndex = this.findIndexByStatusId(parent.id)
+                    updateArray.push({index:updatedParentIndex, object:updatedParent})
+                    let commentsLoaderIndex = this.findStatusCommentLoaderByStatusId(parent.id)
+                    let commentLoader = this.state.items[commentsLoaderIndex] as StatusCommentLoader
+                    if(commentLoader)
+                    {
+                        commentLoader.currentCommentsCount += 1
+                        commentLoader.totalCommentsCount += 1
+                        updateArray.push({index:commentsLoaderIndex, object:commentLoader})
+                    }
+                    this.updateItems(updateArray)
+                }
+            }
+            this.setState({ isLoading: false })//TODO: do this in this.updateItems or here?
+            ToastManager.showErrorToast(error)
+        })
+    }
+    private fetchUpdates = () => {
+        const firstStatus = this.state.items[0] as Status
+        if(firstStatus && firstStatus.id)
+        {
+            const { limit, contextNaturalKey, contextObjectId } = this.props
+            ApiClient.newsfeedV2(limit, 0, contextNaturalKey, contextObjectId, null, this.props.defaultChildrenLimit, this.props.filter, this.props.includeSubContext, firstStatus.id, (data, status, error) => {
+                if(data && data.results)
+                {
+                    const { items } = this.state
+                    let newData = this.flattenData( data.results )
+                    this.setState({
+                        items: [...newData, ...items],
+                        isRefreshing: false,
+                        isLoading:false,
+                    });
+                }
+                ToastManager.showErrorToast(error)
+            })
+        }
+    }
+    private processIncomingStatusUpdate = (...args:any[]) => {
+        const object = args[0]
+        const id = object && object.status_id
+        if(id)
+        {
+            //fetch & update if feed contains status
+            const oldStatus = this.findStatusByStatusId(id)
+            if(oldStatus)
+            {
+                ApiClient.getStatus(id, (status, reqStatus, error) => {
+                    if(status)
+                        this.updateStatusItem(status)
+                })  
+            }
+        }
+    }
+    private processIncomingStatusDeleted = (...args:any[]) => {
+        const object = args[0]
+        const id = object && object.status_id
+        if(id)
+        {
+            const status = this.findStatusByStatusId(id)
+            if(status)
+                this.postDeleteStatus(status)
+        }
+    }
     componentDidMount = () => 
     {
+        const obs1 = NotificationCenter.addObserver('eventstream_' + EventStreamMessageType.STATUS_NEW, this.processIncomingStatusNew)
+        this.observers.push(obs1)
+        const obs2 = NotificationCenter.addObserver('eventstream_' + EventStreamMessageType.STATUS_UPDATE, this.processIncomingStatusUpdate)
+        this.observers.push(obs2)
+        const obs3 = NotificationCenter.addObserver('eventstream_' + EventStreamMessageType.STATUS_DELETED, this.processIncomingStatusDeleted)
+        this.observers.push(obs3)
+
         if(this.props.scrollParent)
         {
             this.props.scrollParent.addEventListener("scroll", this.onScroll)
@@ -150,6 +257,7 @@ export class NewsfeedComponent extends React.Component<Props, State> {
     }
     componentWillUnmount = () =>
     {
+        this.observers.forEach(o => o.remove())
         if(this.props.scrollParent)
         {
             this.props.scrollParent.removeEventListener("scroll", this.onScroll)
@@ -189,14 +297,15 @@ export class NewsfeedComponent extends React.Component<Props, State> {
     }
     loadStatuses = () => 
     {
-        const { items, offset } = this.state
+        const { items } = this.state
+        const offset = items.length
         const { limit, contextNaturalKey, contextObjectId } = this.props
-        ApiClient.newsfeedV2(limit,offset,contextNaturalKey, contextObjectId, null, this.props.defaultChildrenLimit, this.props.filter, this.props.includeSubContext, (data, status, error) => {
+        ApiClient.newsfeedV2(limit,offset,contextNaturalKey, contextObjectId, null, this.props.defaultChildrenLimit, this.props.filter, this.props.includeSubContext, null, (data, status, error) => {
             if(data && data.results)
             {
                 let newData = this.flattenData( data.results )
                 this.setState({
-                    items: offset == 0 ?  newData :  [...items, ...newData],
+                    items: offset == 0 || this.state.isRefreshing ?  newData :  [...items, ...newData],
                     isRefreshing: false,
                     hasMore:data.next != null,
                     isLoading:false,
@@ -213,7 +322,6 @@ export class NewsfeedComponent extends React.Component<Props, State> {
             return
         }
         this.setState({
-            offset: 0,
             isRefreshing: true,
             isLoading: true
         }, this.loadStatuses);
@@ -302,7 +410,6 @@ export class NewsfeedComponent extends React.Component<Props, State> {
             return
         }
         this.setState({
-            offset: this.state.offset + this.props.limit,
             isLoading: true
         }, this.loadStatuses);
     }
@@ -351,48 +458,53 @@ export class NewsfeedComponent extends React.Component<Props, State> {
               })
         })
     }
+    //after status deleted ok, update current data structure
+    postDeleteStatus = (status:Status) => {
+
+        const indexesToDelete:number[] = []
+        if(status.parent)//update parent and commentloader
+        {
+            const ix = this.findIndexByStatusId(status.parent)
+            if(ix > -1)
+            {
+                let updateArray:ArrayItem[] = []
+                const parent = this.getClonedStatus(this.state.items[ix] as Status)
+                parent.comments -= 1
+                updateArray.push({index:ix, object:parent})
+
+                let commentsLoaderIndex = this.findStatusCommentLoaderByStatusId(parent.id)
+                let commentLoader = this.state.items[commentsLoaderIndex] as StatusCommentLoader
+                if(commentLoader)
+                {
+                    commentLoader.currentCommentsCount -= 1
+                    commentLoader.totalCommentsCount -= 1
+                    updateArray.push({index:commentsLoaderIndex, object:commentLoader})
+                }
+                this.updateItems(updateArray)
+            }
+        }
+        else // root status, remove children, commentLoader and status composer
+        {
+
+            let commentsLoaderIndex = this.findStatusCommentLoaderByStatusId(status.id)
+            if(commentsLoaderIndex)
+                indexesToDelete.push(commentsLoaderIndex)
+            let cIndex = this.findStatusComposerByStatusId(status.id)
+            indexesToDelete.push(cIndex)
+            const childIndexes = this.findCommentsByStatusId(status.id)
+            indexesToDelete.push(...childIndexes)
+        }
+        let index = this.findIndexByStatusId(status.id)
+        indexesToDelete.push(index)
+        this.removeObjectsAtIndexes(indexesToDelete)
+    }
     deleteStatus = (status:Status) => {
         console.log("deleteStatus", status.id)
         
         ApiClient.deleteStatus(status.id, (data, st, error) => {
-            const indexesToDelete:number[] = []
             if(nullOrUndefined(error))
             {
-                if(status.parent)//update parent and commentloader
-                {
-                    const ix = this.findIndexByStatusId(status.parent)
-                    if(ix > -1)
-                    {
-                        let updateArray:ArrayItem[] = []
-                        const parent = this.getClonedStatus(this.state.items[ix] as Status)
-                        parent.comments -= 1
-                        updateArray.push({index:ix, object:parent})
-
-                        let commentsLoaderIndex = this.findStatusCommentLoaderByStatusId(parent.id)
-                        let commentLoader = this.state.items[commentsLoaderIndex] as StatusCommentLoader
-                        if(commentLoader)
-                        {
-                            commentLoader.currentCommentsCount -= 1
-                            commentLoader.totalCommentsCount -= 1
-                            updateArray.push({index:commentsLoaderIndex, object:commentLoader})
-                        }
-                        this.updateItems(updateArray)
-                    }
-                }
-                else // root status, remove children, commentLoader and status composer
-                {
-
-                    let commentsLoaderIndex = this.findStatusCommentLoaderByStatusId(status.id)
-                    if(commentsLoaderIndex)
-                        indexesToDelete.push(commentsLoaderIndex)
-                    let cIndex = this.findStatusComposerByStatusId(status.id)
-                    indexesToDelete.push(cIndex)
-                    const childIndexes = this.findCommentsByStatusId(status.id)
-                    indexesToDelete.push(...childIndexes)
-                }
-                let index = this.findIndexByStatusId(status.id)
-                indexesToDelete.push(index)
-                this.removeObjectsAtIndexes(indexesToDelete)
+                this.postDeleteStatus(status)
             }
             ToastManager.showErrorToast(error)
         })

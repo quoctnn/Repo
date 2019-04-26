@@ -26,6 +26,11 @@ export abstract class ProfileManager
 {
     static setup = () =>
     {
+        NotificationCenter.addObserver('eventstream_' + EventStreamMessageType.USER_UPDATE, ProfileManager.processIncomingUserUpdate)
+    }
+    private static processIncomingUserUpdate(...args:any[]) {
+        let profile = args[0]
+        ProfileManager.storeProfiles([profile])
     }
     static getProfile = (profileId:string):UserProfile|null =>
     {

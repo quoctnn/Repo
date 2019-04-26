@@ -74,8 +74,8 @@ const PathLoader = (Component: any, extractKey:(path:string) => string) =>
             })
         }
         render() {
-        const { loading } = this.state
-        return loading ? <LoadingSpinner /> : <Component key={extractKey(location.pathname)} {...this.props} />
+            const { loading } = this.state
+            return loading ? <LoadingSpinner /> : <Component key={extractKey(location.pathname)} {...this.props} />
         }
     }
 const PathLoadedProfilePage = PathLoader(ProfilePage, (path) => { return path})

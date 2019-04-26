@@ -147,9 +147,9 @@ export default class ApiClient
             callback(null, status, error)
         })
     }
-    static newsfeedV2(limit:number,offset:number,context_natural_key:ContextNaturalKey, context_object_id:number, parent:number, children:number,attribute:ObjectAttributeType, include_sub_context:boolean = true,  callback:ApiClientFeedPageCallback<Status>)
+    static newsfeedV2(limit:number,offset:number,context_natural_key:ContextNaturalKey, context_object_id:number, parent:number, children:number,attribute:ObjectAttributeType, include_sub_context:boolean = true, after:number, callback:ApiClientFeedPageCallback<Status>)
     {
-        let url = Constants.apiRoute.postUrl + "?" + this.getQueryString({limit,offset,context_natural_key	,context_object_id, parent, children, attribute, include_sub_context })
+        let url = Constants.apiRoute.postUrl + "?" + this.getQueryString({limit,offset,context_natural_key	,context_object_id, parent, children, attribute, include_sub_context, after })
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
@@ -196,6 +196,15 @@ export default class ApiClient
     {
         let url = Constants.apiRoute.postUrl + status.id + "/"
         AjaxRequest.patch(url, status, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
+    static getStatus(id:number|string, callback:ApiClientCallback<Status>)
+    {
+        let url = Constants.apiRoute.postUpdateUrl(id)
+        AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
             callback(null, status, error)

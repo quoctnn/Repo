@@ -425,7 +425,6 @@ export type UserProfile = {
     user_status:UserStatus
     biography:string
     slug_name:string
-    updated_at:number
     relationship?: string[]
     mutual_friends?: number[]
     last_seen?:number

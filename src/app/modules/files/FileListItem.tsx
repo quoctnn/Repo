@@ -2,10 +2,7 @@ import * as React from 'react'
 import classnames from "classnames"
 import "./FileListItem.scss"
 import { UploadedFile, UploadedFileType } from '../../types/intrasocial_types';
-import { stringToDate, DateFormat, userFullName } from '../../utilities/Utilities';
-import Routes from '../../utilities/Routes';
 import { Link } from 'react-router-dom';
-import { translate } from '../../localization/AutoIntlProvider';
 import { FileUtilities } from '../../utilities/FileUtilities';
 import { SecureImage } from '../../components/general/SecureImage';
 import PhotoSwipeComponent from '../../components/general/gallery/PhotoSwipeComponent';
@@ -89,9 +86,15 @@ export default class FileListItem extends React.Component<Props, State> {
                             <i className="fa file-icon"></i>
                             }
                         </div>
-                        <div className="d-flex flex-column text-truncate content-container">
+                        <div className="d-flex flex-grow-1 flex-column content-container">
                             <div className="text-truncate">{name}</div>
-                            <div className="text-muted text-truncate">{fileSize}</div>
+                            <div className="d-flex text-muted text-truncate">
+                                <div className="text-truncate">{fileSize}</div>
+                                <div className="flex-grow-1"></div>
+                                <div className="theme-box theme-bg-gradient flex-shrink-0">
+                                    {file.extension}
+                                </div>
+                            </div>
                         </div>
                     </div>
                     {this.renderModal()}

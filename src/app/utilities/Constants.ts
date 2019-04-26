@@ -155,8 +155,8 @@ export default  {
         postCommentsUrl: (id:number) => {
             return `/api/v2/status/${id}/`
         },
-        postUpdateUrl: (id:number) => {
-            return `/api/v1/status/${id}/`
+        postUpdateUrl: (id:number|string) => {
+            return `/api/v2/status/${id}/`
         },
         postLike: (id:number) => {
             return `/api/v1/status/${id}/like/`
