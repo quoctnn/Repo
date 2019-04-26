@@ -52,6 +52,9 @@ export default  {
         communityUrl: (id:number|string) => {
             return `/api/v2/community/${id}/`
         },
+        setMainCommunityUrl: (id:number|string) => {
+            return `/api/v2/community/${id}/set-as-main`
+        },
         communityList:'/api/v2/community/',
         // Profile URLs
         myProfileUrl: '/api/v2/profile/me/',

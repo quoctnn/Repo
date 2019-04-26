@@ -5,6 +5,9 @@ import { Community, IntraSocialType } from '../../types/intrasocial_types';
 import { communityCover } from '../../utilities/Utilities';
 import { SecureImage } from '../../components/general/SecureImage';
 import { IntraSocialLink } from '../../components/general/IntraSocialLink';
+import ApiClient from '../../network/ApiClient';
+import { Button } from 'reactstrap';
+import { translate } from '../../localization/AutoIntlProvider';
 
 type OwnProps = {
     community:Community
@@ -24,6 +27,12 @@ export default class CommunityListItem extends React.Component<Props, State> {
         return ret
 
     }
+    setMainCommunity = (community:Community) => (e:React.SyntheticEvent<any>) => {
+        e.preventDefault()
+        e.stopPropagation()
+        if (community)
+            ApiClient.setMainCommunity(community.id, () => {})
+    }
     render()
     {
         const {community, className, ...rest} = this.props
@@ -41,6 +50,7 @@ export default class CommunityListItem extends React.Component<Props, State> {
                                 <i className="fa fa-user"></i>
                             </div>
                             <div className="title text-truncate">{community.name}</div>
+                            <Button className="theme-bg-gradient set-main" onClick={this.setMainCommunity(community)} title={translate("Select as main community")}><i className="fa fa-plus"/></Button>
                         </div>
                     </div>
                 </IntraSocialLink>)
