@@ -97,7 +97,7 @@
             }
             .section-list-item.active
             {
-                @include var(background-color, button-hover-background-color);
+                @include var(background-color, list-item-background-hover-color);
             }
         }
     }
