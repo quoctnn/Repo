@@ -84,6 +84,18 @@ class EventDetailsModule extends React.Component<Props, State> {
                                 <div>
                                     { event.permission >= Permission.read &&
                                         <DetailsContent community={community} description={event.description}>
+                                            { event.parent &&
+                                                <div>
+                                                    <span className="details-field-name">
+                                                        {translate("common.event")}:&nbsp;
+                                                    </span>
+                                                    <span className="details-field-value">
+                                                        <Link to={event.parent.uri || "#"}>
+                                                            {event.parent.name}
+                                                        </Link>
+                                                    </span>
+                                                </div>
+                                            }
                                         </DetailsContent>
                                     }
                                 </div>

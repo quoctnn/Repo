@@ -21,9 +21,7 @@ class PageMainMenu extends React.Component<Props, {}> {
     render() {
         return(
             <div style={this.props.style} id="page-main-menu" className={this.props.className}>
-                <Link to={"/"}>
-                Home    
-                </Link>
+                {/* TODO: Insert back navigation here */}
             </div>
         );
     }

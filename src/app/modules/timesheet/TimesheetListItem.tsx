@@ -32,14 +32,14 @@ export default class TimesheetListItem extends React.Component<Props, State> {
         const cl = classnames("timesheet-list-item", className)
         const name = userFullName(timesheet.user)
         const date = stringToDate(timesheet.date, DateFormat.day)
-        const time = `${timesheet.hours}${translate("date.format.hours")}` + (!!timesheet.minutes ? ` ${timesheet.minutes}${translate("date.format.minutes")}` : "")
+        const time = `${timesheet.hours || 0}${translate("date.format.hours")}` + (!!timesheet.minutes ? ` ${timesheet.minutes}${translate("date.format.minutes")}` : "")
         return (<Link to={Routes.taskUrl(0, timesheet.project, timesheet.task)} {...rest} className={cl}>
                     <div className="d-flex justify-content-around">
-                        <div className="d-flex flex-column align-items-center">
+                        <div className="d-flex flex-column align-items-center datetime">
                             <div className="date">{date}</div>
                             <div className="time">{time}</div>
                         </div>
-                        <div className="d-flex flex-column">
+                        <div className="d-flex flex-column details">
                             <div className="user">{name}</div>
                             <div className="task-info"><b>{translate("common.task") + ":"}</b> &nbsp;{timesheet.task}</div>
                         </div>

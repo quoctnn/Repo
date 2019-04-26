@@ -3,3 +3,11 @@
         padding: 12px;
     }
 }
+.timesheet-list-item{
+    .datetime{
+        flex-grow:1;
+    }
+    .details{
+        flex:6;
+    }
+}

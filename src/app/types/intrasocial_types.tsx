@@ -471,6 +471,7 @@ export type Event = {
     end:string
     location:Coordinate
     address:string
+    parent:Event
 
 } & AvatarAndCover & Linkable & Permissible & IdentifiableObject
 
