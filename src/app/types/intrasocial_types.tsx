@@ -272,7 +272,7 @@ export enum UploadedFileType
     AUDIO = "audio",
 }
 
-export type UploadedFile = 
+export type UploadedFile =
 {
     id:number
     user:number
@@ -406,6 +406,7 @@ export type ICommunity = {
 export type Community = {
     members: number[]
     relationship: any
+    description: string
     updated_at:string
 } & ICommunity & AvatarAndCover & Permissible
 

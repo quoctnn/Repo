@@ -18,6 +18,7 @@ import EventDetailsModule from "./modules/events/EventDetailsModule";
 import TimesheetModule from "./modules/timesheet/TimesheetModule";
 import FilesModule from "./modules/files/FilesModule";
 import CommunitiesModule from "./modules/communities/CommunitiesModule";
+import CommunityDetailsModule from "./modules/communities/CommunityDetailsModule";
 
 type DemoProps = {
     text?:string
@@ -41,6 +42,7 @@ export namespace DashboardComponents {
         "DemoComponent": DemoComponent,
         "NewsfeedModule":NewsfeedModule,
         "CommunitiesModule":CommunitiesModule,
+        "CommunityDetailsModule":CommunityDetailsModule,
         "TaskModule": TasksModule,
         "GroupsModule":GroupsModule,
         "GroupDetailsModule":GroupDetailsModule,
