@@ -43,7 +43,7 @@ export default class CommunityListItem extends React.Component<Props, State> {
         const communityClass = classnames("community-list-item", className)
         const cover = communityCover(community, true)
         return (<IntraSocialLink to={community} type={IntraSocialType.community} {...rest} className={communityClass}>
-                    <div className="drop-shadow">
+                    <div className="drop-shadow hover-card">
                         <SecureImage className="img top" setBearer={true} setAsBackground={true} url={cover}/>
                         <div className="bottom d-flex align-items-center flex-row">
                             <div className="theme-box theme-bg-gradient flex-shrink-0">
