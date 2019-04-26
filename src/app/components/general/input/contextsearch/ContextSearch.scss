@@ -30,11 +30,12 @@
         }
         .list-item.section-title
         {
+            @include var(color, secondary-text-color);
             padding: 2px 6px;
         }
         .list
         {
-            background: white;
+            @include var(background-color, main-content-background);
             box-shadow: 0px 3px 9px 0px rgba(0, 0, 0, 0.35);
             border-radius: 4px;
             margin: 0;
@@ -74,8 +75,8 @@
             .section-list-item-count{
                 margin-left: 6px;
                 padding: 0 3px;
-                background: white;
-                color: black;
+                @include var(background-color, main-content-background);
+                @include var(color, secondary-text-color);
                 border-radius: 4px;
                 line-height: 1.4em;
                 font-size: 12px;
@@ -96,6 +97,7 @@
             }
             .section-list-item.active
             {
+                @include var(background-color, button-hover-background-color);
             }
         }
     }

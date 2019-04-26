@@ -90,8 +90,8 @@ class TasksModule extends React.Component<Props, State> {
                 prevData.category != data.category ||
                 prevData.responsible != data.responsible ||
                 prevData.term != data.term ||
-                prevProps.contextObject && !this.props.contextObject || 
-                !prevProps.contextObject && this.props.contextObject || 
+                prevProps.contextObject && !this.props.contextObject ||
+                !prevProps.contextObject && this.props.contextObject ||
                 prevProps.contextObject && this.props.contextObject && prevProps.contextObject.id != this.props.contextObject.id
     }
     getContextData = () => {
@@ -170,7 +170,7 @@ class TasksModule extends React.Component<Props, State> {
                         const taskClone = {...task}
                         this.updateTimeSpent(taskClone, timesheet.hours, timesheet.minutes)
                         this.updateTaskItem(taskClone)
-                        ToastManager.showInfoToast(translate("task.timesheet.added"))
+                        ToastManager.showInfoToast(translate("task.timesheet.added"), task.title)
                     }
                     completion && completion(success)
                     ToastManager.showErrorToast(error)
@@ -184,7 +184,7 @@ class TasksModule extends React.Component<Props, State> {
                     const success = !!newStatus
                     if(success)
                     {
-                        ToastManager.showInfoToast(translate("task.status.added"))
+                        ToastManager.showInfoToast(translate("task.status.added"), task.title)
                     }
                     completion && completion(success)
                     ToastManager.showErrorToast(error)
@@ -242,11 +242,11 @@ class TasksModule extends React.Component<Props, State> {
         const {breakpoint, className} = this.props
         const cn = classnames("tasks-module", className)
         const menu = <TaskMenu data={this.state.menuData} onUpdate={this.menuDataUpdated}  />
-        return (<SimpleModule {...rest} 
-                    className={cn} 
-                    headerClick={this.headerClick} 
-                    breakpoint={breakpoint} 
-                    isLoading={this.state.isLoading} 
+        return (<SimpleModule {...rest}
+                    className={cn}
+                    headerClick={this.headerClick}
+                    breakpoint={breakpoint}
+                    isLoading={this.state.isLoading}
                     onMenuToggle={this.onMenuToggle}
                     menu={menu}
                     title={translate("task.module.title")}>

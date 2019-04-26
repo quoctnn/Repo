@@ -8,6 +8,7 @@ import { IntraSocialLink } from '../../components/general/IntraSocialLink';
 import ApiClient from '../../network/ApiClient';
 import { Button } from 'reactstrap';
 import { translate } from '../../localization/AutoIntlProvider';
+import { ToastManager } from '../../managers/ToastManager';
 
 type OwnProps = {
     community:Community
@@ -31,7 +32,10 @@ export default class CommunityListItem extends React.Component<Props, State> {
         e.preventDefault()
         e.stopPropagation()
         if (community)
-            ApiClient.setMainCommunity(community.id, () => {})
+            ApiClient.setMainCommunity(community.id, () => {
+                // TODO: Move Toast to eventlistener 'eventstream_community.main'
+                ToastManager.showInfoToast(translate("Main community changed"), community.name)
+            })
     }
     render()
     {
