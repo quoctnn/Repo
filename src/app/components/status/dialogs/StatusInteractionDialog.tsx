@@ -42,7 +42,7 @@ export class StatusInteractionDialog extends React.Component<InteractionDialogPr
                             return (
                                 <ProfileItem key={user.id}
                                                 itemClass="col-6 col-lg-4"
-                                                profile={user} reaction={StatusUtilities.getReaction(this.props.reactions,user)}/>
+                                                profile={user} reaction={StatusUtilities.getReaction(this.props.reactions,user.id)}/>
                             )
                         })
                         }

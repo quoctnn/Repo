@@ -84,16 +84,16 @@ export class StatusUtilities
         let reactors = Object.keys(reactions).map(k => reactions[k]).reduce((ret,val) => ret.concat(val),[])
         return reactors.indexOf(user.id) > -1
     }
-    static getStatusReaction = (status:Status, user:UserProfile) => {
+    static getStatusReaction = (status:Status, userId:number) => {
         let reactions = status.reactions || {}
-        return StatusUtilities.getReaction(reactions, user)
+        return StatusUtilities.getReaction(reactions, userId)
     }
-    static getReaction = (reactions:{[id:string]:number[]}, user:UserProfile) => {
+    static getReaction = (reactions:{[id:string]:number[]}, userId:number) => {
         let keys = Object.keys(reactions)
         for(var i = 0; i < keys.length;i++)
         {
             let users = reactions[keys[i]]
-            if(users.indexOf(user.id) > -1)
+            if(users.indexOf(userId) > -1)
                 return keys[i]
         }
         return null

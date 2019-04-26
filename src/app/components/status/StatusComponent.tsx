@@ -107,7 +107,7 @@ export class StatusComponent extends React.Component<Props, State> {
     }
     renderReactButton = () => {
         if (this.props.status.created_at != null) {
-            const reaction = StatusUtilities.getStatusReaction(this.props.status, AuthenticationManager.getAuthenticatedUser())
+            const reaction = StatusUtilities.getStatusReaction(this.props.status, AuthenticationManager.getAuthenticatedUser().id)
             const action = this.props.status.permission > Permission.read ? this.props.onActionPress : undefined
             return (
                 <ReactButton reaction={reaction}
