@@ -160,8 +160,8 @@ export class NewsfeedComponent extends React.Component<Props, State> {
         ApiClient.getStatus(id, (comment, requestStatus, error) => {
             if(comment)
             {
-                const parent = this.findStatusByStatusId(comment.id)
-                const composerIndex = this.findStatusComposerByStatusId(comment.id)
+                const parent = this.findStatusByStatusId(comment.parent)
+                const composerIndex = this.findStatusComposerByStatusId(comment.parent)
                 if(composerIndex > -1 )
                 {
                     this.insertObject(comment,composerIndex)
