@@ -156,7 +156,7 @@ export default  {
         // Other
         postUrl: '/api/v2/status/',
         postCommentsUrl: (id:number) => {
-            return `/api/v2/status/${id}/`
+            return `/api/v2/status/${id}/children/`
         },
         postUpdateUrl: (id:number|string) => {
             return `/api/v2/status/${id}/`

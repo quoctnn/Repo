@@ -21,6 +21,7 @@ import classnames = require("classnames");
 import { StatusBadgeList, ObjectAttributeTypeExtension } from "./StatusBadgeList";
 import ReactButton from "./ReactButton";
 import { IntraSocialLink } from "../general/IntraSocialLink";
+import { Button } from "reactstrap";
 
 interface OwnProps 
 {
@@ -148,6 +149,9 @@ export class StatusComponent extends React.Component<Props, State> {
             return ProfileManager.getProfiles(mentions)
         return ProfileManager.getProfilesFetchRest(mentions, this.refresh)
     }
+    showCommentBox = () => {
+        this.props.onActionPress(StatusActions.showCommentReply, {id:this.props.status.id})
+    }
     render() {
         const {status, isComment, className, onActionPress, canUpload, authorizedUserId, addLinkToContext} = this.props
         if(this.state.renderPlaceholder)
@@ -160,11 +164,10 @@ export class StatusComponent extends React.Component<Props, State> {
         const truncateLength = this.state.readMoreActive ? 0 : Settings.statusTruncationLength
         const content = getTextContent(status.id.toString(), status.text, mentions, true, onActionPress, truncateLength, Settings.statusLinebreakLimit)
         const {textContent, linkCards, hasMore} = content
-        const cn = classnames("status-component", className, "sid-" + status.id, {comment:isComment})
+        const cn = classnames("status-component", className, "lvl" + (status.level || 0) , "sid-" + status.id, {comment:isComment})
         const avatarSize = isComment ? 40 : 50
         const files = status.files || []
         let communityId = status.community && status.community.id ? status.community.id : null
-        const footerStyles:React.CSSProperties = {justifyContent: isComment ? "space-between" : "space-around"} 
         //console.log("Render Status ", status.id)
         return(<div className={cn}>
                 <div className="d-flex">
@@ -211,16 +214,22 @@ export class StatusComponent extends React.Component<Props, State> {
                     {files.length > 0 && <ContentGallery files={files}/>}
                     {linkCards.length > 0 && linkCards}
                     </div>}
-                    <div className="status-footer d-flex" style={footerStyles}>
+                    <div className="status-footer d-flex">
                         <div className="reaction-wrapper">
                             {this.renderReactButton()}
                             <ReactionStats reactions={this.props.status.reactions}
                                 reactionsCount={this.props.status.reaction_count}/>
                         </div>
-                        {!isComment && 
-                                <div className="comments-count-wrapper">
-                                    <i className="far fa-comment"></i><span className="comment-count">{this.props.status.comments}</span>
-                                </div>
+                        {isComment && 
+                            <div className="comments-reply">
+                                <Button color="link" size="xs" onClick={this.showCommentBox}>
+                                {translate("comment.reply")}
+                                </Button>
+                            </div>
+                            ||
+                            <div className="comments-count-wrapper">
+                                <i className="far fa-comment"></i><span className="comment-count">{this.props.status.comments}</span>
+                            </div>
                         }
                         <StatusOptionsComponent 
                                     status={status} 

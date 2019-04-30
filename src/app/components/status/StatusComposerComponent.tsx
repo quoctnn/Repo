@@ -27,10 +27,14 @@ type OwnProps =
     children?:React.ReactNode
     canPost?:() => boolean
     refresh?:string
+    content?:string
+    mentions?:Mention[]
     onDidType?:(unprocessedText:string) => void
     taggableMembers?:number[] | (() => number[])
     onBlur?(e: React.SyntheticEvent<{}>): void
     onFocus?(e: React.SyntheticEvent<{}>): void
+    focusEnd?:(f:() => void) => void
+    forceUpdate?:string
 }
 type DefaultProps = {
 
@@ -69,6 +73,10 @@ export class StatusComposerComponent extends React.Component<Props, State> {
     }
     shouldComponentUpdate = (nextProps:Props, nextState:State) => {
         const ret = nextState.text != this.state.text ||
+                nextProps.content != this.props.content ||
+                !!nextProps.mentions && !this.props.mentions || 
+                !nextProps.mentions && !!this.props.mentions || 
+                nextProps.mentions && this.props.mentions && !nextProps.mentions.isEqual(this.props.mentions) || 
                 nextState.uploading != this.state.uploading || 
                 nextState.link != this.state.link || 
                 !nextState.mentions.isEqual(this.state.mentions) || 
@@ -273,6 +281,10 @@ export class StatusComposerComponent extends React.Component<Props, State> {
                     onBlur={this.props.onBlur}
                     onFocus={this.props.onFocus}
                     showSubmitButton={this.props.showSubmitButton}
+                    content={this.props.content}
+                    mentions={this.props.mentions}
+                    focusEnd={this.props.focusEnd}
+                    forceUpdate={this.props.forceUpdate}
                     >
                     {this.props.children}
                     </CommentForm>

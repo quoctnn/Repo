@@ -135,6 +135,9 @@ type Props = {
     showEmojiPicker?:boolean
     onBlur?(e: React.SyntheticEvent<{}>): void
     onFocus?(e: React.SyntheticEvent<{}>): void
+    focusEnd?:(f:() => void) => void
+    forceUpdate?:string
+
 }
 type DefaultProps = {
     showSubmitButton:boolean 
@@ -147,13 +150,16 @@ interface State
 }
 export class ChatMessageComposer extends React.Component<Props & DefaultProps,State> implements IEditorComponent {
     
-    private inputRef = React.createRef<any>()
+    private inputRef = React.createRef<MentionEditor>()
     static defaultProps:DefaultProps = {
         showSubmitButton:true
     }
     constructor(props) {
         super(props)
-        this.state = {plainText:"", editorState:EditorState.createWithContent(generateContentState(this.props.content, this.props.mentions))}
+        this.state = {
+            plainText:this.props.content || "", 
+            editorState:EditorState.createWithContent(generateContentState(this.props.content, this.props.mentions))
+        }
         this.handleSubmit = this.handleSubmit.bind(this)
         this.fixFocusInput = this.fixFocusInput.bind(this)
         this.sendDidType = this.sendDidType.bind(this)
@@ -162,13 +168,39 @@ export class ChatMessageComposer extends React.Component<Props & DefaultProps,St
         this.canSubmit = this.canSubmit.bind(this)
         
     }
+    componentDidMount = () => {
+        this.props.focusEnd && this.props.focusEnd(this.focusEnd)
+    }
+    focus = () => {
+        this.inputRef.current.focus()
+    }
+
+    focusEnd = () => {
+        
+        this.setState((prevState) => {
+            const editorState = EditorState.moveFocusToEnd(prevState.editorState)
+            return {editorState: editorState}
+        }, this.inputRef.current.focus)
+    }
     shouldComponentUpdate(nextProps:Props, nextState:State)
     {
-        return nextProps.canSubmit != this.props.canSubmit || 
+        const update = nextProps.canSubmit != this.props.canSubmit || 
                 nextState.editorState != this.state.editorState || 
                 nextProps.content != this.props.content || 
                 nextProps.className != this.props.className ||
-                (nextProps.mentions || []).length != (this.props.mentions || []).length
+                nextProps.forceUpdate != this.props.forceUpdate ||
+                !(nextProps.mentions || []).isEqual(this.props.mentions || [])
+        return update
+    }
+    componentDidUpdate = (prevProps:Props) => {
+        if(this.state.plainText == "" && this.props.forceUpdate != prevProps.forceUpdate && this.props.content && this.props.content.length > 0)
+        {
+            this.setState((prevState) => {
+                const editorState = EditorState.push(prevState.editorState, generateContentState(this.props.content, this.props.mentions), "change-block-data");
+                const text = editorState.getCurrentContent().getPlainText()
+                return {plainText:text, editorState: editorState}
+            }, this.sendDidType)
+        }
     }
     clearEditorContent = () => {
 
@@ -182,7 +214,7 @@ export class ChatMessageComposer extends React.Component<Props & DefaultProps,St
         if (text.length > 0) {
             this.props.onSubmit(text, mentions)
             const editorState = EditorState.push(this.state.editorState, ContentState.createFromText(''), "remove-range");
-            this.setState({plainText: '', editorState:editorState})
+            this.setState({plainText: '', editorState})
             ProtectNavigation(false);
         }
         return false
@@ -193,7 +225,7 @@ export class ChatMessageComposer extends React.Component<Props & DefaultProps,St
     }
     fixFocusInput() {
         // For mobile devices that doesn't show soft keyboard
-        this.inputRef.current.click;
+        //this.inputRef.current.click;
     }
     onChange(state:EditorState)
     {
@@ -233,16 +265,16 @@ export class ChatMessageComposer extends React.Component<Props & DefaultProps,St
                         <div className="input-wrap"
                             onFocus={this.fixFocusInput}>
                             <MentionEditor 
-                            onHandleUploadClick={this.props.onHandleUploadClick} 
-                            filesAdded={this.props.filesAdded} 
-                            mentionSearch={this.props.mentionSearch} 
-                            editorState={this.state.editorState} 
-                            ref={this.inputRef} 
-                            onChange={this.onChange}
-                            placeholder={this.props.placeholder}
-                            showEmojiPicker={this.props.showEmojiPicker}
-                            onBlur={this.props.onBlur}
-                            onFocus={this.props.onFocus}
+                                onHandleUploadClick={this.props.onHandleUploadClick} 
+                                filesAdded={this.props.filesAdded} 
+                                mentionSearch={this.props.mentionSearch} 
+                                editorState={this.state.editorState} 
+                                ref={this.inputRef} 
+                                onChange={this.onChange}
+                                placeholder={this.props.placeholder}
+                                showEmojiPicker={this.props.showEmojiPicker}
+                                onBlur={this.props.onBlur}
+                                onFocus={this.props.onFocus}
                             /> 
                         </div>
                         {this.props.showSubmitButton && 

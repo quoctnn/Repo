@@ -1,5 +1,5 @@
 import * as React from "react";
-import { History} from 'history'
+import { History } from 'history'
 import { Link, withRouter, RouteComponentProps} from 'react-router-dom'
 import Routes from "../../utilities/Routes";
 

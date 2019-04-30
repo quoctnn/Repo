@@ -50,6 +50,7 @@ export class StatusUtilities
         status.pending = true
         status.reaction_count = 0
         status.temporary = true
+        status.level = parent.level + 1
         return status
     }
     static findPrimaryLink(text:string) {

@@ -137,6 +137,7 @@ var translations = {
     "timesheet.module.title":"Timesheet",
     "files.module.title":"Files",
     "communities.module.title":"Communities",
+    "comment.reply":"Reply",
   },
   no: {
     "search.placeholder": "Søk ...",
@@ -276,6 +277,7 @@ var translations = {
     "timesheet.module.title":"Timesheet",
     "files.module.title":"Filer",
     "communities.module.title":"Community",
+    "comment.reply":"Svare",
   },
   en: {
     "search.placeholder": "Search ...",
@@ -422,6 +424,7 @@ var translations = {
     "timesheet.module.title":"Timesheet",
     "files.module.title":"Files",
     "communities.module.title":"Communities",
+    "comment.reply":"Reply",
   }
 };
 

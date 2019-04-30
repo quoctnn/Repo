@@ -74,6 +74,7 @@ export type Status = {
     attributes:SimpleObjectAttribute[]
     temporary:boolean
     visibility?:number[]
+    level?:number
 } & TempStatus & Permissible
 
 export interface FileUpload
@@ -806,5 +807,7 @@ export enum StatusActions
     createAttribute,
     /**deletes an attribute on status; extra:{id:number} */
     deleteAttribute,
+    /**activates reply box for comments; extra:{id:number}, where id = status_id */
+    showCommentReply,
 
 }

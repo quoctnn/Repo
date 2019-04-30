@@ -129,8 +129,10 @@
         }
         .status-content{
             margin-left: 65px;
-            .status-footer{
-            }
+            
         }
+    }
+    .status-footer{
+        justify-content: space-around;    
     }
 }

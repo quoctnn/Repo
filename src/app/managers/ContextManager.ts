@@ -165,6 +165,6 @@ export abstract class ContextManager
     } 
     private static getStore = ():Store<ReduxState,any> =>
     {
-        return window.store 
+        return window.store
     }
 }

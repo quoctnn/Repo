@@ -32,6 +32,8 @@ export interface OwnProps
     children?:React.ReactNode
     onBlur?(e: React.SyntheticEvent<{}>): void
     onFocus?(e: React.SyntheticEvent<{}>): void
+    focusEnd?:(f:() => void) => void
+    forceUpdate?:string
 }
 export interface DefaultProps
 {
@@ -153,6 +155,8 @@ export default class StatusFormBase extends React.Component<Props, State> implem
                 onBlur={this.props.onBlur}
                 onFocus={this.props.onFocus}
                 showSubmitButton={this.props.showSubmitButton}
+                focusEnd={this.props.focusEnd}
+                forceUpdate={this.props.forceUpdate}
             />                      
         )
     }
