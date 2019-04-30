@@ -19,7 +19,8 @@ export enum EventStreamMessageType {
     STATUS_DELETED = "status.deleted",
     STATUS_INTERACTION_UPDATE = "status.interaction.update",
     NOTIFICATION_NEW = "notification.new",
-    SOCKET_STATE_CHANGE = "socket.state.change"
+    SOCKET_STATE_CHANGE = "socket.state.change",
+    COMMUNITY_MAIN = "community.main"
 
 }
 export const eventStreamNotificationPrefix = "eventstream_"
@@ -145,7 +146,7 @@ class ChannelEventStream extends React.Component<Props, State> {
         NotificationCenter.push(eventStreamNotificationPrefix + event.type,[event.data])
     }
     connectStream = () => {
-        
+
         if (this.props.endpoint && (!this.stream || this.stream.readyState == ReconnectingWebSocket.CLOSED || this.stream.readyState == ReconnectingWebSocket.CLOSING) )  {
             console.log('Setting up WebSocket to', this.props.endpoint);
             this.stream = new ReconnectingWebSocket(

@@ -1,11 +1,13 @@
 import {  Store } from 'redux';
 import { AjaxRequest } from '../network/AjaxRequest';
-import { UserProfile, UserStatus } from '../types/intrasocial_types';
+import { UserProfile, UserStatus, ContextNaturalKey } from '../types/intrasocial_types';
 import { sendOnWebsocket, EventStreamMessageType } from '../network/ChannelEventStream';
 import { ReduxState } from '../redux/index';
 import { setAuthenticationProfileAction, setAuthenticationTokenAction } from '../redux/authentication';
 import { NotificationCenter } from '../utilities/NotificationCenter';
 import { ApplicationManager } from './ApplicationManager';
+import { CommunityManager } from './CommunityManager';
+import { ContextManager } from './ContextManager';
 
 export const AuthenticationManagerAuthenticatedUserChangedNotification = "AuthenticationManagerAuthenticatedUserChangedNotification"
 export abstract class AuthenticationManager
@@ -17,6 +19,7 @@ export abstract class AuthenticationManager
     static setup = () =>
     {
         NotificationCenter.addObserver('eventstream_' + EventStreamMessageType.CLIENT_STATUS_CHANGE, AuthenticationManager.processIncomingUserUpdate)
+        NotificationCenter.addObserver('eventstream_' + EventStreamMessageType.COMMUNITY_MAIN, AuthenticationManager.processSwitchedMainCommunity)
     }
     static processIncomingUserUpdate = (...args:any[]) => {
         let status = args[0]['status'] as UserStatus;
@@ -26,6 +29,22 @@ export abstract class AuthenticationManager
         let profile = Object.assign({}, currentProfile)
         profile.user_status = status
         AuthenticationManager.setUpdatedProfileStatus(profile)
+
+    }
+    static processSwitchedMainCommunity = (...args:any[]) => {
+        let community = args[0]['community_id'] as number;
+        const currentProfile = AuthenticationManager.getAuthenticatedUser()
+        if(!currentProfile)
+            return
+        let profile = Object.assign({}, currentProfile)
+        profile.active_community = community
+        AuthenticationManager.setUpdatedProfileStatus(profile)
+        // Refresh the UI
+        CommunityManager.setInitialCommunity(community)
+        if (!ContextManager.getContextObject(window.routerHistory.location.pathname, ContextNaturalKey.COMMUNITY)) {
+            CommunityManager.applyCommunityTheme(CommunityManager.getActiveCommunity())
+        }
+
     }
     static getAuthenticatedUser = () =>
     {

@@ -53,7 +53,7 @@ const PathLoader = (Component: any, extractKey:(path:string) => string) =>
           }
         }
         shouldComponentUpdate = (nextProps:PathLoaderProps, nextState:PathLoaderState) => {
-            return extractKey(nextProps.location.pathname) != extractKey(this.props.location.pathname) || 
+            return extractKey(nextProps.location.pathname) != extractKey(this.props.location.pathname) ||
                     nextState.loading != this.state.loading
         }
         componentDidMount = () => {
@@ -100,6 +100,9 @@ class Main extends React.Component<Props, State> {
     componentWillReceiveProps(nextProps) {
         this.previousLocation = this.props.location;
     }
+    componentWillMount() {
+        window.routerHistory = this.props.history;
+    }
     render() {
         const {profile} = this.props
         const userIsAdmin = isAdmin(profile)
@@ -115,7 +118,7 @@ class Main extends React.Component<Props, State> {
                             }
                             {this.props.loaded &&
                                 <Switch>
-                                    {userIsAdmin && 
+                                    {userIsAdmin &&
                                         <Route path={Routes.ADMIN_DASHBOARD_BUILDER.path} component={DashboardBuilderPage} />
                                     }
                                     <Redirect from={Routes.ELECTRON} to={Routes.ROOT} />
