@@ -1,11 +1,12 @@
 
 import * as ReactIntl from "react-intl";
+import { History} from 'history'
 import { AppWindowObject } from "../managers/WindowManager";
 import { Store } from "redux";
 import { ReduxState } from "../redux";
 declare global {
     interface DocumentTouch {}
-    interface Window { app: AppWindowObject; ReactIntlLocaleData:Array<any>, Intl:any, CSS:CSS, store:Store<ReduxState,any>, DocumentTouch:DocumentTouch}
+    interface Window { app: AppWindowObject; ReactIntlLocaleData:Array<any>, Intl:any, CSS:CSS, store:Store<ReduxState,any>, DocumentTouch:DocumentTouch, routerHistory: History}
     interface Navigator { browserLanguage: string; }
     interface String {
         hashCode(): number;
@@ -13,7 +14,7 @@ declare global {
         isNumber():boolean
         trimLeftCharacters(charlist:string):string;
     }
-    interface Array<T> 
+    interface Array<T>
     {
         move(oldIndex, newIndex) : void
         distinct() : T[]
@@ -23,7 +24,7 @@ declare global {
         toDictionary(indexKey: keyof T):{ [key: string]: T }
         toggleElement(element):void
     }
-    interface Number 
+    interface Number
     {
         mod(val:number):number
         isNumber():boolean
@@ -32,8 +33,8 @@ declare global {
 }
 
 export default class Intl {
-    static getCurrentLocale() 
-    { 
+    static getCurrentLocale()
+    {
         // Get the user set language if available
         if (window.app && window.app.user_locale) {
             if (window.app.user_locale === "no") window.app.user_locale = "nb";
@@ -65,12 +66,12 @@ export default class Intl {
 
         return (navigator.language || navigator.browserLanguage);
     }
-    static getCurrentLocalePrefix() 
-    { 
+    static getCurrentLocalePrefix()
+    {
         return Intl.getCurrentLocale().slice(0, 2);
     }
-    static translate(intl:ReactIntl.InjectedIntl, key:string) 
-    { 
+    static translate(intl:ReactIntl.InjectedIntl, key:string)
+    {
         return intl.formatMessage({id:key, defaultMessage:key})
     }
 }

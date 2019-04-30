@@ -1,13 +1,11 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 
-import { EditorState } from "draft-js";
+import { EditorState } from 'draft-js';
 import Editor from "draft-js-plugins-editor";
 import "draft-js-mention-plugin/lib/plugin.css";
 import "draft-js-emoji-plugin/lib/plugin.css";
-import createMentionPlugin, {
-  defaultSuggestionsFilter
-} from "draft-js-mention-plugin";
+import createMentionPlugin, { defaultSuggestionsFilter } from "draft-js-mention-plugin";
 import createEmojiPlugin from "draft-js-emoji-plugin";
 import emojiPositionSuggestions from "./emojiPositionSuggestion";
 import {defaultTheme} from 'draft-js-emoji-plugin'
@@ -17,7 +15,6 @@ import { Settings } from "../../../utilities/Settings";
 import { SecureImage } from '../SecureImage';
 import { userFullName } from "../../../utilities/Utilities";
 require("./MentionEditor.scss");
-
 
 let theme = {...defaultTheme, emojiSelectPopover:"emojiSelectPopover " + defaultTheme.emojiSelectPopover}
 
@@ -107,6 +104,7 @@ type OwnProps = {
     mentionSearch:(search:string, completion:(mentions:Mention[]) => void) => void
     onHandleUploadClick?:(event) => void
     placeholder?:string
+    keyBindings?:(event) => void
     
 }
 type DefaultProps = {
@@ -320,6 +318,7 @@ export default class MentionEditor extends React.Component<Props, {}> {
                             onBlur={this.props.onBlur}
                             onFocus={this.props.onFocus}
                             placeholder={this.props.placeholder}
+                            keyBindingFn={this.props.keyBindings}
                         />
                         <EmojiSuggestions />
                     </div>

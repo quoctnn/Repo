@@ -19,7 +19,7 @@ $rightcolorstop2: #cb98ce;
         background-image: linear-gradient(to bottom, $rightcolorstop1, $rightcolorstop2);
     }
     .wave {
-        position:fixed; 
+        position:fixed;
         top: 0;
         height: 100%;
         width: 300px;
@@ -27,7 +27,7 @@ $rightcolorstop2: #cb98ce;
         left: calc(50% - 150px);
     }
     .left{
-        position:fixed; 
+        position:fixed;
         left:0;
         right: 50%;
         top:0;
@@ -35,7 +35,7 @@ $rightcolorstop2: #cb98ce;
         background-image: linear-gradient(to bottom, $leftcolorstop1, $leftcolorstop2);
     }
     .right{
-        position:fixed; 
+        position:fixed;
         left:50%;
         right: 0;
         top:0;
@@ -43,6 +43,7 @@ $rightcolorstop2: #cb98ce;
     }
     .logo{
         max-width: 300px;
+        width: 300px;
         margin-bottom: 20px;
         .background{
             fill:white;
@@ -52,7 +53,7 @@ $rightcolorstop2: #cb98ce;
         }
     }
     .splash-content{
-        color:white;  
+        color:white;
         font-weight: 300;
         text-transform: uppercase;
         font-size: 24px;
