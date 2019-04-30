@@ -1,13 +1,11 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 
-import { EditorState } from "draft-js";
+import { EditorState } from 'draft-js';
 import Editor from "draft-js-plugins-editor";
 import "draft-js-mention-plugin/lib/plugin.css";
 import "draft-js-emoji-plugin/lib/plugin.css";
-import createMentionPlugin, {
-  defaultSuggestionsFilter
-} from "draft-js-mention-plugin";
+import createMentionPlugin, { defaultSuggestionsFilter } from "draft-js-mention-plugin";
 import createEmojiPlugin from "draft-js-emoji-plugin";
 import emojiPositionSuggestions from "./emojiPositionSuggestion";
 import {defaultTheme} from 'draft-js-emoji-plugin'
@@ -17,7 +15,6 @@ import { Settings } from "../../../utilities/Settings";
 import { SecureImage } from '../SecureImage';
 import { userFullName } from "../../../utilities/Utilities";
 require("./MentionEditor.scss");
-
 
 let theme = {...defaultTheme, emojiSelectPopover:"emojiSelectPopover " + defaultTheme.emojiSelectPopover}
 
@@ -108,6 +105,7 @@ type OwnProps = {
   mentionSearch:(search:string, completion:(mentions:Mention[]) => void) => void
   onHandleUploadClick?:(event) => void
   placeholder?:string
+  keyBindings?:(event) => void
 }
 type DefaultProps = {
     showEmojiPicker:boolean
@@ -153,7 +151,7 @@ export default class MentionEditor extends React.Component<Props, {}> {
     };
     this.onEmojiButtonMouseUp = this.onEmojiButtonMouseUp.bind(this);
     this.uploadFileChanged = this.uploadFileChanged.bind(this);
-    
+
     this.rootElement = null;
     this.positioningElement = null;
     this.observer = null;
@@ -188,7 +186,7 @@ export default class MentionEditor extends React.Component<Props, {}> {
   onEmojiButtonMouseUp(e) {
     this.toggleEmojiPanel(e)
   }
-  handleRootClick = (e) => 
+  handleRootClick = (e) =>
   {
       this.toggleEmojiPanel(e)
   }
@@ -207,7 +205,7 @@ export default class MentionEditor extends React.Component<Props, {}> {
       this.positioningElement = posEl;
       document.body.appendChild(this.positioningElement);
 
-      
+
       this.addObservers();
       this.updatePositioningElementStyle();
       let windowHeight = window.innerHeight;
@@ -238,7 +236,7 @@ export default class MentionEditor extends React.Component<Props, {}> {
           this.positioningElement.style.width = width + "px"
           this.positioningElement.style.position = "absolute"
       }
-        
+
   }
   removeBackDrop = () => {
     let el = this.rootElement;
@@ -253,7 +251,7 @@ export default class MentionEditor extends React.Component<Props, {}> {
     }
     this.removeObservers();
   }
-  addObservers = () => 
+  addObservers = () =>
   {
       var observer = new MutationObserver(this.observeCallback)
       var config = {childList: true, subtree: true}
@@ -261,7 +259,7 @@ export default class MentionEditor extends React.Component<Props, {}> {
       this.observer = observer
       window.addEventListener("resize", this.observeCallback)
   }
-  removeObservers = () => 
+  removeObservers = () =>
   {
       if(this.observer)
       {
@@ -269,7 +267,7 @@ export default class MentionEditor extends React.Component<Props, {}> {
           this.observer = null
       }
   }
-  observeCallback = (mutations) => 
+  observeCallback = (mutations) =>
   {
       this.updatePositioningElementStyle()
   }
@@ -284,13 +282,13 @@ export default class MentionEditor extends React.Component<Props, {}> {
         this.removeBackDrop();
       }
     })
-    
+
   }
   uploadFileChanged(event)
   {
      let filesList = this.fileUploader.current.files
      let files = []
-     for (var i = 0; i < filesList.length; i++) 
+     for (var i = 0; i < filesList.length; i++)
      {
         let file = filesList.item(i)
         files.push(file)
@@ -322,6 +320,7 @@ export default class MentionEditor extends React.Component<Props, {}> {
                         onBlur={this.props.onBlur}
                         onFocus={this.props.onFocus}
                         placeholder={this.props.placeholder}
+                        keyBindingFn={this.props.keyBindings}
                     />
                     <EmojiSuggestions />
                 </div>
@@ -343,7 +342,7 @@ export default class MentionEditor extends React.Component<Props, {}> {
               </div>
           </div>
         </div>
-          
+
         <MentionSuggestions
               onSearchChange={this.onSearchChange}
               suggestions={this.state.suggestions}

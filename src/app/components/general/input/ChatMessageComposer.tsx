@@ -1,14 +1,17 @@
 
 import * as React from "react";
 import MentionEditor from "../input/MentionEditor";
-import { EditorState, ContentState, SelectionState, Modifier} from "draft-js";
+import { EditorState, ContentState, getDefaultKeyBinding, KeyBindingUtil,  SelectionState, Modifier} from "draft-js";
 import { Mention } from '../input/MentionEditor';
 import { ProtectNavigation, nullOrUndefined } from "../../../utilities/Utilities";
 import "./ChatMessageComposer.scss"
+
+const { hasCommandModifier } = KeyBindingUtil;
+
 export type EditorContent = {text:string, mentions:number[]}
-export interface IEditorComponent 
+export interface IEditorComponent
 {
-    clearEditorContent:() => void 
+    clearEditorContent:() => void
     getContent:() => EditorContent
 }
 interface MentionEntry
@@ -17,7 +20,7 @@ interface MentionEntry
     blockKey: string,
     blockData:{offset:number, length:number},
     entity:Mention,
-    start?:number, 
+    start?:number,
     end?:number
 }
 function getEntities(contentState:ContentState, entityType = null) {
@@ -61,7 +64,7 @@ const getBlocks = (contentState:ContentState) => {
     })
     return blocks
 }
-const generateContentState = (content:string, mentions:Mention[]):ContentState => 
+const generateContentState = (content:string, mentions:Mention[]):ContentState =>
 {
     var contentState = ContentState.createFromText(content || "")
     const selectionsToReplace:{mention:Mention, selectionState:any}[] = [];
@@ -91,7 +94,7 @@ const generateContentState = (content:string, mentions:Mention[]):ContentState =
                 let newLength = ix.mention.name.length
                 let diff = newLength - length
                 if(diff != 0)
-                {   
+                {
                     for(var j = i + 1; j < arr.length; j++) // move following
                     {
                         arr[j].index = arr[j].index + diff
@@ -103,7 +106,7 @@ const generateContentState = (content:string, mentions:Mention[]):ContentState =
                             anchorOffset: ix.index,
                             focusOffset: ix.index + ix.length,
                         });
-            
+
                     selectionsToReplace.push({mention:ix.mention, selectionState:blockSelection})
             }
         })
@@ -137,7 +140,7 @@ type Props = {
     onFocus?(e: React.SyntheticEvent<{}>): void
 }
 type DefaultProps = {
-    showSubmitButton:boolean 
+    showSubmitButton:boolean
 }
 
 interface State
@@ -146,7 +149,7 @@ interface State
     editorState:EditorState
 }
 export class ChatMessageComposer extends React.Component<Props & DefaultProps,State> implements IEditorComponent {
-    
+
     private inputRef = React.createRef<any>()
     static defaultProps:DefaultProps = {
         showSubmitButton:true
@@ -160,13 +163,13 @@ export class ChatMessageComposer extends React.Component<Props & DefaultProps,St
         this.getProcessedText = this.getProcessedText.bind(this)
         this.onChange = this.onChange.bind(this)
         this.canSubmit = this.canSubmit.bind(this)
-        
+
     }
     shouldComponentUpdate(nextProps:Props, nextState:State)
     {
-        return nextProps.canSubmit != this.props.canSubmit || 
-                nextState.editorState != this.state.editorState || 
-                nextProps.content != this.props.content || 
+        return nextProps.canSubmit != this.props.canSubmit ||
+                nextState.editorState != this.state.editorState ||
+                nextProps.content != this.props.content ||
                 nextProps.className != this.props.className ||
                 (nextProps.mentions || []).length != (this.props.mentions || []).length
     }
@@ -187,6 +190,13 @@ export class ChatMessageComposer extends React.Component<Props & DefaultProps,St
         }
         return false
     }
+    keyBindings = (e: any) => {
+        if (e.keyCode === 13 && hasCommandModifier(e)) { // Ctrl(Cmd) + Enter Submits the form
+          return this.handleSubmit(e)
+        }
+        return getDefaultKeyBinding(e);
+      }
+
     sendDidType()
     {
         this.props.onDidType(this.state.plainText)
@@ -232,20 +242,21 @@ export class ChatMessageComposer extends React.Component<Props & DefaultProps,St
                     <div className="input-group">
                         <div className="input-wrap"
                             onFocus={this.fixFocusInput}>
-                            <MentionEditor 
-                            onHandleUploadClick={this.props.onHandleUploadClick} 
-                            filesAdded={this.props.filesAdded} 
-                            mentionSearch={this.props.mentionSearch} 
-                            editorState={this.state.editorState} 
-                            ref={this.inputRef} 
+                            <MentionEditor
+                            onHandleUploadClick={this.props.onHandleUploadClick}
+                            filesAdded={this.props.filesAdded}
+                            mentionSearch={this.props.mentionSearch}
+                            editorState={this.state.editorState}
+                            ref={this.inputRef}
                             onChange={this.onChange}
                             placeholder={this.props.placeholder}
                             showEmojiPicker={this.props.showEmojiPicker}
                             onBlur={this.props.onBlur}
                             onFocus={this.props.onFocus}
-                            /> 
+                            keyBindings={this.keyBindings}
+                            />
                         </div>
-                        {this.props.showSubmitButton && 
+                        {this.props.showSubmitButton &&
                             <div className="button-wrap d-flex flex-column-reverse">
                                 <button disabled={!canSubmit} className="btn btn-submit btn-default align-items-end message-send-button">
                                     <i className="fas fa-location-arrow" />
