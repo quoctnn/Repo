@@ -3,10 +3,6 @@ const path = require('path');
 const url = require('url');
 
 let win;
-function webViewLoadFailed() {
-
-}
-
 function createWindow() {
     win = new BrowserWindow({
         width: 1440,
@@ -26,16 +22,16 @@ function createWindow() {
     }))
 
     // Navigate back to start if page failed to load
-    win.webContents.on('did-fail-load', function() {
-        win.loadURL(url.format({
-            pathname: path.join(__dirname, './electron.html'),
-            protocol: 'file:',
-            slashes: true,
-        }))
-    });
+    // win.webContents.on('did-fail-load', function() {
+    //     win.loadURL(url.format({
+    //         pathname: path.join(__dirname, './electron.html'),
+    //         protocol: 'file:',
+    //         slashes: true,
+    //     }))
+    // });
 
     // Open devtools
-    //win.webContents.openDevTools();
+    win.webContents.openDevTools();
 
     win.on('closed', () => {
         win = null;
@@ -43,8 +39,6 @@ function createWindow() {
 
     require('./menu');
 }
-
-
 
 app.on('ready', createWindow);
 

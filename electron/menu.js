@@ -1,11 +1,23 @@
 const { app, Menu } = require('electron')
 const i18n = new(require('./translations/i18n'))
+const path = require('path');
+const url = require('url');
 
 back = (menuItem, browserWindow, event) => {
   browserWindow.webContents.back;
 }
 
 const template = [
+  {
+    label: i18n.__('Home'),
+    click(menuItem, browserWindow, event) {
+      browserWindow.loadURL(url.format({
+        pathname: path.join(__dirname, './electron.html'),
+        protocol: 'file:',
+        slashes: true,
+      }))
+    }
+},
   {
     label: i18n.__('Edit'),
     submenu: [
@@ -72,7 +84,18 @@ const template = [
 
 if (process.platform === 'darwin') {
   const name = app.getName()
-  template.unshift({
+  template.unshift(
+    {
+      label: i18n.__('Home'),
+      click(menuItem, browserWindow, event) {
+        browserWindow.loadURL(url.format({
+          pathname: path.join(__dirname, './electron.html'),
+          protocol: 'file:',
+          slashes: true,
+        }))
+      }
+    },
+    {
     label: name,
     submenu: [
       {
