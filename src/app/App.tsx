@@ -20,7 +20,6 @@ import { Settings } from "./utilities/Settings";
 import { createStore, applyMiddleware } from "redux";
 import appReducer from "./redux/index";
 import { middleWares } from "./redux/middleware";
-import { applyTheme } from "./redux/theme";
 import initializeManagers from "./managers";
 import ChannelEventStream from "./network/ChannelEventStream";
 import AutoIntlProvider from "./localization/AutoIntlProvider";
@@ -28,6 +27,7 @@ import { BrowserRouter as Router} from "react-router-dom";
 import "./utilities/Extensions"
 import { AuthenticationManager } from "./managers/AuthenticationManager";
 import { activateCrosstabAuthenticationSync } from "./redux/crosstabAuthenticationSync";
+import { ThemeManager } from "./managers/ThemeManager";
 
 
 const store = createStore(appReducer, applyMiddleware(...middleWares));
@@ -43,7 +43,7 @@ const persistor = persistStore(store, {}, () => {
     //rehydrate complete
     if (Settings.supportsTheming) {
         let themeIndex = store.getState().theme.theme || 0;
-        applyTheme(themeIndex);
+        ThemeManager.setTheme(themeIndex)
     }
     console.log("rehydrate complete")
     AuthenticationManager.signInCurrent()

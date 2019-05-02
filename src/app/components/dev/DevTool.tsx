@@ -17,6 +17,7 @@ import { resetProfilesAction } from "../../redux/profileStore";
 import { AuthenticationManager } from "../../managers/AuthenticationManager";
 import { parseJSONObject } from "../../utilities/Utilities";
 import * as websocketInfo from "../../../../docs/Websocket messages.json"
+import { ThemeManager } from "../../managers/ThemeManager";
 
 type ReduxStateProps = {
     language: number;
@@ -30,7 +31,6 @@ type ReduxDispatchProps = {
     setAccessTokenOverride: (accessToken: string) => void;
     sendOnWebsocket: (data: string) => void;
     //disableWebsocket: (state: boolean) => void;
-    setTheme?: (index: number) => void;
     clearDataStore: () => void;
     enablePushNotifications: () => void;
 }
@@ -84,7 +84,7 @@ class DevTool extends React.PureComponent<Props, State> {
                 <a
                     key={index}
                     onClick={() => {
-                    this.props.setTheme(index);
+                        ThemeManager.setTheme(index)
                     }}
                     className="dropdown-item"
                     href="#"
@@ -404,9 +404,6 @@ const mapDispatchToProps = dispatch => {
     return {
         setLanguage:(index:number) => {
             dispatch(setLanguageAction(index));
-        },
-        setTheme:(index:number) => {
-            dispatch(setThemeAction(index));
         },
         setApiEndpoint: (index:number) => {
             

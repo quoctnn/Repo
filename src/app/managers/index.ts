@@ -12,6 +12,7 @@ import { ContextManager } from './ContextManager';
 import { PermissionManager } from './PermissionManager';
 import { ApplicationManager } from './ApplicationManager';
 import { WindowAppManager } from './WindowManager';
+import { ThemeManager } from './ThemeManager';
 const initializeManagers = () => 
 {
     ApplicationManager.setup()
@@ -28,5 +29,6 @@ const initializeManagers = () =>
     ContextManager.setup()
     PermissionManager.setup()
     WindowAppManager.setup()
+    ThemeManager.setup()
 }
 export default initializeManagers

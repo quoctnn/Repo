@@ -22,8 +22,6 @@ export type AppWindowObject = {
     sendOutgoingOnSocket:(data:object) => void
     sendInboundOnSocket:(data:{type:string, data:any}) => void
     clear:() => void
-    setTheme:(index:number) => void
-    getTheme:() => number
 }
 export abstract class WindowAppManager
 {
@@ -36,8 +34,6 @@ export abstract class WindowAppManager
             sendOutgoingOnSocket:WindowAppManager.sendOutgoingOnSocket,
             sendInboundOnSocket:WindowAppManager.sendInboundOnSocket,
             clear:WindowAppManager.clear,
-            setTheme:WindowAppManager.setTheme,
-            getTheme:WindowAppManager.getTheme,
         }
     }
     static resetEventStore = () => {
@@ -62,13 +58,6 @@ export abstract class WindowAppManager
     }
     static sendOutgoingOnSocket = (data:object) => {
         sendOnWebsocket(JSON.stringify(data))
-    }
-    static setTheme = (index:number) => {
-        const dispatch =  WindowAppManager.getStore().dispatch
-        dispatch(setThemeAction(index));
-    }
-    static getTheme = () => {
-        return WindowAppManager.getStore().getState().theme.theme
     }
     static sendInboundOnSocket = (data:{type:string, data:any}) => {
         if(!data || !data.type)
