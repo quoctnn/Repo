@@ -6,7 +6,6 @@ const url = require('url');
 back = (menuItem, browserWindow, event) => {
   browserWindow.webContents.back;
 }
-
 const template = [
   {
     label: i18n.__('Home'),

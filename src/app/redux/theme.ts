@@ -1,4 +1,5 @@
 import { ReduxState } from './index';
+import { ThemeManager } from '../managers/ThemeManager';
 export enum ThemeActionTypes {
     SetTheme = 'theme.set_theme',
 }
@@ -30,18 +31,11 @@ export const theme = (state = INITIAL_STATE, action:SetThemeAction) => {
       return state;
   }
 }
-export const applyTheme = (themeIndex: number) => {
-    let theme = availableThemes[themeIndex];
-    let selector = theme.selector;
-    let root = document.querySelector(':root');
-    if(root)
-        root.className = selector;
-}
 export const themeSwitcherMiddleware = store => next => (action:SetThemeAction) => {
     let result = next(action);
     if (action.type === ThemeActionTypes.SetTheme) {
         let state = store.getState() as ReduxState
-        applyTheme(state.theme.theme)
+        ThemeManager.applyTheme(state.theme.theme)
     }
     return result;
 }

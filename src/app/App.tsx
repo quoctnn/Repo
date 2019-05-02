@@ -20,7 +20,7 @@ import { Settings } from "./utilities/Settings";
 import { createStore, applyMiddleware } from "redux";
 import appReducer from "./redux/index";
 import { middleWares } from "./redux/middleware";
-import { applyTheme } from "./redux/theme";
+import { applyTheme, availableThemes } from './redux/theme';
 import initializeManagers from "./managers";
 import ChannelEventStream from "./network/ChannelEventStream";
 import AutoIntlProvider from "./localization/AutoIntlProvider";
