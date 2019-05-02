@@ -26,6 +26,7 @@ import { ContextManager } from "./managers/ContextManager";
 import DevTool from "./components/dev/DevTool";
 import LoadingSpinner from "./components/LoadingSpinner";
 import { CommunityManager } from "./managers/CommunityManager";
+import ConversationsPage from "./components/pages/ConversationsPage";
 
 type OwnProps = {
 }
@@ -84,6 +85,7 @@ const PathLoadedGroupPage = PathLoader(GroupPage, (path) => { return path})
 const PathLoadedProjectPage = PathLoader(ProjectPage, (path) => { return path})
 const PathLoadedEventPage = PathLoader(EventPage, (path) => { return path})
 const PathLoadedTaskPage = PathLoader(TaskPage, (path) => { return path})
+const PathLoadedConversationsPage = PathLoader(ConversationsPage, (path) => { return path})
 const PathLoadedDashboardPage = PathLoader(DashboardPage, (path) => { return path})
 
 type Props = ReduxStateProps & ReduxDispatchProps & OwnProps & RouteComponentProps<any>
@@ -133,6 +135,7 @@ class Main extends React.Component<Props, State> {
                                     <Route path={Routes.SIGNIN} component={Signin} />
                                     <Route path={Routes.SIGNOUT} component={Signout} />
                                     <Route path={Routes.ROOT} exact={true} component={PathLoadedDashboardPage} />
+                                    <Route path={Routes.CONVERSATIONS} exact={true} component={PathLoadedConversationsPage} />
                                     <Route path={Routes.ELECTRON} component={PathLoadedDashboardPage} />
                                     <Route path={Routes.ANY} component={Error404} />
                                 </Switch>

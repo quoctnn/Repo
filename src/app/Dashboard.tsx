@@ -78,7 +78,7 @@ export default class DashboardComponent extends React.Component<Props, State> {
     {
         super(props)
         const grid = {...this.findGridLayout(0, false), id:-1, min_width:ResponsiveBreakpoint.standard}
-        grid.grid_modules = grid.grid_modules.map(m => {return {...m, module:{...m.module}}})
+        grid.grid_modules = (grid.grid_modules || []).map(m => {return {...m, module:{...m.module}}})
         let rowStart = 1
         grid.grid_modules.forEach(m => {
             m.column = 1
