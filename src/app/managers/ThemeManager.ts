@@ -10,9 +10,9 @@ export abstract class ThemeManager
     static setTheme = (index:number) => {
         const dispatch =  ThemeManager.getStore().dispatch
         dispatch(setThemeAction(index))
+        ThemeManager.applyTheme(index)
     }
-    // normally called after theme has changed in redux
-    static applyTheme = (themeIndex: number) => {
+    private static applyTheme = (themeIndex: number) => {
         let theme = availableThemes[themeIndex];
         let selector = theme.selector;
         let root = document.querySelector(':root');

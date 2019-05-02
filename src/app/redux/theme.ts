@@ -31,11 +31,3 @@ export const theme = (state = INITIAL_STATE, action:SetThemeAction) => {
       return state;
   }
 }
-export const themeSwitcherMiddleware = store => next => (action:SetThemeAction) => {
-    let result = next(action);
-    if (action.type === ThemeActionTypes.SetTheme) {
-        let state = store.getState() as ReduxState
-        ThemeManager.applyTheme(state.theme.theme)
-    }
-    return result;
-}
