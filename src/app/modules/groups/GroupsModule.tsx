@@ -110,7 +110,7 @@ class GroupsModule extends React.Component<Props, State> {
                     isLoading={this.state.isLoading} 
                     onMenuToggle={this.onMenuToggle}
                     menu={menu}
-                    title={translate("groups.module.title")}>
+                    headerTitle={translate("groups.module.title")}>
                 {this.renderContent()}
                 </SimpleModule>)
     }

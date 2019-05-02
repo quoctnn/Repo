@@ -106,7 +106,7 @@ class LocationModule extends React.Component<Props, State> {
                     headerClick={this.headerClick} 
                     breakpoint={breakpoint} 
                     isLoading={this.state.isLoading} 
-                    title={translate("location.module.title")}>
+                    headerTitle={translate("location.module.title")}>
                 {this.renderContent()}
                 </SimpleModule>)
     }

@@ -99,7 +99,7 @@ class CommunitiesModule extends React.Component<Props, State> {
                     isLoading={this.state.isLoading}
                     onMenuToggle={this.onMenuToggle}
                     menu={menu}
-                    title={translate("communities.module.title")}>
+                    headerTitle={translate("communities.module.title")}>
                 {this.renderContent()}
                 </SimpleModule>)
     }

@@ -8,15 +8,15 @@ import TaskMenu, { TasksMenuData } from './TasksMenu';
 import { ContextNaturalKey, TaskActions, Task, Permissible, IdentifiableObject, Project } from '../../types/intrasocial_types';
 import { ReduxState } from '../../redux';
 import { connect } from 'react-redux';
-import { ProjectManager } from '../../managers/ProjectManager';
 import ListComponent from '../../components/general/ListComponent';
 import ApiClient, { PaginationResult } from '../../network/ApiClient';
 import { ToastManager } from '../../managers/ToastManager';
 import TaskListItem from './TaskListItem';
 import { StatusUtilities } from '../../utilities/StatusUtilities';
-import LoadingSpinner from '../../components/LoadingSpinner';
 import SimpleModule from '../SimpleModule';
-import { ResolvedContextObject, ContextManager } from '../../managers/ContextManager';
+import { ContextManager } from '../../managers/ContextManager';
+import { ButtonGroup, Button } from 'reactstrap';
+import { AuthenticationManager } from '../../managers/AuthenticationManager';
 
 type OwnProps = {
     className?:string
@@ -229,6 +229,7 @@ class TasksModule extends React.Component<Props, State> {
     onMenuToggle = (visible:boolean) => {
         console.log("menu open", visible)
         const newState:Partial<State> = {}
+        newState.menuVisible = visible
         if(!visible && this.tempMenuData) // update menudata
         {
             newState.menuData = this.tempMenuData
@@ -236,12 +237,43 @@ class TasksModule extends React.Component<Props, State> {
         }
         this.setState(newState as State)
     }
+    toggleAssignedTo = () => {
+        const md = {...this.state.menuData}
+        md.assignedTo = !!md.assignedTo ? undefined : AuthenticationManager.getAuthenticatedUser().id
+        this.setState({menuData:md})
+    }
+    toggleResponsible = () => {
+        const md = {...this.state.menuData}
+        md.responsible = !!md.responsible ? undefined : AuthenticationManager.getAuthenticatedUser().id
+        this.setState({menuData:md})
+    }
+    toggleCreator = () => {
+        const md = {...this.state.menuData}
+        md.creator = !!md.creator ? undefined : AuthenticationManager.getAuthenticatedUser().id
+        this.setState({menuData:md})
+    }
+    renderFilters = () => {
+        if(this.state.menuVisible)
+            return null
+        return (<ButtonGroup className="header-filter-group">
+                    <Button size="xs" active={!!this.state.menuData.assignedTo} onClick={this.toggleAssignedTo} color="light">
+                        <span>A</span>{/* <i className="fas fa-calendar-check"></i>*/} 
+                    </Button>
+                    <Button size="xs" active={!!this.state.menuData.responsible} onClick={this.toggleResponsible} color="light">
+                        <span>R</span>{/* <i className="fas fa-user-check"></i>*/} 
+                    </Button>
+                    <Button size="xs" active={!!this.state.menuData.creator} onClick={this.toggleCreator} color="light">
+                        <span>C</span>{/* <i className="fas fa-user-check"></i>*/} 
+                    </Button>
+                </ButtonGroup>)
+    }
     render()
     {
         const {history, match, location, staticContext, contextNaturalKey, contextObject, ...rest} = this.props
         const {breakpoint, className} = this.props
         const cn = classnames("tasks-module", className)
         const menu = <TaskMenu data={this.state.menuData} onUpdate={this.menuDataUpdated}  />
+        const headerContent = this.renderFilters()
         return (<SimpleModule {...rest}
                     className={cn}
                     headerClick={this.headerClick}
@@ -249,7 +281,8 @@ class TasksModule extends React.Component<Props, State> {
                     isLoading={this.state.isLoading}
                     onMenuToggle={this.onMenuToggle}
                     menu={menu}
-                    title={translate("task.module.title")}>
+                    headerContent={headerContent}
+                    headerTitle={translate("task.module.title")}>
                 {this.renderContent()}
                 </SimpleModule>)
     }

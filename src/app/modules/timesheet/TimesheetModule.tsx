@@ -94,7 +94,7 @@ class TimesheetModule extends React.Component<Props, State> {
                     headerClick={this.headerClick} 
                     breakpoint={breakpoint} 
                     isLoading={this.state.isLoading} 
-                    title={translate("timesheet.module.title")}>
+                    headerTitle={translate("timesheet.module.title")}>
                 {this.renderContent(contextObject)}
                 </SimpleModule>)
     }

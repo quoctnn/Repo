@@ -107,7 +107,7 @@ class EventsModule extends React.Component<Props, State> {
                     isLoading={this.state.isLoading} 
                     onMenuToggle={this.onMenuToggle}
                     menu={menu}
-                    title={translate("events.module.title")}>
+                    headerTitle={translate("events.module.title")}>
                 {this.renderContent()}
                 </SimpleModule>)
     }

@@ -15,7 +15,8 @@ type Props = {
     menu?:JSX.Element
     children:JSX.Element | JSX.Element[]
     onMenuToggle?:(visible:boolean) => void
-    title?:string
+    headerTitle?:string | JSX.Element
+    headerContent?: React.ReactNode
     headerClick?:(event:React.SyntheticEvent<any>) => void
     isLoading:boolean
 }
@@ -41,12 +42,13 @@ export default class SimpleModule extends React.Component<Props, State> {
     }
     render()
     {
-        const {breakpoint, className, contextNaturalKey,children, menu, onMenuToggle: onMenuVisibilityChanged, title, isLoading,  headerClick,  ...rest} = this.props
+        const {breakpoint, className, contextNaturalKey,children, menu, onMenuToggle: onMenuVisibilityChanged, headerTitle: title, isLoading,  headerClick,  ...rest} = this.props
         const cn = classnames("simple-module", className, {"menu-visible":this.state.menuVisible})
         const headClick = breakpoint < ResponsiveBreakpoint.standard ? headerClick : undefined
         const headerClass = classnames({link:headClick})
         return (<Module {...rest} className={cn}>
                     <ModuleHeader className={headerClass} onClick={headClick} loading={isLoading} headerTitle={title}>
+                        {this.props.headerContent}
                         {menu && <ModuleMenuTrigger onClick={this.toggleMenuClick} />}
                     </ModuleHeader>
                     {breakpoint >= ResponsiveBreakpoint.standard && //do not render for small screens

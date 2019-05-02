@@ -87,7 +87,7 @@ class FilesModule extends React.Component<Props, State> {
                     headerClick={this.headerClick} 
                     breakpoint={breakpoint} 
                     isLoading={this.state.isLoading} 
-                    title={translate("files.module.title")}>
+                    headerTitle={translate("files.module.title")}>
                 {this.renderContent(contextObject)}
                 </SimpleModule>)
     }

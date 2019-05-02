@@ -106,7 +106,7 @@ class ProjectsModule extends React.Component<Props, State> {
                     isLoading={this.state.isLoading} 
                     onMenuToggle={this.onMenuToggle}
                     menu={menu}
-                    title={translate("projects.module.title")}>
+                    headerTitle={translate("projects.module.title")}>
                 {this.renderContent()}
                 </SimpleModule>)
     }
