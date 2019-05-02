@@ -62,6 +62,7 @@ const template = [
   },
   {
     label: i18n.__('View'),
+    id: 'view.menu',
     submenu: [
       {
         role: 'resetzoom', label: i18n.__('Actual size')
