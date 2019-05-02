@@ -23,7 +23,7 @@ export class DetailsMembers extends React.Component<Props, State> {
     }
     render()
     {
-        const members = this.props.members.length > 0 ? this.props.members : null
+        const members = this.props.members && this.props.members.length > 0 ? this.props.members : null
         return (
             <div className="details-module">
                 { members &&

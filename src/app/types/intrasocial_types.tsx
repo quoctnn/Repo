@@ -462,9 +462,12 @@ export type Event = {
     description: string
     creator: UserProfile
     privacy: string
-    attendees_count: number
     attending: number[]
+    attending_count: number
     not_attending: number[]
+    not_attending_count: number
+    invited: number[]
+    invited_count: number
     created_at: string
     group: Group
     updated_at: string
