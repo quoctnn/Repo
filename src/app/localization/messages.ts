@@ -141,6 +141,7 @@ var translations = {
     "files.module.title":"Files",
     "communities.module.title":"Communities",
     "comment.reply":"Reply",
+    "conversations.module.title":"Conversations",
   },
   no: {
     "search.placeholder": "Søk ...",
@@ -284,6 +285,7 @@ var translations = {
     "files.module.title":"Filer",
     "communities.module.title":"Community",
     "comment.reply":"Svare",
+    "conversations.module.title":"Samtaler",
   },
   en: {
     "search.placeholder": "Search ...",
@@ -434,6 +436,7 @@ var translations = {
     "files.module.title":"Files",
     "communities.module.title":"Communities",
     "comment.reply":"Reply",
+    "conversations.module.title":"Conversations",
   }
 };
 
