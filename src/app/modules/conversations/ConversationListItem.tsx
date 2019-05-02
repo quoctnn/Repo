@@ -27,7 +27,7 @@ export default class ConversationListItem extends React.Component<Props, State> 
     {
         const {conversation, className, children, ...rest} = this.props
         const cl = classnames("conversation-list-item", className)
-        return (<Link to={conversation.uri} {...rest} className={cl}>
+        return (<Link to={conversation.uri || "#"} {...rest} className={cl}>
                     {getConversationTitle( conversation, AuthenticationManager.getAuthenticatedUser().id)}
                 </Link>)
     }
