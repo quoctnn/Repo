@@ -169,7 +169,6 @@ export class ChatMessageComposer extends React.Component<Props & DefaultProps,St
         this.getProcessedText = this.getProcessedText.bind(this)
         this.onChange = this.onChange.bind(this)
         this.canSubmit = this.canSubmit.bind(this)
-
     }
     componentDidMount = () => {
         this.props.focusEnd && this.props.focusEnd(this.focusEnd)

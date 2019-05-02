@@ -32,7 +32,7 @@ class DemoComponent extends React.Component<DemoProps, {}> {
     render = () => {
         const {text, ...rest} = this.props
         return <Module {...rest}>
-                <ModuleHeader title={"Header"}></ModuleHeader>
+                <ModuleHeader headerTitle={"Header"}></ModuleHeader>
                 <ModuleContent>{this.props.text || "Test"}</ModuleContent>
                 </Module>
     }

@@ -15,6 +15,7 @@ type Props =
     filter:ObjectAttributeType
     onUpdate:(data:NewsfeedMenuData) => void
     availableFilters:ObjectAttributeType[]
+    disableContextSearch?:boolean
 }
 type State = {
     includeSubContext:boolean
@@ -190,18 +191,20 @@ export default class NewsfeedMenu extends React.Component<Props, State> {
                                 </Button>)
                     })}
                 </ButtonGroup>
-                <FormGroup>
-                    <Label>{translate("FeedContext")}</Label>
-                    <ContextSearch
-                        onAutocompleteToggle={this.onAutocompleteToggle}
-                        searchData={this.props.selectedSearchContext}
-                        allowedSearchOptions={allowedSearchOptions}
-                        ref={this.contextSearch}
-                        onSearchDataChanged={this.onSearchDataChanged}
-                        placeholder="Search..."
-                        sections={this.state.sections}
-                        />
-                </FormGroup>
+                {!this.props.disableContextSearch && 
+                    <FormGroup>
+                        <Label>{translate("FeedContext")}</Label>
+                        <ContextSearch
+                            onAutocompleteToggle={this.onAutocompleteToggle}
+                            searchData={this.props.selectedSearchContext}
+                            allowedSearchOptions={allowedSearchOptions}
+                            ref={this.contextSearch}
+                            onSearchDataChanged={this.onSearchDataChanged}
+                            placeholder="Search..."
+                            sections={this.state.sections}
+                            />
+                    </FormGroup>
+                }
                 <FormGroup check={true}>
                     <Label check={true}>
                         <Input type="checkbox" onChange={this.includeSubContextChanged} checked={this.state.includeSubContext} />{" " + translate("IncludeSubContext")}

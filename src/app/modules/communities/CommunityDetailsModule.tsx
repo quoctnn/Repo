@@ -69,7 +69,7 @@ class GroupDetailsModule extends React.Component<Props, State> {
     {
         const {breakpoint, history, match, location, staticContext, community, contextNaturalKey, ...rest} = this.props
         return (<Module {...rest}>
-                    <ModuleHeader title={community && community.name || translate("detail.module.title")} loading={this.state.isLoading}>
+                    <ModuleHeader headerTitle={community && community.name || translate("detail.module.title")} loading={this.state.isLoading}>
                         <ModuleMenuTrigger onClick={this.menuItemClick} />
                     </ModuleHeader>
                     {breakpoint >= ResponsiveBreakpoint.standard && //do not render for small screens

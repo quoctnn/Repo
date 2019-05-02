@@ -46,7 +46,7 @@ export default class SimpleModule extends React.Component<Props, State> {
         const headClick = breakpoint < ResponsiveBreakpoint.standard ? headerClick : undefined
         const headerClass = classnames({link:headClick})
         return (<Module {...rest} className={cn}>
-                    <ModuleHeader className={headerClass} onClick={headClick} loading={isLoading} title={title}>
+                    <ModuleHeader className={headerClass} onClick={headClick} loading={isLoading} headerTitle={title}>
                         {menu && <ModuleMenuTrigger onClick={this.toggleMenuClick} />}
                     </ModuleHeader>
                     {breakpoint >= ResponsiveBreakpoint.standard && //do not render for small screens

@@ -4,7 +4,7 @@ import CircularLoadingSpinner from "../components/general/CircularLoadingSpinner
 
 export type Props =
 {
-    title?:string
+    headerTitle?:string|JSX.Element
     loading?:boolean
 }
 
@@ -15,13 +15,13 @@ export default class ModuleHeader extends React.Component<Props & React.HTMLAttr
         }
     }
     render() {
-        const {className, title, loading, children, ...rest} = this.props
+        const {className, headerTitle, loading, children, ...rest} = this.props
         const cn = classnames("module-header", className)
         return(
             <div {...rest} className={cn}>
                     <div className="flex-grow-1 text-truncate d-flex align-items-center">
-                    {title &&
-                        <div className="text-truncate module-header-title-left">{title}</div>
+                    {headerTitle &&
+                        <div className="text-truncate module-header-title-left">{headerTitle}</div>
                     }
                     {this.renderLoading()}
                     <div className="spacer flex-grow-1 flex-shrink-1"></div>

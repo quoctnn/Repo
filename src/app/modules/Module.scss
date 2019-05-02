@@ -12,12 +12,12 @@ $headerHeight:40px;
         padding: 0.5em 0.7em;
         flex-shrink: 0;
         font-size: 25px;
+        position: relative;
         .circular-spinner{
             margin: 0 5px;
         }
         .module-menu-trigger
         {
-            min-width: 30px;
             text-align: center;
             visibility: hidden;
             cursor: pointer;

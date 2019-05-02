@@ -17,13 +17,9 @@ import { ObjectAttributeType, ContextNaturalKey, StatusActions, Permission, Perm
 import { ButtonGroup, Button } from 'reactstrap';
 import { ContextSearchData } from '../../components/general/input/contextsearch/extensions';
 import { translate } from '../../localization/AutoIntlProvider';
-import ApiClient from '../../network/ApiClient';
-import { ToastManager } from '../../managers/ToastManager';
-import { convertElasticResultItem, ContextValue } from '../../components/general/input/ContextFilter';
 import { ReduxState } from '../../redux';
 import { StatusComposerComponent } from '../../components/status/StatusComposerComponent';
 import { ContextManager } from '../../managers/ContextManager';
-import { string } from 'prop-types';
 
 type OwnProps = {
     className?:string
@@ -53,8 +49,7 @@ interface State
 
     contextNaturalKey:ContextNaturalKey,
     contextObjectId:number
-    contextTitle:string
-    contextResolveError:string
+    contextTitle?:string
 
     statusComposerFocus:boolean
 }
@@ -78,11 +73,12 @@ class NewsfeedModule extends React.Component<Props, State> {
             isLoading:false,
             contextNaturalKey:undefined,
             contextObjectId:undefined,
-            contextTitle:undefined,
-            contextResolveError:undefined,
             statusComposerFocus:false
         }
         console.log("NewsfeedModule props", this.props)
+    }
+    componentDidMount = () => {
+
     }
     componentDidUpdate = (prevProps:Props) => {
         //turn off loading spinner if feed is removed
@@ -99,8 +95,6 @@ class NewsfeedModule extends React.Component<Props, State> {
                 //state
                 nextState.contextNaturalKey != this.state.contextNaturalKey ||
                 nextState.contextObjectId != this.state.contextObjectId ||
-                nextState.contextTitle != this.state.contextTitle ||
-                nextState.contextResolveError != this.state.contextResolveError ||
                 nextState.isLoading != this.state.isLoading ||
                 nextState.filter != this.state.filter ||
                 nextState.includeSubContext != this.state.includeSubContext ||
@@ -125,33 +119,9 @@ class NewsfeedModule extends React.Component<Props, State> {
             const contextObject = this.tempMenuData.selectedSearchContext.contextObject(allowedSearchOptions)
             this.tempMenuData = null
 
-            newState.contextObjectId = undefined
-            newState.contextTitle = undefined
+            newState.contextObjectId = contextObject && contextObject.id
             newState.contextNaturalKey = contextObject && contextObject.contextNaturalKey
-
-            if(contextObject)
-            {
-                console.log("selectedSearchContext", contextObject)
-                if(contextObject.id && contextObject.id > 0)
-                {
-                    newState.contextNaturalKey = contextObject.contextNaturalKey
-                    newState.contextObjectId = contextObject.id
-                    newState.contextTitle = contextObject.value
-                }
-                else {
-                    //resolve if contextObject is incomplete
-                    const term = contextObject.value.isNumber() ? "django_id:" + contextObject.value : "slug:"+ contextObject.value.trimLeftCharacters("@")
-                    ApiClient.search(1, 0, term, [ContextNaturalKey.elasticTypeForKey(contextObject.contextNaturalKey)],false, true,false,true,{}, [], (data, status, error) => {
-                        let resolvedData:ContextValue = null
-                        if(data && data.results && data.results.length > 0)
-                        {
-                            resolvedData = convertElasticResultItem( data.results[0] )
-                        }
-                        this.setState({contextNaturalKey:contextObject.contextNaturalKey, contextObjectId:resolvedData && resolvedData.id, contextTitle:resolvedData && resolvedData.label, contextResolveError:!resolvedData ? error || "Error": undefined})
-                        ToastManager.showErrorToast(error)
-                    })
-                }
-            }
+            newState.contextTitle = contextObject && contextObject.value
         }
         this.setState(newState as State)
     }
@@ -185,23 +155,55 @@ class NewsfeedModule extends React.Component<Props, State> {
     onStatusComposerFocus = (e: React.SyntheticEvent<{}>) => {
         this.setState({statusComposerFocus:true})
     }
+    renderStatusComposer = (resolvedContextNaturalKey:ContextNaturalKey, resolvedContextObjectId:number) => {
+
+        const {contextObject} = this.props
+        const canPost = (contextObject && contextObject.permission >= Permission.post) || false
+        if(canPost)
+        {
+            return (<>
+                <div className="status-composer-backdrop" onMouseDown={this.blurStatusComposer}></div>
+                <div ref={this.statuscomposer} className="feed-composer-container main-content-background">
+                    <StatusComposerComponent
+                        canUpload={true}
+                        canMention={true}
+                        canComment={true}
+                        onActionPress={this.onAddStatusActionPress}
+                        contextNaturalKey={resolvedContextNaturalKey}
+                        contextObjectId={resolvedContextObjectId}
+                        placeholder={translate("newsfeed.module.addstatus.placeholder")}
+                        communityId={-1}
+                        renderPlaceholder={false}
+                        onFocus={this.onStatusComposerFocus}
+                        showEmojiPicker={this.state.statusComposerFocus}
+                        showSubmitButton={this.state.statusComposerFocus}
+                        //taggableMembers={task.visibility}
+                    />
+                </div>
+            </>)
+        }
+        return null
+    }
     render()
     {
         const {breakpoint, history, match, location, staticContext, className, contextNaturalKey, contextObjectId, contextObject, includeSubContext, ...rest} = this.props
-        const cn = classnames("newsfeed-module", className, {"menu-visible":this.state.menuVisible, "status-composer-focus":this.state.statusComposerFocus})
         const headerClick = breakpoint < ResponsiveBreakpoint.standard ? this.headerClick : undefined
-        const {contextTitle}  = this.state
+        const {contextTitle} = this.state
         const resolvedContextNaturalKey = this.state.contextNaturalKey || this.props.contextNaturalKey
         const resolvedContextObjectId =  this.state.contextObjectId || this.props.contextObjectId
-        const title = contextTitle ? contextTitle + " - " + translate("Feed") : translate("Newsfeed")
-        const headerClass = classnames({link:headerClick})
         const filter = this.state.filter
         const r = {wrappedComponentRef:(c) => this.newsfeedComponent = c}
-        const canPost = (contextObject && contextObject.permission >= Permission.post) || false
+        const disableContextSearch = !!contextNaturalKey && !!contextObjectId
+        const showComposer = !!this.props.contextNaturalKey && !!this.props.contextObjectId
+        const composer = showComposer ? this.renderStatusComposer(resolvedContextNaturalKey, resolvedContextObjectId) : undefined
+        const hasComposer = !!composer
+        const cn = classnames("newsfeed-module", className, {"menu-visible":this.state.menuVisible, "status-composer-focus":this.state.statusComposerFocus, "has-status-composer":hasComposer })
+        const headerClass = classnames({link:headerClick})
+        const title = composer || contextTitle || translate("Newsfeed")
         return (<Module {...rest} className={cn}>
-                    <ModuleHeader title={title} loading={this.state.isLoading} className={headerClass} onClick={headerClick}>
+                    <ModuleHeader headerTitle={title} loading={this.state.isLoading} className={headerClass} onClick={headerClick}>
                         {!this.state.menuVisible &&
-                            <ButtonGroup>
+                            <ButtonGroup className="header-filter-group">
                                 {this.availableFilters.map(f => {
                                     return (<Button size="xs" key={f} active={filter == f} onClick={this.filterButtonChanged(f)} color="light">
                                                 <i className={ObjectAttributeType.iconForType(f)}></i>
@@ -214,26 +216,6 @@ class NewsfeedModule extends React.Component<Props, State> {
                     {breakpoint >= ResponsiveBreakpoint.standard && //do not render for small screens
                         <>
                             <ModuleContent>
-                            {canPost &&
-                                <>
-                                <div className="status-composer-backdrop" onMouseDown={this.blurStatusComposer}></div>
-                                <div ref={this.statuscomposer} className="feed-composer-container main-content-background">
-                                    <StatusComposerComponent
-                                        canUpload={true}
-                                        canMention={true}
-                                        canComment={true}
-                                        onActionPress={this.onAddStatusActionPress}
-                                        contextNaturalKey={resolvedContextNaturalKey}
-                                        contextObjectId={resolvedContextObjectId}
-                                        placeholder={translate("newsfeed.module.addstatus.placeholder")}
-                                        communityId={-1}
-                                        renderPlaceholder={false}
-                                        onFocus={this.onStatusComposerFocus}
-                                        showEmojiPicker={this.state.statusComposerFocus}
-                                        showSubmitButton={this.state.statusComposerFocus}
-                                        //taggableMembers={task.visibility}
-                                    />
-                                </div></>}
                                 <NewsfeedComponentRouted {...r}
                                     onLoadingStateChanged={this.feedLoadingStateChanged}
                                     includeSubContext={this.state.includeSubContext}
@@ -252,6 +234,7 @@ class NewsfeedModule extends React.Component<Props, State> {
                             includeSubContext={this.state.includeSubContext}
                             filter={this.state.filter}
                             availableFilters={this.availableFilters}
+                            disableContextSearch={disableContextSearch}
                             />
                     </ModuleMenu>
                 </Module>)
@@ -260,6 +243,7 @@ class NewsfeedModule extends React.Component<Props, State> {
 const mapStateToProps = (state:ReduxState, ownProps: OwnProps & RouteComponentProps<any>):ReduxStateProps => {
 
     const resolved = ContextManager.getContextObject(ownProps.location.pathname, ownProps.contextNaturalKey)
+    console.log("resolved", resolved)
     return {
         contextObject:resolved,
         contextObjectId:resolved && resolved.id,

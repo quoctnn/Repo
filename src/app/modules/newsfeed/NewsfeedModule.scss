@@ -1,21 +1,29 @@
+$headerHeight:40px;
+$headerComposerHeight:56px;
+$headerComposerFullHeight:232px;
 .newsfeed-module
 {
     .module-header.link {
         cursor: pointer;
     }
-    .module-content{
+    .module-header{
+        align-items: center;
         .feed-composer-container{
             flex:0;
             z-index: 301 !important;
             > .comment-form{
+                z-index: 301 !important;
                 position: relative;
                 .DraftEditor-editorContainer
                 {
-                    transition:min-height 200ms ease-in-out;
+                    transition:min-height 200ms ease-in-out, width 200ms ease-in-out;
                     min-height:24px;
                 } 
             }
         }
+    }
+    .module-menu{
+        top:$headerHeight;
     }
     .status-composer-backdrop{
         background: #000;
@@ -28,17 +36,58 @@
         transition: opacity .3s, bottom 0s .3s;
         z-index: 300;
     }
-    &.status-composer-focus{
-        .status-composer-backdrop{
-            bottom: 0%;
-            opacity: .6;
-            transition: opacity .3s;
+    .module-header {
+        height: $headerHeight;
+        align-items: center;
+        transition:min-height 200ms ease-in-out,height 200ms ease-in-out, width 200ms ease-in-out;
+        .module-header-title-left{
+            flex:1;
         }
-        .feed-composer-container > .comment-form{
-            .DraftEditor-editorContainer
-            {
-                min-height: 200px;
+        .spacer{
+            flex:0 !important;
+        }
+    }
+    &.menu-visible{
+        .module-header-title-left{
+            visibility: hidden;
+        }
+    }
+    &.has-status-composer{
+
+        .module-header{
+            height: auto;
+            padding-left: 0;
+            padding-top: 0;
+            padding-bottom: 0;
+            min-height: $headerComposerHeight;
+        }
+        .module-menu{
+            top:$headerComposerHeight;
+        }
+        &.status-composer-focus{
+            .module-header{
+                padding-right: 0;
+                min-height: $headerComposerFullHeight;
+                .status-composer-backdrop{
+                    bottom: 0%;
+                    opacity: .6;
+                    transition: opacity 200ms;
+                }
+                .feed-composer-container{
+                    > .comment-form{
+                        .DraftEditor-editorContainer
+                        {
+                            min-height: 200px;
+                        }
+                    }
+                } 
+                .header-filter-group, .module-menu-trigger{
+                    flex-basis: 0px;
+                    overflow: hidden;
+                    min-width: auto;
+                }
             }
         }
     }
+    
 }
