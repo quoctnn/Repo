@@ -2,22 +2,35 @@ const { app, Menu } = require('electron')
 const i18n = new(require('./translations/i18n'))
 const path = require('path');
 const url = require('url');
-
-back = (menuItem, browserWindow, event) => {
-  browserWindow.webContents.back;
-}
+const name = app.getName()
 
 const template = [
   {
-    label: i18n.__('Home'),
-    click(menuItem, browserWindow, event) {
-      browserWindow.loadURL(url.format({
-        pathname: path.join(__dirname, './electron.html'),
-        protocol: 'file:',
-        slashes: true,
-      }))
-    }
-},
+    label: name,
+    submenu: [
+      {
+        label: i18n.__('Home'),
+        click(menuItem, browserWindow, event) {
+          browserWindow.loadURL(url.format({
+            pathname: path.join(__dirname, './electron.html'),
+            protocol: 'file:',
+            slashes: true,
+          }))
+        }
+      },
+      {
+        label: i18n.__('Hard reset'),
+        click(menuItem, browserWindow, event) {
+          browserWindow.webContents.executeJavaScript('window.app.clear();');
+          browserWindow.loadURL(url.format({
+            pathname: path.join(__dirname, './electron.html'),
+            protocol: 'file:',
+            slashes: true,
+          }))
+        }
+      }
+    ]
+  },
   {
     label: i18n.__('Edit'),
     submenu: [
@@ -83,21 +96,31 @@ const template = [
 ]
 
 if (process.platform === 'darwin') {
-  const name = app.getName()
-  template.unshift(
-    {
-      label: i18n.__('Home'),
-      click(menuItem, browserWindow, event) {
-        browserWindow.loadURL(url.format({
-          pathname: path.join(__dirname, './electron.html'),
-          protocol: 'file:',
-          slashes: true,
-        }))
-      }
-    },
+  template[0] =
     {
     label: name,
     submenu: [
+      {
+        label: i18n.__('Home'),
+        click(menuItem, browserWindow, event) {
+          browserWindow.loadURL(url.format({
+            pathname: path.join(__dirname, './electron.html'),
+            protocol: 'file:',
+            slashes: true,
+          }))
+        }
+      },
+      {
+        label: i18n.__('Hard reset'),
+        click(menuItem, browserWindow, event) {
+          browserWindow.webContents.executeJavaScript('window.app.clear();');
+          browserWindow.loadURL(url.format({
+            pathname: path.join(__dirname, './electron.html'),
+            protocol: 'file:',
+            slashes: true,
+          }))
+        }
+      },
       {
         role: 'about', label: i18n.__('About') + " " + app.getName()
       },
@@ -127,46 +150,35 @@ if (process.platform === 'darwin') {
         role: 'quit', label: i18n.__('Quit') + " " + app.getName()
       }
     ]
-  })
-  template[0].submenu.push(
+  }
+  template.splice(4, 0,
     {
-      type: 'separator'
-    },
-    {
-      label: i18n.__('Speech'),
+      label: "Window",
       submenu: [
         {
-          role: 'startspeaking', label: i18n.__('Start speaking')
+          label: i18n.__('Close'),
+          accelerator: 'CmdOrCtrl+W',
+          role: 'close'
         },
         {
-          role: 'stopspeaking', label: i18n.__('Stop speaking')
+          label: i18n.__('Minimize'),
+          accelerator: 'CmdOrCtrl+M',
+          role: 'minimize'
+        },
+        {
+          label: i18n.__('Zoom'),
+          role: 'zoom'
+        },
+        {
+          type: 'separator'
+        },
+        {
+          label: i18n.__('Bring all to front'),
+          role: 'front'
         }
       ]
     }
   )
-  template[1].submenu = [
-    {
-      label: i18n.__('Close'),
-      accelerator: 'CmdOrCtrl+W',
-      role: 'close'
-    },
-    {
-      label: i18n.__('Minimize'),
-      accelerator: 'CmdOrCtrl+M',
-      role: 'minimize'
-    },
-    {
-      label: i18n.__('Zoom'),
-      role: 'zoom'
-    },
-    {
-      type: 'separator'
-    },
-    {
-      label: i18n.__('Bring all to front'),
-      role: 'front'
-    }
-  ]
 }
 
 const menu = Menu.buildFromTemplate(template)

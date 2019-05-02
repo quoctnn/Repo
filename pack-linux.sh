@@ -1,0 +1,1 @@
+electron-packager app intraSocial --overwrite && zip -r intraSocial-linux.zip intraSocial-linux-x64/ && mv intraSocial-linux.zip intraSocial-linux-x64/
