@@ -4,10 +4,22 @@ import ApiClient from '../network/ApiClient';
 import { ReduxState } from '../redux';
 import { addCommunitiesAction } from '../redux/communityStore';
 import { setActiveCommunityAction } from '../redux/activeCommunity';
+import { NotificationCenter } from '../utilities/NotificationCenter';
+import { EventStreamMessageType } from '../network/ChannelEventStream';
 export abstract class CommunityManager
 {
     static setup = () => 
     {
+        NotificationCenter.addObserver('eventstream_' + EventStreamMessageType.COMMUNITY_UPDATE, CommunityManager.processCommunityUpdate)
+    }
+    static processCommunityUpdate = (...args:any[]) => {
+        let communityId = args[0]['community_id'] as number;
+        ApiClient.getCommunity(communityId, (community, status, error) => {
+            if(community)
+            {
+                CommunityManager.storeCommunities([community])
+            }
+        })
     }
     static storeCommunities = (communities:Community[]) => {
         if(communities.length > 0)
