@@ -358,7 +358,7 @@ export type AvatarAndCover = {
     cover_cropped: string
     cover_thumbnail: string
 }
-export class Conversation
+export type Conversation =
 {
     id:number
     title:string
@@ -369,28 +369,9 @@ export class Conversation
     absolute_url:string
     created_at:string
     updated_at:string
-    unread_messages!:number[]
-    constructor(id:number,
-        title:string,
-        users:number[],
-        archived_by: number[],
-        last_message:Message,
-        read_by:any[],
-        absolute_url:string,
-        created_at:string,
-        updated_at:string)
-    {
-        this.id = id
-        this.title = title
-        this.users = users
-        this.archived_by = archived_by
-        this.last_message = last_message
-        this.read_by = read_by
-        this.absolute_url = absolute_url
-        this.created_at = created_at
-        this.updated_at = updated_at
-    }
-}
+    unread_messages?:number[]
+    
+} & Linkable
 export enum IntraSocialType{
     community, profile, project, group, event, task
 }

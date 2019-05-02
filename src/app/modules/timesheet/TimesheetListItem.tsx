@@ -1,11 +1,8 @@
 import * as React from 'react'
 import classnames from "classnames"
 import "./TimesheetListItem.scss"
-import { Event, IntraSocialType, Timesheet } from '../../types/intrasocial_types';
-import { eventCover, stringToDate, DateFormat, userFullName } from '../../utilities/Utilities';
-import { SecureImage } from '../../components/general/SecureImage';
-import { IntraSocialLink } from '../../components/general/IntraSocialLink';
-import Routes from '../../utilities/Routes';
+import { Timesheet } from '../../types/intrasocial_types';
+import { stringToDate, DateFormat, userFullName } from '../../utilities/Utilities';
 import { Link } from 'react-router-dom';
 import { translate } from '../../localization/AutoIntlProvider';
 

@@ -19,6 +19,7 @@ import TimesheetModule from "./modules/timesheet/TimesheetModule";
 import FilesModule from "./modules/files/FilesModule";
 import CommunitiesModule from "./modules/communities/CommunitiesModule";
 import CommunityDetailsModule from "./modules/communities/CommunityDetailsModule";
+import ConversationsModule from "./modules/conversations/ConversationsModule";
 
 type DemoProps = {
     text?:string
@@ -53,6 +54,7 @@ export namespace DashboardComponents {
         "LocationModule":LocationModule,
         "TimesheetModule":TimesheetModule,
         "FilesModule":FilesModule,
+        "ConversationsModule":ConversationsModule
     }
     export function getComponent(type: string, props:any) {
         const comp = componentMap[type]
