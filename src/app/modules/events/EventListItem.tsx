@@ -5,6 +5,7 @@ import { Event, IntraSocialType } from '../../types/intrasocial_types';
 import { eventCover, stringToDate, DateFormat } from '../../utilities/Utilities';
 import { SecureImage } from '../../components/general/SecureImage';
 import { IntraSocialLink } from '../../components/general/IntraSocialLink';
+import { translate } from '../../localization/AutoIntlProvider';
 
 type OwnProps = {
     event:Event
@@ -38,11 +39,23 @@ export default class EventListItem extends React.Component<Props, State> {
                             </div>
                         </SecureImage>
                         <div className="bottom d-flex align-items-center flex-row">
-                            <div className="theme-box theme-bg-gradient flex-shrink-0">
-                                {event.attendees_count || "--"}&nbsp;
-                                <i className="fa fa-user"></i>
+                            <div className="title text-truncate">
+                                {event.name}
                             </div>
-                            <div className="title text-truncate">{event.name}</div>
+                        </div>
+                        <div className="bottom d-flex align-items-center flex-row justify-content-around">
+                            <div className="item">
+                                <div className="item-top"><b>{event.attending_count}&nbsp;</b></div>
+                                <div className="item-bottom">{translate("event.going")}</div>
+                            </div>
+                            <div className="item">
+                                <div className="item-top"><b>{event.not_attending_count}&nbsp;</b></div>
+                                <div className="item-bottom">{translate("event.not_going")}</div>
+                            </div>
+                            <div className="item">
+                                <div className="item-top"><b>{event.invited_count}&nbsp;</b></div>
+                                <div className="item-bottom">{translate("event.invited")}</div>
+                            </div>
                         </div>
                     </div>
                 </IntraSocialLink>)
