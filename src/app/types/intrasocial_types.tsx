@@ -734,7 +734,7 @@ export type Timesheet = {
     description:string
     project:number
     task:number
-} & Permissible
+} & Permissible & Linkable
 export interface EmbedMedia
 {
     height:number
