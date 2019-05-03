@@ -11,7 +11,7 @@ import { TaskManager } from './TaskManager';
 import { ContextManager } from './ContextManager';
 import { PermissionManager } from './PermissionManager';
 import { ApplicationManager } from './ApplicationManager';
-import { WindowAppManager } from './WindowManager';
+import { WindowAppManager } from './WindowAppManager';
 import { ThemeManager } from './ThemeManager';
 const initializeManagers = () => 
 {

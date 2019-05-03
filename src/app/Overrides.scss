@@ -1,0 +1,31 @@
+/*
+@import "./Config";
+.module.newsfeed-module{
+    box-shadow: none !important;
+    border-radius: 8px;
+    background: none;
+    .module-header,.module-menu{
+        @include var(background-color, main-content-background);
+        border-radius: 8px;
+        margin-bottom: 8px;
+    }
+    .comment-form .chat-message-composer-container{
+        border-radius: 8px;
+        box-shadow: none !important;
+    }
+    .newsfeed-component{
+        .status-component, .comment-form.lvl0{
+            @include var(background-color, main-content-background);
+        }
+        .status-component.lvl0{
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+        }
+        .comment-form.lvl0{
+            border-bottom-left-radius: 8px;
+            border-bottom-right-radius: 8px;
+            margin-bottom: 16px;
+        }
+    }
+
+}*/

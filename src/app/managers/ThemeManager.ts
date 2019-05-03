@@ -1,7 +1,7 @@
 import {  Store } from 'redux';
 import { ReduxState } from '../redux';
 import { availableThemes, setThemeAction } from '../redux/theme';
-
+import { WindowAppManager } from './WindowAppManager';
 export abstract class ThemeManager
 {
     static setup = () => 
@@ -11,6 +11,7 @@ export abstract class ThemeManager
         const dispatch =  ThemeManager.getStore().dispatch
         dispatch(setThemeAction(index))
         ThemeManager.applyTheme(index)
+        WindowAppManager.sendMessageElectron("themeUpdated", index)
     }
     private static applyTheme = (themeIndex: number) => {
         let theme = availableThemes[themeIndex];

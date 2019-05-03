@@ -4,7 +4,6 @@ import { Route, Switch, withRouter, RouteComponentProps, Redirect } from "react-
 import { ToastContainer } from 'react-toastify';
 import Routes from "./utilities/Routes";
 import { connect } from 'react-redux'
-import "./Main.scss"
 import { ReduxState } from "./redux";
 import Signin from "./views/signin/Signin";
 import { Error404 } from "./views/error/Error404";
@@ -27,6 +26,8 @@ import DevTool from "./components/dev/DevTool";
 import LoadingSpinner from "./components/LoadingSpinner";
 import { CommunityManager } from "./managers/CommunityManager";
 import ConversationsPage from "./components/pages/ConversationsPage";
+import "./Main.scss"
+import "./Overrides.scss"
 
 type OwnProps = {
 }

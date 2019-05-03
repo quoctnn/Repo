@@ -1,9 +1,30 @@
-const { app, Menu } = require('electron')
+const { app, Menu, ipcMain } = require('electron')
 const i18n = new(require('./translations/i18n'))
 const path = require('path');
 const url = require('url');
 const name = app.getName()
-
+const themeMenu = {
+    label:'Theme',
+    id:'theme.menu',
+    submenu:[
+          {
+              label: 'Light Mode',
+              type: 'checkbox',
+              checked: false,
+              click: function (menuItem, browserWindow, event) {
+                  browserWindow.webContents.executeJavaScript('window.app.setTheme(0);');
+              }
+          },
+          {
+              label: 'Dark Mode',
+              type: 'checkbox',
+              checked: false,
+              click: function (menuItem, browserWindow, event) {
+                  browserWindow.webContents.executeJavaScript('window.app.setTheme(2);');
+              }
+          },
+    ]
+}
 const template = [
   {
     label: name,
@@ -122,6 +143,7 @@ if (process.platform === 'darwin') {
           }))
         }
       },
+      themeMenu,
       {
         role: 'about', label: i18n.__('About') + " " + app.getName()
       },
@@ -184,3 +206,13 @@ if (process.platform === 'darwin') {
 
 const menu = Menu.buildFromTemplate(template)
 Menu.setApplicationMenu(menu)
+
+ipcMain.on('themeUpdated', (event, msg) => {
+    console.log("themeUpdated", msg, menu)
+    const themeMenu = menu.getMenuItemById("theme.menu")
+    if(themeMenu)
+    {
+        themeMenu.submenu.items[0].checked = msg == 0;
+        themeMenu.submenu.items[1].checked = msg == 2;
+    }
+})

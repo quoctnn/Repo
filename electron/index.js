@@ -1,4 +1,4 @@
-const {app, BrowserWindow} = require('electron');
+const {app, BrowserWindow, ipcMain} = require('electron');
 const path = require('path');
 const url = require('url');
 
@@ -11,7 +11,8 @@ function createWindow() {
         backgroundColor: 'f3f3f3',
         webPreferences: {
             nodeIntegration: false,
-            contextIsolation: true
+            contextIsolation: false,
+            preload: path.join(__dirname, './preload.js'),
         }
     })
 
@@ -36,7 +37,6 @@ function createWindow() {
     win.on('closed', () => {
         win = null;
     });
-
     require('./menu');
 }
 
