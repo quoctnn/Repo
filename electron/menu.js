@@ -49,7 +49,11 @@ const template = [
             slashes: true,
           }))
         }
-      }
+      },
+      {
+        type: 'separator'
+      },
+      themeMenu,
     ]
   },
   {
@@ -208,7 +212,6 @@ const menu = Menu.buildFromTemplate(template)
 Menu.setApplicationMenu(menu)
 
 ipcMain.on('themeUpdated', (event, msg) => {
-    console.log("themeUpdated", msg, menu)
     const themeMenu = menu.getMenuItemById("theme.menu")
     if(themeMenu)
     {

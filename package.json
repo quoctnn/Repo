@@ -94,7 +94,7 @@
     "babel-loader": "^7.1.5",
     "electron": "^5.0.0",
     "electron-installer-debian": "^0.8.1",
-    "electron-packager": "^12.1.2",
+    "electron-packager": "^13.1.1",
     "file-loader": "^1.1.11",
     "mini-css-extract-plugin": "^0.4.1",
     "moment-timezone": "^0.5.21",
