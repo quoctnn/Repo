@@ -8,6 +8,7 @@ import { translate } from '../../localization/AutoIntlProvider';
 
 type OwnProps = {
     timesheet:Timesheet
+    showTaskTitle:boolean
 }
 type State = {
 }
@@ -25,7 +26,7 @@ export default class TimesheetListItem extends React.Component<Props, State> {
     }
     render()
     {
-        const {timesheet, className, children, ...rest} = this.props
+        const {timesheet, className, children, showTaskTitle, ...rest} = this.props
         const cl = classnames("timesheet-list-item", className)
         const name = userFullName(timesheet.user)
         const date = stringToDate(timesheet.date, DateFormat.day)
@@ -38,7 +39,9 @@ export default class TimesheetListItem extends React.Component<Props, State> {
                         </div>
                         <div className="d-flex flex-column details">
                             <div className="user">{name}</div>
-                            <div className="task-info"><b>{translate("common.task") + ":"}</b> &nbsp;{timesheet.task}</div>
+                            { this.props.showTaskTitle &&
+                                <div className="task-info"><b>{translate("common.task") + ":"}</b> &nbsp;{timesheet.task_title}</div>
+                            }
                         </div>
                     </div>
                 </Link>)

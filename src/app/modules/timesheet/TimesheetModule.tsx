@@ -14,10 +14,14 @@ import TimesheetListItem from './TimesheetListItem';
 import ApiClient, { PaginationResult } from '../../network/ApiClient';
 import { ToastManager } from '../../managers/ToastManager';
 import { ContextManager } from '../../managers/ContextManager';
+import { defaultProps } from 'react-select/lib/Async';
 type OwnProps = {
     className?:string
     breakpoint:ResponsiveBreakpoint
     contextNaturalKey?:ContextNaturalKey
+}
+type DefaultProps = {
+    showTaskTitles?:boolean
 }
 type State = {
     isLoading:boolean
@@ -27,9 +31,12 @@ type ReduxStateProps = {
 }
 type ReduxDispatchProps = {
 }
-type Props = OwnProps & RouteComponentProps<any> & ReduxStateProps & ReduxDispatchProps
-class TimesheetModule extends React.Component<Props, State> {  
+type Props = DefaultProps & OwnProps & RouteComponentProps<any> & ReduxStateProps & ReduxDispatchProps
+class TimesheetModule extends React.Component<Props, State> {
     timesheetList = React.createRef<ListComponent<Timesheet>>()
+    static defaultProps: DefaultProps = {
+        showTaskTitles: true
+    }
     constructor(props:Props) {
         super(props);
         this.state = {
@@ -66,7 +73,8 @@ class TimesheetModule extends React.Component<Props, State> {
         })
     }
     renderTimesheet = (timesheet:Timesheet) =>  {
-        return <TimesheetListItem key={timesheet.id} timesheet={timesheet} />
+        const showTitles = this.props.showTaskTitles
+        return <TimesheetListItem key={timesheet.id} timesheet={timesheet} showTaskTitle={showTitles}/>
     }
     renderEmpty = () => {
         return <div>{"Empty List"}</div>
@@ -76,24 +84,24 @@ class TimesheetModule extends React.Component<Props, State> {
         const {} = this.props
         return <>
             {!contextObject && <LoadingSpinner key="loading"/>}
-            {contextObject && <ListComponent<Timesheet> 
-                        ref={this.timesheetList} 
+            {contextObject && <ListComponent<Timesheet>
+                        ref={this.timesheetList}
                         renderEmpty={this.renderEmpty}
-                        onLoadingStateChanged={this.feedLoadingStateChanged} 
-                        fetchData={this.fetchTimesheets} 
+                        onLoadingStateChanged={this.feedLoadingStateChanged}
+                        fetchData={this.fetchTimesheets}
                         renderItem={this.renderTimesheet} className="timesheet-module-list" />}
             </>
     }
     render()
     {
-        const {history, match, location, staticContext, contextNaturalKey, contextObject, ...rest} = this.props
+        const {history, match, location, staticContext, contextNaturalKey, contextObject, showTaskTitles, ...rest} = this.props
         const {breakpoint, className} = this.props
         const cn = classnames("timesheet-module", className)
-        return (<SimpleModule {...rest} 
-                    className={cn} 
-                    headerClick={this.headerClick} 
-                    breakpoint={breakpoint} 
-                    isLoading={this.state.isLoading} 
+        return (<SimpleModule {...rest}
+                    className={cn}
+                    headerClick={this.headerClick}
+                    breakpoint={breakpoint}
+                    isLoading={this.state.isLoading}
                     headerTitle={translate("timesheet.module.title")}>
                 {this.renderContent(contextObject)}
                 </SimpleModule>)

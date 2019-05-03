@@ -370,7 +370,7 @@ export type Conversation =
     created_at:string
     updated_at:string
     unread_messages?:number[]
-    
+
 } & Linkable
 export enum IntraSocialType{
     community, profile, project, group, event, task
@@ -481,18 +481,29 @@ export type Project = {
     tasks_responsible: number
 } & AvatarAndCover & Linkable & Permissible & IdentifiableObject
 
+export type TimeSpent = {
+    hours: number
+    minutes: Number
+}
+
 export type Task = {
     id: number
     updated_at: string
     project:number
     title:string
+    description: string
+    last_change_by: number
     absolute_url: string
     category: string
     creator: SimpleUserProfile
+    responsible?: SimpleUserProfile
+    assigned_to?: SimpleUserProfile[]
     priority: TaskPriority
     state: TaskState
-    serialization_date:string
-    visibility?:number[]
+    spent_time: TimeSpent
+    serialization_date: string
+    visibility?: number[]
+    attributes?: TaskObjectAttribute[]
 } & Linkable & Permissible & IdentifiableObject
 
 export enum TaskPriority{
@@ -715,6 +726,7 @@ export type Timesheet = {
     description:string
     project:number
     task:number
+    task_title: string
 } & Permissible & Linkable
 export interface EmbedMedia
 {

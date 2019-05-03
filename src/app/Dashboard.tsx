@@ -20,6 +20,7 @@ import FilesModule from "./modules/files/FilesModule";
 import CommunitiesModule from "./modules/communities/CommunitiesModule";
 import CommunityDetailsModule from "./modules/communities/CommunityDetailsModule";
 import ConversationsModule from "./modules/conversations/ConversationsModule";
+import TaskDetailsModule from "./modules/tasks/TaskDetailsModule";
 
 type DemoProps = {
     text?:string
@@ -45,6 +46,7 @@ export namespace DashboardComponents {
         "CommunitiesModule":CommunitiesModule,
         "CommunityDetailsModule":CommunityDetailsModule,
         "TaskModule": TasksModule,
+        "TaskDetailsModule": TaskDetailsModule,
         "GroupsModule":GroupsModule,
         "GroupDetailsModule":GroupDetailsModule,
         "ProjectsModule":ProjectsModule,
