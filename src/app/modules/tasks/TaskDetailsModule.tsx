@@ -67,51 +67,51 @@ class TaskDetailsModule extends React.Component<Props, State> {
     {
         const {breakpoint, history, match, location, staticContext, task, project, community, contextNaturalKey, ...rest} = this.props
         return (<Module {...rest}>
-                    <ModuleHeader headerTitle={task && task.title || translate("detail.module.title")} loading={this.state.isLoading}>
-                        <ModuleMenuTrigger onClick={this.menuItemClick} />
-                    </ModuleHeader>
-                    {breakpoint >= ResponsiveBreakpoint.standard && //do not render for small screens
-                        <>
-                            <ModuleContent>
-                            { task &&
-                                <div>
-                                    { task.permission >= Permission.read &&
-                                        <DetailsContent community={community} description={task.description}>
-                                            { this.props.project &&
-                                                <div className="text-truncate">
-                                                    <span className="details-field-name">{translate("common.project")}: </span>
-                                                    <span className="details-field-value"><Link to={this.props.project.uri}>{this.props.project.name}</Link></span>
+                        <ModuleHeader className="task-detail" headerTitle={task && task.title || translate("detail.module.title")} loading={this.state.isLoading}>
+                            <ModuleMenuTrigger onClick={this.menuItemClick} />
+                        </ModuleHeader>
+                        {breakpoint >= ResponsiveBreakpoint.standard && //do not render for small screens
+                            <>
+                                <ModuleContent>
+                                { task &&
+                                    <div>
+                                        { task.permission >= Permission.read &&
+                                            <DetailsContent community={community} description={task.description}>
+                                                { this.props.project &&
+                                                    <div className="text-truncate">
+                                                        <span className="details-field-name">{translate("common.project")}: </span>
+                                                        <span className="details-field-value"><Link to={this.props.project.uri}>{this.props.project.name}</Link></span>
+                                                    </div>
+                                                }
+                                            </DetailsContent>
+                                        }
+                                    </div>
+                                    ||
+                                    <LoadingSpinner key="loading"/>
+                                }
+                                </ModuleContent>
+                                <ModuleFooter>
+                                    <div className="details-module d-flex flex-row">
+                                        { task.responsible &&
+                                            <div className="details-members-left" style={{flexGrow: 1}}>
+                                                <div>
+                                                    {translate('task.responsible')}
+                                                    <StackedAvatars userIds={[task.responsible.id]} />
                                                 </div>
-                                            }
-                                        </DetailsContent>
-                                    }
-                                </div>
-                                ||
-                                <LoadingSpinner key="loading"/>
-                            }
-                            </ModuleContent>
-                            <ModuleFooter>
-                                <div className="details-module d-flex flex-row">
-                                    { task.responsible &&
-                                        <div className="details-members-left" style={{flexGrow: 1}}>
-                                            <div>
-                                                {translate('task.responsible')}
-                                                <StackedAvatars userIds={[task.responsible.id]} />
                                             </div>
-                                        </div>
-                                    }
-                                    { task.assigned_to &&
-                                        <div className="details-members">
-                                            <div>
-                                                {translate('task.assigned_to')}
-                                                <StackedAvatars userIds={task.assigned_to.map((user) => {return user.id})} />
+                                        }
+                                        { task.assigned_to && task.assigned_to.length > 0 &&
+                                            <div className="details-members">
+                                                <div>
+                                                    {translate('task.assigned_to')}
+                                                    <StackedAvatars userIds={task.assigned_to.map((user) => {return user.id})} />
+                                                </div>
                                             </div>
-                                        </div>
-                                    }
-                                </div>
-                            </ModuleFooter>
-                        </>
-                    }
+                                        }
+                                    </div>
+                                </ModuleFooter>
+                            </>
+                        }
                 </Module>)
     }
 }
