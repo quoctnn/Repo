@@ -14,6 +14,8 @@ import { resetProfilesAction } from '../redux/profileStore';
 import { resetProjectsAction } from '../redux/projectStore';
 import { resetEventsAction } from '../redux/eventStore';
 import { resetTasksAction } from '../redux/taskStore';
+import * as jsxc from "jsxc/src/api/v1/start"
+
 export type ApplicationData = {
     dashboards:Dashboard[]
     communitiesLoaded:boolean
@@ -118,7 +120,21 @@ export abstract class ApplicationManager
     }
     private static setApplicationLoaded = () => {
         const authUser = AuthenticationManager.getAuthenticatedUser()
-        authUser && CommunityManager.setInitialCommunity(authUser.active_community)
+        if(authUser)
+        {
+            CommunityManager.setInitialCommunity(authUser.active_community)
+            if(!authUser.is_anonymous)
+            {
+                const url = "https://cloud-dev.intra.work/http-bind/"
+                const jid = "admin2@intra.work"
+                const password = "admin"
+                jsxc.start(url, jid, password).then(function() {
+                    console.log('>>> CONNECTION READY')
+                 }).catch(function(err) {
+                    console.log('>>> catch', err)
+                 })
+            }
+        }
         ApplicationManager.getStore().dispatch(setApplicationLoadedAction(true))
     }
     private static getStore = ():Store<ReduxState,any> =>

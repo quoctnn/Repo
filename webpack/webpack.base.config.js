@@ -11,7 +11,14 @@ module.exports = {
   devtool: 'source-map',
 
   resolve: {
-    extensions: ['.ts', '.tsx', '.js', '.json', '.scss']
+    extensions: ['.ts', '.tsx', '.js', '.json', '.scss'],
+    alias: {
+      '@connection': path.resolve(__dirname, '../../jsxc/jsxc/src/connection/'),
+      '@ui': path.resolve(__dirname, '../../jsxc/jsxc/src/ui/'),
+      '@util': path.resolve(__dirname, '../../jsxc/jsxc/src/util/'),
+      '@vendor': path.resolve(__dirname, '../../jsxc/jsxc/src/vendor/'),
+      '@src': path.resolve(__dirname, '../../jsxc/jsxc/src/'),
+   }
   },
 
   module: {
@@ -31,7 +38,7 @@ module.exports = {
         ]
       },
       {
-        test: /\.(svg|gif|png|jpg)(\?v=\d+\.\d+\.\d+)?$/,
+        test: /\.(svg|gif|png|jpg|mp3|wav)(\?v=\d+\.\d+\.\d+)?$/,
         use: [
           {
             loader: 'file-loader',

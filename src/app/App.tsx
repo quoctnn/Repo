@@ -29,7 +29,6 @@ import { AuthenticationManager } from "./managers/AuthenticationManager";
 import { activateCrosstabAuthenticationSync } from "./redux/crosstabAuthenticationSync";
 import { ThemeManager } from "./managers/ThemeManager";
 
-
 const store = createStore(appReducer, applyMiddleware(...middleWares));
 activateCrosstabAuthenticationSync()
 

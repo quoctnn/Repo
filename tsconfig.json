@@ -7,6 +7,15 @@
         "target": "es6",
         "jsx": "react",
         "resolveJsonModule":true,
+        "baseUrl": "./",
+        "paths": {
+           "@connection/*": ["../jsxc/jsxc/src/connection/*"],
+           "@ui/*": ["../jsxc/jsxc/src/ui/*"],
+           "@util/*": ["../jsxc/jsxc/src/util/*"],
+           "@vendor/*": ["../jsxc/jsxc/src/vendor/*"],
+           "@src/*": ["../jsxc/jsxc/src/*"],
+           "strophe.js": ["node_modules/strophe.js/strophe.js"],
+        }
     },
     "include": [
         "./src/**/*"
