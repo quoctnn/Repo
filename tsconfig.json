@@ -19,5 +19,8 @@
     },
     "include": [
         "./src/**/*"
+    ],
+    "files": [
+        "../jsxc/jsxc/custom.d.ts"
     ]
 }
