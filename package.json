@@ -59,6 +59,7 @@
     "emoji-mart": "^2.7.0",
     "fbemitter": "^2.1.1",
     "google-maps-react": "^2.0.2",
+    "handlebars-loader": "^1.7.1",
     "immutable": "^3.8.2",
     "intersection-observer": "^0.5.1",
     "jquery": "^3.4.1",

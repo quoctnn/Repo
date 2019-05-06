@@ -1,4 +1,5 @@
 var path = require('path');
+const fs = require('fs');
 var webpack = require('webpack');
 var BundleTracker = require('webpack-bundle-tracker');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
@@ -14,6 +15,30 @@ try {
   // Not local domain specified, shared on localhost
   localDomain = 'localhost';
 }
+
+let supportedLangs = fs.readdirSync(path.resolve(__dirname,'../../jsxc/jsxc/locales/')).filter(filename => {
+  if (!/\.json$/.test(filename)) {
+     return false;
+  }
+
+  let file = require(path.resolve(__dirname,`../../jsxc/jsxc/locales/${filename}`));
+
+  for (let key in file.translation) {
+     if (typeof file.translation[key] === 'string') {
+        return true;
+     }
+  }
+
+  return false;
+}).map(filename => filename.replace(/\.json$/, ''));
+const JS_BUNDLE_NAME = 'jsxc.bundle.js';
+let buildDate = (new Date()).toDateString();
+let definePluginConfig = {
+  __BUILD_DATE__: JSON.stringify(buildDate),
+  __BUNDLE_NAME__: JSON.stringify(JS_BUNDLE_NAME),
+  __DEPENDENCIES__: "",
+  __LANGS__: JSON.stringify(supportedLangs),
+};
 
 config.entry = {
   main: [
@@ -40,7 +65,8 @@ config.plugins = [
   new MiniCssExtractPlugin({
     filename: '[name].css',
     chunkFilename: '[id].css'
-  })
+  }),
+  new webpack.DefinePlugin(definePluginConfig)
 ];
 config.module.rules.unshift(
   {

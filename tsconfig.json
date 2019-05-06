@@ -1,4 +1,6 @@
 {
+    "allowSyntheticDefaultImports": true,
+    "allowJs": true,
     "compilerOptions": {
         "outDir": "./dist/",
         "sourceMap": true,
@@ -18,7 +20,11 @@
         }
     },
     "include": [
-        "./src/**/*"
+        "./src/**/*",
+        "../jsxc/jsxc/src/**/*.ts",
+        "../jsxc/jsxc/template/*.hbs",
+        "../jsxc/jsxc/*.d.ts",
+
     ],
     "files": [
         "../jsxc/jsxc/custom.d.ts"

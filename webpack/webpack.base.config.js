@@ -1,6 +1,7 @@
 var path = require('path');
 
 module.exports = {
+
   entry: path.resolve(__dirname, '../src/app/App.tsx'),
   output: {
     filename: 'bundle.js',
@@ -11,7 +12,7 @@ module.exports = {
   devtool: 'source-map',
 
   resolve: {
-    extensions: ['.ts', '.tsx', '.js', '.json', '.scss'],
+    extensions: ['.ts', '.tsx', '.js', '.json', '.scss', ".hbs"],
     alias: {
       '@connection': path.resolve(__dirname, '../../jsxc/jsxc/src/connection/'),
       '@ui': path.resolve(__dirname, '../../jsxc/jsxc/src/ui/'),
@@ -37,6 +38,19 @@ module.exports = {
           }
         ]
       },
+      {
+        test: /\.hbs$/,
+        loader: 'handlebars-loader',
+        exclude: /node_modules/,
+        options: {
+           helperDirs: [
+              path.resolve(__dirname, '../../jsxc/jsxc/template', 'helpers')
+           ],
+           partialDirs: [
+              path.resolve(__dirname, '../../jsxc/jsxc/template', 'partials')
+           ]
+        }
+     },
       {
         test: /\.(svg|gif|png|jpg|mp3|wav)(\?v=\d+\.\d+\.\d+)?$/,
         use: [
