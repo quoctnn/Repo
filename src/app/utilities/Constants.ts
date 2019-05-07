@@ -133,6 +133,12 @@ export default  {
             return `/api/v2/event/${id}/files/`
         },
 
+        // Recent Activity URLs
+        recentActivityUrl: '/api/v2/notification/',
+        recentActivityUnreadUrl: '/api/v2/notification/unread-count/',
+        recentActivityMarkReadUrl: '/api/v2/notification/update-as-read/',
+        recentActivityMarkAllReadUrl: '/api/v2/notification/mark-all-as-read/',
+
         // Notification URLs
         notificationUrl: '/api/v2/notification/',
         notificationLastActivityTimeUrl: '/api/v2/notification/last-activity-time/',

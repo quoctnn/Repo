@@ -12,9 +12,10 @@ import Routes from "../utilities/Routes";
 import { translate } from "../localization/AutoIntlProvider";
 import { CommunityManager } from "../managers/CommunityManager";
 import { NavigationUtilities } from "../utilities/NavigationUtilities";
+import CommunitySelector from "./general/community/CommunitySelector";
 export interface OwnProps
 {
-    primaryItemImage:string 
+    primaryItemImage:string
     primaryItemTitle:string
 }
 interface ReduxStateProps
@@ -43,14 +44,15 @@ class PageTopNavigation extends React.Component<Props, {}> {
                     <div className="flex-grow-0 left text-truncate">
                         <div className="community-box d-flex align-items-center mb-2">
                             <Avatar className="" image={this.props.primaryItemImage} size={70}/>
-                            <div className="text-truncate ml-2">
+                            <div className="d-flex text-truncate ml-2">
                                 <div className="community-name text-truncate">{ this.props.primaryItemTitle }</div>
+                                <CommunitySelector />
                             </div>
                         </div>
                     </div>
                     <div className="center flex-grow-1"></div>
                 </div>
-                <div className="menu-row" > 
+                <div className="menu-row" >
                     <PageMainMenu className="d-flex justify-content-center align-items-end" style={{gridArea: "1 / 1 / span 1 / span 3"}}/>
                     <div className="center flex-grow-1 d-flex justify-content-around align-items-end" style={{gridArea: "1 / 4 / span 1 / span 6"}}>
                         <a onClick={this.navigateToCommunity} href="#">{translate("Community")}</a>

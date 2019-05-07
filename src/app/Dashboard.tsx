@@ -22,6 +22,7 @@ import CommunityDetailsModule from "./modules/communities/CommunityDetailsModule
 import ConversationsModule from "./modules/conversations/ConversationsModule";
 import TaskDetailsModule from "./modules/tasks/TaskDetailsModule";
 import ConversationModule from "./modules/conversation/ConversationModule";
+import ActivityModule from "./modules/activity/ActivityModule";
 
 type DemoProps = {
     text?:string
@@ -58,7 +59,8 @@ export namespace DashboardComponents {
         "TimesheetModule":TimesheetModule,
         "FilesModule":FilesModule,
         "ConversationsModule":ConversationsModule,
-        "ConversationModule":ConversationModule
+        "ConversationModule":ConversationModule,
+        "RecentActivityModule":ActivityModule,
     }
     export function getComponent(type: string, props:any) {
         const comp = componentMap[type]

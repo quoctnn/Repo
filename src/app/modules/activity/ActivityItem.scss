@@ -1,0 +1,45 @@
+@import "../../Config.scss";
+
+$margin:5px;
+.activity-list-item{
+    padding: 8px;
+    text-decoration: none;
+    &:hover{
+        text-decoration: none;
+    }
+    &.unseen{
+        .activity-content{
+            @include var(background-color, main-content-secondary-background);
+        }
+    }
+    &.unread{
+        font-weight: 700;
+    }
+    .activity-content{
+        max-height: 4rem;
+        border-radius: 10px;
+        overflow: hidden;
+        position: relative;
+        align-items: center;
+        font-size: 14px;
+
+        .avatar-list{
+            justify-content: center;
+            margin: $margin;
+            flex: 0;
+        }
+        .activity-text{
+            flex-shrink: 1;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            white-space: unset;
+            word-break: break-word;
+            max-height: 40px;
+        }
+        .date{
+            font-weight: 400;
+        }
+    }
+}

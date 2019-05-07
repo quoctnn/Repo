@@ -52,7 +52,7 @@ class PageTopMenu extends React.Component<Props, State> {
             return {popoverOpen:false, renderFunc:() => [], target:null, key:null}
         },completion)
     }
-    renderPopover = () => 
+    renderPopover = () =>
     {
         const open = this.state.popoverOpen
         if(!this.state.target)
@@ -65,6 +65,12 @@ class PageTopMenu extends React.Component<Props, State> {
     }
     showMainPanel = (e:React.SyntheticEvent<any>) => {
         this.showPanel(this.renderMainPanel, e.currentTarget, "main")
+    }
+    showNotificationPanel = (e:React.SyntheticEvent<any>) => {
+        this.showPanel(this.renderNotificationPanel, e.currentTarget, "notification")
+    }
+    showFilesPanel = (e:React.SyntheticEvent<any>) => {
+        this.showPanel(this.renderFilesPanel, e.currentTarget, "files")
     }
     showSearchPanel = (e:React.SyntheticEvent<any>) => {
         this.showPanel(this.renderSearchPanel, e.currentTarget, "search")
@@ -141,10 +147,18 @@ class PageTopMenu extends React.Component<Props, State> {
     renderSearchPanel = () => {
         return <div>Search</div>
     }
+    renderNotificationPanel = () => {
+        return <div>Notifications</div>
+    }
+    renderFilesPanel = () => {
+        return <div>Files</div>
+    }
     render() {
         return(
             <div id="page-top-menu">
                 <Button onClick={this.showSearchPanel} color="link"><i className="fas fa-search"></i></Button>
+                <Button onClick={this.showNotificationPanel} color="link"><i className="fas fa-bell"></i></Button>
+                <Button onClick={this.showFilesPanel} color="link"><i className="fas fa-cloud"></i></Button>
                 <Button onClick={this.showMainPanel} color="link"><i className="fas fa-cog"></i></Button>
                 {this.renderPopover()}
                 {this.renderDeveloperTool()}
