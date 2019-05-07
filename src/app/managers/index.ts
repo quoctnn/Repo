@@ -13,6 +13,7 @@ import { PermissionManager } from './PermissionManager';
 import { ApplicationManager } from './ApplicationManager';
 import { WindowAppManager } from './WindowAppManager';
 import { ThemeManager } from './ThemeManager';
+import { ConversationManager } from './ConversationManager';
 const initializeManagers = () => 
 {
     ApplicationManager.setup()
@@ -30,5 +31,6 @@ const initializeManagers = () =>
     PermissionManager.setup()
     WindowAppManager.setup()
     ThemeManager.setup()
+    ConversationManager.setup()
 }
 export default initializeManagers

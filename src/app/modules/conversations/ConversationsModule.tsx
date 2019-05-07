@@ -52,7 +52,7 @@ class ConversationsModule extends React.Component<Props, State> {
         })
     }
     renderConversation = (conversation:Conversation) =>  {
-        return <ConversationListItem key={conversation.id} conversation={conversation} />
+        return <ConversationListItem key={conversation.id} conversation={conversation} isActive={false} />
     }
     renderEmpty = () => {
         return <div>{"Empty List"}</div>

@@ -11,7 +11,6 @@ export default abstract class Routes {
     static PROFILE_UPDATE = "/profile/update"
     static SIGNIN = "/signin"
     static SIGNOUT = "/signout"
-    static CONVERSATIONS = "/conversations/"
     static CONVERSATION_CREATE = "/conversation/create/"
     static SEARCH = "/search/"
     static UPDATE_TOOL = "/app-update"
@@ -21,11 +20,11 @@ export default abstract class Routes {
 
     private static PROFILE = "/profile/"
     private static COMMUNITY = "/community/"
-    private static CONVERSATION = "/conversation/"
     private static PROJECT = "/project/"
     private static TASK = "/task/"
     private static GROUP = "/group/"
     private static EVENT = "/event/"
+    private static CONVERSATION = "/conversation/"
     private static ERROR_NOT_FOUND = "/error404/"
 
     static searchUrl = (query:string) => {
@@ -51,7 +50,7 @@ export default abstract class Routes {
         return `${Routes.PROFILE}${profile}/`
     }
     static conversationUrl = (conversation:string|number, includeTrailingSlash:boolean = true) => {
-        return `${Routes.CONVERSATION}${conversation}${includeTrailingSlash ? "/": ""}`
+        return `${Routes.CONVERSATION}${conversation || ""}${!!conversation && includeTrailingSlash ? "/": ""}`
     }
     static communityUrl = (community:string|number, includeTrailingSlash:boolean = true) => {
         return `${Routes.COMMUNITY}${community}${includeTrailingSlash ? "/": ""}`

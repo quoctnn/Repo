@@ -140,10 +140,12 @@ type Props = {
     onFocus?(e: React.SyntheticEvent<{}>): void
     focusEnd?:(f:() => void) => void
     forceUpdate?:string
+    submitOnEnter:boolean
 
 }
 type DefaultProps = {
     showSubmitButton:boolean
+    submitOnEnter:boolean
 }
 
 interface State
@@ -155,7 +157,8 @@ export class ChatMessageComposer extends React.Component<Props & DefaultProps,St
     
     private inputRef = React.createRef<MentionEditor>()
     static defaultProps:DefaultProps = {
-        showSubmitButton:true
+        showSubmitButton:true,
+        submitOnEnter:false
     }
     constructor(props) {
         super(props)
@@ -222,7 +225,7 @@ export class ChatMessageComposer extends React.Component<Props & DefaultProps,St
         return false
     }
     keyBindings = (e: any) => {
-        if (e.keyCode === 13 && hasCommandModifier(e)) { // Ctrl(Cmd) + Enter Submits the form
+        if (e.keyCode === 13 && (hasCommandModifier(e) || this.props.submitOnEnter) ){ // Ctrl(Cmd) + Enter Submits the form
           return this.handleSubmit(e)
         }
         return getDefaultKeyBinding(e);

@@ -1,6 +1,5 @@
 
 import * as React from "react";
-import { ResponsiveBreakpoint } from "./ResponsiveComponent";
 type State = 
 {
     breakpoint:number
@@ -11,6 +10,7 @@ type OwnProps =
     render:(state:State) => React.ReactNode
     setClassOnBody?:boolean
     breakpoints:number[]
+    updateKey:string
 }
 type Props = OwnProps
 export default class WindowResponsiveComponent extends React.Component<Props, State> 
@@ -55,7 +55,7 @@ export default class WindowResponsiveComponent extends React.Component<Props, St
     }
     shouldComponentUpdate(nextProps:Props, nextState:State)
     {
-        return nextState.breakpoint != this.state.breakpoint
+        return nextState.breakpoint != this.state.breakpoint || nextProps.updateKey != this.props.updateKey
     }
     render() {
         console.log("render", this.state.breakpoint)

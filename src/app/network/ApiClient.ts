@@ -455,9 +455,9 @@ export default class ApiClient
             callback(null, status, error)
         })
     }
-    static getConversationMessages(conversationId:number, limit:number, offset:number,callback:ApiClientFeedPageCallback<Message>)
+    static getConversationMessages(conversation:number, limit:number, offset:number,callback:ApiClientFeedPageCallback<Message>)
     {
-        let url = Constants.apiRoute.conversationMessagesUrl(conversationId) + "?" + this.getQueryString({limit, offset})
+        let url = Constants.apiRoute.conversationMessagesUrl +  "?" + this.getQueryString({limit, offset, conversation})
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {

@@ -9,6 +9,7 @@ import LoadingSpinner from "../../LoadingSpinner";
 import Constants from "../../../utilities/Constants";
 import { Avatar } from "../Avatar";
 import { Settings } from "../../../utilities/Settings";
+import classnames from 'classnames';
 export interface OwnProps {
     url: string
 }
@@ -89,11 +90,11 @@ class Embedly extends React.Component<Props, State> {
         {
             case LinkCardType.embed:
             {
-                const data:EmbedCardItem = this.props.data as any
-                if(!data.provider_url || data.error_code || data.type == "error" )
+                if(this.hasError())
                 {
-                    return null//(<a href={this.props.url} target="_blank"  data-toggle="tooltip" title={this.props.url}>{this.props.url}</a>)
+                    return this.props.url//(<a href={this.props.url} target="_blank"  data-toggle="tooltip" title={this.props.url}>{this.props.url}</a>)
                 }
+                const data:EmbedCardItem = this.props.data as any
                 if(data.media && data.media.html)
                 {
                     return <div className="is-embed-card responsive" dangerouslySetInnerHTML={{__html: data.media.html}}></div>
@@ -109,10 +110,14 @@ class Embedly extends React.Component<Props, State> {
             default:return null;
         }
     }
+    hasError = () => {
+        return this.props.data && (!this.props.data.provider_url || this.props.data.error_code || this.props.data.type == "error")
+    }
     render = () => {
         const title = Settings.renderLinkTitle ? this.props.data && this.props.data.title : undefined
         const url = (this.props.data && this.props.data.url) || this.props.url
-        return (<a href={url} className="is-embed-card" target="_blank" title={title}>
+        const cl = classnames("is-embed-card", {"has-error":this.hasError()})
+        return (<a href={url} className={cl} target="_blank" title={title}>
                 {this.props.isLoading && <LoadingSpinner/>}
                 {this.props.data && this.renderCardData()}
                 </a>)

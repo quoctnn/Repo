@@ -7,7 +7,8 @@ import { CommunityManager } from '../managers/CommunityManager';
 import { EventManager } from './EventManager';
 import { TaskManager } from './TaskManager';
 import { ProjectManager } from './ProjectManager';
-import { ContextNaturalKey, Permissible, Task, Community, Project, UserProfile, Group, Event, ContextSegmentKey, IdentifiableObject } from '../types/intrasocial_types';
+import { ContextNaturalKey, Permissible, Task, Community, Project, UserProfile, Group, Event, ContextSegmentKey, IdentifiableObject, Conversation } from '../types/intrasocial_types';
+import { ConversationManager } from './ConversationManager';
 
 export type ResolvedContextObject = {
     contextNaturalKey:ContextNaturalKey
@@ -23,6 +24,7 @@ type ResolvedContextObjects = {
     profile?:UserProfile
     event?:Event
     group?:Group
+    conversation?:Conversation
     success:boolean
     resolvedPath?:string
 }
@@ -39,6 +41,7 @@ export abstract class ContextManager
         ContextManager.objectFetchers[ContextSegmentKey.GROUP] = GroupManager.ensureGroupExists as any
         ContextManager.objectFetchers[ContextSegmentKey.EVENT] = EventManager.ensureEventExists as any
         ContextManager.objectFetchers[ContextSegmentKey.USER] = ProfileManager.ensureProfileExists as any
+        ContextManager.objectFetchers[ContextSegmentKey.CONVERSATION] = ConversationManager.ensureConversationExists as any
 
         ContextManager.objectResolvers[ContextSegmentKey.COMMUNITY] = CommunityManager.getCommunity
         ContextManager.objectResolvers[ContextSegmentKey.PROJECT] = ProjectManager.getProject
@@ -46,6 +49,7 @@ export abstract class ContextManager
         ContextManager.objectResolvers[ContextSegmentKey.GROUP] = GroupManager.getGroup
         ContextManager.objectResolvers[ContextSegmentKey.EVENT] = EventManager.getEvent
         ContextManager.objectResolvers[ContextSegmentKey.USER] = ProfileManager.getProfile
+        ContextManager.objectResolvers[ContextSegmentKey.CONVERSATION] = ConversationManager.getConversation
     }
     static pathToDictionary = (path:string) => {
         const dict:StringDictionary = {}

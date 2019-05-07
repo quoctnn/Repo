@@ -21,6 +21,7 @@ import CommunitiesModule from "./modules/communities/CommunitiesModule";
 import CommunityDetailsModule from "./modules/communities/CommunityDetailsModule";
 import ConversationsModule from "./modules/conversations/ConversationsModule";
 import TaskDetailsModule from "./modules/tasks/TaskDetailsModule";
+import ConversationModule from "./modules/conversation/ConversationModule";
 
 type DemoProps = {
     text?:string
@@ -56,7 +57,8 @@ export namespace DashboardComponents {
         "LocationModule":LocationModule,
         "TimesheetModule":TimesheetModule,
         "FilesModule":FilesModule,
-        "ConversationsModule":ConversationsModule
+        "ConversationsModule":ConversationsModule,
+        "ConversationModule":ConversationModule
     }
     export function getComponent(type: string, props:any) {
         const comp = componentMap[type]
@@ -72,6 +74,7 @@ type OwnProps =
 {
     breakpoint:number
     dashboard:Dashboard
+    updateKey?:string
 }
 type State = {
     defaultGrid:GridLayout

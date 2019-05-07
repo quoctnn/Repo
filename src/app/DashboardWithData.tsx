@@ -5,7 +5,7 @@ import { ApplicationManager } from "./managers/ApplicationManager";
 import WindowResponsiveComponent from "./components/general/observers/WindowResponsiveComponent";
 import DashboardComponent from "./Dashboard";
 import { translate } from "./localization/AutoIntlProvider";
-export const DashboardWithData = (props:{category:string}) => {
+export const DashboardWithData = (props:{category:string, updateKey?:string}) => {
     const dashboards = ApplicationManager.getDashboards(props.category)
     const dashboard = dashboards[0] 
     if(!dashboard)
@@ -26,11 +26,15 @@ export const DashboardWithData = (props:{category:string}) => {
     breakpoints = breakpoints.sort((a, b) => b - a) //descending
     return (
 
-        <WindowResponsiveComponent breakpoints={breakpoints} setClassOnBody={true} render={({ breakpoint }) => (
-            <DashboardComponent
-                dashboard={dashboard}
-                breakpoint={breakpoint}
-            />
+        <WindowResponsiveComponent
+            breakpoints={breakpoints} 
+            updateKey={props.updateKey} 
+            setClassOnBody={true} 
+            render={({ breakpoint }) => (
+                <DashboardComponent
+                    dashboard={dashboard}
+                    breakpoint={breakpoint}
+                />
         )}/>
     );
 }

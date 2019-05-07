@@ -79,8 +79,11 @@ export enum DateFormat {
     day = "L", 
     time = "LT"
 }
-export const stringToDate = (string:string, format?:DateFormat ) => {
+export const stringToDateFormat = (string:string, format?:DateFormat ) => {
     return moment(string).tz(timezone).format(format || DateFormat.date)
+}
+export const stringToDate = (string?:string) => {
+    return moment(string).tz(timezone)
 }
 export const EMAIL_REGEX = /(\b\s+)(([a-zA-Z0-9\-\_\.])+@[a-zA-Z\_]+?(\.[a-zA-Z]{2,6})+)/gm
 export const URL_REGEX = /(\b(https?|ftp):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/gim

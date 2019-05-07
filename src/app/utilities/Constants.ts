@@ -168,9 +168,7 @@ export default  {
             return `/api/v2/status/${id}/react/`
         },
         fileUploadUrl: '/api/v2/file-upload/',
-        conversationMessagesUrl: (id:number) => {
-            return `/api/v2/conversation/${id}/messages/`
-        },
+        conversationMessagesUrl: "/api/v2/message/",
         conversationMarkAsReadUrl: (id:number) => {
             return `/api/v2/conversation/${id}/mark_read/`
         },

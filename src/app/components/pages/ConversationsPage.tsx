@@ -11,6 +11,7 @@ import { Error404 } from '../../views/error/Error404';
 import { communityAvatar, communityName, communityCover } from "../../utilities/Utilities";
 export interface OwnProps 
 {
+    updateKey?:string
 }
 interface ReduxStateProps 
 {
@@ -53,7 +54,7 @@ class ConversationsPage extends React.Component<Props, State>
             <div id="conversations-page" className="dashboard-container">
                 <div className="content dashboard-container">
                     {this.renderHeader(community)}
-                    <DashboardWithData category="conversations" />
+                    <DashboardWithData category="conversations" updateKey={this.props.updateKey} />
                 </div>
             </div>
         );

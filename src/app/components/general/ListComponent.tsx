@@ -92,7 +92,7 @@ export default class ListComponent<T extends IdentifiableObject> extends React.C
             isAtBottom = event.target.scrollTop + event.target.offsetHeight >= event.target.scrollHeight
         if(isAtBottom)
         {
-            this.handleLoadMore()
+            
         }
     }
     handleLoadMore = () => 

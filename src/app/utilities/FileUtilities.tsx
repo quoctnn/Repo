@@ -6,7 +6,7 @@ import { SecureImage } from '../components/general/SecureImage';
 export class FileUtilities {
     static renderDocument(file:UploadedFile)
     {
-        let iconClass = "document " + file.extension
+        let iconClass = "file document " + file.extension
         let url = IntraSocialUtilities.appendAuthorizationTokenToUrl( file.file )
         return (
             <div className={iconClass} key={file.id}>

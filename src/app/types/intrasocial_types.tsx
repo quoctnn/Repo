@@ -209,6 +209,7 @@ export enum ContextNaturalKey
     TASK = "project.task",
     EVENT = "event.event",
     NEWSFEED = "newsfeed",
+    CONVERSATION = "conversation",
 }
 export enum ContextSegmentKey
 {
@@ -218,6 +219,7 @@ export enum ContextSegmentKey
     PROJECT = "project",
     TASK = "task",
     EVENT = "event",
+    CONVERSATION = "conversation"
 }
 export namespace ContextSegmentKey {
     export function keyForNaturalKey(key: ContextNaturalKey) {
@@ -228,6 +230,7 @@ export namespace ContextSegmentKey {
             case ContextNaturalKey.PROJECT: return ContextSegmentKey.PROJECT
             case ContextNaturalKey.EVENT: return ContextSegmentKey.EVENT
             case ContextNaturalKey.TASK: return ContextSegmentKey.TASK
+            case ContextNaturalKey.CONVERSATION: return ContextSegmentKey.CONVERSATION
             default:return null
         }
     }
@@ -360,7 +363,6 @@ export type AvatarAndCover = {
 }
 export type Conversation =
 {
-    id:number
     title:string
     users:number[]
     archived_by: number[]
@@ -371,7 +373,7 @@ export type Conversation =
     updated_at:string
     unread_messages?:number[]
 
-} & Linkable
+} & Linkable & IdentifiableObject & Permissible
 export enum IntraSocialType{
     community, profile, project, group, event, task
 }

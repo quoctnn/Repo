@@ -2,7 +2,7 @@ import * as React from 'react'
 import classnames from "classnames"
 import "./TimesheetListItem.scss"
 import { Timesheet } from '../../types/intrasocial_types';
-import { stringToDate, DateFormat, userFullName } from '../../utilities/Utilities';
+import { stringToDateFormat, DateFormat, userFullName } from '../../utilities/Utilities';
 import { Link } from 'react-router-dom';
 import { translate } from '../../localization/AutoIntlProvider';
 
@@ -29,7 +29,7 @@ export default class TimesheetListItem extends React.Component<Props, State> {
         const {timesheet, className, children, showTaskTitle, ...rest} = this.props
         const cl = classnames("timesheet-list-item", className)
         const name = userFullName(timesheet.user)
-        const date = stringToDate(timesheet.date, DateFormat.day)
+        const date = stringToDateFormat(timesheet.date, DateFormat.day)
         const time = (!!timesheet.hours ? ` ${timesheet.hours}${translate("date.format.hours")}` : "") + (!!timesheet.minutes ? ` ${timesheet.minutes}${translate("date.format.minutes")}` : "")
         return (<Link to={timesheet.uri} {...rest} className={cl}>
                     <div className="d-flex justify-content-around">

@@ -46,7 +46,7 @@ type PathLoaderProps = {
 
 } & RouteComponentProps<any>
 type PathLoaderState = {loading:boolean}
-const PathLoader = (Component: any, extractKey:(path:string) => string) =>
+const PathLoader = (Component: any, extractKey:(path:string) => string, forceUpdate?:(path:string) => string) =>
     class WithLoading extends React.Component<PathLoaderProps , PathLoaderState> {
       constructor(props:PathLoaderProps){
           super(props)
@@ -55,8 +55,10 @@ const PathLoader = (Component: any, extractKey:(path:string) => string) =>
           }
         }
         shouldComponentUpdate = (nextProps:PathLoaderProps, nextState:PathLoaderState) => {
-            return extractKey(nextProps.location.pathname) != extractKey(this.props.location.pathname) ||
-                    nextState.loading != this.state.loading
+            const ret =  extractKey(nextProps.location.pathname) != extractKey(this.props.location.pathname) ||
+                    nextState.loading != this.state.loading || 
+                    ((!!forceUpdate && forceUpdate(nextProps.location.pathname) != forceUpdate(this.props.location.pathname)) || false) 
+            return ret
         }
         componentDidMount = () => {
             this.update()
@@ -77,7 +79,8 @@ const PathLoader = (Component: any, extractKey:(path:string) => string) =>
         }
         render() {
             const { loading } = this.state
-            return loading ? <LoadingSpinner /> : <Component key={extractKey(location.pathname)} {...this.props} />
+            const updateKey = forceUpdate && forceUpdate(this.props.location.pathname)
+            return loading ? <LoadingSpinner /> : <Component key={extractKey(location.pathname)} {...this.props} updateKey={updateKey} />
         }
     }
 const PathLoadedProfilePage = PathLoader(ProfilePage, (path) => { return path})
@@ -86,7 +89,7 @@ const PathLoadedGroupPage = PathLoader(GroupPage, (path) => { return path})
 const PathLoadedProjectPage = PathLoader(ProjectPage, (path) => { return path})
 const PathLoadedEventPage = PathLoader(EventPage, (path) => { return path})
 const PathLoadedTaskPage = PathLoader(TaskPage, (path) => { return path})
-const PathLoadedConversationsPage = PathLoader(ConversationsPage, (path) => { return path})
+const PathLoadedConversationsPage = PathLoader(ConversationsPage, (path) => { return "/conversations/"}, (path) => path)
 const PathLoadedDashboardPage = PathLoader(DashboardPage, (path) => { return path})
 
 type Props = ReduxStateProps & ReduxDispatchProps & OwnProps & RouteComponentProps<any>
@@ -136,7 +139,7 @@ class Main extends React.Component<Props, State> {
                                     <Route path={Routes.SIGNIN} component={Signin} />
                                     <Route path={Routes.SIGNOUT} component={Signout} />
                                     <Route path={Routes.ROOT} exact={true} component={PathLoadedDashboardPage} />
-                                    <Route path={Routes.CONVERSATIONS} exact={true} component={PathLoadedConversationsPage} />
+                                    <Route path={Routes.conversationUrl(":conversationId?")} exact={true} component={PathLoadedConversationsPage} />
                                     <Route path={Routes.ELECTRON} component={PathLoadedDashboardPage} />
                                     <Route path={Routes.ANY} component={Error404} />
                                 </Switch>
