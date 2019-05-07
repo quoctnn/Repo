@@ -9,6 +9,8 @@ import { OverflowMenuItem, OverflowMenuItemType, createDropdownItem } from '../O
 import { CommunityManager } from '../../../managers/CommunityManager';
 import ApiClient from '../../../network/ApiClient';
 import { ToastManager } from '../../../managers/ToastManager';
+import Routes from '../../../utilities/Routes';
+import { withRouter, RouteComponentProps } from 'react-router-dom';
 
 export interface OwnProps
 {
@@ -18,7 +20,7 @@ interface ReduxStateProps
     mainCommunity:number,
     communities:number[]
 }
-type Props = ReduxStateProps & OwnProps
+type Props = ReduxStateProps & OwnProps & RouteComponentProps<any>
 export interface State {
     communities:Community[]
 }
@@ -45,6 +47,7 @@ class UserStatusSelector extends React.Component<Props, State> {
             ApiClient.setMainCommunity(community.id, () => {
                 // TODO: Move Toast to eventlistener 'eventstream_community.main'
                 ToastManager.showInfoToast(translate("Main community changed"), community.name)
+                this.props.history.push(Routes.communityUrl(community.slug_name))
             })
     }
     showAllCommunities = () => (event: React.SyntheticEvent<any>) => {
@@ -95,4 +98,4 @@ const mapStateToProps = (state:ReduxState, ownProps:OwnProps) => {
         communities
     }
 }
-export default connect<ReduxStateProps, void, OwnProps>(mapStateToProps, null)(UserStatusSelector)
+export default withRouter(connect<ReduxStateProps, void, OwnProps>(mapStateToProps, null)(UserStatusSelector))

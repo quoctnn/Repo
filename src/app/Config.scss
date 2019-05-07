@@ -11,7 +11,7 @@
     @return $string;
 }
 $font:"Heebo";
-$font-url:"https://fonts.googleapis.com/css?family=Heebo";
+$font-url:"https://fonts.googleapis.com/css?family=Heebo:400,700,800,900";
 @import url(#{$font-url});
 
 //DEFAULT

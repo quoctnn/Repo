@@ -7,6 +7,9 @@ import { Avatar } from '../../components/general/Avatar';
 import { ProfileManager } from '../../managers/ProfileManager';
 import { userAvatar } from '../../utilities/Utilities';
 import ApiClient from '../../network/ApiClient';
+import Moment from 'react-moment';
+import * as moment from 'moment-timezone';
+let timezone = moment.tz.guess();
 
 type OwnProps = {
     activity:RecentActivity
@@ -37,6 +40,15 @@ export default class ActivityItem extends React.Component<Props, State> {
     fetchProfiles = () => {
         return ProfileManager.getProfiles(this.props.activity.actors)
     }
+    getTimestamp = (createdAt:string) => {
+        let created = moment.utc(createdAt).tz(timezone).toDate();
+        let now = moment.utc().tz(timezone).toDate()
+        if (created <= now) {
+            return <Moment interval={60000} fromNow={true} date={created} />
+        } else {
+            return <Moment interval={60000} fromNow={true} date={now} />
+        }
+    }
     renderAvatar= (profile:UserProfile) => {
         return(
             <Avatar key={profile.id} size={40} image={userAvatar(profile, true)} borderColor={"#FFFFFF"} borderWidth={2} />
@@ -51,14 +63,19 @@ export default class ActivityItem extends React.Component<Props, State> {
         const text = activity.display_text
         const profiles = this.fetchProfiles()
         return (<Link key={activity.id} onClick={this.handleActivityClick} to={activity.uri || "#"} {...rest} className={cl}>
-                    <div className="d-flex flex-row drop-shadow hover-card activity-content">
+                    <div className="d-flex flex-row hover-card activity-content">
                         <div className="avatar-list">
                             {profiles.slice(0,2).map((profile) => {
                                 return(this.renderAvatar(profile))
                             })}
                         </div>
-                        <div className="text-muted activity-text">
-                            {text}
+                        <div>
+                            <div className="text-truncate activity-text">
+                                {text}
+                            </div>
+                            <div className="date text-truncate secondary-text">
+                                {this.getTimestamp(this.props.activity.created_at)}
+                            </div>
                         </div>
                     </div>
                 </Link>)

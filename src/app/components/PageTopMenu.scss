@@ -1,5 +1,5 @@
 $fontSize:20px;
-$padding:10px;
+$padding:5px;
 $spacing:2px;
 #page-top-menu{
     > button{
@@ -8,7 +8,7 @@ $spacing:2px;
         line-height: $fontSize;
         color:white;
         &:not(:first-child){
-            margin-left:$spacing; 
+            margin-left:$spacing;
         }
     }
 }
