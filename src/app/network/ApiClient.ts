@@ -175,6 +175,15 @@ export default class ApiClient
         })
 
     }
+    static readActivity(id:number, callback: (success, response) => void)
+    {
+        let url = Constants.apiRoute.recentActivityMarkReadUrl
+        AjaxRequest.post(url, {'serialization_ids':[id]}, (data, status, request) => {
+            callback(true, data)
+        }, (request, status, error) => {
+            callback(false, error)
+        })
+    }
     static createStatus(status:Status, callback:ApiClientCallback<Status>)
     {
         let url = Constants.apiRoute.postUrl

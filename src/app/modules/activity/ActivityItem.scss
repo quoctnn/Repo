@@ -7,6 +7,14 @@ $margin:5px;
     &:hover{
         text-decoration: none;
     }
+    &.unseen{
+        .activity-content{
+            @include var(background-color, main-content-secondary-background);
+        }
+    }
+    &.unread{
+        font-weight: 900;
+    }
     .activity-content{
         max-height: 4rem;
         border-radius: 10px;
@@ -26,5 +34,4 @@ $margin:5px;
             max-height: 65px;
         }
     }
-
 }
