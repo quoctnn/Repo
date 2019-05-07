@@ -12,6 +12,7 @@ export interface Verb
 export type IdentifiableObject = {
     id: number
 }
+/* deprecated?
 export interface SimpleNotification
 {
     absolute_url:string
@@ -20,9 +21,10 @@ export interface SimpleNotification
     message:string
     verb:Verb
 }
-export interface Notification
+*/
+export type RecentActivity =
 {
-    serialization_id:string
+    id:number
     created_at:string
     updated_at:string
     verb:Verb
@@ -32,7 +34,9 @@ export interface Notification
     display_text:string
     extra:any
     absolute_url:string
+    uri:string
     actors:number[]
+    mentions:number[]
 }
 export type TempStatus = {
   text: string

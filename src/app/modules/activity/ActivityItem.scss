@@ -1,0 +1,30 @@
+@import "../../Config.scss";
+
+$margin:5px;
+.activity-list-item{
+    padding: 8px;
+    text-decoration: none;
+    &:hover{
+        text-decoration: none;
+    }
+    .activity-content{
+        max-height: 4rem;
+        border-radius: 10px;
+        overflow: hidden;
+        position: relative;
+        align-items: center;
+
+        .avatar-list{
+            justify-content: center;
+            margin: $margin;
+            flex: 0;
+        }
+        .activity-text{
+            flex-shrink: 1;
+            font-size: 14px;
+            word-break: initial;
+            max-height: 65px;
+        }
+    }
+
+}
