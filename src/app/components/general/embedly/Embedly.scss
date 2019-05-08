@@ -73,6 +73,7 @@
     display: block;
     &.has-error{
         margin: initial;
+        text-decoration: underline !important;
     }
 }
 .is-embed-card.responsive 

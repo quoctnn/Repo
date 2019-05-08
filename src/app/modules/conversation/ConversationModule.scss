@@ -1,7 +1,6 @@
 @import "../../Config";
 .conversation-module
 {
-    
     .message-list-container{
         .img-responsive{
             object-fit: cover;
@@ -62,7 +61,7 @@
             margin: 2px auto;
             max-width: calc(90% - 40px);
             position: relative;
-            display: flex;
+            display: block;
             .file{
                 i{
                     margin-right: 8px;
@@ -76,6 +75,9 @@
                     padding: 4px 10px;
                     margin: 2px 0;
                 }
+            }
+            a{
+                text-decoration: underline;
             }
         }
         .chat-message.single-embed
@@ -99,13 +101,9 @@
             &.single-embed{
                 padding: 0;
                 a{
+                    float: left;
                     @include var(background-color, chat-message-left-background);
                 }
-            }
-            a
-            {
-                text-decoration: underline;
-                display: block;
             }
         }
 
@@ -119,13 +117,9 @@
             &.single-embed{
                 padding: 0;
                 a{
+                    float: right;
                     @include var(background-color, chat-message-right-background);
                 }
-            }
-            a
-            {
-                display: block;
-                text-decoration: underline;
             }
         }
         .chat-message.temp
@@ -172,11 +166,39 @@
                 margin-right: 5px;
             }
         }
-        .drop-zone
+        .drop-zone-content
         {
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            right: 0px;
+            bottom: 0px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 28px;
+            text-align: center;
+            pointer-events: none;
+            z-index: 20001;
+        }
+        .drop-zone:before{
+            @include var(border-color, border-color-default);
             border-width: 2px;
             border-style: dashed;
-            @include var(border-color, border-color-default);
+            position: absolute;
+            content:'';
+            top: 0px;
+            left: 0px;
+            right: 0px;
+            bottom: 0px;
+            opacity: 0.5;
+            @include var(background, highlight-foreground-color);
+            transition: all 0.1s ease;
+            pointer-events: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 20000;
         }
     }
 }

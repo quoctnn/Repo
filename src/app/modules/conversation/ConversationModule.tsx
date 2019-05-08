@@ -45,6 +45,7 @@ type State = {
     hasError:boolean
     showSpinner:boolean
     isTyping:{[key:string]:NodeJS.Timer}
+    renderDropZone:boolean
 }
 type ReduxStateProps = {
     conversation: Conversation
@@ -56,6 +57,8 @@ type ReduxDispatchProps = {
 type Props = OwnProps & RouteComponentProps<any> & ReduxStateProps & ReduxDispatchProps
 class ConversationModule extends React.Component<Props, State> {  
 
+    private dragCount:number = 0
+    private dropTarget = React.createRef<ChatMessageList>();
     private canPublishDidType = true
     private observers:EventSubscription[] = []
     constructor(props:Props) {
@@ -69,7 +72,8 @@ class ConversationModule extends React.Component<Props, State> {
             hasReceivedData:false,
             hasError:false,
             showSpinner:false,
-            isTyping:{}
+            isTyping:{},
+            renderDropZone:false,
         }
     }
     shouldReloadList = (prevProps:Props) => {
@@ -284,6 +288,72 @@ class ConversationModule extends React.Component<Props, State> {
             ConversationManager.sendMessage(message)
         })
     }
+    onDragOver = (event:React.DragEvent<HTMLDivElement>) => {
+        event.preventDefault()
+        try 
+        {
+            event.dataTransfer.dropEffect = "copy"
+        } 
+        catch (err) { }
+    }
+    onDrop = (event:React.DragEvent<HTMLDivElement>) => {
+        event.preventDefault()
+        let files = []
+        if (event.dataTransfer.items) 
+        {
+            for (var i = 0; i < event.dataTransfer.items.length; i++) 
+            {
+                if (event.dataTransfer.items[i].kind === 'file') 
+                {
+                    var file = event.dataTransfer.items[i].getAsFile()
+                    files.push(file)
+                }
+            }
+        } 
+        else 
+        {
+            for (var i = 0; i < event.dataTransfer.files.length; i++) 
+            {
+                let file = event.dataTransfer.files[i]
+                files.push(file)
+            }
+        }
+        this.removeDragData(event)
+        this.dragCount = 0
+        this.setState({renderDropZone:false})
+        if(files.length > 0)
+            this.filesAdded(files)
+    }
+
+    removeDragData = (event:React.DragEvent<HTMLDivElement>) => {
+        if (event.dataTransfer.items) 
+        {
+            event.dataTransfer.items.clear()
+        } 
+        else 
+        {
+            event.dataTransfer.clearData()
+        }
+    }
+    onDragLeave = (event:React.DragEvent<HTMLDivElement>) => {
+        event.preventDefault()
+        this.dragCount -= 1
+        if(this.dragCount == 0 && this.state.renderDropZone)
+        {
+            this.setState({renderDropZone:false})
+        }
+        console.log("onDragLeave", this.dragCount)
+    }
+    onDragEnter = (event:React.DragEvent<HTMLDivElement>) => {
+        event.preventDefault()
+        console.log((event.target as any).classList)
+        this.dragCount += 1
+        if(this.dragCount > 0 && !this.state.renderDropZone)
+        {
+            this.setState({renderDropZone:true})
+        }
+        console.log("onDragEnter", this.dragCount)
+    }
     renderNoConversation = () => {
         return <div>NO CONTENT</div>
     }
@@ -293,11 +363,25 @@ class ConversationModule extends React.Component<Props, State> {
         const {items, isLoading} = this.state
         let messages = this.props.queuedMessages.concat(items).sort((a,b) => uidToNumber(b.uid || messageToUid(b)) - uidToNumber(a.uid || messageToUid(a)))
         const conversationId = conversation && conversation.id
+        if(!conversationId)
+        {
+            return this.renderNoConversation()
+        }
+        const cl = classnames("list list-component-list vertical-scroll droptarget")
         return <div className="list-component message-list-container">
-                    <ChatMessageList className="list list-component-list vertical-scroll" conversation={conversationId} loading={isLoading} chatDidScrollToTop={this.chatDidScrollToTop} messages={messages} current_user={authenticatedUser} >
-                        {this.renderSomeoneIsTyping()}
-                        {!conversationId && this.renderNoConversation()}
-                    </ChatMessageList>
+                        <ChatMessageList ref={this.dropTarget}
+                            onDragOver={this.onDragOver} 
+                            onDrop={this.onDrop} 
+                            onDragLeave={this.onDragLeave} 
+                            onDragEnter={this.onDragEnter}
+                            className={cl} 
+                            conversation={conversationId} 
+                            loading={isLoading} 
+                            chatDidScrollToTop={this.chatDidScrollToTop} 
+                            messages={messages} 
+                            current_user={authenticatedUser} >
+                            {this.renderSomeoneIsTyping()}
+                        </ChatMessageList>
                     <ChatMessageComposer 
                                 className="secondary-text main-content-secondary-background" 
                                 mentionSearch={this.handleMentionSearch} 
@@ -308,6 +392,10 @@ class ConversationModule extends React.Component<Props, State> {
                                 onSubmit={this.onChatMessageSubmit} 
                                 onDidType={this.onDidType} 
                             />
+                    {this.state.renderDropZone && 
+                        <div className="drop-zone">
+                            <div className="drop-zone-content">{translate("conversation.module.drop.to.send.title")}</div>
+                        </div>}
                 </div>
     }
     render()
@@ -315,12 +403,13 @@ class ConversationModule extends React.Component<Props, State> {
         const {history, match, location, staticContext, contextNaturalKey, conversation, authenticatedUser, queuedMessages, ...rest} = this.props
         const {breakpoint, className} = this.props
         const cn = classnames("conversation-module", className)
+        const title = conversation && conversation.title
         return (<SimpleModule {...rest} 
                     className={cn} 
                     headerClick={this.headerClick} 
                     breakpoint={breakpoint} 
                     isLoading={this.state.isLoading} 
-                    headerTitle={translate("conversation.module.title")}>
+                    headerTitle={title}>
                 {this.renderContent()}
                 </SimpleModule>)
     }

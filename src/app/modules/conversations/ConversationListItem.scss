@@ -1,2 +1,52 @@
+@import "../../Config";
 .conversation-list-item{
+    padding: 8px;
+    .title
+    {
+        padding-left: 8px;
+        padding-right: 8px;
+
+    }
+    .is-typing-container
+    {
+        bottom: 0px;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        flex-shrink: 0;
+        > *
+        {
+            margin-right: 5px;
+        }
+        margin-left: 8px;
+    }
+    .conversation-item-body{
+
+        width: 100%;
+    }
+    &.active
+    {
+       @include var(background-color, main-content-secondary-background);
+       > a
+       {
+            color: #fff;
+       }
+    }
 }
+.notification-badge {
+    grid-row: 1 / 2;
+    grid-column: 2 / 3;
+    justify-self: right;
+    min-width: 16px;
+    height: 16px;
+    border-radius: 8px;
+    display: inline-grid;
+    justify-items: center;
+    align-items: center;
+    grid-column-end: 2;
+    color:white;
+    font-size: 12px;
+    align-self: center;
+    align-content: center;
+    padding: 4px;
+  }

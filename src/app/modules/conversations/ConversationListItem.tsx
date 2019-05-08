@@ -55,7 +55,7 @@ class ConversationListItem extends React.Component<Props, State> {
         const cl = classnames("conversation-list-item", className, {active:isActive})
         return (
             <div className={cl}>
-                <Link className="d-flex button-link" to={Routes.conversationUrl(conversation.id)}>
+                <Link className="d-flex button-link" to={conversation.uri || "#"}>
                     <div className="conversation-item-body d-flex align-items-center">
                         <div>
                             <Avatar images={avatars} size={size} borderColor="white" borderWidth={2}>
@@ -75,14 +75,6 @@ class ConversationListItem extends React.Component<Props, State> {
                 </Link>
             </div>
         )
-    }
-    render2()
-    {
-        const {conversation, className, children, ...rest} = this.props
-        const cl = classnames("conversation-list-item", className)
-        return (<Link to={conversation.uri || "#"} {...rest} className={cl}>
-                    {ConversationUtilities.getConversationTitle( conversation, AuthenticationManager.getAuthenticatedUser().id)}
-                </Link>)
     }
 }
 const mapStateToProps = (state:ReduxState, ownProps: OwnProps):ReduxStateProps => {

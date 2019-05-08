@@ -16,7 +16,7 @@ export interface Props {
     conversation:number
     className?:string
 }
-export class ChatMessageList extends React.Component<Props, {}> {
+export class ChatMessageList extends React.Component<Props & React.HTMLAttributes<HTMLElement>, {}> {
     SCROLL_POSITION:any = null
     wasAtBottomBeforeUpdate:boolean = false
     scrollToBottomThreshold = 50
@@ -80,15 +80,15 @@ export class ChatMessageList extends React.Component<Props, {}> {
         }
     }
     render = () => {
+        const {messages,current_user,chatDidScrollToTop,loading, children,conversation,className, ...rest} = this.props
         let components = [];
         let lastUserId = null, lastDay = null;
-        let messages = this.props.messages
         let messageTimeDist = 5;
         for (let i = messages.length - 1; i >= 0; i--) {
             let message = messages[i]
             let currentDate = stringToDate(message.created_at)
             let showTime = false
-            let isMessageFromCurrentUser = message.user == this.props.current_user.id
+            let isMessageFromCurrentUser = message.user == current_user.id
 
             if (!currentDate.isSame(lastDay, 'day')) // not same day as last message
             {
@@ -101,7 +101,7 @@ export class ChatMessageList extends React.Component<Props, {}> {
             {
                 showTime = true
             }
-            if(lastUserId && lastUserId == this.props.current_user.id && currentDate.diff(lastDay, "minutes") > messageTimeDist)
+            if(lastUserId && lastUserId == current_user.id && currentDate.diff(lastDay, "minutes") > messageTimeDist)
             {
                 showTime = true
             }
@@ -128,12 +128,12 @@ export class ChatMessageList extends React.Component<Props, {}> {
             lastUserId = message.user;
             lastDay = currentDate;
         }
-        const cn = classnames("message-list",  this.props.className)
+        const cn = classnames("message-list",  className)
         return (
-            <div onScroll={this.onChatScroll} className={cn} ref={this.listRef}>
+            <div {...rest} onScroll={this.onChatScroll} className={cn} ref={this.listRef}>
                 {this.renderLoading()}
                 {components}
-                {this.props.children}
+                {children}
             </div>
         )
     }

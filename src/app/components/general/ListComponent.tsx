@@ -6,7 +6,6 @@ import { List } from '../../components/general/List';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import { translate } from '../../localization/AutoIntlProvider';
 import { IdentifiableObject } from '../../types/intrasocial_types';
-import { getScrollParent } from 'react-select/lib/utils';
 
 type Props<T> = {
     className?:string
@@ -16,7 +15,9 @@ type Props<T> = {
     renderItem:(item:T) => React.ReactNode
     renderEmpty?:() => React.ReactNode
     renderError?:() => React.ReactNode
+    sortItems?:(items:T[]) => T[]
     reloadContext?:string
+    redrawContext?:string
 }
 type State<T> = {
     items:T[]
@@ -26,6 +27,7 @@ type State<T> = {
     requestId:number
     hasReceivedData:boolean
     hasError:boolean
+    redrawContext?:string
 }
 export default class ListComponent<T extends IdentifiableObject> extends React.Component<Props<T>, State<T>> {
     constructor(props:Props<T>) {
@@ -47,14 +49,16 @@ export default class ListComponent<T extends IdentifiableObject> extends React.C
         return this.state.items.find(t => t[key] == value)
     }
     updateItem = (item:T) => {
-        const index = this.state.items.findIndex(t => t.id == item.id)
-        let stateItems = this.state.items
-        stateItems[index!] = item
-        this.setState({items:stateItems})
+        this.setState((prevState:State<T>) => { 
+            const index = prevState.items.findIndex(t => t.id == item.id)
+            let stateItems = this.state.items
+            stateItems[index!] = item
+            return {items:stateItems}
+        })
     }
-    safeUnshift = (item:T, key:string) => {
+    safeUnshift = (item:T, key?:string) => {
         // Check if item exists (by id)
-        const oldItem = this.getItemByProperty(key, item[key])
+        const oldItem = !!key ? this.getItemByProperty(key, item[key]) : this.getItemById(item.id)
         if (oldItem) {
             this.updateItem(item);
         } else {
@@ -66,7 +70,7 @@ export default class ListComponent<T extends IdentifiableObject> extends React.C
         }
     }
     reload = () => {
-        this.setState(prevState => ({
+        this.setState((prevState:State<T>) => ({
             isRefreshing: true,
             isLoading: true,
             items:[],
@@ -80,7 +84,7 @@ export default class ListComponent<T extends IdentifiableObject> extends React.C
         {
             this.props.scrollParent.addEventListener("scroll", this.onScroll)
         }
-        this.setState(prevState => ({ // first load
+        this.setState((prevState:State<T>) => ({ // first load
             isLoading: true,
             requestId:prevState.requestId + 1
         }), this.loadData)
@@ -88,12 +92,18 @@ export default class ListComponent<T extends IdentifiableObject> extends React.C
     componentDidUpdate = (prevProps:Props<T>, prevState:State<T>) => {
         if(prevProps.reloadContext != this.props.reloadContext)
         {
-            this.setState(prevState => ({
+            this.setState((prevState:State<T>) => ({
                 isRefreshing: true,
                 isLoading: true,
                 items:[],
                 requestId:prevState.requestId + 1
             }), this.loadData)
+        }
+        if(prevProps.redrawContext != this.props.redrawContext)
+        {
+            this.setState((prevState:State<T>) => {
+                return {redrawContext:this.props.redrawContext}
+            })
         }
         if(this.props.onLoadingStateChanged && prevState.isLoading != this.state.isLoading)
         {
@@ -109,7 +119,7 @@ export default class ListComponent<T extends IdentifiableObject> extends React.C
             isAtBottom = event.target.scrollTop + event.target.offsetHeight >= event.target.scrollHeight
         if(isAtBottom)
         {
-            
+            this.handleLoadMore()
         }
     }
     handleLoadMore = () =>
@@ -118,7 +128,7 @@ export default class ListComponent<T extends IdentifiableObject> extends React.C
         {
             return
         }
-        this.setState(prevState => ({
+        this.setState((prevState:State<T>) => ({
             isLoading: true,
             requestId:prevState.requestId + 1
         }), this.loadData)
@@ -136,25 +146,28 @@ export default class ListComponent<T extends IdentifiableObject> extends React.C
                 if(requestId == this.state.requestId)
                 {
                     const d = offset == 0 ?  newData :  [...items, ...newData]
-                    this.setState({
-                        items: d,
-                        isRefreshing: false,
-                        hasMore:data.next != null,
-                        isLoading:false,
-                        hasReceivedData:true,
-                        hasError:false,
+                    this.setState((prevState:State<T>) => {
+                        return {
+                            items: d,
+                            isRefreshing: false,
+                            hasMore:data.next != null,
+                            isLoading:false,
+                            hasReceivedData:true,
+                            hasError:false,
+                        }
                     });
                 }
             }
             else {
-                this.setState({
+                this.setState((prevState:State<T>) => {
+                    return {
                     items: [],
                     isRefreshing: false,
                     hasMore:false,
                     isLoading:false,
                     hasReceivedData:true,
                     hasError:true,
-                });
+                }});
             }
         })
     }
@@ -167,7 +180,8 @@ export default class ListComponent<T extends IdentifiableObject> extends React.C
     renderItems = () => {
         const cn = classnames("list-component-list vertical-scroll", this.props.className)
         const scroll = this.props.scrollParent ? undefined : this.onScroll
-        const items = this.state.items.map(i => {
+        const listItems = this.props.sortItems ? this.props.sortItems(this.state.items) : this.state.items
+        const items = listItems.map(i => {
                             return this.props.renderItem(i)
                         }).concat(this.renderLoading())
         return (<List enableAnimation={false}
