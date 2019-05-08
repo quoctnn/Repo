@@ -41,7 +41,7 @@ export const setEndpointAction = (index: number):SetEndpointAction => ({
     endpoint: index
 })
 const INITIAL_STATE = {
-    endpoint: 0
+    endpoint: 1
 }
 const endpoint = (state = INITIAL_STATE, action:SetEndpointAction) => {
     switch (action.type) {

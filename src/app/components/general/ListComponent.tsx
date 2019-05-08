@@ -6,6 +6,7 @@ import { List } from '../../components/general/List';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import { translate } from '../../localization/AutoIntlProvider';
 import { IdentifiableObject } from '../../types/intrasocial_types';
+import { getScrollParent } from 'react-select/lib/utils';
 
 type Props<T> = {
     className?:string
@@ -26,7 +27,7 @@ type State<T> = {
     hasReceivedData:boolean
     hasError:boolean
 }
-export default class ListComponent<T extends IdentifiableObject> extends React.Component<Props<T>, State<T>> {  
+export default class ListComponent<T extends IdentifiableObject> extends React.Component<Props<T>, State<T>> {
     constructor(props:Props<T>) {
         super(props);
         this.state = {
@@ -42,11 +43,27 @@ export default class ListComponent<T extends IdentifiableObject> extends React.C
     getItemById = (id:number) => {
         return this.state.items.find(t => t.id == id)
     }
+    getItemByProperty = (key:string, value:any) => {
+        return this.state.items.find(t => t[key] == value)
+    }
     updateItem = (item:T) => {
         const index = this.state.items.findIndex(t => t.id == item.id)
         let stateItems = this.state.items
         stateItems[index!] = item
         this.setState({items:stateItems})
+    }
+    safeUnshift = (item:T, key:string) => {
+        // Check if item exists (by id)
+        const oldItem = this.getItemByProperty(key, item[key])
+        if (oldItem) {
+            this.updateItem(item);
+        } else {
+            this.setState((prevState:State<T>) => {
+                const l = prevState.items
+                l.unshift(item)
+                return {items:l}
+            })
+        }
     }
     reload = () => {
         this.setState(prevState => ({
@@ -57,7 +74,7 @@ export default class ListComponent<T extends IdentifiableObject> extends React.C
             hasReceivedData:false,
         }), this.loadData)
     }
-    componentDidMount = () => 
+    componentDidMount = () =>
     {
         if(this.props.scrollParent)
         {
@@ -88,14 +105,14 @@ export default class ListComponent<T extends IdentifiableObject> extends React.C
         let isAtBottom = false
         if(event.target instanceof Document)
             isAtBottom = (window.innerHeight + window.scrollY) >= document.body.offsetHeight
-        else 
+        else
             isAtBottom = event.target.scrollTop + event.target.offsetHeight >= event.target.scrollHeight
         if(isAtBottom)
         {
             this.handleLoadMore()
         }
     }
-    handleLoadMore = () => 
+    handleLoadMore = () =>
     {
         if(!this.state.hasMore || this.state.isLoading)
         {
@@ -106,7 +123,7 @@ export default class ListComponent<T extends IdentifiableObject> extends React.C
             requestId:prevState.requestId + 1
         }), this.loadData)
     }
-    loadData = () => 
+    loadData = () =>
     {
 
         const { items } = this.state
@@ -153,12 +170,12 @@ export default class ListComponent<T extends IdentifiableObject> extends React.C
         const items = this.state.items.map(i => {
                             return this.props.renderItem(i)
                         }).concat(this.renderLoading())
-        return (<List enableAnimation={false} 
-                    onScroll={scroll} 
+        return (<List enableAnimation={false}
+                    onScroll={scroll}
                     className={cn}>
                     {items}
                 </List>)
-        
+
     }
     renderError = () => {
         if(this.state.hasError && !this.state.isLoading && this.state.hasReceivedData)

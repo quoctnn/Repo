@@ -11,6 +11,8 @@ import ListComponent from '../../components/general/ListComponent';
 import ApiClient, { PaginationResult } from '../../network/ApiClient';
 import { ToastManager } from '../../managers/ToastManager';
 import ActivityItem  from './ActivityItem';
+import { NotificationCenter } from '../../utilities/NotificationCenter';
+import { eventStreamNotificationPrefix, EventStreamMessageType } from '../../network/ChannelEventStream';
 
 type OwnProps = {
     breakpoint:ResponsiveBreakpoint
@@ -35,6 +37,13 @@ class ActivityModule extends React.Component<Props, State> {
         {
             this.setState({isLoading:false})
         }
+    }
+    componentDidMount = () => {
+        NotificationCenter.addObserver(eventStreamNotificationPrefix + EventStreamMessageType.ACTIVITY_NEW, this.newActivityReceived)
+    }
+    newActivityReceived = (...args:any[]) => {
+        const activity = args[0] as RecentActivity;
+        if (activity) this.activityListInput.current.safeUnshift(activity, "created_at");
     }
     headerClick = (e) => {
         return 0;
