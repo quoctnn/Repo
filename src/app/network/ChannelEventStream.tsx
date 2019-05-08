@@ -18,7 +18,7 @@ export enum EventStreamMessageType {
     STATUS_UPDATE = "status.update",
     STATUS_DELETED = "status.deleted",
     STATUS_INTERACTION_UPDATE = "status.interaction.update",
-    NOTIFICATION_NEW = "notification.new",
+    ACTIVITY_NEW = "activity.new",
     SOCKET_STATE_CHANGE = "socket.state.change",
     COMMUNITY_MAIN = "community.main",
     COMMUNITY_UPDATE = "community.update"
