@@ -6,7 +6,6 @@ import { Link } from 'react-router-dom';
 import { AuthenticationManager } from '../../managers/AuthenticationManager';
 import { ProfileManager } from '../../managers/ProfileManager';
 import { nullOrUndefined } from '../../utilities/Utilities';
-import Routes from '../../utilities/Routes';
 import { Avatar } from '../../components/general/Avatar';
 import { ReduxState } from '../../redux';
 import { connect } from 'react-redux';

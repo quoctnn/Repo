@@ -110,6 +110,8 @@ class ConversationModule extends React.Component<Props, State> {
 
     incomingMessageHandler = (...args:any[]) => 
     {
+        if(!this.props.conversation)
+            return
         let message = args[0] as Message
         let conversation = this.props.conversation.id
         if(message.conversation == conversation)
@@ -124,12 +126,13 @@ class ConversationModule extends React.Component<Props, State> {
         }
     }
     isTypingHandler = (...args:any[]) => {
+
         let object = args[0]
         let user = object.user
         let conversation = object.conversation
-        if(user == this.props.authenticatedUser.id || conversation != this.props.conversation.id)
+        if(user == this.props.authenticatedUser.id || (this.props.conversation && (conversation != this.props.conversation.id)))
         {
-            return
+            return 
         }
         let it = {...this.state.isTyping}
         let oldUserTimer = it[user]

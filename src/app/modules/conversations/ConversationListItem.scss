@@ -27,10 +27,6 @@
     &.active
     {
        @include var(background-color, main-content-secondary-background);
-       > a
-       {
-            color: #fff;
-       }
     }
 }
 .notification-badge {

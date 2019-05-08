@@ -22,6 +22,9 @@ import { Settings } from '../../utilities/Settings';
 import { AuthenticationManager } from '../../managers/AuthenticationManager';
 import { uniqueId } from '../../utilities/Utilities';
 import { ContextManager } from '../../managers/ContextManager';
+import { Button } from 'reactstrap';
+import SimpleDialog from '../../components/general/dialogs/SimpleDialog';
+import CreateConversation from './create/CreateConversation';
 type IsTypingStore = {[conversation:number]:{[user:number]:NodeJS.Timer}}
 type OwnProps = {
     className?:string
@@ -36,6 +39,7 @@ type State = {
     isLoading:boolean
     isTyping:IsTypingStore
     listRedrawContext?:string
+    createConversationDialogVisible:boolean,
 }
 type ReduxStateProps = {
     authenticatedUser:UserProfile
@@ -56,7 +60,8 @@ class ConversationsModule extends React.Component<Props, State> {
         super(props);
         this.state = {
             isLoading:false,
-            isTyping:{}
+            isTyping:{},
+            createConversationDialogVisible:false
         }
     }
     componentDidMount = () => {
@@ -180,9 +185,33 @@ class ConversationsModule extends React.Component<Props, State> {
                         renderItem={this.renderConversation} className="conversations-module-list" />
             </>
     }
+    showCreateConversationDialog = () => {
+        this.setState((prevState) => {
+            return {createConversationDialogVisible:true}
+        })
+    }
+    closeCreateConversationDialog = () => {
+        this.setState((prevState) => {
+            return {createConversationDialogVisible:false}
+        })
+    }
+    renderCreateConversation = () => {
+        return <Button onClick={this.showCreateConversationDialog} className="btn btn-dark flex-shrink-0 btn-sm" >
+                    <i className="fas fa-plus"></i>
+                </Button>
+    }
+    renderCreateDialog = () => {
+        if(this.state.createConversationDialogVisible)
+        {
+            return (<SimpleDialog didCancel={this.closeCreateConversationDialog} visible={this.state.createConversationDialogVisible}>
+                        <CreateConversation onComplete={this.closeCreateConversationDialog} />
+                    </SimpleDialog>)
+        }
+        return null
+    }
     render()
     {
-        const {history, match, location, staticContext, contextNaturalKey, ...rest} = this.props
+        const {history, match, location, staticContext, contextNaturalKey,authenticatedUser, conversation, ...rest} = this.props
         const {breakpoint, className} = this.props
         const cn = classnames("conversations-module", className)
         return (<SimpleModule {...rest} 
@@ -190,8 +219,11 @@ class ConversationsModule extends React.Component<Props, State> {
                     headerClick={this.headerClick} 
                     breakpoint={breakpoint} 
                     isLoading={this.state.isLoading} 
-                    headerTitle={translate("conversations.module.title")}>
+                    headerTitle={translate("conversations.module.title")}
+                    headerContent={this.renderCreateConversation()}
+                    >
                 {this.renderContent()}
+                {this.renderCreateDialog()}
                 </SimpleModule>)
     }
 }

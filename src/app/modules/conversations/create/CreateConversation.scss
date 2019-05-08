@@ -1,0 +1,60 @@
+@import "../../../Config";
+#create-conversation
+{
+    @include var(color, primary-text-color);
+
+    .jumbotron {
+        @include var(background-color, main-content-background);
+    }
+
+    .member-list
+    {
+        > *
+        {
+            margin: 8px;
+            width: 80px;
+            display: inline-block;
+            .avatar
+            {
+                margin: 0 auto;
+            }
+            .member-name
+            {
+                text-align: center;
+            }
+            .remove-button
+            {
+                padding: 0;
+                width: 24px;
+                height: 24px;
+            }
+        }
+    }
+    .btn {
+        @include var(background, button-background-color);
+        @include var(color, button-color);
+        @include var(border-color, button-border-color);
+    }
+    .btn:hover {
+        @include var(background, button-hover-background-color); }
+
+    .btn:disabled {
+        @include var(background, button-disabled-background-color);
+        @include var(color, button-disabled-text-color); }
+
+    .submit-button
+    {
+        @include var(background, button-background-color);
+        @include var(color, button-color);
+        @include var(border-color, button-border-color);
+        .spinner
+        {
+            margin: 0;
+            > div
+            {
+                background-color:white;
+            }
+        }
+
+    }
+}

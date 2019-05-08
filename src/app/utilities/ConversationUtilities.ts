@@ -1,5 +1,5 @@
 import { ProfileManager } from '../managers/ProfileManager';
-import { Conversation, Message } from '../types/intrasocial_types';
+import { Conversation, Message, UserProfile } from '../types/intrasocial_types';
 import { nullOrUndefined } from './Utilities';
 
 export class ConversationUtilities 
@@ -7,8 +7,15 @@ export class ConversationUtilities
     static getConversationTitle = (conversation: Conversation, me:number) => {
         if(conversation.title)
             return conversation.title
-        return conversation.users.filter(i => i != me).map(u => {
-            let p = ProfileManager.getProfileById(u)
+        return ConversationUtilities.getConversationTitleFromMembers(conversation.users, me)
+    }
+    static getConversationTitleFromMembers = (members:number[], me:number) => {
+        const profiles = ProfileManager.getProfiles(members.filter(i => i != me))
+        return ConversationUtilities.getConversationTitleFromProfiles(profiles, me)
+    }
+    static getConversationTitleFromProfiles = (members:UserProfile[], me:number) => {
+        const profiles = members.filter(i => i.id != me)
+        return profiles.map(p => {
             if(p && p.first_name)
                 return p.first_name
             return "Unknown User"
