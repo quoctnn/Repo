@@ -22,6 +22,7 @@ type State = {
 }
 type Props = OwnProps & RouteComponentProps<any>
 class ActivityModule extends React.Component<Props, State> {
+    activityId = 0;
     activityListInput = React.createRef<ListComponent<RecentActivity>>()
     constructor(props:Props) {
         super(props);
@@ -43,10 +44,15 @@ class ActivityModule extends React.Component<Props, State> {
     }
     newActivityReceived = (...args:any[]) => {
         const activity = args[0] as RecentActivity;
-        if (activity) this.activityListInput.current.safeUnshift(activity, "created_at");
+        if (activity && this.activityListInput.current) this.activityListInput.current.safeUnshift(activity);
     }
     headerClick = (e) => {
         return 0;
+    }
+    getKey = (activity: RecentActivity) => {
+        // There is no unique key for notifications, so we use an incrementing integer
+        this.activityId += 1
+        return this.activityId
     }
     feedLoadingStateChanged = (isLoading:boolean) => {
         this.setState({isLoading})
@@ -58,7 +64,7 @@ class ActivityModule extends React.Component<Props, State> {
         })
     }
     renderActivity = (activity:RecentActivity) =>  {
-        return <ActivityItem key={activity.created_at} activity={activity} />
+        return <ActivityItem key={this.getKey(activity)} activity={activity} />
     }
     renderContent = () => {
         const {} = this.props
