@@ -2,7 +2,7 @@ import * as React from 'react'
 import classnames from "classnames"
 import "./EventListItem.scss"
 import { Event, IntraSocialType } from '../../types/intrasocial_types';
-import { eventCover, stringToDate, DateFormat } from '../../utilities/Utilities';
+import { eventCover, stringToDateFormat, DateFormat } from '../../utilities/Utilities';
 import { SecureImage } from '../../components/general/SecureImage';
 import { IntraSocialLink } from '../../components/general/IntraSocialLink';
 import { translate } from '../../localization/AutoIntlProvider';
@@ -35,7 +35,7 @@ export default class EventListItem extends React.Component<Props, State> {
                         <SecureImage className="top img" setBearer={true} setAsBackground={true} url={cover}>
                             <div className="flex-grow-1"></div>
                             <div className="event-date theme-box theme-bg-gradient">
-                                {stringToDate( event.start , DateFormat.day)}
+                                {stringToDateFormat( event.start , DateFormat.day)}
                             </div>
                         </SecureImage>
                         <div className="bottom d-flex align-items-center flex-row">

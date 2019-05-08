@@ -38,7 +38,7 @@ export default  {
         getSearchHistoryUrl: '/api/v1/search/history/',//GET
         createSearchHistoryUrl: '/api/v1/search/history/', //POST
         removeSearchHistoryUrl: (id:number) => {
-            return `/api/v2/search/${id}/remove_from_history/`
+            return `/api/v1/search/${id}/remove_from_history/`
         },
         // Community URLs
         myCommunitiesUrl: '/api/v2/community/as-member/',
@@ -64,8 +64,8 @@ export default  {
         profilesUrl: '/api/v2/profile/',
         profilesV1Url: '/api/v1/profile/',
 
-        myBusinessDataUrl:"/api/v2/profile/business_data/",
-        myPersonalDataUrl:"/api/v2/profile/personal_data/",
+        myBusinessDataUrl:"/api/v2/profile/business-data/",
+        myPersonalDataUrl:"/api/v2/profile/personal-data/",
         // Friends URLs
         friendsUrl: '/api/v2/friends/',
 
@@ -174,11 +174,9 @@ export default  {
             return `/api/v2/status/${id}/react/`
         },
         fileUploadUrl: '/api/v2/file-upload/',
-        conversationMessagesUrl: (id:number) => {
-            return `/api/v2/conversation/${id}/messages/`
-        },
+        conversationMessagesUrl: "/api/v2/message/",
         conversationMarkAsReadUrl: (id:number) => {
-            return `/api/v2/conversation/${id}/mark_read/`
+            return `/api/v2/conversation/${id}/mark-read/`
         },
         conversation: (id:number) => {
             return `/api/v2/conversation/${id}/`

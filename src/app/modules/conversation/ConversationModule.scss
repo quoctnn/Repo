@@ -1,0 +1,204 @@
+@import "../../Config";
+.conversation-module
+{
+    .message-list-container{
+        .img-responsive{
+            object-fit: cover;
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 8px;
+        }
+        .day-line
+        {
+            text-align: center;
+        }
+        .chat-user
+        {
+            margin-bottom: 0px;
+            position: relative;
+            .chat-user-inner
+            {
+                display: flex;
+                .avatar
+                {
+                    flex-shrink: 0;
+                }
+                .text
+                {
+                    font-size: 12px;
+                }
+            }
+        }
+        .chat-user.left {
+            margin-top: 20px;
+            .chat-user-inner
+            {
+                text-align: left;
+                flex-direction: row;
+                margin: 0 5px -9px 15px;
+                .avatar 
+                {
+                    margin-right: 5px;
+                }
+            }
+        }
+        .chat-user.right 
+        {
+            .chat-user-inner
+            {
+                text-align: right;
+                flex-direction: row-reverse;
+                margin:5px 15px 0 5px;
+            }
+        }
+        .chat-message
+        {
+            @include var(color, primary-text-color);
+            word-wrap: break-word;
+            word-break: break-word;
+            border-radius: 8px;
+            padding: 4px 10px;
+            margin: 2px auto;
+            max-width: calc(90% - 40px);
+            position: relative;
+            display: block;
+            .file{
+                i{
+                    margin-right: 8px;
+                }
+            }
+            &.single-embed{
+                padding: 0;
+                a{
+                    word-wrap: break-word;
+                    border-radius: 8px;
+                    padding: 4px 10px;
+                    margin: 2px 0;
+                }
+            }
+            a{
+                text-decoration: underline;
+            }
+        }
+        .chat-message.single-embed
+        {
+            width: calc(90% - 40px);
+            a:not(.has-error){
+                width: 100%;
+            }
+        }
+        .chat-message:last-child
+        {
+            margin-bottom: 5px;
+        }
+        .chat-message.left {
+            text-align: left;
+            margin-left: 40px;
+            &:not(.single-embed){
+
+                @include var(background-color, chat-message-left-background);
+            }
+            &.single-embed{
+                padding: 0;
+                a{
+                    float: left;
+                    @include var(background-color, chat-message-left-background);
+                }
+            }
+        }
+
+        .chat-message.right{
+            margin-right: 15px;
+            flex-direction: row-reverse;
+            &:not(.single-embed){
+
+                @include var(background-color, chat-message-right-background);
+            }
+            &.single-embed{
+                padding: 0;
+                a{
+                    float: right;
+                    @include var(background-color, chat-message-right-background);
+                }
+            }
+        }
+        .chat-message.temp
+        {
+            border:1px solid red;
+        }
+        @include var(background-color, main-content-background);
+        @include var(color, primary-text-color);
+
+        .card-body
+        {
+            padding: 0;
+        }
+        .chat-message-composer
+        {
+            position: relative;
+            margin: 8px;
+            border-radius: 8px;
+            > form{
+                padding-left: 8px;
+            }
+            .btn{
+                box-shadow: none;
+                &:active, &:hover, &:focus{
+                    box-shadow: none;
+                }
+            }
+        }
+        .is-typing-container
+        {
+            position: -webkit-sticky;
+            position: -moz-sticky;
+            position: -o-sticky;
+            position: sticky;
+            @include var(background-color, main-content-background);
+            bottom: 0px;
+            padding: 5px 5px 5px 15px;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            flex-shrink: 0;
+            > *
+            {
+                margin-right: 5px;
+            }
+        }
+        .drop-zone-content
+        {
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            right: 0px;
+            bottom: 0px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 28px;
+            text-align: center;
+            pointer-events: none;
+            z-index: 20001;
+        }
+        .drop-zone:before{
+            @include var(border-color, border-color-default);
+            border-width: 2px;
+            border-style: dashed;
+            position: absolute;
+            content:'';
+            top: 0px;
+            left: 0px;
+            right: 0px;
+            bottom: 0px;
+            opacity: 0.5;
+            @include var(background, highlight-foreground-color);
+            transition: all 0.1s ease;
+            pointer-events: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 20000;
+        }
+    }
+}

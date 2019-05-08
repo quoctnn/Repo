@@ -9,7 +9,7 @@ export interface AddTasksAction{
     tasks:Task[]
 }
 export interface ResetTasksAction{
-    type:string
+    type:TaskStoreActionTypes
 }
 export const addTasksAction = (tasks: Task[]):AddTasksAction => ({
     type: TaskStoreActionTypes.AddTasks,

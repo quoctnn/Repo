@@ -11,12 +11,11 @@ import { translate } from '../../localization/AutoIntlProvider';
 import { Event, Community, ContextNaturalKey, Permission } from '../../types/intrasocial_types';
 import { connect } from 'react-redux';
 import { ReduxState } from '../../redux';
-import { CommunityManager } from '../../managers/CommunityManager';
 import CircularLoadingSpinner from '../../components/general/CircularLoadingSpinner';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import { DetailsContent } from '../../components/details/DetailsContent';
 import { DetailsMembers } from '../../components/details/DetailsMembers';
-import { stringToDate, DateFormat } from '../../utilities/Utilities';
+import { stringToDateFormat, DateFormat } from '../../utilities/Utilities';
 import { ContextManager } from '../../managers/ContextManager';
 const shortMonth:string[] = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 type OwnProps = {
@@ -117,9 +116,9 @@ class EventDetailsModule extends React.Component<Props, State> {
                                     </div>
                                     <div className="event-start-end text-truncate">
                                         <div className="details-field-value">
-                                            {stringToDate(event.start, DateFormat.date)}
+                                            {stringToDateFormat(event.start, DateFormat.date)}
                                             &nbsp;-<br/>
-                                            {stringToDate(event.end, DateFormat.date)}
+                                            {stringToDateFormat(event.end, DateFormat.date)}
                                         </div>
                                     </div>
                                 </div>

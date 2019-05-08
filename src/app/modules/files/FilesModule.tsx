@@ -3,7 +3,7 @@ import { withRouter, RouteComponentProps } from "react-router-dom";
 import classnames from "classnames"
 import "./FilesModule.scss"
 import { ResponsiveBreakpoint } from '../../components/general/observers/ResponsiveComponent';
-import { ContextNaturalKey, Permissible, UploadedFile, Community, IdentifiableObject } from '../../types/intrasocial_types';
+import { ContextNaturalKey, Permissible, UploadedFile, IdentifiableObject } from '../../types/intrasocial_types';
 import { connect } from 'react-redux';
 import { ReduxState } from '../../redux';
 import LoadingSpinner from '../../components/LoadingSpinner';

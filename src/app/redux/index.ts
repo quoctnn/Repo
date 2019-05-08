@@ -6,7 +6,7 @@ import { theme } from "./theme";
 import endpoint from './endpoint';
 import authentication, { AuthenticationData } from "./authentication";
 import { embedlyStore } from "../components/general/embedly/redux";
-import { EmbedCardItem, Community, UserProfile, Group, Project, Event, Task } from '../types/intrasocial_types';
+import { EmbedCardItem, Community, UserProfile, Group, Project, Event, Task, Conversation } from '../types/intrasocial_types';
 import { communityStore } from "./communityStore";
 import { profileStore } from './profileStore';
 import {groupStore} from './groupStore';
@@ -15,6 +15,8 @@ import { eventStore } from './eventStore';
 import {taskStore} from './taskStore';
 import { projectStore } from "./projectStore";
 import application from "./application";
+import { conversationStore } from './conversationStore';
+import messageQueue, { MessageQueue } from "./messageQueue";
 const rootPersistConfig:PersistConfig = {
     key: 'root',
     storage: storage,
@@ -23,7 +25,7 @@ const rootPersistConfig:PersistConfig = {
   }
 const rootReducer = combineReducers({
     authentication, language, theme, endpoint, embedlyStore, communityStore, profileStore,
-    groupStore, activeCommunity, eventStore, taskStore, projectStore, application,
+    groupStore, activeCommunity, eventStore, taskStore, projectStore, application, conversationStore, messageQueue
 })
 export default persistReducer(rootPersistConfig, rootReducer)
 export interface ReduxState
@@ -37,9 +39,11 @@ export interface ReduxState
     groupStore:{ byId: { [id: number]: Group},allIds: number[]}
     projectStore:{ byId: { [id: number]: Project},allIds: number[]}
     profileStore:{ byId: { [id: number]: UserProfile},allIds: number[]}
+    conversationStore:{ byId: { [id: number]: Conversation},allIds: number[]}
     eventStore:{ byId: { [id: number]: Event},allIds: number[]}
     taskStore:{ byId: { [id: number]: Task},allIds: number[]}
     activeCommunity:{activeCommunity:number}
     application:{loaded:boolean}
+    messageQueue:MessageQueue
     _persist:any
 }
