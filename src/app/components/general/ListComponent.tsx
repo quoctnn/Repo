@@ -52,9 +52,12 @@ export default class ListComponent<T extends IdentifiableObject> extends React.C
         stateItems[index!] = item
         this.setState({items:stateItems})
     }
-    safeUnshift = (item:T, key:string) => {
-        // Check if item exists (by id)
-        const oldItem = this.getItemByProperty(key, item[key])
+    safeUnshift = (item:T, key?:string) => {
+        let oldItem = null
+        if (key)
+            oldItem = this.getItemByProperty(key, item['key'])
+        else
+            oldItem = this.getItemById(item.id)
         if (oldItem) {
             this.updateItem(item);
         } else {
