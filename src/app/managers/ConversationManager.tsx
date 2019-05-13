@@ -1,9 +1,10 @@
 import {  Store } from 'redux';
+import * as React from 'react';
 import ApiClient from '../network/ApiClient';
-import { Conversation, Message, UserProfile } from '../types/intrasocial_types';
+import { Conversation, Message, UserProfile, Permission } from '../types/intrasocial_types';
 import { EventStreamMessageType, sendOnWebsocket, canSendOnWebsocket } from '../network/ChannelEventStream';
 import { ReduxState } from '../redux';
-import { addConversationsAction } from '../redux/conversationStore';
+import { addConversationsAction, removeConversationAction } from '../redux/conversationStore';
 import { updateMessageInQueueAction, processMessageInQueueAction, removeMessageFromQueueAction, processNextMessageInQueueAction, addMessageToQueueAction } from '../redux/messageQueue';
 import { AuthenticationManager } from './AuthenticationManager';
 import { NotificationCenter } from '../utilities/NotificationCenter';
@@ -11,7 +12,8 @@ import Routes from '../utilities/Routes';
 import { ProfileManager } from './ProfileManager';
 import { ToastManager } from './ToastManager';
 import { translate } from '../localization/AutoIntlProvider';
-
+import { setTemporaryConversationAction } from '../redux/tempCache';
+import { nullOrUndefined } from '../utilities/Utilities';
 export abstract class ConversationManager 
 {
     static setup = () => 
@@ -23,9 +25,24 @@ export abstract class ConversationManager
     static storeConversations = (conversations:Conversation[]) => {
         ConversationManager.getStore().dispatch(addConversationsAction(conversations))
     }
+    static removeConversation = (conversationsId:number) => {
+        ConversationManager.getStore().dispatch(removeConversationAction(conversationsId))
+    }
     static getConversation = (conversationId:number|string):Conversation => 
     {
         return ConversationManager.getStore().getState().conversationStore.byId[conversationId]
+    }
+    static deleteConversation = (conversationId:number, completion:(success:boolean) => void) => 
+    {
+        ApiClient.deleteConversation(conversationId, (data, status, error) => {
+            const success = nullOrUndefined(error)
+            if(nullOrUndefined(error))
+            {
+                ConversationManager.removeConversation(conversationId)
+            }
+            ToastManager.showErrorToast(error)
+            completion(success)
+        })
     }
     static ensureConversationExists = (conversationId:number|string, completion:(conversation:Conversation) => void) => 
     {
@@ -56,7 +73,6 @@ export abstract class ConversationManager
         }
 
     }
-
     private static processIncomingConversation = (...args:any[]) => 
     {
         let conversation = args[0] as Conversation
@@ -76,7 +92,32 @@ export abstract class ConversationManager
         })
         
     }
+    static createTemporaryConversation = () => {
 
+        let store = ConversationManager.getStore()
+        const now = Date.now()
+        const created = new Date()
+        created.setFullYear(created.getFullYear() + 1)
+        const ds = created.toUTCString()
+        const conversation:Conversation = {
+            id: now,
+            created_at: ds,
+            updated_at:ds,
+            title:null,
+            users:[],
+            unread_messages:[],
+            last_message:null,
+            read_by:[],
+            uri:Routes.conversationUrl("new"),
+            permission:Permission.post,
+            temporary:true
+        }
+        store.dispatch(setTemporaryConversationAction(conversation))
+    }
+    static updateTemporaryConversation = (conversation:Conversation) => {
+        let store = ConversationManager.getStore()
+        store.dispatch(setTemporaryConversationAction(conversation))
+    }
     private static sendMessageNotification = (message: Message) =>  
     {
         let uri = Routes.conversationUrl(message.conversation)

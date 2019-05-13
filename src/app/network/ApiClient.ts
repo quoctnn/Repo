@@ -202,6 +202,15 @@ export default class ApiClient
             callback(null, status, error)
         })
     }
+    static deleteConversation(conversationId:number, callback:ApiClientCallback<any>)
+    {
+        let url = Constants.apiRoute.conversation(conversationId)
+        AjaxRequest.delete(url, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
     static updateTask(id:number, task:Partial<Task>, callback:ApiClientCallback<Task>)
     {
         let url = Constants.apiRoute.taskIdUrl(id)
@@ -456,9 +465,9 @@ export default class ApiClient
             callback(null, status, error)
         })
     }
-    static getConversations(limit:number, offset:number,callback:ApiClientFeedPageCallback<Conversation>)
+    static getConversations(limit:number, offset:number, archived:boolean, callback:ApiClientFeedPageCallback<Conversation>)
     {
-        let url = Constants.apiRoute.conversations + "?" + this.getQueryString({limit, offset})
+        let url = Constants.apiRoute.conversations + "?" + this.getQueryString({limit, offset, archived})
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {

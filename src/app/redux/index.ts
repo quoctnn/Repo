@@ -17,15 +17,16 @@ import { projectStore } from "./projectStore";
 import application from "./application";
 import { conversationStore } from './conversationStore';
 import messageQueue, { MessageQueue } from "./messageQueue";
+import tempCache, { TempCache } from './tempCache';
 const rootPersistConfig:PersistConfig = {
     key: 'root',
     storage: storage,
-    blacklist: ['authentication', "application"],
+    blacklist: ['authentication', "application", "tempCache"],
     debug:true,
   }
 const rootReducer = combineReducers({
     authentication, language, theme, endpoint, embedlyStore, communityStore, profileStore,
-    groupStore, activeCommunity, eventStore, taskStore, projectStore, application, conversationStore, messageQueue
+    groupStore, activeCommunity, eventStore, taskStore, projectStore, application, conversationStore, messageQueue, tempCache
 })
 export default persistReducer(rootPersistConfig, rootReducer)
 export interface ReduxState
@@ -45,5 +46,6 @@ export interface ReduxState
     activeCommunity:{activeCommunity:number}
     application:{loaded:boolean}
     messageQueue:MessageQueue
+    tempCache:TempCache
     _persist:any
 }

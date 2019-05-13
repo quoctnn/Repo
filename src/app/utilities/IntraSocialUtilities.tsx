@@ -65,7 +65,7 @@ export class IntraSocialUtilities
             // Failsafe to prevent crash if unable to parse url
             let u: URL;
             try {
-                u = new URL(url)
+                u = new URL(url, location.href)
             } catch {
                 u = new URL("https://intra.work")
             }

@@ -38,8 +38,7 @@ class CreateConversation extends React.Component<Props, State> {
         }
     }
     getConversationPlaceholderTitle = () => {
-        const me = AuthenticationManager.getAuthenticatedUser().id
-        return this.state.selectedUsers.length == 0 ? translate("No title") : ConversationUtilities.getConversationTitleFromProfiles(this.state.selectedUsers, me)
+        return this.state.selectedUsers.length == 0 ? translate("No title") : ConversationUtilities.getConversationTitleFromProfiles(this.state.selectedUsers)
     }
     removeUser(id:number)
     {
@@ -82,7 +81,6 @@ class CreateConversation extends React.Component<Props, State> {
                 })
             } )
         })
-        
     }
     canSubmit = () => {
         return this.state.selectedUsers.length > 0 && !this.state.submitting

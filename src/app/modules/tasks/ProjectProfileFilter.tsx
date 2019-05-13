@@ -10,8 +10,10 @@ import { SingleValueProps } from 'react-select/lib/components/SingleValue';
 import { AsyncSelectIW } from '../../components/general/input/AsyncSelectIW';
 
 export type ProfileFilterOption = { value: string, label: string, id:number, icon:string}
-
-const ProfileOptionComponent = (props:OptionProps<ProfileFilterOption>) => {
+export const createProfileFilterOption = (profile:UserProfile):ProfileFilterOption => {
+    return {value:profile.slug_name, label:userFullName(profile), id:profile.id, icon:userAvatar(profile, true)}
+}
+export const ProfileOptionComponent = (props:OptionProps<ProfileFilterOption>) => {
 
     const option = props.data as ProfileFilterOption
     const onClick = props.innerProps.onClick
@@ -30,7 +32,7 @@ const ProfileOptionComponent = (props:OptionProps<ProfileFilterOption>) => {
         </div>
     </div>)
 }
-const ProfileSingleValueComponent = (props:SingleValueProps<ProfileFilterOption>) => {
+export const ProfileSingleValueComponent = (props:SingleValueProps<ProfileFilterOption>) => {
 
     const option = props.data
     const avatar = option.icon
@@ -62,17 +64,14 @@ export class ProjectProfileFilter extends React.PureComponent<Props & React.HTML
     onChange = (value:ProfileFilterOption) => {
         this.props.onValueChange(value)
     }
-    getProfileFilterOption = (profile:UserProfile):ProfileFilterOption => {
-        return {value:profile.slug_name, label:userFullName(profile), id:profile.id, icon:userAvatar(profile, true)}
-    }
     getProfiles = (text:string, completion:(options:ProfileFilterOption[]) => void) => {
         const resp = (profiles:number[]) => {
             if(!profiles)
             {
-                completion(ProfileManager.searchProfiles(text,null, 50, true).map(this.getProfileFilterOption))
+                completion(ProfileManager.searchProfiles(text,null, 50, true).map(createProfileFilterOption))
             } else {
                 ProfileManager.ensureProfilesExists(profiles, () => {
-                    completion(ProfileManager.searchProfileIds(text, profiles).map(this.getProfileFilterOption))
+                    completion(ProfileManager.searchProfileIds(text, profiles).map(createProfileFilterOption))
                 })
             }
         }

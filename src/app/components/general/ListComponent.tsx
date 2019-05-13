@@ -18,6 +18,8 @@ type Props<T> = {
     sortItems?:(items:T[]) => T[]
     reloadContext?:string
     redrawContext?:string
+    /** Filter out elements that should not count for offset */
+    offsetCountFilter?:(items:T[]) => number
 }
 type State<T> = {
     items:T[]
@@ -30,6 +32,7 @@ type State<T> = {
     redrawContext?:string
 }
 export default class ListComponent<T extends IdentifiableObject> extends React.Component<Props<T>, State<T>> {
+    private listRef = React.createRef<List>()
     constructor(props:Props<T>) {
         super(props);
         this.state = {
@@ -45,6 +48,9 @@ export default class ListComponent<T extends IdentifiableObject> extends React.C
     getItemById = (id:number) => {
         return this.state.items.find(t => t.id == id)
     }
+    getItemAtIndex = (index:number) => {
+        return this.state.items[index]
+    }
     getItemByProperty = (key:string, value:any) => {
         return this.state.items.find(t => t[key] == value)
     }
@@ -53,6 +59,18 @@ export default class ListComponent<T extends IdentifiableObject> extends React.C
             const index = prevState.items.findIndex(t => t.id == item.id)
             let stateItems = this.state.items
             stateItems[index!] = item
+            return {items:stateItems}
+        })
+    }
+    removeItemById = (id:number) => {
+        
+        this.setState((prevState:State<T>) => {
+            let stateItems = prevState.items
+            const index = stateItems.findIndex(t => t.id == id)
+            if(index > -1)
+            {
+                stateItems.splice(index,1)
+            }
             return {items:stateItems}
         })
     }
@@ -110,6 +128,9 @@ export default class ListComponent<T extends IdentifiableObject> extends React.C
             this.props.onLoadingStateChanged(this.state.isLoading)
         }
     }
+    scrollToTop = () => {
+        this.listRef.current.scrollToTop()
+    }
     onScroll = (event:any) =>
     {
         let isAtBottom = false
@@ -133,11 +154,16 @@ export default class ListComponent<T extends IdentifiableObject> extends React.C
             requestId:prevState.requestId + 1
         }), this.loadData)
     }
-    loadData = () =>
-    {
+    getOffset = () => {
 
         const { items } = this.state
-        const offset = items.length
+        if(this.props.offsetCountFilter)
+            return this.props.offsetCountFilter(items)
+        return items.length
+    }
+    loadData = () =>
+    {
+        const offset = this.getOffset()
         const requestId = this.state.requestId
         this.props.fetchData(offset, (data) => {
             if(data && data.results)
@@ -145,8 +171,9 @@ export default class ListComponent<T extends IdentifiableObject> extends React.C
                 let newData = data.results
                 if(requestId == this.state.requestId)
                 {
-                    const d = offset == 0 ?  newData :  [...items, ...newData]
                     this.setState((prevState:State<T>) => {
+                        const items = prevState.items
+                        const d = offset == 0 ?  newData :  [...items, ...newData]
                         return {
                             items: d,
                             isRefreshing: false,
@@ -184,7 +211,7 @@ export default class ListComponent<T extends IdentifiableObject> extends React.C
         const items = listItems.map(i => {
                             return this.props.renderItem(i)
                         }).concat(this.renderLoading())
-        return (<List enableAnimation={false}
+        return (<List ref={this.listRef} enableAnimation={false}
                     onScroll={scroll}
                     className={cn}>
                     {items}

@@ -22,9 +22,9 @@ export class FileUtilities {
     }
     static renderVideo(file:UploadedFile)
     {
-        if(VideoPlayer.canPlay(file.file))
+        if(VideoPlayer.canPlay(file.file, file.extension))
         {
-            return (<VideoPlayer link={file.file} key={file.id}/>)
+            return (<VideoPlayer link={file.file} key={file.id} extension={file.extension}/>)
         }
         return null
     }

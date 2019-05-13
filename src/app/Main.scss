@@ -20,6 +20,20 @@ html{
 }
 ul,li{ list-style-type: none; padding: 0;}
 //bootstrap extensions/overrides
+.title-text{
+    font-size: 1.3em;
+    font-weight: bold;
+}
+.small-text{
+    font-size: 0.7em;
+}
+.medium-text{
+    font-size: 0.9em;
+}
+
+.push-right {
+    margin-left: auto;
+}
 .modal-title {
     display: block;
     width: 100%;
@@ -66,7 +80,6 @@ button{@include var(color, primary-text-color);}
     font-weight: 500;
     cursor: pointer;
     display: inline;
-    word-break: break-all;
 }
 .link-text:hover, a:hover, .text.link:hover, .btn-link:hover
 {

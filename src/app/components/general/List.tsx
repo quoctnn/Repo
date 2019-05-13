@@ -24,11 +24,18 @@ export class List extends React.PureComponent<Props, {}> {
         children:[]
     }
     state:State
+    private listRef = React.createRef<HTMLDivElement>()
     constructor(props) {
         super(props);
         this.state = {items:[], rects:{}}
         this.getChildren = this.getChildren.bind(this)
         this.animateAndTransform = this.animateAndTransform.bind(this)
+    }
+    scrollToTop = () => {
+        this.listRef.current.scrollTo({
+            top: 0,
+            behavior:"smooth"
+        })
     }
     componentWillReceiveProps(newProps) {
         if(this.props.enableAnimation)
@@ -120,7 +127,7 @@ export class List extends React.PureComponent<Props, {}> {
     render() 
     {
         return(
-            <div onScroll={this.props.onScroll} className={"list" + (this.props.className ? " " + this.props.className : "") } >
+            <div ref={this.listRef} onScroll={this.props.onScroll} className={"list" + (this.props.className ? " " + this.props.className : "") } >
                   {this.props.children}
             </div>
         );

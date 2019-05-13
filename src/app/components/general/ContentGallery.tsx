@@ -9,7 +9,7 @@ import PhotoSwipeComponent from './gallery/PhotoSwipeComponent';
 import { nullOrUndefined } from '../../utilities/Utilities';
 import classnames from 'classnames';
 import { SecureImage } from './SecureImage';
-require("./ContentGallery.scss");
+import "./ContentGallery.scss"
 export const convertToComponent = (file:UploadedFile,galleryMode?:boolean, onClick?:(file:UploadedFile, event) => void):JSX.Element => {
     const gm = nullOrUndefined( galleryMode ) ? false : galleryMode
     switch(file.type)
@@ -34,7 +34,7 @@ export const getImageUrl = (file:UploadedFile, preferFullVersion:boolean) => {
     let img = preferFullVersion ? file.image : file.thumbnail
     if(!img) // pick any if not found
         img = file.image || file.thumbnail
-    return img
+    return IntraSocialUtilities.appendAuthorizationTokenToUrl(img)
 } 
 export class GalleryImageComponent extends React.Component<GalleryComponentProps, {}> {
     onClick = (event:any) => {
@@ -91,11 +91,10 @@ export class GalleryMediaComponent extends React.Component<GalleryComponentProps
                     {active && <VideoPlayer autoPlay={true} poster={poster} link={url} extension={extension}/>}
                     {!active && 
                         <div className="poster-container">
-                            <SecureImage label={this.props.file.filename + " poster image"} url={poster} setBearer={false} />
+                            <SecureImage label={this.props.file.filename + " poster image"} className="img-responsive" url={poster} />
                             <div className="play-button">
                                 <i className="fas fa-play"></i>
                             </div>
-                            
                         </div>
                     }
                 </div>
@@ -112,6 +111,7 @@ export interface OwnProps
 export interface DefaultProps 
 {
     height:number
+    setWidth:boolean
 }
 interface State 
 {
@@ -122,7 +122,8 @@ type Props = OwnProps & DefaultProps
 
 export default class ContentGallery extends React.Component<Props, State> {     
     static defaultProps:DefaultProps = {
-        height:200
+        height:200,
+        setWidth:false
     }
     windowResizeOn = false
     animationDuration = 300
@@ -195,14 +196,12 @@ export default class ContentGallery extends React.Component<Props, State> {
             totalWidth += w
             points.push({width:w, height:targetHeight})
         })
-        //console.log("calc", points, totalWidth, "target:", targetWidth, targetHeight)
         //rescale
         const scale = totalWidth / targetWidth  
         const newPoints:Point[] = points.map(p => {
             return {width:p.width / scale, height:p.height / scale}
         })
         const maxWidth = Math.min( targetWidth * scale , targetWidth) 
-        //console.log("rescale", newPoints, scale, maxWidth)
         return {points:newPoints, maxWidth:maxWidth, width:targetWidth, height:targetHeight / scale }
     }
     renderModal = () => 
@@ -239,7 +238,12 @@ export default class ContentGallery extends React.Component<Props, State> {
         const sizes = this.calculateSizes(files)
         const height = sizes.height * 100 / sizes.width
         const items = this.renderItems(files)
-        return (<div className="gallery-container" style={{ maxWidth:sizes.maxWidth}}>
+        const styles:React.CSSProperties = {}
+        if(this.props.setWidth)
+            styles.width = sizes.maxWidth
+        else 
+            styles.maxWidth = sizes.maxWidth
+        return (<div className="gallery-container" style={styles}>
                     <div ref={this.galleryContainer} style={{paddingBottom:height + "%"}} className={"gallery-list"}>
                         {items}
                     </div>

@@ -1,6 +1,6 @@
 import * as React from "react";
 import { connect } from 'react-redux'
-import { nullOrUndefined } from '../../../utilities/Utilities';
+import { nullOrUndefined, truncate } from '../../../utilities/Utilities';
 import { EmbedCardItem } from '../../../types/intrasocial_types';
 import { ReduxState } from '../../../redux/index';
 import { embedlyRequestDataAction } from './redux';
@@ -10,32 +10,41 @@ import Constants from "../../../utilities/Constants";
 import { Avatar } from "../Avatar";
 import { Settings } from "../../../utilities/Settings";
 import classnames from 'classnames';
-export interface OwnProps {
+import { Card, CardImg, CardBody, CardTitle, CardSubtitle, CardText, Button } from "reactstrap";
+import { SecureImage } from "../SecureImage";
+import { EndpointManager } from "../../../managers/EndpointManager";
+import { IntraSocialUtilities } from "../../../utilities/IntraSocialUtilities";
+type OwnProps = {
     url: string
 }
-interface ReduxStateProps 
-{
+type DefaultProps = {
+    showMedia:boolean
+    verticalCard:boolean
+}
+type ReduxStateProps = {
     data:EmbedCardItem
     isLoading:boolean
 }
-interface ReduxDispatchProps 
-{
+type ReduxDispatchProps = {
     requestEmbedData:(urls:string[], cardType:LinkCardType) => void
 }
-type Props = ReduxStateProps & ReduxDispatchProps & OwnProps
+type Props = ReduxStateProps & ReduxDispatchProps & OwnProps & DefaultProps
 
 export enum LinkCardType {
     embed 
 }
-interface State {
+type State = {
     cardType:LinkCardType
 }
 class Embedly extends React.Component<Props, State> {
-    state: State;
+    static defaultProps:DefaultProps = {
+        showMedia:false,
+        verticalCard:false
+    }
     constructor(props:Props) {
         super(props);
         this.state = {
-            cardType:LinkCardType.embed
+            cardType:LinkCardType.embed,
         }
     }
     shouldComponentUpdate = (nextProps:Props, nextState:State) => {
@@ -61,9 +70,30 @@ class Embedly extends React.Component<Props, State> {
         }
         return null
     }
-    renderCard = (image:string, title:string, subtitle:string, description:string, avatar:string, icon:string) => 
-    {
+    renderVerticalCard  = (image:string, title:string, subtitle:string, description:string, avatar:string, icon:string, url:string) => {
         const bgImage = image || Constants.resolveUrl(Constants.defaultImg.default)()
+        const favIcon = avatar || icon
+        return (<Card className="hover-card">
+                    <CardImg top width="100%" src={bgImage} alt="Card image cap" />
+                    <CardBody>
+                        <CardTitle className="primary-text title-text">{title}</CardTitle>
+                        {subtitle && <CardSubtitle>{subtitle}</CardSubtitle>}
+                        <p className="secondary-text medium-text">{description}</p>
+                        <div className="d-flex align-items-center">
+                            {favIcon && <SecureImage className="mr-1 favicon" url={favIcon} />}
+                            <div className="secondary-text text-truncate small-text">{url}</div>
+                        </div>
+                    </CardBody>
+                </Card>)
+    }
+    renderCard = (image:string, title:string, subtitle:string, description:string, avatar:string, icon:string, url:string) => 
+    {
+        if(this.props.verticalCard)
+        {
+            return this.renderVerticalCard(image, title, subtitle, description, avatar, icon, url)
+        }
+        const bgImage = image || Constants.resolveUrl(Constants.defaultImg.default)()
+        const favIcon = avatar || icon
         return (<div className="card card-horizontal card-highlight anim-transition hover-card drop-shadow">
                     <div className="row">
                         <div className="col-4" style={{padding:0}}>
@@ -73,13 +103,17 @@ class Embedly extends React.Component<Props, State> {
                         </div>
                         <div className="col-8 card-content" style={{paddingLeft:"8px", paddingRight:"8px"}}>
                             <div className="card-block">
-                                <h4 className="card-title text-uppercase text-truncate">
-                                {avatar && <Avatar size={24} image={avatar} className="" />}                                
-                                {icon && <i className={icon}></i>}
+                                <CardTitle className="primary-text title-text text-truncate">
+                                    {avatar && <Avatar size={24} image={avatar} className="" />}                                
+                                    {icon && <i className={icon}></i>}
                                     <div className="text-truncate">{title}</div>
-                                </h4>
-                                {subtitle && <p className="card-subtitle font-italic text-muted">{subtitle}</p>}
-                                <p className="card-text" dangerouslySetInnerHTML={{__html: description}}></p>
+                                </CardTitle>
+                                {subtitle && <CardSubtitle>{subtitle}</CardSubtitle>}
+                                <p className="secondary-text medium-text">{description}</p>
+                                <div className="d-flex align-items-center">
+                                    {favIcon && <SecureImage className="mr-1 favicon" url={favIcon} />}
+                                    <div className="secondary-text text-truncate small-text">{url}</div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -95,17 +129,22 @@ class Embedly extends React.Component<Props, State> {
                     return this.props.url//(<a href={this.props.url} target="_blank"  data-toggle="tooltip" title={this.props.url}>{this.props.url}</a>)
                 }
                 const data:EmbedCardItem = this.props.data as any
-                if(data.media && data.media.html)
-                {
-                    return <div className="is-embed-card responsive" dangerouslySetInnerHTML={{__html: data.media.html}}></div>
-                }
                 const image = data.images && data.images.length > 0 ?  data.images[0].url : undefined
                 const title = data.title || ""
                 const subtitle = data.subtitle
+                if(this.props.showMedia && data.media && data.media.html)
+                {
+                    return <div className="is-embed-card responsive" dangerouslySetInnerHTML={{__html: data.media.html}}></div>
+                }
                 const avatar = data.avatar
-                const description = data.description || ""
-                const icon = !avatar ? this.resolveIcon(data.type) : null
-                return this.renderCard(image, title, subtitle, description, avatar, icon)
+                const description = truncate(IntraSocialUtilities.htmlToText(data.description || ""), 200)
+                let icon:string = null
+                if(!avatar)
+                {
+                    icon = this.resolveIcon(data.type) || data.favicon_url
+                }
+                const url = this.getUrl()
+                return this.renderCard(image, title, subtitle, description, avatar, icon, url)
             }
             default:return null;
         }
@@ -113,9 +152,12 @@ class Embedly extends React.Component<Props, State> {
     hasError = () => {
         return this.props.data && (!this.props.data.provider_url || this.props.data.error_code || this.props.data.type == "error")
     }
+    getUrl = () => {
+        return (this.props.data && new URL(this.props.data.url, location.href).href) || this.props.url
+    }
     render = () => {
         const title = Settings.renderLinkTitle ? this.props.data && this.props.data.title : undefined
-        const url = (this.props.data && this.props.data.url) || this.props.url
+        const url = this.getUrl()
         const cl = classnames("is-embed-card", {"has-error":this.hasError()})
         return (<a href={url} className={cl} target="_blank" title={title}>
                 {this.props.isLoading && <LoadingSpinner/>}

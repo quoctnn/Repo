@@ -1,12 +1,43 @@
 @import "../../Config";
+
 .conversation-module
 {
+    .img-responsive{
+        object-fit: contain;
+        width: 100%;
+        max-width: initial;
+        max-height: 100%;
+    }
+    &.temporary{
+        .module-header{
+            .module-header-title-left{
+                flex-grow: 200;
+                .member-select-container{
+                    display: flex;
+                    font-size: 14px;
+                    align-items: center;
+                    .member-select{
+                        flex-grow: 1;
+                        .select__control{
+                            background-color: transparent;
+                            border-style: none;
+                            border-radius: 0;
+                            box-shadow: none;
+                        }
+                        .select__input{
+                            @include var(color, primary-text-color);
+                        }
+                        .select__indicators{
+                            display: none;
+                        }
+                    }
+                }
+            }
+        }
+    }
     .message-list-container{
-        .img-responsive{
-            object-fit: cover;
+        .gallery-container{
             max-width: 100%;
-            max-height: 200px;
-            border-radius: 8px;
         }
         .day-line
         {
@@ -53,38 +84,37 @@
         }
         .chat-message
         {
-            @include var(color, primary-text-color);
-            word-wrap: break-word;
-            word-break: break-word;
-            border-radius: 8px;
-            padding: 4px 10px;
-            margin: 2px auto;
-            max-width: calc(90% - 40px);
-            position: relative;
-            display: block;
-            .file{
-                i{
-                    margin-right: 8px;
+            > .message{
+
+                @include var(color, primary-text-color);
+                word-wrap: break-word;
+                word-break: break-word;
+                border-radius: 8px;
+                padding: 4px 10px;
+                margin: 5px auto;
+                max-width: calc(90% - 40px);
+                position: relative;
+                display: block;
+                .file{
+                    i{
+                        margin-right: 8px;
+                    }
                 }
-            }
-            &.single-embed{
-                padding: 0;
+                &.embed{
+                    padding: 0;
+                    max-width: 300px;
+                    a{
+                        &.has-error{
+                            padding: 4px 10px;
+                        }
+                        word-wrap: break-word;
+                        border-radius: 8px;
+                        margin: 0;
+                    }
+                }
                 a{
-                    word-wrap: break-word;
-                    border-radius: 8px;
-                    padding: 4px 10px;
-                    margin: 2px 0;
+                    text-decoration: underline;
                 }
-            }
-            a{
-                text-decoration: underline;
-            }
-        }
-        .chat-message.single-embed
-        {
-            width: calc(90% - 40px);
-            a:not(.has-error){
-                width: 100%;
             }
         }
         .chat-message:last-child
@@ -94,44 +124,31 @@
         .chat-message.left {
             text-align: left;
             margin-left: 40px;
-            &:not(.single-embed){
-
+            .message{
+                float: left;
+            }
+            .message, .message .card{
                 @include var(background-color, chat-message-left-background);
             }
-            &.single-embed{
-                padding: 0;
-                a{
-                    float: left;
-                    @include var(background-color, chat-message-left-background);
-                }
-            }
         }
-
         .chat-message.right{
             margin-right: 15px;
-            flex-direction: row-reverse;
-            &:not(.single-embed){
-
+            .message{
+                float: right;
+            }
+            .message, .message .card{
                 @include var(background-color, chat-message-right-background);
             }
-            &.single-embed{
-                padding: 0;
-                a{
-                    float: right;
-                    @include var(background-color, chat-message-right-background);
-                }
-            }
         }
-        .chat-message.temp
+        .chat-message.temp .message
         {
             border:1px solid red;
         }
         @include var(background-color, main-content-background);
         @include var(color, primary-text-color);
-
         .card-body
         {
-            padding: 0;
+            padding: 8px;
         }
         .chat-message-composer
         {

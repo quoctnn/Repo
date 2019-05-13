@@ -1,5 +1,3 @@
-import { ReduxState } from './index';
-import { ThemeManager } from '../managers/ThemeManager';
 export enum ThemeActionTypes {
     SetTheme = 'theme.set_theme',
 }

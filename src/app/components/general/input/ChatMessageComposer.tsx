@@ -1,7 +1,7 @@
 
 import * as React from "react";
 import MentionEditor from "../input/MentionEditor";
-import { EditorState, ContentState, getDefaultKeyBinding, KeyBindingUtil,  SelectionState, Modifier} from "draft-js";
+import { EditorState, ContentState, getDefaultKeyBinding, KeyBindingUtil,  SelectionState, Modifier, DraftHandleValue} from "draft-js";
 import { Mention } from '../input/MentionEditor';
 import { ProtectNavigation, nullOrUndefined } from "../../../utilities/Utilities";
 import "./ChatMessageComposer.scss"
@@ -166,7 +166,6 @@ export class ChatMessageComposer extends React.Component<Props & DefaultProps,St
             plainText:this.props.content || "", 
             editorState:EditorState.createWithContent(generateContentState(this.props.content, this.props.mentions))
         }
-        this.handleSubmit = this.handleSubmit.bind(this)
         this.fixFocusInput = this.fixFocusInput.bind(this)
         this.sendDidType = this.sendDidType.bind(this)
         this.getProcessedText = this.getProcessedText.bind(this)
@@ -213,8 +212,8 @@ export class ChatMessageComposer extends React.Component<Props & DefaultProps,St
     getContent = () => {
         return this.getProcessedText()
     }
-    handleSubmit(e) {
-        e.preventDefault();
+    handleSubmit = (e?:any) => {
+        e && e.preventDefault();
         let {text, mentions} = this.getProcessedText()
         if (text.length > 0) {
             this.props.onSubmit(text, mentions)
@@ -225,12 +224,22 @@ export class ChatMessageComposer extends React.Component<Props & DefaultProps,St
         return false
     }
     keyBindings = (e: any) => {
-        if (e.keyCode === 13 && (hasCommandModifier(e) || this.props.submitOnEnter) ){ // Ctrl(Cmd) + Enter Submits the form
-          return this.handleSubmit(e)
+        if (e.keyCode === 13 && (hasCommandModifier(e) || this.props.submitOnEnter) )
+        { // Ctrl(Cmd) + Enter Submits the form
+            return 'command-enter'//this.handleSubmit(e)
         }
         return getDefaultKeyBinding(e);
+    }
+    handleKeyCommand = (command: string): DraftHandleValue => {
+        if (command === 'command-enter') {
+            if(this.canSubmit())
+                this.handleSubmit()
+          // Perform a request to save your contents, set
+          // a new `editorState`, etc.
+          return 'handled';
+        }
+        return 'not-handled';
       }
-
     sendDidType()
     {
         this.props.onDidType(this.state.plainText)
@@ -264,9 +273,10 @@ export class ChatMessageComposer extends React.Component<Props & DefaultProps,St
     }
     canSubmit()
     {
+        const canSubmit = this.state.plainText.length > 0
         if( !nullOrUndefined( this.props.canSubmit) )
-            return this.props.canSubmit
-        return this.state.plainText.length > 0
+            return canSubmit && this.props.canSubmit
+        return canSubmit
     }
     render() {
         const canSubmit = this.canSubmit()
@@ -288,6 +298,7 @@ export class ChatMessageComposer extends React.Component<Props & DefaultProps,St
                                 onBlur={this.props.onBlur}
                                 onFocus={this.props.onFocus}
                                 keyBindings={this.keyBindings}
+                                handleKeyCommand={this.handleKeyCommand}
                             /> 
                         </div>
                         {this.props.showSubmitButton &&

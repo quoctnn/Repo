@@ -18,6 +18,10 @@ export class NavigationUtilities {
     static navigateToProfile = (history: H.History, profile:UserProfile) => {
         history.push(Routes.profileUrl(profile.slug_name))
     }
+    static navigateToConversation = (history: H.History, conversationId:number|string) => 
+    {
+        history.push(Routes.conversationUrl(conversationId, true))
+    }
     static navigateToProfileId = (history: H.History, profile:number) =>
     {
         ProfileManager.ensureProfilesExists([profile],() => {

@@ -25,6 +25,12 @@ import { Settings } from '../../utilities/Settings';
 import { ChatMessageComposer } from '../../components/general/input/ChatMessageComposer';
 import { Mention } from '../../components/general/input/MentionEditor';
 import { ConversationUtilities } from '../../utilities/ConversationUtilities';
+import Select from 'react-select';
+import { ProfileOptionComponent, ProfileSingleValueComponent, createProfileFilterOption, ProfileFilterOption } from '../tasks/ProjectProfileFilter';
+import { ActionMeta } from 'react-select/lib/types';
+import { NavigationUtilities } from '../../utilities/NavigationUtilities';
+import SimpleDialog from '../../components/general/dialogs/SimpleDialog';
+import { ConversationEditor } from './ConversationEditor';
 
 const reducer = (accumulator, currentValue) => accumulator + currentValue;
 const uidToNumber = (uid) => uid.split("_").map(n => parseInt(n)).reduce(reducer)
@@ -46,11 +52,13 @@ type State = {
     showSpinner:boolean
     isTyping:{[key:string]:NodeJS.Timer}
     renderDropZone:boolean
+    conversationEditorDialogVisible:boolean
 }
 type ReduxStateProps = {
     conversation: Conversation
     authenticatedUser:UserProfile
     queuedMessages:Message[]
+    createNewConversation:boolean
 }
 type ReduxDispatchProps = {
 }
@@ -74,6 +82,7 @@ class ConversationModule extends React.Component<Props, State> {
             showSpinner:false,
             isTyping:{},
             renderDropZone:false,
+            conversationEditorDialogVisible:false
         }
     }
     shouldReloadList = (prevProps:Props) => {
@@ -107,7 +116,6 @@ class ConversationModule extends React.Component<Props, State> {
             this.setState({showSpinner:false})
         }
     }
-
     incomingMessageHandler = (...args:any[]) => 
     {
         if(!this.props.conversation)
@@ -211,7 +219,13 @@ class ConversationModule extends React.Component<Props, State> {
         })
     }
     fetchMessages = (offset:number, completion:(items:PaginationResult<Message>) => void ) => {
-        const conversationId = this.props.conversation && this.props.conversation.id
+
+        if(!this.props.conversation || this.props.conversation.temporary)
+        {
+            completion({results:[], count:0, previous:null, next:null})
+            return
+        }
+        const conversationId = this.props.conversation.id
         ApiClient.getConversationMessages(conversationId, 30, offset, (data, status, error) => {
             completion(data)
             ToastManager.showErrorToast(error)
@@ -260,7 +274,7 @@ class ConversationModule extends React.Component<Props, State> {
     }
     onDidType = (unprocessedText:string) => {
         let conversation = this.props.conversation
-        if(!conversation)
+        if(!conversation || conversation.temporary)
             return
         if(this.canPublishDidType) 
         {
@@ -272,13 +286,33 @@ class ConversationModule extends React.Component<Props, State> {
             }, Settings.sendSomeoneIsTypingthrottle)
         }
     }
+    createConversationWithMessage = (tempConversation:Conversation, message:Message) => {
+        ApiClient.createConversation(tempConversation.title, tempConversation.users, (newConversation, status, error) => {
+            if(newConversation)
+            {
+                message.conversation = newConversation.id
+                ConversationManager.sendMessage(message)
+                ConversationManager.updateTemporaryConversation(null)
+                NavigationUtilities.navigateToConversation(this.props.history, newConversation.id)
+                ToastManager.showInfoToast(translate("conversation.created"))
+            }
+            if(error || status == "error")
+            {
+                ToastManager.showErrorToast(error || translate("Could not create conversation"))
+                return
+            }
+        } )
+    }
     onChatMessageSubmit = (text:string, mentions:number[]) => {
         let conversation = this.props.conversation
         if(!conversation)
             return
         let tempId = `${conversation.id}_${this.props.authenticatedUser.id}_${Date.now()}`
         const message = ConversationUtilities.getChatMessagePreview(this.props.authenticatedUser.id, text, null, tempId, mentions, conversation)
-        ConversationManager.sendMessage(message)
+        if(conversation.temporary)
+            this.createConversationWithMessage(conversation, message)
+        else 
+            ConversationManager.sendMessage(message)
     }
     filesAdded = (files:File[]) => {
         let conversation = this.props.conversation
@@ -360,17 +394,22 @@ class ConversationModule extends React.Component<Props, State> {
     renderNoConversation = () => {
         return <div>NO CONTENT</div>
     }
+    sortMessages = (a:Message, b:Message):number => {
+        return b.id - a.id
+        return uidToNumber(b.uid || messageToUid(b)) - uidToNumber(a.uid || messageToUid(a))
+    }
     renderContent = () => {
 
         const { conversation, authenticatedUser } = this.props
         const {items, isLoading} = this.state
-        let messages = this.props.queuedMessages.concat(items).sort((a,b) => uidToNumber(b.uid || messageToUid(b)) - uidToNumber(a.uid || messageToUid(a)))
+        let messages = this.props.queuedMessages.concat(items).sort(this.sortMessages)
         const conversationId = conversation && conversation.id
         if(!conversationId)
         {
             return this.renderNoConversation()
         }
         const cl = classnames("list list-component-list vertical-scroll droptarget")
+        const canSubmit = !this.props.conversation.temporary || this.props.conversation.users.length > 0
         return <div className="list-component message-list-container">
                         <ChatMessageList ref={this.dropTarget}
                             onDragOver={this.onDragOver} 
@@ -394,6 +433,7 @@ class ConversationModule extends React.Component<Props, State> {
                                 filesAdded={this.filesAdded} 
                                 onSubmit={this.onChatMessageSubmit} 
                                 onDidType={this.onDidType} 
+                                canSubmit={canSubmit}
                             />
                     {this.state.renderDropZone && 
                         <div className="drop-zone">
@@ -401,12 +441,59 @@ class ConversationModule extends React.Component<Props, State> {
                         </div>}
                 </div>
     }
+    onMemberSelectChange = (value: ProfileFilterOption[], action: ActionMeta) => {
+        const temp = {...this.props.conversation}
+        temp.users = value.map(v => v.id)
+        ConversationManager.updateTemporaryConversation(temp)
+    }
+    renderMembersInput = () => {
+        
+        const availableMembers = ProfileManager.getProfiles(ProfileManager.getContactListIds(false))
+        const currentMembers = ProfileManager.getProfiles(this.props.conversation && this.props.conversation.users || [])
+        const availableOptions = availableMembers.map(createProfileFilterOption)
+        const defaultValue = currentMembers.map(createProfileFilterOption)
+        return <div className="member-select-container"><span className="to-label">{translate("To")+ ":"}</span><Select
+            defaultValue={defaultValue}
+            isMulti={true}
+            name="members"
+            options={availableOptions}
+            className="member-select"
+            classNamePrefix="select"
+            isClearable={false}
+            onChange={this.onMemberSelectChange}
+            components={{ Option: ProfileOptionComponent, SingleValue:ProfileSingleValueComponent }}
+            styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
+            menuPortalTarget={document.body} 
+            autoFocus={true}
+            placeholder={translate("conversation.create.members.placeholder")}
+        /></div>
+    }
+    renderConversationEditorTitle = () => {
+        const conversation = this.props.conversation
+        if(conversation)
+        {
+            return <div onClick={this.toggleConversationEditorDialog}>{ConversationUtilities.getConversationTitle(conversation)}</div>
+        }
+        return null
+    }
+    toggleConversationEditorDialog = () => {
+        this.setState((prevState:State ) => {
+            return {conversationEditorDialogVisible:!prevState.conversationEditorDialogVisible}
+        })
+    }
+    renderConversationEditorDialog = () => {
+        const visible = this.state.conversationEditorDialogVisible
+        return <SimpleDialog didCancel={this.toggleConversationEditorDialog} visible={visible}>
+                    <ConversationEditor />
+                </SimpleDialog>
+        
+    }
     render()
     {
-        const {history, match, location, staticContext, contextNaturalKey, conversation, authenticatedUser, queuedMessages, ...rest} = this.props
+        const {history, match, location, staticContext, contextNaturalKey, conversation, createNewConversation, authenticatedUser, queuedMessages, ...rest} = this.props
         const {breakpoint, className} = this.props
-        const cn = classnames("conversation-module", className)
-        const title = conversation && conversation.title
+        const cn = classnames("conversation-module", className, {temporary:conversation && conversation.temporary})
+        const title = createNewConversation ? this.renderMembersInput() : this.renderConversationEditorTitle()
         return (<SimpleModule {...rest} 
                     className={cn} 
                     headerClick={this.headerClick} 
@@ -414,18 +501,21 @@ class ConversationModule extends React.Component<Props, State> {
                     isLoading={this.state.isLoading} 
                     headerTitle={title}>
                 {this.renderContent()}
+                {this.renderConversationEditorDialog()}
                 </SimpleModule>)
     }
 }
 const mapStateToProps = (state:ReduxState, ownProps: OwnProps & RouteComponentProps<any>):ReduxStateProps => {
 
-    const conversation = ContextManager.getContextObject(ownProps.location.pathname, ContextNaturalKey.CONVERSATION) as Conversation
+    const conversation = ContextManager.getContextObject(ownProps.location.pathname, ContextNaturalKey.CONVERSATION) as Conversation || state.tempCache.conversation
     const authenticatedUser = AuthenticationManager.getAuthenticatedUser()
     const queuedMessages = (!!conversation && state.messageQueue.messages.filter(m => m.conversation == conversation.id)) || []
+    const createNewConversation = ownProps.match.params.conversationId == "new"
     return {
         conversation,
         authenticatedUser,
-        queuedMessages
+        queuedMessages,
+        createNewConversation,
     }
 }
 const mapDispatchToProps = (dispatch:ReduxState, ownProps: OwnProps):ReduxDispatchProps => {

@@ -2,7 +2,6 @@ import * as React from "react";
 import { ButtonGroup, Button, UncontrolledTooltip, Dropdown, DropdownToggle, DropdownMenu, DropdownItem, DropdownItemProps } from "reactstrap";
 import { translate } from "../../localization/AutoIntlProvider";
 import classnames from 'classnames';
-import { nullOrUndefined } from '../../utilities/Utilities';
 require("./OverflowMenu.scss");
 export enum OverflowMenuItemType {
     option, divider, header
@@ -40,8 +39,7 @@ export const createDropdownItem = (item:OverflowMenuItem) => {
         props.divider = true
     if(item.disabled)
         props.disabled = true
-    const toggle = nullOrUndefined( item.toggleMenu ) ? true : item.toggleMenu
-
+    const toggle = !!item.toggleMenu
     return (<DropdownItem active={item.active}  {...props} toggle={toggle} key={item.id} onClick={item.onPress} className="clickable">
                     {!useStackedIcons && item.iconClass && <i className={item.iconClass}></i>}
                     {useStackedIcons && <span className="fa-menu-icon-stack">

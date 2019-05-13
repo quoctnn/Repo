@@ -14,7 +14,6 @@ import TimesheetListItem from './TimesheetListItem';
 import ApiClient, { PaginationResult } from '../../network/ApiClient';
 import { ToastManager } from '../../managers/ToastManager';
 import { ContextManager } from '../../managers/ContextManager';
-import { defaultProps } from 'react-select/lib/Async';
 type OwnProps = {
     className?:string
     breakpoint:ResponsiveBreakpoint

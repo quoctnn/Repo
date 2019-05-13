@@ -1,20 +1,26 @@
 import { ProfileManager } from '../managers/ProfileManager';
 import { Conversation, Message, UserProfile } from '../types/intrasocial_types';
 import { nullOrUndefined } from './Utilities';
+import { translate } from '../localization/AutoIntlProvider';
+import { AuthenticationManager } from '../managers/AuthenticationManager';
 
 export class ConversationUtilities 
 {
-    static getConversationTitle = (conversation: Conversation, me:number) => {
+    static getConversationTitle = (conversation: Conversation, me?:number) => {
         if(conversation.title)
             return conversation.title
+        if(conversation.temporary && conversation.users.length == 0)
+            return translate("New conversation")
         return ConversationUtilities.getConversationTitleFromMembers(conversation.users, me)
     }
-    static getConversationTitleFromMembers = (members:number[], me:number) => {
-        const profiles = ProfileManager.getProfiles(members.filter(i => i != me))
-        return ConversationUtilities.getConversationTitleFromProfiles(profiles, me)
+    static getConversationTitleFromMembers = (members:number[], me?:number) => {
+        const myId = me || AuthenticationManager.getAuthenticatedUser().id
+        const profiles = ProfileManager.getProfiles(members.filter(i => i != myId))
+        return ConversationUtilities.getConversationTitleFromProfiles(profiles, myId)
     }
-    static getConversationTitleFromProfiles = (members:UserProfile[], me:number) => {
-        const profiles = members.filter(i => i.id != me)
+    static getConversationTitleFromProfiles = (members:UserProfile[], me?:number) => {
+        const myId = me || AuthenticationManager.getAuthenticatedUser()
+        const profiles = members.filter(i => i.id != myId)
         return profiles.map(p => {
             if(p && p.first_name)
                 return p.first_name

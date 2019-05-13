@@ -9,7 +9,6 @@ import Constants from '../utilities/Constants';
 import { translate } from '../localization/AutoIntlProvider';
 import { IntraSocialLink } from '../components/general/IntraSocialLink';
 import * as moment from 'moment-timezone';
-import { availableLanguages } from '../redux/language';
 let timezone = moment.tz.guess()
 export const getDomainName = (url:string) =>  {
     var url_parts = url.split("/")
@@ -170,8 +169,12 @@ export function getTextContent(prefixId:string,
     }
     return ret
 }
-const flattenElements = (arr:JSX.Element[]) => {
-    let result:JSX.Element[] = []
+export const flattenElements = (arr:any):JSX.Element[] => {
+    if(typeof arr == "string" && !Array.isArray(arr))
+    {
+        return arr as any
+    }
+    let result = []
     for (let i = 0; i < arr.length; i++) {
         const item = arr[i]
         if(typeof item != "string" && Array.isArray(item))
@@ -179,7 +182,8 @@ const flattenElements = (arr:JSX.Element[]) => {
             result = result.concat(flattenElements(item))
         }
         else {
-            result.push(item)
+            if(typeof item != "string" || item.length > 0)
+                result.push(item)
         }
     }
     return result

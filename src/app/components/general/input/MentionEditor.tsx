@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 
-import { EditorState } from 'draft-js';
+import { EditorState, DraftHandleValue } from 'draft-js';
 import Editor from "draft-js-plugins-editor";
 import "draft-js-mention-plugin/lib/plugin.css";
 import "draft-js-emoji-plugin/lib/plugin.css";
@@ -105,6 +105,7 @@ type OwnProps = {
     onHandleUploadClick?:(event) => void
     placeholder?:string
     keyBindings?:(event) => void
+    handleKeyCommand?:(command: string) => DraftHandleValue
     
 }
 type DefaultProps = {
@@ -214,7 +215,7 @@ export default class MentionEditor extends React.Component<Props, {}> {
         let tranform = up ? "translate(0, calc(-100% - 55px))" : "none";
         ReactDOM.render(
             <div className="emoji-picker-container" style={{ transform: tranform }}>
-            <EmojiSelect isOpen={this.state.emojiSelectOpen} />
+                <EmojiSelect isOpen={this.state.emojiSelectOpen} />
             </div>,
             this.positioningElement
         );
@@ -319,24 +320,27 @@ export default class MentionEditor extends React.Component<Props, {}> {
                             onFocus={this.props.onFocus}
                             placeholder={this.props.placeholder}
                             keyBindingFn={this.props.keyBindings}
+                            handleKeyCommand={this.props.handleKeyCommand}
                         />
-                        <EmojiSuggestions />
                     </div>
                 </div>
                 <div className="d-flex align-items-end">
-                    {this.props.showEmojiPicker && <button
-                    ref={this.emojiButton}
-                    className="emojiButton editor-button btn btn-default"
-                    onMouseUp={this.onEmojiButtonMouseUp}
-                    type="button" >
-                    <i className="far fa-smile fa-lg"></i>
-                    </button>}
-                    {(this.props.filesAdded || this.props.onHandleUploadClick) && <button
-                    className="upload-button editor-button btn btn-default"
-                    type="button" onClick={this.onFileuploadButtonClick} >
-                    {this.props.filesAdded && <input ref={this.fileUploader} accept={Settings.allowedTypesFileUpload} multiple={true} className="form-control" type="file" onChange={this.uploadFileChanged} /> }
-                    <i className="fa fa-paperclip fa-lg"></i>
-                    </button>}
+                    {this.props.showEmojiPicker && 
+                        <button
+                            ref={this.emojiButton}
+                            className="emojiButton editor-button btn btn-default"
+                            onMouseUp={this.onEmojiButtonMouseUp}
+                            type="button" >
+                                <i className="far fa-smile fa-lg"></i>
+                        </button>
+                    }
+                    {(this.props.filesAdded || this.props.onHandleUploadClick) && 
+                        <button
+                            className="upload-button editor-button btn btn-default"
+                            type="button" onClick={this.onFileuploadButtonClick} >
+                            {this.props.filesAdded && <input ref={this.fileUploader} accept={Settings.allowedTypesFileUpload} multiple={true} className="form-control" type="file" onChange={this.uploadFileChanged} /> }
+                            <i className="fa fa-paperclip fa-lg"></i>
+                        </button>}
                 </div>
             </div>
             </div>

@@ -369,13 +369,14 @@ export type Conversation =
 {
     title:string
     users:number[]
-    archived_by: number[]
+    archived_by?: number[]
     last_message:Message
     read_by:any[]
-    absolute_url:string
+    absolute_url?:string
     created_at:string
     updated_at:string
-    unread_messages?:number[]
+    unread_messages:number[]
+    temporary?:boolean
 
 } & Linkable & IdentifiableObject & Permissible
 export enum IntraSocialType{

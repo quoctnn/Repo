@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { withRouter, RouteComponentProps } from "react-router-dom";
+import { withRouter, RouteComponentProps, Link } from "react-router-dom";
 import classnames from "classnames"
 import "./ConversationsModule.scss"
 import { ResponsiveBreakpoint } from '../../components/general/observers/ResponsiveComponent';
@@ -13,8 +13,6 @@ import ApiClient, { PaginationResult } from '../../network/ApiClient';
 import { ToastManager } from '../../managers/ToastManager';
 import ConversationListItem from './ConversationListItem';
 import { TypingIndicator } from '../../components/general/TypingIndicator';
-import { Avatar } from '../../components/general/Avatar';
-import { ProfileManager } from '../../managers/ProfileManager';
 import { EventSubscription } from 'fbemitter';
 import { NotificationCenter } from '../../utilities/NotificationCenter';
 import { EventStreamMessageType } from '../../network/ChannelEventStream';
@@ -22,9 +20,13 @@ import { Settings } from '../../utilities/Settings';
 import { AuthenticationManager } from '../../managers/AuthenticationManager';
 import { uniqueId } from '../../utilities/Utilities';
 import { ContextManager } from '../../managers/ContextManager';
-import { Button } from 'reactstrap';
-import SimpleDialog from '../../components/general/dialogs/SimpleDialog';
-import CreateConversation from './create/CreateConversation';
+import { ConversationManager } from '../../managers/ConversationManager';
+import Routes from '../../utilities/Routes';
+import { ConversationAction } from './ConversationListItem';
+import { NavigationUtilities } from '../../utilities/NavigationUtilities';
+import ConfirmDialog from '../../components/general/dialogs/ConfirmDialog';
+import ButtonGroup from 'reactstrap/lib/ButtonGroup';
+import Button from 'reactstrap/lib/Button';
 type IsTypingStore = {[conversation:number]:{[user:number]:NodeJS.Timer}}
 type OwnProps = {
     className?:string
@@ -33,17 +35,21 @@ type OwnProps = {
 }
 type DefaultProps = {
     activeConversation:number
-    preventShowTyingInChatId:number,
+    preventShowTypingInChatId:number,
 }
 type State = {
     isLoading:boolean
     isTyping:IsTypingStore
     listRedrawContext?:string
     createConversationDialogVisible:boolean,
+    conversationToDelete:number
+    filterArchived:boolean
 }
 type ReduxStateProps = {
     authenticatedUser:UserProfile
     conversation:Conversation
+    createNewConversation:boolean
+    tempConversation:Conversation
 }
 type ReduxDispatchProps = {
 }
@@ -52,17 +58,21 @@ type Props = OwnProps & RouteComponentProps<any> & ReduxStateProps & ReduxDispat
 class ConversationsModule extends React.Component<Props, State> {  
     conversationsList = React.createRef<ListComponent<Conversation>>()
     private observers:EventSubscription[] = []
+    private tempConversationId:number = 0
     static defaultProps:DefaultProps = {
         activeConversation:-1,
-        preventShowTyingInChatId:-1
+        preventShowTypingInChatId:-1
     }
     constructor(props:Props) {
         super(props);
         this.state = {
             isLoading:false,
             isTyping:{},
-            createConversationDialogVisible:false
+            createConversationDialogVisible:false,
+            conversationToDelete:0,
+            filterArchived:false
         }
+
     }
     componentDidMount = () => {
         const obs1 = NotificationCenter.addObserver("eventstream_" + EventStreamMessageType.CONVERSATION_TYPING, this.isTypingHandler)
@@ -71,6 +81,28 @@ class ConversationsModule extends React.Component<Props, State> {
         this.observers.push(obs2)
         const obs3 = NotificationCenter.addObserver("eventstream_" + EventStreamMessageType.CONVERSATION_UPDATE, this.processIncomingConversation)
         this.observers.push(obs3)
+        if(this.props.createNewConversation)
+            this.createTemporaryConversation()
+    }
+    componentDidUpdate = (prevProps:Props, prevState:State) => {
+        if(this.state.filterArchived != prevState.filterArchived)
+        {
+            this.conversationsList.current.reload()
+        }
+        if(prevProps.breakpoint != this.props.breakpoint && this.props.breakpoint < ResponsiveBreakpoint.standard && this.state.isLoading)
+        {
+            this.setState({isLoading:false})
+        }
+        if(this.props.tempConversation)
+        {
+            this.tempConversationId = this.props.tempConversation.id
+            this.conversationsList.current.safeUnshift(this.props.tempConversation)
+        }
+        else if(this.tempConversationId)
+        {
+            this.conversationsList.current.removeItemById(this.tempConversationId)
+            this.tempConversationId = 0
+        }
     }
     componentWillUnmount = () =>
     {
@@ -88,7 +120,7 @@ class ConversationsModule extends React.Component<Props, State> {
         let object = args[0]
         let user = object.user
         let conversation = object.conversation
-        if((this.props.preventShowTyingInChatId && this.props.preventShowTyingInChatId == conversation) || user == this.props.authenticatedUser.id || !this.conversationsList.current.getItemById(conversation))
+        if((this.props.preventShowTypingInChatId && this.props.preventShowTypingInChatId == conversation) || user == this.props.authenticatedUser.id || !this.conversationsList.current.getItemById(conversation))
         {
             return
         }
@@ -124,12 +156,6 @@ class ConversationsModule extends React.Component<Props, State> {
         }
         return it
     }
-    componentDidUpdate = (prevProps:Props) => {
-        if(prevProps.breakpoint != this.props.breakpoint && this.props.breakpoint < ResponsiveBreakpoint.standard && this.state.isLoading)
-        {
-            this.setState({isLoading:false})
-        }
-    }
     headerClick = (e) => {
         //NavigationUtilities.navigateToNewsfeed(this.props.history, context && context.type, context && context.id, this.state.includeSubContext)
     }
@@ -137,30 +163,81 @@ class ConversationsModule extends React.Component<Props, State> {
         this.setState({isLoading})
     }
     fetchConversations = (offset:number, completion:(items:PaginationResult<Conversation>) => void ) => {
-        ApiClient.getConversations( 30, offset, (data, status, error) => {
+        const archived = this.state.filterArchived
+        ApiClient.getConversations( 30, offset, archived, (data, status, error) => {
             completion(data)
             ToastManager.showErrorToast(error)
         })
     }
     renderSomeoneIsTyping = (conversationId:number) => {
-        let isTypingData = this.state.isTyping[conversationId]
+        let isTypingData = this.state.isTyping && this.state.isTyping[conversationId]
         if(isTypingData)
         {
-            let keys = Object.keys(isTypingData).map(s => parseInt(s))
             return <div className="is-typing-container">
-            {keys.map((data, index) => {
-                let avatar = ProfileManager.getProfileById(data).avatar
-                return (<Avatar key={index} image={avatar} size={24}/>)
-
-            })}
-            <TypingIndicator />
-            </div>
+                        <TypingIndicator />
+                    </div>
         }
         return null
     }
+    onConfirmDelete = (confirmed:boolean) => {
+        const conversation = this.state.conversationToDelete
+        if(confirmed)
+        {
+            ConversationManager.deleteConversation(conversation, (success) => {
+                if(success)
+                {
+                    ToastManager.showInfoToast("convesation.deleted")
+                    this.conversationsList.current.removeItemById(conversation)
+                    NavigationUtilities.navigateToConversation(this.props.history, null)
+                }
+                this.setState(() => {
+                    return {conversationToDelete:0}
+                })
+            })
+        }
+        else {
+            this.setState(() => {
+                return {conversationToDelete:0}
+            })
+        }
+    }
+    renderConfirmDeleteDialog = () => {
+        const visible = this.state.conversationToDelete > 0
+        const title = translate("conversation.preventdelete.title")
+        const message = translate("conversation.preventdelete.description")
+        const okButtonTitle = translate("common.yes")
+        return <ConfirmDialog visible={visible} title={title} message={message} didComplete={this.onConfirmDelete} okButtonTitle={okButtonTitle}/>
+    }
+    onConversationAction = (action:ConversationAction, conversationId:number) => {
+        switch(action)
+        {
+            case ConversationAction.delete:
+            {
+                const conversation = this.conversationsList.current.getItemById(conversationId)
+                if(conversation.temporary)
+                {
+                    const firstConversation = this.conversationsList.current.getItemAtIndex(1)
+                    ConversationManager.updateTemporaryConversation(null)
+                    this.conversationsList.current.removeItemById(conversation.id)
+                    NavigationUtilities.navigateToConversation(this.props.history, firstConversation && firstConversation.id)
+                }
+                else{
+                    
+                    const currentlyDeletingConversation = this.state.conversationToDelete > 0
+                    if(!currentlyDeletingConversation)
+                    {
+                        this.setState(() => {
+                            return {conversationToDelete:conversation.id}
+                        })
+                    }
+                }
+            }
+        }
+    }
     renderConversation = (conversation:Conversation) =>  {
-        const isActive = this.props.conversation && (this.props.conversation.id == conversation.id)
-        return <ConversationListItem key={conversation.id} conversation={conversation} isActive={isActive} >
+        const isActive = (this.props.createNewConversation && this.props.tempConversation && (this.props.tempConversation.id == conversation.id)) ||
+                            (this.props.conversation && (this.props.conversation.id == conversation.id))
+        return <ConversationListItem onConversationAction={this.onConversationAction} key={conversation.id} conversation={conversation} isActive={isActive} >
                 {this.renderSomeoneIsTyping(conversation.id)}
                 </ConversationListItem>
     }
@@ -171,12 +248,16 @@ class ConversationsModule extends React.Component<Props, State> {
         const sorted = conversations.sort((a, b) =>  new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime())
         return sorted
     }
+    listOffsetCountFilter = (items:Conversation[]) => {
+        return items.filter(i => !i.temporary).length
+    }
     renderContent = () => {
 
         const {} = this.props
         return <>
             <ListComponent<Conversation> 
                         ref={this.conversationsList} 
+                        offsetCountFilter={this.listOffsetCountFilter}
                         renderEmpty={this.renderEmpty}
                         onLoadingStateChanged={this.feedLoadingStateChanged} 
                         fetchData={this.fetchConversations} 
@@ -195,23 +276,48 @@ class ConversationsModule extends React.Component<Props, State> {
             return {createConversationDialogVisible:false}
         })
     }
-    renderCreateConversation = () => {
-        return <Button onClick={this.showCreateConversationDialog} className="btn btn-dark flex-shrink-0 btn-sm" >
-                    <i className="fas fa-plus"></i>
-                </Button>
-    }
-    renderCreateDialog = () => {
-        if(this.state.createConversationDialogVisible)
+    createTemporaryConversation = () => {
+        if(!this.props.tempConversation)
         {
-            return (<SimpleDialog didCancel={this.closeCreateConversationDialog} visible={this.state.createConversationDialogVisible}>
-                        <CreateConversation onComplete={this.closeCreateConversationDialog} />
-                    </SimpleDialog>)
+            ConversationManager.createTemporaryConversation()
         }
-        return null
+        this.conversationsList.current && this.conversationsList.current.scrollToTop()
+    }
+    renderHeaderContent = () => {
+        return <div>
+                    {this.renderFilters()}
+                    <Link onClick={this.createTemporaryConversation} to={Routes.conversationUrl("new")} className="btn btn-dark flex-shrink-0 btn-sm" >
+                        <i className="fas fa-plus"></i>
+                    </Link>
+                </div>
+    }
+    toggleFilterArchived = () => {
+        this.setState((prevState:State ) => {
+            return {filterArchived:!prevState.filterArchived}
+        })
+    }
+    renderFilters = () => {
+        return (<ButtonGroup className="header-filter-group">
+                    <Button size="xs" active={!!this.state.filterArchived} onClick={this.toggleFilterArchived} color="light">
+                        <span>A</span>
+                    </Button>
+                </ButtonGroup>)
     }
     render()
     {
-        const {history, match, location, staticContext, contextNaturalKey,authenticatedUser, conversation, ...rest} = this.props
+        const { history, 
+            match, 
+            location, 
+            staticContext, 
+            contextNaturalKey, 
+            authenticatedUser,
+            preventShowTypingInChatId, 
+            activeConversation, 
+            conversation,
+            createNewConversation, 
+            tempConversation,
+            ...rest} = this.props
+
         const {breakpoint, className} = this.props
         const cn = classnames("conversations-module", className)
         return (<SimpleModule {...rest} 
@@ -220,10 +326,10 @@ class ConversationsModule extends React.Component<Props, State> {
                     breakpoint={breakpoint} 
                     isLoading={this.state.isLoading} 
                     headerTitle={translate("conversations.module.title")}
-                    headerContent={this.renderCreateConversation()}
+                    headerContent={this.renderHeaderContent()}
                     >
                 {this.renderContent()}
-                {this.renderCreateDialog()}
+                {this.renderConfirmDeleteDialog()}
                 </SimpleModule>)
     }
 }
@@ -231,9 +337,13 @@ const mapStateToProps = (state:ReduxState, ownProps: OwnProps & RouteComponentPr
 
     const authenticatedUser = AuthenticationManager.getAuthenticatedUser()
     const conversation = ContextManager.getContextObject(ownProps.location.pathname, ContextNaturalKey.CONVERSATION) as Conversation
+    const createNewConversation = ownProps.match.params.conversationId == "new"
+    const tempConversation = state.tempCache.conversation
     return {
         authenticatedUser,
-        conversation
+        conversation,
+        createNewConversation,
+        tempConversation
     }
 }
 const mapDispatchToProps = (dispatch:ReduxState, ownProps: OwnProps):ReduxDispatchProps => {

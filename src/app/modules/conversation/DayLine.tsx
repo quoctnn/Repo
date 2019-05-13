@@ -1,5 +1,6 @@
 import * as React from "react";
 import { stringToDate } from '../../utilities/Utilities';
+import { translate } from "../../localization/AutoIntlProvider";
 
 type Props = {
     date:string
@@ -11,7 +12,7 @@ export class DayLine extends React.PureComponent<Props,{}> {
         let today = stringToDate()
 
         if (createdAt.isSame(today, 'd')) {
-            time = "Today"
+            time = translate("Today")
         } else {
             time = createdAt.format('LL')
         }
