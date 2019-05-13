@@ -3,7 +3,7 @@ import { Popover, PopoverBody } from 'reactstrap';
 import classnames = require('classnames');
 import { OverflowMenuItem, createDropdownItem } from './OverflowMenu';
 type Props = {
-    items:() => OverflowMenuItem[]
+    items:(() => OverflowMenuItem[]) | OverflowMenuItem[]
     className?:string
     triggerClass:string
 }
@@ -54,7 +54,7 @@ export class DropDownMenu extends React.Component<Props, State> {
         const open = !this.state.popoverRemoved || this.state.popoverVisible
         if(!open)
             return null
-        const items = this.props.items()
+        const items =  Array.isArray(this.props.items) ? this.props.items : this.props.items()
         return <Popover className="dropdown-menu-popover" 
                         delay={0} 
                         trigger="legacy" 

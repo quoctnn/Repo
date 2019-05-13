@@ -30,7 +30,7 @@ import { ProfileOptionComponent, ProfileSingleValueComponent, createProfileFilte
 import { ActionMeta } from 'react-select/lib/types';
 import { NavigationUtilities } from '../../utilities/NavigationUtilities';
 import SimpleDialog from '../../components/general/dialogs/SimpleDialog';
-import { ConversationEditor } from './ConversationEditor';
+import ConversationEditor from './ConversationEditor';
 
 const reducer = (accumulator, currentValue) => accumulator + currentValue;
 const uidToNumber = (uid) => uid.split("_").map(n => parseInt(n)).reduce(reducer)
@@ -482,10 +482,15 @@ class ConversationModule extends React.Component<Props, State> {
         })
     }
     renderConversationEditorDialog = () => {
-        const visible = this.state.conversationEditorDialogVisible
-        return <SimpleDialog didCancel={this.toggleConversationEditorDialog} visible={visible}>
-                    <ConversationEditor />
-                </SimpleDialog>
+        const conversation = this.props.conversation
+        if(conversation)
+        {
+            const visible = this.state.conversationEditorDialogVisible
+            return <SimpleDialog header={translate("common.conversation")} showCloseButton={true} didCancel={this.toggleConversationEditorDialog} visible={visible}>
+                        <ConversationEditor conversationId={this.props.conversation.id}/>
+                    </SimpleDialog>
+        }
+        return null
         
     }
     render()

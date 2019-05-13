@@ -12,7 +12,7 @@ export class DayLine extends React.PureComponent<Props,{}> {
         let today = stringToDate()
 
         if (createdAt.isSame(today, 'd')) {
-            time = translate("Today")
+            time = translate("common.Today")
         } else {
             time = createdAt.format('LL')
         }

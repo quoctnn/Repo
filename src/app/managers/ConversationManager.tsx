@@ -44,6 +44,14 @@ export abstract class ConversationManager
             completion(success)
         })
     }
+    static archiveConversation = (conversationId:number, completion:(success:boolean) => void) => 
+    {
+        ApiClient.deleteConversation(conversationId, (data, status, error) => {
+            const success = nullOrUndefined(error)
+            ToastManager.showErrorToast(error)
+            completion(success)
+        })
+    }
     static ensureConversationExists = (conversationId:number|string, completion:(conversation:Conversation) => void) => 
     {
         if(!conversationId.isNumber())
@@ -150,7 +158,12 @@ export abstract class ConversationManager
             }
         }
     }
-
+    static updateConversation = (conversationId:number, conversation:Partial<Conversation>, completion:() => void) => 
+    {
+        ApiClient.updateConversation(conversationId,conversation, (data, status, error) => {
+            completion()
+        })
+    }
     static markConversationAsRead = (conversationId:number, completion:() => void) => 
     {
         ApiClient.markConversationAsRead(conversationId, (data, status, error) => {

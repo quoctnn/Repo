@@ -14,6 +14,8 @@ import { resetProfilesAction } from '../redux/profileStore';
 import { resetProjectsAction } from '../redux/projectStore';
 import { resetEventsAction } from '../redux/eventStore';
 import { resetTasksAction } from '../redux/taskStore';
+import { resetConversationsAction } from '../redux/conversationStore';
+import { resetMessageQueueAction } from '../redux/messageQueue';
 export type ApplicationData = {
     dashboards:Dashboard[]
     communitiesLoaded:boolean
@@ -50,6 +52,8 @@ export abstract class ApplicationManager
             store.dispatch(resetProjectsAction())
             store.dispatch(resetEventsAction())
             store.dispatch(resetTasksAction())
+            store.dispatch(resetConversationsAction())
+            store.dispatch(resetMessageQueueAction())
         }
     }
     static getDashboards = (category:string) => {

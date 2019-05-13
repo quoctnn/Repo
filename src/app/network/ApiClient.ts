@@ -211,6 +211,24 @@ export default class ApiClient
             callback(null, status, error)
         })
     }
+    static updateConversation(id:number, conversation:Partial<Conversation>, callback:ApiClientCallback<Conversation>)
+    {
+        let url = Constants.apiRoute.conversation(id)
+        AjaxRequest.patch(url, conversation, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
+    static leaveConversation(id:number, callback:ApiClientCallback<any>)
+    {
+        let url = Constants.apiRoute.leaveConversation(id)
+        AjaxRequest.get(url, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
     static updateTask(id:number, task:Partial<Task>, callback:ApiClientCallback<Task>)
     {
         let url = Constants.apiRoute.taskIdUrl(id)

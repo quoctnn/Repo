@@ -1,4 +1,5 @@
 import * as React from "react";
+import classnames from 'classnames';
 const ReactDOM = require("react-dom");
 require("./List.scss");
 
@@ -14,7 +15,36 @@ export interface State {
     items:React.ReactElement<any>[]
     rects:{[id:number]:DOMRect}
 }
+type ListItemProps = {
+}
+
 //WARNING:ANIMATION REMOVED
+export class ListItem extends React.PureComponent<ListItemProps & React.HTMLAttributes<HTMLElement>, {}> {
+    render() 
+    {
+        const {className, ...rest} = this.props
+        const cn = classnames("list-item primary-text", className)
+        return(
+            <div {...rest} className={cn} >
+                  {this.props.children}
+            </div>
+        );
+    }
+}
+type ListHeaderProps = {
+}
+export class ListHeader extends React.PureComponent<ListHeaderProps & React.HTMLAttributes<HTMLElement>, {}> {
+    render() 
+    {
+        const {className, ...rest} = this.props
+        const cn = classnames("list-header secondary-text", className)
+        return(
+            <div {...rest} className={cn} >
+                  {this.props.children}
+            </div>
+        );
+    }
+}
 export class List extends React.PureComponent<Props, {}> {
     static defaultProps:Props = {
         className:null,
@@ -25,7 +55,7 @@ export class List extends React.PureComponent<Props, {}> {
     }
     state:State
     private listRef = React.createRef<HTMLDivElement>()
-    constructor(props) {
+    constructor(props:Props) {
         super(props);
         this.state = {items:[], rects:{}}
         this.getChildren = this.getChildren.bind(this)

@@ -42,7 +42,7 @@ type State = {
     isTyping:IsTypingStore
     listRedrawContext?:string
     createConversationDialogVisible:boolean,
-    conversationToDelete:number
+    conversationActionInProgress:{conversation:number, action:ConversationAction}
     filterArchived:boolean
 }
 type ReduxStateProps = {
@@ -69,8 +69,8 @@ class ConversationsModule extends React.Component<Props, State> {
             isLoading:false,
             isTyping:{},
             createConversationDialogVisible:false,
-            conversationToDelete:0,
-            filterArchived:false
+            conversationActionInProgress:{conversation:0, action:null},
+            filterArchived:false,
         }
 
     }
@@ -165,6 +165,10 @@ class ConversationsModule extends React.Component<Props, State> {
     fetchConversations = (offset:number, completion:(items:PaginationResult<Conversation>) => void ) => {
         const archived = this.state.filterArchived
         ApiClient.getConversations( 30, offset, archived, (data, status, error) => {
+            if(data && data.results)
+            {
+                ConversationManager.storeConversations(data.results)
+            }
             completion(data)
             ToastManager.showErrorToast(error)
         })
@@ -179,36 +183,72 @@ class ConversationsModule extends React.Component<Props, State> {
         }
         return null
     }
-    onConfirmDelete = (confirmed:boolean) => {
-        const conversation = this.state.conversationToDelete
-        if(confirmed)
-        {
-            ConversationManager.deleteConversation(conversation, (success) => {
-                if(success)
-                {
-                    ToastManager.showInfoToast("convesation.deleted")
-                    this.conversationsList.current.removeItemById(conversation)
-                    NavigationUtilities.navigateToConversation(this.props.history, null)
-                }
-                this.setState(() => {
-                    return {conversationToDelete:0}
-                })
-            })
-        }
-        else {
-            this.setState(() => {
-                return {conversationToDelete:0}
-            })
-        }
+    resetAction = () => {
+        this.setState(() => {
+            return {conversationActionInProgress:{conversation:0, action:null}}
+        })
     }
-    renderConfirmDeleteDialog = () => {
-        const visible = this.state.conversationToDelete > 0
-        const title = translate("conversation.preventdelete.title")
-        const message = translate("conversation.preventdelete.description")
+    setAction = (conversation:number, action:ConversationAction) => {
+        this.setState(() => {
+            return {conversationActionInProgress:{conversation:conversation, action:action}}
+        })
+    }
+    onConfirmAction = (confirmed:boolean) => {
+        const action = this.state.conversationActionInProgress
+        if(action.conversation == 0)
+            return
+        if(action.action == ConversationAction.delete)
+        {
+            if(confirmed)
+            {
+                ConversationManager.deleteConversation(action.conversation, (success) => {
+                    if(success)
+                    {
+                        ToastManager.showInfoToast("conversation.deleted")
+                        this.conversationsList.current.removeItemById(action.conversation)
+                        NavigationUtilities.navigateToConversation(this.props.history, null)
+                    }
+                    this.resetAction()
+                })
+            }
+            else {
+                this.resetAction()
+            }
+        }
+        else if(action.action == ConversationAction.archive)
+        {
+            if(confirmed)
+            {
+                ConversationManager.archiveConversation(action.conversation, (success) => {
+                    if(success)
+                    {
+                        ToastManager.showInfoToast("conversation.archived")
+                        this.conversationsList.current.removeItemById(action.conversation)
+                        NavigationUtilities.navigateToConversation(this.props.history, null)
+                    }
+                    this.resetAction()
+                })
+            }
+            else {
+                this.resetAction()
+            }
+        }
+        
+    }
+    renderConfirmDialog = () => {
+        const action = this.state.conversationActionInProgress
+        const visible = action.action && action.conversation > 0
+        const title = action.action ? translate(`conversation.prevent${action.action}.title`) : ""
+        const message = action.action ? translate(`conversation.prevent${action.action}.description`) : ""
         const okButtonTitle = translate("common.yes")
-        return <ConfirmDialog visible={visible} title={title} message={message} didComplete={this.onConfirmDelete} okButtonTitle={okButtonTitle}/>
+        return <ConfirmDialog visible={visible} title={title} message={message} didComplete={this.onConfirmAction} okButtonTitle={okButtonTitle}/>
     }
     onConversationAction = (action:ConversationAction, conversationId:number) => {
+
+        const currentAction = this.state.conversationActionInProgress
+        const currentActionInProgress = currentAction.conversation > 0
+        if(currentActionInProgress)
+            return
         switch(action)
         {
             case ConversationAction.delete:
@@ -222,15 +262,14 @@ class ConversationsModule extends React.Component<Props, State> {
                     NavigationUtilities.navigateToConversation(this.props.history, firstConversation && firstConversation.id)
                 }
                 else{
-                    
-                    const currentlyDeletingConversation = this.state.conversationToDelete > 0
-                    if(!currentlyDeletingConversation)
-                    {
-                        this.setState(() => {
-                            return {conversationToDelete:conversation.id}
-                        })
-                    }
+                    this.setAction(conversationId, action)
                 }
+                break;
+            }
+            case ConversationAction.archive:
+            {
+                this.setAction(conversationId, action)
+                break;
             }
         }
     }
@@ -277,11 +316,24 @@ class ConversationsModule extends React.Component<Props, State> {
         })
     }
     createTemporaryConversation = () => {
+        
         if(!this.props.tempConversation)
         {
-            ConversationManager.createTemporaryConversation()
+            const onReady = () => {
+
+                ConversationManager.createTemporaryConversation()
+                this.conversationsList.current && this.conversationsList.current.scrollToTop()
+            }
+            if(this.state.filterArchived)
+            {
+                this.setState(() => {
+                    return {filterArchived:false}
+                },onReady)
+            }
+            else {
+                onReady()
+            }
         }
-        this.conversationsList.current && this.conversationsList.current.scrollToTop()
     }
     renderHeaderContent = () => {
         return <div>
@@ -329,7 +381,7 @@ class ConversationsModule extends React.Component<Props, State> {
                     headerContent={this.renderHeaderContent()}
                     >
                 {this.renderContent()}
-                {this.renderConfirmDeleteDialog()}
+                {this.renderConfirmDialog()}
                 </SimpleModule>)
     }
 }

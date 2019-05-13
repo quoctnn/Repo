@@ -15,7 +15,8 @@ import { OverflowMenuItem, OverflowMenuItemType } from '../../components/general
 import { translate } from '../../localization/AutoIntlProvider';
 import { MessageContent } from '../conversation/MessageContent';
 export enum ConversationAction{
-    delete, archive
+    delete = "delete",
+    archive = "archive"
 }
 type OwnProps = {
     conversation:Conversation
@@ -65,10 +66,14 @@ class ConversationListItem extends React.Component<Props, State> {
         return null
     }
     getOptionMenuItems = () => {
-        const conversationId = this.props.conversation.id
+        const conversation = this.props.conversation
         const items:OverflowMenuItem[] = []
-        items.push({id:"2", type:OverflowMenuItemType.option, title:translate("conversation.menu.delete"), onPress:this.onConversationAction(ConversationAction.delete, conversationId), toggleMenu:false})
-        items.push({id:"3", type:OverflowMenuItemType.option, title:translate("conversation.menu.archive"), onPress:this.onConversationAction(ConversationAction.archive, conversationId), toggleMenu:false})
+        if(conversation.temporary)
+            return items
+        const isArchived = (conversation.archived_by || []).contains(this.props.authenticatedProfile.id)
+        //items.push({id:"2", type:OverflowMenuItemType.option, title:translate("conversation.menu.delete"), onPress:this.onConversationAction(ConversationAction.delete, conversationId), toggleMenu:false})
+        if(!isArchived)
+            items.push({id:"3", type:OverflowMenuItemType.option, title:translate("conversation.menu.archive"), onPress:this.onConversationAction(ConversationAction.archive, conversation.id), toggleMenu:false})
         return items
     }
     render() {
@@ -84,6 +89,7 @@ class ConversationListItem extends React.Component<Props, State> {
         const avatars = users.map(u => u.avatar_thumbnail || u.avatar).filter(a => !nullOrUndefined(a))
         const size = 44
         const cl = classnames("conversation-list-item", className, {active:isActive})
+        const ddOptions = this.getOptionMenuItems()
         return (
             <div className={cl}>
                 <Link className="d-flex button-link" to={conversation.uri || "#"}>
@@ -101,8 +107,8 @@ class ConversationListItem extends React.Component<Props, State> {
                                 <div className="title text-truncate">{title}</div>
                                 {conversation.temporary && 
                                 <i onClick={this.onConversationAction(ConversationAction.delete, conversation.id)} className="fas fa-times action-button push-right"></i>
-                                ||
-                                <DropDownMenu items={this.getOptionMenuItems} triggerClass="fas fa-cog action-button push-right" />
+                                || ddOptions.length > 0 &&
+                                <DropDownMenu items={ddOptions} triggerClass="fas fa-cog action-button push-right" />
                                 }
                             </div>
                             <div className="subtitle-row d-flex">

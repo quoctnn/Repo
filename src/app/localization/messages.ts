@@ -155,6 +155,7 @@ var translations = {
     "file.type.document":"Document",
     "file.type.video":"Video",
     "file.type.audio":"Audio",
+    "common.Today":"Today",
   },
   no: {
     "search.placeholder": "Søk ...",
@@ -312,6 +313,7 @@ var translations = {
     "file.type.document":"Dokument",
     "file.type.video":"Video",
     "file.type.audio":"Lyd",
+    "common.Today":"I dag",
   },
   en: {
     "search.placeholder": "Search ...",
@@ -476,6 +478,7 @@ var translations = {
     "file.type.document":"Document",
     "file.type.video":"Video",
     "file.type.audio":"Audio",
+    "common.Today":"Today",
   }
 };
 
