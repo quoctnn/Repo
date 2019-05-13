@@ -31,8 +31,8 @@ type ReduxStateProps = {
 type ReduxDispatchProps = {
 }
 type Props = OwnProps & RouteComponentProps<any> & ReduxStateProps & ReduxDispatchProps
-class GroupsModule extends React.Component<Props, State> {  
-    tempMenuData:GroupsMenuData = null   
+class GroupsModule extends React.Component<Props, State> {
+    tempMenuData:GroupsMenuData = null
     groupsList = React.createRef<ListComponent<Group>>()
     constructor(props:Props) {
         super(props);
@@ -71,8 +71,9 @@ class GroupsModule extends React.Component<Props, State> {
         this.tempMenuData = data
     }
     fetchGroups = (offset:number, completion:(items:PaginationResult<Group>) => void ) => {
+        let ordering = 'recent'  // TODO: Add filter to settings
         const communityId = this.props.community && this.props.community.id
-        ApiClient.getGroups(communityId, 30, offset, (data, status, error) => {
+        ApiClient.getGroups(communityId, 30, offset, ordering, (data, status, error) => {
             completion(data)
             ToastManager.showErrorToast(error)
         })
@@ -102,11 +103,11 @@ class GroupsModule extends React.Component<Props, State> {
         const {breakpoint, className} = this.props
         const cn = classnames("groups-module", className)
         const menu = <GroupsMenu data={this.state.menuData} onUpdate={this.menuDataUpdated}  />
-        return (<SimpleModule {...rest} 
-                    className={cn} 
-                    headerClick={this.headerClick} 
-                    breakpoint={breakpoint} 
-                    isLoading={this.state.isLoading} 
+        return (<SimpleModule {...rest}
+                    className={cn}
+                    headerClick={this.headerClick}
+                    breakpoint={breakpoint}
+                    isLoading={this.state.isLoading}
                     onMenuToggle={this.onMenuToggle}
                     menu={menu}
                     headerTitle={translate("groups.module.title")}>

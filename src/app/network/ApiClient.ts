@@ -411,9 +411,9 @@ export default class ApiClient
             callback(null, status, error)
         })
     }
-    static getGroups(community:number, limit:number, offset:number,callback:ApiClientFeedPageCallback<Group>)
+    static getGroups(community:number, limit:number, offset:number, ordering:string, callback:ApiClientFeedPageCallback<Group>)
     {
-        let url = Constants.apiRoute.groupsUrl + "?" + this.getQueryString({community, limit, offset})
+        let url = Constants.apiRoute.groupsUrl + "?" + this.getQueryString({community, limit, offset, ordering})
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
@@ -438,18 +438,18 @@ export default class ApiClient
             callback(null, status, error)
         })
     }
-    static getEvents(community:number, limit:number, offset:number,callback:ApiClientFeedPageCallback<Event>)
+    static getEvents(community:number, limit:number, offset:number, ordering:string, callback:ApiClientFeedPageCallback<Event>)
     {
-        let url = Constants.apiRoute.eventsUrl + "?" + this.getQueryString({community, limit, offset})
+        let url = Constants.apiRoute.eventsUrl + "?" + this.getQueryString({community, limit, offset, ordering})
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
             callback(null, status, error)
         })
     }
-    static getProjects(community:number, limit:number, offset:number,callback:ApiClientFeedPageCallback<Project>)
+    static getProjects(community:number, limit:number, offset:number, ordering:string, callback:ApiClientFeedPageCallback<Project>)
     {
-        let url = Constants.apiRoute.projectsUrl + "?" + this.getQueryString({community, limit, offset})
+        let url = Constants.apiRoute.projectsUrl + "?" + this.getQueryString({community, limit, offset, ordering})
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
