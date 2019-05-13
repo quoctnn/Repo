@@ -472,7 +472,7 @@ class ConversationModule extends React.Component<Props, State> {
         const conversation = this.props.conversation
         if(conversation)
         {
-            return <div onClick={this.toggleConversationEditorDialog}>{ConversationUtilities.getConversationTitle(conversation)}</div>
+            return <div className="link" onClick={this.toggleConversationEditorDialog}>{ConversationUtilities.getConversationTitle(conversation)}</div>
         }
         return null
     }

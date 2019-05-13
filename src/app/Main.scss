@@ -74,6 +74,9 @@ button{@include var(color, primary-text-color);}
     line-height: 1.5;
     border-radius: 0.2rem;
 }
+.link{
+    cursor: pointer;
+}
 .link-text, a, .text.link, .btn-link
 {
     @include var(color, link-color);
