@@ -173,11 +173,8 @@ class ChannelEventStream extends React.Component<Props, State> {
                 this.playEvent(data)
             }
             this.stream.onclose = event => {
-
                 NotificationCenter.push(eventStreamNotificationPrefix + EventStreamMessageType.SOCKET_STATE_CHANGE,[this.stream.readyState])
-                if (!event.wasClean)
-                {
-                }
+                this.authorized = false;
                 console.log('WebSocket CLOSED', this.stream);
                 if (this.stream && (this.stream as any)._shouldReconnect)
                     (this.stream as any)._connect();

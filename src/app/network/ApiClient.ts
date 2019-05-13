@@ -6,7 +6,7 @@ import { Status, UserProfile, UploadedFile, Community, Group, Conversation, Proj
 import { nullOrUndefined } from '../utilities/Utilities';
 import moment = require("moment");
 import { Settings } from "../utilities/Settings";
-export type PaginationResult<T> = {results:T[], count:number, previous:string|null, next:string|null}
+export type PaginationResult<T> = {results:T[], count:number, previous:string|null, next:string|null, divider?:number}
 export type ElasticSuggestion = {text:string, offset:number, length:number, options:[]}
 export type ElasticExtensionResult = {stats:{suggestions:{[key:string]:ElasticSuggestion}, aggregations:{[key:string]:any}}}
 export type StatusCommentsResult<T> = {results:T[], count:number, parent:T}

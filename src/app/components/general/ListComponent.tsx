@@ -7,6 +7,13 @@ import LoadingSpinner from '../../components/LoadingSpinner';
 import { translate } from '../../localization/AutoIntlProvider';
 import { IdentifiableObject } from '../../types/intrasocial_types';
 
+class ListComponentDivider extends React.Component{
+    render() {
+        return (
+            <div className="theme-box theme-bg-gradient list-divider"><hr/></div>
+        )
+    }
+}
 type Props<T> = {
     className?:string
     onLoadingStateChanged?:(isLoading:boolean) => void
@@ -30,6 +37,7 @@ type State<T> = {
     hasReceivedData:boolean
     hasError:boolean
     redrawContext?:string
+    dividerPosition?:number
 }
 export default class ListComponent<T extends IdentifiableObject> extends React.Component<Props<T>, State<T>> {
     private listRef = React.createRef<List>()
@@ -63,7 +71,7 @@ export default class ListComponent<T extends IdentifiableObject> extends React.C
         })
     }
     removeItemById = (id:number) => {
-        
+
         this.setState((prevState:State<T>) => {
             let stateItems = prevState.items
             const index = stateItems.findIndex(t => t.id == id)
@@ -169,6 +177,8 @@ export default class ListComponent<T extends IdentifiableObject> extends React.C
             if(data && data.results)
             {
                 let newData = data.results
+                let divider = data.divider
+                if (divider == data.count) divider=null
                 if(requestId == this.state.requestId)
                 {
                     this.setState((prevState:State<T>) => {
@@ -181,6 +191,7 @@ export default class ListComponent<T extends IdentifiableObject> extends React.C
                             isLoading:false,
                             hasReceivedData:true,
                             hasError:false,
+                            dividerPosition: divider
                         }
                     });
                 }
@@ -208,9 +219,10 @@ export default class ListComponent<T extends IdentifiableObject> extends React.C
         const cn = classnames("list-component-list vertical-scroll", this.props.className)
         const scroll = this.props.scrollParent ? undefined : this.onScroll
         const listItems = this.props.sortItems ? this.props.sortItems(this.state.items) : this.state.items
-        const items = listItems.map(i => {
+        let items = listItems.map(i => {
                             return this.props.renderItem(i)
                         }).concat(this.renderLoading())
+        if (this.state.dividerPosition) items.splice(this.state.dividerPosition, 0, <ListComponentDivider key="divider"/>)
         return (<List ref={this.listRef} enableAnimation={false}
                     onScroll={scroll}
                     className={cn}>
