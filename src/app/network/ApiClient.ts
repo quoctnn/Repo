@@ -6,7 +6,7 @@ import { Status, UserProfile, UploadedFile, Community, Group, Conversation, Proj
 import { nullOrUndefined } from '../utilities/Utilities';
 import moment = require("moment");
 import { Settings } from "../utilities/Settings";
-export type PaginationResult<T> = {results:T[], count:number, previous:string|null, next:string|null}
+export type PaginationResult<T> = {results:T[], count:number, previous:string|null, next:string|null, divider?:number}
 export type ElasticSuggestion = {text:string, offset:number, length:number, options:[]}
 export type ElasticExtensionResult = {stats:{suggestions:{[key:string]:ElasticSuggestion}, aggregations:{[key:string]:any}}}
 export type StatusCommentsResult<T> = {results:T[], count:number, parent:T}
@@ -465,9 +465,10 @@ export default class ApiClient
             callback(null, status, error)
         })
     }
-    static getEvents(community:number, limit:number, offset:number, ordering:string, callback:ApiClientFeedPageCallback<Event>)
+    static getEvents(community:number, limit:number, offset:number, ordering:string, upcoming:boolean, callback:ApiClientFeedPageCallback<Event>)
     {
-        let url = Constants.apiRoute.eventsUrl + "?" + this.getQueryString({community, limit, offset, ordering})
+        let start_date = upcoming ? "&start_after=" : "&start_before="
+        let url = Constants.apiRoute.eventsUrl + "?" + this.getQueryString({community, limit, offset, ordering}) + start_date + moment().format("YYYY-MM-DD")
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
