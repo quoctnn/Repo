@@ -32,8 +32,8 @@ type ReduxStateProps = {
 type ReduxDispatchProps = {
 }
 type Props = OwnProps & RouteComponentProps<any> & ReduxStateProps & ReduxDispatchProps
-class EventsModule extends React.Component<Props, State> {  
-    tempMenuData:EventsMenuData = null   
+class EventsModule extends React.Component<Props, State> {
+    tempMenuData:EventsMenuData = null
     eventsList = React.createRef<ListComponent<Event>>()
     constructor(props:Props) {
         super(props);
@@ -68,8 +68,9 @@ class EventsModule extends React.Component<Props, State> {
         this.tempMenuData = data
     }
     fetchEvents = (offset:number, completion:(items:PaginationResult<Event>) => void ) => {
+        let ordering = 'recent'  // TODO: Add filter to settings
         const communityId = this.props.community && this.props.community.id
-        ApiClient.getEvents(communityId, 30, offset, (data, status, error) => {
+        ApiClient.getEvents(communityId, 30, offset, ordering, (data, status, error) => {
             completion(data)
             ToastManager.showErrorToast(error)
         })
@@ -90,7 +91,7 @@ class EventsModule extends React.Component<Props, State> {
     renderContent = () => {
         return <>
             {!this.props.community && <LoadingSpinner key="loading"/>}
-            {this.props.community && <ListComponent<Event> 
+            {this.props.community && <ListComponent<Event>
                 ref={this.eventsList} onLoadingStateChanged={this.feedLoadingStateChanged} fetchData={this.fetchEvents} renderItem={this.renderEvent} />}
             </>
     }
@@ -100,11 +101,11 @@ class EventsModule extends React.Component<Props, State> {
         const {breakpoint, className} = this.props
         const cn = classnames("events-module", className)
         const menu = <EventsMenu data={this.state.menuData} onUpdate={this.menuDataUpdated}  />
-        return (<SimpleModule {...rest} 
-                    className={cn} 
-                    headerClick={this.headerClick} 
-                    breakpoint={breakpoint} 
-                    isLoading={this.state.isLoading} 
+        return (<SimpleModule {...rest}
+                    className={cn}
+                    headerClick={this.headerClick}
+                    breakpoint={breakpoint}
+                    isLoading={this.state.isLoading}
                     onMenuToggle={this.onMenuToggle}
                     menu={menu}
                     headerTitle={translate("events.module.title")}>

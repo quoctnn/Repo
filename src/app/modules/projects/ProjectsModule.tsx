@@ -32,8 +32,8 @@ type ReduxStateProps = {
 type ReduxDispatchProps = {
 }
 type Props = OwnProps & RouteComponentProps<any> & ReduxStateProps & ReduxDispatchProps
-class ProjectsModule extends React.Component<Props, State> {  
-    tempMenuData:ProjectsMenuData = null   
+class ProjectsModule extends React.Component<Props, State> {
+    tempMenuData:ProjectsMenuData = null
     projectsList = React.createRef<ListComponent<Project>>()
     constructor(props:Props) {
         super(props);
@@ -68,8 +68,9 @@ class ProjectsModule extends React.Component<Props, State> {
         this.tempMenuData = data
     }
     fetchProjects = (offset:number, completion:(items:PaginationResult<Project>) => void ) => {
+        let ordering = 'recent'  // TODO: Add filter to settings
         const communityId = this.props.community && this.props.community.id
-        ApiClient.getProjects(communityId, 30, offset, (data, status, error) => {
+        ApiClient.getProjects(communityId, 30, offset, ordering, (data, status, error) => {
             completion(data)
             ToastManager.showErrorToast(error)
         })
@@ -99,11 +100,11 @@ class ProjectsModule extends React.Component<Props, State> {
         const {breakpoint, className} = this.props
         const cn = classnames("projects-module", className)
         const menu = <ProjectsMenu data={this.state.menuData} onUpdate={this.menuDataUpdated}  />
-        return (<SimpleModule {...rest} 
-                    className={cn} 
-                    headerClick={this.headerClick} 
-                    breakpoint={breakpoint} 
-                    isLoading={this.state.isLoading} 
+        return (<SimpleModule {...rest}
+                    className={cn}
+                    headerClick={this.headerClick}
+                    breakpoint={breakpoint}
+                    isLoading={this.state.isLoading}
                     onMenuToggle={this.onMenuToggle}
                     menu={menu}
                     headerTitle={translate("projects.module.title")}>

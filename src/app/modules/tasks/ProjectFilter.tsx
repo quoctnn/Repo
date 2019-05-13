@@ -45,13 +45,13 @@ export class ProjectFilter extends React.PureComponent<Props & React.HTMLAttribu
         return new Promise((resolve) => {
             return ApiClient.search(10, 0, "*" + text + "*", ProjectFilter.searchTypes, false , true, false, true,{}, [], (data,status,error) => {
                 const d = data && data.results || []
-                resolve(d.map(r => this.convertResultItem(r)).filter(r => r != null)) 
+                resolve(d.map(r => this.convertResultItem(r)).filter(r => r != null))
             })
         });
     }
     searchOptions2 = (text:string) => {
         return new Promise((resolve) => {
-            return ApiClient.getProjects(null,20,0, (data, status, error) => {
+            return ApiClient.getProjects(null,20,0, null, (data, status, error) => {
                 const options:ContextValue[] = data.results.map(p => {return {value:ContextNaturalKey.PROJECT + "_" + p.id, label:p.name, id:p.id, type:ContextNaturalKey.PROJECT}})
                 resolve([{options:options, label:ContextNaturalKey.PROJECT}])
             })
@@ -60,19 +60,19 @@ export class ProjectFilter extends React.PureComponent<Props & React.HTMLAttribu
     onChange = (value:ContextValue) => {
         this.setState({ selectedValue: value }, () => this.props.onValueChange(this.state.selectedValue));
     }
-    render() 
+    render()
     {
         const {className} = this.props
         const { selectedValue} = this.state;
         const cn = classnames("context-filter", className)
         return(<div className={cn}>
-                <AsyncSelectIW 
+                <AsyncSelectIW
                     styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
                     isClearable={true}
                     value={selectedValue}
-                    menuPortalTarget={document.body} 
-                    cacheOptions={true} 
-                    defaultOptions={true} 
+                    menuPortalTarget={document.body}
+                    cacheOptions={true}
+                    defaultOptions={true}
                     onChange={this.onChange}
                     loadOptions={this.searchOptions} />
                 </div>
