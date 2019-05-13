@@ -76,6 +76,9 @@ button{@include var(color, primary-text-color);}
 }
 .link{
     cursor: pointer;
+    &:hover{
+        @include var(color, link-color);
+    }
 }
 .link-text, a, .text.link, .btn-link
 {
