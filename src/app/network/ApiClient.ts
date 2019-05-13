@@ -447,9 +447,10 @@ export default class ApiClient
             callback(null, status, error)
         })
     }
-    static getEvents(community:number, limit:number, offset:number, ordering:string, callback:ApiClientFeedPageCallback<Event>)
+    static getEvents(community:number, limit:number, offset:number, ordering:string, upcoming:boolean, callback:ApiClientFeedPageCallback<Event>)
     {
-        let url = Constants.apiRoute.eventsUrl + "?" + this.getQueryString({community, limit, offset, ordering})
+        let start_date = upcoming ? "&start_after=" : "&start_before="
+        let url = Constants.apiRoute.eventsUrl + "?" + this.getQueryString({community, limit, offset, ordering}) + start_date + moment().format("YYYY-MM-DD")
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {

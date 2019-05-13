@@ -16,6 +16,8 @@ import EventListItem from './EventListItem';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import SimpleModule from '../SimpleModule';
 import { ContextManager } from '../../managers/ContextManager';
+import { EventSorting } from './EventsMenu';
+import { ButtonGroup, Button } from 'reactstrap';
 type OwnProps = {
     className?:string
     breakpoint:ResponsiveBreakpoint
@@ -41,14 +43,16 @@ class EventsModule extends React.Component<Props, State> {
             menuVisible:false,
             isLoading:false,
             menuData:{
+                sorting:EventSorting.date,
+                upcoming:true
             }
         }
     }
     shouldReloadList = (prevProps:Props) => {
         return this.props.community && prevProps.community && this.props.community.id != prevProps.community.id
     }
-    componentDidUpdate = (prevProps:Props) => {
-        if(this.shouldReloadList(prevProps))
+    componentDidUpdate = (prevProps:Props, prevState:State) => {
+        if(this.shouldReloadList(prevProps) || this.contextDataChanged(prevState.menuData, prevProps))
         {
             this.eventsList.current.reload()
         }
@@ -67,10 +71,15 @@ class EventsModule extends React.Component<Props, State> {
     menuDataUpdated = (data:EventsMenuData) => {
         this.tempMenuData = data
     }
+    contextDataChanged = (prevData:EventsMenuData, prevProps:Props) => {
+        const data = this.state.menuData
+        return prevData.sorting != data.sorting || prevData.upcoming != data.upcoming
+    }
     fetchEvents = (offset:number, completion:(items:PaginationResult<Event>) => void ) => {
-        let ordering = 'recent'  // TODO: Add filter to settings
+        let ordering = this.state.menuData.sorting
+        let upcoming = this.state.menuData.upcoming
         const communityId = this.props.community && this.props.community.id
-        ApiClient.getEvents(communityId, 30, offset, ordering, (data, status, error) => {
+        ApiClient.getEvents(communityId, 30, offset, ordering, upcoming, (data, status, error) => {
             completion(data)
             ToastManager.showErrorToast(error)
         })
@@ -79,14 +88,30 @@ class EventsModule extends React.Component<Props, State> {
         return <EventListItem key={event.id} event={event} />
     }
     onMenuToggle = (visible:boolean) => {
-
         const newState:Partial<State> = {}
+        newState.menuVisible = visible
         if(!visible && this.tempMenuData) // update menudata
         {
             newState.menuData = this.tempMenuData
             this.tempMenuData = null
         }
         this.setState(newState as State)
+    }
+    toggleSorting = (sorting: EventSorting) => (e) => {
+        const md = {sorting: sorting, upcoming: this.state.menuData.upcoming}
+        this.setState({menuData:md})
+    }
+    renderSorting = () => {
+        if(this.state.menuVisible)
+            return null
+        return (<ButtonGroup className="header-filter-group">
+                    <Button size="xs" active={this.state.menuData.sorting === EventSorting.date} onClick={this.toggleSorting(EventSorting.date)} color="light">
+                        <span>{EventSorting.translatedText(EventSorting.date)}</span>
+                    </Button>
+                    <Button size="xs" active={this.state.menuData.sorting === EventSorting.popular} onClick={this.toggleSorting(EventSorting.popular)} color="light">
+                        <span>{EventSorting.translatedText(EventSorting.popular)}</span>
+                    </Button>
+                </ButtonGroup>)
     }
     renderContent = () => {
         return <>
@@ -101,6 +126,7 @@ class EventsModule extends React.Component<Props, State> {
         const {breakpoint, className} = this.props
         const cn = classnames("events-module", className)
         const menu = <EventsMenu data={this.state.menuData} onUpdate={this.menuDataUpdated}  />
+        const headerContent = this.renderSorting()
         return (<SimpleModule {...rest}
                     className={cn}
                     headerClick={this.headerClick}
@@ -108,6 +134,7 @@ class EventsModule extends React.Component<Props, State> {
                     isLoading={this.state.isLoading}
                     onMenuToggle={this.onMenuToggle}
                     menu={menu}
+                    headerContent={headerContent}
                     headerTitle={translate("events.module.title")}>
                 {this.renderContent()}
                 </SimpleModule>)

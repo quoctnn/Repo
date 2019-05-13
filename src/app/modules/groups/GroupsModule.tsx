@@ -16,12 +16,15 @@ import GroupListItem from './GroupListItem';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import SimpleModule from '../SimpleModule';
 import { ContextManager } from '../../managers/ContextManager';
+import { ButtonGroup, Button } from 'reactstrap';
+import { GroupSorting } from './GroupsMenu';
 type OwnProps = {
     className?:string
     breakpoint:ResponsiveBreakpoint
     contextNaturalKey?:ContextNaturalKey
 }
 type State = {
+    menuVisible:boolean
     isLoading:boolean
     menuData:GroupsMenuData
 }
@@ -37,16 +40,18 @@ class GroupsModule extends React.Component<Props, State> {
     constructor(props:Props) {
         super(props);
         this.state = {
+            menuVisible:false,
             isLoading:false,
             menuData:{
+                sorting:GroupSorting.recent
             }
         }
     }
     shouldReloadList = (prevProps:Props) => {
         return this.props.community && prevProps.community && this.props.community.id != prevProps.community.id
     }
-    componentDidUpdate = (prevProps:Props) => {
-        if(this.shouldReloadList(prevProps))
+    componentDidUpdate = (prevProps:Props, prevState:State) => {
+        if(this.shouldReloadList(prevProps) || this.contextDataChanged(prevState.menuData, prevProps))
         {
             this.groupsList.current.reload()
         }
@@ -70,8 +75,12 @@ class GroupsModule extends React.Component<Props, State> {
     menuDataUpdated = (data:GroupsMenuData) => {
         this.tempMenuData = data
     }
+    contextDataChanged = (prevData:GroupsMenuData, prevProps:Props) => {
+        const data = this.state.menuData
+        return prevData.sorting != data.sorting
+    }
     fetchGroups = (offset:number, completion:(items:PaginationResult<Group>) => void ) => {
-        let ordering = 'recent'  // TODO: Add filter to settings
+        let ordering = this.state.menuData.sorting
         const communityId = this.props.community && this.props.community.id
         ApiClient.getGroups(communityId, 30, offset, ordering, (data, status, error) => {
             completion(data)
@@ -88,8 +97,8 @@ class GroupsModule extends React.Component<Props, State> {
             </>
     }
     onMenuToggle = (visible:boolean) => {
-        console.log("menu open", visible)
         const newState:Partial<State> = {}
+        newState.menuVisible = visible
         if(!visible && this.tempMenuData) // update menudata
         {
             newState.menuData = this.tempMenuData
@@ -97,12 +106,32 @@ class GroupsModule extends React.Component<Props, State> {
         }
         this.setState(newState as State)
     }
+    toggleSorting = (sorting: GroupSorting) => (e) => {
+        const md = {sorting: sorting}
+        this.setState({menuData:md})
+    }
+    renderSorting = () => {
+        if(this.state.menuVisible)
+            return null
+        return (<ButtonGroup className="header-filter-group">
+                    <Button size="xs" active={this.state.menuData.sorting === GroupSorting.recent} onClick={this.toggleSorting(GroupSorting.recent)} color="light">
+                        <span>{GroupSorting.translatedText(GroupSorting.recent)}</span>
+                    </Button>
+                    <Button size="xs" active={this.state.menuData.sorting === GroupSorting.mostUsed} onClick={this.toggleSorting(GroupSorting.mostUsed)} color="light">
+                        <span>{GroupSorting.translatedText(GroupSorting.mostUsed)}</span>
+                    </Button>
+                    <Button size="xs" active={this.state.menuData.sorting === GroupSorting.AtoZ} onClick={this.toggleSorting(GroupSorting.AtoZ)} color="light">
+                        <span>{GroupSorting.translatedText(GroupSorting.AtoZ)}</span>
+                    </Button>
+                </ButtonGroup>)
+    }
     render()
     {
         const {history, match, location, staticContext, contextNaturalKey, community, ...rest} = this.props
         const {breakpoint, className} = this.props
         const cn = classnames("groups-module", className)
         const menu = <GroupsMenu data={this.state.menuData} onUpdate={this.menuDataUpdated}  />
+        const headerContent = this.renderSorting()
         return (<SimpleModule {...rest}
                     className={cn}
                     headerClick={this.headerClick}
@@ -110,6 +139,7 @@ class GroupsModule extends React.Component<Props, State> {
                     isLoading={this.state.isLoading}
                     onMenuToggle={this.onMenuToggle}
                     menu={menu}
+                    headerContent={headerContent}
                     headerTitle={translate("groups.module.title")}>
                 {this.renderContent()}
                 </SimpleModule>)
