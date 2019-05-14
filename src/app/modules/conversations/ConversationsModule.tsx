@@ -59,7 +59,6 @@ type Props = OwnProps & RouteComponentProps<any> & ReduxStateProps & ReduxDispat
 class ConversationsModule extends React.Component<Props, State> {  
     conversationsList = React.createRef<ListComponent<Conversation>>()
     private observers:EventSubscription[] = []
-    private tempConversationId:number = 0
     static defaultProps:DefaultProps = {
         activeConversation:-1,
         preventShowTypingInChatId:-1
@@ -78,10 +77,10 @@ class ConversationsModule extends React.Component<Props, State> {
 
     }
     processConversationRemoved = (...args:any[]) => {
-        let data:{conversation:number} = args[0]
+        let data:{conversation:number, temporary:boolean} = args[0]
         const isActive = this.props.routeConversationId == data.conversation.toString()
         this.conversationsList.current.removeItemById(data.conversation)
-        if(isActive)
+        if(isActive && !data.temporary)
         {
             NavigationUtilities.navigateToConversation(this.props.history, null)
         }
@@ -107,13 +106,7 @@ class ConversationsModule extends React.Component<Props, State> {
         }
         if(this.props.tempConversation)
         {
-            this.tempConversationId = this.props.tempConversation.id
             this.conversationsList.current.safeUnshift(this.props.tempConversation)
-        }
-        else if(this.tempConversationId)
-        {
-            this.conversationsList.current.removeItemById(this.tempConversationId)
-            this.tempConversationId = 0
         }
     }
     componentWillUnmount = () =>

@@ -1,5 +1,4 @@
 import {  Store } from 'redux';
-import * as React from 'react';
 import ApiClient from '../network/ApiClient';
 import { Conversation, Message, UserProfile, Permission } from '../types/intrasocial_types';
 import { EventStreamMessageType, sendOnWebsocket, canSendOnWebsocket } from '../network/ChannelEventStream';
@@ -22,14 +21,14 @@ export abstract class ConversationManager
         NotificationCenter.addObserver("eventstream_" + EventStreamMessageType.CONVERSATION_NEW, ConversationManager.processIncomingConversation)
         NotificationCenter.addObserver("eventstream_" + EventStreamMessageType.CONVERSATION_UPDATE, ConversationManager.processIncomingConversation)
         NotificationCenter.addObserver("eventstream_" + EventStreamMessageType.CONVERSATION_MESSAGE, ConversationManager.processIncomingConversationMessage)
-        NotificationCenter.addObserver("eventstream_" + EventStreamMessageType.CONVERSATION_MESSAGE, ConversationManager.processIncomingConversationRemove)
+        NotificationCenter.addObserver("eventstream_" + EventStreamMessageType.CONVERSATION_REMOVE, ConversationManager.processIncomingConversationRemove)
     }
     static storeConversations = (conversations:Conversation[]) => {
         ConversationManager.getStore().dispatch(addConversationsAction(conversations))
     }
     static removeConversation = (conversationsId:number) => {
         ConversationManager.getStore().dispatch(removeConversationAction(conversationsId))
-        NotificationCenter.push(ConversationManagerConversationRemovedEvent, [{conversation:conversationsId}])
+        NotificationCenter.push(ConversationManagerConversationRemovedEvent, [{conversation:conversationsId, temporary:false}])
     }
     static getConversation = (conversationId:number|string):Conversation => 
     {
@@ -131,7 +130,12 @@ export abstract class ConversationManager
     }
     static updateTemporaryConversation = (conversation:Conversation) => {
         let store = ConversationManager.getStore()
+        const tempConversation = store.getState().tempCache.conversation
         store.dispatch(setTemporaryConversationAction(conversation))
+        if(tempConversation && !conversation)
+        {
+            NotificationCenter.push(ConversationManagerConversationRemovedEvent, [{conversation:tempConversation.id, temporary:true}])
+        }
     }
     private static sendMessageNotification = (message: Message) =>  
     {
