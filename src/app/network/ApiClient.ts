@@ -457,9 +457,9 @@ export default class ApiClient
             callback(null, status, error)
         })
     }
-    static getProjects(community:number, limit:number, offset:number, ordering:string, callback:ApiClientFeedPageCallback<Project>)
+    static getProjects(community:number, limit:number, offset:number, ordering:string, responsible:boolean, assigned:boolean, callback:ApiClientFeedPageCallback<Project>)
     {
-        let url = Constants.apiRoute.projectsUrl + "?" + this.getQueryString({community, limit, offset, ordering})
+        let url = Constants.apiRoute.projectsUrl + "?" + this.getQueryString({community, limit, offset, ordering, responsible, assigned})
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {

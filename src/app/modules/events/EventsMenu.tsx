@@ -36,15 +36,13 @@ export default class EventsMenu extends React.Component<Props, State> {
         }
     }
     sortingButtonChanged = (sorting:EventSorting) => (event) => {
-        const currentSorting = this.state.data.sorting
-        const newSorting = sorting == currentSorting ? null : sorting
-        const data = {sorting:newSorting, upcoming:this.state.data.upcoming}
+        const data = { ... this.state.data }
+        data.sorting = sorting
         this.setState({data}, this.sendUpdate)
     }
     filterButtonChanged = (filter:boolean) => (event) => {
-        const currentFilter = this.state.data.upcoming
-        const newFilter = filter == currentFilter ? null : filter
-        const data = {upcoming:newFilter, sorting:this.state.data.sorting}
+        const data = { ... this.state.data }
+        data.upcoming = filter
         this.setState({data}, this.sendUpdate)
     }
     sendUpdate = () => {

@@ -11,7 +11,6 @@ import ApiClient, { PaginationResult } from '../../network/ApiClient';
 import { ToastManager } from '../../managers/ToastManager';
 import { connect } from 'react-redux';
 import { ReduxState } from '../../redux';
-import { CommunityManager } from '../../managers/CommunityManager';
 import EventListItem from './EventListItem';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import SimpleModule from '../SimpleModule';
@@ -63,7 +62,6 @@ class EventsModule extends React.Component<Props, State> {
     }
     headerClick = (e) => {
         const context = this.state.menuData
-        //NavigationUtilities.navigateToNewsfeed(this.props.history, context && context.type, context && context.id, this.state.includeSubContext)
     }
     feedLoadingStateChanged = (isLoading:boolean) => {
         this.setState({isLoading})
@@ -98,7 +96,10 @@ class EventsModule extends React.Component<Props, State> {
         this.setState(newState as State)
     }
     toggleSorting = (sorting: EventSorting) => (e) => {
-        const md = {sorting: sorting, upcoming: this.state.menuData.upcoming}
+        const md = {
+            sorting: sorting,
+            upcoming: this.state.menuData.upcoming
+        }
         this.setState({menuData:md})
     }
     renderSorting = () => {

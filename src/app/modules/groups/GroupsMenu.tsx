@@ -36,9 +36,8 @@ export default class GroupsMenu extends React.Component<Props, State> {
         }
     }
     sortingButtonChanged = (sorting:GroupSorting) => (event) => {
-        const currentSorting = this.state.data.sorting
-        const newSorting = sorting == currentSorting ? null : sorting
-        const data = {sorting:newSorting}
+        const data = { ... this.state.data }
+        data.sorting = sorting
         this.setState({data}, this.sendUpdate)
     }
     sendUpdate = () => {
