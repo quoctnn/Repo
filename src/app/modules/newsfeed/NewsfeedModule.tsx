@@ -159,6 +159,7 @@ class NewsfeedModule extends React.Component<Props, State> {
 
         const {contextObject} = this.props
         const canPost = (contextObject && contextObject.permission >= Permission.post) || false
+        let communityId = contextObject && ((contextObject as any).community || null)
         if(canPost)
         {
             return (<>
@@ -172,7 +173,7 @@ class NewsfeedModule extends React.Component<Props, State> {
                         contextNaturalKey={resolvedContextNaturalKey}
                         contextObjectId={resolvedContextObjectId}
                         placeholder={translate("newsfeed.module.addstatus.placeholder")}
-                        communityId={-1}
+                        communityId={communityId}
                         renderPlaceholder={false}
                         onFocus={this.onStatusComposerFocus}
                         showEmojiPicker={this.state.statusComposerFocus}

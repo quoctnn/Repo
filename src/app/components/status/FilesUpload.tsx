@@ -90,15 +90,16 @@ export default class FilesUpload extends React.Component<Props, State> {
     };
 
     dropzoneSettings() {
+        const params:any = {}
+        if(this.props.communityId)
+            params.community = this.props.communityId
         return {
             componentConfig: {
                 postUrl: EndpointManager.applyEndpointDomain(Constants.apiRoute.fileUploadUrl)
             },
 
             djsConfig: {
-                params: {
-                    community: this.props.communityId
-                },
+                params: params,
                 addRemoveLinks: true,
                 dictDefaultMessage: "<i class='fa fa-cloud-upload fa-2x'></i>",
                 acceptedFiles: this.props.acceptedFiles,

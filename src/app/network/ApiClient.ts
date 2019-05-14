@@ -545,6 +545,7 @@ export class FileUploader
     progress:(percent:number) => void
     constructor(file:Blob, progress:(percent:number) => void)
     {
+        debugger
         this.file = file
         this.progress = progress
         this.doUpload = this.doUpload.bind(this)
