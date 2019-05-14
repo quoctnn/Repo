@@ -16,14 +16,18 @@ export interface State {
     rects:{[id:number]:DOMRect}
 }
 type ListItemProps = {
+    hasAction:boolean
 }
 
 //WARNING:ANIMATION REMOVED
 export class ListItem extends React.PureComponent<ListItemProps & React.HTMLAttributes<HTMLElement>, {}> {
+    static defaultProps:ListItemProps = {
+        hasAction:false
+    }
     render() 
     {
-        const {className, ...rest} = this.props
-        const cn = classnames("list-item primary-text", className)
+        const {className, hasAction, ...rest} = this.props
+        const cn = classnames("list-item primary-text d-flex align-items-center", className, {"has-action":hasAction})
         return(
             <div {...rest} className={cn} >
                   {this.props.children}

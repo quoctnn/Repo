@@ -1,7 +1,5 @@
-.toast-error {
-}
-.toast-info {
-    .toast-info-description{
+.toast-info, .toast-error  {
+    .toast-description{
         font-size: 12px;
     }
 }

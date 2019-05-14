@@ -139,7 +139,7 @@ export default class StatusOptionsComponent extends React.Component<Props, State
                     visible={visible}
                     didCancel={this.closeAttentionModal}
                     didSubmit={this.createAttentionComplete}
-                    valueChanged={this.createAttentionValueChanged}
+                    didUpdate={this.createAttentionValueChanged}
                     canSubmit={this.state.selectedMembers.length > 0}
                     selected={this.state.selectedMembers}
                     singleSelect={true}

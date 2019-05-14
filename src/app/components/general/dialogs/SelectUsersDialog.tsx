@@ -4,8 +4,9 @@ import { UserProfile } from "../../../types/intrasocial_types";
 import { Avatar } from "../Avatar";
 import { translate } from "../../../localization/AutoIntlProvider";
 import { userFullName } from "../../../utilities/Utilities";
-
-require("./SelectUsersDialog.scss");
+import SimpleDialog from "./SimpleDialog";
+import { ListItem, List } from '../List';
+import classnames from 'classnames';
 
 interface UserInfoProps
 {
@@ -14,99 +15,114 @@ interface UserInfoProps
     onClick:(event) => void
 }
 export const UserInfo = (props:UserInfoProps) => {
+    const checkClass = classnames("mr-2 d-flex align-items-center justify-content-center border-1", {"primary-theme-bg":props.selected})
     return (
-      <div onClick={props.onClick} className="user-info d-flex">
-        <Avatar image={props.user.avatar} className="flex-shrink-0" />
-        <div className="flex-truncate-container flex-shrink-1 flex-grow-1">
-            <div className="user-info-name text-truncate">
+      <ListItem hasAction={true} onClick={props.onClick}>
+        <Avatar image={props.user.avatar} className="flex-shrink-0 mr-2" />
+        <div className="flex-shrink-1 flex-grow-1 mw0">
+            <div className="text-truncate">
                 {userFullName(props.user)}
             </div>
-            <div className="user-info-username text-truncate">
+            <div className="text-truncate">
                 {props.user.username}
             </div>
         </div>
         <div className="flex-shrink-0 flex-grow-0">
-            <Input type="checkbox" checked={props.selected} />
+            <div className={checkClass} style={{width:24, height:24, borderRadius:"50%"}}>
+                {props.selected && <i className="fas fa-check small-text"></i>}
+            </div>
         </div>
-      </div>
+      </ListItem>
     );
   }
-type Props = {
+type OwnProps = {
     visible:boolean
     canSubmit:boolean
     title?:string,
     completeButtonTitle?:string
     didCancel:() => void
-    didSubmit:() => void
-    valueChanged:(value:number[]) => void
+    didSubmit:(added:number[], removed:number[]) => void
+    didUpdate?:(added:number[], removed:number[]) => void
     contacts:UserProfile[]
-    selected:number[]
-    singleSelect:boolean
 }
+type DefaultProps = {
+    singleSelect:boolean
+    canRemove:boolean
+    selected:number[]
+}
+type Props = OwnProps & DefaultProps
 type State =
 {
+    added:number[]
+    removed:number[]
 }
 export default class SelectUsersDialog extends React.Component<Props, State> {
+    static defaultProps:DefaultProps = {
+        singleSelect:false,
+        canRemove:true,
+        selected:[]
+    }
     constructor(props:Props) {
         super(props);
         this.state = {
+            added:[],
+            removed:[]
         }
     }
-    didToggleUser = (user:number) => {
-        let arr =  [...this.props.selected]
-        let index = arr.indexOf(user)
-        if(index == -1)
-        {
-            if(this.props.singleSelect)
-                arr = [user]
-            else 
-                arr.push(user)
-        }
-        else 
-        {
-            arr.splice(index, 1)
-        }
-        this.sendValueChanged(arr)
+    didToggleUser = (user:number) => (e:React.SyntheticEvent) => {
+        e.preventDefault()
+        e.stopPropagation()
+        const selected =  this.props.selected
+        this.setState((prevState:State) => {
+            let added = [...prevState.added]
+            const removed = [...prevState.removed]
+            const index = selected.indexOf(user)
+            if(index == -1)
+            {
+                if(this.props.singleSelect)
+                    added = [user]
+                else 
+                    added.toggleElement(user)
+            }
+            else if(this.props.canRemove)
+            {
+                removed.toggleElement(user)
+            }
+            return {added, removed}
+        }, this.sendValueChanged)
     }
-    sendValueChanged = (arr:number[]) => {
-        console.log(arr)
-        if(this.props.valueChanged)
+    sendValueChanged = () => {
+        console.log("added:", this.state.added, "removed:", this.state.removed)
+        if(this.props.didUpdate)
         {
-            this.props.valueChanged(arr)
+            this.props.didUpdate(this.state.added, this.state.removed)
         }
     }
     didSubmit = () => {
-        this.props.didSubmit()
+        this.props.didSubmit(this.state.added, this.state.removed)
+    }
+    isSelected = (user:number, selected:number[], added:number[], removed:number[]) => {
+        return !removed.contains(user) && (selected.contains(user) || added.contains(user))
+    }
+    renderFooter = () => {
+        return <Button color="primary" onClick={this.didSubmit} disabled={!this.props.canSubmit}>
+                {this.props.completeButtonTitle || translate("common.done")}
+            </Button>
     }
     render() 
     {
         const selected = this.props.selected
-        return(
-            <div >
-                <Modal toggle={this.props.didCancel} id="select-users-dialog" zIndex={1070} isOpen={this.props.visible} className="full-height">
+        const {added, removed} = this.state
+        return( <SimpleDialog footer={this.renderFooter()} header={this.props.title} didCancel={this.props.didCancel} visible={this.props.visible}>
+                    <List enableAnimation={false}>
                     {
-                        this.props.title && 
-                        <ModalHeader>
-                            {this.props.title}
-                        </ModalHeader>
+                        this.props.contacts.map((u, index) => {
+                            return <UserInfo onClick={this.didToggleUser(u.id)} key={u.id} user={u} selected={this.isSelected(u.id, selected, added, removed)}/>
+                        })
                     }
-                    <ModalBody className="vertical-scroll">
-                        {
-                            this.props.contacts.map((u, index) => {
-                                return <UserInfo onClick={() => {this.didToggleUser(u.id)}} key={u.id} user={u} selected={selected.indexOf(u.id) >= 0}/>
-                            })
-                        }
-                    </ModalBody>
-                    <ModalFooter>
-                        <Button color="secondary" onClick={this.props.didCancel}>
-                            {translate("Cancel")}
-                        </Button>
-                        <Button color="primary" onClick={this.didSubmit} disabled={!this.props.canSubmit}>
-                            {this.props.completeButtonTitle || translate("Submit")}
-                        </Button>
-                    </ModalFooter>
-                </Modal>
-            </div>
+                    </List>
+                </SimpleDialog>
+            
         );
     }
 }

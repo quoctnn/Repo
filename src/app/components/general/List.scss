@@ -15,5 +15,12 @@
         @include var(border-color, border-color-default);
         border-bottom-width: 1px;
         border-style: solid;
+        &.has-action:hover{
+            @include var(background-color, main-content-secondary-background);
+            cursor: pointer;
+        }
+        &:last-child{
+            border-bottom-width: 0;
+        }
     }
 }

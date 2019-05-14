@@ -20,7 +20,7 @@ import { Settings } from '../../utilities/Settings';
 import { AuthenticationManager } from '../../managers/AuthenticationManager';
 import { uniqueId } from '../../utilities/Utilities';
 import { ContextManager } from '../../managers/ContextManager';
-import { ConversationManager } from '../../managers/ConversationManager';
+import { ConversationManager, ConversationManagerConversationRemovedEvent } from '../../managers/ConversationManager';
 import Routes from '../../utilities/Routes';
 import { ConversationAction } from './ConversationListItem';
 import { NavigationUtilities } from '../../utilities/NavigationUtilities';
@@ -50,6 +50,7 @@ type ReduxStateProps = {
     conversation:Conversation
     createNewConversation:boolean
     tempConversation:Conversation
+    routeConversationId:string
 }
 type ReduxDispatchProps = {
 }
@@ -72,7 +73,18 @@ class ConversationsModule extends React.Component<Props, State> {
             conversationActionInProgress:{conversation:0, action:null},
             filterArchived:false,
         }
+        const observer = NotificationCenter.addObserver(ConversationManagerConversationRemovedEvent, this.processConversationRemoved)
+        this.observers.push(observer)
 
+    }
+    processConversationRemoved = (...args:any[]) => {
+        let data:{conversation:number} = args[0]
+        const isActive = this.props.routeConversationId == data.conversation.toString()
+        this.conversationsList.current.removeItemById(data.conversation)
+        if(isActive)
+        {
+            NavigationUtilities.navigateToConversation(this.props.history, null)
+        }
     }
     componentDidMount = () => {
         const obs1 = NotificationCenter.addObserver("eventstream_" + EventStreamMessageType.CONVERSATION_TYPING, this.isTypingHandler)
@@ -273,9 +285,12 @@ class ConversationsModule extends React.Component<Props, State> {
             }
         }
     }
+    isConversationActive = (conversationId:number) => {
+        return (this.props.createNewConversation && this.props.tempConversation && (this.props.tempConversation.id == conversationId)) ||
+        (this.props.conversation && (this.props.conversation.id == conversationId))
+    }
     renderConversation = (conversation:Conversation) =>  {
-        const isActive = (this.props.createNewConversation && this.props.tempConversation && (this.props.tempConversation.id == conversation.id)) ||
-                            (this.props.conversation && (this.props.conversation.id == conversation.id))
+        const isActive = this.isConversationActive(conversation.id)
         return <ConversationListItem onConversationAction={this.onConversationAction} key={conversation.id} conversation={conversation} isActive={isActive} >
                 {this.renderSomeoneIsTyping(conversation.id)}
                 </ConversationListItem>
@@ -368,6 +383,7 @@ class ConversationsModule extends React.Component<Props, State> {
             conversation,
             createNewConversation, 
             tempConversation,
+            routeConversationId,
             ...rest} = this.props
 
         const {breakpoint, className} = this.props
@@ -389,13 +405,15 @@ const mapStateToProps = (state:ReduxState, ownProps: OwnProps & RouteComponentPr
 
     const authenticatedUser = AuthenticationManager.getAuthenticatedUser()
     const conversation = ContextManager.getContextObject(ownProps.location.pathname, ContextNaturalKey.CONVERSATION) as Conversation
-    const createNewConversation = ownProps.match.params.conversationId == "new"
+    const conversationId:string = ownProps.match.params.conversationId
+    const createNewConversation = conversationId == "new"
     const tempConversation = state.tempCache.conversation
     return {
         authenticatedUser,
         conversation,
         createNewConversation,
-        tempConversation
+        tempConversation,
+        routeConversationId: conversationId
     }
 }
 const mapDispatchToProps = (dispatch:ReduxState, ownProps: OwnProps):ReduxDispatchProps => {

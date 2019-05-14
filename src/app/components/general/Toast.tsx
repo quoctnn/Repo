@@ -1,17 +1,16 @@
 import * as React from 'react';
 require('./Toast.scss')
 
-interface ErrorToastProps {
+interface ToastProps {
   message?: string;
+  description?:string
 }
-export const ErrorToast = (props:ErrorToastProps) => {
-    return <div className="toast-error">{props.message || 'Error'}</div>;
+export const ErrorToast = (props:ToastProps) => {
+    return <div className="toast-error">
+    {props.message || 'Error'}
+    {props.description && <div className="toast-description">{props.description}</div>}
+    </div>;
 }
-//////
-interface InfoToastProps {
-    message?: string;
-    description?:string
-}
-export const InfoToast = (props:InfoToastProps) => {
+export const InfoToast = (props:ToastProps) => {
     return <div className="toast-info">{props.message || 'Info'}{props.description && <div className="toast-info-description">{props.description}</div>}</div>;
 }

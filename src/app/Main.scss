@@ -20,6 +20,9 @@ html{
 }
 ul,li{ list-style-type: none; padding: 0;}
 //bootstrap extensions/overrides
+.mw0{
+    min-width: 0 !important;
+}
 .title-text{
     font-size: 1.3em;
     font-weight: bold;
@@ -38,7 +41,7 @@ ul,li{ list-style-type: none; padding: 0;}
     display: block;
     width: 100%;
 }
-.modal-header, .module-footer{
+.modal-header, .modal-footer{
     @include var(border-color, border-color-default);
 }.modal-title {
     margin: 0 auto;
@@ -81,7 +84,6 @@ body
     @include var(background-color, body-background);
     @include var(font-family, font-family-default);
     @include var(color, primary-text-color);
-
 }
 body[class^="select-active-"], body[class*=" select-active-"]{
     position: static !important;
@@ -130,6 +132,9 @@ button{@include var(color, primary-text-color);}
 
     @include var(background, highlight-background-color);
     @include var(color, highlight-foreground-color);
+}
+.primary-theme-bg {
+    @include var(background, primary-theme-color);
 }
 .theme-bg-gradient{
     background-image: linear-gradient(to left, #{map-get($root, secondary-theme-color)}, #{map-get($root, primary-theme-color)});

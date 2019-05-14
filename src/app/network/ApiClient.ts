@@ -220,6 +220,15 @@ export default class ApiClient
             callback(null, status, error)
         })
     }
+    static addConversationUsers(conversation:number, users:number[], callback:ApiClientCallback<Conversation>)
+    {
+        let url = Constants.apiRoute.addConversationUsers(conversation)
+        AjaxRequest.post(url, {users}, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
     static leaveConversation(id:number, callback:ApiClientCallback<any>)
     {
         let url = Constants.apiRoute.leaveConversation(id)

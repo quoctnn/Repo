@@ -1086,7 +1086,6 @@ export class NewsfeedComponent extends React.Component<Props, State> {
         const requestingCount = Math.min(this.props.childrenLimit, rest)
         const offset = Math.max(0, rest - requestingCount)
         //console.log("loadItems comments", "limit:" + requestingCount, "offset:"+offset)
-        //debugger
         ApiClient.statusComments(loader.statusId, offset, requestingCount, false, (data, status, error) => {
             if(data && data.results)
             {

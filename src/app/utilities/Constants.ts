@@ -184,6 +184,9 @@ export default  {
         leaveConversation: (id:number) => {
             return `/api/v2/conversation/${id}/leave/`
         },
+        addConversationUsers: (id:number) => {
+            return `/api/v2/conversation/${id}/add-users/`
+        },
         conversations: '/api/v2/conversation/',
         composeMessageUrl: '/api/v1/conversation/compose/',
 

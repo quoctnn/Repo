@@ -115,6 +115,12 @@ class ConversationModule extends React.Component<Props, State> {
         {
             this.setState({showSpinner:false})
         }
+        if(!this.props.conversation && !!prevProps.conversation) // if conversation removed
+        {
+            this.setState((prevState:State) => {
+                return {conversationEditorDialogVisible:false, renderDropZone:false, showSpinner:false}
+            })
+        }
     }
     incomingMessageHandler = (...args:any[]) => 
     {

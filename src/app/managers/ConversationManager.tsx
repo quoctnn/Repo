@@ -14,6 +14,7 @@ import { ToastManager } from './ToastManager';
 import { translate } from '../localization/AutoIntlProvider';
 import { setTemporaryConversationAction } from '../redux/tempCache';
 import { nullOrUndefined } from '../utilities/Utilities';
+export const ConversationManagerConversationRemovedEvent = "ConversationManagerConversationRemovedEvent"
 export abstract class ConversationManager 
 {
     static setup = () => 
@@ -21,12 +22,14 @@ export abstract class ConversationManager
         NotificationCenter.addObserver("eventstream_" + EventStreamMessageType.CONVERSATION_NEW, ConversationManager.processIncomingConversation)
         NotificationCenter.addObserver("eventstream_" + EventStreamMessageType.CONVERSATION_UPDATE, ConversationManager.processIncomingConversation)
         NotificationCenter.addObserver("eventstream_" + EventStreamMessageType.CONVERSATION_MESSAGE, ConversationManager.processIncomingConversationMessage)
+        NotificationCenter.addObserver("eventstream_" + EventStreamMessageType.CONVERSATION_MESSAGE, ConversationManager.processIncomingConversationRemove)
     }
     static storeConversations = (conversations:Conversation[]) => {
         ConversationManager.getStore().dispatch(addConversationsAction(conversations))
     }
     static removeConversation = (conversationsId:number) => {
         ConversationManager.getStore().dispatch(removeConversationAction(conversationsId))
+        NotificationCenter.push(ConversationManagerConversationRemovedEvent, [{conversation:conversationsId}])
     }
     static getConversation = (conversationId:number|string):Conversation => 
     {
@@ -86,6 +89,10 @@ export abstract class ConversationManager
         let conversation = args[0] as Conversation
         ConversationManager.getStore().dispatch(addConversationsAction([conversation]))
     }
+    private static processIncomingConversationRemove = (...args:any[]) => {
+        let data:{conversation:number} = args[0]
+        ConversationManager.removeConversation(data.conversation)
+    } 
     private static processIncomingConversationMessage = (...args:any[]) => 
     {
         let store = ConversationManager.getStore()
@@ -158,10 +165,17 @@ export abstract class ConversationManager
             }
         }
     }
-    static updateConversation = (conversationId:number, conversation:Partial<Conversation>, completion:() => void) => 
+    static leaveConversation = (conversationId:number, completion:(success:boolean) => void) => 
     {
-        ApiClient.updateConversation(conversationId,conversation, (data, status, error) => {
-            completion()
+        ApiClient.leaveConversation(conversationId, (data, status, error) => {
+            const success = !error
+            console.log(data,status, error)
+            ToastManager.showErrorToast(error, status, translate("Could not leave conversation"))
+            if(success)
+            {
+                ConversationManager.removeConversation(conversationId)
+            }
+            completion(success)
         })
     }
     static markConversationAsRead = (conversationId:number, completion:() => void) => 

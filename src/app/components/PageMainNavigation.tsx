@@ -37,7 +37,11 @@ class PageTopNavigation extends React.Component<Props, {}> {
     }
     render() {
         const profile = this.props.profile
-        const currentState = UserStatus.getObject(this.props.profile.user_status)
+        if(!profile)
+        {
+            return
+        }
+        const currentState = UserStatus.getObject(profile.user_status)
         return(
             <div id="page-main-navigation" className="">
                 <div className="d-flex">

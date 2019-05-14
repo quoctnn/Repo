@@ -6,6 +6,8 @@ import { translate } from "../../../localization/AutoIntlProvider";
 type DefaultProps = {
     zIndex:number
     showCloseButton:boolean
+    centered:boolean
+    scrollable:boolean
 }
 type Props = {
     header?:React.ReactNode
@@ -21,7 +23,9 @@ type State =
 export default class SimpleDialog extends React.Component<Props, State> {
     static defaultProps:DefaultProps = {
         zIndex:1070,
-        showCloseButton:true
+        showCloseButton:true,
+        centered:true,
+        scrollable:true
     }
     constructor(props:Props) {
         super(props);
@@ -38,11 +42,11 @@ export default class SimpleDialog extends React.Component<Props, State> {
     }
     render() 
     {
-        const cn = classnames("full-height", this.props.className)
+        const cn = classnames(this.props.className, {"modal-dialog-scrollable":this.props.scrollable})
         const headerToggle = this.props.showCloseButton ? this.props.didCancel : undefined
         return(
             <div>
-                <Modal toggle={this.props.didCancel} zIndex={this.props.zIndex} isOpen={this.props.visible} className={cn}>
+                <Modal centered={this.props.centered} toggle={this.props.didCancel} zIndex={this.props.zIndex} isOpen={this.props.visible} className={cn}>
                     {
                         this.props.header && 
                         <ModalHeader toggle={headerToggle}>

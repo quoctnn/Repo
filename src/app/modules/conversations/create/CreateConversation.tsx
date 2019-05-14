@@ -155,7 +155,7 @@ class CreateConversation extends React.Component<Props, State> {
                         visible={this.state.dialogVisible}
                         didCancel={this.onSelectUsersDialogCancel}
                         didSubmit={this.onSelectUsersDialogSubmit}
-                        valueChanged={this.onSelectUsersDialogValueChanged}
+                        didUpdate={this.onSelectUsersDialogValueChanged}
                         canSubmit={this.canSubmit()}
                         selected={this.state.selectedUsers.map(u => u.id)}
                         singleSelect={false}

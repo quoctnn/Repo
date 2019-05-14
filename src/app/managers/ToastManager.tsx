@@ -12,9 +12,9 @@ export abstract class ToastManager
         if(message)
             toast.info(<InfoToast message={message} description={description} />,opts || {hideProgressBar: true});
     }
-    static showErrorToast = (message:string, preferredMessage?:string, opts?:ToastOptions) => 
+    static showErrorToast = (message:string, preferredMessage?:string, description?:string, opts?:ToastOptions) => 
     {
         if(message)
-            toast.error(<ErrorToast message={preferredMessage || message} />,opts || {hideProgressBar: true});
+            toast.error(<ErrorToast message={preferredMessage || message} description={description} />,opts || {hideProgressBar: true});
     }
 }
