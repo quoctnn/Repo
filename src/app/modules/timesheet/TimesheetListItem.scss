@@ -1,3 +1,4 @@
+@import "../../Config";
 .timesheet-list-item{
     text-decoration: none;
     color:#000000;
@@ -10,11 +11,15 @@
     &:not(:last-child){
         margin-bottom: 6px;
     }
-    &:nth-child(odd) {
-        background: #f3f3f3;
+    .datetime{
+        // background: linear-gradient(50deg, #{map-get($root, secondary-theme-color)} 30%, #{map-get($root, primary-theme-color)} 70%);
+        // background: linear-gradient(50deg, var(--secondary-theme-color) 30%, var(--primary-theme-color) 70%);
+        font-weight: 300;
     }
-    &:nth-child(even) {
-        background: #FAD5FB;
+    .task-info{
+        text-overflow: ellipsis;
+        font-weight: 400;
+        width: 100%;
     }
     .user{
         font-size: 16px;
