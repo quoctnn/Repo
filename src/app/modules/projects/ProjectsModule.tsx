@@ -10,12 +10,13 @@ import ApiClient, { PaginationResult } from '../../network/ApiClient';
 import { ToastManager } from '../../managers/ToastManager';
 import { connect } from 'react-redux';
 import { ReduxState } from '../../redux';
-import { CommunityManager } from '../../managers/CommunityManager';
-import ProjectsMenu, { ProjectsMenuData } from './ProjectsMenu';
+import ProjectsMenu from './ProjectsMenu';
+import { ProjectsMenuData, ProjectSorting } from './ProjectsMenu';
 import ProjectListItem from './ProjectListItem';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import SimpleModule from '../SimpleModule';
 import { ContextManager } from '../../managers/ContextManager';
+import { ButtonGroup, Button } from 'reactstrap';
 type OwnProps = {
     className?:string
     breakpoint:ResponsiveBreakpoint
@@ -41,14 +42,17 @@ class ProjectsModule extends React.Component<Props, State> {
             menuVisible:false,
             isLoading:false,
             menuData:{
+                sorting:ProjectSorting.mostUsed,
+                responsible:false,
+                assigned:false
             }
         }
     }
     shouldReloadList = (prevProps:Props) => {
         return this.props.community && prevProps.community && this.props.community.id != prevProps.community.id
     }
-    componentDidUpdate = (prevProps:Props) => {
-        if(this.shouldReloadList(prevProps))
+    componentDidUpdate = (prevProps:Props, prevState:State) => {
+        if(this.shouldReloadList(prevProps) || this.contextDataChanged(prevState.menuData, prevProps))
         {
             this.projectsList.current.reload()
         }
@@ -59,7 +63,6 @@ class ProjectsModule extends React.Component<Props, State> {
     }
     headerClick = (e) => {
         const context = this.state.menuData
-        //NavigationUtilities.navigateToNewsfeed(this.props.history, context && context.type, context && context.id, this.state.includeSubContext)
     }
     feedLoadingStateChanged = (isLoading:boolean) => {
         this.setState({isLoading})
@@ -67,10 +70,16 @@ class ProjectsModule extends React.Component<Props, State> {
     menuDataUpdated = (data:ProjectsMenuData) => {
         this.tempMenuData = data
     }
+    contextDataChanged = (prevData:ProjectsMenuData, prevProps:Props) => {
+        const data = this.state.menuData
+        return (prevData.sorting != data.sorting ||
+                prevData.responsible != data.responsible ||
+                prevData.assigned != data.assigned)
+    }
     fetchProjects = (offset:number, completion:(items:PaginationResult<Project>) => void ) => {
-        let ordering = 'recent'  // TODO: Add filter to settings
+        const md = this.state.menuData
         const communityId = this.props.community && this.props.community.id
-        ApiClient.getProjects(communityId, 30, offset, ordering, (data, status, error) => {
+        ApiClient.getProjects(communityId, 30, offset, md.sorting, md.responsible, md.assigned, (data, status, error) => {
             completion(data)
             ToastManager.showErrorToast(error)
         })
@@ -79,14 +88,30 @@ class ProjectsModule extends React.Component<Props, State> {
         return <ProjectListItem key={project.id} project={project} />
     }
     onMenuToggle = (visible:boolean) => {
-
         const newState:Partial<State> = {}
+        newState.menuVisible = visible
         if(!visible && this.tempMenuData) // update menudata
         {
             newState.menuData = this.tempMenuData
             this.tempMenuData = null
         }
         this.setState(newState as State)
+    }
+    toggleSorting = (sorting: ProjectSorting) => (e) => {
+        const md = { ... this.state.menuData }
+        md.sorting = sorting
+        this.setState({menuData:md})
+    }
+    renderSorting = () => {
+        if(this.state.menuVisible)
+            return null
+        return (<ButtonGroup className="header-filter-group">
+                    {ProjectSorting.all.map(s =>
+                        <Button size="xs" active={this.state.menuData.sorting === s} key={s} onClick={this.toggleSorting(s)} color="light">
+                            <span>{ProjectSorting.translatedText(s)}</span>
+                        </Button>
+                    )}
+                </ButtonGroup>)
     }
     renderContent = () => {
         return <>
@@ -100,6 +125,7 @@ class ProjectsModule extends React.Component<Props, State> {
         const {breakpoint, className} = this.props
         const cn = classnames("projects-module", className)
         const menu = <ProjectsMenu data={this.state.menuData} onUpdate={this.menuDataUpdated}  />
+        const headerContent = this.renderSorting()
         return (<SimpleModule {...rest}
                     className={cn}
                     headerClick={this.headerClick}
@@ -107,6 +133,7 @@ class ProjectsModule extends React.Component<Props, State> {
                     isLoading={this.state.isLoading}
                     onMenuToggle={this.onMenuToggle}
                     menu={menu}
+                    headerContent={headerContent}
                     headerTitle={translate("projects.module.title")}>
                 {this.renderContent()}
                 </SimpleModule>)

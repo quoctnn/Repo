@@ -114,15 +114,11 @@ class GroupsModule extends React.Component<Props, State> {
         if(this.state.menuVisible)
             return null
         return (<ButtonGroup className="header-filter-group">
-                    <Button size="xs" active={this.state.menuData.sorting === GroupSorting.recent} onClick={this.toggleSorting(GroupSorting.recent)} color="light">
-                        <span>{GroupSorting.translatedText(GroupSorting.recent)}</span>
-                    </Button>
-                    <Button size="xs" active={this.state.menuData.sorting === GroupSorting.mostUsed} onClick={this.toggleSorting(GroupSorting.mostUsed)} color="light">
-                        <span>{GroupSorting.translatedText(GroupSorting.mostUsed)}</span>
-                    </Button>
-                    <Button size="xs" active={this.state.menuData.sorting === GroupSorting.AtoZ} onClick={this.toggleSorting(GroupSorting.AtoZ)} color="light">
-                        <span>{GroupSorting.translatedText(GroupSorting.AtoZ)}</span>
-                    </Button>
+                    {GroupSorting.all.map(s =>
+                        <Button size="xs" active={this.state.menuData.sorting === s} key={s} onClick={this.toggleSorting(s)} color="light">
+                            <span>{GroupSorting.translatedText(s)}</span>
+                        </Button>
+                    )}
                 </ButtonGroup>)
     }
     render()

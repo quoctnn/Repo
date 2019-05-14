@@ -11,7 +11,6 @@ import ApiClient, { PaginationResult } from '../../network/ApiClient';
 import { ToastManager } from '../../managers/ToastManager';
 import { connect } from 'react-redux';
 import { ReduxState } from '../../redux';
-import { CommunityManager } from '../../managers/CommunityManager';
 import EventListItem from './EventListItem';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import SimpleModule from '../SimpleModule';
@@ -63,7 +62,6 @@ class EventsModule extends React.Component<Props, State> {
     }
     headerClick = (e) => {
         const context = this.state.menuData
-        //NavigationUtilities.navigateToNewsfeed(this.props.history, context && context.type, context && context.id, this.state.includeSubContext)
     }
     feedLoadingStateChanged = (isLoading:boolean) => {
         this.setState({isLoading})
@@ -98,19 +96,21 @@ class EventsModule extends React.Component<Props, State> {
         this.setState(newState as State)
     }
     toggleSorting = (sorting: EventSorting) => (e) => {
-        const md = {sorting: sorting, upcoming: this.state.menuData.upcoming}
+        const md = {
+            sorting: sorting,
+            upcoming: this.state.menuData.upcoming
+        }
         this.setState({menuData:md})
     }
     renderSorting = () => {
         if(this.state.menuVisible)
             return null
         return (<ButtonGroup className="header-filter-group">
-                    <Button size="xs" active={this.state.menuData.sorting === EventSorting.date} onClick={this.toggleSorting(EventSorting.date)} color="light">
-                        <span>{EventSorting.translatedText(EventSorting.date)}</span>
-                    </Button>
-                    <Button size="xs" active={this.state.menuData.sorting === EventSorting.popular} onClick={this.toggleSorting(EventSorting.popular)} color="light">
-                        <span>{EventSorting.translatedText(EventSorting.popular)}</span>
-                    </Button>
+                    {EventSorting.all.map(s =>
+                        <Button size="xs" active={this.state.menuData.sorting === s} key={s} onClick={this.toggleSorting(s)} color="light">
+                            <span>{EventSorting.translatedText(s)}</span>
+                        </Button>
+                    )}
                 </ButtonGroup>)
     }
     renderContent = () => {

@@ -7,6 +7,10 @@ export enum EventSorting {
     popular = "popularity",
 }
 export namespace EventSorting {
+    export const all = [
+        EventSorting.date,
+        EventSorting.popular
+    ]
     export function translatedText(type: EventSorting) {
         switch(type){
             case EventSorting.date: return translate("common.sorting.date")
@@ -36,15 +40,13 @@ export default class EventsMenu extends React.Component<Props, State> {
         }
     }
     sortingButtonChanged = (sorting:EventSorting) => (event) => {
-        const currentSorting = this.state.data.sorting
-        const newSorting = sorting == currentSorting ? null : sorting
-        const data = {sorting:newSorting, upcoming:this.state.data.upcoming}
+        const data = { ... this.state.data }
+        data.sorting = sorting
         this.setState({data}, this.sendUpdate)
     }
     filterButtonChanged = (filter:boolean) => (event) => {
-        const currentFilter = this.state.data.upcoming
-        const newFilter = filter == currentFilter ? null : filter
-        const data = {upcoming:newFilter, sorting:this.state.data.sorting}
+        const data = { ... this.state.data }
+        data.upcoming = filter
         this.setState({data}, this.sendUpdate)
     }
     sendUpdate = () => {
@@ -52,7 +54,6 @@ export default class EventsMenu extends React.Component<Props, State> {
         this.props.onUpdate(data)
     }
     render() {
-        const sorting = this.state.data.sorting
         const upcoming = this.state.data.upcoming
         return(
             <div className="events-menu">
@@ -60,12 +61,11 @@ export default class EventsMenu extends React.Component<Props, State> {
                     <Label>{translate("events.module.menu.sorting.title")}</Label>
                     <div>
                         <ButtonGroup>
-                            <Button active={sorting === EventSorting.date} onClick={this.sortingButtonChanged(EventSorting.date)} color="light">
-                                <span>{EventSorting.translatedText(EventSorting.date)}</span>
-                            </Button>
-                            <Button active={sorting === EventSorting.popular} onClick={this.sortingButtonChanged(EventSorting.popular)} color="light">
-                                <span>{EventSorting.translatedText(EventSorting.popular)}</span>
-                            </Button>
+                            {EventSorting.all.map(s =>
+                                <Button active={this.state.data.sorting === s} key={s} onClick={this.sortingButtonChanged(s)} color="light">
+                                    <span>{EventSorting.translatedText(s)}</span>
+                                </Button>
+                            )}
                         </ButtonGroup>
                     </div>
                 </FormGroup>
