@@ -25,6 +25,13 @@ export namespace ProjectSorting {
             default: return "N/A"
         }
     }
+    export function icon(type: ProjectSorting) {
+        switch(type){
+            case ProjectSorting.recent: return <i className="fa fa-user-clock"></i>
+            case ProjectSorting.mostUsed: return <i className="fa fa-burn"></i>
+            default: return  <i className="fa fa-question"></i>
+        }
+    }
 }
 export enum ProjectFilter {
     responsible = "responsible",

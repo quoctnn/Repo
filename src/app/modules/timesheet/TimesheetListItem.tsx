@@ -31,7 +31,8 @@ export default class TimesheetListItem extends React.Component<Props, State> {
         const name = userFullName(timesheet.user)
         const date = stringToDateFormat(timesheet.date, DateFormat.day)
         const time = (!!timesheet.hours ? ` ${timesheet.hours}${translate("date.format.hours")}` : "") + (!!timesheet.minutes ? ` ${timesheet.minutes}${translate("date.format.minutes")}` : "")
-        return (<Link to={timesheet.uri} {...rest} className={cl}>
+        return (
+                <Link to={timesheet.uri} {...rest} className={cl}>
                     <div className="d-flex justify-content-around">
                         <div className="d-flex flex-column align-items-center datetime">
                             <div className="date">{date}</div>
@@ -41,9 +42,12 @@ export default class TimesheetListItem extends React.Component<Props, State> {
                             <div className="user">{name}</div>
                             { this.props.showTaskTitle &&
                                 <div className="task-info"><b>{translate("common.task") + ":"}</b> &nbsp;{timesheet.task_title}</div>
+                                ||
+                                <div className="task-info">{timesheet.description}</div>
                             }
                         </div>
                     </div>
-                </Link>)
+                </Link>
+            )
+        }
     }
-}

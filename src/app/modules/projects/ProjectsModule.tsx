@@ -106,9 +106,9 @@ class ProjectsModule extends React.Component<Props, State> {
         if(this.state.menuVisible)
             return null
         return (<ButtonGroup className="header-filter-group">
-                    {ProjectSorting.all.map(s =>
+                    {ProjectSorting.all.slice(1,3).map(s =>
                         <Button size="xs" active={this.state.menuData.sorting === s} key={s} onClick={this.toggleSorting(s)} color="light">
-                            <span>{ProjectSorting.translatedText(s)}</span>
+                            <span title={ProjectSorting.translatedText(s)}>{ProjectSorting.icon(s)}</span>
                         </Button>
                     )}
                 </ButtonGroup>)

@@ -74,7 +74,7 @@ class UserStatusSelector extends React.Component<Props, State> {
                             return createDropdownItem(dd)
                         }) }
                         <DropdownItem divider={true}/>
-                        <DropdownItem title={translate("community.list")} toggle={false} onClick={this.showAllCommunities()}>{translate("community.list")}</DropdownItem>
+                        <DropdownItem title={translate("common.see.all")} toggle={false} onClick={this.showAllCommunities()}>{translate("common.see.all")}</DropdownItem>
                     </div>
                 </div>
             </div>

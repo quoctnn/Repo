@@ -28,14 +28,14 @@ export class DetailsContent extends React.Component<Props, State> {
             <div className="details-module details-content">
                 { this.props.community &&
                     <div className="text-truncate">
-                        <span className="details-field-name">{translate("common.community")}: </span>
-                        <span className="details-field-value"><Link to={this.props.community.uri}>{this.props.community.name}</Link></span>
+                        <div className="details-field-name">{translate("common.community")}</div>
+                        <div className="details-field-value"><Link to={this.props.community.uri}>{this.props.community.name}</Link></div>
                     </div>
                 }
                 {this.props.children}
                 { this.props.description &&
                     <div className="details-description">
-                        <span className="details-field-value">{IntraSocialUtilities.truncateText(IntraSocialUtilities.htmlToText(this.props.description), this.props.truncate)}</span>
+                        {IntraSocialUtilities.truncateText(IntraSocialUtilities.htmlToText(this.props.description), this.props.truncate)}
                     </div>
                 }
             </div>

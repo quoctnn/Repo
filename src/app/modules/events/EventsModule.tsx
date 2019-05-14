@@ -108,7 +108,7 @@ class EventsModule extends React.Component<Props, State> {
         return (<ButtonGroup className="header-filter-group">
                     {EventSorting.all.map(s =>
                         <Button size="xs" active={this.state.menuData.sorting === s} key={s} onClick={this.toggleSorting(s)} color="light">
-                            <span>{EventSorting.translatedText(s)}</span>
+                            <span title={EventSorting.translatedText(s)}>{EventSorting.icon(s)}</span>
                         </Button>
                     )}
                 </ButtonGroup>)

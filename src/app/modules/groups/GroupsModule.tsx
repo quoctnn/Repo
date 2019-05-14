@@ -114,9 +114,9 @@ class GroupsModule extends React.Component<Props, State> {
         if(this.state.menuVisible)
             return null
         return (<ButtonGroup className="header-filter-group">
-                    {GroupSorting.all.map(s =>
+                    {GroupSorting.all.slice(0,2).map(s =>
                         <Button size="xs" active={this.state.menuData.sorting === s} key={s} onClick={this.toggleSorting(s)} color="light">
-                            <span>{GroupSorting.translatedText(s)}</span>
+                            <span title={GroupSorting.translatedText(s)}>{GroupSorting.icon(s)}</span>
                         </Button>
                     )}
                 </ButtonGroup>)
