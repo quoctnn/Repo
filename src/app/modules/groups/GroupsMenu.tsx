@@ -21,6 +21,13 @@ export namespace GroupSorting {
             default: return "N/A"
         }
     }
+    export function icon(type: GroupSorting) {
+        switch(type){
+            case GroupSorting.recent: return <i className="fa fa-user-clock"></i>
+            case GroupSorting.mostUsed: return <i className="fa fa-burn"></i>
+            default: return  <i className="fa fa-question"></i>
+        }
+    }
 }
 export type GroupsMenuData = {
     sorting:GroupSorting

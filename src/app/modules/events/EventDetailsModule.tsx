@@ -74,7 +74,7 @@ class EventDetailsModule extends React.Component<Props, State> {
         const {breakpoint, history, match, location, staticContext, event, community, contextNaturalKey, ...rest} = this.props
         const startDate = event ? new Date(event.start) : null
         return (<Module {...rest}>
-                    <ModuleHeader headerTitle={event && event.name || translate("detail.module.title")} loading={this.state.isLoading}>
+                    <ModuleHeader className="event-detail" headerTitle={event && event.name || translate("detail.module.title")} loading={this.state.isLoading}>
                         <ModuleMenuTrigger onClick={this.menuItemClick} />
                     </ModuleHeader>
                     {breakpoint >= ResponsiveBreakpoint.standard && //do not render for small screens

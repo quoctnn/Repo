@@ -1,7 +1,7 @@
 import * as React from "react";
 import classnames from 'classnames';
 
-export type Props = 
+export type Props =
 {
     onClick:(event) => void
 }
@@ -12,7 +12,7 @@ export default class ModuleMenuTrigger extends React.Component<Props, {}> {
         return(
             <div className={cn} onClick={this.props.onClick} >
                 <span className="fa-stack">
-                    <i className="fa fa-ellipsis-v fa-stack-1x icon-default"></i>
+                    <i className="fa fa-ellipsis-h fa-stack-1x icon-default"></i>
                     <i className="fa fa-times fa-stack-1x icon-active"></i>
                 </span>
             </div>
@@ -20,4 +20,3 @@ export default class ModuleMenuTrigger extends React.Component<Props, {}> {
     }
 }
 
-                        

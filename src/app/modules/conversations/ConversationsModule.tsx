@@ -56,7 +56,7 @@ type ReduxDispatchProps = {
 }
 type Props = OwnProps & RouteComponentProps<any> & ReduxStateProps & ReduxDispatchProps & DefaultProps
 
-class ConversationsModule extends React.Component<Props, State> {  
+class ConversationsModule extends React.Component<Props, State> {
     conversationsList = React.createRef<ListComponent<Conversation>>()
     private observers:EventSubscription[] = []
     static defaultProps:DefaultProps = {
@@ -113,7 +113,7 @@ class ConversationsModule extends React.Component<Props, State> {
     {
         this.observers.forEach(o => o.remove())
     }
-    processIncomingConversation = (...args:any[]) => 
+    processIncomingConversation = (...args:any[]) =>
     {
         let conversation = args[0] as Conversation
         this.conversationsList.current.safeUnshift(conversation)
@@ -135,15 +135,15 @@ class ConversationsModule extends React.Component<Props, State> {
         {
             clearTimeout(conversationData[user])
         }
-        else 
+        else
         {
             it[conversation] = {}
         }
-        it[conversation][user] = setTimeout(() => 
+        it[conversation][user] = setTimeout(() =>
             {
                 let it = this.removeUserFromIsTypingData(conversation, user)
                 this.setState({isTyping:it})
-    
+
             }, Settings.clearSomeoneIsTypingInterval)
         this.setState({isTyping:it})
     }
@@ -238,7 +238,7 @@ class ConversationsModule extends React.Component<Props, State> {
                 this.resetAction()
             }
         }
-        
+
     }
     renderConfirmDialog = () => {
         const action = this.state.conversationActionInProgress
@@ -302,12 +302,12 @@ class ConversationsModule extends React.Component<Props, State> {
 
         const {} = this.props
         return <>
-            <ListComponent<Conversation> 
-                        ref={this.conversationsList} 
+            <ListComponent<Conversation>
+                        ref={this.conversationsList}
                         offsetCountFilter={this.listOffsetCountFilter}
                         renderEmpty={this.renderEmpty}
-                        onLoadingStateChanged={this.feedLoadingStateChanged} 
-                        fetchData={this.fetchConversations} 
+                        onLoadingStateChanged={this.feedLoadingStateChanged}
+                        fetchData={this.fetchConversations}
                         sortItems={this.sortItems}
                         redrawContext={this.state.listRedrawContext}
                         renderItem={this.renderConversation} className="conversations-module-list" />
@@ -324,7 +324,7 @@ class ConversationsModule extends React.Component<Props, State> {
         })
     }
     createTemporaryConversation = () => {
-        
+
         if(!this.props.tempConversation)
         {
             const onReady = () => {
@@ -346,7 +346,7 @@ class ConversationsModule extends React.Component<Props, State> {
     renderHeaderContent = () => {
         return <div>
                     {this.renderFilters()}
-                    <Link onClick={this.createTemporaryConversation} to={Routes.conversationUrl("new")} className="btn btn-dark flex-shrink-0 btn-sm" >
+                    <Link title={translate("conversation.menu.create")} onClick={this.createTemporaryConversation} to={Routes.conversationUrl("new")} className="btn btn-dark flex-shrink-0 btn-sm" >
                         <i className="fas fa-plus"></i>
                     </Link>
                 </div>
@@ -359,33 +359,33 @@ class ConversationsModule extends React.Component<Props, State> {
     renderFilters = () => {
         return (<ButtonGroup className="header-filter-group">
                     <Button size="xs" active={!!this.state.filterArchived} onClick={this.toggleFilterArchived} color="light">
-                        <span>A</span>
+                        <span title={translate("conversation.menu.archived")}><i className="fa fa-archive"></i></span>
                     </Button>
                 </ButtonGroup>)
     }
     render()
     {
-        const { history, 
-            match, 
-            location, 
-            staticContext, 
-            contextNaturalKey, 
+        const { history,
+            match,
+            location,
+            staticContext,
+            contextNaturalKey,
             authenticatedUser,
-            preventShowTypingInChatId, 
-            activeConversation, 
+            preventShowTypingInChatId,
+            activeConversation,
             conversation,
-            createNewConversation, 
+            createNewConversation,
             tempConversation,
             routeConversationId,
             ...rest} = this.props
 
         const {breakpoint, className} = this.props
         const cn = classnames("conversations-module", className)
-        return (<SimpleModule {...rest} 
-                    className={cn} 
-                    headerClick={this.headerClick} 
-                    breakpoint={breakpoint} 
-                    isLoading={this.state.isLoading} 
+        return (<SimpleModule {...rest}
+                    className={cn}
+                    headerClick={this.headerClick}
+                    breakpoint={breakpoint}
+                    isLoading={this.state.isLoading}
                     headerTitle={translate("conversations.module.title")}
                     headerContent={this.renderHeaderContent()}
                     >

@@ -79,8 +79,8 @@ class TaskDetailsModule extends React.Component<Props, State> {
                                             <DetailsContent community={community} description={task.description}>
                                                 { this.props.project &&
                                                     <div className="text-truncate">
-                                                        <span className="details-field-name">{translate("common.project")}: </span>
-                                                        <span className="details-field-value"><Link to={this.props.project.uri}>{this.props.project.name}</Link></span>
+                                                        <div className="details-field-name">{translate("common.project")}</div>
+                                                        <div className="details-field-value"><Link to={this.props.project.uri}>{this.props.project.name}</Link></div>
                                                     </div>
                                                 }
                                             </DetailsContent>

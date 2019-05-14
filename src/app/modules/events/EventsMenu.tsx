@@ -18,6 +18,13 @@ export namespace EventSorting {
             default: return "N/A"
         }
     }
+    export function icon(type: EventSorting) {
+        switch(type){
+            case EventSorting.date: return <i className="fa fa-calendar"></i>
+            case EventSorting.popular: return  <i className="fa fa-burn"></i>
+            default: return <i className="fa fa-question"></i>
+        }
+    }
 }
 export type EventsMenuData = {
     sorting:EventSorting
