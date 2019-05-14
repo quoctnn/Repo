@@ -2,7 +2,7 @@ import * as React from "react";
 import { Message } from "../../types/intrasocial_types";
 import classnames from 'classnames';
 import { Link } from 'react-router-dom';
-import { IS_ONLY_LINK_REGEX, URL_REGEX, uniqueId, userFullName } from '../../utilities/Utilities';
+import { IS_ONLY_LINK_REGEX, URL_REGEX, uniqueId, userFullName, LINEBREAK_REGEX } from '../../utilities/Utilities';
 import { ProfileManager } from "../../managers/ProfileManager";
 import Routes from "../../utilities/Routes";
 import ContentGallery from "../../components/general/ContentGallery";
@@ -45,6 +45,14 @@ export class MessageContentParser{
                 }
             }
             config.push(k)
+            const breaks = {
+                regex: LINEBREAK_REGEX,
+                fn: (key, result) => 
+                {
+                    return (<br key={uniqueId()} />)
+                }
+            }
+            config.push(breaks)
         }
         let mentions = this.message.mentions || []
         let mentionSearch = mentions.map(m => {

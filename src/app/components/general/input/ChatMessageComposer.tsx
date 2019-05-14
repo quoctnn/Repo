@@ -6,7 +6,7 @@ import { Mention } from '../input/MentionEditor';
 import { ProtectNavigation, nullOrUndefined } from "../../../utilities/Utilities";
 import "./ChatMessageComposer.scss"
 
-const { hasCommandModifier } = KeyBindingUtil;
+const { isCtrlKeyCommand } = KeyBindingUtil;
 
 export type EditorContent = {text:string, mentions:number[]}
 export interface IEditorComponent
@@ -224,21 +224,58 @@ export class ChatMessageComposer extends React.Component<Props & DefaultProps,St
         return false
     }
     keyBindings = (e: any) => {
-        if (e.keyCode === 13 && (hasCommandModifier(e) || this.props.submitOnEnter) )
-        { // Ctrl(Cmd) + Enter Submits the form
-            return 'command-enter'//this.handleSubmit(e)
+        
+        if (e.keyCode === 13 )
+        { 
+            if(isCtrlKeyCommand(e) || e.nativeEvent.shiftKey)
+            {
+                if(this.props.submitOnEnter)
+                    return "insert-linebreak"
+                else 
+                    return "submit"
+            }
+            if(this.props.submitOnEnter)
+                return "submit"
         }
         return getDefaultKeyBinding(e);
     }
     handleKeyCommand = (command: string): DraftHandleValue => {
-        if (command === 'command-enter') {
+        if (command == "submit") {
             if(this.canSubmit())
+            {
                 this.handleSubmit()
-          // Perform a request to save your contents, set
-          // a new `editorState`, etc.
-          return 'handled';
+            }
+            return 'handled';
+        }
+        else if (command == "insert-linebreak")
+        {
+            this.setState((prevState:State) => {
+                const editorState = this.insertLinebreak(prevState.editorState)
+                return {editorState}
+            })
+            return 'handled';
         }
         return 'not-handled';
+    }
+    insertLinebreak = (editorState: EditorState): EditorState => {
+        const contentState = Modifier.insertText(
+          editorState.getCurrentContent(),
+          editorState.getSelection(),
+          '\n',
+          editorState.getCurrentInlineStyle(),
+          null,
+        );
+    
+        const newEditorState = EditorState.push(
+          editorState,
+          contentState,
+          'insert-characters',
+        );
+    
+        return EditorState.forceSelection(
+          newEditorState,
+          contentState.getSelectionAfter(),
+        );
       }
     sendDidType()
     {
