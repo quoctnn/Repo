@@ -374,7 +374,13 @@ export class NewsfeedComponent extends React.Component<Props, State> {
     loadStatuses = () => 
     {
         const { items } = this.state
-        const offset = items.length
+        const offset = items.filter(o => {
+            if(o.hasOwnProperty('id'))
+            {
+                return !(o as Status).parent
+            }
+            return false
+        }).length
         const { limit, contextNaturalKey, contextObjectId } = this.props
         ApiClient.newsfeedV2(limit,offset,contextNaturalKey, contextObjectId, null, this.props.defaultChildrenLimit, this.props.filter, this.props.includeSubContext, null, (data, status, error) => {
             if(data && data.results)
