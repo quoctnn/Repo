@@ -10,6 +10,12 @@ export enum ProjectSorting {
     AtoZ = "alphabetically",
 }
 export namespace ProjectSorting {
+    export const all = [
+        ProjectSorting.recentActivity,
+        ProjectSorting.recent,
+        ProjectSorting.mostUsed,
+        ProjectSorting.AtoZ,
+    ]
     export function translatedText(type: ProjectSorting) {
         switch(type){
             case ProjectSorting.recentActivity: return translate("common.sorting.recentActivity")
@@ -19,6 +25,16 @@ export namespace ProjectSorting {
             default: return "N/A"
         }
     }
+}
+export enum ProjectFilter {
+    responsible = "responsible",
+    assigned = "assigned"
+}
+export namespace ProjectFilter {
+    export const all = [
+        ProjectFilter.responsible,
+        ProjectFilter.assigned
+    ]
 }
 export type ProjectsMenuData = {
     sorting:ProjectSorting
@@ -46,14 +62,9 @@ export default class ProjectsMenu extends React.Component<Props, State> {
         data.sorting = sorting
         this.setState({data}, this.sendUpdate)
     }
-    responsibleButtonChanged = (filter:boolean) => (event) => {
+    filterButtonChanged = (filter:string, value:boolean) => (event) => {
         const data = { ... this.state.data }
-        data.responsible = filter
-        this.setState({data}, this.sendUpdate)
-    }
-    assignedButtonChanged = (filter:boolean) => (event) => {
-        const data = { ... this.state.data }
-        data.assigned = filter
+        data[filter] = value
         this.setState({data}, this.sendUpdate)
     }
     sendUpdate = () => {
@@ -61,27 +72,17 @@ export default class ProjectsMenu extends React.Component<Props, State> {
         this.props.onUpdate(data)
     }
     render() {
-        const sorting = this.state.data.sorting
-        const responsible = this.state.data.responsible
-        const assigned = this.state.data.assigned
         return(
             <div className="projects-menu">
                 <FormGroup>
                     <Label>{translate("projects.module.menu.sorting.title")}</Label>
                     <div>
                         <ButtonGroup>
-                            <Button active={sorting === ProjectSorting.recentActivity} onClick={this.sortingButtonChanged(ProjectSorting.recentActivity)} color="light">
-                                <span>{ProjectSorting.translatedText(ProjectSorting.recentActivity)}</span>
-                            </Button>
-                            <Button active={sorting === ProjectSorting.recent} onClick={this.sortingButtonChanged(ProjectSorting.recent)} color="light">
-                                <span>{ProjectSorting.translatedText(ProjectSorting.recent)}</span>
-                            </Button>
-                            <Button active={sorting === ProjectSorting.mostUsed} onClick={this.sortingButtonChanged(ProjectSorting.mostUsed)} color="light">
-                                <span>{ProjectSorting.translatedText(ProjectSorting.mostUsed)}</span>
-                            </Button>
-                            <Button active={sorting === ProjectSorting.AtoZ} onClick={this.sortingButtonChanged(ProjectSorting.AtoZ)} color="light">
-                                <span>{ProjectSorting.translatedText(ProjectSorting.AtoZ)}</span>
-                            </Button>
+                            {ProjectSorting.all.map(s =>
+                                <Button active={this.state.data.sorting === s} key={s} onClick={this.sortingButtonChanged(s)} color="light">
+                                    <span>{ProjectSorting.translatedText(s)}</span>
+                                </Button>
+                            )}
                         </ButtonGroup>
                     </div>
                 </FormGroup>
@@ -89,12 +90,11 @@ export default class ProjectsMenu extends React.Component<Props, State> {
                     <Label>{translate("projects.module.menu.filter.title")}</Label>
                     <div>
                         <ButtonGroup>
-                            <Button active={responsible} onClick={this.responsibleButtonChanged(!responsible)} color="light">
-                                <span>{translate("projects.module.menu.filter.responsible")}</span>
-                            </Button>
-                            <Button active={assigned} onClick={this.assignedButtonChanged(!assigned)} color="light">
-                                <span>{translate("projects.module.menu.filter.assigned")}</span>
-                            </Button>
+                            {ProjectFilter.all.map(f =>
+                                <Button active={this.state.data[f]} key={f} onClick={this.filterButtonChanged(f, !this.state.data[f])} color="light">
+                                    <span>{translate("projects.module.menu.filter." + f)}</span>
+                                </Button>
+                            )}
                         </ButtonGroup>
                     </div>
                 </FormGroup>

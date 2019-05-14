@@ -8,6 +8,11 @@ export enum GroupSorting {
     AtoZ = "alphabetically",
 }
 export namespace GroupSorting {
+    export const all = [
+        GroupSorting.recent,
+        GroupSorting.mostUsed,
+        GroupSorting.AtoZ
+    ]
     export function translatedText(type: GroupSorting) {
         switch(type){
             case GroupSorting.recent: return translate("common.sorting.recent")
@@ -45,22 +50,17 @@ export default class GroupsMenu extends React.Component<Props, State> {
         this.props.onUpdate(data)
     }
     render() {
-        const sorting = this.state.data.sorting
         return(
             <div className="groups-menu">
                 <FormGroup>
                     <Label>{translate("groups.module.menu.sorting.title")}</Label>
                     <div>
                         <ButtonGroup>
-                            <Button active={sorting === GroupSorting.recent} onClick={this.sortingButtonChanged(GroupSorting.recent)} color="light">
-                                <span>{GroupSorting.translatedText(GroupSorting.recent)}</span>
-                            </Button>
-                            <Button active={sorting === GroupSorting.mostUsed} onClick={this.sortingButtonChanged(GroupSorting.mostUsed)} color="light">
-                                <span>{GroupSorting.translatedText(GroupSorting.mostUsed)}</span>
-                            </Button>
-                            <Button active={sorting === GroupSorting.AtoZ} onClick={this.sortingButtonChanged(GroupSorting.AtoZ)} color="light">
-                                <span>{GroupSorting.translatedText(GroupSorting.AtoZ)}</span>
-                            </Button>
+                            {GroupSorting.all.map(s =>
+                                    <Button active={this.state.data.sorting === s} key={s} onClick={this.sortingButtonChanged(s)} color="light">
+                                        <span>{GroupSorting.translatedText(s)}</span>
+                                    </Button>
+                                )}
                         </ButtonGroup>
                     </div>
                 </FormGroup>

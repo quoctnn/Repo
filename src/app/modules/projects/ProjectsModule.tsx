@@ -106,18 +106,11 @@ class ProjectsModule extends React.Component<Props, State> {
         if(this.state.menuVisible)
             return null
         return (<ButtonGroup className="header-filter-group">
-                    <Button size="xs" active={this.state.menuData.sorting === ProjectSorting.recentActivity} onClick={this.toggleSorting(ProjectSorting.recentActivity)} color="light">
-                        <span>{ProjectSorting.translatedText(ProjectSorting.recentActivity)}</span>
-                    </Button>
-                    <Button size="xs" active={this.state.menuData.sorting === ProjectSorting.recent} onClick={this.toggleSorting(ProjectSorting.recent)} color="light">
-                        <span>{ProjectSorting.translatedText(ProjectSorting.recent)}</span>
-                    </Button>
-                    <Button size="xs" active={this.state.menuData.sorting === ProjectSorting.mostUsed} onClick={this.toggleSorting(ProjectSorting.mostUsed)} color="light">
-                        <span>{ProjectSorting.translatedText(ProjectSorting.mostUsed)}</span>
-                    </Button>
-                    <Button size="xs" active={this.state.menuData.sorting === ProjectSorting.AtoZ} onClick={this.toggleSorting(ProjectSorting.AtoZ)} color="light">
-                        <span>{ProjectSorting.translatedText(ProjectSorting.AtoZ)}</span>
-                    </Button>
+                    {ProjectSorting.all.map(s =>
+                        <Button size="xs" active={this.state.menuData.sorting === s} key={s} onClick={this.toggleSorting(s)} color="light">
+                            <span>{ProjectSorting.translatedText(s)}</span>
+                        </Button>
+                    )}
                 </ButtonGroup>)
     }
     renderContent = () => {
