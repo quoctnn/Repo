@@ -20,6 +20,9 @@
         @include var(color, default-color);
         border-top-left-radius: 10px;
         border-bottom-left-radius: 10px;
+        flex-grow: unset;
+        width:90px;
+        padding-top: 4px;
         font-weight: 300;
         text-shadow: 0 0 3px rgba(0, 0, 0, .8);
     }
