@@ -38,12 +38,17 @@ export default class TimesheetListItem extends React.Component<Props, State> {
                             <div className="date">{date}</div>
                             <div className="time">{time}</div>
                         </div>
+                        <div className="d-flex flex-column">
+                            <svg className="semi-circle" preserveAspectRatio="xMidYMid slice">
+                                <path d="M0,0 C7,10 7,35 0,45"/>
+                            </svg>
+                        </div>
                         <div className="d-flex flex-column details text-truncate">
-                            <div className="user">{name}</div>
+                            <div title={name} className="user text-truncate">{name}</div>
                             { this.props.showTaskTitle &&
-                                <div title={timesheet.task_title} className="task-info"><b>{translate("common.task") + ":"}</b> &nbsp;{timesheet.task_title}</div>
+                                <div title={timesheet.task_title} className="task-info text-truncate"><b>{translate("common.task") + ":"}</b> &nbsp;{timesheet.task_title}</div>
                                 ||
-                                <div title={timesheet.description} className="task-info">{timesheet.description}</div>
+                                <div title={timesheet.description} className="task-info text-truncate">{timesheet.description}</div>
                             }
                         </div>
                     </div>

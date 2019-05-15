@@ -9,7 +9,7 @@ import Logo from "./general/Logo";
 interface OwnProps
 {
     coverImage:string
-    primaryItemImage:string 
+    primaryItemImage:string
     primaryItemTitle:string
 }
 type Props = OwnProps
