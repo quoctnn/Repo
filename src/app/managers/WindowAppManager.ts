@@ -14,10 +14,12 @@ import { resetProfilesAction } from '../redux/profileStore';
 import { setAuthenticationTokenAction, setAuthenticationProfileAction } from '../redux/authentication';
 import { setThemeAction } from '../redux/theme';
 import { ThemeManager } from './ThemeManager';
+import { resetMessageQueueAction } from '../redux/messageQueue';
 export type AppWindowObject = {
     deleteCommunity:(id:number) => void
     resetProjectStore:() => void
     resetEventStore:() => void
+    resetMessageQueue:() => void
     user_locale?:string
     socket?:ReconnectingWebSocket
     sendOutgoingOnSocket:(data:object) => void
@@ -38,7 +40,8 @@ export abstract class WindowAppManager
             sendInboundOnSocket:WindowAppManager.sendInboundOnSocket,
             clear:WindowAppManager.clear,
             sendMessageElectron:WindowAppManager.sendMessageElectron,
-            setTheme:WindowAppManager.setTheme
+            setTheme:WindowAppManager.setTheme,
+            resetMessageQueue:WindowAppManager.resetMessageQueue
         }
         //
         //window.ipcRenderer.on('channel', (event, msg) => console.log(msg) )
@@ -50,6 +53,9 @@ export abstract class WindowAppManager
         if (window.isElectron) {
             window.ipcRenderer.send(channel, msg)
         }
+    }
+    static resetMessageQueue = () => {
+        WindowAppManager.getStore().dispatch(resetMessageQueueAction())
     }
     static resetEventStore = () => {
         WindowAppManager.getStore().dispatch(resetEventsAction())

@@ -10,7 +10,7 @@ import Embedly from "../../components/general/embedly/Embedly";
 import { ConversationManager } from "../../managers/ConversationManager";
 import { FileUtilities } from "../../utilities/FileUtilities";
 import RadialProgress from "../../components/general/loading/RadialProgress";
-import { translate } from "../../localization/AutoIntlProvider";
+import { translate } from '../../localization/AutoIntlProvider';
 const processString = require('react-process-string');
 export class MessageContentParser{
     content:any = ""
@@ -149,40 +149,54 @@ export class MessageContent extends React.Component<Props,State> {
             }
         }
     }
-    private wrapInMessage = (content:any, className?:string, key?:string) => {
+    private wrapInMessage = (content:any, className?:string, key?:string, error?:string) => {
         const cn = classnames("message", className)
-        return <div key={key || uniqueId()} className={cn}>{content}</div>
+        return <div key={key || uniqueId()} className={cn}>
+                    {content}
+                    {error && <div className="small-text text-danger"><i className="fas fa-exclamation-triangle">&nbsp;{translate("sending failed")}</i></div>}
+                </div>
     }
     private renderRemoveFailedContent = (message:Message) => {
-        return (<div>
-            <div className="title">{message.tempFile.name}</div>
-            <div className="status">{translate("Sending failed")}</div>
-            <div className="footer"><button className="btn" onClick={() => ConversationManager.removeQueuedMessage(message)}>{translate("Remove")}</button></div>
-        </div>)
+        return (<div className="d-flex align-items-center">
+                    <div className="d-flex flex-column mw0 mr-2">
+                        <div className="title text-truncate">{message.tempFile.name}</div>
+                        <div className="status text-truncate">{translate("Sending failed")}</div>
+                    </div>
+                    <div className="d-flex flex-shrink-0">
+                        <button className="btn" onClick={() => ConversationManager.retryQueuedMessage(message)}>{translate("Retry")}</button>
+                        <button className="btn" onClick={() => ConversationManager.removeQueuedMessage(message)}>{translate("Remove")}</button>
+                    </div>
+                </div>)
     }
     private renderUploadingContent = (message:Message) => {
-        return (<div>
-            <div className="title">{message.tempFile.name}</div>
-            <div className="status">{ FileUtilities.humanFileSize( message.tempFile.size ) + " " + translate("Sending...")}</div>
-            <div className="footer"><RadialProgress percent={message.tempFile.progress} size={40} strokeWidth={5} /></div>
-        </div>)
+        return (<div className="d-flex align-items-center">
+                    <div className="d-flex flex-shrink-0">
+                        <RadialProgress percent={message.tempFile.progress} size={40} strokeWidth={5} />
+                    </div>
+                    <div className="d-flex flex-column mw0 ml-2">
+                        <div className="title text-truncate">{message.tempFile.name}</div>
+                        <div className="status text-truncate">{ FileUtilities.humanFileSize( message.tempFile.size ) + " " + translate("Sending...")}</div>
+                    </div>
+                </div>)
     }
     private renderRetryUploadingContent = (message:Message) => {
-        return (<div>
-            <div className="title">{message.tempFile.name}</div>
-            <div className="status">{ FileUtilities.humanFileSize( message.tempFile.size ) + " " + translate("Sending failed")}</div>
-            <div className="footer"><button className="btn" onClick={() => ConversationManager.retryQueuedMessage(message)}>{translate("Retry")}</button></div>
-        </div>)
+        return (<div className="d-flex align-items-center">
+                    <div className="d-flex flex-column mw0 mr-2">
+                        <div className="title text-truncate">{message.tempFile.name}</div>
+                        <div className="status text-truncate">{ FileUtilities.humanFileSize( message.tempFile.size ) + " " + translate("Sending failed")}</div>
+                    </div>
+                    <div className="d-flex flex-shrink-0">
+                        <button className="btn" onClick={() => ConversationManager.retryQueuedMessage(message)}>{translate("Retry")}</button>
+                    </div>
+                </div>)
     }
     private renderTryingToCreateContent = (message:Message) => {
-        return (<div>
-            <div className="title">{message.tempFile.name}</div>
-            <div className="status">{translate("File uploaded. Creating message...") }</div>            
-            <div className="footer">
-                <button className="btn" onClick={() => ConversationManager.retryQueuedMessage(message)}>{translate("Retry")}</button>
-                <button className="btn" onClick={() => ConversationManager.removeQueuedMessage(message)}>{translate("Remove")}</button>
-            </div>
-        </div>)
+        return (<div className="d-flex align-items-center">
+                    <div className="d-flex flex-column mw0 mr-2">
+                        <div className="title text-truncate">{message.tempFile.name}</div>
+                        <div className="status text-truncate">{translate("File uploaded. Creating message") }</div>   
+                    </div>
+                </div>)
     }
     render = () => {
         const {message, simpleMode} = this.props
@@ -198,15 +212,19 @@ export class MessageContent extends React.Component<Props,State> {
             }
             return processedContent.content
         }
-        if(message.tempFile && message.tempFile.file)
+        if(!message.error && message.tempFile && message.tempFile.file)
         {
             return this.renderTempFile()
         }
+        if(message.error)
+        {
+            debugger
+        }
         const urls = processedContent.urls
         return  <>
-                    {processedContent.content.length > 0 && this.wrapInMessage(processedContent.content)}
-                    {files.length > 0 && this.wrapInMessage(<ContentGallery files={files} setWidth={true}/>)}
-                    {urls.length > 0 && urls.map(u => this.wrapInMessage(<Embedly verticalCard={true} url={u} />, "embed"))}
+                    {processedContent.content.length > 0 && this.wrapInMessage(processedContent.content, null, null, message.error )}
+                    {files.length > 0 && this.wrapInMessage(<ContentGallery files={files} setWidth={true}/>,null, null, message.error)}
+                    {urls.length > 0 && urls.map(u => this.wrapInMessage(<Embedly verticalCard={true} url={u} />, "embed", null, message.error))}
                 </>
     }
 }

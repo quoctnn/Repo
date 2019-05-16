@@ -1,5 +1,5 @@
 import * as React from 'react';
-require("./RadialProgress.scss");
+import "./RadialProgress.scss"
 
 export interface OwnProps 
 {

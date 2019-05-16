@@ -1,6 +1,6 @@
 import { Settings } from "../utilities/Settings";
 import { embedlyMiddleware } from "../components/general/embedly/redux";
-import { messageQueueMiddleware } from "./messageQueue";
+//import { messageQueueMiddleware } from "./messageQueue";
 
 const loggingMiddleware = store => next => action => {
     console.log('DISPATCHING => ', action);
@@ -13,5 +13,5 @@ let _middleWares = [loggingMiddleware];
 if (Settings.showEmbedlyCards) {
     _middleWares.push(embedlyMiddleware);
 }
-_middleWares.push(messageQueueMiddleware)
+//_middleWares.push(messageQueueMiddleware)
 export const middleWares = _middleWares

@@ -107,6 +107,7 @@ export class Message
     mentions!:number[]
     files?:UploadedFile[]
     tempFile?:FileUpload
+    error?:string
 }
 export enum Permission{
     none = 0,

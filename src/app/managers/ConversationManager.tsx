@@ -4,7 +4,7 @@ import { Conversation, Message, UserProfile, Permission } from '../types/intraso
 import { EventStreamMessageType, sendOnWebsocket, canSendOnWebsocket } from '../network/ChannelEventStream';
 import { ReduxState } from '../redux';
 import { addConversationsAction, removeConversationAction } from '../redux/conversationStore';
-import { updateMessageInQueueAction, processMessageInQueueAction, removeMessageFromQueueAction, processNextMessageInQueueAction, addMessageToQueueAction } from '../redux/messageQueue';
+import { updateMessageInQueueAction, removeMessageFromQueueAction, processNextMessageInQueueAction, addMessageToQueueAction } from '../redux/messageQueue';
 import { AuthenticationManager } from './AuthenticationManager';
 import { NotificationCenter } from '../utilities/NotificationCenter';
 import Routes from '../utilities/Routes';
@@ -201,18 +201,37 @@ export abstract class ConversationManager
     {
         let store = ConversationManager.getStore()
         store.dispatch(addMessageToQueueAction(message))
+        ConversationManager.processTempQueue()
+    }
+    private static createMessage(message:Message, completion?:() => void){
+        ApiClient.createMessage(message, (newMessage, status, error) => {
+            if(newMessage)
+            {
+                ConversationManager.removeQueuedMessage(message)
+            }
+            completion && completion()
+        })
     }
     //queue
     static processTempQueue = () => 
     {
-        if (canSendOnWebsocket) 
-        {
-            ConversationManager.getStore().dispatch(processNextMessageInQueueAction())
+        const messages = [...ConversationManager.getStore().getState().messageQueue.messages].reverse()
+        const processNext = () => {
+            const message = messages.pop()
+            if(message)
+            {
+                ConversationManager.createMessage(message, processNext)
+            }
         }
+        processNext()
     }
     static removeQueuedMessage = (message:Message) => 
     {
         ConversationManager.getStore().dispatch(removeMessageFromQueueAction(message))
+    }
+    static updateQueuedMessage = (message:Message) => 
+    {
+        ConversationManager.getStore().dispatch(updateMessageInQueueAction(message))
     }
     static retryQueuedMessage = (message:Message) => 
     {
@@ -221,7 +240,7 @@ export abstract class ConversationManager
         m.tempFile.progress = 0
         m.tempFile.error = null
         ConversationManager.getStore().dispatch(updateMessageInQueueAction(m))
-        ConversationManager.getStore().dispatch(processMessageInQueueAction(m))
+        ConversationManager.createMessage(message)
     }
     private static getStore = ():Store<ReduxState,any> => 
     {
