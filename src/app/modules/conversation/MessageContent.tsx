@@ -111,7 +111,7 @@ export class MessageContent extends React.Component<Props,State> {
         }
     }
     shouldComponentUpdate = (prevProps:Props, prevState:State) => {
-        return this.inputChanged(prevProps)
+        return this.inputChanged(prevProps) || prevState.content != this.state.content
     }
     inputChanged = (prevProps:Props) => {
         return prevProps.message != this.props.message || prevProps.simpleMode != this.props.simpleMode
