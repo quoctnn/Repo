@@ -16,6 +16,7 @@ import LoadingSpinner from '../../components/LoadingSpinner';
 import { DetailsMembers } from '../../components/details/DetailsMembers';
 import { DetailsContent } from '../../components/details/DetailsContent';
 import { ContextManager } from '../../managers/ContextManager';
+import classNames from 'classnames';
 type OwnProps = {
     breakpoint:ResponsiveBreakpoint
     contextNaturalKey: ContextNaturalKey
@@ -70,19 +71,15 @@ class ProjectDetailsModule extends React.Component<Props, State> {
                         <ModuleMenuTrigger onClick={this.menuItemClick} />
                     </ModuleHeader>
                     {breakpoint >= ResponsiveBreakpoint.standard && //do not render for small screens
-                        <>
-                            <ModuleContent>
-                            { project &&
-                                <div>
-                                    { project.permission >= Permission.read &&
-                                        <DetailsContent community={community} description={project.description}/>
-                                    }
+                        <ModuleContent>
+                            { project && project.permission >= Permission.read &&
+                                <div className="project-details-content">
+                                    <DetailsContent community={community} description={project.description}/>
                                 </div>
                                 ||
                                 <LoadingSpinner key="loading"/>
                             }
-                            </ModuleContent>
-                        </>
+                        </ModuleContent>
                     }
                     <ModuleFooter>
                     { project && project.permission >= Permission.read &&

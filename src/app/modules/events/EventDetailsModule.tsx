@@ -79,24 +79,22 @@ class EventDetailsModule extends React.Component<Props, State> {
                     </ModuleHeader>
                     {breakpoint >= ResponsiveBreakpoint.standard && //do not render for small screens
                         <ModuleContent>
-                            { event &&
-                                <div>
-                                    { event.permission >= Permission.read &&
-                                        <DetailsContent community={community} description={event.description}>
-                                            { event.parent &&
-                                                <div>
-                                                    <span className="details-field-name">
-                                                        {translate("common.event")}:&nbsp;
-                                                    </span>
-                                                    <span className="details-field-value">
-                                                        <Link to={event.parent.uri || "#"}>
-                                                            {event.parent.name}
-                                                        </Link>
-                                                    </span>
-                                                </div>
-                                            }
-                                        </DetailsContent>
-                                    }
+                            { event && event.permission >= Permission.read &&
+                                <div className="event-details-content">
+                                    <DetailsContent community={community} description={event.description}>
+                                        { event.parent &&
+                                            <div>
+                                                <span className="details-field-name">
+                                                    {translate("common.event")}:&nbsp;
+                                                </span>
+                                                <span className="details-field-value">
+                                                    <Link to={event.parent.uri || "#"}>
+                                                        {event.parent.name}
+                                                    </Link>
+                                                </span>
+                                            </div>
+                                        }
+                                    </DetailsContent>
                                 </div>
                                 ||
                                 <LoadingSpinner key="loading"/>

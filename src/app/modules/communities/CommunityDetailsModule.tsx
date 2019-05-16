@@ -74,14 +74,10 @@ class GroupDetailsModule extends React.Component<Props, State> {
                     </ModuleHeader>
                     {breakpoint >= ResponsiveBreakpoint.standard && //do not render for small screens
                         <ModuleContent>
-                            { community &&
-                                <div>
-                                    { community.permission >= Permission.read &&
-                                        <DetailsContent description={community.description}/>
-                                    }
-                                </div>
-                                ||
-                                <LoadingSpinner key="loading"/>
+                            { community && community.permission >= Permission.read &&
+                                <DetailsContent description={community.description}/>
+                            ||
+                            <LoadingSpinner key="loading"/>
                             }
                         </ModuleContent>
                     }
