@@ -40,6 +40,13 @@ const template = [
         }
       },
       {
+        label: i18n.__('Feedback'),
+        click () { require('electron').shell.openExternal('https://feedback.intra.work/') }
+      },
+      {
+        type: 'separator'
+      },
+      {
         label: i18n.__('Hard reload'),
         click(menuItem, browserWindow, event) {
           browserWindow.webContents.executeJavaScript('window.app.hardReset();');
@@ -146,6 +153,13 @@ if (process.platform === 'darwin') {
             slashes: true,
           }))
         }
+      },
+      {
+        label: i18n.__('Feedback'),
+        click () { require('electron').shell.openExternal('https://feedback.intra.work/') }
+      },
+      {
+        type: 'separator'
       },
       {
         label: i18n.__('Hard reload'),
