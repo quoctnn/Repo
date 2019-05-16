@@ -29,3 +29,6 @@
     flex-grow: 1;
     text-align: right;
 }
+.event-details-content .details-description{
+    -webkit-line-clamp: 5;
+}

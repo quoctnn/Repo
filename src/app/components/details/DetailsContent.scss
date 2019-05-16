@@ -1,19 +1,25 @@
-.module-content .details-content{
+.details-content {
     margin: 0 18px;
-}
-.module-content .details-field-name{
-    font-size: 15px;
-    font-weight: 300;
-}
-.module-content .details-field-value{
-    font-size: 18px;
-    font-weight: 300;
-    a{
-        font-weight: unset;
+    height: 100%;
+    .details-field-name{
+        font-size: 15px;
+        font-weight: 300;
     }
-}
-.module-content .details-description{
-    margin-top: 15px;
-    font-size: 15px;
-    font-weight: 300;
+    .details-field-value{
+        font-size: 18px;
+        font-weight: 300;
+        a{
+            font-weight: unset;
+        }
+    }
+    .details-description{
+        font-size: 15px;
+        font-weight: 300;
+        height: unset;
+        display: -webkit-box;
+        -webkit-line-clamp: 8;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        white-space: unset;
+    }
 }

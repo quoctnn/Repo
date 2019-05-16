@@ -8,14 +8,12 @@ import "./DetailsContent.scss"
 type OwnProps = {
     community?:Community
     description?:string
-    truncate?:number
 }
 type State = {
 }
 type Props = OwnProps
 export class DetailsContent extends React.Component<Props, State> {
     static defaultProps:OwnProps = {
-        truncate:200
     }
     constructor(props:Props) {
         super(props);
@@ -25,17 +23,17 @@ export class DetailsContent extends React.Component<Props, State> {
     render()
     {
         return (
-            <div className="details-module details-content">
+            <div className="details-content">
                 { this.props.community &&
                     <div className="text-truncate">
                         <div className="details-field-name">{translate("common.community")}</div>
-                        <div className="details-field-value"><Link to={this.props.community.uri}>{this.props.community.name}</Link></div>
+                        <div title={this.props.community.name} className="details-field-value"><Link to={this.props.community.uri}>{this.props.community.name}</Link></div>
                     </div>
                 }
                 {this.props.children}
                 { this.props.description &&
-                    <div className="details-description">
-                        {IntraSocialUtilities.truncateText(IntraSocialUtilities.htmlToText(this.props.description), this.props.truncate)}
+                    <div title={IntraSocialUtilities.htmlToText(this.props.description)} className="details-description">
+                        {IntraSocialUtilities.htmlToText(this.props.description)}
                     </div>
                 }
             </div>

@@ -73,20 +73,18 @@ class TaskDetailsModule extends React.Component<Props, State> {
                         {breakpoint >= ResponsiveBreakpoint.standard && //do not render for small screens
                             <>
                                 <ModuleContent>
-                                { task &&
-                                    <div>
-                                        { task.permission >= Permission.read &&
-                                            <DetailsContent community={community} description={task.description}>
+                                { task && task.permission >= Permission.read &&
+                                    <div className="task-details-content">
+                                        <DetailsContent community={community} description={task.description}>
                                                 { this.props.project &&
-                                                    <div className="text-truncate">
+                                                    <div>
                                                         <div className="details-field-name">{translate("common.project")}</div>
-                                                        <div className="details-field-value"><Link to={this.props.project.uri}>{this.props.project.name}</Link></div>
+                                                        <div title={this.props.project.name} className="details-field-value text-truncate"><Link to={this.props.project.uri}>{this.props.project.name}</Link></div>
                                                     </div>
                                                 }
-                                            </DetailsContent>
-                                        }
+                                        </DetailsContent>
                                     </div>
-                                    ||
+                                        ||
                                     <LoadingSpinner key="loading"/>
                                 }
                                 </ModuleContent>
