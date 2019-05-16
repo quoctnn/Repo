@@ -55,7 +55,7 @@ type ReduxStateProps = {
 type ReduxDispatchProps = {
 }
 type Props = OwnProps & RouteComponentProps<any> & ReduxStateProps & ReduxDispatchProps & DefaultProps
-
+export const tempConversationId = "new"
 class ConversationsModule extends React.Component<Props, State> {
     conversationsList = React.createRef<ListComponent<Conversation>>()
     private observers:EventSubscription[] = []
@@ -82,7 +82,7 @@ class ConversationsModule extends React.Component<Props, State> {
         this.conversationsList.current.removeItemById(data.conversation)
         if(isActive && !data.temporary)
         {
-            NavigationUtilities.navigateToConversation(this.props.history, null)
+            this.navigateToFirstConversation()
         }
     }
     componentDidMount = () => {
@@ -107,6 +107,10 @@ class ConversationsModule extends React.Component<Props, State> {
         if(this.props.tempConversation)
         {
             this.conversationsList.current.safeUnshift(this.props.tempConversation)
+        }
+        if(!this.props.routeConversationId)
+        {
+            this.navigateToFirstConversation()
         }
     }
     componentWillUnmount = () =>
@@ -198,6 +202,15 @@ class ConversationsModule extends React.Component<Props, State> {
             return {conversationActionInProgress:{conversation:conversation, action:action}}
         })
     }
+    navigateToFirstConversation = () => {
+
+        const conversation = this.conversationsList.current.getItemAtIndex(0)
+        if(conversation)
+        {
+            const id = conversation.temporary ? tempConversationId : conversation.id
+            NavigationUtilities.navigateToConversation(this.props.history, id)
+        }
+    }
     onConfirmAction = (confirmed:boolean) => {
         const action = this.state.conversationActionInProgress
         if(action.conversation == 0)
@@ -211,7 +224,7 @@ class ConversationsModule extends React.Component<Props, State> {
                     {
                         ToastManager.showInfoToast("conversation.deleted")
                         this.conversationsList.current.removeItemById(action.conversation)
-                        NavigationUtilities.navigateToConversation(this.props.history, null)
+                        this.navigateToFirstConversation()
                     }
                     this.resetAction()
                 })
@@ -229,7 +242,7 @@ class ConversationsModule extends React.Component<Props, State> {
                     {
                         ToastManager.showInfoToast("conversation.archived")
                         this.conversationsList.current.removeItemById(action.conversation)
-                        NavigationUtilities.navigateToConversation(this.props.history, null)
+                        this.navigateToFirstConversation()
                     }
                     this.resetAction()
                 })
@@ -298,12 +311,19 @@ class ConversationsModule extends React.Component<Props, State> {
     listOffsetCountFilter = (items:Conversation[]) => {
         return items.filter(i => !i.temporary).length
     }
+    onDidLoadData = (offset:number) => {
+        if(offset == 0)
+        {
+            this.navigateToFirstConversation()
+        }
+    }
     renderContent = () => {
 
         const {} = this.props
         return <>
             <ListComponent<Conversation>
                         ref={this.conversationsList}
+                        onDidLoadData={this.onDidLoadData}
                         offsetCountFilter={this.listOffsetCountFilter}
                         renderEmpty={this.renderEmpty}
                         onLoadingStateChanged={this.feedLoadingStateChanged}
@@ -346,7 +366,7 @@ class ConversationsModule extends React.Component<Props, State> {
     renderHeaderContent = () => {
         return <div>
                     {this.renderFilters()}
-                    <Link title={translate("conversation.menu.create")} onClick={this.createTemporaryConversation} to={Routes.conversationUrl("new")} className="btn btn-dark flex-shrink-0 btn-sm" >
+                    <Link title={translate("conversation.menu.create")} onClick={this.createTemporaryConversation} to={Routes.conversationUrl(tempConversationId)} className="btn btn-dark flex-shrink-0 btn-sm" >
                         <i className="fas fa-plus"></i>
                     </Link>
                 </div>
@@ -399,7 +419,7 @@ const mapStateToProps = (state:ReduxState, ownProps: OwnProps & RouteComponentPr
     const authenticatedUser = AuthenticationManager.getAuthenticatedUser()
     const conversation = ContextManager.getContextObject(ownProps.location.pathname, ContextNaturalKey.CONVERSATION) as Conversation
     const conversationId:string = ownProps.match.params.conversationId
-    const createNewConversation = conversationId == "new"
+    const createNewConversation = conversationId == tempConversationId
     const tempConversation = state.tempCache.conversation
     return {
         authenticatedUser,

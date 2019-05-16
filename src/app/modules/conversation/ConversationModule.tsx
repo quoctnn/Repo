@@ -31,6 +31,7 @@ import { ActionMeta } from 'react-select/lib/types';
 import { NavigationUtilities } from '../../utilities/NavigationUtilities';
 import SimpleDialog from '../../components/general/dialogs/SimpleDialog';
 import ConversationEditor from './ConversationEditor';
+import { tempConversationId } from '../conversations/ConversationsModule';
 
 const reducer = (accumulator, currentValue) => accumulator + currentValue;
 const uidToNumber = (uid) => uid.split("_").map(n => parseInt(n)).reduce(reducer)
@@ -107,7 +108,7 @@ class ConversationModule extends React.Component<Props, State> {
     {
         this.observers.forEach(o => o.remove())
     }
-    componentDidUpdate = (prevProps:Props) => {
+    componentDidUpdate = (prevProps:Props, prevState:State) => {
         if(this.shouldReloadList(prevProps))
         {
             this.reload()
@@ -122,6 +123,10 @@ class ConversationModule extends React.Component<Props, State> {
                 return {conversationEditorDialogVisible:false, renderDropZone:false, showSpinner:false}
             })
         }
+        if(this.props.conversation &&  this.state.hasReceivedData && !prevState.hasReceivedData && this.props.conversation.unread_messages.length > 0)
+        {
+            ConversationManager.markConversationAsRead(this.props.conversation.id, () => {})
+        }
     }
     incomingMessageHandler = (...args:any[]) => 
     {
@@ -132,7 +137,8 @@ class ConversationModule extends React.Component<Props, State> {
         if(message.conversation == conversation)
         {
             let it = this.removeUserFromIsTypingData(message.user)
-            ConversationManager.markConversationAsRead(conversation, () => {})
+            if(message.user != this.props.authenticatedUser.id)
+                ConversationManager.markConversationAsRead(conversation, () => {})
             this.setState((prevState:State) => {
                 const items = prevState.items
                 items.push(message)
@@ -397,7 +403,7 @@ class ConversationModule extends React.Component<Props, State> {
         console.log("onDragEnter", this.dragCount)
     }
     renderNoConversation = () => {
-        return <div>NO CONTENT</div>
+        return <div></div>
     }
     sortMessages = (a:Message, b:Message):number => {
         return b.id - a.id
@@ -519,7 +525,7 @@ const mapStateToProps = (state:ReduxState, ownProps: OwnProps & RouteComponentPr
     const conversation = ContextManager.getContextObject(ownProps.location.pathname, ContextNaturalKey.CONVERSATION) as Conversation || state.tempCache.conversation
     const authenticatedUser = AuthenticationManager.getAuthenticatedUser()
     const queuedMessages = (!!conversation && ConversationManager.getQueuedMessages(conversation.id)) || []
-    const createNewConversation = ownProps.match.params.conversationId == "new"
+    const createNewConversation = ownProps.match.params.conversationId == tempConversationId
     return {
         conversation,
         authenticatedUser,

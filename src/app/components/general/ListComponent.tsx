@@ -27,6 +27,7 @@ type Props<T> = {
     redrawContext?:string
     /** Filter out elements that should not count for offset */
     offsetCountFilter?:(items:T[]) => number
+    onDidLoadData?:(offset:number) => void
 }
 type State<T> = {
     items:T[]
@@ -38,6 +39,7 @@ type State<T> = {
     hasError:boolean
     redrawContext?:string
     dividerPosition?:number
+    lastFetchOffset:number
 }
 export default class ListComponent<T extends IdentifiableObject> extends React.Component<Props<T>, State<T>> {
     private listRef = React.createRef<List>()
@@ -50,7 +52,8 @@ export default class ListComponent<T extends IdentifiableObject> extends React.C
             hasMore:true,
             requestId:0,
             hasReceivedData:false,
-            hasError:false
+            hasError:false,
+            lastFetchOffset:0
         }
     }
     getItemById = (id:number) => {
@@ -134,6 +137,10 @@ export default class ListComponent<T extends IdentifiableObject> extends React.C
         if(this.props.onLoadingStateChanged && prevState.isLoading != this.state.isLoading)
         {
             this.props.onLoadingStateChanged(this.state.isLoading)
+            if(this.props.onDidLoadData && !this.state.isLoading)
+            {
+                this.props.onDidLoadData(this.state.lastFetchOffset)
+            }
         }
     }
     scrollToTop = () => {
@@ -191,7 +198,8 @@ export default class ListComponent<T extends IdentifiableObject> extends React.C
                             isLoading:false,
                             hasReceivedData:true,
                             hasError:false,
-                            dividerPosition: divider
+                            dividerPosition: divider,
+                            lastFetchOffset:offset
                         }
                     });
                 }
@@ -205,6 +213,7 @@ export default class ListComponent<T extends IdentifiableObject> extends React.C
                     isLoading:false,
                     hasReceivedData:true,
                     hasError:true,
+                    lastFetchOffset:0
                 }});
             }
         })
