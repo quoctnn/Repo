@@ -16,6 +16,11 @@ import { resetEventsAction } from '../redux/eventStore';
 import { resetTasksAction } from '../redux/taskStore';
 import { resetConversationsAction } from '../redux/conversationStore';
 import { resetMessageQueueAction } from '../redux/messageQueue';
+import { resetEndpointAction } from '../redux/endpoint';
+import { resetThemeAction } from '../redux/theme';
+import { resetActiveCommunityAction } from '../redux/activeCommunity';
+import { resetEmbedlyStoreAction } from '../components/general/embedly/redux';
+
 export type ApplicationData = {
     dashboards:Dashboard[]
     communitiesLoaded:boolean
@@ -43,17 +48,7 @@ export abstract class ApplicationManager
         ApplicationManager.applicationData = {dashboards:[], communitiesLoaded:false, profileLoaded:false, contactsLoaded:false}
         if(resetCachedData)
         {
-            const store = ApplicationManager.getStore()
-            // Clean up cached data
-            store.dispatch(resetCommunitiesAction())
-            store.dispatch(resetGroupsAction())
-            store.dispatch(resetProfilesAction())
-
-            store.dispatch(resetProjectsAction())
-            store.dispatch(resetEventsAction())
-            store.dispatch(resetTasksAction())
-            store.dispatch(resetConversationsAction())
-            store.dispatch(resetMessageQueueAction())
+            ApplicationManager.reset()
         }
     }
     static getDashboards = (category:string) => {
@@ -124,6 +119,29 @@ export abstract class ApplicationManager
         const authUser = AuthenticationManager.getAuthenticatedUser()
         authUser && CommunityManager.setInitialCommunity(authUser.active_community)
         ApplicationManager.getStore().dispatch(setApplicationLoadedAction(true))
+    }
+    static hardReset = () => {
+        const dispatch = ApplicationManager.getStore().dispatch
+        dispatch(resetMessageQueueAction())
+        dispatch(resetEndpointAction())
+        dispatch(resetEmbedlyStoreAction())
+        ApplicationManager.softReset()
+    }
+    static softReset = () => {
+        const dispatch = ApplicationManager.getStore().dispatch
+        dispatch(resetThemeAction())
+        dispatch(resetActiveCommunityAction())
+        ApplicationManager.reset()
+    }
+    private static reset = () => {
+        const dispatch = ApplicationManager.getStore().dispatch
+        dispatch(resetCommunitiesAction())
+        dispatch(resetProfilesAction())
+        dispatch(resetGroupsAction())
+        dispatch(resetEventsAction())
+        dispatch(resetTasksAction())
+        dispatch(resetProjectsAction())
+        dispatch(resetConversationsAction())
     }
     private static getStore = ():Store<ReduxState,any> =>
     {

@@ -532,7 +532,7 @@ export default class ApiClient
         
     }
     private static sendMessage(message:Message, callback:ApiClientCallback<Message>){
-        var data = { conversation: message.conversation, text: message.text, uid: message.uid, mentions:message.mentions, files:[] }
+        var data = { conversation: message.conversation, text: message.text, uid: message.uid, mentions:message.mentions, files:(message.files || []).map(f => f.id) }
         if(message.tempFile && message.tempFile.fileId)
         {
             data.files.push(message.tempFile.fileId)
@@ -554,23 +554,28 @@ export default class ApiClient
             m.tempFile = Object.assign({}, m.tempFile)
             m.tempFile.progress = progress
             ConversationManager.updateQueuedMessage(m)
-            debugger
         })
         uploader.doUpload((file:UploadedFile) => {
             let m = Object.assign({}, message)
-            m.tempFile = Object.assign({}, m.tempFile)
             if(file)
             {
-                m.tempFile.fileId = file.id
-                m.tempFile.file = {} as any
+                m.tempFile = null
+                if(m.files)
+                {
+                    m.files.push(file)
+                }
+                else 
+                {
+                    m.files = [file]
+                }
             }
             else 
             {
+                m.tempFile = Object.assign({}, m.tempFile)
                 m.tempFile.progress = 0
                 m.tempFile.error = "error"
             }
             ConversationManager.updateQueuedMessage(m)
-            debugger
             completion(m)
         })
     }

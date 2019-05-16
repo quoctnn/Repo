@@ -1,7 +1,4 @@
-import { FileUploader } from '../network/ApiClient';
-import { Message, UploadedFile } from "../types/intrasocial_types";
-import { sendOnWebsocket, EventStreamMessageType } from '../network/ChannelEventStream';
-import { ReduxState } from './index';
+import { Message } from "../types/intrasocial_types";
 export enum MessageQueueActionTypes {
     AddMessage = 'messagequeue.add_message',
     RemoveMessage = 'messagequeue.remove_message',
@@ -10,7 +7,6 @@ export enum MessageQueueActionTypes {
     ProcessMessage = 'messagequeue.process_message',
     Reset = 'messagequeue.reset',
 }
-var messageQueueWorking = false
 export type MessageQueue = {
     messages:Message[]
 }
@@ -67,43 +63,3 @@ const messageQueue = (state = INITIAL_STATE, action:MessageQueueAction):MessageQ
     }
 }
 export default messageQueue
-
-export const messageQueueMiddleware = store => next => action => {
-    let result = next(action);
-    if (action.type === MessageQueueActionTypes.AddMessage) {
-        //processMessage(store, action.message)
-    }
-    else if(action.type === MessageQueueActionTypes.RemoveMessage)
-    {
-        messageQueueWorking = false
-        store.dispatch(processNextMessageInQueueAction())
-    }
-    else if(action.type === MessageQueueActionTypes.ProcessNextMessage)
-    {
-        let state = store.getState() as ReduxState
-        if(state.messageQueue.messages.length > 0)
-        {
-            for(var i = 0; i < state.messageQueue.messages.length; i++)
-            {
-                var message = state.messageQueue.messages[i]
-                if(!message.tempFile || message.tempFile.file && ((message.tempFile.file instanceof File && !message.tempFile.error) || message.tempFile.fileId) )
-                {
-                    //processMessage(store, message)
-                    break;
-                }
-            }
-        }
-    }
-    else if(action.type === MessageQueueActionTypes.ProcessMessage)
-    {
-        let m = action.message as Message
-        let state = store.getState() as ReduxState
-        let index = state.messageQueue.messages.findIndex(msg => msg.uid == m.uid)
-        if( index > -1)
-        {
-            //processMessage(store, state.messageQueue.messages[index])
-        }
-        
-    }
-    return result;
-  }

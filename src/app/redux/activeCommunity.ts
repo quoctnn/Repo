@@ -1,8 +1,9 @@
 export enum ActiveCommunityActionTypes {
     SetActiveCommunity = 'activecommunity.set_active_community',
 }
+const defaultActiveCommunity = 0
 const INITIAL_STATE = {
-  activeCommunity: 0
+  activeCommunity: defaultActiveCommunity
 }
 export interface SetActiveCommunityAction{
     type:string
@@ -11,6 +12,10 @@ export interface SetActiveCommunityAction{
 export const setActiveCommunityAction = (index: number):SetActiveCommunityAction => ({
     type: ActiveCommunityActionTypes.SetActiveCommunity,
     activeCommunity: index
+})
+export const resetActiveCommunityAction = ():SetActiveCommunityAction => ({
+  type: ActiveCommunityActionTypes.SetActiveCommunity,
+  activeCommunity: defaultActiveCommunity
 })
 const activeCommunity = (state = INITIAL_STATE, action:SetActiveCommunityAction) => {
   switch (action.type) {

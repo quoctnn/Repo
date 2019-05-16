@@ -1,5 +1,6 @@
 export enum EndpointActionTypes {
     SetEndpoint = 'endpoint.set_endpoint',
+    ResetEndpoint = 'endpoint.reset_endpoint',
 }
 export enum EndpointLoginType {
     API = 1,
@@ -32,6 +33,7 @@ export const availableEndpoints: ApiEndpoint[] = [
         websocket: 'ws://127.0.0.1:8000/socket/'
     },
 ]
+const defaultEndpoint = 0
 export interface SetEndpointAction{
     type:string
     endpoint:number
@@ -40,8 +42,12 @@ export const setEndpointAction = (index: number):SetEndpointAction => ({
     type: EndpointActionTypes.SetEndpoint,
     endpoint: index
 })
+export const resetEndpointAction = ():SetEndpointAction => ({
+    type: EndpointActionTypes.SetEndpoint,
+    endpoint: defaultEndpoint
+})
 const INITIAL_STATE = {
-    endpoint: 0
+    endpoint: defaultEndpoint
 }
 const endpoint = (state = INITIAL_STATE, action:SetEndpointAction) => {
     switch (action.type) {

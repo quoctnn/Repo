@@ -212,6 +212,9 @@ export abstract class ConversationManager
             completion && completion()
         })
     }
+    static getQueuedMessages = (conversationId:number, onlyErrors:boolean = false) => {
+        return ConversationManager.getStore().getState().messageQueue.messages.filter(m => m.conversation == conversationId && (onlyErrors ? (m.error || (m.tempFile && m.tempFile.error) ) : true ))
+    }
     //queue
     static processTempQueue = () => 
     {

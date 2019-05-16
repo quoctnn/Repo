@@ -518,7 +518,7 @@ const mapStateToProps = (state:ReduxState, ownProps: OwnProps & RouteComponentPr
 
     const conversation = ContextManager.getContextObject(ownProps.location.pathname, ContextNaturalKey.CONVERSATION) as Conversation || state.tempCache.conversation
     const authenticatedUser = AuthenticationManager.getAuthenticatedUser()
-    const queuedMessages = (!!conversation && state.messageQueue.messages.filter(m => m.conversation == conversation.id)) || []
+    const queuedMessages = (!!conversation && ConversationManager.getQueuedMessages(conversation.id)) || []
     const createNewConversation = ownProps.match.params.conversationId == "new"
     return {
         conversation,

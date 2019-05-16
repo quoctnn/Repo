@@ -21,7 +21,7 @@ export default class ModuleHeader extends React.Component<Props & React.HTMLAttr
             <div {...rest} className={cn}>
                     <div className="flex-grow-1 text-truncate d-flex align-items-center">
                     {headerTitle &&
-                        <div className="text-truncate module-header-title-left">{headerTitle}</div>
+                        <div className="text-truncate module-header-title-left mr-1">{headerTitle}</div>
                     }
                     {this.renderLoading()}
                     <div className="spacer flex-grow-1 flex-shrink-1"></div>

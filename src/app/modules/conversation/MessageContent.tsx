@@ -216,15 +216,16 @@ export class MessageContent extends React.Component<Props,State> {
         {
             return this.renderTempFile()
         }
-        if(message.error)
-        {
-            debugger
-        }
         const urls = processedContent.urls
+        const hasContent = processedContent.content.length > 0
+        const hasFiles = files.length > 0
+        const hasLinks = urls.length > 0
+        const showError = message.error && !hasContent && !hasFiles && !hasLinks
         return  <>
-                    {processedContent.content.length > 0 && this.wrapInMessage(processedContent.content, null, null, message.error )}
-                    {files.length > 0 && this.wrapInMessage(<ContentGallery files={files} setWidth={true}/>,null, null, message.error)}
-                    {urls.length > 0 && urls.map(u => this.wrapInMessage(<Embedly verticalCard={true} url={u} />, "embed", null, message.error))}
+                    {hasContent && this.wrapInMessage(processedContent.content, null, null, message.error )}
+                    {hasFiles && this.wrapInMessage(<ContentGallery files={files} setWidth={true}/>,null, null, message.error)}
+                    {hasLinks && urls.map(u => this.wrapInMessage(<Embedly verticalCard={true} url={u} />, "embed", null, message.error))}
+                    {showError && this.wrapInMessage(translate("The message could not be sent"), null, null, message.error)}
                 </>
     }
 }

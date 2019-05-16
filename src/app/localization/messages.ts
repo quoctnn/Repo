@@ -183,6 +183,8 @@ var translations = {
     "Could not add new members":"Could not add new members",
     "Could not leave conversation":"Could not leave conversation",
     "Could not update conversation":"Could not update conversation",
+    "common.reset.soft":"Clear storage",
+    "common.reset.hard":"Clear all storage",
   },
   no: {
     "search.placeholder": "Søk ...",
@@ -368,6 +370,8 @@ var translations = {
     "Could not add new members":"Kunne ikke legge til nye medlemmer",
     "Could not leave conversation":"Kunne ikke forlate samtale",
     "Could not update conversation":"Kunne ikke oppdatere samtale",
+    "common.reset.soft":"Tøm lagring",
+    "common.reset.hard":"Tøm all lagring",
   },
   en: {
     "search.placeholder": "Search ...",
@@ -560,6 +564,8 @@ var translations = {
     "Could not add new members":"Could not add new members",
     "Could not leave conversation":"Could not leave conversation",
     "Could not update conversation":"Could not update conversation",
+    "common.reset.soft":"Clear storage",
+    "common.reset.hard":"Clear all storage",
   }
 };
 

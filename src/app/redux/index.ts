@@ -21,7 +21,11 @@ import tempCache, { TempCache } from './tempCache';
 const rootPersistConfig:PersistConfig = {
     key: 'root',
     storage: storage,
-    blacklist: ['authentication', "application", "tempCache"],
+    blacklist: [    
+                    'authentication',
+                    "application", 
+                    "tempCache",
+                ],
     debug:true,
   }
 const rootReducer = combineReducers({
