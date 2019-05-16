@@ -56,7 +56,6 @@ class TimesheetModule extends React.Component<Props, State> {
         }
     }
     headerClick = (e) => {
-        //NavigationUtilities.navigateToNewsfeed(this.props.history, context && context.type, context && context.id, this.state.includeSubContext)
     }
     feedLoadingStateChanged = (isLoading:boolean) => {
         this.setState({isLoading})

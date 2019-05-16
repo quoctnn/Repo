@@ -1,8 +1,11 @@
+@import "../../Config";
 .timesheet-list-item{
     text-decoration: none;
-    color:#000000;
+    @include var(color, primary-text-color);
+    @include var(background-color, main-content-secondary-background);
     font-size: 14px;
     border-radius: 10px;
+    height: 45px;
     &:hover{
         text-decoration: none;
         color:#000000;
@@ -10,11 +13,27 @@
     &:not(:last-child){
         margin-bottom: 6px;
     }
-    &:nth-child(odd) {
-        background: #f3f3f3;
+    .datetime{
+        // background: linear-gradient(50deg, #{map-get($root, secondary-theme-color)} 30%, #{map-get($root, primary-theme-color)} 70%);
+        // background: linear-gradient(50deg, var(--secondary-theme-color) 30%, var(--primary-theme-color) 70%);
+        @include var(background-color, primary-theme-color);
+        @include var(color, default-color);
+        border-top-left-radius: 10px;
+        border-bottom-left-radius: 10px;
+        flex-grow: unset;
+        width:90px;
+        padding-top: 4px;
+        font-weight: 300;
+        text-shadow: 0 0 3px rgba(0, 0, 0, .8);
     }
-    &:nth-child(even) {
-        background: #FAD5FB;
+    .semi-circle{
+        width:10px;
+        height:45px;
+        @include var(fill, primary-theme-color);
+    }
+    .task-info{
+        text-overflow: ellipsis;
+        font-weight: 400;
     }
     .user{
         font-size: 16px;
