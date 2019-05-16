@@ -14,7 +14,7 @@
         box-shadow: none !important;
     }
     .newsfeed-component{
-        .status-component, .comment-form.lvl0{
+        .status-component, .comment-form{
             @include var(background-color, main-content-background);
         }
         .status-component.lvl0{
