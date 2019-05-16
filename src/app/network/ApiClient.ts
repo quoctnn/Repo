@@ -6,6 +6,7 @@ import { Status, UserProfile, UploadedFile, Community, Group, Conversation, Proj
 import { nullOrUndefined } from '../utilities/Utilities';
 import moment = require("moment");
 import { Settings } from "../utilities/Settings";
+import { ConversationManager } from '../managers/ConversationManager';
 export type PaginationResult<T> = {results:T[], count:number, previous:string|null, next:string|null, divider?:number}
 export type ElasticSuggestion = {text:string, offset:number, length:number, options:[]}
 export type ElasticExtensionResult = {stats:{suggestions:{[key:string]:ElasticSuggestion}, aggregations:{[key:string]:any}}}
@@ -511,6 +512,73 @@ export default class ApiClient
             callback(null, status, error)
         })
     }
+    static createMessage(message:Message, callback:ApiClientCallback<Message>)
+    {
+        if(message.tempFile && message.tempFile.file && message.tempFile.file instanceof File)
+        {
+            this.uploadFile(message, (m:Message) => {
+                if(m.tempFile && m.tempFile.error)
+                {
+                    callback(null, "Error", "Error uploading file")
+                }
+                else {
+                    this.sendMessage(m, callback)
+                }
+            })
+        }
+        else {
+            this.sendMessage(message, callback)
+        }
+        
+    }
+    private static sendMessage(message:Message, callback:ApiClientCallback<Message>){
+        var data = { conversation: message.conversation, text: message.text, uid: message.uid, mentions:message.mentions, files:(message.files || []).map(f => f.id) }
+        if(message.tempFile && message.tempFile.fileId)
+        {
+            data.files.push(message.tempFile.fileId)
+        }
+        AjaxRequest.postJSON(Constants.apiRoute.conversationMessagesUrl, data, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            let m = Object.assign({}, message)
+            m.tempFile = Object.assign({}, m.tempFile)
+            m.error = status
+            ConversationManager.updateQueuedMessage(m)
+            callback(null, status, error)
+        })
+    }
+    private static uploadFile(message:Message, completion:(message:Message) => void){
+        let file = message.tempFile.file
+        let uploader = new FileUploader(file, (progress) => {
+            let m = Object.assign({}, message)
+            m.tempFile = Object.assign({}, m.tempFile)
+            m.tempFile.progress = progress
+            ConversationManager.updateQueuedMessage(m)
+        })
+        uploader.doUpload((file:UploadedFile) => {
+            let m = Object.assign({}, message)
+            if(file)
+            {
+                m.tempFile = null
+                if(m.files)
+                {
+                    m.files.push(file)
+                }
+                else 
+                {
+                    m.files = [file]
+                }
+            }
+            else 
+            {
+                m.tempFile = Object.assign({}, m.tempFile)
+                m.tempFile.progress = 0
+                m.tempFile.error = "error"
+            }
+            ConversationManager.updateQueuedMessage(m)
+            completion(m)
+        })
+    }
     static getConversationMessages(conversation:number, limit:number, offset:number,callback:ApiClientFeedPageCallback<Message>)
     {
         let url = Constants.apiRoute.conversationMessagesUrl +  "?" + this.getQueryString({limit, offset, conversation})
@@ -545,7 +613,6 @@ export class FileUploader
     progress:(percent:number) => void
     constructor(file:Blob, progress:(percent:number) => void)
     {
-        debugger
         this.file = file
         this.progress = progress
         this.doUpload = this.doUpload.bind(this)

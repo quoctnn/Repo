@@ -35,6 +35,7 @@ import ConversationEditor from './ConversationEditor';
 const reducer = (accumulator, currentValue) => accumulator + currentValue;
 const uidToNumber = (uid) => uid.split("_").map(n => parseInt(n)).reduce(reducer)
 const messageToUid = (message:Message) => message.conversation + "_" + message.user + "_" + new Date(message.updated_at).getTime()
+const messageToTimestamp = (message:Message) => new Date(message.updated_at).getTime()
 
 type OwnProps = {
     className?:string
@@ -313,8 +314,7 @@ class ConversationModule extends React.Component<Props, State> {
         let conversation = this.props.conversation
         if(!conversation)
             return
-        let tempId = `${conversation.id}_${this.props.authenticatedUser.id}_${Date.now()}`
-        const message = ConversationUtilities.getChatMessagePreview(this.props.authenticatedUser.id, text, null, tempId, mentions, conversation)
+        const message = ConversationUtilities.getChatMessagePreview(this.props.authenticatedUser.id, text, null, mentions, conversation)
         if(conversation.temporary)
             this.createConversationWithMessage(conversation, message)
         else 
@@ -326,8 +326,7 @@ class ConversationModule extends React.Component<Props, State> {
             return
         files.forEach(f => {
             
-            let tempId = `${conversation.id}_${this.props.authenticatedUser.id}_${Date.now()}`
-            const message = ConversationUtilities.getChatMessagePreview(this.props.authenticatedUser.id, "", f, tempId, [], conversation)
+            const message = ConversationUtilities.getChatMessagePreview(this.props.authenticatedUser.id, "", f, [], conversation)
             ConversationManager.sendMessage(message)
         })
     }
@@ -402,7 +401,6 @@ class ConversationModule extends React.Component<Props, State> {
     }
     sortMessages = (a:Message, b:Message):number => {
         return b.id - a.id
-        return uidToNumber(b.uid || messageToUid(b)) - uidToNumber(a.uid || messageToUid(a))
     }
     renderContent = () => {
 
@@ -520,7 +518,7 @@ const mapStateToProps = (state:ReduxState, ownProps: OwnProps & RouteComponentPr
 
     const conversation = ContextManager.getContextObject(ownProps.location.pathname, ContextNaturalKey.CONVERSATION) as Conversation || state.tempCache.conversation
     const authenticatedUser = AuthenticationManager.getAuthenticatedUser()
-    const queuedMessages = (!!conversation && state.messageQueue.messages.filter(m => m.conversation == conversation.id)) || []
+    const queuedMessages = (!!conversation && ConversationManager.getQueuedMessages(conversation.id)) || []
     const createNewConversation = ownProps.match.params.conversationId == "new"
     return {
         conversation,

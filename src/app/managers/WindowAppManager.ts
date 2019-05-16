@@ -14,15 +14,19 @@ import { resetProfilesAction } from '../redux/profileStore';
 import { setAuthenticationTokenAction, setAuthenticationProfileAction } from '../redux/authentication';
 import { setThemeAction } from '../redux/theme';
 import { ThemeManager } from './ThemeManager';
+import { resetMessageQueueAction } from '../redux/messageQueue';
+import { ApplicationManager } from './ApplicationManager';
 export type AppWindowObject = {
     deleteCommunity:(id:number) => void
     resetProjectStore:() => void
     resetEventStore:() => void
+    resetMessageQueue:() => void
     user_locale?:string
     socket?:ReconnectingWebSocket
     sendOutgoingOnSocket:(data:object) => void
     sendInboundOnSocket:(data:{type:string, data:any}) => void
-    clear:() => void
+    hardReset:() => void
+    softReset:() => void
     sendMessageElectron:(channel:string, msg:any) => void
     setTheme:(index:number) => void
 }
@@ -36,9 +40,11 @@ export abstract class WindowAppManager
             resetEventStore:WindowAppManager.resetEventStore,
             sendOutgoingOnSocket:WindowAppManager.sendOutgoingOnSocket,
             sendInboundOnSocket:WindowAppManager.sendInboundOnSocket,
-            clear:WindowAppManager.clear,
+            hardReset:WindowAppManager.hardReset,
+            softReset:WindowAppManager.softReset,
             sendMessageElectron:WindowAppManager.sendMessageElectron,
-            setTheme:WindowAppManager.setTheme
+            setTheme:WindowAppManager.setTheme,
+            resetMessageQueue:WindowAppManager.resetMessageQueue
         }
         //
         //window.ipcRenderer.on('channel', (event, msg) => console.log(msg) )
@@ -51,19 +57,17 @@ export abstract class WindowAppManager
             window.ipcRenderer.send(channel, msg)
         }
     }
+    static resetMessageQueue = () => {
+        WindowAppManager.getStore().dispatch(resetMessageQueueAction())
+    }
     static resetEventStore = () => {
         WindowAppManager.getStore().dispatch(resetEventsAction())
     }
-    static clear = () => {
-        const dispatch =  WindowAppManager.getStore().dispatch
-        dispatch(resetCommunitiesAction())
-        dispatch(resetGroupsAction())
-        dispatch(resetProjectsAction())
-        dispatch(resetEventsAction())
-        dispatch(resetTasksAction())
-        dispatch(resetProfilesAction())
-        dispatch(setAuthenticationTokenAction(null))
-        dispatch(setAuthenticationProfileAction(null))
+    static hardReset = () => {
+        ApplicationManager.hardReset()
+    }
+    static softReset = () => {
+        ApplicationManager.hardReset()
     }
     static resetProjectStore = () => {
         WindowAppManager.getStore().dispatch(resetProjectsAction())

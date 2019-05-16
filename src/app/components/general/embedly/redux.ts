@@ -9,17 +9,17 @@ export enum EmbedlyStoreActionTypes {
     RemoveFromQueue = 'embedly.remove_from_queue',
     RequestData = 'embedly.request_data',
 }
-export interface EmbedlyDataRequestAction{
-    type:string
+export interface EmbedlyAction{
+    type:EmbedlyStoreActionTypes
+}
+export interface EmbedlyDataRequestAction extends EmbedlyAction{
     urls:string[],
     cardType:LinkCardType
 }
-export interface EmbedlyPagesAction{
-    type:string
+export interface EmbedlyPagesAction extends EmbedlyAction{
     pages:EmbedCardItem[]
 }
-export interface EmbedlyIdsAction{
-    type:string
+export interface EmbedlyIdsAction extends EmbedlyAction {
     ids:string[]
 }
 export const embedlyRequestDataAction = (urls: string[], cardType:LinkCardType):EmbedlyDataRequestAction => ({
@@ -39,6 +39,9 @@ export const embedlyRemovePagesFromQueue = (ids: string[]):EmbedlyIdsAction => (
     type: EmbedlyStoreActionTypes.RemoveFromQueue,
     ids
 })
+export const resetEmbedlyStoreAction = ():EmbedlyAction => ({
+    type: EmbedlyStoreActionTypes.Reset,
+})
 const addPages = (state, action:EmbedlyPagesAction) => {
     let pages = action.pages
     let newState = {  ...state }
@@ -47,10 +50,10 @@ const addPages = (state, action:EmbedlyPagesAction) => {
     })
     return newState
 }
-export const pagesById = (state = {}, action:EmbedlyPagesAction) =>
+export const pagesById = (state = {}, action:EmbedlyPagesAction | EmbedlyAction) =>
 {
     switch(action.type) {
-        case EmbedlyStoreActionTypes.AddPages: return addPages(state, action);
+        case EmbedlyStoreActionTypes.AddPages: return addPages(state, action as EmbedlyPagesAction);
         case EmbedlyStoreActionTypes.Reset: return {}
         default : return state;
     }
@@ -83,19 +86,19 @@ const addPageIds = (state:string[], action:EmbedlyPagesAction) => {
     })
     return newState
 }
-export const allPages = (state:string[] = [], action:EmbedlyPagesAction) =>
+export const allPages = (state:string[] = [], action:EmbedlyPagesAction | EmbedlyAction) =>
 {
     switch(action.type) {
-        case EmbedlyStoreActionTypes.AddPages: return addPageIds(state, action);
+        case EmbedlyStoreActionTypes.AddPages: return addPageIds(state, action as EmbedlyPagesAction);
         case EmbedlyStoreActionTypes.Reset: return []
         default : return state;
     }
 }
-export const pageQueue = (state = {}, action:EmbedlyIdsAction) =>
+export const pageQueue = (state = {}, action:EmbedlyIdsAction | EmbedlyAction) =>
 {
     switch(action.type) {
-        case EmbedlyStoreActionTypes.AddToQueue: return addPageIdsToQueue(state, action);
-        case EmbedlyStoreActionTypes.RemoveFromQueue: return removePageIdsFromQueue(state, action);
+        case EmbedlyStoreActionTypes.AddToQueue: return addPageIdsToQueue(state, action as EmbedlyIdsAction);
+        case EmbedlyStoreActionTypes.RemoveFromQueue: return removePageIdsFromQueue(state, action as EmbedlyIdsAction);
         case EmbedlyStoreActionTypes.Reset: return {}
         default : return state;
     }
@@ -116,6 +119,7 @@ const requestEmbedlyCards = (store, action:EmbedlyDataRequestAction) => {
         store.dispatch(embedlyRemovePagesFromQueue(ids))
     })
 }
+//MIDDLEWARE
 export const embedlyMiddleware = store => next => (action:EmbedlyDataRequestAction) => {
     let result = next(action)
     if (action.type === EmbedlyStoreActionTypes.RequestData) {

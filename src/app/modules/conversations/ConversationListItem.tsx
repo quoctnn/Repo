@@ -14,6 +14,7 @@ import { DropDownMenu } from '../../components/general/DropDownMenu';
 import { OverflowMenuItem, OverflowMenuItemType } from '../../components/general/OverflowMenu';
 import { translate } from '../../localization/AutoIntlProvider';
 import { MessageContent } from '../conversation/MessageContent';
+import { ConversationManager } from '../../managers/ConversationManager';
 export enum ConversationAction{
     delete = "delete",
     archive = "archive"
@@ -27,7 +28,8 @@ type OwnProps = {
 }
 type ReduxStateProps = 
 {
-    authenticatedProfile:UserProfile
+    authenticatedProfile:UserProfile,
+    queueLength:number
 }
 type State = {
     optionsMenuVisible:boolean
@@ -47,7 +49,8 @@ class ConversationListItem extends React.Component<Props, State> {
         nextState.optionsMenuVisible != this.state.optionsMenuVisible || 
         nextProps.conversation != this.props.conversation || 
         nextProps.conversation.unread_messages.length != this.props.conversation.unread_messages.length || 
-        this.props.children != nextProps.children
+        this.props.children != nextProps.children || 
+        this.props.queueLength != nextProps.queueLength
     }
     onConversationAction = (action:ConversationAction, conversationId:number) => (e:React.SyntheticEvent) => {
         e.preventDefault()
@@ -78,7 +81,7 @@ class ConversationListItem extends React.Component<Props, State> {
     }
     render() {
 
-        const {conversation, className, authenticatedProfile, isActive, children, ...rest} = this.props
+        const {conversation, className, authenticatedProfile, isActive, children, queueLength, ...rest} = this.props
         if(!authenticatedProfile)
         {
             return null
@@ -90,6 +93,7 @@ class ConversationListItem extends React.Component<Props, State> {
         const size = 44
         const cl = classnames("conversation-list-item", className, {active:isActive})
         const ddOptions = this.getOptionMenuItems()
+        const hasUnsentMessages = queueLength > 0
         return (
             <div className={cl}>
                 <Link className="d-flex button-link" to={conversation.uri || "#"}>
@@ -104,7 +108,10 @@ class ConversationListItem extends React.Component<Props, State> {
                         </div>
                         <div className="d-flex flex-column text-truncate right-content">
                             <div className="title-row d-flex">
-                                <div className="title text-truncate">{title}</div>
+                                <div className="title text-truncate">
+                                {hasUnsentMessages && <i className="fas fa-exclamation-triangle small-text text-danger mr-1"></i>}
+                                {title}
+                                </div>
                                 {conversation.temporary && 
                                 <i onClick={this.onConversationAction(ConversationAction.delete, conversation.id)} className="fas fa-times action-button push-right"></i>
                                 || ddOptions.length > 0 &&
@@ -125,8 +132,14 @@ class ConversationListItem extends React.Component<Props, State> {
     }
 }
 const mapStateToProps = (state:ReduxState, ownProps: OwnProps):ReduxStateProps => {
+
+    
+    let queueLength = 0
+    if(ownProps.conversation)
+        queueLength = ConversationManager.getQueuedMessages(ownProps.conversation.id, true).length
     return {
-        authenticatedProfile:AuthenticationManager.getAuthenticatedUser()
+        authenticatedProfile:AuthenticationManager.getAuthenticatedUser(),
+        queueLength
     }
 }
 export default connect<ReduxStateProps, {}, OwnProps>(mapStateToProps, null)(ConversationListItem);

@@ -27,7 +27,9 @@ export class ConversationUtilities
             return "Unknown User"
         }).join(", ")
     }
-    static getChatMessagePreview(userId:number,text:string,file:File, uid:string, mentions:number[], conversation:Conversation):Message {
+    static getChatMessagePreview(userId:number,text:string,file:File, mentions:number[], conversation:Conversation):Message {
+
+        let uid = `${conversation.id}_${userId}_${Date.now()}`
         const now = Date.now()
         const ds = new Date().toUTCString()
         const tempFile = nullOrUndefined(file) ? null: {file:file, progress:0, name:file.name, size:file.size, type:file.type, error:null}

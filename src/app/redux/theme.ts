@@ -10,8 +10,9 @@ export const availableThemes: StyleTheme[] = [
   { name: 'Light', selector: 'light' },
   { name: 'Dark', selector: 'dark' }
 ]
+const defaultTheme = 0
 const INITIAL_STATE = {
-    theme: 0
+    theme: defaultTheme
 }
 export interface SetThemeAction{
     type:string
@@ -20,6 +21,10 @@ export interface SetThemeAction{
 export const setThemeAction = (index: number):SetThemeAction => ({
     type: ThemeActionTypes.SetTheme,
     theme: index
+})
+export const resetThemeAction = ():SetThemeAction => ({
+  type: ThemeActionTypes.SetTheme,
+  theme: defaultTheme
 })
 export const theme = (state = INITIAL_STATE, action:SetThemeAction) => {
   switch (action.type) {

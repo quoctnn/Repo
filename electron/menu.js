@@ -40,9 +40,20 @@ const template = [
         }
       },
       {
-        label: i18n.__('Hard reset'),
+        label: i18n.__('Hard reload'),
         click(menuItem, browserWindow, event) {
-          browserWindow.webContents.executeJavaScript('window.app.clear();');
+          browserWindow.webContents.executeJavaScript('window.app.hardReset();');
+          browserWindow.loadURL(url.format({
+            pathname: path.join(__dirname, './electron.html'),
+            protocol: 'file:',
+            slashes: true,
+          }))
+        }
+      },
+      {
+        label: i18n.__('Soft reload'),
+        click(menuItem, browserWindow, event) {
+          browserWindow.webContents.executeJavaScript('window.app.softReset();');
           browserWindow.loadURL(url.format({
             pathname: path.join(__dirname, './electron.html'),
             protocol: 'file:',
@@ -137,9 +148,21 @@ if (process.platform === 'darwin') {
         }
       },
       {
-        label: i18n.__('Hard reset'),
+        label: i18n.__('Hard reload'),
         click(menuItem, browserWindow, event) {
-          browserWindow.webContents.executeJavaScript('window.app.clear();');
+          browserWindow.webContents.executeJavaScript('window.app.hardReset();');
+          browserWindow.loadURL(url.format({
+            pathname: path.join(__dirname, './electron.html'),
+            protocol: 'file:',
+            slashes: true,
+          }))
+        }
+      },
+
+      {
+        label: i18n.__('Soft reload'),
+        click(menuItem, browserWindow, event) {
+          browserWindow.webContents.executeJavaScript('window.app.softReset();');
           browserWindow.loadURL(url.format({
             pathname: path.join(__dirname, './electron.html'),
             protocol: 'file:',

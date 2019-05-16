@@ -1,3 +1,4 @@
+@import "../../../Config";
 .circle-background,
 .circle-progress {
   fill: none;
@@ -8,7 +9,7 @@
 }
 
 .circle-progress {
-  stroke: red;
+  @include var(stroke, primary-theme-color);
   stroke-linecap: round;
   stroke-linejoin: round;
 }
@@ -16,5 +17,5 @@
 .circle-text {
   font-weight: bold;
   font-size: 9px;
-  fill: red;
+  @include var(fill, primary-theme-color);
 }

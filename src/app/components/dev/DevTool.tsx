@@ -1,23 +1,18 @@
 import * as React from "react";
 import { connect } from "react-redux";
-import { Form, Button, Popover, PopoverBody } from "reactstrap";
+import { Form, Popover, PopoverBody } from "reactstrap";
 import "./DevTool.scss"
 import { translate } from "../../localization/AutoIntlProvider";
 import { availableLanguages, setLanguageAction } from "../../redux/language";
-import { availableThemes, setThemeAction } from "../../redux/theme";
+import { availableThemes } from "../../redux/theme";
 import { sendOnWebsocket } from "../../network/ChannelEventStream";
 import { ReduxState } from "../../redux";
 import { availableEndpoints, setEndpointAction } from "../../redux/endpoint";
-import { resetCommunitiesAction } from "../../redux/communityStore";
-import { resetGroupsAction } from "../../redux/groupStore";
-import { resetEventsAction } from "../../redux/eventStore";
-import { resetProjectsAction } from "../../redux/projectStore";
-import { resetTasksAction } from "../../redux/taskStore";
-import { resetProfilesAction } from "../../redux/profileStore";
 import { AuthenticationManager } from "../../managers/AuthenticationManager";
 import { parseJSONObject } from "../../utilities/Utilities";
 import * as websocketInfo from "../../../../docs/Websocket messages.json"
 import { ThemeManager } from "../../managers/ThemeManager";
+import { ApplicationManager } from '../../managers/ApplicationManager';
 
 type ReduxStateProps = {
     language: number;
@@ -30,8 +25,6 @@ type ReduxDispatchProps = {
     setApiEndpoint?: (index: number) => void;
     setAccessTokenOverride: (accessToken: string) => void;
     sendOnWebsocket: (data: string) => void;
-    //disableWebsocket: (state: boolean) => void;
-    clearDataStore: () => void;
     enablePushNotifications: () => void;
 }
 type OwnProps = {
@@ -270,12 +263,27 @@ class DevTool extends React.PureComponent<Props, State> {
         </div>
         );
     }
-    renderClearStoreButton() {
+    renderClearStoreSoftButton() {
         return (
         <div className="input-group">
             <button
             onClick={() => {
-                this.props.clearDataStore();
+                ApplicationManager.softReset()
+            }}
+            className="btn btn-outline-secondary"
+            type="button"
+            >
+            {translate("Clear")}
+            </button>
+        </div>
+        );
+    }
+    renderClearStoreHardButton() {
+        return (
+        <div className="input-group">
+            <button
+            onClick={() => {
+                ApplicationManager.hardReset()
             }}
             className="btn btn-outline-secondary"
             type="button"
@@ -369,10 +377,18 @@ class DevTool extends React.PureComponent<Props, State> {
                 </div>
                 <div className="form-group row">
                     <label htmlFor="clearStore" className="col-sm-4 col-form-label">
-                    {translate("Local Storage")}
+                    {translate("common.reset.soft")}
                     </label>
                     <div className="col-sm-8" id="clearStore">
-                    {this.renderClearStoreButton()}
+                    {this.renderClearStoreSoftButton()}
+                    </div>
+                </div>
+                <div className="form-group row">
+                    <label htmlFor="clearStore" className="col-sm-4 col-form-label">
+                    {translate("common.reset.hard")}
+                    </label>
+                    <div className="col-sm-8" id="clearStore">
+                    {this.renderClearStoreHardButton()}
                     </div>
                 </div>
                 <div className="form-group row">
@@ -413,14 +429,6 @@ const mapDispatchToProps = dispatch => {
         setAccessTokenOverride: (accessToken:string) => {
             AuthenticationManager.signOut()
             AuthenticationManager.signIn(accessToken)
-        },
-        clearDataStore: () => {
-            dispatch(resetCommunitiesAction())
-            dispatch(resetGroupsAction())
-            dispatch(resetProjectsAction())
-            dispatch(resetEventsAction())
-            dispatch(resetTasksAction())
-            dispatch(resetProfilesAction())
         },
         sendOnWebsocket: (data: string) => {
             sendOnWebsocket(data);

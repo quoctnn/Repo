@@ -13,13 +13,17 @@ type Props = {
 }
 export class ChatMessage extends React.Component<Props, {}> {
     shouldComponentUpdate = (nextProps:Props, nextState) => {
+        if(nextProps.data.error != this.props.data.error)
+        {
+            return true
+        }
         let n = nextProps.data.tempFile
         let o = this.props.data.tempFile
         if((n && !o ) || !n && o)
             return true
         if(!n && !o)
             return false
-        return n.progress != o.progress || n.error != o.error
+        return n.progress != o.progress || n.error != o.error 
     }
     render() {
         const message = this.props.data
