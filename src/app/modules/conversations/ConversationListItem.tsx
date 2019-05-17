@@ -26,7 +26,7 @@ type OwnProps = {
     isActive:boolean
     onConversationAction?:(action:ConversationAction, conversationId:number) => void
 }
-type ReduxStateProps = 
+type ReduxStateProps =
 {
     authenticatedProfile:UserProfile,
     queueLength:number
@@ -44,13 +44,16 @@ class ConversationListItem extends React.Component<Props, State> {
         }
     }
     shouldComponentUpdate(nextProps:Props, nextState:State) {
-        return nextProps.isActive != this.props.isActive || 
-        nextProps.className != this.props.className || 
-        nextState.optionsMenuVisible != this.state.optionsMenuVisible || 
-        nextProps.conversation != this.props.conversation || 
-        nextProps.conversation.unread_messages.length != this.props.conversation.unread_messages.length || 
-        this.props.children != nextProps.children || 
+        return nextProps.isActive != this.props.isActive ||
+        nextProps.className != this.props.className ||
+        nextState.optionsMenuVisible != this.state.optionsMenuVisible ||
+        nextProps.conversation != this.props.conversation ||
+        nextProps.conversation.unread_messages.length != this.props.conversation.unread_messages.length ||
+        this.props.children != nextProps.children ||
         this.props.queueLength != nextProps.queueLength
+    }
+    conversationUpdate = () => (e:React.SyntheticEvent) => {
+        this.forceUpdate();
     }
     onConversationAction = (action:ConversationAction, conversationId:number) => (e:React.SyntheticEvent) => {
         e.preventDefault()
@@ -96,12 +99,12 @@ class ConversationListItem extends React.Component<Props, State> {
         const hasUnsentMessages = queueLength > 0
         return (
             <div className={cl}>
-                <Link className="d-flex button-link" to={conversation.uri || "#"}>
+                <Link onClick={this.conversationUpdate()} className="d-flex button-link" to={conversation.uri || "#"}>
                     <div className="conversation-item-body d-flex align-items-center">
                         <div>
                             <Avatar images={avatars} size={size} borderColor="white" borderWidth={2}>
-                                    {!!this.props.children && this.props.children 
-                                        || conversation.unread_messages.length > 0 && 
+                                    {!!this.props.children && this.props.children
+                                        || conversation.unread_messages.length > 0 &&
                                         <div className="notification-badge bg-success text-white text-truncate"><span>{conversation.unread_messages.length}</span></div>
                                     }
                             </Avatar>
@@ -112,7 +115,7 @@ class ConversationListItem extends React.Component<Props, State> {
                                 {hasUnsentMessages && <i className="fas fa-exclamation-triangle small-text text-danger mr-1"></i>}
                                 {title}
                                 </div>
-                                {conversation.temporary && 
+                                {conversation.temporary &&
                                 <i onClick={this.onConversationAction(ConversationAction.delete, conversation.id)} className="fas fa-times action-button push-right"></i>
                                 || ddOptions.length > 0 &&
                                 <DropDownMenu items={ddOptions} triggerClass="fas fa-cog action-button push-right" />
@@ -133,7 +136,7 @@ class ConversationListItem extends React.Component<Props, State> {
 }
 const mapStateToProps = (state:ReduxState, ownProps: OwnProps):ReduxStateProps => {
 
-    
+
     let queueLength = 0
     if(ownProps.conversation)
         queueLength = ConversationManager.getQueuedMessages(ownProps.conversation.id, true).length
