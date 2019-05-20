@@ -173,7 +173,6 @@ export abstract class ConversationManager
     {
         ApiClient.leaveConversation(conversationId, (data, status, error) => {
             const success = !error
-            console.log(data,status, error)
             ToastManager.showErrorToast(error, status, translate("Could not leave conversation"))
             if(success)
             {

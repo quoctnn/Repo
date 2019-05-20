@@ -68,7 +68,6 @@ export default class VideoPlayer extends React.Component<Props,State> {
         return window.location.protocol + '//' + window.location.host + "/stream/?url=" + encodeURIComponent(this.props.link)
     }
     onVisibilityChange = (isVisible:boolean) => {
-        console.log("VISIBILITY CHANGED:",isVisible,  this.props.link)
         if(!isVisible)
         {
             if(this.videoRef && this.videoRef.current)

@@ -109,7 +109,7 @@ const PathLoader = (Component: any, extractKey:(path:string) => string, forceUpd
             const { loading } = this.state
             const updateKey = forceUpdate && forceUpdate(this.props.location.pathname)
             const key = extractKey(location.pathname)
-            console.log("HOC update", key, updateKey)
+            //console.log("HOC update", key, updateKey)
             return loading ? <LoadingSpinner /> : <Component key={key} {...this.props} updateKey={updateKey} />
         }
 }

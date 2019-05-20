@@ -37,7 +37,6 @@ export class ChatMessageList extends React.Component<Props & React.HTMLAttribute
     }
 
     componentWillUpdate = (nextProps:Props, nextState) => {
-        console.log("ChatMessageList will update")
         if (this.listUpdateAfterInitialRender(this.props, nextProps)) {
             this.SCROLL_POSITION.prepareFor('up')
         }

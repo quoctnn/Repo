@@ -37,7 +37,6 @@ export class Grid extends React.PureComponent<Props, State> {
         this.state = {items:[], rects:{}}
     }
     componentDidUpdate = (prevProps:Props) => {
-        console.log("componentDidUpdate Grid")
         if(this.props.fill != prevProps.fill && this.props.breakpoint != prevProps.breakpoint)
         {
             if(this.props.fill && this.props.breakpoint > ResponsiveBreakpoint.standard)

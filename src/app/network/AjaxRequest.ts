@@ -13,7 +13,6 @@ export class AjaxRequest
     static sendAuthorization:boolean = true
     static setup(token:string|null)
     {
-        console.log("AjaxRequest.setup", token)
         $.ajaxSetup({
             beforeSend: function (xhr, settings) {
                 if(AjaxRequest.sendAuthorization && token)

@@ -46,7 +46,6 @@ export abstract class WindowAppManager
             navigateToRoute:WindowAppManager.navigateToRoute
         }
         //
-        //window.ipcRenderer.on('channel', (event, msg) => console.log(msg) )
     }
     static setTheme = (index:number) => {
         ThemeManager.setTheme(index)

@@ -77,7 +77,6 @@ class CommunitiesModule extends React.Component<Props, State> {
             </>
     }
     onMenuToggle = (visible:boolean) => {
-        console.log("menu open", visible)
         const newState:Partial<State> = {}
         if(!visible && this.tempMenuData) // update menudata
         {

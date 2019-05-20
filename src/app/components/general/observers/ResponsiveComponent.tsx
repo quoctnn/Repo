@@ -61,7 +61,6 @@ class ResponsiveComponent extends React.Component<Props, State>
         return nextState.breakpoint != this.state.breakpoint
     }
     render() {
-        console.log("render", this.state.breakpoint)
         return(<div ref={this.props.measureRef}>
                 {this.props.render(this.state)}
                 </div>

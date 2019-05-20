@@ -201,7 +201,6 @@ class MomentInput extends React.Component<MomentInputProps, MomentInputState> {
     }
 
     onClose = (e)  => {
-        console.log(e.target);
         if (this.node.contains(e.target))
             return;
 

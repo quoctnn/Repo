@@ -99,10 +99,6 @@ export default class DashboardComponent extends React.Component<Props, State> {
             defaultGrid:grid,
         }
     }
-    componentDidUpdate = (prevProps:Props) => {
-
-        console.log("componentDidUpdate DashboardComponent", this.props.updateKey)
-    }
     renderModules = () =>
     {
         const grid = this.findGridLayout(this.props.breakpoint, true)

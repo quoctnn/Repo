@@ -364,7 +364,7 @@ class ConversationsModule extends React.Component<Props, State> {
         }
     }
     renderHeaderContent = () => {
-        return <div>
+        return <div className="flex-shrink-0">
                     {this.renderFilters()}
                     <Link title={translate("conversation.menu.create")} onClick={this.createTemporaryConversation} to={Routes.conversationUrl(tempConversationId)} className="btn btn-dark flex-shrink-0 btn-sm" >
                         <i className="fas fa-plus"></i>

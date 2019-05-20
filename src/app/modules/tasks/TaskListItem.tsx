@@ -104,7 +104,6 @@ export default class TaskListItem extends React.Component<Props, State> {
         return style
     }
     onAddStatusActionPress = (action: StatusActions, extra?: Object, completion?: (success: boolean) => void) => {
-        console.log("onAddStatusActionPress", action, extra)
         this.props.onActionPress(TaskActions.addStatus, extra)
     }
     onAddTimeActionPress = (action: StatusActions, extra?: any, completion?: (success: boolean) => void) => {

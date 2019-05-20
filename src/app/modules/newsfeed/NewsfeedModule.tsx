@@ -75,7 +75,6 @@ class NewsfeedModule extends React.Component<Props, State> {
             contextObjectId:undefined,
             statusComposerFocus:false
         }
-        console.log("NewsfeedModule props", this.props)
     }
     componentDidMount = () => {
 
@@ -143,7 +142,6 @@ class NewsfeedModule extends React.Component<Props, State> {
         this.setState({filter:newFilter})
     }
     onAddStatusActionPress = (action: StatusActions, extra?: any, completion?: (success: boolean) => void) => {
-        console.log("onAddStatusActionPress", action, extra)
         this.blurStatusComposer()
         const instance = this.newsfeedComponent.wrappedInstance as NewsfeedComponent
         if(instance)
@@ -244,7 +242,6 @@ class NewsfeedModule extends React.Component<Props, State> {
 const mapStateToProps = (state:ReduxState, ownProps: OwnProps & RouteComponentProps<any>):ReduxStateProps => {
 
     const resolved = ContextManager.getContextObject(ownProps.location.pathname, ownProps.contextNaturalKey)
-    console.log("resolved", resolved)
     return {
         contextObject:resolved,
         contextObjectId:resolved && resolved.id,

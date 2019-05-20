@@ -47,7 +47,6 @@ class ProjectDetailsModule extends React.Component<Props, State> {
         }
     }
     menuItemClick = (e) => {
-        console.log("menuItemClick")
         e.preventDefault()
         e.stopPropagation()
         const visible = !this.state.menuVisible

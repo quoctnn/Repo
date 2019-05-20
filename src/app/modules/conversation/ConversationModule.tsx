@@ -109,7 +109,6 @@ class ConversationModule extends React.Component<Props, State> {
         this.observers.forEach(o => o.remove())
     }
     componentDidUpdate = (prevProps:Props, prevState:State) => {
-        console.log("ConversationModule componentDidUpdate")
         if(this.shouldReloadList(prevProps))
         {
             this.reload()
@@ -281,7 +280,6 @@ class ConversationModule extends React.Component<Props, State> {
             completion([])
             return
         }
-        console.log("searching", search)
         ProfileManager.searchProfilesInContext({search, taggableMembers:this.props.conversation.users, completion:(profiles) => {
             completion(profiles.map(u => Mention.fromUser(u)))
         }})
@@ -391,17 +389,14 @@ class ConversationModule extends React.Component<Props, State> {
         {
             this.setState({renderDropZone:false})
         }
-        console.log("onDragLeave", this.dragCount)
     }
     onDragEnter = (event:React.DragEvent<HTMLDivElement>) => {
         event.preventDefault()
-        console.log((event.target as any).classList)
         this.dragCount += 1
         if(this.dragCount > 0 && !this.state.renderDropZone)
         {
             this.setState({renderDropZone:true})
         }
-        console.log("onDragEnter", this.dragCount)
     }
     renderNoConversation = () => {
         return <div></div>

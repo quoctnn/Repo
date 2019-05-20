@@ -92,7 +92,6 @@ export default class SelectUsersDialog extends React.Component<Props, State> {
         }, this.sendValueChanged)
     }
     sendValueChanged = () => {
-        console.log("added:", this.state.added, "removed:", this.state.removed)
         if(this.props.didUpdate)
         {
             this.props.didUpdate(this.state.added, this.state.removed)

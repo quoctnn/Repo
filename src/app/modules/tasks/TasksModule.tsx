@@ -227,7 +227,6 @@ class TasksModule extends React.Component<Props, State> {
         return <ListComponent<Task> ref={this.taskList} onLoadingStateChanged={this.feedLoadingStateChanged} fetchData={this.fetchTasks} renderItem={this.renderTask} />
     }
     onMenuToggle = (visible:boolean) => {
-        console.log("menu open", visible)
         const newState:Partial<State> = {}
         newState.menuVisible = visible
         if(!visible && this.tempMenuData) // update menudata

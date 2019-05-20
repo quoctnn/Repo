@@ -34,7 +34,6 @@ export class Changelog extends React.Component<Props, State>
     }
     loadContent = () => {
         const url = resolveFileUrl("assets/docs/CHANGELOG.rst")
-        console.log("u", url)
         AjaxRequest.ajaxCallAny("text" , "GET", url, undefined, (data, status, request) => {
             const content = data 
             if(content) 

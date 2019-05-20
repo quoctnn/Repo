@@ -58,7 +58,6 @@ export default class WindowResponsiveComponent extends React.Component<Props, St
         return nextState.breakpoint != this.state.breakpoint || nextProps.updateKey != this.props.updateKey
     }
     render() {
-        console.log("render", this.state.breakpoint)
         return(<div className="window-responsive-component">
                 {this.props.render(this.state)}
                 </div>
