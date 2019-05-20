@@ -28,6 +28,34 @@ import { CommunityManager } from "./managers/CommunityManager";
 import ConversationsPage from "./components/pages/ConversationsPage";
 import "./Main.scss"
 import "./Overrides.scss"
+import { Changelog } from './components/Changelog';
+import SimpleDialog from "./components/general/dialogs/SimpleDialog";
+import { translate } from "./localization/AutoIntlProvider";
+
+
+const WithModal = (Component: any, title?:string) =>
+    withRouter(class Modal extends React.Component<RouteComponentProps<any> , {visible:boolean}> {
+        constructor(props:PathLoaderProps){
+            super(props)
+            this.state = {
+                visible:true
+            }
+        }
+        back = () => {
+            const goBack = () => {
+                setTimeout(this.props.history.goBack, 450)
+            }
+            this.setState(() => {
+                return {visible:false}
+            }, goBack)
+        }
+        render() {
+            const translated = translate(title)
+            return <SimpleDialog visible={this.state.visible} didCancel={this.back} header={translated}>
+                    <Component />
+                </SimpleDialog>
+        }
+    })
 
 type OwnProps = {
 }
@@ -80,9 +108,11 @@ const PathLoader = (Component: any, extractKey:(path:string) => string, forceUpd
         render() {
             const { loading } = this.state
             const updateKey = forceUpdate && forceUpdate(this.props.location.pathname)
-            return loading ? <LoadingSpinner /> : <Component key={extractKey(location.pathname)} {...this.props} updateKey={updateKey} />
+            const key = extractKey(location.pathname)
+            console.log("HOC update", key, updateKey)
+            return loading ? <LoadingSpinner /> : <Component key={key} {...this.props} updateKey={updateKey} />
         }
-    }
+}
 const PathLoadedProfilePage = PathLoader(ProfilePage, (path) => { return path})
 const PathLoadedCommunityPage = PathLoader(CommunityPage, (path) => { return path})
 const PathLoadedGroupPage = PathLoader(GroupPage, (path) => { return path})
@@ -91,6 +121,8 @@ const PathLoadedEventPage = PathLoader(EventPage, (path) => { return path})
 const PathLoadedTaskPage = PathLoader(TaskPage, (path) => { return path})
 const PathLoadedConversationsPage = PathLoader(ConversationsPage, (path) => { return "/conversations/"}, (path) => path)
 const PathLoadedDashboardPage = PathLoader(DashboardPage, (path) => { return path})
+const ModalChangelog = WithModal(Changelog, "Changelog")
+
 
 type Props = ReduxStateProps & ReduxDispatchProps & OwnProps & RouteComponentProps<any>
 class Main extends React.Component<Props, State> {
@@ -110,8 +142,9 @@ class Main extends React.Component<Props, State> {
         window.routerHistory = this.props.history;
     }
     render() {
-        const {profile} = this.props
+        const {profile, location} = this.props
         const userIsAdmin = isAdmin(profile)
+        const modal = location.state && location.state.modal
         return(
             <div id="main">
                     <div id="main-content">
@@ -123,7 +156,8 @@ class Main extends React.Component<Props, State> {
                                 </Switch>
                             }
                             {this.props.loaded &&
-                                <Switch>
+                            <>
+                                <Switch location={modal ? this.previousLocation : location}>
                                     {userIsAdmin &&
                                         <Route path={Routes.ADMIN_DASHBOARD_BUILDER.path} component={DashboardBuilderPage} />
                                     }
@@ -143,6 +177,11 @@ class Main extends React.Component<Props, State> {
                                     <Route path={Routes.ELECTRON} component={PathLoadedDashboardPage} />
                                     <Route path={Routes.ANY} component={Error404} />
                                 </Switch>
+                                <Switch location={location}>
+                                    <Route path={Routes.CHANGELOG} component={ModalChangelog} />
+                                </Switch>
+                                
+                                </>
                             }
                         </div>
                     </div>

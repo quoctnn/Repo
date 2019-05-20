@@ -99,11 +99,15 @@ export default class DashboardComponent extends React.Component<Props, State> {
             defaultGrid:grid,
         }
     }
+    componentDidUpdate = (prevProps:Props) => {
+
+        console.log("componentDidUpdate DashboardComponent", this.props.updateKey)
+    }
     renderModules = () =>
     {
         const grid = this.findGridLayout(this.props.breakpoint, true)
         const fill = this.props.breakpoint > ResponsiveBreakpoint.standard && grid.fill
-        return (<Grid fill={fill} grid={grid} breakpoint={this.props.breakpoint} enableAnimation={true} />)
+        return (<Grid updateKey={this.props.updateKey} fill={fill} grid={grid} breakpoint={this.props.breakpoint} enableAnimation={true} />)
     }
     findGridLayout = (breakpoint: number, useDefaultAsFallback:boolean) => {
 
@@ -122,12 +126,10 @@ export default class DashboardComponent extends React.Component<Props, State> {
                 </>)
     }
     render() {
-
         return(
             <div id="dashboard">
-                    {this.renderContent()}
+                {this.renderContent()}
             </div>
-
         );
     }
 }

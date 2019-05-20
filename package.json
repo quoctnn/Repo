@@ -84,6 +84,7 @@
     "reactstrap": "^8.0.0",
     "reconnecting-websocket": "^4.1.10",
     "redux": "^4.0.0",
+    "rst2html": "^1.0.4",
     "webpack-merge": "^4.1.4"
   },
   "devDependencies": {
@@ -102,6 +103,7 @@
     "offline-plugin": "^5.0.5",
     "optimize-css-assets-webpack-plugin": "^5.0.1",
     "patch-package": "^5.1.1",
+    "raw-loader": "^2.0.0",
     "react-hot-loader": "^4.3.4",
     "react-intl": "^2.4.0",
     "react-redux": "^5.0.7",

@@ -109,6 +109,7 @@ class ConversationModule extends React.Component<Props, State> {
         this.observers.forEach(o => o.remove())
     }
     componentDidUpdate = (prevProps:Props, prevState:State) => {
+        console.log("ConversationModule componentDidUpdate")
         if(this.shouldReloadList(prevProps))
         {
             this.reload()
@@ -482,7 +483,7 @@ class ConversationModule extends React.Component<Props, State> {
         const conversation = this.props.conversation
         if(conversation)
         {
-            return <div className="link" onClick={this.toggleConversationEditorDialog}>{ConversationUtilities.getConversationTitle(conversation)}</div>
+            return <div className="link text-truncate" onClick={this.toggleConversationEditorDialog}>{ConversationUtilities.getConversationTitle(conversation)}</div>
         }
         return null
     }

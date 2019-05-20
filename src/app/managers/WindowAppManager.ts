@@ -1,6 +1,6 @@
 import {  Store } from 'redux';
 import { ReduxState } from '../redux';
-import { removeCommunityAction, resetCommunitiesAction } from '../redux/communityStore';
+import { removeCommunityAction } from '../redux/communityStore';
 import { resetProjectsAction } from '../redux/projectStore';
 import { resetEventsAction } from '../redux/eventStore';
 import ReconnectingWebSocket from "reconnecting-websocket";
@@ -8,11 +8,6 @@ import { sendOnWebsocket, eventStreamNotificationPrefix } from '../network/Chann
 import { NotificationCenter } from '../utilities/NotificationCenter';
 import { ToastManager } from './ToastManager';
 import { translate } from '../localization/AutoIntlProvider';
-import { resetGroupsAction } from '../redux/groupStore';
-import { resetTasksAction } from '../redux/taskStore';
-import { resetProfilesAction } from '../redux/profileStore';
-import { setAuthenticationTokenAction, setAuthenticationProfileAction } from '../redux/authentication';
-import { setThemeAction } from '../redux/theme';
 import { ThemeManager } from './ThemeManager';
 import { resetMessageQueueAction } from '../redux/messageQueue';
 import { ApplicationManager } from './ApplicationManager';
@@ -29,11 +24,14 @@ export type AppWindowObject = {
     softReset:() => void
     sendMessageElectron:(channel:string, msg:any) => void
     setTheme:(index:number) => void
+    navigateToRoute:(route:string, modal?:boolean) => void
 }
 export abstract class WindowAppManager
 {
     static setup = () => 
     {
+        if(!window.appRoot)
+            window.appRoot = "/app/"
         window.app = {
             deleteCommunity:WindowAppManager.deleteCachedCommunity,
             resetProjectStore:WindowAppManager.resetProjectStore, 
@@ -44,7 +42,8 @@ export abstract class WindowAppManager
             softReset:WindowAppManager.softReset,
             sendMessageElectron:WindowAppManager.sendMessageElectron,
             setTheme:WindowAppManager.setTheme,
-            resetMessageQueue:WindowAppManager.resetMessageQueue
+            resetMessageQueue:WindowAppManager.resetMessageQueue,
+            navigateToRoute:WindowAppManager.navigateToRoute
         }
         //
         //window.ipcRenderer.on('channel', (event, msg) => console.log(msg) )
@@ -77,6 +76,9 @@ export abstract class WindowAppManager
     }
     static sendOutgoingOnSocket = (data:object) => {
         sendOnWebsocket(JSON.stringify(data))
+    }
+    static navigateToRoute = (route:string, modal = false) => {
+        window.routerHistory.push(route, {modal}) 
     }
     static sendInboundOnSocket = (data:{type:string, data:any}) => {
         if(!data || !data.type)

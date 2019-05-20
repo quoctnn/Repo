@@ -244,5 +244,8 @@ export default  {
         projectAvatar: '/static/img/default-group.jpg',
         default: '/static/img/og_image.jpg'
     },
+    docs:{
+        changelog:"/app/assets/docs/CHANGELOG.rst"
+    },
     resolveUrl:resolveAbsolute
 };

@@ -11,7 +11,7 @@ module.exports = {
   devtool: 'source-map',
 
   resolve: {
-    extensions: ['.ts', '.tsx', '.js', '.json', '.scss']
+    extensions: ['.ts', '.tsx', '.js', '.json', '.scss', ".rst"]
   },
 
   module: {
@@ -41,7 +41,20 @@ module.exports = {
             }
           }
         ]
-      }
+      },
+      {
+        test: /\.(rst)(\?v=\d+\.\d+\.\d+)?$/,
+        use: [
+          {
+            loader: 'file-loader',
+            options: {
+              name: '[name].[ext]',
+              outputPath: '../app/assets/docs'
+            }
+          }
+        ]
+      },
+      /*{ test: /\.rst$/, use: 'raw-loader' },*/
     ]
   }
   // When importing a module whose path matches one of the following, just

@@ -1,3 +1,4 @@
+import { Settings } from '../utilities/Settings';
 export enum EndpointActionTypes {
     SetEndpoint = 'endpoint.set_endpoint',
     ResetEndpoint = 'endpoint.reset_endpoint',
@@ -33,7 +34,7 @@ export const availableEndpoints: ApiEndpoint[] = [
         websocket: 'ws://127.0.0.1:8000/socket/'
     },
 ]
-const defaultEndpoint = 0
+const defaultEndpoint = Settings.isElectron ? 2 : 0
 export interface SetEndpointAction{
     type:string
     endpoint:number

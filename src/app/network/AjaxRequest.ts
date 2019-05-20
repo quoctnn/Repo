@@ -159,6 +159,27 @@ export class AjaxRequest
             error: error.bind(this),
         });
     }
+    static ajaxCallAny(dataType:string, method:string, url:string, data:any, success:SuccessCallback, error:ErrorCallback) 
+    {
+        url = EndpointManager.applyEndpointDomain(url)
+        if (typeof  success === 'undefined') {
+            success = defaultCallback;
+        }
+    
+        if (typeof  error === 'undefined') {
+            error = defaultErrorCallback;
+        }
+        return $.ajax({
+            url: url,
+            dataType: dataType,
+            cache: false,
+            type: method,
+            traditional: true,
+            data: data,
+            success: success.bind(this),
+            error: error.bind(this),
+        });
+    }
 }
 const defaultCallback:SuccessCallback = (data, status, jxhr) => {
     if (!isProduction) {

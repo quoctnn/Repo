@@ -16,6 +16,7 @@ declare global {
         routerHistory: History
         isElectron:boolean
         ipcRenderer:any
+        appRoot:string
     }
     interface Navigator { browserLanguage: string; }
     interface String {

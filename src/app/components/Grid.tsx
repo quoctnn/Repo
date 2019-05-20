@@ -12,6 +12,7 @@ type OwnProps = {
     childClassName?:string,
     id?:string
     fill:boolean
+    updateKey?:string
 }
 type DefaultProps = {
 
@@ -24,19 +25,19 @@ export interface State {
     rects:{[id:number]:DOMRect}
 }
 type Props = OwnProps & DefaultProps
-export class Grid extends React.PureComponent<Props, {}> {
+export class Grid extends React.PureComponent<Props, State> {
     static modeFillClass = "dash-fill"
     bodyClassAdded = false
     static defaultProps:DefaultProps = {
         enableAnimation:true,
         breakpoint:ResponsiveBreakpoint.mini,
     }
-    state:State
     constructor(props:Props) {
         super(props);
         this.state = {items:[], rects:{}}
     }
     componentDidUpdate = (prevProps:Props) => {
+        console.log("componentDidUpdate Grid")
         if(this.props.fill != prevProps.fill && this.props.breakpoint != prevProps.breakpoint)
         {
             if(this.props.fill && this.props.breakpoint > ResponsiveBreakpoint.standard)

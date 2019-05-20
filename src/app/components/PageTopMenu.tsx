@@ -10,6 +10,8 @@ import { isAdmin } from "../utilities/Utilities";
 import { translate } from "../localization/AutoIntlProvider";
 import DevTool from "./dev/DevTool";
 import { OverflowMenuItem, OverflowMenuItemType, createDropdownItem } from "./general/OverflowMenu";
+import { Settings } from '../utilities/Settings';
+import { WindowAppManager } from '../managers/WindowAppManager';
 
 interface OwnProps
 {
@@ -28,7 +30,7 @@ type State = {
     renderFunc:RenderFunc
     target:HTMLElement
     key:string
-    developerToolVisible:boolean
+    developerToolVisible:boolean,
 }
 class PageTopMenu extends React.Component<Props, State> {
     constructor(props:Props) {
@@ -93,11 +95,23 @@ class PageTopMenu extends React.Component<Props, State> {
             this.setState({popoverOpen:true, renderFunc, target, key})
         }
     }
+    navigateToChangelog = () => {
+        WindowAppManager.navigateToRoute(Routes.CHANGELOG, true)
+    }
     renderMainPanel = () => {
         return <div className="menu-panel">
-                    <div>Content needed</div>
+                    {this.renderMainLinks()}
                     {this.renderAdminLinks()}
                 </div>
+    }
+    renderMainLinks = () => {
+
+        const items:OverflowMenuItem[] = []
+        if(!Settings.isElectron)
+            items.push({id:"changelog", type:OverflowMenuItemType.option, title:translate("Changelog"), onPress:this.navigateToChangelog, toggleMenu:false})
+        return (<div className="main-links">
+            {items.map(i => createDropdownItem(i))}
+         </div>)
     }
     renderAdminLinks = () => {
         if(!isAdmin(this.props.profile))

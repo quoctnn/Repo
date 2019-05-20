@@ -1,7 +1,8 @@
-const { ipcRenderer } = require('electron');
+const { ipcRenderer, remote } = require('electron');
 function init() {
     window.isElectron = true
     window.ipcRenderer = ipcRenderer
+    window.appRoot = remote.app.getAppPath()
     console.log("TEST", window, ipcRenderer)
 }
 init();

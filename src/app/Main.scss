@@ -200,7 +200,7 @@ button{@include var(color, primary-text-color);}
     left: 0;
     height: 100vh;
     width: 100vw;
-    z-index: 1200;
+    z-index: 1060;
     display: none;
     &.modal-entering, &.modal-entered, &.modal-exiting  {
         display: block;

@@ -10,7 +10,7 @@ type OwnProps =
     render:(state:State) => React.ReactNode
     setClassOnBody?:boolean
     breakpoints:number[]
-    updateKey:string
+    updateKey?:string
 }
 type Props = OwnProps
 export default class WindowResponsiveComponent extends React.Component<Props, State> 

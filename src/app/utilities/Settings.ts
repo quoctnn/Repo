@@ -16,6 +16,7 @@ const isTouchDevice = () =>
 export interface ISettings 
 {
     isProduction:boolean,
+    isElectron:boolean,
     supportsTheming:boolean,
     showEmbedlyCards:boolean,
     searchEnabled:boolean,
@@ -33,6 +34,7 @@ export interface ISettings
 }
 export const Settings:ISettings = {
     isProduction : process.env.NODE_ENV === "production",
+    isElectron: navigator.userAgent.toLowerCase().indexOf(' electron/') > -1,
     searchEnabled:true,
     maxFileSize: 400,
     supportsTheming: window.CSS && window.CSS.supports && window.CSS.supports("(--foo: red)"),

@@ -1,4 +1,4 @@
-const { app, Menu, ipcMain } = require('electron')
+const { app, Menu, ipcMain, BrowserWindow } = require('electron')
 const i18n = new(require('./translations/i18n'))
 const path = require('path');
 const url = require('url');
@@ -127,6 +127,12 @@ const template = [
       {
         label: i18n.__('Privacy Policy'),
         click () { require('electron').shell.openExternal('https://intra.work/policy/') }
+      },
+      {
+        label: i18n.__('Changelog'),
+        click(menuItem, browserWindow, event) {
+            browserWindow.webContents.executeJavaScript("window.app.navigateToRoute('/changelog/', true)")
+        }
       }
     ]
   }

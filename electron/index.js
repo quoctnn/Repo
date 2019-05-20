@@ -3,6 +3,7 @@ const path = require('path');
 const url = require('url');
 
 let win;
+let modal;
 function createWindow() {
     win = new BrowserWindow({
         width: 1440,
@@ -13,6 +14,8 @@ function createWindow() {
             nodeIntegration: false,
             contextIsolation: false,
             preload: path.join(__dirname, './preload.js'),
+            nativeWindowOpen:true,
+
         }
     })
 

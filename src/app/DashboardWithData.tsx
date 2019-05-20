@@ -34,6 +34,7 @@ export const DashboardWithData = (props:{category:string, updateKey?:string}) =>
                 <DashboardComponent
                     dashboard={dashboard}
                     breakpoint={breakpoint}
+                    updateKey={props.updateKey} 
                 />
         )}/>
     );
