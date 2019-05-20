@@ -22,15 +22,6 @@ function createWindow() {
         slashes: true,
     }))
 
-    // Navigate back to start if page failed to load
-    // win.webContents.on('did-fail-load', function() {
-    //     win.loadURL(url.format({
-    //         pathname: path.join(__dirname, './electron.html'),
-    //         protocol: 'file:',
-    //         slashes: true,
-    //     }))
-    // });
-
     // Open devtools
     win.webContents.openDevTools();
 
