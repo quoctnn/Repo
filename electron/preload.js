@@ -3,6 +3,5 @@ function init() {
     window.isElectron = true
     window.ipcRenderer = ipcRenderer
     window.appRoot = remote.app.getAppPath()
-    console.log("TEST", window, ipcRenderer)
 }
 init();
