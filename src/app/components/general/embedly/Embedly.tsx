@@ -10,20 +10,22 @@ import Constants from "../../../utilities/Constants";
 import { Avatar } from "../Avatar";
 import { Settings } from "../../../utilities/Settings";
 import classnames from 'classnames';
-import { Card, CardImg, CardBody, CardTitle, CardSubtitle, CardText, Button } from "reactstrap";
+import { Card, CardImg, CardBody, CardTitle, CardSubtitle } from "reactstrap";
 import { SecureImage } from "../SecureImage";
-import { EndpointManager } from "../../../managers/EndpointManager";
 import { IntraSocialUtilities } from "../../../utilities/IntraSocialUtilities";
+import Link from "../Link";
 type OwnProps = {
     url: string
 }
 type DefaultProps = {
     showMedia:boolean
     verticalCard:boolean
+    renderOnError:boolean
 }
 type ReduxStateProps = {
     data:EmbedCardItem
     isLoading:boolean
+    hasError:boolean
 }
 type ReduxDispatchProps = {
     requestEmbedData:(urls:string[], cardType:LinkCardType) => void
@@ -39,7 +41,8 @@ type State = {
 class Embedly extends React.Component<Props, State> {
     static defaultProps:DefaultProps = {
         showMedia:false,
-        verticalCard:false
+        verticalCard:false,
+        renderOnError:true
     }
     constructor(props:Props) {
         super(props);
@@ -124,7 +127,7 @@ class Embedly extends React.Component<Props, State> {
         {
             case LinkCardType.embed:
             {
-                if(this.hasError())
+                if(this.props.hasError)
                 {
                     return this.props.url//(<a href={this.props.url} target="_blank"  data-toggle="tooltip" title={this.props.url}>{this.props.url}</a>)
                 }
@@ -149,28 +152,28 @@ class Embedly extends React.Component<Props, State> {
             default:return null;
         }
     }
-    hasError = () => {
-        return this.props.data && (!this.props.data.provider_url || this.props.data.error_code || this.props.data.type == "error")
-    }
     getUrl = () => {
-        return (this.props.data && new URL(this.props.data.url, location.href).href) || this.props.url
+        return (this.props.data && this.props.data.provider_url && new URL(this.props.data.url, this.props.data.provider_url).href) || this.props.url
     }
     render = () => {
+        if(!this.props.renderOnError && this.props.hasError)
+            return null
         const title = Settings.renderLinkTitle ? this.props.data && this.props.data.title : undefined
         const url = this.getUrl()
-        const cl = classnames("is-embed-card", {"has-error":this.hasError()})
-        return (<a href={url} className={cl} target="_blank" title={title}>
+        const cl = classnames("is-embed-card", {"has-error":this.props.hasError})
+        return (<Link to={url} className={cl} title={title}>
                 {this.props.isLoading && <LoadingSpinner/>}
                 {this.props.data && this.renderCardData()}
-                </a>)
+                </Link>)
     }
 }
 const mapStateToProps = (state:ReduxState, ownProps: OwnProps):ReduxStateProps => {
-  const page = state.embedlyStore.byId[ownProps.url]
+    const page = state.embedlyStore.byId[ownProps.url]
     const isLoading = !nullOrUndefined( state.embedlyStore.queuedIds[ownProps.url] )
     return {
         data:page,
-        isLoading
+        isLoading,
+        hasError:(page && (!page.provider_url || !!page.error_code || page.type == "error")) || false
     };
 }
 const mapDispatchToProps = (dispatch:any, ownProps: OwnProps):ReduxDispatchProps => {

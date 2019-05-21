@@ -2,6 +2,8 @@ import { combineReducers } from 'redux';
 import { EmbedCardItem } from '../../../types/intrasocial_types';
 import { LinkCardType } from './Embedly';
 import ApiClient from '../../../network/ApiClient';
+import { PersistConfig, persistReducer } from 'redux-persist';
+import storage from 'redux-persist/lib/storage';
 export enum EmbedlyStoreActionTypes {
     AddPages = 'embedly.add_page',
     Reset = 'embedly.reset',
@@ -104,11 +106,20 @@ export const pageQueue = (state = {}, action:EmbedlyIdsAction | EmbedlyAction) =
     }
 }
 ​
-export const embedlyStore = combineReducers({
+const embedStore = combineReducers({
     byId : pagesById,
     allIds : allPages,
     queuedIds:pageQueue
 });
+const rootPersistConfig:PersistConfig = {
+    key: 'embedlyStore',
+    storage: storage,
+    blacklist: [    
+                    'queuedIds',
+                ],
+    debug:true,
+  }
+export const embedlyStore =  persistReducer(rootPersistConfig, embedStore)
 const requestEmbedlyCards = (store, action:EmbedlyDataRequestAction) => {
 
     let ids = action.urls

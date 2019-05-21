@@ -66,3 +66,31 @@
 
     }
 }
+.chat-message-composer.single-line
+{
+    .mention-editor{
+        .editor-container{
+            overflow: hidden;
+        }
+        .DraftEditor-root{
+            .public-DraftStyleDefault-block, *[data-block="true"] {
+                display: inline-block;
+                min-width: 1px;
+                white-space: nowrap;
+            }
+        }
+        .public-DraftEditor-content {
+            min-height: 20px;
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding-left: 3px;
+            padding-right: 3px;
+            *[data-contents="true"]{
+                white-space: nowrap;
+            }
+        }
+    }
+    .input-wrap{
+        overflow: hidden;
+    }
+}

@@ -31,9 +31,11 @@ export const getFileUrl = (file:UploadedFile) => {
 }
 export const getImageUrl = (file:UploadedFile, preferFullVersion:boolean) => {
 
-    let img = preferFullVersion ? file.image : file.thumbnail
-    if(!img) // pick any if not found
-        img = file.image || file.thumbnail
+    let img:string = null
+    if(file.type ==  UploadedFileType.IMAGE && file.extension.toLowerCase() == "gif")
+        img = file.file
+    if(!img) 
+        img = preferFullVersion ?  (file.image || file.thumbnail)  : (file.thumbnail || file.image)
     return IntraSocialUtilities.appendAuthorizationTokenToUrl(img)
 } 
 export class GalleryImageComponent extends React.Component<GalleryComponentProps, {}> {

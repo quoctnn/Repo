@@ -39,6 +39,8 @@ type OwnProps =
 type DefaultProps = {
 
     renderPlaceholder:boolean
+    singleLine:boolean
+    forceHideDropzone:boolean
 }
 type State =
 {
@@ -57,6 +59,8 @@ export class StatusComposerComponent extends React.Component<Props, State> {
     observer:IntersectionObserver = null
     static defaultProps:DefaultProps = {
         renderPlaceholder:false,
+        singleLine:false,
+        forceHideDropzone:false
     }
     constructor(props:Props) {
         super(props)
@@ -85,7 +89,9 @@ export class StatusComposerComponent extends React.Component<Props, State> {
                 nextProps.className != this.props.className || 
                 nextProps.refresh != this.props.refresh || 
                 nextProps.showEmojiPicker != this.props.showEmojiPicker ||
-                nextProps.showSubmitButton != this.props.showSubmitButton
+                nextProps.showSubmitButton != this.props.showSubmitButton || 
+                nextProps.singleLine != this.props.singleLine || 
+                nextProps.forceHideDropzone != this.props.forceHideDropzone
         return ret;
     }
     componentDidMount = () => {
@@ -285,6 +291,8 @@ export class StatusComposerComponent extends React.Component<Props, State> {
                     mentions={this.props.mentions}
                     focusEnd={this.props.focusEnd}
                     forceUpdate={this.props.forceUpdate}
+                    singleLine={this.props.singleLine}
+                    forceHideDropzone={this.props.forceHideDropzone}
                     >
                     {this.props.children}
                     </CommentForm>

@@ -134,7 +134,8 @@
         .chat-message.right{
             margin-right: 15px;
             .message{
-                float: right;
+                float: right;    
+                clear: both;
             }
             .message, .message .card{
                 @include var(background-color, chat-message-right-background);

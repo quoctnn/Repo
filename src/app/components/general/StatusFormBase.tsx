@@ -38,6 +38,9 @@ export interface OwnProps
 export interface DefaultProps
 {
     textPlaceholder:string
+    singleLine:boolean
+    forceHideDropzone:boolean
+
 }
 
 interface State 
@@ -52,7 +55,9 @@ export default class StatusFormBase extends React.Component<Props, State> implem
     inputRef = React.createRef<IEditorComponent & any>();
     static defaultProps:DefaultProps =
     {
-        textPlaceholder:"✎"
+        textPlaceholder:"✎",
+        singleLine:false,
+        forceHideDropzone:false
     }
     constructor(props) {
         super(props)
@@ -86,6 +91,10 @@ export default class StatusFormBase extends React.Component<Props, State> implem
         if(!this.props.canUpload)
             return
         // Hide/Show dropzone
+        if(this.props.forceHideDropzone && this.state.showDropzone)
+        {
+            return
+        }
         if (this.state.filesCount == 0) {
             this.setState((prevState, currentProps) => {
                 return {showDropzone: !prevState.showDropzone}
@@ -157,6 +166,7 @@ export default class StatusFormBase extends React.Component<Props, State> implem
                 showSubmitButton={this.props.showSubmitButton}
                 focusEnd={this.props.focusEnd}
                 forceUpdate={this.props.forceUpdate}
+                singleLine={this.props.singleLine}
             />                      
         )
     }

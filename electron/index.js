@@ -1,4 +1,4 @@
-const {app, BrowserWindow, ipcMain} = require('electron');
+const {app, BrowserWindow, ipcMain, shell} = require('electron');
 const path = require('path');
 const url = require('url');
 
@@ -31,6 +31,11 @@ function createWindow() {
     win.on('closed', () => {
         win = null;
     });
+    win.webContents.on('new-window', function(event, url){
+        console.log('new-window', url, event)
+        event.preventDefault();
+        shell.openExternal(url);
+      });
     require('./menu');
 }
 

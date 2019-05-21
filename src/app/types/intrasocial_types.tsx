@@ -287,7 +287,7 @@ export type UploadedFile =
     user:number
     filename:string
     file:string
-    type:string
+    type:UploadedFileType
     extension:string
     image:string
     image_width:number
@@ -767,6 +767,7 @@ export interface EmbedCardItem
     type:string
     avatar:string
     subtitle:string
+    internal?:boolean
 }
 export enum TaskActions
 {

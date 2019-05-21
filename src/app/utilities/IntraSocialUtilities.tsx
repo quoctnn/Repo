@@ -1,5 +1,6 @@
 import { AuthenticationManager } from '../managers/AuthenticationManager';
 import { Status, UserProfile, UploadedFile } from '../types/intrasocial_types';
+import { EndpointManager } from '../managers/EndpointManager';
 
 export const URL_REGEX = /(\b(https?|ftp):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/gim
 export const URL_WWW_REGEX = /(^(\b|\s+)(www)\.[\S]+(\b|$))/gim
@@ -65,7 +66,7 @@ export class IntraSocialUtilities
             // Failsafe to prevent crash if unable to parse url
             let u: URL;
             try {
-                u = new URL(url, location.href)
+                u = new URL(url, EndpointManager.currentEndpoint().endpoint)
             } catch {
                 u = new URL("https://intra.work")
             }
@@ -73,14 +74,6 @@ export class IntraSocialUtilities
             return u.href
         }
         return url
-    }
-    static getProfileImageUrl = (user:UserProfile) =>
-    {
-        if(user === undefined)
-        {
-            let k = 5
-        }
-        return IntraSocialUtilities.appendAuthorizationTokenToUrl(user.avatar_thumbnail || user.avatar)
     }
     static uniqueId = () =>  {
         return Math.random().toString(36).substr(2, 16);

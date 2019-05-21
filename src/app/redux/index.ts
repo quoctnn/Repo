@@ -25,6 +25,7 @@ const rootPersistConfig:PersistConfig = {
                     'authentication',
                     "application", 
                     "tempCache",
+                    "embedlyStore",
                 ],
     debug:true,
   }

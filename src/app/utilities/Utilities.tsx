@@ -9,6 +9,7 @@ import Constants from '../utilities/Constants';
 import { translate } from '../localization/AutoIntlProvider';
 import { IntraSocialLink } from '../components/general/IntraSocialLink';
 import * as moment from 'moment-timezone';
+import Link from '../components/general/Link';
 let timezone = moment.tz.guess()
 export const getDomainName = (url:string) =>  {
     var url_parts = url.split("/")
@@ -118,9 +119,9 @@ export function getTextContent(prefixId:string,
         {
             if(includeEmbedlies)
             {
-                embedlyArr[result[0]] = <Embedly key={getKey("embedly_" + result[0])} url={result[0]} />
+                embedlyArr[result[0]] = <Embedly renderOnError={false} key={getKey("embedly_" + result[0])} url={result[0]} />
             }
-            return (<Text key={getKey("link_" + result[0])} title={result[0]} href={result[0]}>{truncate(result[0], 50 )}</Text>)
+            return (<Link key={getKey("link_" + result[0])} title={result[0]} to={result[0]}>{truncate(result[0], 50 )}</Link>)
         }
     }
     config.push(embedlies)

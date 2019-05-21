@@ -297,9 +297,9 @@ export default class MentionEditor extends React.Component<Props, {}> {
     }
     onFileuploadButtonClick = (event) => {
         if(this.props.filesAdded)
-        this.fileUploader.current.click()
+            this.fileUploader.current.click()
         else if(this.props.onHandleUploadClick)
-        this.props.onHandleUploadClick(event)
+            this.props.onHandleUploadClick(event)
     }
     render() {
         const { MentionSuggestions } = this.mentionPlugin;

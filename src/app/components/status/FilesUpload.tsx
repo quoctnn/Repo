@@ -44,6 +44,7 @@ export interface OwnProps
     onFileQueueComplete:() => void
     communityId:number
     files?:UploadedFile[]
+    className?:string
 }
 interface DefaultProps 
 {
@@ -141,7 +142,7 @@ export default class FilesUpload extends React.Component<Props, State> {
     render() {
         let dz = this.dropzoneSettings();
         return (
-            <DropzoneComponent config={dz.componentConfig}
+            <DropzoneComponent className={this.props.className} config={dz.componentConfig}
                                eventHandlers={dz.eventHandlers}
                                djsConfig={dz.djsConfig}/>
         );

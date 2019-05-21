@@ -5,6 +5,7 @@ import { EditorState, ContentState, getDefaultKeyBinding, KeyBindingUtil,  Selec
 import { Mention } from '../input/MentionEditor';
 import { ProtectNavigation, nullOrUndefined } from "../../../utilities/Utilities";
 import "./ChatMessageComposer.scss"
+import classnames from 'classnames';
 
 const { isCtrlKeyCommand } = KeyBindingUtil;
 
@@ -124,7 +125,7 @@ const generateContentState = (content:string, mentions:Mention[]):ContentState =
     })
     return contentState
 }
-type Props = {
+type OwnProps = {
     onSubmit:(text:string, mentions:number[]) => void,
     onDidType:(unprocessedText:string) => void
     filesAdded?:(files:File[]) => void
@@ -140,25 +141,26 @@ type Props = {
     onFocus?(e: React.SyntheticEvent<{}>): void
     focusEnd?:(f:() => void) => void
     forceUpdate?:string
-    submitOnEnter:boolean
-
+    submitOnEnter:ConstrainBoolean
 }
 type DefaultProps = {
     showSubmitButton:boolean
     submitOnEnter:boolean
+    singleLine:boolean
 }
-
+type Props = OwnProps & DefaultProps
 interface State
 {
     plainText:string
     editorState:EditorState
 }
-export class ChatMessageComposer extends React.Component<Props & DefaultProps,State> implements IEditorComponent {
+export class ChatMessageComposer extends React.Component<Props,State> implements IEditorComponent {
     
     private inputRef = React.createRef<MentionEditor>()
     static defaultProps:DefaultProps = {
         showSubmitButton:true,
-        submitOnEnter:false
+        submitOnEnter:false,
+        singleLine:false
     }
     constructor(props) {
         super(props)
@@ -180,7 +182,6 @@ export class ChatMessageComposer extends React.Component<Props & DefaultProps,St
     }
 
     focusEnd = () => {
-        
         this.setState((prevState) => {
             const editorState = EditorState.moveFocusToEnd(prevState.editorState)
             return {editorState: editorState}
@@ -192,7 +193,8 @@ export class ChatMessageComposer extends React.Component<Props & DefaultProps,St
                 nextState.editorState != this.state.editorState || 
                 nextProps.content != this.props.content || 
                 nextProps.className != this.props.className ||
-                nextProps.forceUpdate != this.props.forceUpdate ||
+                nextProps.forceUpdate != this.props.forceUpdate || 
+                nextProps.singleLine != this.props.singleLine || 
                 !(nextProps.mentions || []).isEqual(this.props.mentions || [])
         return update
     }
@@ -317,8 +319,9 @@ export class ChatMessageComposer extends React.Component<Props & DefaultProps,St
     }
     render() {
         const canSubmit = this.canSubmit()
+        const cn = classnames("chat-message-composer", this.props.className, {"single-line":this.props.singleLine})
         return (
-            <div className={"chat-message-composer" + (this.props.className ? " " + this.props.className : "")}>
+            <div className={cn}>
                 <form className="clearfix" action="." onSubmit={this.handleSubmit}>
                     <div className="input-group">
                         <div className="input-wrap"
