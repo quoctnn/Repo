@@ -10,7 +10,6 @@ import { UserProfile, Status, UploadedFile, ContextNaturalKey, StatusActions, Ob
 import { nullOrUndefined, uniqueId } from '../../utilities/Utilities';
 import { ToastManager } from '../../managers/ToastManager';
 import { StatusComponent } from '../../components/status/StatusComponent';
-import { StatusComposerComponent } from '../../components/status/StatusComposerComponent';
 import { StatusCommentLoader as CommentLoader } from '../../components/status/StatusCommentLoader';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import { List } from '../../components/general/List';
@@ -21,6 +20,7 @@ import { NotificationCenter } from '../../utilities/NotificationCenter';
 import { EventStreamMessageType } from '../../network/ChannelEventStream';
 import { EventSubscription } from 'fbemitter';
 import { Mention } from '../../components/general/input/MentionEditor';
+import { StatusComposerComponent } from '../../components/general/input/StatusComposerComponent';
 class StatusComposer
 {
     statusId:number
@@ -926,8 +926,9 @@ export class NewsfeedComponent extends React.Component<Props, State> {
         let status = this.state.items[index] as Status
         this.navigateToAction(status, action, extra, completion)
     }
-    renderStatus = (authUser:UserProfile, item:Status, isComment:boolean, index:number, color:string) => 
+    renderStatus = (authUser:UserProfile, item:Status, isComment:boolean, index:number, color:string, isLast:boolean) => 
     {
+        const cn = classnames(color, {"last":isLast})
         return <StatusComponent 
                     canUpload={true}
                     addLinkToContext={true}
@@ -937,7 +938,7 @@ export class NewsfeedComponent extends React.Component<Props, State> {
                     authorizedUserId={authUser.id}
                     isComment={isComment}
                     onActionPress={this.navigateToActionWithId(item.id)}
-                    className={color}
+                    className={cn}
                 />
     }
     renderStatusComposer = (composer:StatusComposer, index:number, color:string) => {
@@ -1163,7 +1164,13 @@ export class NewsfeedComponent extends React.Component<Props, State> {
                                 return this.renderCommentLoader(s, i, color)
                             }
                             const isComment = !!s.parent
-                            return this.renderStatus(authUser, s, isComment, i, color)
+                            const next = this.state.items[i + 1]
+                            let isLast = true
+                            if(next)
+                            {
+                                isLast = !(next instanceof StatusComposer || next instanceof StatusCommentLoader) && !next.parent
+                            }
+                            return this.renderStatus(authUser, s, isComment, i, color, isLast)
                         }).concat(this.renderLoading()) }
                         {this.renderEmpty()}                    
                         {this.renderError()}

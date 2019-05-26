@@ -310,6 +310,7 @@ var DOUBLE_TAP_RADIUS = 25,
  * Options
  */
 var _options = {
+	disablePanning:false,
 	allowPanToNext:true,
 	spacing: 0.12,
 	bgOpacity: 1,
@@ -1560,7 +1561,7 @@ var _gestureStartTime,
 					}
 					
 					// drag right
-					if( (startOverDiff <= 0 || mainScrollDiff < 0) && _getNumItems() > 1 ) {
+					if( (startOverDiff <= 0 || mainScrollDiff < 0) && _getNumItems() > 1  && !_options.disablePanning) {
 						newMainScrollPos = newMainScrollPosition;
 						if(mainScrollDiff < 0 && newMainScrollPosition > _startMainScrollPos.x) {
 							newMainScrollPos = _startMainScrollPos.x;
@@ -1580,7 +1581,7 @@ var _gestureStartTime,
 						startOverDiff = _startPanOffset[axis] - _currPanBounds.max[axis];
 					}
 
-					if( (startOverDiff <= 0 || mainScrollDiff > 0) && _getNumItems() > 1 ) {
+					if( (startOverDiff <= 0 || mainScrollDiff > 0) && _getNumItems() > 1 && !_options.disablePanning) {
 						newMainScrollPos = newMainScrollPosition;
 
 						if(mainScrollDiff > 0 && newMainScrollPosition < _startMainScrollPos.x) {
@@ -2432,7 +2433,6 @@ _registerModule('Gestures', {
 	publicMethods: {
 
 		initGestures: function() {
-
 			// helper function that builds touch/pointer/mouse events
 			var addEventNames = function(pref, down, move, up, cancel) {
 				_dragStartEvent = pref + down;

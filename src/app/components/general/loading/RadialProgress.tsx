@@ -6,6 +6,7 @@ export interface OwnProps
     percent:number
     size:number
     strokeWidth:number
+    className?:string
 }
 interface State 
 {
@@ -24,7 +25,7 @@ export default class RadialProgress extends React.Component<OwnProps, State> {
         const dashOffset = dashArray - dashArray * this.props.percent / 100;
     
         return (
-          <svg
+          <svg className={this.props.className}
               width={this.props.size}
               height={this.props.size}
               viewBox={viewBox}>

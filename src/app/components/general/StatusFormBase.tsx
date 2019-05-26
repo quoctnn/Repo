@@ -5,6 +5,7 @@ import { Mention } from './input/MentionEditor';
 import { IEditorComponent, ChatMessageComposer } from './input/ChatMessageComposer';
 import { translate } from '../../localization/AutoIntlProvider';
 import Constants from '../../utilities/Constants';
+import FilesUpload from '../status/FilesUpload';
 
 export interface OwnProps
 {
@@ -53,6 +54,7 @@ type Props = OwnProps & DefaultProps
 export default class StatusFormBase extends React.Component<Props, State> implements IEditorComponent {
 
     inputRef = React.createRef<IEditorComponent & any>();
+    fileUploadRef = React.createRef<FilesUpload>();
     static defaultProps:DefaultProps =
     {
         textPlaceholder:"✎",
@@ -82,6 +84,7 @@ export default class StatusFormBase extends React.Component<Props, State> implem
         console.log("clear, why?")
     }
     handleSubmit(text:string, mentions:number[]) {
+
         this.setState({showDropzone: false, filesCount: 0})
         this.props.onSubmit(text, mentions)
     }
@@ -109,8 +112,7 @@ export default class StatusFormBase extends React.Component<Props, State> implem
 
         this.props.onFileAdded()
     }
-
-    handleFileRemoved(file) {
+    handleFileRemoved(file:UploadedFile) {
         this.setState((prevState, currentProps) => {
             return {filesCount: prevState.filesCount - 1}
         })

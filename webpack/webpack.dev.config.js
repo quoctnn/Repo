@@ -44,7 +44,7 @@ config.plugins = [
 ];
 config.module.rules.unshift(
   {
-    test: /\.tsx?$/,
+    test: /\.(tsx?)$/,
     use: [
       {
         loader: 'babel-loader',
@@ -56,7 +56,21 @@ config.module.rules.unshift(
       'ts-loader'
     ],
     exclude: /node_modules/
-  },
+    },
+    {
+      test:/\.js$/,
+      include: [
+          path.resolve(__dirname, "../node_modules/react-360-web")
+      ],use: [
+        {
+          loader: 'babel-loader',
+          options: {
+            presets: []
+          }
+        },
+        //'ts-loader'
+      ]
+    },
   {
     test: /\.(s*)css$/,
     use: [

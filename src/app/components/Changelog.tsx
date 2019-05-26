@@ -3,17 +3,8 @@ import { AjaxRequest } from '../network/AjaxRequest';
 import { ToastManager } from '../managers/ToastManager';
 import * as rst2html from 'rst2html'
 import "./Changelog.scss"
+import { WindowAppManager } from '../managers/WindowAppManager';
 
-const url = require('url');
-const path = require("path")
-const resolveFileUrl = (file:string) => {
-    return url.format({
-        pathname: path.join(window.appRoot, file),
-        protocol: location.protocol,
-        host:location.host,
-        slashes: true,
-    })
-}
 type Props = 
 {
 }
@@ -33,7 +24,7 @@ export class Changelog extends React.Component<Props, State>
         this.loadContent()
     }
     loadContent = () => {
-        const url = resolveFileUrl("assets/docs/CHANGELOG.rst")
+        const url = WindowAppManager.resolveLocalFileUrl("assets/docs/CHANGELOG.rst")
         AjaxRequest.ajaxCallAny("text" , "GET", url, undefined, (data, status, request) => {
             const content = data 
             if(content) 

@@ -1,16 +1,17 @@
 @import "../../Config";
-.filepicker {
+/*.filepicker {
   font-family: sans-serif;
 }
 
 div.filepicker {
   margin: 6px;
+  padding: 5px;
+  border-radius: 5px;
   text-align: center;
   padding: 5px;
   padding-left: 0;
   margin-left: 0;
   @include var(background-color, main-content-secondary-background);
-  border-radius: 5px;
   min-height: 60px;
   border-width: 2px;
   border-style:dashed;
@@ -25,7 +26,6 @@ div.filepicker .fa {
   @include var(color, primary-theme-color);
 }
 
-/* Icon */
 .filepicker-file-icon {
   position: relative;
   display: inline-block;
@@ -73,7 +73,6 @@ div.filepicker .fa {
   border-color: white transparent transparent #920035;
 }
 
-/* Overrite dropzone css */
 .dropzone .dz-preview .dz-image {
   border-radius: 0;
 
@@ -131,3 +130,66 @@ div.filepicker .fa {
   opacity: 1;
   top: 5px
 }
+*/
+
+////new
+.dropzone-container {
+  
+  margin: 6px;
+  padding: 5px;
+  padding-left: 0;
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+  font-family: sans-serif;
+}
+
+.dropzone {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  border-width: 2px;
+  border-radius: 2px;
+  border-color: #2196f3;
+  border-style: dashed;
+  outline: none;
+  transition: border .24s ease-in-out;
+}
+
+.dropzone.disabled {
+  opacity: 0.6;
+}
+.thumb {
+  display: inline-flex;
+  flex-shrink: 0;
+  border-radius: 2px;
+  margin-bottom: 8px;
+  margin-right: 8px;
+  width: 100px;
+  height: 100px;
+  padding: 4px;
+  position: relative;
+  .thumb-inner {
+    display: flex;
+    min-width: 0;
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+  }
+  .remove-button{
+    position: absolute;
+    right: 5px;
+    top:5px;
+  }
+  .upload-progress{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+}
+

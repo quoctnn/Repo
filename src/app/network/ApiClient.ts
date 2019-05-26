@@ -248,10 +248,10 @@ export default class ApiClient
             callback(null, status, error)
         })
     }
-    static updateStatus(status:Status, callback:ApiClientCallback<Status>)
+    static updateStatus(status:Partial<Status>, callback:ApiClientCallback<Status>)
     {
         let url = Constants.apiRoute.postUrl + status.id + "/"
-        AjaxRequest.patch(url, status, (data, status, request) => {
+        AjaxRequest.patchJSON(url, status, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
             callback(null, status, error)

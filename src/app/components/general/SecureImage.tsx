@@ -42,7 +42,6 @@ export class SecureImage extends React.PureComponent<Props & React.HTMLAttribute
     }
     render() 
     {
-        const {data, status} = this.state
         const {setAsBackground,setBearer, label, url, ...rest} = this.props
         const imgUrl = setBearer && url ? IntraSocialUtilities.appendAuthorizationTokenToUrl(url) : url
         if(setAsBackground)

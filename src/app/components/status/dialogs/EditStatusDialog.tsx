@@ -1,10 +1,10 @@
 import * as React from 'react';
 import { ModalBody, Modal, ModalHeader, ModalFooter } from 'reactstrap';
 import { Status, UploadedFile } from '../../../types/intrasocial_types';
-import StatusEditFormContainer from '../../general/StatusEditFormContainer';
 import { translate } from '../../../localization/AutoIntlProvider';
 
 import "./EditStatusDialog.scss"
+import StatusEditorComponent from '../../general/input/StatusEditorComponent';
 
 export interface Props 
 {
@@ -26,13 +26,13 @@ export default class EditStatusDialog extends React.Component<Props, State> {
         }
     }
     renderForm() {
-        
-        return (<StatusEditFormContainer 
+        return <StatusEditorComponent 
             communityId={this.props.communityId}
             canUpload={this.props.canUpload}
             status={this.props.status}
             canMention={this.props.canMention || false}
-            onStatusSubmit={this.props.onSave} />)
+            onStatusSubmit={this.props.onSave}
+        />
     }
     render()
     {

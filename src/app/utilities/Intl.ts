@@ -18,6 +18,9 @@ declare global {
         ipcRenderer:any
         appRoot:string
     }
+    interface Console{
+        reportErrorsAsExceptions:boolean
+    }
     interface Navigator { browserLanguage: string; }
     interface String {
         hashCode(): number;

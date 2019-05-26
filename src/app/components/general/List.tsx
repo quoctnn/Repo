@@ -89,7 +89,7 @@ export class List extends React.PureComponent<Props, {}> {
     }
     getChildren()
     {
-        let items:React.ReactChild[] = []
+        let items:React.ReactNode[] = []
         React.Children.map(this.props.children, (c, i)  => {
             items.push(c)
         })

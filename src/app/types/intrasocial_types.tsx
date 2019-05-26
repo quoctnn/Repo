@@ -276,11 +276,23 @@ export type ContextGroup = {
 export enum UploadedFileType
 {
     IMAGE = "image",
+    IMAGE360 = "360photo",
     DOCUMENT = "document",
     VIDEO = "video",
     AUDIO = "audio",
 }
-
+export namespace UploadedFileType {
+    export function parseFromMimeType(mimeType:string) {
+        const mime = mimeType.toLowerCase()
+        if(mime.indexOf(UploadedFileType.IMAGE) > -1)
+            return UploadedFileType.IMAGE
+        if(mime.indexOf(UploadedFileType.VIDEO) > -1)
+            return UploadedFileType.VIDEO
+        if(mime.indexOf(UploadedFileType.AUDIO) > -1)
+            return UploadedFileType.AUDIO
+        return UploadedFileType.DOCUMENT
+    }
+}
 export type UploadedFile =
 {
     id:number
@@ -296,6 +308,7 @@ export type UploadedFile =
     size:number
     created_at:string
 } & IdentifiableObject
+
 type FileIcon = {name:string, color:string}
 export const fileIcon = (file:UploadedFile) =>
 {

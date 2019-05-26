@@ -147,6 +147,7 @@ type DefaultProps = {
     showSubmitButton:boolean
     submitOnEnter:boolean
     singleLine:boolean
+    minimumTextLength:number
 }
 type Props = OwnProps & DefaultProps
 interface State
@@ -160,7 +161,8 @@ export class ChatMessageComposer extends React.Component<Props,State> implements
     static defaultProps:DefaultProps = {
         showSubmitButton:true,
         submitOnEnter:false,
-        singleLine:false
+        singleLine:false,
+        minimumTextLength:1
     }
     constructor(props) {
         super(props)
@@ -217,7 +219,7 @@ export class ChatMessageComposer extends React.Component<Props,State> implements
     handleSubmit = (e?:any) => {
         e && e.preventDefault();
         let {text, mentions} = this.getProcessedText()
-        if (text.length > 0) {
+        if (text.length >= this.props.minimumTextLength) {
             this.props.onSubmit(text, mentions)
             const editorState = EditorState.push(this.state.editorState, ContentState.createFromText(''), "remove-range");
             this.setState({plainText: '', editorState})
@@ -312,7 +314,7 @@ export class ChatMessageComposer extends React.Component<Props,State> implements
     }
     canSubmit()
     {
-        const canSubmit = this.state.plainText.length > 0
+        const canSubmit = this.state.plainText.length >= this.props.minimumTextLength
         if( !nullOrUndefined( this.props.canSubmit) )
             return canSubmit && this.props.canSubmit
         return canSubmit

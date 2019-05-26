@@ -18,8 +18,8 @@ import { ButtonGroup, Button } from 'reactstrap';
 import { ContextSearchData } from '../../components/general/input/contextsearch/extensions';
 import { translate } from '../../localization/AutoIntlProvider';
 import { ReduxState } from '../../redux';
-import { StatusComposerComponent } from '../../components/status/StatusComposerComponent';
 import { ContextManager } from '../../managers/ContextManager';
+import { StatusComposerComponent } from '../../components/general/input/StatusComposerComponent';
 
 type OwnProps = {
     className?:string

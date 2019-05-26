@@ -2,12 +2,6 @@
 
 .conversation-module
 {
-    .img-responsive{
-        object-fit: contain;
-        width: 100%;
-        max-width: initial;
-        max-height: 100%;
-    }
     &.temporary{
         .module-header{
             .module-header-title-left{

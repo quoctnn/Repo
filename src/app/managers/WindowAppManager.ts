@@ -11,6 +11,10 @@ import { translate } from '../localization/AutoIntlProvider';
 import { ThemeManager } from './ThemeManager';
 import { resetMessageQueueAction } from '../redux/messageQueue';
 import { ApplicationManager } from './ApplicationManager';
+
+const url = require('url');
+const path = require("path")
+
 export type AppWindowObject = {
     deleteCommunity:(id:number) => void
     resetProjectStore:() => void
@@ -86,6 +90,14 @@ export abstract class WindowAppManager
             return
         }
         NotificationCenter.push(eventStreamNotificationPrefix + data.type,[data.data])
+    }
+    static resolveLocalFileUrl = (file:string) => {
+        return url.format({
+            pathname: path.join(window.appRoot, file),
+            protocol: location.protocol,
+            host:location.host,
+            slashes: true,
+        })
     }
     private static getStore = ():Store<ReduxState,any> =>
     {

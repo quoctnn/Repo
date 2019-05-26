@@ -22,18 +22,18 @@ export default class StatusForm extends StatusFormBase {
     canPost() {
         return this.props.canPost && !this.state.isSuggestionsVisible
     }
-
+    handleTempFilesChanged = () => {
+        
+    }
     render() {
         const canPost = this.canPost()
         return (
             <div className="panel panel-flat create-post-panel">
                 <div className="panel-body">
                         {this.renderTextArea(canPost)}
-                        {this.state.showDropzone && <FilesUpload onFileAdded={this.handleFileAdded}
-                                onFileError={this.handleFileError}
-                                onFileRemoved={this.handleFileRemoved}
-                                onFileUploaded={this.props.onFileUploaded}
-                                onFileQueueComplete={this.props.onFileQueueComplete}
+                        {this.state.showDropzone && <FilesUpload 
+                                ref={this.fileUploadRef} 
+                                onTempFilesChanged={this.handleTempFilesChanged}
                                 communityId={this.props.communityId}/>
                         }
                 </div>

@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { ModalBody, Modal, ModalHeader, ModalFooter } from 'reactstrap';
 import { Status } from '../../../types/intrasocial_types';
-import StatusEditFormContainer from '../../general/StatusEditFormContainer';
 import { translate } from '../../../localization/AutoIntlProvider';
 
 import "./AttentionDialog.scss"

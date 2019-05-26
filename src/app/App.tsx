@@ -33,6 +33,8 @@ import { ThemeManager } from "./managers/ThemeManager";
 const store = createStore(appReducer, applyMiddleware(...middleWares));
 activateCrosstabAuthenticationSync()
 
+//Disable react-native error handling (react360)
+console.reportErrorsAsExceptions = false
 window.store = store;
 //initialize managers
 initializeManagers();

@@ -4,11 +4,11 @@ import "./TaskListItem.scss"
 import { Task, TaskPriority, TaskActions, TaskState, StatusActions, ContextNaturalKey } from '../../types/intrasocial_types';
 import { translate } from '../../localization/AutoIntlProvider';
 import {ButtonGroup, Button, FormGroup, Label } from 'reactstrap';
-import { StatusComposerComponent } from '../../components/status/StatusComposerComponent';
 import { DateTimePicker } from '../../components/general/input/DateTimePicker';
 import * as moment from 'moment-timezone';
 import ConfirmDialog from '../../components/general/dialogs/ConfirmDialog';
 import CollapseComponent from '../../components/general/CollapseComponent';
+import { StatusComposerComponent } from '../../components/general/input/StatusComposerComponent';
 let timezone = moment.tz.guess()
 
 type OwnProps = {
@@ -128,7 +128,7 @@ export default class TaskListItem extends React.Component<Props, State> {
 
         const timecomposerContent = this.timecomposer.current.getContent()
         const statuscomposerContent = this.statuscomposer.current.getContent()
-        const statusFileCount = this.statuscomposer.current.getFilesCount()
+        const statusFileCount = this.statuscomposer.current.getDropzoneFilesCount()
         return timecomposerContent.text.length == 0 && statuscomposerContent.text.length == 0 && statusFileCount == 0
     }
     onTimeChange = (time:moment.Moment) => {

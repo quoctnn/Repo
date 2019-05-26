@@ -9,7 +9,7 @@
         border-radius: 8px;
         margin-bottom: 8px;
     }
-    .comment-form .chat-message-composer-container{
+    .chat-message-composer-container{
         border-radius: 8px;
         box-shadow: none !important;
     }
@@ -21,7 +21,7 @@
             border-top-left-radius: 8px;
             border-top-right-radius: 8px;
         }
-        .comment-form.lvl0{
+        .comment-form.lvl0, .status-component.last{
             border-bottom-left-radius: 8px;
             border-bottom-right-radius: 8px;
             margin-bottom: 16px;

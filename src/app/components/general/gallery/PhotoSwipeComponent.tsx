@@ -4,7 +4,7 @@ import "photoswipe/dist/photoswipe.css"
 import "photoswipe/dist/default-skin/default-skin.css"
 import * as React from 'react';
 import { UploadedFile, UploadedFileType } from '../../../types/intrasocial_types';
-import { convertToComponent, getImageUrl, getFileUrl } from "../ContentGallery";
+import { convertToComponent, getImageUrl, getFileUrl, GalleryComponent } from "../ContentGallery";
 import ReactDOM = require("react-dom");
 
 export interface Props 
@@ -22,28 +22,33 @@ export default class PhotoSwipeComponent extends React.Component<Props, State>
 {     
     pswp:any = null
     gallery:any = null
+    allowSwipe = true
     constructor(props:Props) {
         super(props);
+        const data = this.getData(props)
         this.state = {
-            items:this.getData(props)
+            items:data.items,
         }
         this.openPhotoSwipe()
     }
     getData = (props:Props) => {
 
-        const items:(PhotoSwipe.Item|any)[] = props.items.map(f => 
+        const comps:{[key:string]: React.Component<GalleryComponent<any>, React.ComponentState, any>} = {}
+        const items:(PhotoSwipe.Item|any)[] = props.items.map((f,i) => 
             {
-                const gi = convertToComponent(f, true, null)
                 const thumbImage = getImageUrl(f, false)
                 const fullImage = getImageUrl(f, true)
                 const fileUrl = getFileUrl(f)
                 switch(f.type)
                 {
                     case UploadedFileType.IMAGE:return {msrc:thumbImage, src:fullImage, w:f.image_width, h:f.image_height, download:fileUrl}
+                    case UploadedFileType.IMAGE360:
                     case UploadedFileType.AUDIO:
                     case UploadedFileType.VIDEO:{
                         var html = document.createElement('div');
+
                         html.classList.add("gallery-item-full-container")
+                        const gi = convertToComponent(f, true, null)
                         ReactDOM.render(
                             gi ,
                             html
@@ -53,6 +58,7 @@ export default class PhotoSwipeComponent extends React.Component<Props, State>
                     case UploadedFileType.DOCUMENT:{
                         var html = document.createElement('div');
                         html.classList.add("gallery-item-full-container")
+                        const gi = convertToComponent(f, true, null)
                         ReactDOM.render(
                             gi ,
                             html
@@ -63,11 +69,25 @@ export default class PhotoSwipeComponent extends React.Component<Props, State>
                 }
             }
         )
-        return items
+        return {items, comps}
     }
     componentWillUnmount()
     {
         this.removeGallery()
+    }
+    preventSwipe = (e) => {
+        if (!this.allowSwipe) {
+            e.preventDefault();
+            //e.stopPropagation();
+        }
+    }
+    setAllowSwipe = (allow:boolean) => {
+        this.gallery.options.disablePanning = !allow
+        this.gallery.options.allowPanToNext = allow;
+        this.gallery.options.pinchToClose = allow
+        this.gallery.options.closeOnScroll = allow
+        this.gallery.options.closeOnVerticalDrag = allow
+        this.allowSwipe = allow
     }
     openPhotoSwipe = () => {
 
@@ -90,6 +110,7 @@ export default class PhotoSwipeComponent extends React.Component<Props, State>
                 // 
                 return this.gallery.currItem.download || '';
             },
+            allowPanToNext:false,
             ...this.props.options
         };
         
@@ -100,8 +121,12 @@ export default class PhotoSwipeComponent extends React.Component<Props, State>
                 this.gallery = null
                 this.props.onClose()
         })
-
+        
         this.gallery.listen('afterChange', () => { 
+            /*this.gallery.container.addEventListener('pointerdown', this.preventSwipe);
+            this.gallery.container.addEventListener('MSPointerDown', this.preventSwipe);
+            this.gallery.container.addEventListener('touchstart', this.preventSwipe);
+            this.gallery.container.addEventListener('mousedown', this.preventSwipe);*/
             const index = this.gallery.getCurrentIndex()
             if(index > 0)
             {
@@ -113,6 +138,14 @@ export default class PhotoSwipeComponent extends React.Component<Props, State>
                 const nextItem = this.state.items[index + 1]
                 this.pauseMedia(nextItem)
             }
+            const item = this.state.items[index]
+            if(item.filetype == UploadedFileType.IMAGE360)
+            {
+                this.setAllowSwipe(false)
+            }
+            else{
+                this.setAllowSwipe(true)
+            }
             console.log("afterChange", this.gallery)
         });
         this.gallery.listen('outItemSize', (item) => { 
@@ -122,11 +155,12 @@ export default class PhotoSwipeComponent extends React.Component<Props, State>
 
         });
         this.gallery.listen('preventDragEvent', (e, isDown, _preventObj) => { 
-            console.log("preventDragEvent", _preventObj)
             const index = this.gallery.getCurrentIndex()
             const item = this.state.items[index]
-            if(item.filetype == UploadedFileType.VIDEO || item.filetype == UploadedFileType.VIDEO)
+            if(item.filetype == UploadedFileType.VIDEO || item.filetype == UploadedFileType.IMAGE360)
                 _preventObj.prevent = false
+            
+            console.log("preventDragEvent", _preventObj.prevent)
 
         });
         this.gallery.init()

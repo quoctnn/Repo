@@ -33,7 +33,12 @@ ul,li{ list-style-type: none; padding: 0;}
 .medium-text{
     font-size: 0.9em;
 }
-
+.img-responsive{
+    object-fit: contain;
+    width: 100%;
+    max-width: initial;
+    max-height: 100%;
+}
 .push-right {
     margin-left: auto;
 }
@@ -72,11 +77,18 @@ ul,li{ list-style-type: none; padding: 0;}
         border-style: solid;
     }
 }
+.swiper-container
+{
+    width: 100%;
+}
 //borders
 .border-1{
     @include var(border-color, border-color-default);
     border-width: 1px;
     border-style: solid;
+}
+.main-border-color-background{
+    @include var(background-color, border-color-default);
 }
 //theme
 body

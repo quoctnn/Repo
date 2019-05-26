@@ -6,6 +6,7 @@ var config = require('./webpack.base.config.js');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const OptimizeCSSAssetsPlugin = require("optimize-css-assets-webpack-plugin");
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+var path = require('path');
 
 // Default buildType
 var buildType = 'production';
@@ -15,6 +16,19 @@ if (process.argv.includes('--debug')) {
 
 config.module.rules.unshift(
   { test: /\.tsx?$/, loader: 'ts-loader' },
+  {
+    test:/\.js$/,
+    include: [
+        path.resolve(__dirname, "../node_modules/react-360-web")
+    ],use: [
+      {
+        loader: 'babel-loader',
+        options: {
+          presets: []
+        }
+      }
+    ]
+  },
   {
     test: /\.(s*)css$/,
     use: [
@@ -60,6 +74,10 @@ module.exports = merge(config, {
     }),
     new CopyWebpackPlugin([{
       from: 'electron/'
+    }]),
+    new CopyWebpackPlugin([{
+      from: 'react360/',
+      to:"react360"
     }])
   ],
   devtool: 'cheap-module-source-map',

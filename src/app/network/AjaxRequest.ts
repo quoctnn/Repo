@@ -55,6 +55,10 @@ export class AjaxRequest
     {
         return AjaxRequest.ajaxCall("DELETE", url, null, success, error);
     }
+    static patchJSON(url, json, success:SuccessCallback, error:ErrorCallback)
+    {
+        return AjaxRequest.ajaxCallJSON("PATCH", url, json, success, error);
+    }
     static postJSON(url, json, success:SuccessCallback, error:ErrorCallback)
     {
         return AjaxRequest.ajaxCallJSON("POST", url, json, success, error);
