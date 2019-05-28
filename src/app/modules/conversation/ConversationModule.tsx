@@ -65,7 +65,7 @@ type ReduxStateProps = {
 type ReduxDispatchProps = {
 }
 type Props = OwnProps & RouteComponentProps<any> & ReduxStateProps & ReduxDispatchProps
-class ConversationModule extends React.Component<Props, State> {  
+class ConversationModule extends React.Component<Props, State> {
 
     private dragCount:number = 0
     private dropTarget = React.createRef<ChatMessageList>();
@@ -91,7 +91,7 @@ class ConversationModule extends React.Component<Props, State> {
         const oldConversation = prevProps.conversation
         const newConversation = this.props.conversation
         return (oldConversation && !newConversation) ||
-                (!oldConversation && newConversation) || 
+                (!oldConversation && newConversation) ||
                 (oldConversation && newConversation && oldConversation.id != newConversation.id)
     }
     componentDidMount = () => {
@@ -99,6 +99,7 @@ class ConversationModule extends React.Component<Props, State> {
         this.observers.push(obs1)
         const obs2 = NotificationCenter.addObserver("eventstream_" + EventStreamMessageType.CONVERSATION_MESSAGE, this.incomingMessageHandler)
         this.observers.push(obs2)
+        window.addEventListener('focus', this.conversationGotFocus);
         if(this.props.conversation)
         {
             this.reload()
@@ -107,6 +108,7 @@ class ConversationModule extends React.Component<Props, State> {
     componentWillUnmount = () =>
     {
         this.observers.forEach(o => o.remove())
+        window.removeEventListener('focus', this.conversationGotFocus);
     }
     componentDidUpdate = (prevProps:Props, prevState:State) => {
         if(this.shouldReloadList(prevProps))
@@ -128,13 +130,13 @@ class ConversationModule extends React.Component<Props, State> {
             ConversationManager.markConversationAsRead(this.props.conversation.id, () => {})
         }
     }
-    incomingMessageHandler = (...args:any[]) => 
+    incomingMessageHandler = (...args:any[]) =>
     {
         if(!this.props.conversation)
             return
         let message = args[0] as Message
         let conversation = this.props.conversation.id
-        if(message.conversation == conversation)
+        if(message.conversation == conversation && document.hasFocus())
         {
             let it = this.removeUserFromIsTypingData(message.user)
             if(message.user != this.props.authenticatedUser.id)
@@ -146,6 +148,12 @@ class ConversationModule extends React.Component<Props, State> {
             })
         }
     }
+    conversationGotFocus = () => {
+        if (!this.props.conversation.read_by.contains(this.props.authenticatedUser.id))
+        {
+            ConversationManager.markConversationAsRead(this.props.conversation.id, () => {})
+        }
+    }
     isTypingHandler = (...args:any[]) => {
 
         let object = args[0]
@@ -153,7 +161,7 @@ class ConversationModule extends React.Component<Props, State> {
         let conversation = object.conversation
         if(user == this.props.authenticatedUser.id || (this.props.conversation && (conversation != this.props.conversation.id)))
         {
-            return 
+            return
         }
         let it = {...this.state.isTyping}
         let oldUserTimer = it[user]
@@ -161,7 +169,7 @@ class ConversationModule extends React.Component<Props, State> {
         {
             clearTimeout(oldUserTimer)
         }
-        it[user] = setTimeout(() => 
+        it[user] = setTimeout(() =>
         {
             let it = this.removeUserFromIsTypingData(user)
             this.setState({isTyping:it})
@@ -196,7 +204,7 @@ class ConversationModule extends React.Component<Props, State> {
             return (<CircularLoadingSpinner borderWidth={3} size={20} key="loading"/>)
         }
     }
-    loadData = () => 
+    loadData = () =>
     {
 
         const { items } = this.state
@@ -244,7 +252,7 @@ class ConversationModule extends React.Component<Props, State> {
             ToastManager.showErrorToast(error)
         })
     }
-    handleLoadMore = () => 
+    handleLoadMore = () =>
     {
         if(!this.state.hasMore || this.state.isLoading)
         {
@@ -288,7 +296,7 @@ class ConversationModule extends React.Component<Props, State> {
         let conversation = this.props.conversation
         if(!conversation || conversation.temporary)
             return
-        if(this.canPublishDidType) 
+        if(this.canPublishDidType)
         {
             console.log("sendDidType")
             ConversationManager.sendTypingInConversation(conversation.id)
@@ -322,7 +330,7 @@ class ConversationModule extends React.Component<Props, State> {
         const message = ConversationUtilities.getChatMessagePreview(this.props.authenticatedUser.id, text, null, mentions, conversation)
         if(conversation.temporary)
             this.createConversationWithMessage(conversation, message)
-        else 
+        else
             ConversationManager.sendMessage(message)
     }
     filesAdded = (files:File[]) => {
@@ -330,36 +338,36 @@ class ConversationModule extends React.Component<Props, State> {
         if(!conversation)
             return
         files.forEach(f => {
-            
+
             const message = ConversationUtilities.getChatMessagePreview(this.props.authenticatedUser.id, "", f, [], conversation)
             ConversationManager.sendMessage(message)
         })
     }
     onDragOver = (event:React.DragEvent<HTMLDivElement>) => {
         event.preventDefault()
-        try 
+        try
         {
             event.dataTransfer.dropEffect = "copy"
-        } 
+        }
         catch (err) { }
     }
     onDrop = (event:React.DragEvent<HTMLDivElement>) => {
         event.preventDefault()
         let files = []
-        if (event.dataTransfer.items) 
+        if (event.dataTransfer.items)
         {
-            for (var i = 0; i < event.dataTransfer.items.length; i++) 
+            for (var i = 0; i < event.dataTransfer.items.length; i++)
             {
-                if (event.dataTransfer.items[i].kind === 'file') 
+                if (event.dataTransfer.items[i].kind === 'file')
                 {
                     var file = event.dataTransfer.items[i].getAsFile()
                     files.push(file)
                 }
             }
-        } 
-        else 
+        }
+        else
         {
-            for (var i = 0; i < event.dataTransfer.files.length; i++) 
+            for (var i = 0; i < event.dataTransfer.files.length; i++)
             {
                 let file = event.dataTransfer.files[i]
                 files.push(file)
@@ -373,11 +381,11 @@ class ConversationModule extends React.Component<Props, State> {
     }
 
     removeDragData = (event:React.DragEvent<HTMLDivElement>) => {
-        if (event.dataTransfer.items) 
+        if (event.dataTransfer.items)
         {
             event.dataTransfer.items.clear()
-        } 
-        else 
+        }
+        else
         {
             event.dataTransfer.clearData()
         }
@@ -418,30 +426,30 @@ class ConversationModule extends React.Component<Props, State> {
         const canSubmit = !this.props.conversation.temporary || this.props.conversation.users.length > 0
         return <div className="list-component message-list-container">
                         <ChatMessageList ref={this.dropTarget}
-                            onDragOver={this.onDragOver} 
-                            onDrop={this.onDrop} 
-                            onDragLeave={this.onDragLeave} 
+                            onDragOver={this.onDragOver}
+                            onDrop={this.onDrop}
+                            onDragLeave={this.onDragLeave}
                             onDragEnter={this.onDragEnter}
-                            className={cl} 
-                            conversation={conversationId} 
-                            loading={isLoading} 
-                            chatDidScrollToTop={this.chatDidScrollToTop} 
-                            messages={messages} 
+                            className={cl}
+                            conversation={conversationId}
+                            loading={isLoading}
+                            chatDidScrollToTop={this.chatDidScrollToTop}
+                            messages={messages}
                             current_user={authenticatedUser} >
                             {this.renderSomeoneIsTyping()}
                         </ChatMessageList>
-                    <ChatMessageComposer 
-                                className="secondary-text main-content-secondary-background" 
-                                mentionSearch={this.handleMentionSearch} 
-                                content={""} 
-                                mentions={[]} 
+                    <ChatMessageComposer
+                                className="secondary-text main-content-secondary-background"
+                                mentionSearch={this.handleMentionSearch}
+                                content={""}
+                                mentions={[]}
                                 submitOnEnter={true}
-                                filesAdded={this.filesAdded} 
-                                onSubmit={this.onChatMessageSubmit} 
-                                onDidType={this.onDidType} 
+                                filesAdded={this.filesAdded}
+                                onSubmit={this.onChatMessageSubmit}
+                                onDidType={this.onDidType}
                                 canSubmit={canSubmit}
                             />
-                    {this.state.renderDropZone && 
+                    {this.state.renderDropZone &&
                         <div className="drop-zone">
                             <div className="drop-zone-content">{translate("conversation.module.drop.to.send.title")}</div>
                         </div>}
@@ -453,7 +461,7 @@ class ConversationModule extends React.Component<Props, State> {
         ConversationManager.updateTemporaryConversation(temp)
     }
     renderMembersInput = () => {
-        
+
         const availableMembers = ProfileManager.getProfiles(ProfileManager.getContactListIds(false))
         const currentMembers = ProfileManager.getProfiles(this.props.conversation && this.props.conversation.users || [])
         const availableOptions = availableMembers.map(createProfileFilterOption)
@@ -469,7 +477,7 @@ class ConversationModule extends React.Component<Props, State> {
             onChange={this.onMemberSelectChange}
             components={{ Option: ProfileOptionComponent, SingleValue:ProfileSingleValueComponent }}
             styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
-            menuPortalTarget={document.body} 
+            menuPortalTarget={document.body}
             autoFocus={true}
             placeholder={translate("conversation.create.members.placeholder")}
         /></div>
@@ -497,7 +505,7 @@ class ConversationModule extends React.Component<Props, State> {
                     </SimpleDialog>
         }
         return null
-        
+
     }
     render()
     {
@@ -505,11 +513,11 @@ class ConversationModule extends React.Component<Props, State> {
         const {breakpoint, className} = this.props
         const cn = classnames("conversation-module", className, {temporary:conversation && conversation.temporary})
         const title = createNewConversation ? this.renderMembersInput() : this.renderConversationEditorTitle()
-        return (<SimpleModule {...rest} 
-                    className={cn} 
-                    headerClick={this.headerClick} 
-                    breakpoint={breakpoint} 
-                    isLoading={this.state.isLoading} 
+        return (<SimpleModule {...rest}
+                    className={cn}
+                    headerClick={this.headerClick}
+                    breakpoint={breakpoint}
+                    isLoading={this.state.isLoading}
                     headerTitle={title}>
                 {this.renderContent()}
                 {this.renderConversationEditorDialog()}
