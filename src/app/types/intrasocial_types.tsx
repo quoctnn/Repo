@@ -295,7 +295,6 @@ export namespace UploadedFileType {
 }
 export type UploadedFile =
 {
-    id:number
     user:number
     filename:string
     file:string
@@ -307,6 +306,14 @@ export type UploadedFile =
     thumbnail:string
     size:number
     created_at:string
+    //extensions
+    tempId?:number|string
+    custom?:boolean
+    uploadProgress?:number
+    uploading?:boolean
+    uploaded?:boolean
+    hasError?:boolean
+
 } & IdentifiableObject
 
 type FileIcon = {name:string, color:string}

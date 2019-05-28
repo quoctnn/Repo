@@ -67,11 +67,17 @@ ul,li{ list-style-type: none; padding: 0;}
 .form-control-transparent{
     background-color: transparent;
     border: 0;
+    background-color: transparent;
+    outline: none;
+    box-shadow: none;
+    color:inherit;
     &:focus{
         background-color: transparent;
         outline: none;
         box-shadow: none;
         color:inherit;
+    }
+    &.focus-border:focus{
         @include var(border-color, border-color-default);
         border-bottom-width: 1px;
         border-style: solid;

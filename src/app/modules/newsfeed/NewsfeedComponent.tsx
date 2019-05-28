@@ -119,6 +119,7 @@ export class NewsfeedComponent extends React.Component<Props, State> {
     private observers:EventSubscription[] = []
     private stashIncomingUpdates = false 
     private incomingUpdateCache:IncomingUpdateItem[] = []
+    private listRef = React.createRef<List>()
     static defaultProps:OwnProps = {
         limit:30,
         defaultChildrenLimit:5,
@@ -338,8 +339,10 @@ export class NewsfeedComponent extends React.Component<Props, State> {
             this.props.scrollParent.removeEventListener("scroll", this.onScroll)
         }
     }
-    onScroll = (event:any) =>
-    {
+    onScroll = (event) =>
+    {   
+        if(this.listRef.current.listRef.current != event.target)
+            return
         let isAtBottom = false
         if(event.target instanceof Document)
             isAtBottom = (window.innerHeight + window.scrollY) >= document.body.offsetHeight
@@ -1148,7 +1151,7 @@ export class NewsfeedComponent extends React.Component<Props, State> {
         const cn = classnames("status-list vertical-scroll")//, "rb-" + ResponsiveBreakpoint[breakpoint])
         return(
             <div className="newsfeed-component">
-                <List 
+                <List ref={this.listRef}
                     enableAnimation={false} 
                     onScroll={scroll} 
                     className={cn}>

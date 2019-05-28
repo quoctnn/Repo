@@ -7,6 +7,12 @@ import LoadingSpinner from '../../components/LoadingSpinner';
 import { translate } from '../../localization/AutoIntlProvider';
 import { IdentifiableObject } from '../../types/intrasocial_types';
 
+export const ListComponentHeader = (props:{title:React.ReactNode}) => {
+    return (
+        <div className="list-header">{props.title}</div>
+    )
+}
+
 class ListComponentDivider extends React.Component{
     render() {
         return (
@@ -56,7 +62,7 @@ export default class ListComponent<T extends IdentifiableObject> extends React.C
             lastFetchOffset:0
         }
     }
-    getItemById = (id:number) => {
+    getItemById = (id:number|string) => {
         return this.state.items.find(t => t.id == id)
     }
     getItemAtIndex = (index:number) => {

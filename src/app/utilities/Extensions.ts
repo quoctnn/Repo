@@ -46,12 +46,14 @@ Array.prototype.isEqual = function<T>(arr2:T[])
         return false
     if(this.length == 0 && arr2.length == 0)
         return true
+    if(this.length != arr2.length)
+        return false
     let result = false;
     this.forEach((e1,i)=>arr2.forEach(e2=>{
         
             if(Array.isArray(e1) && Array.isArray(e2) && e1.length > 1 && e2.length)
             {
-                result = this.arrayEqual(e1,e2)
+                result = e1.isEqual(e2)
             }
             else if(e1 !== e2 )
             {

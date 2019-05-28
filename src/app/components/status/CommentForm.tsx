@@ -139,10 +139,10 @@ export class CommentForm extends React.Component<Props, State> {
                         {this.renderTextArea(this.props.canPost)}
                         {this.state.showDropzone &&
                         <div className={fileUploadClass}>
-                            <FilesUpload
+                            {/*<FilesUpload
                                 onTempFilesChanged={this.handleTempFilesChanged}
                                 onFileRemoved={this.handleFileRemoved}
-                                communityId={this.props.communityId}/>
+                            communityId={this.props.communityId}/>*/}
                         </div>
                         }
                     </div>

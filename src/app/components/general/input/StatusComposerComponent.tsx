@@ -4,11 +4,12 @@ import { StatusActions, ContextNaturalKey, UploadedFile } from "../../../types/i
 import { Mention } from "./MentionEditor";
 import { ProfileManager } from "../../../managers/ProfileManager";
 import { EditorContent, ChatMessageComposer } from "./ChatMessageComposer";
-import { URL_REGEX, URL_WWW_REGEX } from "../../../utilities/IntraSocialUtilities";
 import { Settings } from "../../../utilities/Settings";
 import "./StatusComposerComponent.scss"
 import FilesUpload from "../../status/FilesUpload";
 import { translate } from "../../../localization/AutoIntlProvider";
+import ApiClient from "../../../network/ApiClient";
+import { ToastManager } from "../../../managers/ToastManager";
 
 type OwnProps =
 {
@@ -49,13 +50,11 @@ type State =
     mentions: number[]
     renderPlaceholder:boolean
     showDropzone: boolean
-    uploadedFiles:UploadedFile[]
-    tempFilesInDropzone:number
+    files:UploadedFile[]            
 }
 type Props = OwnProps & DefaultProps
 export class StatusComposerComponent extends React.Component<Props, State> {
     formRef = React.createRef<ChatMessageComposer>();
-    dropzoneRef = React.createRef<FilesUpload>();
     element = React.createRef<HTMLDivElement>()
     observer:IntersectionObserver = null
     static defaultProps:DefaultProps = {
@@ -73,8 +72,7 @@ export class StatusComposerComponent extends React.Component<Props, State> {
             mentions: [],
             renderPlaceholder:props.renderPlaceholder,
             showDropzone:false,
-            uploadedFiles:[],
-            tempFilesInDropzone:0
+            files:[],
         }
     }
     shouldComponentUpdate = (nextProps:Props, nextState:State) => {
@@ -91,12 +89,11 @@ export class StatusComposerComponent extends React.Component<Props, State> {
                 nextProps.forceHideDropzone != this.props.forceHideDropzone ||
 
                 nextState.showDropzone != this.state.showDropzone ||
-                nextState.tempFilesInDropzone != this.state.tempFilesInDropzone ||
                 nextState.uploading != this.state.uploading || 
                 nextState.link != this.state.link || 
                 !nextState.mentions.isEqual(this.state.mentions) || 
                 nextState.renderPlaceholder != this.state.renderPlaceholder ||
-                nextState.uploadedFiles.length != this.state.uploadedFiles.length
+                nextState.files.length != this.state.files.length
         return ret;
     }
     componentDidMount = () => {
@@ -131,37 +128,15 @@ export class StatusComposerComponent extends React.Component<Props, State> {
             completion(profiles.map(u => Mention.fromUser(u)))
         }})
     }
-    submit = () => {
+    handleSubmit = () => {
         let content = this.getContent()
         if(this.canPost()){
-            this.setState(() => {
-                    return {text:content.text, mentions: content.mentions}
-                } , () => {
+            this.setState({text:content.text, mentions: content.mentions}, () => {
                 let text = this.state.text.trim();
-                this.props.onActionPress(StatusActions.new, {message:text, mentions:this.state.mentions, files:this.state.uploadedFiles})
+                this.props.onActionPress(StatusActions.new, {message:text, mentions:this.state.mentions, files:this.state.files})
                 this.clearStatusState()//maybe not here?
                 this.clearEditor()//maybe not here?
             })
-        }
-    }
-    onTempFilesUploaded = (files:UploadedFile[]) => {
-        this.setState((prevState:State) => {
-            return {uploadedFiles:files, uploading:false}
-        },this.submit)
-    }
-    handleSubmit = () => {
-        if(this.state.uploading)
-            return
-        if(this.state.tempFilesInDropzone > 0)
-        {
-            this.setState((prevState:State) => {
-                return {uploading:true}
-            }, () => {
-                this.dropzoneRef.current.uploadFiles(this.onTempFilesUploaded)
-            })
-        }
-        else {
-            this.submit()
         }
     }
     clearEditor = () => {
@@ -173,7 +148,7 @@ export class StatusComposerComponent extends React.Component<Props, State> {
     clearStatusState = () => {
         this.setState({
             text: '',
-            uploadedFiles: [],
+            files: [],
             link: null,
             mentions: []
         }, this.canPost);
@@ -190,11 +165,10 @@ export class StatusComposerComponent extends React.Component<Props, State> {
                 return false
         if(this.props.canPost)
             return this.props.canPost()
-        return (text != null && text.length > 0) || this.getDropzoneFilesCount() > 0
+        return (text != null && text.length > 0) || this.getFilesCount() > 0
     }
-    getDropzoneFilesCount = () => 
-    {
-        return this.state.tempFilesInDropzone
+    getFilesCount = () => {
+        return this.state.files.length
     }
     handleMentions = (mentions:number[]) => {
         this.setState({mentions: mentions})
@@ -207,16 +181,60 @@ export class StatusComposerComponent extends React.Component<Props, State> {
         {
             return
         }
-        if (this.getDropzoneFilesCount() == 0) {
+        if (this.getFilesCount() == 0) {
             this.setState((prevState, currentProps) => {
                 return {showDropzone: !prevState.showDropzone}
             })
         }
     }
-    handleTempFilesChanged = (length:number) => {
-        this.setState((prevState:State) => {
-            const showDropzone = length > 0 || prevState.showDropzone
-            return {showDropzone:showDropzone, tempFilesInDropzone:length}
+    handleFileUploaded = (file:UploadedFile) => {
+        let files = this.state.files.map(f => f)
+        files.push(file)
+        this.setState({files: files})
+    }
+    handleFileQueueComplete = () => {
+        this.setState({uploading: false});
+    }
+    handleFileAdded = () => {
+        this.setState({uploading: true});
+    }
+    handleFileError = () => {
+        // TODO: ¿Should we display an error message (multi-lang) to the user?
+        this.setState({uploading: true});
+    }
+    handleFileRemoved = (file:UploadedFile) => {
+        if (typeof file !== 'undefined' && file != null) {
+            let files = this.removeFileFromList(file, this.state.files)
+            this.setState({files: files});
+        }
+    }
+    removeFileFromList = (file:UploadedFile, fileList:UploadedFile[]) => {
+        let list = fileList.map(f => f)
+        let index = list.findIndex((item) => {
+            return item.id == file.id;
+        });
+        if(index >= 0)
+        {
+            list.splice(index, 1)
+        }
+        return list
+    }
+    handleRename = (file: UploadedFile, name: string) => {
+        ApiClient.updateFilename(file.id, name, (data, status, error) => {
+            if(!!data && !error)
+            {
+                this.setState((prevState:State) => {
+                    const files = prevState.files.map(f => f)
+                    const index = files.findIndex(f => f.id == data.id)
+                    if(index > -1)
+                    {
+                        files[index] = data
+                        return {files}
+                    }
+                    return 
+                })
+            }
+            ToastManager.showErrorToast(error, status, translate("Could not update filename"))
         })
     }
     renderTextArea = (canSubmit:boolean) => {
@@ -255,16 +273,22 @@ export class StatusComposerComponent extends React.Component<Props, State> {
         if (this.props.canComment) 
         {
             const canPost = this.canPost()
-            const cn = classnames("comment-form", this.props.className)
-            const fileUploadClass = classnames("file-upload-container", {"d-none":this.props.forceHideDropzone })
+            const cn = classnames("comment-form status-composer-component", this.props.className)
+            const fileUploadClass = classnames("file-upload-container vertical-scroll", {"d-none":this.props.forceHideDropzone })
             return (<div className={cn}>
-                    <div className="chat-message-composer-container file-upload-container drop-shadow main-content-secondary-background">
+                    <div className="chat-message-composer-container drop-shadow main-content-secondary-background">
                         {this.props.children}
                         {this.renderTextArea(canPost)}
                         {this.state.showDropzone &&
                         <div className={fileUploadClass}>
-                            <FilesUpload ref={this.dropzoneRef}
-                                onTempFilesChanged={this.handleTempFilesChanged}
+                            <FilesUpload
+                                files={this.state.files}
+                                onFileAdded={this.handleFileAdded}
+                                onFileRename={this.handleRename}
+                                onFileQueueComplete={this.handleFileQueueComplete}
+                                onFileError={this.handleFileError}
+                                onFileRemoved={this.handleFileRemoved}
+                                onFileUploaded={this.handleFileUploaded}
                                 communityId={this.props.communityId}/>
                         </div>
                         }

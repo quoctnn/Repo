@@ -31,11 +31,12 @@ export default class StatusForm extends StatusFormBase {
             <div className="panel panel-flat create-post-panel">
                 <div className="panel-body">
                         {this.renderTextArea(canPost)}
-                        {this.state.showDropzone && <FilesUpload 
+                        {/*this.state.showDropzone && 
+                            <FilesUpload 
                                 ref={this.fileUploadRef} 
                                 onTempFilesChanged={this.handleTempFilesChanged}
                                 communityId={this.props.communityId}/>
-                        }
+                        */}
                 </div>
             </div>
         );

@@ -58,7 +58,7 @@ export class List extends React.PureComponent<Props, {}> {
         children:[]
     }
     state:State
-    private listRef = React.createRef<HTMLDivElement>()
+    listRef = React.createRef<HTMLDivElement>()
     constructor(props:Props) {
         super(props);
         this.state = {items:[], rects:{}}

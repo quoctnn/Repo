@@ -128,7 +128,7 @@ export default class TaskListItem extends React.Component<Props, State> {
 
         const timecomposerContent = this.timecomposer.current.getContent()
         const statuscomposerContent = this.statuscomposer.current.getContent()
-        const statusFileCount = this.statuscomposer.current.getDropzoneFilesCount()
+        const statusFileCount = this.statuscomposer.current.getFilesCount()
         return timecomposerContent.text.length == 0 && statuscomposerContent.text.length == 0 && statusFileCount == 0
     }
     onTimeChange = (time:moment.Moment) => {

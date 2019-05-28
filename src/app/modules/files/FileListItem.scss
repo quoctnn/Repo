@@ -4,6 +4,8 @@ $margin:8px;
 .file-list-item{
     padding: 8px;
     text-decoration: none;
+    position: relative;
+    display: block;
     .file-content{
         border-radius: 10px;
         overflow: hidden;
@@ -32,6 +34,8 @@ $margin:8px;
             left:0;
             right:0;
             background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
         }
     }
     .content-container{

@@ -1,231 +1,180 @@
 import * as React from 'react';
 import { Settings } from '../../utilities/Settings';
-import { UploadedFile, UploadedFileType } from '../../types/intrasocial_types';
+import { UploadedFile, UploadedFileType, UserProfile } from '../../types/intrasocial_types';
 import Dropzone from 'react-dropzone';
-import Swiper from "react-id-swiper";
 import * as Mime from "mime-types"
 import "./FilesUpload.scss" 
-import classnames = require('classnames');
-import { Button } from 'reactstrap';
-import { FileUploader } from '../../network/ApiClient';
-import { SecureImage } from '../general/SecureImage';
-import RadialProgress from '../general/loading/RadialProgress';
+import FileListItem from '../../modules/files/FileListItem';
+import ListComponent, { ListComponentHeader } from '../general/ListComponent';
+import { FileUploaderService, FileQueueObject, ExtendedFile } from './FileUploadService';
+import { ReduxState } from '../../redux';
+import { connect } from 'react-redux';
+import { AuthenticationManager } from '../../managers/AuthenticationManager';
+import { translate } from '../../localization/AutoIntlProvider';
 
-type FileProps<T> = {
-    file:T
-    onRemove:(event:React.SyntheticEvent) => void
-}
-const FileThumb = (props:FileProps<ExtendedFile>) => {
-    const {file, onRemove} = props
-    const extension =  Mime.extension(file.type)
-    const type = UploadedFileType.parseFromMimeType(file.type)
-    const cn = classnames("thumb-inner main-border-color-background", extension, type)
-    return <div className="thumb border-1" key={file.name}>
-                <div className={cn}>
-                    {file.preview && 
-                        <img className="img-responsive" src={file.preview} />
-                        || 
-                        <i className="fa file-icon"></i>
-                    }
-                    <Button className="remove-button" onClick={onRemove} size="xs">
-                        <i className="fas fa-times"></i>
-                    </Button>
-                    {file.uploading && <RadialProgress className="upload-progress" percent={file.uploadPercent || 0} size={64} strokeWidth={2} />}
-                </div>
-            </div>
-}
-const UploadedFileThumb = (props:FileProps<UploadedFile>) => {
-    const {file, onRemove} = props
-    const cn = classnames("thumb-inner main-border-color-background", file.extension, file.type)
-    const image = (file.type == UploadedFileType.IMAGE || file.type == UploadedFileType.IMAGE360) ? file.thumbnail || file.image : undefined
-    return <div className="thumb border-1" key={file.filename}>
-                <div className={cn}>
-                    {image && 
-                        <SecureImage className="img-responsive" setBearer={true} url={image}  />
-                        || 
-                        <i className="fa file-icon"></i>
-                    }
-                    <Button className="remove-button" onClick={onRemove} size="xs">
-                        <i className="fas fa-times"></i>
-                    </Button>
-                </div>
-            </div>
-}
-export interface OwnProps 
-{
-    onTempFilesChanged:(length:number) => void
+type OwnProps = {
     onFileRemoved?:(file:UploadedFile) => void
+    onFileAdded:() => void
+    onFileError:() => void
+    onFileUploaded:(file:UploadedFile) => void
+    onFileRename:(file:UploadedFile, name:string) => void
+    onFileQueueComplete:() => void
     communityId:number
     files?:UploadedFile[]
     className?:string
 }
-interface DefaultProps 
-{
+type DefaultProps = {
     maxFileSize:number
     acceptedFiles:string
 }
-interface ExtendedFile extends File {
-    preview?:string
-    uploading?:boolean
-    uploadPercent?:number
-    uploaded?:boolean
+type FileListItemType = UploadedFile | ExtendedFile
+type State = {
+    files:FileQueueObject[]
+    queueWorking:boolean
 }
-interface State 
-{
-    files:ExtendedFile[]
-    uploadedFiles:UploadedFile[]
+type ReduxStateProps = {
+    authenticatedUser:UserProfile
 }
-type Props = DefaultProps & OwnProps
-export default class FilesUpload extends React.Component<Props, State> { 
+type Props = DefaultProps & OwnProps & ReduxStateProps
+
+class FilesUpload extends React.Component<Props, State> { 
+    filesList = React.createRef<ListComponent<FileListItemType>>()
+    private fileUploaderService:FileUploaderService = null
     static defaultProps:DefaultProps = {
         maxFileSize:Settings.maxFileSize,
         acceptedFiles:Settings.allowedTypesFileUpload,
     }
     constructor(props:Props) {
         super(props)
+        this.fileUploaderService = new FileUploaderService()
+        this.fileUploaderService.onCompleteItem = this.onCompleteItem
+        this.fileUploaderService.onFailedItem = this.onFailedItem
+        this.fileUploaderService.onAddedItem = this.onAddedItem
+        this.fileUploaderService.onQueueUpdated = this.onQueueUpdated
         this.state = {
           files: [],
-          uploadedFiles:props.files || []
+          queueWorking:false,
         }
     }
-    updateUploadProgress = (file:ExtendedFile, percent:number) => {
-        const update = Object.assign(file, {
-            uploadPercent:percent
-        }) as ExtendedFile
-        this.updateFile(file, update)
-    }
-    updateFile = (file:ExtendedFile, updatedFile:ExtendedFile) => {
+    onQueueUpdated = (queue: FileQueueObject[]) => {
+        const completed = queue.length == 0 || queue.filter(f => f.isError()).length == queue.length
+        const onComplete = completed ? this.props.onFileQueueComplete : undefined
         this.setState((prevState:State) => {
-            const files = prevState.files
-            const index = files.indexOf(file)
-            if(index > -1)
-            {
-                files[index] = updatedFile
-                return {files}
-            }
-            return
-        })
+            return {files:queue}
+        }, onComplete)
     }
-    uploadFiles = (completion:(files:UploadedFile[]) => void) => {
-        const files = [...this.state.files].reverse()
-        const uploadedFiles:UploadedFile[] = []
-        const length = files.length
-        const onComplete = (file:ExtendedFile, uploadedFile:UploadedFile) => {
-            uploadedFiles.push(uploadedFile)
-            uploadFile( files.pop() )
-            const update = Object.assign(file, {
-                uploading:false,
-                uploaded:true
-            }) as ExtendedFile
-            this.updateFile(file, update)
-        }
-        const uploadFile = (file:ExtendedFile) => {
-            if(!file)
-            {
-                completion(uploadedFiles)
-                return
-            }
-            const update = Object.assign(file, {
-                uploading:true
-            }) as ExtendedFile
-            this.updateFile(file, update)
-            const uploader = new FileUploader(file, (percent:number) => {
-                    this.updateUploadProgress(file, percent)
-            })
-            uploader.doUpload((uploadedFile:UploadedFile) => {
-                onComplete(file, uploadedFile)
-            })
-        }
-        if(length > 0)
-        {
-            uploadFile( files.pop() )
-            return
-        }
-        completion([])
+    onAddedItem = (queueObj: FileQueueObject) => {
+        this.props.onFileAdded()
     }
-    distinct = (array:ExtendedFile[]) => {
-        const map = new Map<string,ExtendedFile>();
-        for (const item of array) {
-            if(!map.has(item.name)){
-                map.set(item.name, item);
-            }
-        }
-        return Array.from(map.values())
+    onCompleteItem = (queueObj: FileQueueObject) => {
+        const file = queueObj.response
+        queueObj.remove()
+        this.props.onFileUploaded(file)
+    }
+    onFailedItem = (queueObj: FileQueueObject) => {
+        this.props.onFileError()
     }
     onDrop = (acceptedFiles:File[]) => {
         const files:ExtendedFile[] = acceptedFiles.map(f => {
+            const extension =  Mime.extension(f.type)
+            const type = UploadedFileType.parseFromMimeType(f.type)
+            const tempId = f.name + f.lastModified
+            const file = Object.assign(f,{id:tempId.hashCode(), tempId, fileType:type, extension}) as ExtendedFile
             if(f.type.startsWith("image/"))
-                return Object.assign(f, {
-                    preview: URL.createObjectURL(f)
-                })
-            return f
+                file.preview =  URL.createObjectURL(f)
+            return file
         })
-        const dist = this.distinct(this.state.files.concat(files))
-        this.setState((prevState:State) => {
-            return {files:dist}
-        }, () => {
-            this.props.onTempFilesChanged(this.state.files.length)
-        })
+        const queue = this.fileUploaderService.queue()
+        const newFiles = files.filter(f => !queue.find(sf => sf.file.tempId == f.tempId) )
+        this.fileUploaderService.addToQueue(newFiles)
+        this.fileUploaderService.uploadAll()
     }
     cleanup = () => {
         const files = this.state.files
-        files.forEach(file => URL.revokeObjectURL(file.preview));
-    } 
+        files.forEach(file => URL.revokeObjectURL(file.file.preview));
+    }
     componentWillUnmount = () => {
         this.cleanup()
     }
     removeUploadedFile = (event:React.SyntheticEvent, file:UploadedFile) => {
-        event.preventDefault()
-        event.stopPropagation()
-        this.setState((prevState:State) => {
-            const files = prevState.uploadedFiles
-            const index = files.indexOf(file)
-            if(index > -1)
-            {
-                files.splice(index, 1)
-                this.props.onFileRemoved(file)
-            }
-            return {uploadedFiles:files}
-        })
+        this.props.onFileRemoved && this.props.onFileRemoved(file)
     }
-    removeTempFile = (event:React.SyntheticEvent,file:ExtendedFile) => {
+    removeTempFile = (event:React.SyntheticEvent,item:FileQueueObject) => {
+        if(item)
+        {
+            item.file.preview && URL.revokeObjectURL(item.file.preview)
+            item.cancel()
+            item.remove()
+        }
+    }
+    onRemoveFile = (event:React.SyntheticEvent, file:UploadedFile) => {
         event.preventDefault()
         event.stopPropagation()
-        this.setState((prevState:State) => {
-            const files = prevState.files
-            const index = files.indexOf(file)
-            if(index > -1)
-            {
-                files.splice(index, 1)
-                file.preview && URL.revokeObjectURL(file.preview)
-            }
-            return {files}
-        }, () => {
-            this.props.onTempFilesChanged(this.state.files.length)
-        })
+        if(file.custom)
+        {
+            const tempFileId = this.state.files.findIndex(f => f.file.tempId == file.tempId)
+            if(tempFileId > -1)
+                this.removeTempFile(event, this.state.files[tempFileId])
+        }
+        else {
+            this.removeUploadedFile(event, file)
+        }
+    }
+    renderFile = (file:UploadedFile) =>  {
+        const rename = file.user == this.props.authenticatedUser.id ? this.props.onFileRename : undefined
+        return <FileListItem key={file.id} file={file} onRemove={this.onRemoveFile} onRename={rename} useLink={false} />
+    }
+    convertFile = (queueObj:FileQueueObject):UploadedFile => {
+        return {
+            id:queueObj.file.id,
+            user: -1,
+            filename: queueObj.file.name,
+            file: null,
+            type: queueObj.file.fileType,
+            extension: queueObj.file.extension,
+            image: null,
+            image_width: 0,
+            image_height: 0,
+            thumbnail: queueObj.file.preview,
+            size: queueObj.file.size,
+            created_at: new Date().toUTCString(),
+            //ext  
+            tempId:queueObj.file.tempId,
+            custom: true,
+            uploadProgress:queueObj.progress,
+            uploading:queueObj.inProgress(),
+            uploaded:queueObj.isSuccess(),
+            hasError:queueObj.isError()
+        }
+    }
+    renderFiles = () => {
+        const incomingFiles = this.props.files || []
+        return <div className="list list-component-list vertical-scroll">
+                    {this.state.files.map(f => this.renderFile(this.convertFile(f)))}
+                    {incomingFiles.length > 0 && 
+                        <ListComponentHeader title={translate("files.uploaded")} />
+                    }
+                    {incomingFiles.map(f => this.renderFile(f))}
+                </div>
     }
     render = () => {
-        const thumbs = this.state.files.map(file => {
-            return  <FileThumb key={file.name + file.lastModified} onRemove={(event) => this.removeTempFile(event, file)} file={file} />
-        })
-        const uploadedThumbs = this.state.uploadedFiles.map(file => {
-            return  <UploadedFileThumb key={file.id} onRemove={(event) => this.removeUploadedFile(event, file)} file={file} />
-        })
-        const params = {
-            slidesPerView: 'auto',
-            freeMode: true,
-            shouldSwiperUpdate:true,
-        }
+        
         return <Dropzone onDrop={this.onDrop} accept={this.props.acceptedFiles}>
                     {({getRootProps, getInputProps}) => (
                         <div className="dropzone-container">
                             <div {...getRootProps({className: 'dropzone primary-text-color'})}>
                                 <input {...getInputProps()} />
                                 <p><i className="fas fa-cloud-upload-alt"></i></p>
-                                <Swiper className="thumbs-swiper" {...params}>{thumbs}{uploadedThumbs}</Swiper>
                             </div>
+                            {this.renderFiles()}
                         </div>
                     )}
                 </Dropzone>
     }
 }
+const mapStateToProps = (state:ReduxState, ownProps: OwnProps):ReduxStateProps => {
+    return {
+        authenticatedUser: AuthenticationManager.getAuthenticatedUser()
+    }
+}
+export default connect<ReduxStateProps, {}, OwnProps>(mapStateToProps, null)(FilesUpload);

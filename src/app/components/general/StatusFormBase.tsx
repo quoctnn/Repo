@@ -5,7 +5,6 @@ import { Mention } from './input/MentionEditor';
 import { IEditorComponent, ChatMessageComposer } from './input/ChatMessageComposer';
 import { translate } from '../../localization/AutoIntlProvider';
 import Constants from '../../utilities/Constants';
-import FilesUpload from '../status/FilesUpload';
 
 export interface OwnProps
 {
@@ -54,7 +53,6 @@ type Props = OwnProps & DefaultProps
 export default class StatusFormBase extends React.Component<Props, State> implements IEditorComponent {
 
     inputRef = React.createRef<IEditorComponent & any>();
-    fileUploadRef = React.createRef<FilesUpload>();
     static defaultProps:DefaultProps =
     {
         textPlaceholder:"✎",

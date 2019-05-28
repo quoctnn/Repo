@@ -65,9 +65,12 @@ export class FileUtilities {
         }
         return new Blob([u8arr], {type:mime})
     }
-    static humanFileSize = (size) => {
+    static humanFileSize = (size:number) => {
+        /*
         var i = Math.floor( Math.log(size) / Math.log(1024) );
-        return parseFloat((size / Math.pow(1024, i) ).toFixed(2)) * 1 + ' ' + ['B', 'kB', 'MB', 'GB', 'TB'][i];
+        return parseFloat((size / Math.pow(1024, i) ).toFixed(2)) * 1 + ' ' + ['B', 'kB', 'MB', 'GB', 'TB'][i];*/
+        var e = (Math.log(size) / Math.log(1e3)) | 0;
+        return +(size / Math.pow(1e3, e)).toFixed(2) + ' ' + ('kMGTPEZY'[e - 1] || '') + 'B';
     }
 }
 

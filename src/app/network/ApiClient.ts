@@ -7,7 +7,7 @@ import { nullOrUndefined } from '../utilities/Utilities';
 import moment = require("moment");
 import { Settings } from "../utilities/Settings";
 import { ConversationManager } from '../managers/ConversationManager';
-export type PaginationResult<T> = {results:T[], count:number, previous:string|null, next:string|null, divider?:number}
+export type PaginationResult<T> = {results:T[], count:number, previous?:string, next?:string, divider?:number}
 export type ElasticSuggestion = {text:string, offset:number, length:number, options:[]}
 export type ElasticExtensionResult = {stats:{suggestions:{[key:string]:ElasticSuggestion}, aggregations:{[key:string]:any}}}
 export type StatusCommentsResult<T> = {results:T[], count:number, parent:T}
@@ -547,6 +547,14 @@ export default class ApiClient
             callback(null, status, error)
         })
     }
+    static updateFilename(fileId:number,filename:string, callback:ApiClientCallback<UploadedFile>)
+    {
+        AjaxRequest.post(Constants.apiRoute.fileUploadUpdateName(fileId), {filename}, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
     private static uploadFile(message:Message, completion:(message:Message) => void){
         let file = message.tempFile.file
         let uploader = new FileUploader(file, (progress) => {
@@ -611,6 +619,7 @@ export class FileUploader
 {
     file:Blob
     progress:(percent:number) => void
+    request:any = null
     constructor(file:Blob, progress:(percent:number) => void)
     {
         this.file = file
@@ -618,12 +627,12 @@ export class FileUploader
         this.doUpload = this.doUpload.bind(this)
         this.progressHandling = this.progressHandling.bind(this)
     }
-    doUpload(completion:(file:UploadedFile) => void)
-    {
+    doUpload = (completion:(file:UploadedFile, error?:any) => void) => {
         let url = EndpointManager.applyEndpointDomain(Constants.apiRoute.fileUploadUrl)
         const data = new FormData();
         data.append("file", this.file)
-        $.ajax({
+        //data.append("error", "true")
+        this.request = $.ajax({
             type: "POST",
             url: url,
             xhr: () =>  {
@@ -637,7 +646,7 @@ export class FileUploader
                 completion(data.files[0])
             },
             error: function (error) {
-                completion(null)
+                completion(null, error)
             },
             async: true,
             data: data,
@@ -647,8 +656,11 @@ export class FileUploader
             timeout: 60000
         })
     }
-    progressHandling(event)
-    {
+    abort = () => {
+        if(this.request && this.request.abort)
+            this.request.abort()
+    }
+    progressHandling = (event) => {
         var percent = 0;
         var position = event.loaded || event.position;
         var total = event.total;

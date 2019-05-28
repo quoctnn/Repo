@@ -93,7 +93,7 @@ export default class StatusOptionsComponent extends React.Component<Props, State
                 communityId={this.props.communityId}
                 didCancel={this.toggleEditModal}
                 canUpload={this.props.canUpload}
-                visible={visible} ref="editStatusDialog"
+                visible={visible} 
                 status={this.props.status}
                 onSave={this.save} 
                 canMention={this.props.canMention} />

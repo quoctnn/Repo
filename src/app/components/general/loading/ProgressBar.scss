@@ -1,0 +1,7 @@
+@import "../../../Config";
+.filler {
+    height: 100%;
+    border-radius: inherit;
+    transition: width .2s ease-in;
+    @include var(background-color, primary-theme-color);
+}
