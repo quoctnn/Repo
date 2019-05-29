@@ -1,6 +1,6 @@
 import {  Store } from 'redux';
 import { AjaxRequest } from '../network/AjaxRequest';
-import { UserProfile, UserStatus, ContextNaturalKey } from '../types/intrasocial_types';
+import { UserProfile, UserStatus, ContextNaturalKey, RecentActivity } from '../types/intrasocial_types';
 import { sendOnWebsocket, EventStreamMessageType } from '../network/ChannelEventStream';
 import { ReduxState } from '../redux/index';
 import { setAuthenticationProfileAction, setAuthenticationTokenAction } from '../redux/authentication';
@@ -8,6 +8,7 @@ import { NotificationCenter } from '../utilities/NotificationCenter';
 import { ApplicationManager } from './ApplicationManager';
 import { CommunityManager } from './CommunityManager';
 import { ContextManager } from './ContextManager';
+import { ToastManager } from './ToastManager';
 
 export const AuthenticationManagerAuthenticatedUserChangedNotification = "AuthenticationManagerAuthenticatedUserChangedNotification"
 export abstract class AuthenticationManager
@@ -20,7 +21,14 @@ export abstract class AuthenticationManager
     {
         NotificationCenter.addObserver('eventstream_' + EventStreamMessageType.CLIENT_STATUS_CHANGE, AuthenticationManager.processIncomingUserUpdate)
         NotificationCenter.addObserver('eventstream_' + EventStreamMessageType.COMMUNITY_MAIN, AuthenticationManager.processSwitchedMainCommunity)
+        NotificationCenter.addObserver('eventstream_' + EventStreamMessageType.ACTIVITY_NEW, AuthenticationManager.newActivityReceived)
     }
+
+    static newActivityReceived = (...args:any[]) => {
+        const activity = args[0] as RecentActivity;
+        if (activity) ToastManager.showInfoToast(activity.display_text);
+    }
+
     static processIncomingUserUpdate = (...args:any[]) => {
         let status = args[0]['status'] as UserStatus;
         const currentProfile = AuthenticationManager.getAuthenticatedUser()
@@ -129,7 +137,6 @@ export abstract class AuthenticationManager
             AuthenticationManager.resetUserActivityCounter();
             document.addEventListener('mousedown', AuthenticationManager.resetUserActivityCounter);
             window.addEventListener('focus', AuthenticationManager.resetUserActivityCounter);
-
             AuthenticationManager.keepAlive = setInterval(
                 () => {
                     AuthenticationManager.lastUserActivity += AuthenticationManager.keepAliveFrequency;
