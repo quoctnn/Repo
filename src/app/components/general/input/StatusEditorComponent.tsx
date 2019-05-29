@@ -10,6 +10,8 @@ import FilesUpload from '../../status/FilesUpload';
 import { translate } from '../../../localization/AutoIntlProvider';
 import ApiClient from '../../../network/ApiClient';
 import { ToastManager } from '../../../managers/ToastManager';
+import { uniqueId } from '../../../utilities/Utilities';
+import { NavigationUtilities } from '../../../utilities/NavigationUtilities';
 
 type OwnProps = {
     communityId?:number
@@ -43,6 +45,8 @@ type State = {
 type Props = OwnProps & DefaultProps
 export default class StatusEditorComponent extends React.Component<Props, State> {
 
+    private originalText:string = null
+    private protectKey = uniqueId() //protect navigation if files has changed
     formRef = React.createRef<ChatMessageComposer>();
     static defaultProps:DefaultProps =
     {
@@ -61,6 +65,26 @@ export default class StatusEditorComponent extends React.Component<Props, State>
             mentions: this.props.status.mentions,
             showDropzone:files.length > 0, 
         };
+    }
+    getNavigationProtectionKeys = () => {
+        return [this.protectKey]
+    }
+    componentDidMount = () => {
+        this.originalText = this.formRef.current.getPlainText()
+    }
+    componentDidUpdate = () => {
+        const hasChanged = this.hasContentChanged()
+        NavigationUtilities.protectNavigation(this.protectKey, hasChanged)
+    }
+    componentWillUnmount = () => {
+        NavigationUtilities.protectNavigation(this.protectKey, false)
+    }
+    hasContentChanged = () => {
+        if(this.state.text != this.originalText)
+            return true
+        const inFiles = this.props.status.files.map(f => f.id).sort((a,b) => a - b)
+        const currentFiles = this.state.files.map(f => f.id).sort((a,b) => a - b)
+        return !inFiles.isEqual(currentFiles)
     }
     getContent = ():EditorContent => {
         return this.formRef.current.getContent()
@@ -124,6 +148,7 @@ export default class StatusEditorComponent extends React.Component<Props, State>
     
             this.clearStatusState()
             this.clearEditor()
+            NavigationUtilities.protectNavigation(this.protectKey, false)
         })
     }
     clearEditor = () => 

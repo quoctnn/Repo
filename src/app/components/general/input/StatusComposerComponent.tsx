@@ -93,7 +93,7 @@ export class StatusComposerComponent extends React.Component<Props, State> {
                 nextState.link != this.state.link || 
                 !nextState.mentions.isEqual(this.state.mentions) || 
                 nextState.renderPlaceholder != this.state.renderPlaceholder ||
-                nextState.files.length != this.state.files.length
+                !nextState.files.isEqual(this.state.files)
         return ret;
     }
     componentDidMount = () => {

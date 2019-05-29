@@ -28,6 +28,7 @@ import "./utilities/Extensions"
 import { AuthenticationManager } from "./managers/AuthenticationManager";
 import { activateCrosstabAuthenticationSync } from "./redux/crosstabAuthenticationSync";
 import { ThemeManager } from "./managers/ThemeManager";
+import { NavigationUtilities } from "./utilities/NavigationUtilities";
 
 
 const store = createStore(appReducer, applyMiddleware(...middleWares));
@@ -57,7 +58,7 @@ export const App = (props: any) => {
             <ChannelEventStream />
                 <PersistGate loading={null} persistor={persistor}>
                     <AutoIntlProvider>
-                            <Router>
+                            <Router getUserConfirmation={NavigationUtilities.getProtectedNavigationConfirmation}>
                                 <Main />
                             </Router>
                     </AutoIntlProvider>

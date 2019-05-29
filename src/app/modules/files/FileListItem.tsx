@@ -21,22 +21,31 @@ type InputFieldProps = {
     className?:string
     inputClassName?:string
 }
-export const InputField = (props:InputFieldProps) => {
-    const showFocusBorder = nullOrUndefined(props.focusBorder) ? true : props.focusBorder
-    const cn = classnames("input-group-transparent", props.className)
-    const inputcn = classnames("form-control-transparent primary-text", props.inputClassName, {"text-center":props.centerText, "focus-border": showFocusBorder})
-    return (<InputGroup className={cn}>
-                <Input placeholder={props.placeholder} tabIndex={1} className={inputcn} value={props.value} onChange={props.onChange} onBlur={props.onBlur} /> 
-                <InputGroupAddon className="ml-1" addonType="append">
-                    <i className="fas fa-pen"></i>
-                </InputGroupAddon>
-            </InputGroup>)
+export class InputField extends React.Component<InputFieldProps, {}> {
+    inputRef:HTMLInputElement = null
+    handlePenClick = (event:React.SyntheticEvent) => {
+        event.preventDefault()
+        event.stopPropagation()
+        this.inputRef.focus()
+    }
+    render = () => {
+        const showFocusBorder = nullOrUndefined(this.props.focusBorder) ? true : this.props.focusBorder
+        const cn = classnames("input-group-transparent", this.props.className)
+        const inputcn = classnames("form-control-transparent primary-text", this.props.inputClassName, {"text-center":this.props.centerText, "focus-border": showFocusBorder})
+        return (<InputGroup className={cn}>
+                    <Input innerRef={(ref) => this.inputRef = ref} placeholder={this.props.placeholder} tabIndex={1} className={inputcn} value={this.props.value} onChange={this.props.onChange} onBlur={this.props.onBlur} /> 
+                    <InputGroupAddon onClick={this.handlePenClick} className="ml-1" addonType="append">
+                        <i className="fas fa-pen"></i>
+                    </InputGroupAddon>
+                </InputGroup>)
+    }
 }
 
 type OwnProps = {
     file:UploadedFile
-    onRemove?:(event:React.SyntheticEvent,file:UploadedFile) => void
+    onRemove?:(file:UploadedFile) => void
     onRename?:(file:UploadedFile, name:string) => void
+    onRetryUpload?:(file:UploadedFile) => void
 }
 type DefaultProps = {
     useLink:boolean
@@ -72,7 +81,7 @@ export default class FileListItem extends React.Component<Props, State> {
             event.stopPropagation()
             return
         }
-        if(file.type != UploadedFileType.IMAGE)
+        if(file.type != UploadedFileType.IMAGE && file.type != UploadedFileType.IMAGE360)
         {
             this.downloadCurrent()
         }
@@ -115,7 +124,10 @@ export default class FileListItem extends React.Component<Props, State> {
         return <PhotoSwipeComponent items={[this.props.file]} options={options} visible={this.state.visible} onClose={this.onModalClose}/>
     }
     onFileRemove = (file:UploadedFile) => (event:React.SyntheticEvent) =>  {
-        this.props.onRemove && this.props.onRemove(event, file)
+        this.props.onRemove && this.props.onRemove(file)
+    }
+    onFileRetry = (file:UploadedFile) => (event:React.SyntheticEvent) =>  {
+        this.props.onRetryUpload && this.props.onRetryUpload(file)
     }
     onNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.value
@@ -137,7 +149,7 @@ export default class FileListItem extends React.Component<Props, State> {
         return <InputField inputClassName="m-0 p-0 h-auto" focusBorder={false} placeholder={translate("common.filename")} onChange={this.onNameChange} onBlur={this.onNameBlur} value={name}/>
     }
     renderContent = () => {
-        const {file, onRemove} = this.props
+        const {file, onRemove, onRetryUpload} = this.props
         const fileSize = FileUtilities.humanFileSize(file.size || 0)
         const hasThumbnail = !!file.thumbnail
         return <div className="d-flex file-content drop-shadow hover-card">
@@ -150,7 +162,7 @@ export default class FileListItem extends React.Component<Props, State> {
                     <div className="d-flex flex-grow-1 flex-column content-container">
                         {this.renderName()}
                         <div className="d-flex text-muted text-truncate align-items-center">
-                            <div className="text-truncate">{fileSize}</div>
+                            <div className="text-truncate medium-small-text">{fileSize}</div>
                             <div className="flex-grow-1 d-flex">
                             {(file.uploading || file.uploadProgress > 0) && 
                                 <Progress value={file.uploadProgress} className="ml-1 mr-1 flex-grow-1" >
@@ -161,14 +173,20 @@ export default class FileListItem extends React.Component<Props, State> {
                                 <Badge className="ml-1 mr-1" color="danger">{translate("common.upload.error")}</Badge>
                             }
                             </div>
+                            {!!onRetryUpload &&
+                                <Button color="link" className="retry-button" onClick={this.onFileRetry(file)} size="xs">
+                                    <i className="fas fa-redo-alt"></i>
+                                </Button>
+                            }
                             {!!onRemove && 
                                 <Button color="link" className="remove-button" onClick={this.onFileRemove(file)} size="xs">
                                     <i className="fas fa-trash-alt"></i>
                                 </Button>
                             }
-                            <div className="theme-box theme-bg-gradient flex-shrink-0">
-                                {file.extension}
-                            </div>
+                            {file.type == UploadedFileType.IMAGE360 &&
+                                <Badge className="badge-theme ml-1 mr-1">360</Badge>
+                            }
+                            <Badge className="badge-theme ml-1 mr-1">{file.extension}</Badge>
                         </div>
                     </div>
                 {this.renderModal()}
@@ -176,7 +194,7 @@ export default class FileListItem extends React.Component<Props, State> {
     }
     render()
     {
-        const {file, className, children, onRename, onRemove, useLink,  ...rest} = this.props
+        const {file, className, children, onRename, onRemove, useLink, onRetryUpload,  ...rest} = this.props
         const cl = classnames("file-list-item file-item", className, file.type, file.extension)
         if(useLink)
             return (<Link onClick={this.handleFileClick} to={"#"} {...rest} className={cl}> 

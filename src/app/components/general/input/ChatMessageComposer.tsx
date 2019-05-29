@@ -3,9 +3,10 @@ import * as React from "react";
 import MentionEditor from "../input/MentionEditor";
 import { EditorState, ContentState, getDefaultKeyBinding, KeyBindingUtil,  SelectionState, Modifier, DraftHandleValue} from "draft-js";
 import { Mention } from '../input/MentionEditor';
-import { ProtectNavigation, nullOrUndefined } from "../../../utilities/Utilities";
+import {nullOrUndefined, uniqueId } from '../../../utilities/Utilities';
 import "./ChatMessageComposer.scss"
 import classnames from 'classnames';
+import { NavigationUtilities } from '../../../utilities/NavigationUtilities';
 
 const { isCtrlKeyCommand } = KeyBindingUtil;
 
@@ -158,26 +159,28 @@ interface State
 export class ChatMessageComposer extends React.Component<Props,State> implements IEditorComponent {
     
     private inputRef = React.createRef<MentionEditor>()
+    private protectKey = uniqueId()
     static defaultProps:DefaultProps = {
         showSubmitButton:true,
         submitOnEnter:false,
         singleLine:false,
         minimumTextLength:1
     }
-    constructor(props) {
+    getNavigationProtectionKeys = () => {
+        return [this.protectKey]
+    }
+    constructor(props:Props) {
         super(props)
         this.state = {
             plainText:this.props.content || "", 
             editorState:EditorState.createWithContent(generateContentState(this.props.content, this.props.mentions))
         }
-        this.fixFocusInput = this.fixFocusInput.bind(this)
-        this.sendDidType = this.sendDidType.bind(this)
-        this.getProcessedText = this.getProcessedText.bind(this)
-        this.onChange = this.onChange.bind(this)
-        this.canSubmit = this.canSubmit.bind(this)
     }
     componentDidMount = () => {
         this.props.focusEnd && this.props.focusEnd(this.focusEnd)
+    }
+    componentWillUnmount = () => {
+        NavigationUtilities.protectNavigation(this.protectKey, false);
     }
     focus = () => {
         this.inputRef.current.focus()
@@ -189,8 +192,7 @@ export class ChatMessageComposer extends React.Component<Props,State> implements
             return {editorState: editorState}
         }, this.inputRef.current.focus)
     }
-    shouldComponentUpdate(nextProps:Props, nextState:State)
-    {
+    shouldComponentUpdate = (nextProps:Props, nextState:State) => {
         const update = nextProps.canSubmit != this.props.canSubmit || 
                 nextState.editorState != this.state.editorState || 
                 nextProps.content != this.props.content || 
@@ -216,6 +218,9 @@ export class ChatMessageComposer extends React.Component<Props,State> implements
     getContent = () => {
         return this.getProcessedText()
     }
+    getPlainText = () => {
+        return this.state.editorState.getCurrentContent().getPlainText()
+    }
     handleSubmit = (e?:any) => {
         e && e.preventDefault();
         let {text, mentions} = this.getProcessedText()
@@ -223,7 +228,7 @@ export class ChatMessageComposer extends React.Component<Props,State> implements
             this.props.onSubmit(text, mentions)
             const editorState = EditorState.push(this.state.editorState, ContentState.createFromText(''), "remove-range");
             this.setState({plainText: '', editorState})
-            ProtectNavigation(false);
+            NavigationUtilities.protectNavigation(this.protectKey, false);
         }
         return false
     }
@@ -281,24 +286,21 @@ export class ChatMessageComposer extends React.Component<Props,State> implements
           contentState.getSelectionAfter(),
         );
       }
-    sendDidType()
-    {
+    sendDidType = () =>{
         this.props.onDidType(this.state.plainText)
     }
-    fixFocusInput() {
+    fixFocusInput = () => {
         // For mobile devices that doesn't show soft keyboard
         //this.inputRef.current.click;
     }
-    onChange(state:EditorState)
-    {
+    onChange = (state:EditorState) => {
         let text = state.getCurrentContent().getPlainText()
-        ProtectNavigation(text != "")
+        NavigationUtilities.protectNavigation(this.protectKey, text != "")
         const hasChanged = this.state.plainText != text
         const f = hasChanged ? this.sendDidType : undefined
         this.setState({plainText:text, editorState:state}, f)
     }
-    getProcessedText()
-    {
+    private getProcessedText = () => {
         if(!this.state.editorState)
         {
             return {text:"", mentions:[]}
@@ -312,14 +314,13 @@ export class ChatMessageComposer extends React.Component<Props,State> implements
         })
         return {text, mentions:Object.keys(mentions).map(k => parseInt(k))}
     }
-    canSubmit()
-    {
+    canSubmit = () => {
         const canSubmit = this.state.plainText.length >= this.props.minimumTextLength
         if( !nullOrUndefined( this.props.canSubmit) )
             return canSubmit && this.props.canSubmit
         return canSubmit
     }
-    render() {
+    render = () => {
         const canSubmit = this.canSubmit()
         const cn = classnames("chat-message-composer", this.props.className, {"single-line":this.props.singleLine})
         return (

@@ -3,7 +3,6 @@ import * as React from 'react';
 import { StatusActions, Status, UploadedFile, ObjectAttributeType, SimpleObjectAttribute, Permission } from '../../types/intrasocial_types';
 import { translate } from '../../localization/AutoIntlProvider';
 import "./StatusOptionsComponent.scss"
-import EditStatusDialog from './dialogs/EditStatusDialog';
 import ConfirmDialog from '../general/dialogs/ConfirmDialog';
 import { OverflowMenuItem, OverflowMenu, OverflowMenuItemType } from '../general/OverflowMenu';
 import classnames from 'classnames';
@@ -15,6 +14,9 @@ import ReportStatusDialog from './dialogs/ReportStatusDialog';
 import SelectUsersDialog from '../general/dialogs/SelectUsersDialog';
 import { CommunityManager } from '../../managers/CommunityManager';
 import { ProfileManager } from '../../managers/ProfileManager';
+import SimpleDialog from '../general/dialogs/SimpleDialog';
+import StatusEditorComponent from '../general/input/StatusEditorComponent';
+import { NavigationUtilities } from '../../utilities/NavigationUtilities';
 type Props = {
     className?:string
     status:Status
@@ -35,6 +37,7 @@ type State = {
     selectedMembers:number[]
 }
 export default class StatusOptionsComponent extends React.Component<Props, State> {
+    private statusEditorRef = React.createRef<StatusEditorComponent>()
     constructor(props:Props) {
         super(props);
         this.state = {
@@ -86,18 +89,16 @@ export default class StatusOptionsComponent extends React.Component<Props, State
     }
     renderEditDialog = () => {
         const visible = this.state.showEditDialog
-        if(!visible)
-            return null
-        return (
-            <EditStatusDialog
-                communityId={this.props.communityId}
-                didCancel={this.toggleEditModal}
-                canUpload={this.props.canUpload}
-                visible={visible} 
-                status={this.props.status}
-                onSave={this.save} 
-                canMention={this.props.canMention} />
-        )
+        return <SimpleDialog header={translate("Edit")} didCancel={this.toggleEditModal} visible={visible}>
+                <StatusEditorComponent
+                        ref={this.statusEditorRef}
+                        communityId={this.props.communityId}
+                        canUpload={this.props.canUpload}
+                        status={this.props.status}
+                        canMention={this.props.canMention}
+                        onStatusSubmit={this.save}
+                    />
+            </SimpleDialog>
     }
     renderReportDialog = () => {
 
@@ -150,17 +151,25 @@ export default class StatusOptionsComponent extends React.Component<Props, State
         ToastManager.showInfoToast(translate("Link copied!"))
     }
     toggleEditModal = () => {
+        if(this.statusEditorRef && this.statusEditorRef.current)
+        {
+            const protectedNavigationKeys = this.statusEditorRef.current.getNavigationProtectionKeys()
+            if(protectedNavigationKeys && NavigationUtilities.isNavigationProtected(protectedNavigationKeys))
+            {
+                const confirmed = NavigationUtilities.showProtectedNavigationConfirmation()
+                if(!confirmed)
+                    return
+            }
+        }
         this.setState( (previousState, currentProps) => {
             return { showEditDialog: !previousState.showEditDialog };
         });
     }
-
     toggleDeleteModal = () => {
         this.setState( (previousState, currentProps) => {
             return { showDeleteDialog: !previousState.showDeleteDialog };
         });
     }
-
     copyLink = () => {
 
         let permaLink = StatusUtilities.getPermaLink(this.props.status.id)

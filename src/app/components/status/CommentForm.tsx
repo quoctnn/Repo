@@ -54,12 +54,12 @@ export class CommentForm extends React.Component<Props, State> {
         singleLine:false,
         forceHideDropzone:false
     }
-    constructor(props) {
+    constructor(props:Props) {
         super(props)
         this.state = {showDropzone: false, filesCount: 0, isSuggestionsVisible:false}
     }
     getContent = () => {
-        return this.inputRef.current.getProcessedText()
+        return this.inputRef.current.getContent()
     }
     clearEditorContent = () => {
     }

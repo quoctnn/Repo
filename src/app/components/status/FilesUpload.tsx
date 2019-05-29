@@ -96,10 +96,10 @@ class FilesUpload extends React.Component<Props, State> {
     componentWillUnmount = () => {
         this.cleanup()
     }
-    removeUploadedFile = (event:React.SyntheticEvent, file:UploadedFile) => {
+    removeUploadedFile = (file:UploadedFile) => {
         this.props.onFileRemoved && this.props.onFileRemoved(file)
     }
-    removeTempFile = (event:React.SyntheticEvent,item:FileQueueObject) => {
+    removeTempFile = (item:FileQueueObject) => {
         if(item)
         {
             item.file.preview && URL.revokeObjectURL(item.file.preview)
@@ -107,22 +107,32 @@ class FilesUpload extends React.Component<Props, State> {
             item.remove()
         }
     }
-    onRemoveFile = (event:React.SyntheticEvent, file:UploadedFile) => {
-        event.preventDefault()
-        event.stopPropagation()
+    handleRemoveFile = (file:UploadedFile) => {
         if(file.custom)
         {
             const tempFileId = this.state.files.findIndex(f => f.file.tempId == file.tempId)
             if(tempFileId > -1)
-                this.removeTempFile(event, this.state.files[tempFileId])
+                this.removeTempFile(this.state.files[tempFileId])
         }
         else {
-            this.removeUploadedFile(event, file)
+            this.removeUploadedFile(file)
+        }
+    }
+    handleFileRetryUpload = (file:UploadedFile) => {
+        if(file.custom && file.hasError)
+        {
+            const tempFileId = this.state.files.findIndex(f => f.file.tempId == file.tempId)
+            if(tempFileId > -1)
+            {
+                const file = this.state.files[tempFileId]
+                file.upload()
+            }
         }
     }
     renderFile = (file:UploadedFile) =>  {
         const rename = file.user == this.props.authenticatedUser.id ? this.props.onFileRename : undefined
-        return <FileListItem key={file.id} file={file} onRemove={this.onRemoveFile} onRename={rename} useLink={false} />
+        const handleRetry = file.custom && file.hasError ? this.handleFileRetryUpload : undefined
+        return <FileListItem onRetryUpload={handleRetry} key={file.id} file={file} onRemove={this.handleRemoveFile} onRename={rename} useLink={false} />
     }
     convertFile = (queueObj:FileQueueObject):UploadedFile => {
         return {

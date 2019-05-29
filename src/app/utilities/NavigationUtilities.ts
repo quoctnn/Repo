@@ -7,8 +7,13 @@ import { GroupManager } from '../managers/GroupManager';
 import { ProjectManager } from '../managers/ProjectManager';
 import { TaskManager } from '../managers/TaskManager';
 import { EventManager } from '../managers/EventManager';
+import { translate } from '../localization/AutoIntlProvider';
 
 export class NavigationUtilities {
+
+    private static routerNavigationPreventionReleaseCallback: () => void = null
+    private static protectedNavigations = new Map<string, boolean>()
+
     static navigateToSearch = (history: H.History, query:string) => {
         history.push(Routes.searchUrl(query))
     }
@@ -82,5 +87,44 @@ export class NavigationUtilities {
     static navigateToDevTool = (history: H.History) =>
     {
         history.push(Routes.DEVELOPER_TOOL.path)
+    }
+    static getProtectedNavigationConfirmation = (message: string, callback: (ok: boolean) => void) => {
+        const confirmed = NavigationUtilities.showProtectedNavigationConfirmation()
+        if(confirmed)
+        {
+            NavigationUtilities.removeNavigationProtection()
+        }
+        callback(confirmed);
+    }
+    static showProtectedNavigationConfirmation = () => {
+        return window.confirm(translate("prevent.navigation.text"))
+    }
+    private static removeNavigationProtection = () => {
+        NavigationUtilities.protectedNavigations.clear()
+        window.onbeforeunload = null
+        NavigationUtilities.routerNavigationPreventionReleaseCallback && NavigationUtilities.routerNavigationPreventionReleaseCallback()
+    }
+    static isNavigationProtected = (keys:string[]) => {
+        return keys.some(key => NavigationUtilities.protectedNavigations.has(key)) 
+    }
+    static protectNavigation = (key:string, enabled:boolean) => {
+        enabled ? NavigationUtilities.protectedNavigations.set(key, enabled) : NavigationUtilities.protectedNavigations.delete(key)
+        const protect = NavigationUtilities.protectedNavigations.size > 0
+        if (protect){
+            if(!window.onbeforeunload || !NavigationUtilities.routerNavigationPreventionReleaseCallback)
+            {
+                const dialogText = translate("prevent.navigation.text")
+                window.onbeforeunload = function(e) {
+                    e.preventDefault()
+                    e.returnValue = dialogText;
+                    return dialogText;
+                }
+                NavigationUtilities.routerNavigationPreventionReleaseCallback && NavigationUtilities.routerNavigationPreventionReleaseCallback()
+                if(window.routerHistory)
+                NavigationUtilities.routerNavigationPreventionReleaseCallback = window.routerHistory.block(dialogText)
+            }
+        } else {
+            NavigationUtilities.removeNavigationProtection()
+        }
     }
 }

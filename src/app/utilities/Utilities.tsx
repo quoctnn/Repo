@@ -10,6 +10,7 @@ import { translate } from '../localization/AutoIntlProvider';
 import { IntraSocialLink } from '../components/general/IntraSocialLink';
 import * as moment from 'moment-timezone';
 import Link from '../components/general/Link';
+import { string } from 'prop-types';
 let timezone = moment.tz.guess()
 export const getDomainName = (url:string) =>  {
     var url_parts = url.split("/")
@@ -318,20 +319,6 @@ ScrollPosition.prototype.restore = function () {
 ScrollPosition.prototype.prepareFor = function (direction) {
     this.readyFor = direction || 'up';
     this.previousScrollHeightMinusTop = this.node.scrollHeight - this.node.scrollTop;
-}
-
-
-export function ProtectNavigation(enabled:boolean) {
-    if (enabled) {
-        window.onbeforeunload = function(e) {
-            e.preventDefault()
-            let dialogText = "Navigating away will remove your typed text, are you sure?";
-            e.returnValue = dialogText;
-            return dialogText;
-        }
-    } else {
-        window.onbeforeunload = null
-    }
 }
 export function cloneDictKeys(dict:{})
 {
