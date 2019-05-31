@@ -6,7 +6,7 @@ import CircularLoadingSpinner from '../../components/general/CircularLoadingSpin
 import "./ApplicationLoader.scss"
 import { NotificationCenter } from '../../utilities/NotificationCenter';
 import { ApplicationManagerLoadingProgressNotification, LoadingProgress } from '../../managers/ApplicationManager';
-import Logo from '../../components/general/Logo';
+import Logo from '../../components/general/images/Logo';
 import { translate } from '../../localization/AutoIntlProvider';
 import { EventSubscription } from 'fbemitter';
 

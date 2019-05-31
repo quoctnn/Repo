@@ -6,6 +6,8 @@ import { List } from '../../components/general/List';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import { translate } from '../../localization/AutoIntlProvider';
 import { IdentifiableObject } from '../../types/intrasocial_types';
+import EmptyBox from './images/EmptyBox';
+import IceCream from './images/IceCream';
 
 export const ListComponentHeader = (props:{title:React.ReactNode}) => {
     return (
@@ -242,6 +244,8 @@ export default class ListComponent<T extends IdentifiableObject> extends React.C
                     onScroll={scroll}
                     className={cn}>
                     {items}
+                    {this.renderEmpty()}
+                    {this.renderError()}
                 </List>)
 
     }
@@ -250,7 +254,7 @@ export default class ListComponent<T extends IdentifiableObject> extends React.C
         {
             if(this.props.renderError)
                 return this.props.renderError()
-            return <div>{translate("generic.list.error")}</div>
+            return <div className="d-flex justify-content-center align-items-center h-100"><IceCream className="img-responsive" width="100" height="100" style={{maxWidth:100, height:"auto"}}/></div>
         }
         return null
     }
@@ -259,7 +263,7 @@ export default class ListComponent<T extends IdentifiableObject> extends React.C
         {
             if(this.props.renderEmpty)
                 return this.props.renderEmpty()
-            return <div>{translate("generic.list.empty")}</div>
+            return <div className="d-flex justify-content-center align-items-center h-100"><EmptyBox className="img-responsive" width="100" height="100" style={{maxWidth:100, height:"auto"}}/></div>
         }
         return null
     }
@@ -268,8 +272,6 @@ export default class ListComponent<T extends IdentifiableObject> extends React.C
         const cn = classnames("list-component")
         return (<div className={cn}>
                 {this.renderItems()}
-                {this.renderEmpty()}
-                {this.renderError()}
                 </div>)
     }
 }

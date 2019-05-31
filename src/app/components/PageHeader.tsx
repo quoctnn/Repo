@@ -4,7 +4,7 @@ import { CoverImage } from "./general/CoverImage";
 import classnames = require("classnames");
 import PageMainNavigation from "./PageMainNavigation";
 import PageTopMenu from "./PageTopMenu";
-import Logo from "./general/Logo";
+import Logo from "./general/images/Logo";
 
 interface OwnProps
 {

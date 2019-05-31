@@ -77,7 +77,7 @@ export class Gallery360ImageComponent extends GalleryComponent<{ width:number, h
             this.observer.disconnect()
             this.observer = null
         }
-        this.r360.stop()
+        this.r360.stop && this.r360.stop()
         this.r360 = null
     }
     getBundleUrl = () => {

@@ -4,7 +4,7 @@ type Props = {
 } & React.SVGProps<SVGSVGElement>
 export default (props:Props) => {
     const { progress, ...rest} = props
-    return (<svg id="Layer_1" {...rest} x="0px" y="0px" viewBox="0 0 2000 500" >
+    return (<svg xmlns="http://www.w3.org/2000/svg" id="Layer_1" {...rest} x="0px" y="0px" viewBox="0 0 2000 500" >
     <defs>
         <clipPath id="clipPath">
             <rect x="0" y="0" width={progress * 2000} height="500" />
