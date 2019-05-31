@@ -87,7 +87,7 @@
     "react-select": "^2.4.1",
     "react-toastify": "^4.1.0",
     "react-visibility-sensor": "^5.0.2",
-    "reactstrap": "^8.0.0",
+    "reactstrap": "^7.1.0",
     "reconnecting-websocket": "^4.1.10",
     "redux": "^4.0.0",
     "rst2html": "^1.0.4",
