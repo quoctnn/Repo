@@ -9,9 +9,11 @@ import { ProfileManager } from '../../managers/ProfileManager';
 import { userAvatar } from '../../utilities/Utilities';
 import LoadingSpinner from '../LoadingSpinner';
 
-
 type OwnProps = {
     userIds: number[]
+}
+type DefaultProps = {
+    size: number
 }
 type State = {
     isLoading:Boolean
@@ -21,8 +23,11 @@ type ReduxStateProps = {
 }
 type ReduxDispatchProps = {
 }
-type Props = OwnProps & RouteComponentProps<any> & ReduxStateProps & ReduxDispatchProps
+type Props = OwnProps & DefaultProps & RouteComponentProps<any> & ReduxStateProps & ReduxDispatchProps
 class StackedAvatars extends React.Component<Props, State> {
+    static defaultProps:DefaultProps = {
+        size:40
+    }
     constructor(props:Props) {
         super(props);
         this.state = {
@@ -53,7 +58,7 @@ class StackedAvatars extends React.Component<Props, State> {
     renderAvatar = (profile:UserProfile) => {
         return(
             <Link key={profile.id} to={profile.uri}>
-                <Avatar size={40} image={userAvatar(profile, true)} borderColor={"#FFFFFF"} borderWidth={2} />
+                <Avatar title={profile.first_name + " " + profile.last_name} size={this.props.size} image={userAvatar(profile, true)} borderColor={"#FFFFFF"} borderWidth={2} />
             </Link>
         )
     }
