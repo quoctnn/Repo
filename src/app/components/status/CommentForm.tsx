@@ -1,5 +1,4 @@
 import * as React from "react"
-import FilesUpload from './FilesUpload';
 import classnames from 'classnames';
 import "./CommentForm.scss"
 import classNames = require("classnames");

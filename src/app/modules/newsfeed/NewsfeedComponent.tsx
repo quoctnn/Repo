@@ -4,7 +4,7 @@ import { StatusUtilities } from '../../utilities/StatusUtilities';
 import { NavigationUtilities } from '../../utilities/NavigationUtilities';
 import { withRouter } from 'react-router';
 import * as Immutable from 'immutable';
-import ApiClient from '../../network/ApiClient';
+import ApiClient, { ApiClientCallback } from '../../network/ApiClient';
 import { ReduxState } from '../../redux/index';
 import { UserProfile, Status, UploadedFile, ContextNaturalKey, StatusActions, ObjectAttributeType, Permission } from '../../types/intrasocial_types';
 import { nullOrUndefined, uniqueId } from '../../utilities/Utilities';
@@ -21,6 +21,8 @@ import { EventStreamMessageType } from '../../network/ChannelEventStream';
 import { EventSubscription } from 'fbemitter';
 import { Mention } from '../../components/general/input/MentionEditor';
 import { StatusComposerComponent } from '../../components/general/input/StatusComposerComponent';
+import { ReadObserver } from '../../library/ReadObserver';
+
 class StatusComposer
 {
     statusId:number
@@ -106,7 +108,6 @@ interface IncomingUpdateItem{
     type:string 
     status_id:number 
     parent_id?:number
-
 }
 interface IncomingInteractionItem extends IncomingUpdateItem {
     interaction_id:number
@@ -120,6 +121,7 @@ export class NewsfeedComponent extends React.Component<Props, State> {
     private stashIncomingUpdates = false 
     private incomingUpdateCache:IncomingUpdateItem[] = []
     private listRef = React.createRef<List>()
+    private readObserver = new ReadObserver("statusReads", ApiClient.setStatusesRead)
     static defaultProps:OwnProps = {
         limit:30,
         defaultChildrenLimit:5,
@@ -137,19 +139,17 @@ export class NewsfeedComponent extends React.Component<Props, State> {
             hasMore:true,
             hasLoaded:false
         }
+        this.readObserver.onActiveStateChanged = this.readObserverActiveStateChanged
     }
-    setStashUpdates = (stash:boolean) => {
-        this.stashIncomingUpdates = stash
-        if(!stash)
+    readObserverActiveStateChanged = (isActive:boolean) => {
+        if(isActive)
         {
-            const arr = this.incomingUpdateCache
-            this.incomingUpdateCache = [] 
-            arr.forEach(this.runIncomingUpdate)
+            this.readObserver.clear()
+            this.forceUpdate()
         }
     }
-    hasContextError = (props:Props) => {
-        return (!!props.contextNaturalKey && !props.contextObjectId) || (!props.contextNaturalKey && !!props.contextObjectId)
-
+    registerObservee = (id:number) => (element:Element) => {
+        this.readObserver.observe(id, element)
     }
     componentDidUpdate = (prevProps:Props, prevState:State) => {
         if(this.props.contextNaturalKey != prevProps.contextNaturalKey || 
@@ -171,6 +171,57 @@ export class NewsfeedComponent extends React.Component<Props, State> {
         {
             this.props.onLoadingStateChanged(this.state.isLoading)
         }
+    }
+    componentDidMount = () => 
+    {
+        const listRef = this.listRef.current.listRef.current
+        if(listRef)
+        {
+            this.readObserver.initialize(listRef)
+        }
+        const obs1 = NotificationCenter.addObserver('eventstream_' + EventStreamMessageType.STATUS_NEW, this.processIncomingStatusNew)
+        this.observers.push(obs1)
+        const obs2 = NotificationCenter.addObserver('eventstream_' + EventStreamMessageType.STATUS_UPDATE, this.processIncomingStatusUpdate)
+        this.observers.push(obs2)
+        const obs3 = NotificationCenter.addObserver('eventstream_' + EventStreamMessageType.STATUS_DELETED, this.processIncomingStatusDeleted)
+        this.observers.push(obs3)
+        const obs4 = NotificationCenter.addObserver('eventstream_' + EventStreamMessageType.STATUS_INTERACTION_UPDATE, this.processIncomingStatusInteractionUpdate)
+        this.observers.push(obs4)
+        if(this.props.scrollParent)
+        {
+            this.props.scrollParent.addEventListener("scroll", this.onScroll)
+        }
+        
+        const hasContextError = this.hasContextError(this.props)
+        if(!hasContextError)
+        {
+            this.setState({
+                isLoading: true
+            }, this.loadStatuses);
+        }
+    }
+    componentWillUnmount = () =>
+    {
+        this.observers.forEach(o => o.remove())
+        if(this.props.scrollParent)
+        {
+            this.props.scrollParent.removeEventListener("scroll", this.onScroll)
+        }
+        this.readObserver.save()
+        this.readObserver.cleanup()
+    }
+    setStashUpdates = (stash:boolean) => {
+        this.stashIncomingUpdates = stash
+        if(!stash)
+        {
+            const arr = this.incomingUpdateCache
+            this.incomingUpdateCache = [] 
+            arr.forEach(this.runIncomingUpdate)
+        }
+    }
+    hasContextError = (props:Props) => {
+        return (!!props.contextNaturalKey && !props.contextObjectId) || (!props.contextNaturalKey && !!props.contextObjectId)
+
     }
     private processIncomingStatusNew = (...args:any[]) => {
         const object = args[0]
@@ -270,7 +321,6 @@ export class NewsfeedComponent extends React.Component<Props, State> {
             status.reaction_count = data.reactionsCount
             this.updateStatusItem(status)
         }
-        
     }
     private executeStatusUpdate = (update:IncomingUpdateItem) => {
             //fetch & update if feed contains status
@@ -306,37 +356,6 @@ export class NewsfeedComponent extends React.Component<Props, State> {
         {
             const update:IncomingInteractionItem = {type:EventStreamMessageType.STATUS_INTERACTION_UPDATE, ...object} 
             this.processIncomingUpdate(update)
-        }
-    }
-    componentDidMount = () => 
-    {
-        const obs1 = NotificationCenter.addObserver('eventstream_' + EventStreamMessageType.STATUS_NEW, this.processIncomingStatusNew)
-        this.observers.push(obs1)
-        const obs2 = NotificationCenter.addObserver('eventstream_' + EventStreamMessageType.STATUS_UPDATE, this.processIncomingStatusUpdate)
-        this.observers.push(obs2)
-        const obs3 = NotificationCenter.addObserver('eventstream_' + EventStreamMessageType.STATUS_DELETED, this.processIncomingStatusDeleted)
-        this.observers.push(obs3)
-        const obs4 = NotificationCenter.addObserver('eventstream_' + EventStreamMessageType.STATUS_INTERACTION_UPDATE, this.processIncomingStatusInteractionUpdate)
-        this.observers.push(obs4)
-        if(this.props.scrollParent)
-        {
-            this.props.scrollParent.addEventListener("scroll", this.onScroll)
-        }
-        
-        const hasContextError = this.hasContextError(this.props)
-        if(!hasContextError)
-        {
-            this.setState({
-                isLoading: true
-            }, this.loadStatuses);
-        }
-    }
-    componentWillUnmount = () =>
-    {
-        this.observers.forEach(o => o.remove())
-        if(this.props.scrollParent)
-        {
-            this.props.scrollParent.removeEventListener("scroll", this.onScroll)
         }
     }
     onScroll = (event) =>
@@ -636,7 +655,7 @@ export class NewsfeedComponent extends React.Component<Props, State> {
             if(success)
             {
                 const newStatusIndex = this.findIndexByStatusId(tempStatus.id)
-                newStatus.temporary = true
+                //newStatus.temporary = true
                 const updateArray:ArrayItem[] = []
                 updateArray.push({index:newStatusIndex, object:newStatus})
                 this.updateItems(updateArray)
@@ -652,7 +671,7 @@ export class NewsfeedComponent extends React.Component<Props, State> {
         })
     }
     insertOrUpdateComment = (comment:Status, tempId?:number, completion?:() => void) => {
-        comment.temporary = true
+        //comment.temporary = true
         const parent = this.findStatusByStatusId(comment.parent)
         const oldCommentIndex = this.findIndexByStatusId(comment.id)
         const tempIndex = tempId ? this.findIndexByStatusId(tempId) : -1
@@ -932,7 +951,9 @@ export class NewsfeedComponent extends React.Component<Props, State> {
     renderStatus = (authUser:UserProfile, item:Status, isComment:boolean, index:number, color:string, isLast:boolean) => 
     {
         const cn = classnames(color, {"last":isLast})
+        const observerRegister = (item.temporary || item.read || this.readObserver.getReads().contains(item.id)) ? undefined : this.registerObservee(item.id)
         return <StatusComponent 
+                    innerRef={observerRegister}
                     canUpload={true}
                     addLinkToContext={true}
                     key={"status_" + item.id} 

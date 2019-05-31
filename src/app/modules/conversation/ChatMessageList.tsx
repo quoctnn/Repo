@@ -7,6 +7,8 @@ import { ProfileManager } from '../../managers/ProfileManager';
 import { Message, UserProfile } from '../../types/intrasocial_types';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import classnames from 'classnames';
+import { ReadObserver } from '../../library/ReadObserver';
+import ApiClient from '../../network/ApiClient';
 export interface Props {
     messages:Message[],
     current_user:UserProfile,
@@ -20,18 +22,33 @@ export class ChatMessageList extends React.Component<Props & React.HTMLAttribute
     SCROLL_POSITION:any = null
     wasAtBottomBeforeUpdate:boolean = false
     scrollToBottomThreshold = 50
+    private readObserver = new ReadObserver("messageReads", ApiClient.setMessagesRead, 1000)
     private listRef = React.createRef<HTMLDivElement>()
     constructor(props:Props) {
         super(props)
+        this.readObserver.onActiveStateChanged = this.readObserverActiveStateChanged
     }
-
+    readObserverActiveStateChanged = (isActive:boolean) => {
+        if(isActive)
+        {
+            this.readObserver.clear()
+            this.forceUpdate()
+        }
+    }
     componentDidMount = () => {
         if (this.props.messages.length > 0) {
             this.scrollListToBottom()
         }
         this.SCROLL_POSITION = new ScrollPosition(document.querySelector('.message-list'))
+        const listRef = this.listRef.current
+        if(listRef)
+        {
+            this.readObserver.initialize(listRef)
+        }
     }
-
+    registerObservee = (id:number) => (element:Element) => {
+        this.readObserver.observe(id, element)
+    }
     shouldComponentUpdate = (nextProps:Props, nextState) => {
         return nextProps.messages != this.props.messages || nextProps.children != this.props.children || nextProps.loading != this.props.loading || nextProps.conversation != this.props.conversation;
     }
@@ -54,7 +71,10 @@ export class ChatMessageList extends React.Component<Props & React.HTMLAttribute
         {
             this.scrollListToBottom()
         }
-        
+    }
+    componentWillUnmount = () => {
+        this.readObserver.save()
+        this.readObserver.cleanup()
     }
     listUpdateAfterInitialRender(prevProps:Props, currentProps:Props) {
         return prevProps.messages.length != 0 &&
@@ -119,10 +139,14 @@ export class ChatMessageList extends React.Component<Props & React.HTMLAttribute
                     <ChatMessageUser key={message.id + "user"} avatar={avatar} text={str} direction={this.getDirection(message)} />
                 )
             }
+            const observerRegister = (message.user == current_user.id || message.read_by.contains(current_user.id) || this.readObserver.getReads().contains(message.id)) ? undefined : this.registerObservee(message.id)
             components.push(
-                <ChatMessage data={message}
-                         key={message.id}
-                         direction={this.getDirection(message)}/>
+
+                <ChatMessage 
+                        innerRef={observerRegister}
+                        data={message}
+                        key={message.id}
+                        direction={this.getDirection(message)}/>
             )
             lastUserId = message.user;
             lastDay = currentDate;

@@ -104,6 +104,22 @@ export default class ApiClient
             callback(null, status, error)
         })
     }
+    static setStatusesRead(ids:number[], callback:ApiClientCallback<any>){
+        let url = Constants.apiRoute.statusMarkRead
+        AjaxRequest.postJSON(url, {ids}, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
+    static setMessagesRead(ids:number[], callback:ApiClientCallback<any>){
+        let url = Constants.apiRoute.messageMarkRead
+        AjaxRequest.postJSON(url, {ids}, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
     static deleteStatusAttribute(id:number, callback:ApiClientCallback<any>){
         let url = Constants.apiRoute.statusAttributesId(id)
         AjaxRequest.delete(url, (data, status, request) => {

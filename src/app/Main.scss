@@ -59,10 +59,11 @@ ul,li{ list-style-type: none; padding: 0;}
     @include var(color, primary-text-color);
 }
 .close {
-    @include var(color, button-color);
+    opacity: 1 !important;
+    @include var(color, secondary-text-color);
 }
-.close:not(:disabled):not(.disabled):hover {
-    @include var(color, utton-hover-background-color);
+.close:not(:disabled):hover {
+    @include var(color, primary-text-color);
 }
 .input-group-transparent{
     align-items: center;

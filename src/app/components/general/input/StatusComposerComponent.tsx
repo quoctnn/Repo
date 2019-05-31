@@ -220,6 +220,8 @@ export class StatusComposerComponent extends React.Component<Props, State> {
         return list
     }
     handleRename = (file: UploadedFile, name: string) => {
+        if(!name || name.length == 0)
+            return
         ApiClient.updateFilename(file.id, name, (data, status, error) => {
             if(!!data && !error)
             {

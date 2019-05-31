@@ -156,6 +156,7 @@ export default  {
 
         //Status attributes
         statusAttributes:'/api/v2/status-attributes/',
+        statusMarkRead:"/api/v2/status/mark-read/",
         statusAttributesId: (id:number) => {
             return `/api/v2/status-attributes/${id}/`
         },
@@ -177,6 +178,9 @@ export default  {
         fileUploadUpdateName: (id:number) => {
             return `/api/v2/file-upload/${id}/update-name/`
         },
+        //message
+        messageMarkRead:"/api/v2/message/mark-read/",
+        //conversation
         conversationMessagesUrl: "/api/v2/message/",
         conversationMarkAsReadUrl: (id:number) => {
             return `/api/v2/conversation/${id}/mark-read/`

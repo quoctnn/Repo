@@ -10,13 +10,15 @@ export enum MessagePosition
 type Props = {
     data:Message,
     direction:MessagePosition,
+    innerRef?: (element:HTMLElement) => void
 }
 export class ChatMessage extends React.Component<Props, {}> {
     shouldComponentUpdate = (nextProps:Props, nextState) => {
-        if(nextProps.data.error != this.props.data.error)
+        if(nextProps.data.error != this.props.data.error || nextProps.innerRef != this.props.innerRef)
         {
             return true
         }
+
         let n = nextProps.data.tempFile
         let o = this.props.data.tempFile
         if((n && !o ) || !n && o)
@@ -29,7 +31,7 @@ export class ChatMessage extends React.Component<Props, {}> {
         const message = this.props.data
         const cl = classnames("chat-message", this.props.direction + (message.pending ? " temp" : ""), {"temp":message.pending})
         return (
-            <div className={cl}>
+            <div ref={this.props.innerRef} className={cl}>
                 <MessageContent message={message} simpleMode={false} />
             </div>
         )

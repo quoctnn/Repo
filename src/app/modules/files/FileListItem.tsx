@@ -137,6 +137,13 @@ export default class FileListItem extends React.Component<Props, State> {
     }
     onNameBlur = (event: React.FocusEvent<HTMLInputElement>) => {
         const oldName = this.props.file.filename
+        if(this.state.name.length == 0)
+        {
+            this.setState((prevState:State) => {
+                return {name:oldName}
+            })
+            return
+        }
         if(this.state.name != oldName)
         {
             this.props.onRename(this.props.file, this.state.name)

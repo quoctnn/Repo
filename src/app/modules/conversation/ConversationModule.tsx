@@ -68,7 +68,7 @@ type Props = OwnProps & RouteComponentProps<any> & ReduxStateProps & ReduxDispat
 class ConversationModule extends React.Component<Props, State> {
 
     private dragCount:number = 0
-    private dropTarget = React.createRef<ChatMessageList>();
+    private messageList = React.createRef<ChatMessageList>();
     private canPublishDidType = true
     private observers:EventSubscription[] = []
     constructor(props:Props) {
@@ -99,7 +99,6 @@ class ConversationModule extends React.Component<Props, State> {
         this.observers.push(obs1)
         const obs2 = NotificationCenter.addObserver("eventstream_" + EventStreamMessageType.CONVERSATION_MESSAGE, this.incomingMessageHandler)
         this.observers.push(obs2)
-        window.addEventListener('focus', this.conversationGotFocus);
         if(this.props.conversation)
         {
             this.reload()
@@ -108,7 +107,6 @@ class ConversationModule extends React.Component<Props, State> {
     componentWillUnmount = () =>
     {
         this.observers.forEach(o => o.remove())
-        window.removeEventListener('focus', this.conversationGotFocus);
     }
     componentDidUpdate = (prevProps:Props, prevState:State) => {
         if(this.shouldReloadList(prevProps))
@@ -125,10 +123,6 @@ class ConversationModule extends React.Component<Props, State> {
                 return {conversationEditorDialogVisible:false, renderDropZone:false, showSpinner:false}
             })
         }
-        if(this.props.conversation &&  this.state.hasReceivedData && !prevState.hasReceivedData && this.props.conversation.unread_messages.length > 0)
-        {
-            ConversationManager.markConversationAsRead(this.props.conversation.id, () => {})
-        }
     }
     incomingMessageHandler = (...args:any[]) =>
     {
@@ -136,22 +130,14 @@ class ConversationModule extends React.Component<Props, State> {
             return
         let message = args[0] as Message
         let conversation = this.props.conversation.id
-        if(message.conversation == conversation && document.hasFocus())
+        if(message.conversation == conversation)
         {
             let it = this.removeUserFromIsTypingData(message.user)
-            if(message.user != this.props.authenticatedUser.id)
-                ConversationManager.markConversationAsRead(conversation, () => {})
             this.setState((prevState:State) => {
                 const items = prevState.items
                 items.push(message)
                 return {isTyping:it, items }
             })
-        }
-    }
-    conversationGotFocus = () => {
-        if (!this.props.conversation.read_by.contains(this.props.authenticatedUser.id))
-        {
-            ConversationManager.markConversationAsRead(this.props.conversation.id, () => {})
         }
     }
     isTypingHandler = (...args:any[]) => {
@@ -206,7 +192,6 @@ class ConversationModule extends React.Component<Props, State> {
     }
     loadData = () =>
     {
-
         const { items } = this.state
         const offset = items.length
         const requestId = this.state.requestId
@@ -425,7 +410,7 @@ class ConversationModule extends React.Component<Props, State> {
         const cl = classnames("list list-component-list vertical-scroll droptarget")
         const canSubmit = !this.props.conversation.temporary || this.props.conversation.users.length > 0
         return <div className="list-component message-list-container">
-                        <ChatMessageList ref={this.dropTarget}
+                        <ChatMessageList ref={this.messageList}
                             onDragOver={this.onDragOver}
                             onDrop={this.onDrop}
                             onDragLeave={this.onDragLeave}

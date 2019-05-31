@@ -33,6 +33,7 @@ interface OwnProps
     status:Status
     className?:string
     isComment:boolean
+    innerRef?: (element:HTMLElement) => void
 }
 interface State 
 {
@@ -44,6 +45,7 @@ type Props = OwnProps
 
 export class StatusComponent extends React.Component<Props, State> {
     element = React.createRef<HTMLDivElement>()
+    intersectionRef = React.createRef<HTMLDivElement>()
     observer:IntersectionObserver = null
     constructor(props:Props)
     {
@@ -78,6 +80,7 @@ export class StatusComponent extends React.Component<Props, State> {
         const nextStatus = nextProps.status
         const status = this.props.status
         let ret:boolean =  nextStatus.id != status.id || 
+        nextProps.innerRef != this.props.innerRef ||
         nextStatus.comments != status.comments ||
         nextStatus.updated_at != status.updated_at || 
         nextStatus.serialization_date != status.serialization_date ||
@@ -169,7 +172,7 @@ export class StatusComponent extends React.Component<Props, State> {
         const files = status.files || []
         let communityId = status.community && status.community.id ? status.community.id : null
         //console.log("Render Status ", status.id)
-        return(<div className={cn}>
+        return(<div ref={this.props.innerRef} className={cn}>
                 <div className="d-flex">
                     <div className="flex-shrink-0 header-left">
                         <IntraSocialLink to={this.props.status.owner} type={IntraSocialType.profile}>

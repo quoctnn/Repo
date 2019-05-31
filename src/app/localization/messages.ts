@@ -185,6 +185,11 @@ var translations = {
     "Could not update conversation":"Could not update conversation",
     "common.reset.soft":"Clear storage",
     "common.reset.hard":"Clear all storage",
+    "prevent.navigation.text":"Changes that you made may not be saved. \nNavigate anyway?",
+    "files.uploaded":"Uploaded files",
+    "common.filename":"filename",
+    "Could not update filename":"Could not update filename",
+    "Add attention":"Add attention",
   },
   no: {
     "search.placeholder": "Søk ...",
@@ -372,6 +377,11 @@ var translations = {
     "Could not update conversation":"Kunne ikke oppdatere samtale",
     "common.reset.soft":"Tøm lagring",
     "common.reset.hard":"Tøm all lagring",
+    "prevent.navigation.text":"Dine endringer vil muligens ikke bli lagret. \nVil du navigere uansett?",
+    "files.uploaded":"Opplastede filer",
+    "common.filename":"filnavn",
+    "Could not update filename":"Kunne ikke oppdatere filnavnet",
+    "Add attention":"Sett oppmerksomhet",
   },
   en: {
     "search.placeholder": "Search ...",
@@ -566,6 +576,11 @@ var translations = {
     "Could not update conversation":"Could not update conversation",
     "common.reset.soft":"Clear storage",
     "common.reset.hard":"Clear all storage",
+    "prevent.navigation.text":"Changes that you made may not be saved. \nNavigate anyway?",
+    "files.uploaded":"Uploaded files",
+    "common.filename":"filename",
+    "Could not update filename":"Could not update filename",
+    "Add attention":"Add attention",
   }
 };
 
