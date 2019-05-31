@@ -22,8 +22,9 @@ import { StatusBadgeList, ObjectAttributeTypeExtension } from "./StatusBadgeList
 import ReactButton from "./ReactButton";
 import { IntraSocialLink } from "../general/IntraSocialLink";
 import { Button } from "reactstrap";
+import StackedAvatars from "../general/StackedAvatars";
 
-interface OwnProps 
+interface OwnProps
 {
     onActionPress:(action:StatusActions, extra?:Object, completion?:(success:boolean) => void) => void
     bottomOptionsEnabled:boolean
@@ -35,7 +36,7 @@ interface OwnProps
     isComment:boolean
     innerRef?: (element:HTMLElement) => void
 }
-interface State 
+interface State
 {
     renderPlaceholder:boolean
     readMoreActive:boolean
@@ -62,7 +63,7 @@ export class StatusComponent extends React.Component<Props, State> {
             this.observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                   const { isIntersecting } = entry;
-                  if (isIntersecting) 
+                  if (isIntersecting)
                   {
                     this.setState({renderPlaceholder:false})
                     this.observer.disconnect();
@@ -75,19 +76,19 @@ export class StatusComponent extends React.Component<Props, State> {
             this.observer.observe(this.element.current);
         }
     }
-    shouldComponentUpdate(nextProps:Props, nextState:State) 
+    shouldComponentUpdate(nextProps:Props, nextState:State)
     {
         const nextStatus = nextProps.status
         const status = this.props.status
         let ret:boolean =  nextStatus.id != status.id || 
         nextProps.innerRef != this.props.innerRef ||
         nextStatus.comments != status.comments ||
-        nextStatus.updated_at != status.updated_at || 
+        nextStatus.updated_at != status.updated_at ||
         nextStatus.serialization_date != status.serialization_date ||
         nextStatus.reaction_count != status.reaction_count ||
         nextState.renderPlaceholder != this.state.renderPlaceholder ||
         nextState.readMoreActive != this.state.readMoreActive ||
-        nextProps.className != this.props.className || 
+        nextProps.className != this.props.className ||
         nextState.refresh != this.state.refresh
         //nextStatus.reactions != status.reactions
         //console.log("status id:" + status.id, ret,(status.children_ids || []).length, (nextStatus.children_ids|| []).length, )
@@ -141,6 +142,9 @@ export class StatusComponent extends React.Component<Props, State> {
         const badgeSettings = this.getAttributeBadgeSettings(status)
         return <StatusBadgeList setting={badgeSettings} />
     }
+    renderStatusRead = (status:Status) => {
+        return <StackedAvatars userIds={status.read_by} size={24}/>
+    }
     refresh = () => {
         this.setState((prevState) => {
             return {refresh: prevState.refresh + 1}
@@ -189,13 +193,13 @@ export class StatusComponent extends React.Component<Props, State> {
                                 </div>
                                 <div className="text-truncate">
                                     <div className="date text-truncate secondary-text">
-                                    {this.getTimestamp(this.props.status.created_at)} 
+                                    {this.getTimestamp(this.props.status.created_at)}
                                     </div>
                                 </div>
                                 {!isComment && this.renderStatusBadges(status)}
                             </div>
                             <div className="text-truncate  flex-grow-0 flex-shrink-0 header-center-right">
-                                {contextObject && 
+                                {contextObject &&
                                     <div className="text-truncate">
                                         <div className="context text-truncate">
                                             <IntraSocialLink to={contextObject} title={contextObject.name}>
@@ -204,6 +208,7 @@ export class StatusComponent extends React.Component<Props, State> {
                                         </div>
                                     </div>
                                 }
+                                {this.props.status.read_by.length > 0 && this.renderStatusRead(status)}
                             </div>
                         </div>
                         {isComment && <div className="status-content-inner main-content-secondary-background">{this.renderTextContent(textContent, hasMore)}
@@ -223,7 +228,7 @@ export class StatusComponent extends React.Component<Props, State> {
                             <ReactionStats reactions={this.props.status.reactions}
                                 reactionsCount={this.props.status.reaction_count}/>
                         </div>
-                        {isComment && 
+                        {isComment &&
                             <div className="comments-reply">
                                 <Button color="link" size="xs" onClick={this.showCommentBox}>
                                 {translate("comment.reply")}
@@ -234,10 +239,10 @@ export class StatusComponent extends React.Component<Props, State> {
                                 <i className="far fa-comment"></i><span className="comment-count">{this.props.status.comments}</span>
                             </div>
                         }
-                        <StatusOptionsComponent 
-                                    status={status} 
-                                    canMention={true} 
-                                    canUpload={canUpload} 
+                        <StatusOptionsComponent
+                                    status={status}
+                                    canMention={true}
+                                    canUpload={canUpload}
                                     onActionPress={onActionPress}
                                     isOwner={status.owner.id == authorizedUserId}
                                     communityId={communityId}

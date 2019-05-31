@@ -71,6 +71,7 @@ export type Status = {
     permission_set:number[]
     poll:any
     read:boolean
+    read_by:number[]
     updated_at:string
     serialization_date:string
     extra?:string
