@@ -175,6 +175,7 @@ export class StatusComponent extends React.Component<Props, State> {
         const avatarSize = isComment ? 40 : 50
         const files = status.files || []
         let communityId = status.community && status.community.id ? status.community.id : null
+        const readBy = this.props.status.read_by || []
         //console.log("Render Status ", status.id)
         return(<div ref={this.props.innerRef} className={cn}>
                 <div className="d-flex">
@@ -208,7 +209,7 @@ export class StatusComponent extends React.Component<Props, State> {
                                         </div>
                                     </div>
                                 }
-                                {this.props.status.read_by.length > 0 && this.renderStatusRead(status)}
+                                {readBy.length > 0 && this.renderStatusRead(status)}
                             </div>
                         </div>
                         {isComment && <div className="status-content-inner main-content-secondary-background">{this.renderTextContent(textContent, hasMore)}

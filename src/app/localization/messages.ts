@@ -190,6 +190,9 @@ var translations = {
     "common.filename":"filename",
     "Could not update filename":"Could not update filename",
     "Add attention":"Add attention",
+    "To":"To",
+    "conversation.create.members.placeholder":"Type the name of the person",
+    "New conversation":"New conversation",
   },
   no: {
     "search.placeholder": "Søk ...",
@@ -382,6 +385,9 @@ var translations = {
     "common.filename":"filnavn",
     "Could not update filename":"Kunne ikke oppdatere filnavnet",
     "Add attention":"Sett oppmerksomhet",
+    "To":"Til",
+    "conversation.create.members.placeholder":"Skriv inn navnet på personen",
+    "New conversation":"Ny samtale",
   },
   en: {
     "search.placeholder": "Search ...",
@@ -581,6 +587,9 @@ var translations = {
     "common.filename":"filename",
     "Could not update filename":"Could not update filename",
     "Add attention":"Add attention",
+    "To":"To",
+    "conversation.create.members.placeholder":"Type the name of the person",
+    "New conversation":"New conversation",
   }
 };
 
