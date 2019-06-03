@@ -14,6 +14,7 @@ type OwnProps = {
 }
 type DefaultProps = {
     size: number
+    borderWidth:number
 }
 type State = {
     isLoading:Boolean
@@ -26,7 +27,8 @@ type ReduxDispatchProps = {
 type Props = OwnProps & DefaultProps & RouteComponentProps<any> & ReduxStateProps & ReduxDispatchProps
 class StackedAvatars extends React.Component<Props, State> {
     static defaultProps:DefaultProps = {
-        size:40
+        size:40,
+        borderWidth:2
     }
     constructor(props:Props) {
         super(props);
@@ -58,7 +60,7 @@ class StackedAvatars extends React.Component<Props, State> {
     renderAvatar = (profile:UserProfile) => {
         return(
             <Link key={profile.id} to={profile.uri}>
-                <Avatar title={profile.first_name + " " + profile.last_name} size={this.props.size} image={userAvatar(profile, true)} borderColor={"#FFFFFF"} borderWidth={2} />
+                <Avatar title={profile.first_name + " " + profile.last_name} size={this.props.size} image={userAvatar(profile, true)} borderColor={"#FFFFFF"} borderWidth={this.props.borderWidth} />
             </Link>
         )
     }

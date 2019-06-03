@@ -5,7 +5,7 @@ import { Conversation, UserProfile } from '../../types/intrasocial_types';
 import { Link } from 'react-router-dom';
 import { AuthenticationManager } from '../../managers/AuthenticationManager';
 import { ProfileManager } from '../../managers/ProfileManager';
-import { nullOrUndefined } from '../../utilities/Utilities';
+import { nullOrUndefined, userAvatar } from '../../utilities/Utilities';
 import { Avatar } from '../../components/general/Avatar';
 import { ReduxState } from '../../redux';
 import { connect } from 'react-redux';
@@ -89,7 +89,7 @@ class ConversationListItem extends React.Component<Props, State> {
         let myId = authenticatedProfile.id
         let title = ConversationUtilities.getConversationTitle(this.props.conversation, myId)
         let users = ProfileManager.getProfiles(conversation.users.filter(i => i != myId).slice(0, ConversationListItem.maxVisibleAvatars))
-        const avatars = users.map(u => u.avatar_thumbnail || u.avatar).filter(a => !nullOrUndefined(a))
+        const avatars = users.map(u => userAvatar( u )).filter(a => !nullOrUndefined(a))
         const size = 44
         const cl = classnames("conversation-list-item", className, {active:isActive})
         const ddOptions = this.getOptionMenuItems()

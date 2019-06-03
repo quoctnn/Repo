@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { ScrollPosition, stringToDateFormat, DateFormat, stringToDate } from '../../utilities/Utilities';
+import { ScrollPosition, stringToDateFormat, DateFormat, stringToDate, userAvatar } from '../../utilities/Utilities';
 import { ChatMessage, MessagePosition } from './ChatMessage';
 import { DayLine } from './DayLine';
 import { ChatMessageUser } from './ChatMessageUser';
@@ -127,14 +127,13 @@ export class ChatMessageList extends React.Component<Props & React.HTMLAttribute
             if(showTime)
             {
                 var str = stringToDateFormat(message.created_at, DateFormat.time)
-                var avatar = null
+                var avatar:string = null
                 if(!isMessageFromCurrentUser)
                 {
                     let user = ProfileManager.getProfileById(message.user)
                     str = `${user.first_name}, ${str}` 
-                    avatar = user.avatar
+                    avatar = userAvatar(user)
                 }
-
                 components.push(
                     <ChatMessageUser key={message.id + "user"} avatar={avatar} text={str} direction={this.getDirection(message)} />
                 )

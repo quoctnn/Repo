@@ -143,7 +143,7 @@ export class StatusComponent extends React.Component<Props, State> {
         return <StatusBadgeList setting={badgeSettings} />
     }
     renderStatusRead = (status:Status) => {
-        return <StackedAvatars userIds={status.read_by} size={24}/>
+        return <StackedAvatars userIds={status.read_by} size={24} borderWidth={1}/>
     }
     refresh = () => {
         this.setState((prevState) => {

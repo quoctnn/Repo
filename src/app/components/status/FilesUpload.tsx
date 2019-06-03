@@ -17,7 +17,7 @@ type OwnProps = {
     onFileAdded:() => void
     onFileError:() => void
     onFileUploaded:(file:UploadedFile) => void
-    onFileRename:(file:UploadedFile, name:string) => void
+    onFileRename?:(file:UploadedFile, name:string) => void
     onFileQueueComplete:() => void
     communityId:number
     files?:UploadedFile[]
@@ -130,7 +130,7 @@ class FilesUpload extends React.Component<Props, State> {
         }
     }
     renderFile = (file:UploadedFile) =>  {
-        const rename = file.user == this.props.authenticatedUser.id ? this.props.onFileRename : undefined
+        const rename = this.props.onFileRename && file.user == this.props.authenticatedUser.id ? this.props.onFileRename : undefined
         const handleRetry = file.custom && file.hasError ? this.handleFileRetryUpload : undefined
         return <FileListItem onRetryUpload={handleRetry} key={file.id} file={file} onRemove={this.handleRemoveFile} onRename={rename} useLink={false} />
     }

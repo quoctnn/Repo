@@ -78,6 +78,10 @@ module.exports = merge(config, {
     new CopyWebpackPlugin([{
       from: 'react360/',
       to:"react360"
+    }]),
+    new CopyWebpackPlugin([{
+      from: 'CHANGELOG.rst',
+      to:"assets/docs"
     }])
   ],
   devtool: 'cheap-module-source-map',

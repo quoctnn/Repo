@@ -271,7 +271,8 @@ class TasksModule extends React.Component<Props, State> {
         const {history, match, location, staticContext, contextNaturalKey, contextObject, ...rest} = this.props
         const {breakpoint, className} = this.props
         const cn = classnames("tasks-module", className)
-        const menu = <TaskMenu data={this.state.menuData} onUpdate={this.menuDataUpdated}  />
+        const disableContextSearch = !!contextNaturalKey
+        const menu = <TaskMenu data={this.state.menuData} onUpdate={this.menuDataUpdated} disableContextSearch={disableContextSearch}  />
         const headerContent = this.renderFilters()
         return (<SimpleModule {...rest}
                     className={cn}

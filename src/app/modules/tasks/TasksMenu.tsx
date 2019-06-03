@@ -24,6 +24,7 @@ type Props =
 {
     data:TasksMenuData
     onUpdate:(data:TasksMenuData) => void
+    disableContextSearch?:boolean
 }
 type State = {
     data:TasksMenuData
@@ -116,10 +117,12 @@ export default class TaskMenu extends React.Component<Props, State> {
 
         return(
             <div className="tasks-menu">
+                {!this.props.disableContextSearch && 
                 <FormGroup>
                     <Label>{translate("task.module.menu.projectfilter.title")}</Label>
                     <ProjectFilter onValueChange={this.onContextChange} value={this.state.data.project} />
                 </FormGroup>
+                }
                 <FormGroup>
                     <Label>{translate("task.module.menu.state.title")}</Label>
                     <ButtonGroup className="flex-wrap d-block">

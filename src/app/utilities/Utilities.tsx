@@ -45,33 +45,52 @@ export function communityName(community:Community) {
 }
 
 export function userAvatar(user:UserProfile, thumbnail = false) {
-    return (user && (thumbnail ? user.avatar_thumbnail : user.avatar)) || Constants.resolveUrl( Constants.defaultImg.user )()
+    if(user)
+        return thumbnail ? user.avatar_thumbnail || user.avatar : user.avatar || user.avatar_thumbnail
+    return Constants.resolveUrl( Constants.defaultImg.user )()
 }
 export function communityAvatar(community:Community, thumbnail = false) {
-    return (community && (thumbnail ? community.avatar_thumbnail : community.avatar)) || Constants.resolveUrl(Constants.defaultImg.communityAvatar)()
+    if(community)
+        return thumbnail ? community.avatar_thumbnail || community.avatar : community.avatar || community.avatar_thumbnail
+    return Constants.resolveUrl( Constants.defaultImg.communityAvatar )()
 }
 export function groupAvatar(group:Group, thumbnail = false) {
-    return (group && (thumbnail ? group.avatar_thumbnail : group.avatar)) || Constants.resolveUrl(Constants.defaultImg.groupAvatar)()
+    if(group)
+        return thumbnail ? group.avatar_thumbnail || group.avatar : group.avatar || group.avatar_thumbnail
+    return Constants.resolveUrl( Constants.defaultImg.groupAvatar )()
 }
 export function projectAvatar(project:Project, thumbnail = false) {
-    return (project && (thumbnail ? project.avatar_thumbnail : project.avatar_thumbnail || project.avatar)) || Constants.resolveUrl(Constants.defaultImg.projectAvatar)()
+    if(project)
+        return thumbnail ? project.avatar_thumbnail || project.avatar : project.avatar || project.avatar_thumbnail
+    return Constants.resolveUrl( Constants.defaultImg.projectAvatar )()
 }
 
 export function userCover(user:UserProfile, thumbnail = false) {
-    return (user && (thumbnail ? user.cover_thumbnail : user.cover_cropped || user.cover)) || Constants.resolveUrl(Constants.defaultImg.user)()
+    if(user)
+        return thumbnail ? user.cover_thumbnail || user.cover_cropped : user.cover_cropped || user.cover_thumbnail
+    return Constants.resolveUrl(Constants.defaultImg.user)()
 }
 export function communityCover(community:Community, thumbnail = false) {
-    return (community && (thumbnail ? community.cover_thumbnail : community.cover_cropped || community.cover)) || Constants.resolveUrl(Constants.defaultImg.community)()
+    if(community)
+        return thumbnail ? community.cover_thumbnail || community.cover_cropped : community.cover_cropped || community.cover_thumbnail
+    return Constants.resolveUrl(Constants.defaultImg.community)()
 }
 export function projectCover(project:Project, thumbnail = false) {
-    return (project && (thumbnail ? project.cover_thumbnail : project.cover_cropped || project.cover)) || Constants.resolveUrl(Constants.defaultImg.project)()
+    if(project)
+        return thumbnail ? project.cover_thumbnail || project.cover_cropped : project.cover_cropped || project.cover_thumbnail
+    return Constants.resolveUrl(Constants.defaultImg.project)()
 }
 export function groupCover(group:Group, thumbnail = false) {
-    return (group && (thumbnail ? group.cover_thumbnail : group.cover_cropped || group.cover)) || Constants.resolveUrl(Constants.defaultImg.group)()
+    if(group)
+        return thumbnail ? group.cover_thumbnail || group.cover_cropped : group.cover_cropped || group.cover_thumbnail
+    return Constants.resolveUrl(Constants.defaultImg.group)()
 }
 export function eventCover(event:Event, thumbnail = false) {
-    return (event && (thumbnail ? event.cover_thumbnail : event.cover_cropped || event.cover)) || Constants.resolveUrl(Constants.defaultImg.event)()
+    if(event)
+        return thumbnail ? event.cover_thumbnail || event.cover_cropped : event.cover_cropped || event.cover_thumbnail
+    return Constants.resolveUrl(Constants.defaultImg.event)()
 }
+
 export const coordinateIsValid = (coordinate:Coordinate) => {
     return coordinate && coordinate.lat && coordinate.lon
 }

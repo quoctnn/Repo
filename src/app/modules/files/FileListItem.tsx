@@ -10,6 +10,7 @@ import Button from 'reactstrap/lib/Button';
 import { Progress, Badge, InputGroup, Input, InputGroupAddon } from 'reactstrap';
 import { translate } from '../../localization/AutoIntlProvider';
 import { nullOrUndefined } from '../../utilities/Utilities';
+import { OverflowMenu, OverflowMenuItem } from '../../components/general/OverflowMenu';
 
 type InputFieldProps = {
     value:string
@@ -32,9 +33,9 @@ export class InputField extends React.Component<InputFieldProps, {}> {
         const showFocusBorder = nullOrUndefined(this.props.focusBorder) ? true : this.props.focusBorder
         const cn = classnames("input-group-transparent", this.props.className)
         const inputcn = classnames("form-control-transparent primary-text", this.props.inputClassName, {"text-center":this.props.centerText, "focus-border": showFocusBorder})
-        return (<InputGroup className={cn}>
+        return (<InputGroup className={cn} onClick={this.handlePenClick}>
                     <Input innerRef={(ref) => this.inputRef = ref} placeholder={this.props.placeholder} tabIndex={1} className={inputcn} value={this.props.value} onChange={this.props.onChange} onBlur={this.props.onBlur} /> 
-                    <InputGroupAddon onClick={this.handlePenClick} className="ml-1" addonType="append">
+                    <InputGroupAddon className="ml-1" addonType="append">
                         <i className="fas fa-pen"></i>
                     </InputGroupAddon>
                 </InputGroup>)
@@ -155,6 +156,15 @@ export default class FileListItem extends React.Component<Props, State> {
             return <div className="text-truncate">{name}</div>
         return <InputField inputClassName="m-0 p-0 h-auto" focusBorder={false} placeholder={translate("common.filename")} onChange={this.onNameChange} onBlur={this.onNameBlur} value={name}/>
     }
+    fetchMenuItems = () => {
+        const items:OverflowMenuItem[] = [] 
+
+        return items
+    }
+    preventDefault = (e:React.SyntheticEvent) => {
+        event.preventDefault()
+        event.stopPropagation()
+    }
     renderContent = () => {
         const {file, onRemove, onRetryUpload} = this.props
         const fileSize = FileUtilities.humanFileSize(file.size || 0)
@@ -167,7 +177,12 @@ export default class FileListItem extends React.Component<Props, State> {
                         }
                     </div>
                     <div className="d-flex flex-grow-1 flex-column content-container">
-                        {this.renderName()}
+                        <div className="d-flex">
+                            {this.renderName()}
+                            {false && 
+                                <OverflowMenu refresh={"str"} fetchItems={this.fetchMenuItems} maxVisible={0} buttonIconClass="fas fa-ellipsis-v" />
+                            }
+                        </div>
                         <div className="d-flex text-muted text-truncate align-items-center">
                             <div className="text-truncate medium-small-text">{fileSize}</div>
                             <div className="flex-grow-1 d-flex">

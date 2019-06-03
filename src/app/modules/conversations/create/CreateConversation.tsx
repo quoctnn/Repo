@@ -12,6 +12,7 @@ import SelectUsersDialog from '../../../components/general/dialogs/SelectUsersDi
 import { ProfileManager } from '../../../managers/ProfileManager';
 import { ConversationUtilities } from '../../../utilities/ConversationUtilities';
 import { AuthenticationManager } from '../../../managers/AuthenticationManager';
+import { userAvatar } from '../../../utilities/Utilities';
 type OwnProps = {
     onComplete:() => void
 }
@@ -120,7 +121,7 @@ class CreateConversation extends React.Component<Props, State> {
                                                     {
                                                         return (<div key={u.id}>
                                                             <div className="member-avatar">
-                                                            <Avatar image={u.avatar}>
+                                                            <Avatar image={userAvatar(u)}>
                                                                 <button onClick={this.removeUser.bind(this, u.id)} type="button" className="remove-button btn btn-danger btn-sm rounded-circle" aria-label="Close">
                                                                     <i className="fas fa-times"></i>
                                                                 </button>

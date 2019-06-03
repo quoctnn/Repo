@@ -3,7 +3,7 @@ import { withRouter, RouteComponentProps } from "react-router-dom";
 import classnames from "classnames"
 import "./FilesModule.scss"
 import { ResponsiveBreakpoint } from '../../components/general/observers/ResponsiveComponent';
-import { ContextNaturalKey, Permissible, UploadedFile, IdentifiableObject } from '../../types/intrasocial_types';
+import { ContextNaturalKey, Permissible, UploadedFile, IdentifiableObject, UserProfile } from '../../types/intrasocial_types';
 import { connect } from 'react-redux';
 import { ReduxState } from '../../redux';
 import LoadingSpinner from '../../components/LoadingSpinner';
@@ -14,6 +14,7 @@ import ApiClient, { PaginationResult } from '../../network/ApiClient';
 import { ToastManager } from '../../managers/ToastManager';
 import FileListItem from './FileListItem';
 import { ContextManager } from '../../managers/ContextManager';
+import { AuthenticationManager } from '../../managers/AuthenticationManager';
 type OwnProps = {
     className?:string
     breakpoint:ResponsiveBreakpoint
@@ -24,6 +25,7 @@ type State = {
 }
 type ReduxStateProps = {
     contextObject:Permissible & IdentifiableObject
+    authenticatedUser:UserProfile
 }
 type ReduxDispatchProps = {
 }
@@ -62,8 +64,24 @@ class FilesModule extends React.Component<Props, State> {
             ToastManager.showErrorToast(error)
         })
     }
+    handleRenameFile = (file: UploadedFile, name: string) => {
+        if(!name || name.length == 0)
+            return
+        ApiClient.updateFilename(file.id, name, (data, status, error) => {
+            if(!!data && !error)
+            {
+                this.filesList.current.updateItem(data)
+            }
+            ToastManager.showErrorToast(error, status, translate("Could not update filename"))
+        })
+    }
     renderFile = (file:UploadedFile) =>  {
-        return <FileListItem key={file.id} file={file} />
+        //const rename = file.user == this.props.authenticatedUser.id ? this.handleRenameFile : undefined
+        return <FileListItem 
+                key={file.id} 
+                file={file} 
+                //onRename={rename}
+                />
     }
     renderContent = (contextObject:Permissible) => {
 
@@ -79,7 +97,7 @@ class FilesModule extends React.Component<Props, State> {
     }
     render()
     {
-        const {history, match, location, staticContext, contextNaturalKey, contextObject, ...rest} = this.props
+        const {history, match, location, staticContext, contextNaturalKey, contextObject,authenticatedUser, ...rest} = this.props
         const {breakpoint, className} = this.props
         const cn = classnames("files-module", className)
         return (<SimpleModule {...rest} 
@@ -97,6 +115,7 @@ const mapStateToProps = (state:ReduxState, ownProps: OwnProps & RouteComponentPr
     const contextObject = ContextManager.getContextObject(ownProps.location.pathname, ownProps.contextNaturalKey)
     return {
         contextObject,
+        authenticatedUser: AuthenticationManager.getAuthenticatedUser()
     }
 }
 const mapDispatchToProps = (dispatch:ReduxState, ownProps: OwnProps):ReduxDispatchProps => {

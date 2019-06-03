@@ -32,6 +32,7 @@ import { NavigationUtilities } from '../../utilities/NavigationUtilities';
 import SimpleDialog from '../../components/general/dialogs/SimpleDialog';
 import ConversationEditor from './ConversationEditor';
 import { tempConversationId } from '../conversations/ConversationsModule';
+import { userAvatar } from '../../utilities/Utilities';
 
 const reducer = (accumulator, currentValue) => accumulator + currentValue;
 const uidToNumber = (uid) => uid.split("_").map(n => parseInt(n)).reduce(reducer)
@@ -258,7 +259,7 @@ class ConversationModule extends React.Component<Props, State> {
         {
             return <li className="is-typing-container">
             {keys.map((id, index) => {
-                let avatar = ProfileManager.getProfileById(id).avatar
+                let avatar = userAvatar( ProfileManager.getProfileById(id) )
                 return (<Avatar key={index} image={avatar} size={24}/>)
 
             })}

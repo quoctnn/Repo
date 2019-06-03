@@ -1,6 +1,6 @@
 import * as React from "react";
 import classNames from "classnames";
-import { userFullName } from '../utilities/Utilities';
+import { userFullName, userAvatar } from '../utilities/Utilities';
 import { Avatar } from './general/Avatar';
 import { Link } from 'react-router-dom';
 import Routes from '../utilities/Routes';
@@ -71,12 +71,13 @@ export default class ProfileItem extends React.Component<Props,{}> {
         let user = this.props.profile;
         let itemClasses = classNames(this.props.itemClass, "profile-item")
         const reaction = StatusReactionUtilities.parseStatusReaction(this.props.reaction)
+        const avatar = userAvatar(user)
         return (
             <div className={itemClasses}>
                 <Link to={Routes.profileUrl(user.slug_name)}>
                     <div className="wrapper">
                     <div className="col-xs-4">
-                        <Avatar className="img-responsive" image={user.avatar || user.avatar_thumbnail} >
+                        <Avatar className="img-responsive" image={avatar} >
                             <StatusReactionUtilities.Component selected={true} large={false} reaction={reaction}></StatusReactionUtilities.Component>
                         </Avatar>
                     </div>
