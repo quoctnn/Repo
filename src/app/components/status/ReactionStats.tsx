@@ -3,7 +3,6 @@ import classNames from "classnames";
 import { UserProfile } from '../../types/intrasocial_types';
 import { ProfileManager } from '../../managers/ProfileManager';
 import { StatusInteractionDialog } from '.././status/dialogs/StatusInteractionDialog';
-require("./ReactionStats.scss");
 
 export interface ReactionStatsProps
 {
@@ -61,12 +60,11 @@ export default class ReactionStats extends React.Component<ReactionStatsProps,Re
         )
     }
     render() {
-        const classes = classNames("btn reactions-count", {"active": this.props.reactionsCount > 0})
-        const linkClasses = classNames({"text link": this.props.reactionsCount > 0})
+        const classes = classNames("btn reactions-count btn-link", {"active": this.props.reactionsCount > 0})
         return (
             <>
                 <button className={classes} onClick={this.handleShowReactions}>
-                    <span className={linkClasses}>{this.props.reactionsCount}</span>
+                    {this.props.reactionsCount}
                 </button>
                 {this.renderReactionsModal()}
             </>

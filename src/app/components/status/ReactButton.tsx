@@ -105,7 +105,7 @@ export default class ReactButton extends React.Component<Props, State>
     }
     render() {
         const active = this.props.reaction != null
-        let classes = classNames("btn btn-like", {"active": active})
+        let classes = classNames("btn btn-like btn-link", {"active": active})
         const reaction = StatusReactionUtilities.parseStatusReaction(this.props.reaction)
         const showBG = reaction != StatusReaction.LIKE
         const canReact = !!this.props.onActionPress
