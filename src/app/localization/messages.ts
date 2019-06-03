@@ -193,6 +193,7 @@ var translations = {
     "To":"To",
     "conversation.create.members.placeholder":"Type the name of the person",
     "New conversation":"New conversation",
+    "Sending...":"Sending..."
   },
   no: {
     "search.placeholder": "Søk ...",
@@ -388,6 +389,7 @@ var translations = {
     "To":"Til",
     "conversation.create.members.placeholder":"Skriv inn navnet på personen",
     "New conversation":"Ny samtale",
+    "Sending...":"Sender..."
   },
   en: {
     "search.placeholder": "Search ...",
@@ -590,6 +592,7 @@ var translations = {
     "To":"To",
     "conversation.create.members.placeholder":"Type the name of the person",
     "New conversation":"New conversation",
+    "Sending...":"Sending..."
   }
 };
 
