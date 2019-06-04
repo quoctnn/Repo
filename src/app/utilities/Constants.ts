@@ -55,6 +55,12 @@ export default  {
         setMainCommunityUrl: (id:number|string) => {
             return `/api/v2/community/${id}/set-as-main`
         },
+        communityInvitationDeleteUrl: (id:number) => {
+            return `/api/v2/community-invitation/${id}/`
+        },
+        communityInvitationAcceptUrl: (id:number) => {
+            return `/api/v2/community-invitation/${id}/accept/`
+        },
         communityList:'/api/v2/community/',
         // Profile URLs
         myProfileUrl: '/api/v2/profile/me/',
@@ -78,7 +84,12 @@ export default  {
         groupFilesUrl: (id:number) => {
             return `/api/v2/group/${id}/files/`
         },
-
+        groupInvitationDeleteUrl: (id:number) => {
+            return `/api/v2/group-invitation/${id}/`
+        },
+        groupInvitationAcceptUrl: (id:number) => {
+            return `/api/v2/group-invitation/${id}/accept/`
+        },
         // Project URLs
         projectsUrl: '/api/v2/project/',
         projectDetailUrl: (id:number|string) => {
@@ -132,7 +143,16 @@ export default  {
         eventFilesUrl: (id:number) => {
             return `/api/v2/event/${id}/files/`
         },
-
+        eventInvitationGoingUrl: (id:number) => {
+            return `/api/v2/event-invitation/${id}/attending/`
+        },
+        eventInvitationNotGoingUrl: (id:number) => {
+            return `/api/v2/event-invitation/${id}/not-attending/`
+        },
+        eventInvitationDeleteUrl: (id:number) => {
+            return `/api/v2/event-invitation/${id}/`
+        },
+        
         // Recent Activity URLs
         recentActivityUrl: '/api/v2/notification/',
         recentActivityUnreadUrl: '/api/v2/notification/unread-count/',
@@ -145,6 +165,7 @@ export default  {
         notificationUnreadUrl: '/api/v2/notification/unread-count/',
         notificationMarkReadUrl: '/api/v2/notification/update-as-read/',
         notificationMarkAllReadUrl: '/api/v2/notification/mark-all-as-read/',
+        notificationsUnhandledUrl:'/api/v2/notification/unhandled/',
 
         newsfeed:'/api/v2/newsfeed/',
         // Conversation Notification URLs
@@ -154,6 +175,13 @@ export default  {
         convNotificationMarkReadUrl: '/api/v2/notification_conv/update-as-read/',
         convNotificationMarkAllReadUrl: '/api/v2/notification_conv/mark-all-as-read/',
 
+        //friend-invitation
+        friendInvitationDelete: (id:number) => {
+            return `/api/v2/friend-invitation/${id}/`
+        },
+        friendInvitationAccept: (id:number) => {
+            return `/api/v2/friend-invitation/${id}/accept/`
+        },
         //Status attributes
         statusAttributes:'/api/v2/status-attributes/',
         statusMarkRead:"/api/v2/status/mark-read/",

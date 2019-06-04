@@ -21,6 +21,14 @@ String.prototype.trimLeftCharacters = function(charlist:string){
         charlist = "\s";
     return this.replace(new RegExp("^[" + charlist + "]+"), "")
 }
+String.prototype.format = function(...args:any[]) {
+    return this.replace(/{(\d+)}/g, function(match, number) { 
+        return typeof args[number] != 'undefined'
+        ? args[number]
+        : match
+        ;
+    })
+}
 String.prototype.isNumber = function(): boolean
 {
    return !isNaN(Number(this.toString()));

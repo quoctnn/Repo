@@ -1,29 +1,55 @@
+import * as React from "react";
 import {  Store } from 'redux';
 import { Community } from '../types/intrasocial_types';
 import ApiClient from '../network/ApiClient';
 import { ReduxState } from '../redux';
-import { addCommunitiesAction } from '../redux/communityStore';
+import { addCommunitiesAction, removeCommunityAction } from '../redux/communityStore';
 import { setActiveCommunityAction } from '../redux/activeCommunity';
 import { NotificationCenter } from '../utilities/NotificationCenter';
 import { EventStreamMessageType } from '../network/ChannelEventStream';
+import { ToastManager } from './ToastManager';
+import { translate } from '../localization/AutoIntlProvider';
+import { Button } from "reactstrap";
+import { Link } from "react-router-dom";
+import Routes from "../utilities/Routes";
 export abstract class CommunityManager
 {
     static setup = () => 
     {
         NotificationCenter.addObserver('eventstream_' + EventStreamMessageType.COMMUNITY_UPDATE, CommunityManager.processCommunityUpdate)
+        NotificationCenter.addObserver('eventstream_' + EventStreamMessageType.COMMUNITY_DELETE, CommunityManager.processCommunityDelete)
+    }
+    static processCommunityDelete = (...args:any[]) => {
+        let communityId = args[0]['community_id'] as number;
+        CommunityManager.removeCommunity(communityId)
     }
     static processCommunityUpdate = (...args:any[]) => {
         let communityId = args[0]['community_id'] as number;
         ApiClient.getCommunity(communityId, (community, status, error) => {
             if(community)
             {
+                const hasCommunity = !!CommunityManager.getCommunityById(communityId)
                 CommunityManager.storeCommunities([community])
+                if(!hasCommunity)
+                {
+                    const buttons = [<Link key="1" to={Routes.communityUrl(community.slug_name)} className="btn btn-xs btn-primary">{translate("Visit")}</Link>]
+                    ToastManager.showInfoToast(translate("community.incoming.new").format(community.name), null, buttons)
+                }
             }
         })
     }
     static storeCommunities = (communities:Community[]) => {
         if(communities.length > 0)
             CommunityManager.getStore().dispatch(addCommunitiesAction(communities))
+    }
+    static removeCommunity = (communityId:number) => {
+        const activeCommunity = CommunityManager.getActiveCommunity()
+        CommunityManager.getStore().dispatch(removeCommunityAction(communityId))
+        if(activeCommunity && activeCommunity.id == communityId)
+        {
+            CommunityManager.setInitialCommunity()
+            CommunityManager.applyCommunityTheme(CommunityManager.getActiveCommunity())
+        }
     }
     static getCommunity = (communityId:string):Community|null => 
     {

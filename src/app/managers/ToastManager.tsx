@@ -7,14 +7,14 @@ export abstract class ToastManager
     static setup()
     {
     }
-    static showInfoToast = (message:string, description?:string, opts?:ToastOptions) => 
+    static showInfoToast = (message:string, description?:string, buttons?:JSX.Element[], opts?:ToastOptions) => 
     {
         if(message)
-            toast.info(<InfoToast message={message} description={description} />,opts || {hideProgressBar: true});
+            toast.info(<InfoToast message={message} description={description} buttons={buttons} />,opts || {hideProgressBar: true});
     }
-    static showErrorToast = (message:string, preferredMessage?:string, description?:string, opts?:ToastOptions) => 
+    static showErrorToast = (message:string, preferredMessage?:string, description?:string, buttons?:JSX.Element[], opts?:ToastOptions) => 
     {
         if(message)
-            toast.error(<ErrorToast message={preferredMessage || message} description={description} />,opts || {hideProgressBar: true});
+            toast.error(<ErrorToast message={preferredMessage || message} description={description} buttons={buttons} />,opts || {hideProgressBar: true});
     }
 }

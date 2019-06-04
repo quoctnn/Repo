@@ -2,7 +2,7 @@ import Constants from "../utilities/Constants";
 import {AjaxRequest} from "./AjaxRequest";
 import { EndpointManager } from '../managers/EndpointManager';
 var $ = require("jquery")
-import { Status, UserProfile, UploadedFile, Community, Group, Conversation, Project, Message, Event, Task, ElasticSearchType, ObjectAttributeType, StatusObjectAttribute, EmbedCardItem, ReportTag, ContextNaturalKey, ReportResult, Dashboard, Timesheet, Coordinate, RecentActivity } from '../types/intrasocial_types';
+import { Status, UserProfile, UploadedFile, Community, Group, Conversation, Project, Message, Event, Task, ElasticSearchType, ObjectAttributeType, StatusObjectAttribute, EmbedCardItem, ReportTag, ContextNaturalKey, ReportResult, Dashboard, Timesheet, Coordinate, RecentActivity, UnhandledNotifications } from '../types/intrasocial_types';
 import { nullOrUndefined } from '../utilities/Utilities';
 import moment = require("moment");
 import { Settings } from "../utilities/Settings";
@@ -181,6 +181,16 @@ export default class ApiClient
         }, (request, status, error) => {
             callback(null, status, error)
         })
+    }
+    static getNotifications(callback:ApiClientCallback<UnhandledNotifications>)
+    {
+        let url = Constants.apiRoute.notificationsUnhandledUrl
+        AjaxRequest.get(url, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+
     }
     static getRecentActivity(limit:number, offset:number, callback:ApiClientFeedPageCallback<RecentActivity>)
     {
@@ -625,6 +635,78 @@ export default class ApiClient
     {
         let url = endpoint + "?" + this.getQueryString({ limit, offset})
         AjaxRequest.get(url, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
+    static friendInvitationAccept = (invitation:number, callback:ApiClientCallback<any>) => {
+        let url = Constants.apiRoute.friendInvitationAccept(invitation)
+        AjaxRequest.get(url, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
+    static friendInvitationDelete(invitation:number, block:boolean, callback:ApiClientCallback<any>){
+        let url = Constants.apiRoute.friendInvitationDelete(invitation) + "?" + this.getQueryString({block})
+        AjaxRequest.delete(url, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
+    static groupInvitationAccept = (invitation:number, callback:ApiClientCallback<any>) => {
+        let url = Constants.apiRoute.groupInvitationAcceptUrl(invitation)
+        AjaxRequest.get(url, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
+    static groupInvitationDelete(invitation:number, callback:ApiClientCallback<any>){
+        let url = Constants.apiRoute.groupInvitationDeleteUrl(invitation)
+        AjaxRequest.delete(url, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
+    static communityInvitationAccept = (invitation:number, callback:ApiClientCallback<any>) => {
+        let url = Constants.apiRoute.communityInvitationAcceptUrl(invitation)
+        AjaxRequest.get(url, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
+    static communityInvitationDelete(invitation:number, callback:ApiClientCallback<any>){
+        let url = Constants.apiRoute.communityInvitationDeleteUrl(invitation)
+        AjaxRequest.delete(url, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
+    static eventInvitationGoing = (invitation:number, callback:ApiClientCallback<any>) => {
+        let url = Constants.apiRoute.eventInvitationGoingUrl(invitation)
+        AjaxRequest.get(url, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
+    static eventInvitationNotGoing = (invitation:number, callback:ApiClientCallback<any>) => {
+        let url = Constants.apiRoute.eventInvitationNotGoingUrl(invitation)
+        AjaxRequest.get(url, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
+    static eventInvitationDelete(invitation:number, callback:ApiClientCallback<any>){
+        let url = Constants.apiRoute.eventInvitationDeleteUrl(invitation)
+        AjaxRequest.delete(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
             callback(null, status, error)

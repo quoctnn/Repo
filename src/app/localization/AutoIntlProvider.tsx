@@ -18,7 +18,7 @@ export interface Props {
     language: number,
 }
 var private_messages = null
-export const translate = (key:any) => {
+export const translate = (key:string):string => {
     let messages = private_messages
     if(key in messages)
         return messages[key]

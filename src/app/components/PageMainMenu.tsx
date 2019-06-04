@@ -2,7 +2,6 @@ import * as React from "react";
 import "./PageMainMenu.scss"
 import { ReduxState } from "../redux";
 import { connect } from "react-redux";
-import { Link } from "react-router-dom";
 
 interface OwnProps
 {

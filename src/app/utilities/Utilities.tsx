@@ -29,13 +29,22 @@ export const parseJSONObject = (param:string) => {
     return null
 }
 
-export function userFullName(user:SimpleUserProfile | UserProfile) {
+export function userFullName(user:SimpleUserProfile | UserProfile, fallback?:string) {
     if(!user)
-        return "Anonymous"
+    {
+        if(fallback !== undefined)
+            return fallback
+        return  "Anonymous"
+    }
     if (user.first_name) {
         return `${user.first_name} ${user.last_name}`;
     }
-    return (user as UserProfile).username || "No name";
+    const un = (user as UserProfile).username
+    if(un)
+        return un 
+    if(fallback !== undefined)
+        return fallback
+    return "No name";
 }
 export function isAdmin(user:UserProfile) {
     return user && (user.is_superuser || user.is_staff)
@@ -63,6 +72,11 @@ export function projectAvatar(project:Project, thumbnail = false) {
     if(project)
         return thumbnail ? project.avatar_thumbnail || project.avatar : project.avatar || project.avatar_thumbnail
     return Constants.resolveUrl( Constants.defaultImg.projectAvatar )()
+}
+export function eventAvatar(event:Event, thumbnail = false) {
+    if(event)
+        return thumbnail ? event.avatar_thumbnail || event.avatar : event.avatar || event.avatar_thumbnail
+    return Constants.resolveUrl( Constants.defaultImg.eventAvatar )()
 }
 
 export function userCover(user:UserProfile, thumbnail = false) {

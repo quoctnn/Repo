@@ -3,7 +3,7 @@ import "./PageTopMenu.scss"
 import { ReduxState } from "../redux";
 import { connect } from "react-redux";
 import { Button, Popover, PopoverBody, ModalHeader, Modal, ModalBody, ModalFooter, DropdownItem } from "reactstrap";
-import { Link, withRouter, RouteComponentProps } from "react-router-dom";
+import { withRouter, RouteComponentProps } from "react-router-dom";
 import Routes from "../utilities/Routes";
 import { UserProfile } from "../types/intrasocial_types";
 import { isAdmin } from "../utilities/Utilities";
@@ -12,6 +12,8 @@ import DevTool from "./dev/DevTool";
 import { OverflowMenuItem, OverflowMenuItemType, createDropdownItem } from "./general/OverflowMenu";
 import { Settings } from '../utilities/Settings';
 import { WindowAppManager } from '../managers/WindowAppManager';
+import SimpleDialog from "./general/dialogs/SimpleDialog";
+import NotificationsComponent from "./notifications/NotificationsComponent";
 
 interface OwnProps
 {
@@ -31,6 +33,7 @@ type State = {
     target:HTMLElement
     key:string
     developerToolVisible:boolean,
+    notificationsPanelVisible:boolean
 }
 class PageTopMenu extends React.Component<Props, State> {
     constructor(props:Props) {
@@ -41,6 +44,7 @@ class PageTopMenu extends React.Component<Props, State> {
             target:null,
             key:null,
             developerToolVisible:false,
+            notificationsPanelVisible:false,
         }
     }
     closePopoverPanel = () => {
@@ -68,9 +72,6 @@ class PageTopMenu extends React.Component<Props, State> {
     showMainPanel = (e:React.SyntheticEvent<any>) => {
         this.showPanel(this.renderMainPanel, e.currentTarget, "main")
     }
-    showNotificationPanel = (e:React.SyntheticEvent<any>) => {
-        this.showPanel(this.renderNotificationPanel, e.currentTarget, "notification")
-    }
     showFilesPanel = (e:React.SyntheticEvent<any>) => {
         this.showPanel(this.renderFilesPanel, e.currentTarget, "files")
     }
@@ -94,6 +95,21 @@ class PageTopMenu extends React.Component<Props, State> {
 
             this.setState({popoverOpen:true, renderFunc, target, key})
         }
+    }
+    toggleNotificationPanel = (e?:React.SyntheticEvent<any>) => {
+        this.setState((prevState:State) => {
+            return {notificationsPanelVisible:!prevState.notificationsPanelVisible}
+        })
+    }
+    toggleDeveloperTool = (e?:React.SyntheticEvent<any>) => {
+        if(e)
+        {
+            e.preventDefault()
+            e.stopPropagation()
+        }
+        this.setState((prevState) => {
+                return {developerToolVisible: !prevState.developerToolVisible}
+        })
     }
     navigateToChangelog = () => {
         WindowAppManager.navigateToRoute(Routes.CHANGELOG, true)
@@ -127,16 +143,10 @@ class PageTopMenu extends React.Component<Props, State> {
             {items.map(i => createDropdownItem(i))}
          </div>)
     }
-
-    toggleDeveloperTool = (e?:React.SyntheticEvent<any>) => {
-        if(e)
-        {
-            e.preventDefault()
-            e.stopPropagation()
-        }
-        this.setState((prevState) => {
-                return {developerToolVisible: !prevState.developerToolVisible}
-        })
+    renderNotificationsPanel = () => {
+        return <SimpleDialog header={translate("Notifications")} visible={this.state.notificationsPanelVisible} didCancel={this.toggleNotificationPanel}>
+                    <NotificationsComponent />
+                </SimpleDialog>
     }
     renderDeveloperTool = () => {
         if(this.state.developerToolVisible)
@@ -171,11 +181,12 @@ class PageTopMenu extends React.Component<Props, State> {
         return(
             <div id="page-top-menu">
                 <Button onClick={this.showSearchPanel} color="link"><i className="fas fa-search"></i></Button>
-                <Button onClick={this.showNotificationPanel} color="link"><i className="fas fa-bell"></i></Button>
+                <Button onClick={this.toggleNotificationPanel} color="link"><i className="fas fa-bell"></i></Button>
                 <Button onClick={this.showFilesPanel} color="link"><i className="fas fa-cloud"></i></Button>
                 <Button onClick={this.showMainPanel} color="link"><i className="fas fa-cog"></i></Button>
                 {this.renderPopover()}
                 {this.renderDeveloperTool()}
+                {this.renderNotificationsPanel()}
             </div>
         );
     }

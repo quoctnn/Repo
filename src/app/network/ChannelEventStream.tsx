@@ -22,7 +22,8 @@ export enum EventStreamMessageType {
     ACTIVITY_NEW = "activity.new",
     SOCKET_STATE_CHANGE = "socket.state.change",
     COMMUNITY_MAIN = "community.main",
-    COMMUNITY_UPDATE = "community.update"
+    COMMUNITY_UPDATE = "community.update",
+    COMMUNITY_DELETE = "community.delete",
 
 }
 export const eventStreamNotificationPrefix = "eventstream_"

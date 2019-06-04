@@ -27,6 +27,7 @@ declare global {
         splice(idx:number, rem:number, str:string):string;
         isNumber():boolean
         trimLeftCharacters(charlist:string):string;
+        format(...args:any[]):string
     }
     interface Array<T>
     {

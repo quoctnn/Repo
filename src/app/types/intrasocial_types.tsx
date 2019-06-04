@@ -49,6 +49,48 @@ export type TempStatus = {
   mentions: number[]
   pending?:boolean
 }
+export type Invitation = {
+    id:number
+    context_object: any
+    invited_by:number
+    created_at:string
+    message?:string
+}
+export enum NotificationGroupKey 
+{
+    COMMUNITY_INVITATIONS = "community_invitations",
+    GROUP_INVITATIONS = "group_invitations",
+    EVENT_INVITATIONS = "event_invitations",
+    FRIENDSHIP_INVITATIONS = "friendship_invitations",
+
+    UNREAD_CONVERSATIONS = "unread_conversations",
+
+    TASK_NOTIFICATIONS = "task_notifications",
+    TASK_REMINDERS = "task_reminders",
+    TASK_ATTENTIONS = "task_attentions",
+
+    STATUS_NOTIFICATIONS = "status_notifications",
+    STATUS_REMINDERS = "status_reminders",
+    STATUS_ATTENTIONS = "status_attentions",
+    
+    REPORTED_CONTENT = "reported_content",
+}
+export type UnhandledNotifications = {
+    //invitations
+    community_invitations:Invitation[]
+    group_invitations:Invitation[]
+    event_invitations:Invitation[]
+    friendship_invitations:Invitation[]
+    //
+    unread_conversations:Conversation[]
+    task_notifications:any
+    task_reminders:any
+    task_attentions:any
+    status_notifications:any
+    status_reminders:StatusObjectAttribute[]
+    status_attentions:StatusObjectAttribute[]
+    reported_content:ReportResult[]
+}
 export type ContextObject = {
      name:string
 } & Linkable

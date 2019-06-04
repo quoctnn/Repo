@@ -1,6 +1,5 @@
 import {  Store } from 'redux';
 import { ReduxState } from '../redux';
-import { removeCommunityAction } from '../redux/communityStore';
 import { resetProjectsAction } from '../redux/projectStore';
 import { resetEventsAction } from '../redux/eventStore';
 import ReconnectingWebSocket from "reconnecting-websocket";
@@ -11,6 +10,7 @@ import { translate } from '../localization/AutoIntlProvider';
 import { ThemeManager } from './ThemeManager';
 import { resetMessageQueueAction } from '../redux/messageQueue';
 import { ApplicationManager } from './ApplicationManager';
+import { CommunityManager } from './CommunityManager';
 
 const url = require('url');
 const path = require("path")
@@ -75,7 +75,7 @@ export abstract class WindowAppManager
         WindowAppManager.getStore().dispatch(resetProjectsAction())
     }
     static deleteCachedCommunity = (id:number) => {
-        WindowAppManager.getStore().dispatch(removeCommunityAction(id))
+        CommunityManager.removeCommunity(id)
     }
     static sendOutgoingOnSocket = (data:object) => {
         sendOnWebsocket(JSON.stringify(data))
