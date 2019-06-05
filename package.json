@@ -8,6 +8,7 @@
     "build-debug": "webpack --config webpack/webpack.prod.config.js --progress --colors --debug",
     "build-client": "electron app",
     "watch": "node webpack/watch_server.js",
+    "test-prod": "node server.js",
     "test": "webpack-dev-server --content-base ./dist --hot --inline --colors --port 3010 --open",
     "storybook": "NODE_PATH=. start-storybook -p 9001 -c .storybook",
     "prepare": "patch-package",
