@@ -27,7 +27,7 @@ class StatusComposer
 {
     statusId:number
     communityId:number
-    contextObjectId:number 
+    contextObjectId:number
     contextNaturalKey:ContextNaturalKey
     level:number
     content?:string
@@ -52,8 +52,8 @@ class StatusComposer
 class StatusCommentLoader
 {
     statusId:number
-    currentCommentsCount:number 
-    totalCommentsCount:number 
+    currentCommentsCount:number
+    totalCommentsCount:number
     level:number
     constructor(statusId:number, currentCommentsCount:number, totalCommentsCount:number, level:number)
     {
@@ -64,17 +64,17 @@ class StatusCommentLoader
     }
 }
 type FeedListItem = Status | StatusComposer | StatusCommentLoader
-type ArrayItem = 
+type ArrayItem =
 {
-    index:number 
+    index:number
     object:FeedListItem
 }
-interface OwnProps 
+interface OwnProps
 {
     limit:number
     contextNaturalKey?:ContextNaturalKey
     contextObjectId?:number
-    includeSubContext?:boolean 
+    includeSubContext?:boolean
     filter:ObjectAttributeType
     defaultChildrenLimit:number//children fetched upfront
     childrenLimit:number//children when fetching pages
@@ -88,14 +88,14 @@ interface RouteProps
     location: any
     match:any
 }
-interface ReduxStateProps 
+interface ReduxStateProps
 {
     authenticatedProfile:UserProfile,
 }
-interface ReduxDispatchProps 
+interface ReduxDispatchProps
 {
 }
-interface State 
+interface State
 {
     activeCommentLoaders:{[index:number]:StatusCommentLoader}
     items:FeedListItem[]
@@ -105,8 +105,8 @@ interface State
     hasLoaded:boolean
 }
 interface IncomingUpdateItem{
-    type:string 
-    status_id:number 
+    type:string
+    status_id:number
     parent_id?:number
 }
 interface IncomingInteractionItem extends IncomingUpdateItem {
@@ -118,7 +118,7 @@ type Props = ReduxStateProps & ReduxDispatchProps & OwnProps & RouteProps
 export class NewsfeedComponent extends React.Component<Props, State> {
     private isOdd:boolean = false
     private observers:EventSubscription[] = []
-    private stashIncomingUpdates = false 
+    private stashIncomingUpdates = false
     private incomingUpdateCache:IncomingUpdateItem[] = []
     private listRef = React.createRef<List>()
     private readObserver = new ReadObserver("statusReads", ApiClient.setStatusesRead)
@@ -153,10 +153,10 @@ export class NewsfeedComponent extends React.Component<Props, State> {
             this.readObserver.observe(id, element)
     }
     componentDidUpdate = (prevProps:Props, prevState:State) => {
-        if(this.props.contextNaturalKey != prevProps.contextNaturalKey || 
-            this.props.contextObjectId != prevProps.contextObjectId || 
-            this.props.includeSubContext != prevProps.includeSubContext || 
-            this.props.isResolvingContext != prevProps.isResolvingContext || 
+        if(this.props.contextNaturalKey != prevProps.contextNaturalKey ||
+            this.props.contextObjectId != prevProps.contextObjectId ||
+            this.props.includeSubContext != prevProps.includeSubContext ||
+            this.props.isResolvingContext != prevProps.isResolvingContext ||
             this.props.filter != prevProps.filter)
         {
             const hasContextError = this.hasContextError(this.props)
@@ -173,7 +173,7 @@ export class NewsfeedComponent extends React.Component<Props, State> {
             this.props.onLoadingStateChanged(this.state.isLoading)
         }
     }
-    componentDidMount = () => 
+    componentDidMount = () =>
     {
         const listRef = this.listRef.current.listRef.current
         if(listRef)
@@ -192,7 +192,7 @@ export class NewsfeedComponent extends React.Component<Props, State> {
         {
             this.props.scrollParent.addEventListener("scroll", this.onScroll)
         }
-        
+
         const hasContextError = this.hasContextError(this.props)
         if(!hasContextError)
         {
@@ -211,13 +211,19 @@ export class NewsfeedComponent extends React.Component<Props, State> {
         this.readObserver.save()
         this.readObserver.cleanup()
         this.readObserver = null
+        this.isOdd = null;
+        this.observers = null;
+        this.stashIncomingUpdates = null;
+        this.incomingUpdateCache = null;
+        this.listRef = null;
+
     }
     setStashUpdates = (stash:boolean) => {
         this.stashIncomingUpdates = stash
         if(!stash)
         {
             const arr = this.incomingUpdateCache
-            this.incomingUpdateCache = [] 
+            this.incomingUpdateCache = []
             arr.forEach(this.runIncomingUpdate)
         }
     }
@@ -230,7 +236,7 @@ export class NewsfeedComponent extends React.Component<Props, State> {
         const id = object && object.status_id
         if(id)
         {
-            const update:IncomingUpdateItem = {type:EventStreamMessageType.STATUS_NEW, ...object} 
+            const update:IncomingUpdateItem = {type:EventStreamMessageType.STATUS_NEW, ...object}
             this.processIncomingUpdate(update)
         }
     }
@@ -269,7 +275,7 @@ export class NewsfeedComponent extends React.Component<Props, State> {
         const id = object && object.status_id
         if(id)
         {
-            const update:IncomingUpdateItem = {type:EventStreamMessageType.STATUS_UPDATE, ...object} 
+            const update:IncomingUpdateItem = {type:EventStreamMessageType.STATUS_UPDATE, ...object}
             this.processIncomingUpdate(update)
         }
     }
@@ -332,9 +338,9 @@ export class NewsfeedComponent extends React.Component<Props, State> {
                 ApiClient.getStatus(update.status_id, (status, reqStatus, error) => {
                     if(status)
                         this.updateStatusItem(status)
-                })  
+                })
             }
-        
+
     }
     private executeStatusDelete = (update:IncomingUpdateItem) => {
 
@@ -347,7 +353,7 @@ export class NewsfeedComponent extends React.Component<Props, State> {
         const id = object && object.status_id
         if(id)
         {
-            const update:IncomingUpdateItem = {type:EventStreamMessageType.STATUS_DELETED, ...object} 
+            const update:IncomingUpdateItem = {type:EventStreamMessageType.STATUS_DELETED, ...object}
             this.processIncomingUpdate(update)
         }
     }
@@ -356,33 +362,33 @@ export class NewsfeedComponent extends React.Component<Props, State> {
         const id = object && object.status_id
         if(id)
         {
-            const update:IncomingInteractionItem = {type:EventStreamMessageType.STATUS_INTERACTION_UPDATE, ...object} 
+            const update:IncomingInteractionItem = {type:EventStreamMessageType.STATUS_INTERACTION_UPDATE, ...object}
             this.processIncomingUpdate(update)
         }
     }
     onScroll = (event) =>
-    {   
+    {
         if(this.listRef.current.listRef.current != event.target)
             return
         let isAtBottom = false
         if(event.target instanceof Document)
             isAtBottom = (window.innerHeight + window.scrollY) >= document.body.offsetHeight
-        else 
+        else
             isAtBottom = event.target.scrollTop + event.target.offsetHeight >= event.target.scrollHeight
         if(isAtBottom)
         {
             this.handleLoadMore()
         }
     }
-    flattenData = (data:Status[]) => 
+    flattenData = (data:Status[]) =>
     {
         var res:FeedListItem[] = []
         data.forEach(s => {
             let c = (s.children || []).reverse() //node children
             this.applyContextToStatuses(c, s.context_natural_key, s.context_object_id)
-            s.children = [] // remove node children 
+            s.children = [] // remove node children
             res.push(s) //append node
-            if(c.length > 0) 
+            if(c.length > 0)
             {
                 if(s.comments != c.length) //if node has more children
                 {
@@ -395,7 +401,7 @@ export class NewsfeedComponent extends React.Component<Props, State> {
         })
         return res
     }
-    loadStatuses = () => 
+    loadStatuses = () =>
     {
         const { items } = this.state
         const offset = items.filter(o => {
@@ -421,7 +427,7 @@ export class NewsfeedComponent extends React.Component<Props, State> {
             ToastManager.showErrorToast(error)
         })
     }
-    handleRefresh = () => 
+    handleRefresh = () =>
     {
         if(this.state.isLoading || this.hasContextError(this.props))
         { // cancel current
@@ -448,7 +454,7 @@ export class NewsfeedComponent extends React.Component<Props, State> {
 
         return Immutable.fromJS(status).toJS()
     }
-    updateStatusItem = (status:Status, index?:number, clone:boolean = false) => 
+    updateStatusItem = (status:Status, index?:number, clone:boolean = false) =>
     {
         var i = index
         if (nullOrUndefined(i))
@@ -468,7 +474,7 @@ export class NewsfeedComponent extends React.Component<Props, State> {
                 const clone = this.getClonedStatus(status)
                 clone.serialization_date = new Date().toISOString()
                 const attrs = clone.attributes || []
-                const index = attrs.findIndex(e => e.id == id) 
+                const index = attrs.findIndex(e => e.id == id)
                 if(index > -1)
                 {
                     attrs.splice(index, 1)
@@ -493,7 +499,7 @@ export class NewsfeedComponent extends React.Component<Props, State> {
             completion && completion(!!data)
         })
     }
-    handleReaction(reaction:string, status:Status) 
+    handleReaction(reaction:string, status:Status)
     {
         const clone = this.getClonedStatus(status)
         clone.serialization_date = new Date().toISOString()
@@ -507,8 +513,8 @@ export class NewsfeedComponent extends React.Component<Props, State> {
         clone.reactions = data.reactions
         clone.reaction_count = data.reactionsCount
         this.updateStatusItem(clone, index, false)
-        ApiClient.reactToStatus(clone.id, reaction, (data, statusCode, error) => 
-        {  
+        ApiClient.reactToStatus(clone.id, reaction, (data, statusCode, error) =>
+        {
             if(!nullOrUndefined( error ))
             {
                 console.log("error sending reaction:", error)
@@ -517,7 +523,7 @@ export class NewsfeedComponent extends React.Component<Props, State> {
             ToastManager.showErrorToast(error)
         })
     }
-    handleLoadMore = () => 
+    handleLoadMore = () =>
     {
         if(!this.state.hasMore || this.state.isLoading || this.hasContextError(this.props))
         {
@@ -694,13 +700,13 @@ export class NewsfeedComponent extends React.Component<Props, State> {
                 updateArray.push({index:commentsLoaderIndex, object:commentLoader})
             }
         }
-        //tempid && !old 
+        //tempid && !old
         if(tempIndex > -1 && oldCommentIndex == -1) // update parent
         {
             updateArray.push({index:tempIndex, object:comment})
             updateParent()
         }
-        //!tempid && old 
+        //!tempid && old
         else if(tempIndex == -1 && oldCommentIndex > -1)
         {
             updateArray.push({index:oldCommentIndex, object:comment})
@@ -773,20 +779,20 @@ export class NewsfeedComponent extends React.Component<Props, State> {
     navigateToWeb = (url:string) => {
         NavigationUtilities.navigateToUrl(this.props.history, url)
     }
-    navigateToAction = (status:Status, action:StatusActions, extra?:any, completion?:(success:boolean) => void) => 
+    navigateToAction = (status:Status, action:StatusActions, extra?:any, completion?:(success:boolean) => void) =>
     {
-        const logWarn = () => 
+        const logWarn = () =>
         {
             console.warn("Missing Action handler for: ", action, extra)
         }
         switch(action)
         {
-            case StatusActions.search: 
+            case StatusActions.search:
             {
                 this.navigateToSearch(extra && extra.query)
                 break;
             }
-            case StatusActions.user: 
+            case StatusActions.user:
             {
                 const profile = extra && extra.profile && extra.profile.id || status.owner.id
                 this.navigateToProfile(profile);
@@ -824,12 +830,12 @@ export class NewsfeedComponent extends React.Component<Props, State> {
                 {
                     this.navigateToTask(status.context_object_id || -1)
                 }
-                else 
+                else
                 {
                     logWarn()
                 }
                 break;
-                
+
             }
             case StatusActions.link:
             {
@@ -837,57 +843,57 @@ export class NewsfeedComponent extends React.Component<Props, State> {
                 {
                     this.navigateToWeb(extra.link)
                 }
-                else 
+                else
                 {
                     logWarn()
                 }
                 break;
             }
-            case StatusActions.new: 
+            case StatusActions.new:
             {
                 if(extra && extra.message)
                 {
                     this.createNewComment(status, extra.message, extra.mentions, extra.files, extra.completion)
                 }
-                else 
+                else
                 {
                     logWarn()
                 }
                 break;
             }
-            case StatusActions.edit: 
+            case StatusActions.edit:
             {
                 if(extra && extra.status)
                 {
                     this.updateStatus(status.id, extra.status, extra.files, extra.completion)
                 }
-                else 
+                else
                 {
                     logWarn()
                 }
                 break;
             }
-            case StatusActions.delete: 
+            case StatusActions.delete:
             {
                 this.deleteStatus(status)
                 break;
             }
             case StatusActions.react:
             {
-                this.handleReaction(extra.reaction, status); 
+                this.handleReaction(extra.reaction, status);
                 break;
             }
             case StatusActions.createAttribute:
             {
-                this.handleCreateAttribute(status, extra.type, extra.user , completion); 
+                this.handleCreateAttribute(status, extra.type, extra.user , completion);
                 break;
             }
             case StatusActions.deleteAttribute:
             {
-                this.handleDeleteAttribute(extra.id, status); 
+                this.handleDeleteAttribute(extra.id, status);
                 break;
             }
-            case StatusActions.showCommentReply: 
+            case StatusActions.showCommentReply:
             {
                 let parent = status
                 let content:string = undefined
@@ -922,12 +928,12 @@ export class NewsfeedComponent extends React.Component<Props, State> {
         if(composerIndex == -1)
         {
             const composer = this.createStatusComposer(status)
-            composer.content = content 
+            composer.content = content
             composer.mentions = mentions
             let index = -1
             if(status.comments == 0)
                 index = this.findIndexByStatusId(status.id)
-            else 
+            else
                 index = this.findLastCommentIndexByStatusId(status.id)
             if(index > -1)
                 this.insertObject(composer, index + 1, this.setComposerFocus(status.id))
@@ -944,23 +950,23 @@ export class NewsfeedComponent extends React.Component<Props, State> {
 
         return new StatusComposer(status.id, status.community && status.community.id, status.context_object_id , status.context_natural_key, status.level)
     }
-    navigateToActionWithId = (statusId:number) => (action:StatusActions, extra?:any, completion?:(success:boolean) => void) => 
+    navigateToActionWithId = (statusId:number) => (action:StatusActions, extra?:any, completion?:(success:boolean) => void) =>
     {
         let index = this.findIndexByStatusId(statusId)
         let status = this.state.items[index] as Status
         this.navigateToAction(status, action, extra, completion)
     }
-    renderStatus = (authUser:UserProfile, item:Status, isComment:boolean, index:number, color:string, isLast:boolean) => 
+    renderStatus = (authUser:UserProfile, item:Status, isComment:boolean, index:number, color:string, isLast:boolean) =>
     {
         const cn = classnames(color, {"last":isLast})
         const observerRegister = (item.temporary || item.read || this.readObserver.getReads().contains(item.id)) ? undefined : this.registerObservee(item.id)
-        return <StatusComponent 
+        return <StatusComponent
                     innerRef={observerRegister}
                     canUpload={true}
                     addLinkToContext={true}
-                    key={"status_" + item.id} 
-                    status={item} 
-                    bottomOptionsEnabled={true} 
+                    key={"status_" + item.id}
+                    status={item}
+                    bottomOptionsEnabled={true}
                     authorizedUserId={authUser.id}
                     isComment={isComment}
                     onActionPress={this.navigateToActionWithId(item.id)}
@@ -989,21 +995,21 @@ export class NewsfeedComponent extends React.Component<Props, State> {
                 />
             )
     }
-    renderCommentLoader =  (loader: StatusCommentLoader, index:number, color:string) => 
+    renderCommentLoader =  (loader: StatusCommentLoader, index:number, color:string) =>
     {
         const isLoading = this.state.activeCommentLoaders[loader.statusId] != undefined
         const cn = classnames(color, "lvl" + loader.level)
-        return <CommentLoader 
-                    key={"statusloader_" + loader.statusId} 
-                    className={cn} 
-                    isLoading={isLoading} 
+        return <CommentLoader
+                    key={"statusloader_" + loader.statusId}
+                    className={cn}
+                    isLoading={isLoading}
                     loadMoreComments={this.loadMoreComments(loader)}/>
     }
     getStatusTaggableMembers = (statusId:number) => {
         const status = this.findStatusByStatusId(statusId)
         return status.visibility
     }
-    findStatusByStatusId = (statusId:number) => 
+    findStatusByStatusId = (statusId:number) =>
     {
         return this.state.items.find(o => {
             if(o.hasOwnProperty('id'))
@@ -1013,12 +1019,12 @@ export class NewsfeedComponent extends React.Component<Props, State> {
             return false
         }) as Status
     }
-    findCommentsByStatusId = (statusId:number) => 
+    findCommentsByStatusId = (statusId:number) =>
     {
         const result:number[] = []
         this.state.items.forEach( (o, i) => {
             if(o.hasOwnProperty('id'))
-            {  
+            {
                 if((o as Status).parent == statusId)
                 {
                     result.push(i)
@@ -1033,7 +1039,7 @@ export class NewsfeedComponent extends React.Component<Props, State> {
         for (let index = 0; index < items.length; index++) {
             const o = items[index]
             if(o.hasOwnProperty('id'))
-            {  
+            {
                 if((o as Status).parent == statusId)
                 {
                     foundIndex = index
@@ -1046,11 +1052,11 @@ export class NewsfeedComponent extends React.Component<Props, State> {
         }
         return foundIndex
     }
-    findStatusComposerIndexByStatusId = (statusId:number) => 
+    findStatusComposerIndexByStatusId = (statusId:number) =>
     {
         return this.state.items.findIndex( o => {
             if(o instanceof StatusComposer)
-            {   
+            {
                 return (o as StatusComposer).statusId == statusId
             }
             return false
@@ -1066,19 +1072,19 @@ export class NewsfeedComponent extends React.Component<Props, State> {
             return false
         })
     }
-    findStatusCommentLoaderByStatusId = (statusId:number) => 
+    findStatusCommentLoaderByStatusId = (statusId:number) =>
     {
         return this.state.items.findIndex( o => {
             if(o instanceof StatusCommentLoader)
-            {   
+            {
                 return (o as StatusCommentLoader).statusId == statusId
             }
             return false
         })
     }
-    didLoadMoreComments = (loader:StatusCommentLoader, comments:Status[]) => 
+    didLoadMoreComments = (loader:StatusCommentLoader, comments:Status[]) =>
     {
-        var commentLoaderIndex = this.findStatusCommentLoaderByStatusId(loader.statusId) 
+        var commentLoaderIndex = this.findStatusCommentLoaderByStatusId(loader.statusId)
         const newData = this.flattenData(comments)
         let newCommentLoader = new StatusCommentLoader(loader.statusId, loader.currentCommentsCount + comments.length, loader.totalCommentsCount, loader.level)
         this.setState(prevState => {
@@ -1089,8 +1095,8 @@ export class NewsfeedComponent extends React.Component<Props, State> {
             {
                 items.splice(commentLoaderIndex, 1)
                 commentLoaderIndex -= 1
-            }  
-            else 
+            }
+            else
             {
                 items[commentLoaderIndex] = newCommentLoader
             }
@@ -1113,7 +1119,7 @@ export class NewsfeedComponent extends React.Component<Props, State> {
         })
         return statuses
     }
-    _loadComments = (loader:StatusCommentLoader) => 
+    _loadComments = (loader:StatusCommentLoader) =>
     {
         const rest = loader.totalCommentsCount - loader.currentCommentsCount
         const requestingCount = Math.min(this.props.childrenLimit, rest)
@@ -1134,18 +1140,18 @@ export class NewsfeedComponent extends React.Component<Props, State> {
             ToastManager.showErrorToast(error)
         })
     }
-    loadMoreComments = (loader:StatusCommentLoader) => (e:any) => 
+    loadMoreComments = (loader:StatusCommentLoader) => (e:any) =>
     {
         console.log("loadMoreFromLoader", loader.statusId)
         let currentLoaders = this.state.activeCommentLoaders
         currentLoaders[loader.statusId] = loader
         this.setState({activeCommentLoaders:currentLoaders}, () => {this._loadComments(loader)})
-    
+
     }
     getNextColor = () => {
         return null
         const c = this.isOdd ? "odd-color" : "even-color"
-        this.isOdd = !this.isOdd 
+        this.isOdd = !this.isOdd
         return c
     }
     renderError = () => {
@@ -1175,8 +1181,8 @@ export class NewsfeedComponent extends React.Component<Props, State> {
         return(
             <div className="newsfeed-component">
                 <List ref={this.listRef}
-                    enableAnimation={false} 
-                    onScroll={scroll} 
+                    enableAnimation={false}
+                    onScroll={scroll}
                     className={cn}>
                         {this.state.items.map((s, i) => {
                             if(s instanceof StatusComposer)
@@ -1198,15 +1204,15 @@ export class NewsfeedComponent extends React.Component<Props, State> {
                             }
                             return this.renderStatus(authUser, s, isComment, i, color, isLast)
                         }).concat(this.renderLoading()) }
-                        {this.renderEmpty()}                    
+                        {this.renderEmpty()}
                         {this.renderError()}
                     </List>
 
-            </div> 
+            </div>
         );
     }
 }
-const mapStateToProps = (state:ReduxState, ownProps: OwnProps):ReduxStateProps => 
+const mapStateToProps = (state:ReduxState, ownProps: OwnProps):ReduxStateProps =>
 {
     return {
         authenticatedProfile:state.authentication.profile,

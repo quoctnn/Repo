@@ -12,7 +12,7 @@ type Props = {
     value?:moment.Moment,
     max?: moment.Moment,
     min?: moment.Moment,
-} 
+}
 export class DateTimePicker extends React.Component<Props, {}>{
     input = React.createRef<MomentInput>();
     constructor(props:Props)
@@ -22,9 +22,12 @@ export class DateTimePicker extends React.Component<Props, {}>{
     getValue = () => {
         return this.input.current.getValue()
     }
+    componentWillUnmount() {
+        this.input = null;
+    }
     render(){
         const format = `YYYY-MM-DD H[${translate("date.format.hours")}] m[${translate("date.format.minutes")}]`
-        return (<MomentInput 
+        return (<MomentInput
                     ref={this.input}
                     format={format}
                     options={true}
@@ -319,9 +322,9 @@ class MomentInput extends React.Component<MomentInputProps, MomentInputState> {
         return (
             <div style={style} className={className} ref={node => this.node = node}>
                 <InputGroup id={id} className={inputClassName} >
-                    <Input className="btn-rounded" 
-                            value={inputValue || textValue} 
-                            readOnly={readOnly} 
+                    <Input className="btn-rounded"
+                            value={inputValue || textValue}
+                            readOnly={readOnly}
                             onClick={this.inputClick}
                             onChange={this.onTextChange}
                             style={inputStyle}/>
@@ -329,10 +332,10 @@ class MomentInput extends React.Component<MomentInputProps, MomentInputState> {
                         <Button className="btn-rounded" onClick={this.inputClick}><i className="far fa-calendar-alt"></i></Button>
                     </InputGroupAddon>
                 </InputGroup>
-                {isOpen && 
+                {isOpen &&
                     <Popover className="date-time-picker" trigger="legacy" placement="bottom" isOpen={isOpen} target={id} toggle={this.toggleIsOpen}>
                         <PopoverBody>
-                            {options && 
+                            {options &&
                                 <ButtonGroup className="options d-flex">
                                     <Button className={"flex-grow-1" +((activeTab===0 || activeTab===2) ? " active" : "")}
                                         onClick={()=> {this.onActiveTab(0)}}><i className="far fa-calendar-alt"></i>&nbsp;{translate("Date")}

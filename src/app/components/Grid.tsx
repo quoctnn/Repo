@@ -44,7 +44,7 @@ export class Grid extends React.PureComponent<Props, State> {
                 this.bodyClassAdded = true
                 document.body.classList.add(Grid.modeFillClass)
             }
-            else 
+            else
             {
                 this.bodyClassAdded = false
                 document.body.classList.remove(Grid.modeFillClass)
@@ -64,6 +64,7 @@ export class Grid extends React.PureComponent<Props, State> {
     componentWillUnmount = () => {
         if(this.bodyClassAdded)
             document.body.classList.remove(Grid.modeFillClass)
+        this.bodyClassAdded = null;
     }
     componentWillReceiveProps = (newProps:Props) => {
         if(this.props.enableAnimation)
@@ -80,7 +81,7 @@ export class Grid extends React.PureComponent<Props, State> {
             }
         }
     }
-    getKeys = () => 
+    getKeys = () =>
     {
         return Object.keys(this.refs)
     }
@@ -97,9 +98,9 @@ export class Grid extends React.PureComponent<Props, State> {
     animateAndTransform = (key:string, n) =>
         {
         var domNode = ReactDOM.findDOMNode(this.refs[key]) as any;
-        
+
         var [dX, dY] = this.getPositionDelta(domNode, key);
-        
+
         requestAnimationFrame(function(){
             domNode.style.transition = 'transform 0s';
             domNode.style.transform = 'translate('+ dX + 'px, ' + dY + 'px)';
@@ -109,15 +110,15 @@ export class Grid extends React.PureComponent<Props, State> {
             })
         });
     }
-    doesNeedAnimation = (key:string) => 
+    doesNeedAnimation = (key:string) =>
     {
         var isNotMovable = !key;
         var isNew = !this.state.rects[key];
         var isDestroyed = !this.refs[key];
-        
+
         if(isDestroyed) return 2;
         if(isNotMovable || isNew) return;
-        
+
         var domNode = ReactDOM.findDOMNode(this.refs[key]);
         var [dX, dY] = this.getPositionDelta(domNode, key);
         var isStationary = dX === 0 && dY === 0;
@@ -128,13 +129,13 @@ export class Grid extends React.PureComponent<Props, State> {
     {
         var newBox = domNode.getBoundingClientRect();
         var oldBox = this.state.rects[key];
-        
+
         return [
             oldBox.left - newBox.left,
             oldBox.top - newBox.top
         ];
     }
-    render() 
+    render()
     {
         const modules = this.props.grid.grid_modules
         const cn = classnames("module-grid", this.props.className)
@@ -154,7 +155,7 @@ export class Grid extends React.PureComponent<Props, State> {
                 dict[key] = dk
                 return key + "_" + dk
             }
-            
+
         }
         return(
             <div className={cn} style={style}>

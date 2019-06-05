@@ -22,7 +22,7 @@ type Props = {
     allowedSearchOptions:SearchOption[]
     searchData:ContextSearchData
     onAutocompleteToggle?:(visible:boolean) => void
-} 
+}
 type State = {
     searchData:ContextSearchData
     active:boolean
@@ -42,6 +42,13 @@ export class ContextSearch extends React.Component<Props, State>{
             active:false,
             activeSearchType:null,
         }
+    }
+    componentWillUnmount() {
+        this.textInput = null;
+        this.autocomplete = null;
+        this.componentId = null;
+        this.containerId = null;
+        this.preventClose = null;
     }
     editorState = () => {
         return this.textInput.current.editorState()
@@ -92,7 +99,7 @@ export class ContextSearch extends React.Component<Props, State>{
                 //this.textInput.current.getWrappedInstance().focus()
             })
         }
-        else 
+        else
         {
             this.setState({ active:active }, () => {
                 this.props.onAutocompleteToggle && this.props.onAutocompleteToggle(active)
@@ -138,21 +145,21 @@ export class ContextSearch extends React.Component<Props, State>{
               fn: this.onComputeStyle
             }
           }
-        return (<Popover 
-                    modifiers={modifiers} 
-                    container={this.containerId} 
-                    hideArrow={true} 
-                    className="context-search-popover" 
-                    trigger="legacy" 
-                    placement="bottom" 
-                    isOpen={this.state.active} 
+        return (<Popover
+                    modifiers={modifiers}
+                    container={this.containerId}
+                    hideArrow={true}
+                    className="context-search-popover"
+                    trigger="legacy"
+                    placement="bottom"
+                    isOpen={this.state.active}
                     toggle={this.toggleAutocomplete}
-                    target={this.componentId} 
+                    target={this.componentId}
                     >
                     <PopoverBody>
                         <Autocomplete ref={this.autocomplete}
                                 onClose={this.onAutocompleteClose}
-                                sections={sections} 
+                                sections={sections}
                                 emptyContent={translate("contextsearch.dropdown.empty.title")}
                                 />
                     </PopoverBody>
@@ -160,14 +167,14 @@ export class ContextSearch extends React.Component<Props, State>{
     }
     renderSearchBox = () => {
         const cn = classnames("border-1",{"active":this.state.active})
-        return (<SearchBox id={this.componentId} className={cn} 
-                    onEnter={this.onSearchControlEnterKey} 
-                    onFocus={this.onSearchFocus} 
-                    onBlur={this.onSearchBlur} 
-                    ref={this.textInput} 
-                    {...this.props} 
-                    onChange={this.onChange} 
-                    placeholder={this.props.placeholder} 
+        return (<SearchBox id={this.componentId} className={cn}
+                    onEnter={this.onSearchControlEnterKey}
+                    onFocus={this.onSearchFocus}
+                    onBlur={this.onSearchBlur}
+                    ref={this.textInput}
+                    {...this.props}
+                    onChange={this.onChange}
+                    placeholder={this.props.placeholder}
                     onClick={this.showAutocomplete}
                     data={this.state.searchData}
                     multiline={true}

@@ -108,6 +108,10 @@ class ConversationModule extends React.Component<Props, State> {
     componentWillUnmount = () =>
     {
         this.observers.forEach(o => o.remove())
+        this.dragCount = null;
+        this.messageList = null;
+        this.canPublishDidType = null;
+        this.observers = null;
     }
     componentDidUpdate = (prevProps:Props, prevState:State) => {
         if(this.shouldReloadList(prevProps))
