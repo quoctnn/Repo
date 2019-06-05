@@ -144,12 +144,13 @@ export class NewsfeedComponent extends React.Component<Props, State> {
     readObserverActiveStateChanged = (isActive:boolean) => {
         if(isActive)
         {
-            this.readObserver.clear()
+            this.readObserver.clearObservables()
             this.forceUpdate()
         }
     }
     registerObservee = (id:number) => (element:Element) => {
-        this.readObserver.observe(id, element)
+        if(!!element && !!this.readObserver)
+            this.readObserver.observe(id, element)
     }
     componentDidUpdate = (prevProps:Props, prevState:State) => {
         if(this.props.contextNaturalKey != prevProps.contextNaturalKey || 
@@ -209,6 +210,7 @@ export class NewsfeedComponent extends React.Component<Props, State> {
         }
         this.readObserver.save()
         this.readObserver.cleanup()
+        this.readObserver = null
     }
     setStashUpdates = (stash:boolean) => {
         this.stashIncomingUpdates = stash

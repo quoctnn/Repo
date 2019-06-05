@@ -31,7 +31,7 @@ export class ChatMessageList extends React.Component<Props & React.HTMLAttribute
     readObserverActiveStateChanged = (isActive:boolean) => {
         if(isActive)
         {
-            this.readObserver.clear()
+            this.readObserver.clearObservables()
             this.forceUpdate()
         }
     }
@@ -47,7 +47,8 @@ export class ChatMessageList extends React.Component<Props & React.HTMLAttribute
         }
     }
     registerObservee = (id:number) => (element:Element) => {
-        this.readObserver.observe(id, element)
+        if(!!element && !!this.readObserver)
+            this.readObserver.observe(id, element)
     }
     shouldComponentUpdate = (nextProps:Props, nextState) => {
         return nextProps.messages != this.props.messages || nextProps.children != this.props.children || nextProps.loading != this.props.loading || nextProps.conversation != this.props.conversation;
@@ -75,6 +76,7 @@ export class ChatMessageList extends React.Component<Props & React.HTMLAttribute
     componentWillUnmount = () => {
         this.readObserver.save()
         this.readObserver.cleanup()
+        this.readObserver = null
     }
     listUpdateAfterInitialRender(prevProps:Props, currentProps:Props) {
         return prevProps.messages.length != 0 &&

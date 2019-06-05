@@ -85,7 +85,7 @@ export class ReadObserver{
                     this.readRegister.push(id)
                     this.updateTimer()
                     console.log(`object id:${id} is visible`)
-                    this.activeObservables.delete(entry.target)
+                    const deleted = this.activeObservables.delete(entry.target)
                     this.intersectionObserver.unobserve(entry.target)
                 }
             }
@@ -98,7 +98,7 @@ export class ReadObserver{
             this.intersectionObserver && this.intersectionObserver.observe(element)
         }
     }
-    clear = () => {
+    clearObservables = () => {
         this.activeObservables.forEach((val, key) => {
             
             this.intersectionObserver.unobserve(key)
@@ -124,6 +124,7 @@ export class ReadObserver{
         window.removeEventListener("beforeunload", this.save)
         window.removeEventListener('focus', this.windowFocusChanged);
         window.removeEventListener('blur', this.windowFocusChanged);
+        this.clearObservables()
     }
     private updateTimer = () => {
         if(this.errorCount >= this.errorLimit)

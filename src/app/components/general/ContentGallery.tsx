@@ -13,12 +13,15 @@ import "./ContentGallery.scss"
 import {ReactInstance} from 'react-360-web';
 import { WindowAppManager } from '../../managers/WindowAppManager';
 import ResizeObserver from 'resize-observer-polyfill';
+import { Settings } from '../../utilities/Settings';
 export const convertToComponent = (file:UploadedFile,galleryMode?:boolean, onClick?:(file:UploadedFile, event) => void, innerRef?:(a:GalleryComponent<any>) => void):React.ReactElement<GalleryComponent<any>> => {
     const gm = nullOrUndefined( galleryMode ) ? false : galleryMode
     switch(file.type)
     {
+        case UploadedFileType.IMAGE360:
+            if(Settings.allowReact360)
+                return <Gallery360ImageComponent ref={innerRef} galleryMode={gm} file={file} onClick={onClick}/>
         case UploadedFileType.IMAGE: return <GalleryImageComponent galleryMode={gm} file={file} onClick={onClick}/>
-        case UploadedFileType.IMAGE360: return <Gallery360ImageComponent ref={innerRef} galleryMode={gm} file={file} onClick={onClick}/>
         case UploadedFileType.DOCUMENT: return <GalleryDocumentComponent galleryMode={gm} file={file} onClick={onClick}/>
         case UploadedFileType.AUDIO:
         case UploadedFileType.VIDEO: return <GalleryMediaComponent galleryMode={gm} file={file} onClick={onClick}/>

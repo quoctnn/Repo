@@ -31,6 +31,7 @@ export interface ISettings
     statusLinebreakLimit:number
     renderLinkTitle:boolean
     mapboxAccessToken:string
+    allowReact360:boolean
 }
 export const Settings:ISettings = {
     isProduction : process.env.NODE_ENV === "production",
@@ -52,4 +53,5 @@ export const Settings:ISettings = {
     statusLinebreakLimit:5,
     renderLinkTitle:true,
     mapboxAccessToken:"pk.eyJ1IjoiaW50cmFob3VzZSIsImEiOiJjaXJsc3lmc3gwMDJyaGpuaHdvb2oxYnM5In0.2Um0WFRpufTR55w9_6ALDQ",
+    allowReact360:false
 }
