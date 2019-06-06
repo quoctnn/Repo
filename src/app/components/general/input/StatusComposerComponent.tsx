@@ -101,6 +101,8 @@ export class StatusComposerComponent extends React.Component<Props, State> {
             this.observer.disconnect()
         }
         this.observer = null
+        this.formRef = null;
+        this.element = null;
     }
     componentDidMount = () => {
         if(this.state.renderPlaceholder)
@@ -121,11 +123,6 @@ export class StatusComposerComponent extends React.Component<Props, State> {
             });
             this.observer.observe(this.element.current);
         }
-    }
-    componentWillUnmount() {
-        this.formRef = null;
-        this.element = null;
-        this.observer = null;
     }
     handleMentionSearch = (search:string, completion:(mentions:Mention[]) => void) => {
         if(!this.props.canMention)
