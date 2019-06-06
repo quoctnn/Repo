@@ -11,6 +11,7 @@ import ApiClient from '../../../network/ApiClient';
 import { ToastManager } from '../../../managers/ToastManager';
 import Routes from '../../../utilities/Routes';
 import { withRouter, RouteComponentProps, Link } from 'react-router-dom';
+import { DropDownMenu } from '../DropDownMenu';
 
 export interface OwnProps
 {
@@ -49,7 +50,7 @@ class CommunitySelector extends React.Component<Props, State> {
                 this.props.history.push(Routes.communityUrl(community.slug_name))
             })
     }
-    showAllCommunities = () => (event: React.SyntheticEvent<any>) => {
+    showAllCommunities = (event: React.SyntheticEvent<any>) => {
         window.alert("Not implemented")
     }
     renderCommunitySelector = () =>
@@ -63,28 +64,17 @@ class CommunitySelector extends React.Component<Props, State> {
                 toggleMenu:false
             }
         })
+        selectableDropdownItems.push({id:"divider1", type:OverflowMenuItemType.divider})
+        selectableDropdownItems.push({id:"all", type:OverflowMenuItemType.option, title:translate("common.see.all"), onPress:this.showAllCommunities})
         return (
-            <div className="m-2">
-                <div className="dropdown margin-right-sm d-flex">
-                    <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                        {/*selectableDropdownItems.map((dd, index) => {
-                            return createDropdownItem(dd)
-                        }) */}
-                        <DropdownItem divider={true}/>
-                        <DropdownItem title={translate("common.see.all")} toggle={false} onClick={this.showAllCommunities()}>{translate("common.see.all")}</DropdownItem>
-                    </div>
-                </div>
-            </div>
+            <DropDownMenu triggerClass="fas fa-caret-down mx-1" items={selectableDropdownItems}></DropDownMenu>
         )
     }
     render()
     {
         return(
-            <div id="community-selector">
+            <div id="community-selector" className="d-flex align-items-center">
                 {this.renderCommunitySelector()}
-                {this.state.communities.map(c => {
-                    return <Link className="d-block" to={c.uri}>{c.name}</Link>
-                })}
             </div>
         );
     }

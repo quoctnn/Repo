@@ -4,7 +4,6 @@ import "./ListComponent.scss"
 import { PaginationResult } from '../../network/ApiClient';
 import { List } from '../../components/general/List';
 import LoadingSpinner from '../../components/LoadingSpinner';
-import { translate } from '../../localization/AutoIntlProvider';
 import { IdentifiableObject } from '../../types/intrasocial_types';
 import EmptyBox from './images/EmptyBox';
 import IceCream from './images/IceCream';
@@ -114,6 +113,13 @@ export default class ListComponent<T extends IdentifiableObject> extends React.C
             requestId:prevState.requestId + 1,
             hasReceivedData:false,
         }), this.loadData)
+    }
+    componentWillUnmount = () => {
+        if(this.props.scrollParent)
+        {
+            this.props.scrollParent.removeEventListener("scroll", this.onScroll)
+        }
+        this.listRef = null
     }
     componentDidMount = () =>
     {

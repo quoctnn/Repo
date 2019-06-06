@@ -11,11 +11,6 @@ import { NavigationUtilities } from '../../../utilities/NavigationUtilities';
 const { isCtrlKeyCommand } = KeyBindingUtil;
 
 export type EditorContent = {text:string, mentions:number[]}
-export interface IEditorComponent
-{
-    clearEditorContent:() => void
-    getContent:() => EditorContent
-}
 interface MentionEntry
 {
     entityKey:string,
@@ -156,7 +151,7 @@ interface State
     plainText:string
     editorState:EditorState
 }
-export class ChatMessageComposer extends React.Component<Props,State> implements IEditorComponent {
+export class ChatMessageComposer extends React.Component<Props,State> {
 
     private inputRef = React.createRef<MentionEditor>()
     private protectKey = uniqueId()

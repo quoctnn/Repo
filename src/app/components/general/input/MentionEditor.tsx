@@ -119,10 +119,9 @@ type State = {
     search:string
 }
 type Props = DefaultProps & OwnProps
-export default class MentionEditor extends React.Component<Props, {}> {
+export default class MentionEditor extends React.Component<Props, State> {
     mentionPlugin: any;
     editor = React.createRef<Editor>();
-    state: State;
     rootElement: any;
     positioningElement: any;
     observer:MutationObserver
@@ -142,21 +141,19 @@ export default class MentionEditor extends React.Component<Props, {}> {
         super(props);
 
         this.mentionPlugin = createMentionPlugin({
-        positionSuggestions
+            positionSuggestions
         });
         this.state = {
             suggestions: [],
             emojiSelectOpen: false,
             search:""
         };
-        this.onEmojiButtonMouseUp = this.onEmojiButtonMouseUp.bind(this);
-        this.uploadFileChanged = this.uploadFileChanged.bind(this);
-
         this.rootElement = null;
         this.positioningElement = null;
         this.observer = null;
     }
-    componentWillUnmount() {
+    componentWillUnmount = () => {
+        this.removeBackDrop()
         this.mentionPlugin = null;
         this.editor = null;
         this.state = null;
@@ -175,14 +172,14 @@ export default class MentionEditor extends React.Component<Props, {}> {
     }
     onSearchChange = ({ value }) => {
         this.props.mentionSearch(value, (mentions) => {
-        this.setState({
-            suggestions: defaultSuggestionsFilter(value, mentions),
-            search:value
-        });
+            this.setState({
+                suggestions: defaultSuggestionsFilter(value, mentions),
+                search:value
+            });
         })
     }
 
-    onAddMention = mention => {
+    onAddMention = (mention) => {
         // get the mention object selected
         console.log("mention", mention);
     }
@@ -194,7 +191,7 @@ export default class MentionEditor extends React.Component<Props, {}> {
         }
         this.editor.current.focus();
     }
-    onEmojiButtonMouseUp(e) {
+    onEmojiButtonMouseUp = (e) => {
         this.toggleEmojiPanel(e)
     }
     handleRootClick = (e) =>
@@ -205,33 +202,30 @@ export default class MentionEditor extends React.Component<Props, {}> {
 
         const { EmojiSelect } = this.emojiPlugin;
         if (!this.rootElement) {
-        var p = document.createElement("div");
-        p.className = "emoji-backdrop";
-        p.addEventListener("click", this.handleRootClick);
-        document.body.appendChild(p);
-        this.rootElement = p;
+            this.rootElement = document.createElement("div");
+            this.rootElement.className = "emoji-backdrop";
+            this.rootElement.addEventListener("click", this.handleRootClick);
+            document.body.appendChild(this.rootElement);
 
-        var posEl = document.createElement("div");
-        posEl.className = "context-positioning-element";
-        this.positioningElement = posEl;
-        document.body.appendChild(this.positioningElement);
+            this.positioningElement = document.createElement("div");
+            this.positioningElement.className = "context-positioning-element";
+            document.body.appendChild(this.positioningElement);
 
-
-        this.addObservers();
-        this.updatePositioningElementStyle();
-        let windowHeight = window.innerHeight;
-        let buttonRect = this.emojiButton.current.getBoundingClientRect() as any;
-        var bodyRect = document.documentElement.getBoundingClientRect();
-        let offset = buttonRect.top + buttonRect.height - bodyRect.top;
-        let up = offset > 360 && buttonRect.y >= windowHeight / 2;
-        let tranform = up ? "translate(0, calc(-100% - 55px))" : "none";
-        ReactDOM.render(
-            <div className="emoji-picker-container" style={{ transform: tranform }}>
-                <EmojiSelect isOpen={this.state.emojiSelectOpen} />
-            </div>,
-            this.positioningElement
-        );
-        this.updatePositioningElementStyle();
+            this.addObservers();
+            this.updatePositioningElementStyle();
+            let windowHeight = window.innerHeight;
+            let buttonRect = this.emojiButton.current.getBoundingClientRect() as any;
+            var bodyRect = document.documentElement.getBoundingClientRect();
+            let offset = buttonRect.top + buttonRect.height - bodyRect.top;
+            let up = offset > 360 && buttonRect.y >= windowHeight / 2;
+            let tranform = up ? "translate(0, calc(-100% - 55px))" : "none";
+            ReactDOM.render(
+                <div className="emoji-picker-container" style={{ transform: tranform }}>
+                    <EmojiSelect isOpen={this.state.emojiSelectOpen} />
+                </div>,
+                this.positioningElement
+            );
+            this.updatePositioningElementStyle();
         }
     }
     updatePositioningElementStyle = () =>
@@ -252,13 +246,13 @@ export default class MentionEditor extends React.Component<Props, {}> {
     removeBackDrop = () => {
         let el = this.rootElement;
         if (el) {
-        this.rootElement = null;
-        el.parentNode.removeChild(el);
+            this.rootElement = null;
+            el.parentNode.removeChild(el);
         }
         el = this.positioningElement;
         if (el) {
-        this.positioningElement = null;
-        el.parentNode.removeChild(el);
+            this.positioningElement = null;
+            el.parentNode.removeChild(el);
         }
         this.removeObservers();
     }
@@ -277,6 +271,7 @@ export default class MentionEditor extends React.Component<Props, {}> {
             this.observer.disconnect()
             this.observer = null
         }
+        window.removeEventListener("resize", this.observeCallback)
     }
     observeCallback = (mutations) =>
     {
@@ -295,8 +290,7 @@ export default class MentionEditor extends React.Component<Props, {}> {
         })
 
     }
-    uploadFileChanged(event)
-    {
+    uploadFileChanged = (event) => {
         let filesList = this.fileUploader.current.files
         let files = []
         for (var i = 0; i < filesList.length; i++)
@@ -313,10 +307,9 @@ export default class MentionEditor extends React.Component<Props, {}> {
         else if(this.props.onHandleUploadClick)
             this.props.onHandleUploadClick(event)
     }
-    render() {
+    render = () => {
         const { MentionSuggestions } = this.mentionPlugin;
         const plugins = [this.emojiPlugin, this.mentionPlugin];
-        const { EmojiSuggestions } = this.emojiPlugin;
         return (
         <div ref={this.container} className="mention-editor" onClick={this.focus}>
             <div>

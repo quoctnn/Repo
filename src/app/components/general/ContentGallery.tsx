@@ -55,6 +55,7 @@ export class Gallery360ImageComponent extends GalleryComponent<{ width:number, h
     private observer = null;
     private currentWidth = 0;
     private currentHeight = 0;
+    private surfaceId:number = null
     constructor(props:GalleryComponentProps) {
         super(props)
 
@@ -80,8 +81,10 @@ export class Gallery360ImageComponent extends GalleryComponent<{ width:number, h
             this.observer.disconnect()
             this.observer = null
         }
+        this.r360.detachRoot && this.r360.detachRoot(this.surfaceId)
         this.r360.stop && this.r360.stop()
         this.r360 = null
+        this.surfaceId = null
         this.container = null
         this.currentHeight = null
         this.currentWidth = null
@@ -97,7 +100,7 @@ export class Gallery360ImageComponent extends GalleryComponent<{ width:number, h
           });
 
           // Render your app content to the default cylinder surface
-          this.r360.renderToSurface(
+          this.surfaceId = this.r360.renderToSurface(
             this.r360.createRoot('demo360', { /* initial props */ }),
             this.r360.getDefaultSurface()
           );

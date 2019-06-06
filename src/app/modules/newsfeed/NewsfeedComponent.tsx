@@ -995,7 +995,6 @@ export class NewsfeedComponent extends React.Component<Props, State> {
                 />
     }
     renderStatusComposer = (composer:StatusComposer, index:number, color:string) => {
-            return null
         const cn = classnames(color, "lvl" + composer.level)
             return (
                 <StatusComposerComponent

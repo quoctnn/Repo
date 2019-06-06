@@ -150,5 +150,11 @@ export abstract class AuthenticationManager
                     );
                 }, AuthenticationManager.keepAliveFrequency * 1000);
         }
+        else {
+
+            AuthenticationManager.clearKeepAliveTimer()
+            document.removeEventListener('mousedown', AuthenticationManager.resetUserActivityCounter);
+            window.removeEventListener('focus', AuthenticationManager.resetUserActivityCounter);
+        }
     }
 }

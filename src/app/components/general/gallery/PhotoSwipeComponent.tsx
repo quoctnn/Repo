@@ -123,10 +123,6 @@ export default class PhotoSwipeComponent extends React.Component<Props, State>
         })
         
         this.gallery.listen('afterChange', () => { 
-            /*this.gallery.container.addEventListener('pointerdown', this.preventSwipe);
-            this.gallery.container.addEventListener('MSPointerDown', this.preventSwipe);
-            this.gallery.container.addEventListener('touchstart', this.preventSwipe);
-            this.gallery.container.addEventListener('mousedown', this.preventSwipe);*/
             const index = this.gallery.getCurrentIndex()
             if(index > 0)
             {
@@ -176,6 +172,11 @@ export default class PhotoSwipeComponent extends React.Component<Props, State>
         }
     }
     removeGallery() {
+        if(this.gallery)
+        {
+            this.gallery.close()
+            this.gallery = null
+        }
         if(this.pswp && this.pswp.parentElement)
         {
             this.pswp.parentElement.removeChild(this.pswp)
