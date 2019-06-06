@@ -13,12 +13,12 @@ export interface OwnProps
     onFileRemoved?:(file:UploadedFile) => void
     onDidType:(unprocessedText:string) => void
     onChangeMentions?:(mentions: any) => void
-    contextObjectId:number 
+    contextObjectId:number
     contextNaturalKey:string
     canPost:boolean
     canUpload:boolean
     files?:UploadedFile[]
-    content?:string 
+    content?:string
     mentions?:Mention[]
     mentionSearch:(search:string, completion:(mentions:Mention[]) => void) => void
     className?:string
@@ -38,7 +38,7 @@ export interface DefaultProps
     singleLine:boolean
     forceHideDropzone:boolean
 }
-interface State 
+interface State
 {
     showDropzone: boolean
     filesCount: number
@@ -59,6 +59,9 @@ export class CommentForm extends React.Component<Props, State> {
     }
     getContent = () => {
         return this.inputRef.current.getContent()
+    }
+    componentWillUnmount() {
+        this.inputRef = null;
     }
     clearEditorContent = () => {
     }
@@ -108,16 +111,16 @@ export class CommentForm extends React.Component<Props, State> {
         const placeholder = this.props.placeholder || translate("Write a comment")
         const uploadHandler = this.props.canUpload ? this.handleUploadClick : undefined
         return (
-            <ChatMessageComposer 
-                className={cn} 
-                canSubmit={canSubmit} 
-                onHandleUploadClick={uploadHandler} 
-                ref={this.inputRef} 
-                content={this.props.content} 
-                mentionSearch={this.props.mentionSearch} 
-                mentions={this.props.mentions} 
-                onSubmit={this.handleSubmit} 
-                onDidType={this.props.onDidType} 
+            <ChatMessageComposer
+                className={cn}
+                canSubmit={canSubmit}
+                onHandleUploadClick={uploadHandler}
+                ref={this.inputRef}
+                content={this.props.content}
+                mentionSearch={this.props.mentionSearch}
+                mentions={this.props.mentions}
+                onSubmit={this.handleSubmit}
+                onDidType={this.props.onDidType}
                 placeholder={placeholder}
                 showEmojiPicker={this.props.showEmojiPicker}
                 onBlur={this.props.onBlur}
@@ -126,7 +129,7 @@ export class CommentForm extends React.Component<Props, State> {
                 focusEnd={this.props.focusEnd}
                 forceUpdate={this.props.forceUpdate}
                 singleLine={this.props.singleLine}
-            />                      
+            />
         )
     }
     render = () => {
@@ -146,6 +149,6 @@ export class CommentForm extends React.Component<Props, State> {
                         }
                     </div>
                 </div>)
-        
+
     }
 }

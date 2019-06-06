@@ -157,7 +157,7 @@ interface State
     editorState:EditorState
 }
 export class ChatMessageComposer extends React.Component<Props,State> implements IEditorComponent {
-    
+
     private inputRef = React.createRef<MentionEditor>()
     private protectKey = uniqueId()
     static defaultProps:DefaultProps = {
@@ -172,7 +172,7 @@ export class ChatMessageComposer extends React.Component<Props,State> implements
     constructor(props:Props) {
         super(props)
         this.state = {
-            plainText:this.props.content || "", 
+            plainText:this.props.content || "",
             editorState:EditorState.createWithContent(generateContentState(this.props.content, this.props.mentions))
         }
     }
@@ -181,6 +181,8 @@ export class ChatMessageComposer extends React.Component<Props,State> implements
     }
     componentWillUnmount = () => {
         NavigationUtilities.protectNavigation(this.protectKey, false);
+        this.inputRef = null;
+        this.protectKey = null;
     }
     focus = () => {
         this.inputRef.current.focus()
@@ -193,12 +195,12 @@ export class ChatMessageComposer extends React.Component<Props,State> implements
         }, this.inputRef.current.focus)
     }
     shouldComponentUpdate = (nextProps:Props, nextState:State) => {
-        const update = nextProps.canSubmit != this.props.canSubmit || 
-                nextState.editorState != this.state.editorState || 
-                nextProps.content != this.props.content || 
+        const update = nextProps.canSubmit != this.props.canSubmit ||
+                nextState.editorState != this.state.editorState ||
+                nextProps.content != this.props.content ||
                 nextProps.className != this.props.className ||
-                nextProps.forceUpdate != this.props.forceUpdate || 
-                nextProps.singleLine != this.props.singleLine || 
+                nextProps.forceUpdate != this.props.forceUpdate ||
+                nextProps.singleLine != this.props.singleLine ||
                 !(nextProps.mentions || []).isEqual(this.props.mentions || [])
         return update
     }
@@ -233,14 +235,14 @@ export class ChatMessageComposer extends React.Component<Props,State> implements
         return false
     }
     keyBindings = (e: any) => {
-        
+
         if (e.keyCode === 13 )
-        { 
+        {
             if(isCtrlKeyCommand(e) || e.nativeEvent.shiftKey)
             {
                 if(this.props.submitOnEnter)
                     return "insert-linebreak"
-                else 
+                else
                     return "submit"
             }
             if(this.props.submitOnEnter)
@@ -274,13 +276,13 @@ export class ChatMessageComposer extends React.Component<Props,State> implements
           editorState.getCurrentInlineStyle(),
           null,
         );
-    
+
         const newEditorState = EditorState.push(
           editorState,
           contentState,
           'insert-characters',
         );
-    
+
         return EditorState.forceSelection(
           newEditorState,
           contentState.getSelectionAfter(),
@@ -329,12 +331,12 @@ export class ChatMessageComposer extends React.Component<Props,State> implements
                     <div className="input-group">
                         <div className="input-wrap"
                             onFocus={this.fixFocusInput}>
-                            <MentionEditor 
-                                onHandleUploadClick={this.props.onHandleUploadClick} 
-                                filesAdded={this.props.filesAdded} 
-                                mentionSearch={this.props.mentionSearch} 
-                                editorState={this.state.editorState} 
-                                ref={this.inputRef} 
+                            <MentionEditor
+                                onHandleUploadClick={this.props.onHandleUploadClick}
+                                filesAdded={this.props.filesAdded}
+                                mentionSearch={this.props.mentionSearch}
+                                editorState={this.state.editorState}
+                                ref={this.inputRef}
                                 onChange={this.onChange}
                                 placeholder={this.props.placeholder}
                                 showEmojiPicker={this.props.showEmojiPicker}
@@ -342,7 +344,7 @@ export class ChatMessageComposer extends React.Component<Props,State> implements
                                 onFocus={this.props.onFocus}
                                 keyBindings={this.keyBindings}
                                 handleKeyCommand={this.handleKeyCommand}
-                            /> 
+                            />
                         </div>
                         {this.props.showSubmitButton &&
                             <div className="button-wrap d-flex flex-column-reverse">

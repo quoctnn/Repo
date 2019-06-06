@@ -63,7 +63,7 @@ export default class StatusEditorComponent extends React.Component<Props, State>
             uploading: false,
             link: this.props.status.link,
             mentions: this.props.status.mentions,
-            showDropzone:files.length > 0, 
+            showDropzone:files.length > 0,
         };
     }
     getNavigationProtectionKeys = () => {
@@ -78,6 +78,9 @@ export default class StatusEditorComponent extends React.Component<Props, State>
     }
     componentWillUnmount = () => {
         NavigationUtilities.protectNavigation(this.protectKey, false)
+        this.originalText = null;
+        this.protectKey = null;
+        this.formRef = null;
     }
     hasContentChanged = () => {
         if(this.state.text != this.originalText)
@@ -99,11 +102,11 @@ export default class StatusEditorComponent extends React.Component<Props, State>
 
         return (text != null && text.length > 0) || this.getFilesCount() > 0
     }
-    getFilesCount = () => 
+    getFilesCount = () =>
     {
         return this.state.files.length
     }
-    findPrimaryLink = () => 
+    findPrimaryLink = () =>
     {
         // Return first url found in text if any.
         // We are using two regex (with and without http://)
@@ -127,10 +130,10 @@ export default class StatusEditorComponent extends React.Component<Props, State>
             if (!this.canPost()) {
                 return;
             }
-    
+
             let text = this.state.text.trim();
             let link = this.findPrimaryLink();
-    
+
             var status:Partial<Status> = {
                 id: this.props.status.id,
                 text: text,
@@ -145,17 +148,17 @@ export default class StatusEditorComponent extends React.Component<Props, State>
             }
             // Don't need to check if is comment for editing, just calling status submit
             this.props.onStatusSubmit(status as Status, this.state.files);
-    
+
             this.clearStatusState()
             this.clearEditor()
             NavigationUtilities.protectNavigation(this.protectKey, false)
         })
     }
-    clearEditor = () => 
+    clearEditor = () =>
     {
         this.formRef.current.clearEditorContent()
     }
-    clearStatusState = () => 
+    clearStatusState = () =>
     {
         this.setState({
             text: '',
@@ -164,7 +167,7 @@ export default class StatusEditorComponent extends React.Component<Props, State>
             mentions: []
         });
     }
-    handleMentionSearch = (search:string, completion:(mentions:Mention[]) => void) => 
+    handleMentionSearch = (search:string, completion:(mentions:Mention[]) => void) =>
     {
         console.log("searching", search)
         /*ProfileManager.searchMembersInContext(search, this.props.status.context_object_id, this.props.status.context_natural_key, (members) => {
@@ -181,11 +184,11 @@ export default class StatusEditorComponent extends React.Component<Props, State>
     {
         this.setState({text: unprocessedText})
     }
-    handleFileAdded = () => 
+    handleFileAdded = () =>
     {
         this.setState({uploading: true});
     }
-    handleFileRemoved = (file:UploadedFile) => 
+    handleFileRemoved = (file:UploadedFile) =>
     {
         if (typeof file !== 'undefined' && file != null) {
             let files = this.removeFileFromList(file, this.state.files)
@@ -196,17 +199,17 @@ export default class StatusEditorComponent extends React.Component<Props, State>
         // TODO: ¿Should we display an error message (multi-lang) to the user?
         this.setState({uploading: true});
     }
-    handleFileQueueComplete = () => 
+    handleFileQueueComplete = () =>
     {
         this.setState({uploading: false});
     }
-    handleFileUploaded = (file) => 
+    handleFileUploaded = (file) =>
     {
         let files = this.state.files.map(f => f)
         files.push(file)
         this.setState({files: files})
     }
-    removeFileFromList = (file:UploadedFile, fileList:UploadedFile[]) => 
+    removeFileFromList = (file:UploadedFile, fileList:UploadedFile[]) =>
     {
         let list = fileList.map(f => f)
         let index = list.findIndex((item) => {
@@ -246,7 +249,7 @@ export default class StatusEditorComponent extends React.Component<Props, State>
                         files[index] = data
                         return {files}
                     }
-                    return 
+                    return
                 })
             }
             ToastManager.showErrorToast(error, status, translate("Could not update filename"))
@@ -257,16 +260,16 @@ export default class StatusEditorComponent extends React.Component<Props, State>
         const placeholder = this.props.textPlaceholder || translate("Write a comment")
         const uploadHandler = this.props.canUpload ? this.handleUploadClick : undefined
         return (
-            <ChatMessageComposer 
-                className={cn} 
-                canSubmit={canSubmit} 
-                onHandleUploadClick={uploadHandler} 
-                ref={this.formRef} 
-                content={this.state.text} 
-                mentionSearch={this.handleMentionSearch} 
-                mentions={ProfileManager.getProfiles(this.props.status.mentions).map(m => Mention.fromUser(m))} 
-                onSubmit={this.handleSubmit} 
-                onDidType={this.onDidType} 
+            <ChatMessageComposer
+                className={cn}
+                canSubmit={canSubmit}
+                onHandleUploadClick={uploadHandler}
+                ref={this.formRef}
+                content={this.state.text}
+                mentionSearch={this.handleMentionSearch}
+                mentions={ProfileManager.getProfiles(this.props.status.mentions).map(m => Mention.fromUser(m))}
+                onSubmit={this.handleSubmit}
+                onDidType={this.onDidType}
                 placeholder={placeholder}
                 showEmojiPicker={this.props.showEmojiPicker}
                 onBlur={this.props.onBlur}
@@ -276,7 +279,7 @@ export default class StatusEditorComponent extends React.Component<Props, State>
                 forceUpdate={this.props.forceUpdate}
                 singleLine={this.props.singleLine}
                 minimumTextLength={0}
-            />                      
+            />
         )
     }
     render() {

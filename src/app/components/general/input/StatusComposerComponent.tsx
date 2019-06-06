@@ -18,7 +18,7 @@ type OwnProps =
     canComment:boolean
     canUpload:boolean
     className?:string
-    contextObjectId:number 
+    contextObjectId:number
     contextNaturalKey:ContextNaturalKey
     communityId:number
     showEmojiPicker?:boolean
@@ -50,7 +50,7 @@ type State =
     mentions: number[]
     renderPlaceholder:boolean
     showDropzone: boolean
-    files:UploadedFile[]            
+    files:UploadedFile[]
 }
 type Props = OwnProps & DefaultProps
 export class StatusComposerComponent extends React.Component<Props, State> {
@@ -78,20 +78,20 @@ export class StatusComposerComponent extends React.Component<Props, State> {
     shouldComponentUpdate = (nextProps:Props, nextState:State) => {
         const ret = nextState.text != this.state.text ||
                 nextProps.content != this.props.content ||
-                !!nextProps.mentions && !this.props.mentions || 
-                !nextProps.mentions && !!this.props.mentions || 
-                nextProps.mentions && this.props.mentions && !nextProps.mentions.isEqual(this.props.mentions) || 
-                nextProps.className != this.props.className || 
-                nextProps.refresh != this.props.refresh || 
+                !!nextProps.mentions && !this.props.mentions ||
+                !nextProps.mentions && !!this.props.mentions ||
+                nextProps.mentions && this.props.mentions && !nextProps.mentions.isEqual(this.props.mentions) ||
+                nextProps.className != this.props.className ||
+                nextProps.refresh != this.props.refresh ||
                 nextProps.showEmojiPicker != this.props.showEmojiPicker ||
-                nextProps.showSubmitButton != this.props.showSubmitButton || 
-                nextProps.singleLine != this.props.singleLine || 
+                nextProps.showSubmitButton != this.props.showSubmitButton ||
+                nextProps.singleLine != this.props.singleLine ||
                 nextProps.forceHideDropzone != this.props.forceHideDropzone ||
 
                 nextState.showDropzone != this.state.showDropzone ||
-                nextState.uploading != this.state.uploading || 
-                nextState.link != this.state.link || 
-                !nextState.mentions.isEqual(this.state.mentions) || 
+                nextState.uploading != this.state.uploading ||
+                nextState.link != this.state.link ||
+                !nextState.mentions.isEqual(this.state.mentions) ||
                 nextState.renderPlaceholder != this.state.renderPlaceholder ||
                 !nextState.files.isEqual(this.state.files)
         return ret;
@@ -101,6 +101,8 @@ export class StatusComposerComponent extends React.Component<Props, State> {
             this.observer.disconnect()
         }
         this.observer = null
+        this.formRef = null;
+        this.element = null;
     }
     componentDidMount = () => {
         if(this.state.renderPlaceholder)
@@ -108,7 +110,7 @@ export class StatusComposerComponent extends React.Component<Props, State> {
             this.observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                   const { isIntersecting } = entry;
-                  if (isIntersecting) 
+                  if (isIntersecting)
                   {
                     this.setState({renderPlaceholder:false})
                     this.observer.disconnect();
@@ -239,7 +241,7 @@ export class StatusComposerComponent extends React.Component<Props, State> {
                         files[index] = data
                         return {files}
                     }
-                    return 
+                    return
                 })
             }
             ToastManager.showErrorToast(error, status, translate("Could not update filename"))
@@ -250,16 +252,16 @@ export class StatusComposerComponent extends React.Component<Props, State> {
         const placeholder = this.props.placeholder || translate("Write a comment")
         const uploadHandler = this.props.canUpload ? this.handleUploadClick : undefined
         return (
-            <ChatMessageComposer 
-                className={cn} 
-                canSubmit={canSubmit} 
-                onHandleUploadClick={uploadHandler} 
-                ref={this.formRef} 
-                content={this.state.text} 
-                mentionSearch={this.handleMentionSearch} 
-                mentions={this.props.mentions} 
-                onSubmit={this.handleSubmit} 
-                onDidType={this.onDidType} 
+            <ChatMessageComposer
+                className={cn}
+                canSubmit={canSubmit}
+                onHandleUploadClick={uploadHandler}
+                ref={this.formRef}
+                content={this.state.text}
+                mentionSearch={this.handleMentionSearch}
+                mentions={this.props.mentions}
+                onSubmit={this.handleSubmit}
+                onDidType={this.onDidType}
                 placeholder={placeholder}
                 showEmojiPicker={this.props.showEmojiPicker}
                 onBlur={this.props.onBlur}
@@ -269,7 +271,7 @@ export class StatusComposerComponent extends React.Component<Props, State> {
                 forceUpdate={this.props.forceUpdate}
                 singleLine={this.props.singleLine}
                 minimumTextLength={0}
-            />                      
+            />
         )
     }
     render = () => {
@@ -278,7 +280,7 @@ export class StatusComposerComponent extends React.Component<Props, State> {
             let itemClass = classnames("chat-message-composer chat-message-composer-placeholder secondary-text", this.props.className)
             return <div ref={this.element} className={itemClass}></div>
         }
-        if (this.props.canComment) 
+        if (this.props.canComment)
         {
             const canPost = this.canPost()
             const cn = classnames("comment-form status-composer-component", this.props.className)

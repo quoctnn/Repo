@@ -18,7 +18,7 @@ type Props = {
     onClick?:(event:React.SyntheticEvent<any>) => void
     allowedSearchOptions:SearchOption[]
     multiline:boolean
-} 
+}
 type State = {
     editorState:EditorState
     text:string
@@ -40,6 +40,9 @@ export class SearchBox extends React.Component<Props, State>{
 
         const editorState = EditorState.moveSelectionToEnd(this.state.editorState)
         this.setState({editorState})
+    }
+    componentWillUnmount() {
+        this.search = null;
     }
     editorState = () => {
         return this.state.editorState
@@ -63,7 +66,7 @@ export class SearchBox extends React.Component<Props, State>{
     handleReturn = (event:React.SyntheticEvent<any>, editorState:EditorState):DraftHandleValue => {
         if(this.props.onKeyDown)
             this.props.onKeyDown(event)
-        
+
         if(this.props.onEnter)
             this.props.onEnter(event)
         return 'handled'
@@ -112,11 +115,11 @@ export class SearchBox extends React.Component<Props, State>{
                 <Editor
                     editorState={this.state.editorState}
                     onChange={this.onChange}
-                    onFocus={this.onFocus} 
-                    onBlur={this.onBlur} 
+                    onFocus={this.onFocus}
+                    onBlur={this.onBlur}
                     handleReturn={this.handleReturn}
                     placeholder={this.props.placeholder}
-                    ref={this.search} 
+                    ref={this.search}
                 />
                 <span className={cl} onMouseDown={this.onTouchDown} onClick={this.clearTerm}></span>
             </div>

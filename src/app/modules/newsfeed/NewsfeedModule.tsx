@@ -82,7 +82,7 @@ class NewsfeedModule extends React.Component<Props, State> {
     componentWillUnmount = () => {
         this.tempMenuData = null
         this.availableFilters = null
-        this.newsfeedComponent = null 
+        this.newsfeedComponent = null
         this.statuscomposer = null
     }
     componentDidUpdate = (prevProps:Props) => {

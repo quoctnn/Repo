@@ -106,7 +106,7 @@ type OwnProps = {
     placeholder?:string
     keyBindings?:(event) => void
     handleKeyCommand?:(command: string) => DraftHandleValue
-    
+
 }
 type DefaultProps = {
     showEmojiPicker:boolean
@@ -151,10 +151,22 @@ export default class MentionEditor extends React.Component<Props, {}> {
         };
         this.onEmojiButtonMouseUp = this.onEmojiButtonMouseUp.bind(this);
         this.uploadFileChanged = this.uploadFileChanged.bind(this);
-        
+
         this.rootElement = null;
         this.positioningElement = null;
         this.observer = null;
+    }
+    componentWillUnmount() {
+        this.mentionPlugin = null;
+        this.editor = null;
+        this.state = null;
+        this.rootElement = null;
+        this.positioningElement = null;
+        this.observer = null;
+        this.emojiPlugin = null;
+        this.emojiButton = null;
+        this.container = null;
+        this.fileUploader = null;
     }
     onChange = (editorState: EditorState) => {
         if (this.props.onChange) {
@@ -185,7 +197,7 @@ export default class MentionEditor extends React.Component<Props, {}> {
     onEmojiButtonMouseUp(e) {
         this.toggleEmojiPanel(e)
     }
-    handleRootClick = (e) => 
+    handleRootClick = (e) =>
     {
         this.toggleEmojiPanel(e)
     }
@@ -204,7 +216,7 @@ export default class MentionEditor extends React.Component<Props, {}> {
         this.positioningElement = posEl;
         document.body.appendChild(this.positioningElement);
 
-        
+
         this.addObservers();
         this.updatePositioningElementStyle();
         let windowHeight = window.innerHeight;
@@ -235,7 +247,7 @@ export default class MentionEditor extends React.Component<Props, {}> {
             this.positioningElement.style.width = width + "px"
             this.positioningElement.style.position = "absolute"
         }
-            
+
     }
     removeBackDrop = () => {
         let el = this.rootElement;
@@ -250,7 +262,7 @@ export default class MentionEditor extends React.Component<Props, {}> {
         }
         this.removeObservers();
     }
-    addObservers = () => 
+    addObservers = () =>
     {
         var observer = new MutationObserver(this.observeCallback)
         var config = {childList: true, subtree: true}
@@ -258,7 +270,7 @@ export default class MentionEditor extends React.Component<Props, {}> {
         this.observer = observer
         window.addEventListener("resize", this.observeCallback)
     }
-    removeObservers = () => 
+    removeObservers = () =>
     {
         if(this.observer)
         {
@@ -266,7 +278,7 @@ export default class MentionEditor extends React.Component<Props, {}> {
             this.observer = null
         }
     }
-    observeCallback = (mutations) => 
+    observeCallback = (mutations) =>
     {
         this.updatePositioningElementStyle()
     }
@@ -281,13 +293,13 @@ export default class MentionEditor extends React.Component<Props, {}> {
             this.removeBackDrop();
         }
         })
-        
+
     }
     uploadFileChanged(event)
     {
         let filesList = this.fileUploader.current.files
         let files = []
-        for (var i = 0; i < filesList.length; i++) 
+        for (var i = 0; i < filesList.length; i++)
         {
             let file = filesList.item(i)
             files.push(file)
@@ -325,7 +337,7 @@ export default class MentionEditor extends React.Component<Props, {}> {
                     </div>
                 </div>
                 <div className="d-flex align-items-end">
-                    {this.props.showEmojiPicker && 
+                    {this.props.showEmojiPicker &&
                         <button
                             ref={this.emojiButton}
                             className="emojiButton editor-button btn btn-default"
@@ -334,7 +346,7 @@ export default class MentionEditor extends React.Component<Props, {}> {
                                 <i className="far fa-smile fa-lg"></i>
                         </button>
                     }
-                    {(this.props.filesAdded || this.props.onHandleUploadClick) && 
+                    {(this.props.filesAdded || this.props.onHandleUploadClick) &&
                         <button
                             className="upload-button editor-button btn btn-default"
                             type="button" onClick={this.onFileuploadButtonClick} >
@@ -344,7 +356,7 @@ export default class MentionEditor extends React.Component<Props, {}> {
                 </div>
             </div>
             </div>
-            
+
             <MentionSuggestions
                 onSearchChange={this.onSearchChange}
                 suggestions={this.state.suggestions}

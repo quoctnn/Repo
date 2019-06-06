@@ -41,7 +41,7 @@ export const getImageUrl = (file:UploadedFile, preferFullVersion:boolean) => {
     let img:string = null
     if((file.type ==  UploadedFileType.IMAGE && file.extension.toLowerCase() == "gif") || file.type ==  UploadedFileType.IMAGE360)
         img = file.file
-    if(!img) 
+    if(!img)
         img = preferFullVersion ?  (file.image || file.thumbnail)  : (file.thumbnail || file.image)
     return IntraSocialUtilities.appendAuthorizationTokenToUrl(img)
 }
@@ -57,7 +57,7 @@ export class Gallery360ImageComponent extends GalleryComponent<{ width:number, h
     private currentHeight = 0;
     constructor(props:GalleryComponentProps) {
         super(props)
-        
+
       this.state = { width:0, height:0 }
     }
     componentDidMount = () => {
@@ -82,6 +82,9 @@ export class Gallery360ImageComponent extends GalleryComponent<{ width:number, h
         }
         this.r360.stop && this.r360.stop()
         this.r360 = null
+        this.container = null
+        this.currentHeight = null
+        this.currentWidth = null
     }
     getBundleUrl = () => {
         return WindowAppManager.resolveLocalFileUrl( "/react360/react360.bundle.js")
@@ -92,13 +95,13 @@ export class Gallery360ImageComponent extends GalleryComponent<{ width:number, h
             // Add custom options here
             fullScreen: this.props.galleryMode,
           });
-          
+
           // Render your app content to the default cylinder surface
           this.r360.renderToSurface(
             this.r360.createRoot('demo360', { /* initial props */ }),
             this.r360.getDefaultSurface()
           );
-        
+
           // Load the initial environment
           this.r360.compositor.setBackground(image);
     }
@@ -166,7 +169,7 @@ export class GalleryMediaComponent extends GalleryComponent<{active:boolean}> {
         const extension = this.props.file.extension
         return <div key={"media_" + this.props.file.id} className={cn} onClick={this.onClick}>
                     {active && <VideoPlayer autoPlay={true} poster={poster} link={url} extension={extension}/>}
-                    {!active && 
+                    {!active &&
                         <div className="poster-container">
                             <SecureImage label={this.props.file.filename + " poster image"} className="img-responsive" url={poster} />
                             <div className="play-button">
@@ -178,26 +181,26 @@ export class GalleryMediaComponent extends GalleryComponent<{active:boolean}> {
     }
 }
 export type Point = {
-    width:number 
+    width:number
     height:number
 }
-export interface OwnProps 
+export interface OwnProps
 {
     files:UploadedFile[]
 }
-export interface DefaultProps 
+export interface DefaultProps
 {
     height:number
     setWidth:boolean
 }
-interface State 
+interface State
 {
     index:number
     visible:boolean
 }
 type Props = OwnProps & DefaultProps
 
-export default class ContentGallery extends React.Component<Props, State> {     
+export default class ContentGallery extends React.Component<Props, State> {
     static defaultProps:DefaultProps = {
         height:200,
         setWidth:false
@@ -215,16 +218,23 @@ export default class ContentGallery extends React.Component<Props, State> {
         }
     }
     shouldComponentUpdate = (nextProps:Props, nextState:State) => {
-        return nextProps.height != this.props.height || 
-                !nextProps.files.isEqual(this.props.files) || 
-                nextState.visible != this.state.visible || 
+        return nextProps.height != this.props.height ||
+                !nextProps.files.isEqual(this.props.files) ||
+                nextState.visible != this.state.visible ||
                 nextState.index != this.state.index
     }
-    onDialogClose = () => 
+    componentWillUnmount() {
+        this.windowResizeOn = null;
+        this.animationDuration = null;
+        this.animating = null;
+        this.swiper = null;
+        this.galleryContainer = null;
+    }
+    onDialogClose = () =>
     {
         this.setState({visible:false})
     }
-    onGalleryItemClick = (file:UploadedFile, event) => 
+    onGalleryItemClick = (file:UploadedFile, event) =>
     {
         event.preventDefault()
         let ix = this.props.files.indexOf(file)
@@ -256,7 +266,7 @@ export default class ContentGallery extends React.Component<Props, State> {
     }
     calculateSizes = (files:UploadedFile[]) => {
         //find total width at height
-        //scale to specific width 
+        //scale to specific width
         const targetWidth = this.targetWidthForCount(files.length)
         const targetHeight = this.targetHeightForCount(files.length)
         let totalWidth = 0
@@ -274,14 +284,14 @@ export default class ContentGallery extends React.Component<Props, State> {
             points.push({width:w, height:targetHeight})
         })
         //rescale
-        const scale = totalWidth / targetWidth  
+        const scale = totalWidth / targetWidth
         const newPoints:Point[] = points.map(p => {
             return {width:p.width / scale, height:p.height / scale}
         })
-        const maxWidth = Math.min( targetWidth * scale , targetWidth) 
+        const maxWidth = Math.min( targetWidth * scale , targetWidth)
         return {points:newPoints, maxWidth:maxWidth, width:targetWidth, height:targetHeight / scale }
     }
-    renderModal = () => 
+    renderModal = () =>
     {
         if(!this.state.visible)
             return null
@@ -297,7 +307,7 @@ export default class ContentGallery extends React.Component<Props, State> {
         }}
         return <PhotoSwipeComponent items={this.props.files} options={options} visible={this.state.visible} onClose={this.onDialogClose}/>
     }
-    renderItems = (files:UploadedFile[], setSizes:boolean = false) => 
+    renderItems = (files:UploadedFile[], setSizes:boolean = false) =>
     {
         if(files.length == 0)
             return null
@@ -306,7 +316,7 @@ export default class ContentGallery extends React.Component<Props, State> {
             const scale = f.image_width && f.image_height ? (f.image_width / f.image_height) : 1
             const styles = setSizes ? {width: this.props.height * scale, height:this.props.height } : undefined
             return <div key={f.type + "_" + f.id} className="gallery-item-container" style={styles}>{item}</div>
-        })  
+        })
         return items
     }
     renderSingleItem = () => {
@@ -318,7 +328,7 @@ export default class ContentGallery extends React.Component<Props, State> {
         const styles:React.CSSProperties = {}
         if(this.props.setWidth)
             styles.width = sizes.maxWidth
-        else 
+        else
             styles.maxWidth = sizes.maxWidth
         return (<div className="gallery-container" style={styles}>
                     <div ref={this.galleryContainer} style={{paddingBottom:height + "%"}} className={"gallery-list"}>
