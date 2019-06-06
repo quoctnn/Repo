@@ -96,6 +96,12 @@ export class StatusComposerComponent extends React.Component<Props, State> {
                 !nextState.files.isEqual(this.state.files)
         return ret;
     }
+    componentWillUnmount = () => {
+        if (this.observer) {
+            this.observer.disconnect()
+        }
+        this.observer = null
+    }
     componentDidMount = () => {
         if(this.state.renderPlaceholder)
         {

@@ -28,6 +28,7 @@ export class IntersectionObserverComponent extends React.Component<Props,State> 
         if (this.observer) {
             this.observer.disconnect()
         }
+        this.observer = null
     }
     render() {
         var {onChange, children, ...rest} = this.props

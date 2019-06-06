@@ -121,7 +121,7 @@ export class NavigationUtilities {
                 }
                 NavigationUtilities.routerNavigationPreventionReleaseCallback && NavigationUtilities.routerNavigationPreventionReleaseCallback()
                 if(window.routerHistory)
-                NavigationUtilities.routerNavigationPreventionReleaseCallback = window.routerHistory.block(dialogText)
+                    NavigationUtilities.routerNavigationPreventionReleaseCallback = window.routerHistory.block(dialogText)
             }
         } else {
             NavigationUtilities.removeNavigationProtection()

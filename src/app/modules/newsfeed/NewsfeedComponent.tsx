@@ -4,7 +4,7 @@ import { StatusUtilities } from '../../utilities/StatusUtilities';
 import { NavigationUtilities } from '../../utilities/NavigationUtilities';
 import { withRouter } from 'react-router';
 import * as Immutable from 'immutable';
-import ApiClient, { ApiClientCallback } from '../../network/ApiClient';
+import ApiClient from '../../network/ApiClient';
 import { ReduxState } from '../../redux/index';
 import { UserProfile, Status, UploadedFile, ContextNaturalKey, StatusActions, ObjectAttributeType, Permission } from '../../types/intrasocial_types';
 import { nullOrUndefined, uniqueId } from '../../utilities/Utilities';
@@ -152,6 +152,7 @@ export class NewsfeedComponent extends React.Component<Props, State> {
         if(!!element && !!this.readObserver)
             this.readObserver.observe(id, element)
     }
+    
     componentDidUpdate = (prevProps:Props, prevState:State) => {
         if(this.props.contextNaturalKey != prevProps.contextNaturalKey || 
             this.props.contextObjectId != prevProps.contextObjectId || 
@@ -204,13 +205,16 @@ export class NewsfeedComponent extends React.Component<Props, State> {
     componentWillUnmount = () =>
     {
         this.observers.forEach(o => o.remove())
+        this.observers = null
         if(this.props.scrollParent)
         {
             this.props.scrollParent.removeEventListener("scroll", this.onScroll)
         }
+        this.incomingUpdateCache = null
         this.readObserver.save()
         this.readObserver.cleanup()
         this.readObserver = null
+        this.listRef = null
     }
     setStashUpdates = (stash:boolean) => {
         this.stashIncomingUpdates = stash
@@ -968,6 +972,7 @@ export class NewsfeedComponent extends React.Component<Props, State> {
                 />
     }
     renderStatusComposer = (composer:StatusComposer, index:number, color:string) => {
+            return null
         const cn = classnames(color, "lvl" + composer.level)
             return (
                 <StatusComposerComponent

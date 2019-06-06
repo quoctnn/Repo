@@ -35,6 +35,7 @@ class ApplicationLoader extends React.Component<Props, {progress:LoadingProgress
     }
     componentWillUnmount = () => {
         this.observers.forEach(o => o.remove())
+        this.observers = null
     }
     renderLoading = () => {
         if (!this.props.loaded) {

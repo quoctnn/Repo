@@ -79,6 +79,12 @@ class NewsfeedModule extends React.Component<Props, State> {
     componentDidMount = () => {
 
     }
+    componentWillUnmount = () => {
+        this.tempMenuData = null
+        this.availableFilters = null
+        this.newsfeedComponent = null 
+        this.statuscomposer = null
+    }
     componentDidUpdate = (prevProps:Props) => {
         //turn off loading spinner if feed is removed
         if(prevProps.breakpoint != this.props.breakpoint && this.props.breakpoint < ResponsiveBreakpoint.standard && this.state.isLoading)

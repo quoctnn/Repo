@@ -87,8 +87,8 @@ export class Grid extends React.PureComponent<Props, State> {
     animateAndDestroy = (key:string, n) =>
     {
         var domNode = ReactDOM.findDOMNode(this.refs[key]) as any
-        requestAnimationFrame(function() {
-            requestAnimationFrame(function() {
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() =>  {
             domNode.style.opacity = "0";
             domNode.style.transform = "scale(2)"
             });
@@ -100,12 +100,12 @@ export class Grid extends React.PureComponent<Props, State> {
         
         var [dX, dY] = this.getPositionDelta(domNode, key);
         
-        requestAnimationFrame(function(){
+        requestAnimationFrame(() => {
             domNode.style.transition = 'transform 0s';
             domNode.style.transform = 'translate('+ dX + 'px, ' + dY + 'px)';
-            requestAnimationFrame(function() {
-            domNode.style.transform  = '';
-            domNode.style.transition = 'transform 350ms';
+            requestAnimationFrame(() => {
+                domNode.style.transform  = '';
+                domNode.style.transition = 'transform 350ms';
             })
         });
     }
@@ -134,8 +134,7 @@ export class Grid extends React.PureComponent<Props, State> {
             oldBox.top - newBox.top
         ];
     }
-    render() 
-    {
+    render = () => {
         const modules = this.props.grid.grid_modules
         const cn = classnames("module-grid", this.props.className)
         const rows = modules.reduce((a, b) => Math.max(a, b.height + b.row), 0) - 1

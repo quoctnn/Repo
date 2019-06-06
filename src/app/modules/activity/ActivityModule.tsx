@@ -13,6 +13,7 @@ import { ToastManager } from '../../managers/ToastManager';
 import ActivityItem  from './ActivityItem';
 import { NotificationCenter } from '../../utilities/NotificationCenter';
 import { eventStreamNotificationPrefix, EventStreamMessageType } from '../../network/ChannelEventStream';
+import { EventSubscription } from 'fbemitter';
 
 type OwnProps = {
     breakpoint:ResponsiveBreakpoint
@@ -24,6 +25,7 @@ type Props = OwnProps & RouteComponentProps<any>
 class ActivityModule extends React.Component<Props, State> {
     activityId = 0;
     activityListInput = React.createRef<ListComponent<RecentActivity>>()
+    observers:EventSubscription[] = []
     constructor(props:Props) {
         super(props);
         this.state = {
@@ -40,11 +42,19 @@ class ActivityModule extends React.Component<Props, State> {
         }
     }
     componentDidMount = () => {
-        NotificationCenter.addObserver(eventStreamNotificationPrefix + EventStreamMessageType.ACTIVITY_NEW, this.newActivityReceived)
+        const observer1 = NotificationCenter.addObserver(eventStreamNotificationPrefix + EventStreamMessageType.ACTIVITY_NEW, this.newActivityReceived)
+        this.observers.push(observer1)
+    }
+    componentWillUnmount = () =>
+    {
+        this.observers.forEach(o => o.remove())
+        this.observers = null
+        this.activityListInput = null
     }
     newActivityReceived = (...args:any[]) => {
         const activity = args[0] as RecentActivity;
-        if (activity && this.activityListInput.current) this.activityListInput.current.safeUnshift(activity);
+        if (activity && this.activityListInput.current) 
+            this.activityListInput.current.safeUnshift(activity);
     }
     headerClick = (e) => {
         return 0;

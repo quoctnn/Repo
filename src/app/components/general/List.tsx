@@ -4,33 +4,32 @@ const ReactDOM = require("react-dom");
 require("./List.scss");
 
 export interface Props {
-    className?:string,
-    id?:string
-    onScroll?:(event:React.UIEvent<any>) => void
-    enableAnimation:boolean
-    children:React.ReactNode
+    className?: string,
+    id?: string
+    onScroll?: (event: React.UIEvent<any>) => void
+    enableAnimation: boolean
+    children: React.ReactNode
 }
 export interface State {
 
-    items:React.ReactElement<any>[]
-    rects:{[id:number]:DOMRect}
+    items: React.ReactElement<any>[]
+    rects: { [id: number]: DOMRect }
 }
 type ListItemProps = {
-    hasAction:boolean
+    hasAction: boolean
 }
 
 //WARNING:ANIMATION REMOVED
 export class ListItem extends React.PureComponent<ListItemProps & React.HTMLAttributes<HTMLElement>, {}> {
-    static defaultProps:ListItemProps = {
-        hasAction:false
+    static defaultProps: ListItemProps = {
+        hasAction: false
     }
-    render() 
-    {
-        const {className, hasAction, ...rest} = this.props
-        const cn = classnames("list-item primary-text d-flex align-items-center", className, {"has-action":hasAction})
-        return(
+    render() {
+        const { className, hasAction, ...rest } = this.props
+        const cn = classnames("list-item primary-text d-flex align-items-center", className, { "has-action": hasAction })
+        return (
             <div {...rest} className={cn} >
-                  {this.props.children}
+                {this.props.children}
             </div>
         );
     }
@@ -38,131 +37,121 @@ export class ListItem extends React.PureComponent<ListItemProps & React.HTMLAttr
 type ListHeaderProps = {
 }
 export class ListHeader extends React.PureComponent<ListHeaderProps & React.HTMLAttributes<HTMLElement>, {}> {
-    render() 
-    {
-        const {className, ...rest} = this.props
+    render() {
+        const { className, ...rest } = this.props
         const cn = classnames("list-header secondary-text", className)
-        return(
+        return (
             <div {...rest} className={cn} >
-                  {this.props.children}
+                {this.props.children}
             </div>
         );
     }
 }
-export class List extends React.PureComponent<Props, {}> {
-    static defaultProps:Props = {
-        className:null,
-        id:null,
-        onScroll:null,
-        enableAnimation:true,
-        children:[]
-    }
-    state:State
+export class List extends React.PureComponent<Props, State> {
     listRef = React.createRef<HTMLDivElement>()
-    constructor(props:Props) {
+    static defaultProps: Props = {
+        className: null,
+        id: null,
+        onScroll: null,
+        enableAnimation: true,
+        children: []
+    }
+    constructor(props: Props) {
         super(props);
-        this.state = {items:[], rects:{}}
-        this.getChildren = this.getChildren.bind(this)
-        this.animateAndTransform = this.animateAndTransform.bind(this)
+        this.state = { items: [], rects: {} }
     }
     scrollToTop = () => {
         this.listRef.current.scrollTo({
             top: 0,
-            behavior:"smooth"
+            behavior: "smooth"
         })
     }
-    componentWillReceiveProps(newProps) {
-        if(this.props.enableAnimation)
-        {
+    componentWillUnmount = () => {
+        this.listRef = null
+    }
+    componentWillReceiveProps = (newProps:Props) =>  {
+        if (this.props.enableAnimation) {
             let items = this.getChildren() as any[]
-            if(items.length > 0) {
+            if (items.length > 0) {
                 let rects = {}
                 items.forEach(child => {
-                    if(!child.key) return;
+                    if (!child.key) return;
                     var domNode = ReactDOM.findDOMNode(this.refs[child.key]);
                     var boundingBox = domNode.getBoundingClientRect();
                     rects[child.key] = boundingBox
                 })
-                this.setState({rects:rects})
+                this.setState({ rects: rects })
             }
         }
     }
-    getChildren()
-    {
-        let items:React.ReactNode[] = []
-        React.Children.map(this.props.children, (c, i)  => {
+    getChildren = () => {
+        let items: React.ReactNode[] = []
+        React.Children.map(this.props.children, (c, i) => {
             items.push(c)
         })
         return items.filter(i => i != null)
     }
-      componentDidUpdate(previousProps) 
-      {
-        if(this.props.enableAnimation)
-        {
+    componentDidUpdate = (previousProps) => {
+        if (this.props.enableAnimation) {
             var doNeedAnimation = [];
-            this.getChildren().forEach((item) =>  {
-            if(this.doesNeedAnimation(item) === 0) {
-                doNeedAnimation.push(item);
-            }
+            this.getChildren().forEach((item) => {
+                if (this.doesNeedAnimation(item) === 0) {
+                    doNeedAnimation.push(item);
+                }
             });
             doNeedAnimation.forEach(this.animateAndTransform);
         }
-      }
-      animateAndDestroy(child, n) 
-      {
+    }
+    animateAndDestroy = (child, n) => {
         var domNode = ReactDOM.findDOMNode(this.refs[child.key]);
-        requestAnimationFrame(function() {
-          requestAnimationFrame(function() {
-            domNode.style.opacity = "0";
-            domNode.style.transform = "scale(2)"
-          });
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                domNode.style.opacity = "0";
+                domNode.style.transform = "scale(2)"
+            });
         });
-      }
-      animateAndTransform(child, n) 
-      {
+    }
+    animateAndTransform = (child, n) => {
         var domNode = ReactDOM.findDOMNode(this.refs[child.key]);
-        
+
         var [dX, dY] = this.getPositionDelta(domNode, child.key);
-        
-        requestAnimationFrame(function(){
-          domNode.style.transition = 'transform 0s';
-          domNode.style.transform = 'translate('+ dX + 'px, ' + dY + 'px)';
-          requestAnimationFrame(function() {
-            domNode.style.transform  = '';
-            domNode.style.transition = 'transform 400ms';
-          })
+
+        requestAnimationFrame(() => {
+            domNode.style.transition = 'transform 0s';
+            domNode.style.transform = 'translate(' + dX + 'px, ' + dY + 'px)';
+            requestAnimationFrame(() => {
+                domNode.style.transform = '';
+                domNode.style.transition = 'transform 400ms';
+            })
         });
-      }
-      doesNeedAnimation(child) 
-      {
+    }
+    doesNeedAnimation = (child) => {
         var isNotMovable = !child.key;
         var isNew = !this.state.rects[child.key];
         var isDestroyed = !this.refs[child.key];
-        
-        if(isDestroyed) return 2;
-        if(isNotMovable || isNew) return;
-        
+
+        if (isDestroyed) return 2;
+        if (isNotMovable || isNew) return;
+
         var domNode = ReactDOM.findDOMNode(this.refs[child.key]);
         var [dX, dY] = this.getPositionDelta(domNode, child.key);
         var isStationary = dX === 0 && dY === 0;
-    
+
         return (isStationary === true) ? 1 : 0;
-      }
-      getPositionDelta(domNode, key) 
-      {
+    }
+    getPositionDelta = (domNode, key) => {
         var newBox = domNode.getBoundingClientRect();
         var oldBox = this.state.rects[key];
-        
+
         return [
-          oldBox.left - newBox.left,
-          oldBox.top - newBox.top
+            oldBox.left - newBox.left,
+            oldBox.top - newBox.top
         ];
-      }
-    render() 
-    {
-        return(
-            <div ref={this.listRef} onScroll={this.props.onScroll} className={"list" + (this.props.className ? " " + this.props.className : "") } >
-                  {this.props.children}
+    }
+    render = () => {
+        return (
+            <div ref={this.listRef} onScroll={this.props.onScroll} className={"list" + (this.props.className ? " " + this.props.className : "")} >
+                {this.props.children}
             </div>
         );
     }

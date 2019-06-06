@@ -9,7 +9,7 @@ const loggingMiddleware = store => next => action => {
     return result;
 }
 
-let _middleWares = [loggingMiddleware];
+let _middleWares = [/*loggingMiddleware*/];
 if (Settings.showEmbedlyCards) {
     _middleWares.push(embedlyMiddleware);
 }
