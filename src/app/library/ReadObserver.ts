@@ -125,6 +125,9 @@ export class ReadObserver{
         window.removeEventListener('focus', this.windowFocusChanged);
         window.removeEventListener('blur', this.windowFocusChanged);
         this.clearObservables()
+        if(this.intersectionObserver)
+            this.intersectionObserver.disconnect()
+        this.intersectionObserver = null
     }
     private updateTimer = () => {
         if(this.errorCount >= this.errorLimit)

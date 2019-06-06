@@ -116,6 +116,7 @@ class ConversationsModule extends React.Component<Props, State> {
     componentWillUnmount = () =>
     {
         this.observers.forEach(o => o.remove())
+        this.observers = null
     }
     processIncomingConversation = (...args:any[]) =>
     {

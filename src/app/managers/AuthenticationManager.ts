@@ -1,7 +1,7 @@
 import {  Store } from 'redux';
 import { AjaxRequest } from '../network/AjaxRequest';
 import { UserProfile, UserStatus, ContextNaturalKey, RecentActivity } from '../types/intrasocial_types';
-import { sendOnWebsocket, EventStreamMessageType } from '../network/ChannelEventStream';
+import {EventStreamMessageType } from '../network/ChannelEventStream';
 import { ReduxState } from '../redux/index';
 import { setAuthenticationProfileAction, setAuthenticationTokenAction } from '../redux/authentication';
 import { NotificationCenter } from '../utilities/NotificationCenter';
@@ -9,6 +9,7 @@ import { ApplicationManager } from './ApplicationManager';
 import { CommunityManager } from './CommunityManager';
 import { ContextManager } from './ContextManager';
 import { ToastManager } from './ToastManager';
+import { WindowAppManager } from './WindowAppManager';
 
 export const AuthenticationManagerAuthenticatedUserChangedNotification = "AuthenticationManagerAuthenticatedUserChangedNotification"
 export abstract class AuthenticationManager
@@ -19,6 +20,7 @@ export abstract class AuthenticationManager
 
     static setup = () =>
     {
+        console.log("AuthenticationManager setup")
         NotificationCenter.addObserver('eventstream_' + EventStreamMessageType.CLIENT_STATUS_CHANGE, AuthenticationManager.processIncomingUserUpdate)
         NotificationCenter.addObserver('eventstream_' + EventStreamMessageType.COMMUNITY_MAIN, AuthenticationManager.processSwitchedMainCommunity)
         NotificationCenter.addObserver('eventstream_' + EventStreamMessageType.ACTIVITY_NEW, AuthenticationManager.newActivityReceived)
@@ -118,7 +120,7 @@ export abstract class AuthenticationManager
         AuthenticationManager.lastUserActivity = 0
         let profile = AuthenticationManager.getAuthenticatedUser() as UserProfile;
         if (profile && profile.user_status == UserStatus.away){
-            sendOnWebsocket(
+            WindowAppManager.sendOutgoingOnSocket(
                 JSON.stringify({
                 type: EventStreamMessageType.USER_LAST_SEEN,
                 data: { seconds: AuthenticationManager.lastUserActivity }
@@ -140,7 +142,7 @@ export abstract class AuthenticationManager
             AuthenticationManager.keepAlive = setInterval(
                 () => {
                     AuthenticationManager.lastUserActivity += AuthenticationManager.keepAliveFrequency;
-                    sendOnWebsocket(
+                    WindowAppManager.sendOutgoingOnSocket(
                         JSON.stringify({
                         type: EventStreamMessageType.USER_LAST_SEEN,
                         data: { seconds: AuthenticationManager.lastUserActivity }

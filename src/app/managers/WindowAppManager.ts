@@ -3,7 +3,7 @@ import { ReduxState } from '../redux';
 import { resetProjectsAction } from '../redux/projectStore';
 import { resetEventsAction } from '../redux/eventStore';
 import ReconnectingWebSocket from "reconnecting-websocket";
-import { sendOnWebsocket, eventStreamNotificationPrefix } from '../network/ChannelEventStream';
+import { eventStreamNotificationPrefix } from '../network/ChannelEventStream';
 import { NotificationCenter } from '../utilities/NotificationCenter';
 import { ToastManager } from './ToastManager';
 import { translate } from '../localization/AutoIntlProvider';
@@ -22,7 +22,7 @@ export type AppWindowObject = {
     resetMessageQueue:() => void
     user_locale?:string
     socket?:ReconnectingWebSocket
-    sendOutgoingOnSocket:(data:object) => void
+    sendOutgoingOnSocket:(data:string) => void
     sendInboundOnSocket:(data:{type:string, data:any}) => void
     hardReset:() => void
     softReset:() => void
@@ -77,8 +77,12 @@ export abstract class WindowAppManager
     static deleteCachedCommunity = (id:number) => {
         CommunityManager.removeCommunity(id)
     }
-    static sendOutgoingOnSocket = (data:object) => {
-        sendOnWebsocket(JSON.stringify(data))
+    static sendOutgoingOnSocket = (data:string) => {
+        if(WindowAppManager.canSendOnWebsocket())
+            window.app.socket.send(data)
+    }
+    static canSendOnWebsocket = () => {
+        return window.app.socket && window.app.socket.readyState == ReconnectingWebSocket.OPEN
     }
     static navigateToRoute = (route:string, modal = false) => {
         window.routerHistory.push(route, {modal}) 

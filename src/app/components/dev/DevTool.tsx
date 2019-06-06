@@ -5,7 +5,6 @@ import "./DevTool.scss"
 import { translate } from "../../localization/AutoIntlProvider";
 import { availableLanguages, setLanguageAction } from "../../redux/language";
 import { availableThemes } from "../../redux/theme";
-import { sendOnWebsocket } from "../../network/ChannelEventStream";
 import { ReduxState } from "../../redux";
 import { availableEndpoints, setEndpointAction } from "../../redux/endpoint";
 import { AuthenticationManager } from "../../managers/AuthenticationManager";
@@ -13,6 +12,7 @@ import { parseJSONObject } from "../../utilities/Utilities";
 import * as websocketInfo from "../../../../docs/Websocket messages.json"
 import { ThemeManager } from "../../managers/ThemeManager";
 import { ApplicationManager } from '../../managers/ApplicationManager';
+import { WindowAppManager } from '../../managers/WindowAppManager';
 
 type ReduxStateProps = {
     language: number;
@@ -24,7 +24,6 @@ type ReduxDispatchProps = {
     setLanguage?: (index: number) => void;
     setApiEndpoint?: (index: number) => void;
     setAccessTokenOverride: (accessToken: string) => void;
-    sendOnWebsocket: (data: string) => void;
     enablePushNotifications: () => void;
 }
 type OwnProps = {
@@ -190,7 +189,7 @@ class DevTool extends React.PureComponent<Props, State> {
                 <div className="input-group-append">
                     <button
                         onClick={() => {
-                        this.props.sendOnWebsocket(this.state.websocketData);
+                            WindowAppManager.sendOutgoingOnSocket(this.state.websocketData)
                         }}
                         className="btn btn-outline-secondary"
                         type="button"
@@ -429,9 +428,6 @@ const mapDispatchToProps = dispatch => {
         setAccessTokenOverride: (accessToken:string) => {
             AuthenticationManager.signOut()
             AuthenticationManager.signIn(accessToken)
-        },
-        sendOnWebsocket: (data: string) => {
-            sendOnWebsocket(data);
         },
         enablePushNotifications: () => {
             Notification.requestPermission();

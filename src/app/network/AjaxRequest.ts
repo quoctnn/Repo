@@ -186,14 +186,14 @@ export class AjaxRequest
 }
 const defaultCallback:SuccessCallback = (data, status, jxhr) => {
     if (!isProduction) {
-        console.log(data, status);
+        //console.log(data, status);
     }
 };
 const defaultErrorCallback:ErrorCallback = (xhr, status, err) => {
     if (!isProduction) {
         console.error(err.toString())
         console.error("Error status: " + xhr.statusText)
-        console.log(xhr);
+        //console.log(xhr);
     }
 
     if (isProduction && (xhr.status === 403 || xhr.status === 401)) {

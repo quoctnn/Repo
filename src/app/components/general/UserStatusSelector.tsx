@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { connect } from 'react-redux'
 import { UserStatus, UserProfile, UserStatusItem } from '../../types/intrasocial_types';
-import { sendOnWebsocket, EventStreamMessageType } from '../../network/ChannelEventStream';
+import { EventStreamMessageType } from '../../network/ChannelEventStream';
 import { NotificationCenter } from '../../utilities/NotificationCenter';
 import { ReduxState } from '../../redux/index';
 import "./UserStatusSelector.scss"
@@ -12,9 +12,10 @@ import { EventStreamManagerConnectionChangedEvent, EventStreamManager } from '..
 import { DropdownItem } from 'reactstrap';
 import { UserStatusIndicator } from './UserStatusIndicator';
 import { OverflowMenuItem, OverflowMenuItemType, createDropdownItem } from './OverflowMenu';
+import { WindowAppManager } from '../../managers/WindowAppManager';
 
 export const sendUserStatus = (status: UserStatus) => {
-    sendOnWebsocket(
+    WindowAppManager.sendOutgoingOnSocket(
         JSON.stringify({
         type: EventStreamMessageType.USER_UPDATE,
         data: { status: status }
@@ -55,6 +56,7 @@ class UserStatusSelector extends React.Component<Props, State> {
     componentWillUnmount()
     {
         this.observers.forEach(o => o.remove())
+        this.observers = null
     }
     processEventStreamConnectionChange = (...args:any[]) => {
         const connected = EventStreamManager.connected

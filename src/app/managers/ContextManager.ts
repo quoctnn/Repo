@@ -105,7 +105,7 @@ export abstract class ContextManager
         const restKeys = Object.keys(d)
         if(restKeys.length > 0)
         {
-            console.log("rest", restKeys)
+            //console.log("rest", restKeys)
             ContextManager.resolveInitialContextObjects(d, completion)
             return
         }

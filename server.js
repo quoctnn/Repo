@@ -12,7 +12,7 @@ app.use(express.static(DIST_DIR));
 //Send index.html when the user access the web
 app.get("*", function (req, res) {
   console.log("req", req.url)
-  res.sendFile(path.join(DIST_DIR, "index.html"));
+  res.sendFile(path.join(DIST_DIR, "index_1.html"));
 });
 
 app.listen(PORT);

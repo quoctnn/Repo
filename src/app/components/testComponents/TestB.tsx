@@ -9,6 +9,9 @@ export default class TestB extends React.Component<Props,{}> {
     constructor(props:Props){
         super(props)
     }
+    componentWillUnmount = () => {
+        this.testCRef = null
+    }
     render() {
         return (
             <div className="test-b">

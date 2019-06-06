@@ -151,7 +151,18 @@ class Main extends React.Component<Props, State> {
             <div id="main">
                     <div id="main-content">
                         <ToastContainer />
-                        <Link to="/test">404</Link>
+                        <div>
+                            <Link to="/test">404</Link>
+                        </div>
+                        <div>
+                            <Link to="/tests/testB">testB</Link>
+                        </div>
+                        <div>
+                            <Link to="/community/new/">NEW</Link>
+                        </div>
+                        <div>
+                            <Link to="/profile/10/">User</Link>
+                        </div>
                         <div id="content-block" className="">
                             {!this.props.loaded &&
                                 <Switch>
@@ -164,7 +175,6 @@ class Main extends React.Component<Props, State> {
                                     {userIsAdmin &&
                                         <Route path={Routes.ADMIN_DASHBOARD_BUILDER.path} component={DashboardBuilderPage} />
                                     }
-                                    <Redirect from={Routes.ELECTRON} to={Routes.ROOT} />
                                     <Route path="/tests/testA" component={TestA} />
                                     <Route path="/tests/testB" component={TestB} />
                                     <Route path={Routes.DEVELOPER_TOOL.path} component={DevTool} />
@@ -179,14 +189,11 @@ class Main extends React.Component<Props, State> {
                                     <Route path={Routes.SIGNOUT} component={Signout} />
                                     <Route path={Routes.ROOT} exact={true} component={PathLoadedDashboardPage} />
                                     <Route path={Routes.conversationUrl(":conversationId?")} exact={true} component={PathLoadedConversationsPage} />
-                                    <Route path={Routes.ELECTRON} component={PathLoadedDashboardPage} />
-                                    <Route path={Routes.ANY} component={Error404} />
                                 </Switch>
                                 <Switch location={location}>
                                     <Route path={Routes.CHANGELOG} component={ModalChangelog} />
                                 </Switch>
-                                
-                                </>
+                            </>
                             }
                         </div>
                     </div>

@@ -76,6 +76,12 @@ export class StatusComponent extends React.Component<Props, State> {
             this.observer.observe(this.element.current);
         }
     }
+    componentWillUnmount = () => {
+        if (this.observer) {
+            this.observer.disconnect()
+        }
+        this.observer = null
+    }
     shouldComponentUpdate(nextProps:Props, nextState:State)
     {
         const nextStatus = nextProps.status

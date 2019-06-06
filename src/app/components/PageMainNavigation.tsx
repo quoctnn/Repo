@@ -41,7 +41,7 @@ class PageTopNavigation extends React.Component<Props, {}> {
         {
             return
         }
-        const currentState = UserStatus.getObject(profile.user_status)
+        const currentStatus = UserStatus.getObject(profile.user_status)
         return(
             <div id="page-main-navigation" className="">
                 <div className="d-flex">
@@ -65,7 +65,7 @@ class PageTopNavigation extends React.Component<Props, {}> {
                     </div>
                     <div className="right" style={{gridArea: "1 / 10 / span 1 / span 3"}}>
                         <div className="profile-box d-flex align-items-center mr-1  flex-row-reverse">
-                            <Avatar className="" image={userAvatar(profile, true)} size={63} statusColor={currentState && currentState.color} >
+                            <Avatar className="" image={userAvatar(profile, true)} size={63} statusColor={currentStatus && currentStatus.color} >
                             </Avatar>
                             <div className="text-truncate mr-2">
                                 <div className="profile-name text-truncate">{userFullName( profile ) }</div>

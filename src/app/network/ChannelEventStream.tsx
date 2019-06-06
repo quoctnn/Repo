@@ -27,19 +27,6 @@ export enum EventStreamMessageType {
 
 }
 export const eventStreamNotificationPrefix = "eventstream_"
-var publicStream: ReconnectingWebSocket|null = null;
-export const sendOnWebsocket = (data: Message) => {
-    if (canSendOnWebsocket()) {
-        //console.log('Sending Websocket', data);
-        publicStream!.send(data);
-    }
-}
-export const canSendOnWebsocket = () => {
-    return publicStream && publicStream.readyState == ReconnectingWebSocket.OPEN
-}
-export const getStream = () => {
-    return publicStream;
-}
 const socket_options = {
     maxRetries: 20,
     maxReconnectionDelay: 256000,
@@ -136,7 +123,7 @@ class ChannelEventStream extends React.Component<Props, State> {
 
             this.authorized = true
             let data = { type: 'authorization', data: { token: this.props.token } };
-            console.log('Sending Authorization on WebSocket', data);
+            console.log('Sending Authorization on WebSocket');
             this.stream!.send(JSON.stringify(data));
         }
     }
@@ -145,7 +132,7 @@ class ChannelEventStream extends React.Component<Props, State> {
     }
     playEvent = (event:any) =>
     {
-        console.log('Message received on WebSocket', event)
+        console.log('Message received on WebSocket',event)
         NotificationCenter.push(eventStreamNotificationPrefix + event.type,[event.data])
     }
     connectStream = () => {
@@ -157,7 +144,6 @@ class ChannelEventStream extends React.Component<Props, State> {
                 [],
                 socket_options
             );
-            publicStream = this.stream;
             this.stream.onopen = () => {
                 NotificationCenter.push(eventStreamNotificationPrefix + EventStreamMessageType.SOCKET_STATE_CHANGE,[this.stream.readyState])
                 console.log('WebSocket OPEN');
@@ -177,7 +163,7 @@ class ChannelEventStream extends React.Component<Props, State> {
             this.stream.onclose = event => {
                 NotificationCenter.push(eventStreamNotificationPrefix + EventStreamMessageType.SOCKET_STATE_CHANGE,[this.stream.readyState])
                 this.authorized = false;
-                console.log('WebSocket CLOSED', this.stream);
+                console.log('WebSocket CLOSED');
                 if (this.stream && (this.stream as any)._shouldReconnect)
                     (this.stream as any)._connect();
             }
@@ -214,7 +200,6 @@ class ChannelEventStream extends React.Component<Props, State> {
             console.log('Discarding WebSocket');
             this.stream.close()
             this.stream = null;
-            publicStream = null;
             this.authorized = false
         }
     }

@@ -34,7 +34,7 @@ export const createDropdownItem = (item:OverflowMenuItem) => {
     const useStackedIcons = !!item.iconStackClass && !!item.iconClass
     const props:Partial<DropdownItemProps> = {}
     if(item.type == OverflowMenuItemType.header)
-    props.header = true
+        props.header = true
     else if(item.type == OverflowMenuItemType.divider)
         props.divider = true
     if(item.disabled)

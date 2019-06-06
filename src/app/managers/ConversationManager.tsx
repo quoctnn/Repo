@@ -1,7 +1,7 @@
 import {  Store } from 'redux';
 import ApiClient from '../network/ApiClient';
 import { Conversation, Message, UserProfile, Permission } from '../types/intrasocial_types';
-import { EventStreamMessageType, sendOnWebsocket, canSendOnWebsocket } from '../network/ChannelEventStream';
+import { EventStreamMessageType } from '../network/ChannelEventStream';
 import { ReduxState } from '../redux';
 import { addConversationsAction, removeConversationAction } from '../redux/conversationStore';
 import { updateMessageInQueueAction, removeMessageFromQueueAction, processNextMessageInQueueAction, addMessageToQueueAction } from '../redux/messageQueue';
@@ -13,6 +13,7 @@ import { ToastManager } from './ToastManager';
 import { translate } from '../localization/AutoIntlProvider';
 import { setTemporaryConversationAction } from '../redux/tempCache';
 import { nullOrUndefined } from '../utilities/Utilities';
+import { WindowAppManager } from './WindowAppManager';
 export const ConversationManagerConversationRemovedEvent = "ConversationManagerConversationRemovedEvent"
 export abstract class ConversationManager 
 {
@@ -189,7 +190,7 @@ export abstract class ConversationManager
     }
     static sendTypingInConversation = (conversation: number) => 
     {
-        sendOnWebsocket(
+        WindowAppManager.sendOutgoingOnSocket(
           JSON.stringify({
             type: EventStreamMessageType.CONVERSATION_TYPING,
             data: { conversation: conversation }

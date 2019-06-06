@@ -10,7 +10,7 @@ import { CommunityManager } from '../../../managers/CommunityManager';
 import ApiClient from '../../../network/ApiClient';
 import { ToastManager } from '../../../managers/ToastManager';
 import Routes from '../../../utilities/Routes';
-import { withRouter, RouteComponentProps } from 'react-router-dom';
+import { withRouter, RouteComponentProps, Link } from 'react-router-dom';
 
 export interface OwnProps
 {
@@ -24,7 +24,7 @@ type Props = ReduxStateProps & OwnProps & RouteComponentProps<any>
 export interface State {
     communities:Community[]
 }
-class UserStatusSelector extends React.Component<Props, State> {
+class CommunitySelector extends React.Component<Props, State> {
     observers:any[] = []
     constructor(props:Props) {
         super(props);
@@ -39,8 +39,7 @@ class UserStatusSelector extends React.Component<Props, State> {
         })
         this.setState({communities})
     }
-    componentWillUnmount()
-    {
+    componentWillUnmount = () => {
     }
     setMainCommunity = (community:Community) => (e:React.SyntheticEvent<any>) => {
         if (community)
@@ -67,12 +66,10 @@ class UserStatusSelector extends React.Component<Props, State> {
         return (
             <div className="m-2">
                 <div className="dropdown margin-right-sm d-flex">
-                    <a data-boundary="body" className="dropdown-toggle text-truncate" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    </a>
                     <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                        {selectableDropdownItems.map((dd, index) => {
+                        {/*selectableDropdownItems.map((dd, index) => {
                             return createDropdownItem(dd)
-                        }) }
+                        }) */}
                         <DropdownItem divider={true}/>
                         <DropdownItem title={translate("common.see.all")} toggle={false} onClick={this.showAllCommunities()}>{translate("common.see.all")}</DropdownItem>
                     </div>
@@ -83,9 +80,12 @@ class UserStatusSelector extends React.Component<Props, State> {
     render()
     {
         return(
-            <span id="community-selector">
+            <div id="community-selector">
                 {this.renderCommunitySelector()}
-            </span>
+                {this.state.communities.map(c => {
+                    return <Link className="d-block" to={c.uri}>{c.name}</Link>
+                })}
+            </div>
         );
     }
 }
@@ -98,4 +98,4 @@ const mapStateToProps = (state:ReduxState, ownProps:OwnProps) => {
         communities
     }
 }
-export default withRouter(connect<ReduxStateProps, void, OwnProps>(mapStateToProps, null)(UserStatusSelector))
+export default withRouter(connect<ReduxStateProps, void, OwnProps>(mapStateToProps, null)(CommunitySelector))

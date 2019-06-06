@@ -25,7 +25,6 @@ export const DashboardWithData = (props:{category:string, updateKey?:string}) =>
     breakpoints.push(ResponsiveBreakpoint.mini)
     breakpoints = breakpoints.sort((a, b) => b - a) //descending
     return (
-
         <WindowResponsiveComponent
             breakpoints={breakpoints} 
             updateKey={props.updateKey} 
