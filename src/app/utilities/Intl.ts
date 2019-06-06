@@ -1,5 +1,4 @@
 
-import * as ReactIntl from "react-intl";
 import { History} from 'history'
 import { AppWindowObject } from "../managers/WindowAppManager";
 import { Store } from "redux";
@@ -8,8 +7,6 @@ declare global {
     interface DocumentTouch {}
     interface Window { 
         app: AppWindowObject
-        ReactIntlLocaleData:Array<any>
-        Intl:any
         CSS:CSS
         store:Store<ReduxState,any>
         DocumentTouch:DocumentTouch

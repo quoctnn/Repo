@@ -14,7 +14,7 @@ import { availableLanguages } from "../../app/redux/language";
 import { ReduxState } from "../../app/redux";
 addLocaleData([...en, ...es, ...nb]);
 
-export interface Props {
+type Props = {
     language: number,
 }
 var private_messages = null

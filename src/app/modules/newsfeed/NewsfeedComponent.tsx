@@ -122,6 +122,7 @@ export class NewsfeedComponent extends React.Component<Props, State> {
     private incomingUpdateCache:IncomingUpdateItem[] = []
     private listRef = React.createRef<List>()
     private readObserver = new ReadObserver("statusReads", ApiClient.setStatusesRead)
+    private _mounted = true
     static defaultProps:OwnProps = {
         limit:30,
         defaultChildrenLimit:5,
@@ -215,6 +216,7 @@ export class NewsfeedComponent extends React.Component<Props, State> {
         this.readObserver.cleanup()
         this.readObserver = null
         this.listRef = null
+        this._mounted = false
     }
     setStashUpdates = (stash:boolean) => {
         this.stashIncomingUpdates = stash
@@ -240,6 +242,8 @@ export class NewsfeedComponent extends React.Component<Props, State> {
     }
     private fetchComment = (id:number) => () => {
         ApiClient.getStatus(id, (comment, requestStatus, error) => {
+            if(!this._mounted)
+                return
             if(comment)
             {
                 this.insertOrUpdateComment(comment)
@@ -254,6 +258,8 @@ export class NewsfeedComponent extends React.Component<Props, State> {
         {
             const { limit, contextNaturalKey, contextObjectId } = this.props
             ApiClient.newsfeedV2(limit, 0, contextNaturalKey, contextObjectId, null, this.props.defaultChildrenLimit, this.props.filter, this.props.includeSubContext, firstStatus.id, (data, status, error) => {
+                if(!this._mounted)
+                    return
                 if(data && data.results)
                 {
                     const { items } = this.state
@@ -334,6 +340,8 @@ export class NewsfeedComponent extends React.Component<Props, State> {
             if(oldStatus)
             {
                 ApiClient.getStatus(update.status_id, (status, reqStatus, error) => {
+                    if(!this._mounted)
+                        return
                     if(status)
                         this.updateStatusItem(status)
                 })  
@@ -411,6 +419,8 @@ export class NewsfeedComponent extends React.Component<Props, State> {
         }).length
         const { limit, contextNaturalKey, contextObjectId } = this.props
         ApiClient.newsfeedV2(limit,offset,contextNaturalKey, contextObjectId, null, this.props.defaultChildrenLimit, this.props.filter, this.props.includeSubContext, null, (data, status, error) => {
+            if(!this._mounted)
+                return
             if(data && data.results)
             {
                 let newData = this.flattenData( data.results )
@@ -467,6 +477,8 @@ export class NewsfeedComponent extends React.Component<Props, State> {
     }
     handleDeleteAttribute(id:number, status:Status) {
         ApiClient.deleteStatusAttribute(id, (data, st, error) => {
+            if(!this._mounted)
+                return
             if(nullOrUndefined(error))
             {
                 const clone = this.getClonedStatus(status)
@@ -485,6 +497,8 @@ export class NewsfeedComponent extends React.Component<Props, State> {
     handleCreateAttribute(status:Status, type:ObjectAttributeType, user?:number, completion?:(success:boolean) => void )
     {
         ApiClient.createStatusAttribute(status.id, type, user, (data, st, error) => {
+            if(!this._mounted)
+                return
             if(data)
             {
                 const clone = this.getClonedStatus(status)
@@ -511,8 +525,9 @@ export class NewsfeedComponent extends React.Component<Props, State> {
         clone.reactions = data.reactions
         clone.reaction_count = data.reactionsCount
         this.updateStatusItem(clone, index, false)
-        ApiClient.reactToStatus(clone.id, reaction, (data, statusCode, error) => 
-        {  
+        ApiClient.reactToStatus(clone.id, reaction, (data, statusCode, error) => {
+            if(!this._mounted)
+                return
             if(!nullOrUndefined( error ))
             {
                 console.log("error sending reaction:", error)
@@ -629,6 +644,8 @@ export class NewsfeedComponent extends React.Component<Props, State> {
         console.log("deleteStatus", status.id)
         this.setStashUpdates(true)
         ApiClient.deleteStatus(status.id, (data, st, error) => {
+            if(!this._mounted)
+                return
             if(nullOrUndefined(error))
             {
                 this.postDeleteStatus(status)
@@ -639,6 +656,8 @@ export class NewsfeedComponent extends React.Component<Props, State> {
     }
     updateStatus = (statusId:number, status:Status, files?:UploadedFile[], completion?:(success:boolean) => void) => {
         ApiClient.updateStatus(status, (data, reqStatus, error) => {
+            if(!this._mounted)
+                return
             if(data)
             {
                 this.updateStatusItem(data)
@@ -657,6 +676,8 @@ export class NewsfeedComponent extends React.Component<Props, State> {
         this.insertObject(tempStatus,0)
         this.setStashUpdates(true)
         ApiClient.createStatus(tempStatus, (newStatus, requestStatus, error) => {
+            if(!this._mounted)
+                return
             const success = !!newStatus
             if(success)
             {
@@ -734,6 +755,8 @@ export class NewsfeedComponent extends React.Component<Props, State> {
             this.insertObject(tempStatus, composerIndex)
             this.setStashUpdates(true)
             ApiClient.createStatus(tempStatus, (newObject, responseStatusCode, error) => {
+                if(!this._mounted)
+                    return
                 const success = !nullOrUndefined(newObject)
                 if(success)
                 {
@@ -1125,6 +1148,8 @@ export class NewsfeedComponent extends React.Component<Props, State> {
         const offset = Math.max(0, rest - requestingCount)
         //console.log("loadItems comments", "limit:" + requestingCount, "offset:"+offset)
         ApiClient.statusComments(loader.statusId, offset, requestingCount, false, (data, status, error) => {
+            if(!this._mounted)
+                return
             if(data && data.results)
             {
                 const parent = this.findStatusByStatusId(loader.statusId)

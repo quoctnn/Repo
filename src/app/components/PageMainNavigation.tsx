@@ -26,7 +26,7 @@ interface ReduxDispatchProps
 {
 }
 type Props = ReduxStateProps & ReduxDispatchProps & OwnProps & RouteComponentProps<any>
-class PageTopNavigation extends React.Component<Props, {}> {
+class PageMainNavigation extends React.Component<Props, {}> {
     navigateToCommunity = (event:React.SyntheticEvent<any>) => {
         event.preventDefault()
         const community = CommunityManager.getActiveCommunity()
@@ -87,4 +87,4 @@ const mapStateToProps = (state:ReduxState, ownProps: OwnProps):ReduxStateProps =
       return {
     }
   }
-  export default withRouter(connect<ReduxStateProps, ReduxDispatchProps, OwnProps>(mapStateToProps, mapDispatchToProps)(PageTopNavigation))
+  export default withRouter(connect<ReduxStateProps, ReduxDispatchProps, OwnProps>(mapStateToProps, mapDispatchToProps)(PageMainNavigation))
