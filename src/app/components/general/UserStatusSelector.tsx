@@ -5,7 +5,7 @@ import { EventStreamMessageType } from '../../network/ChannelEventStream';
 import { NotificationCenter } from '../../utilities/NotificationCenter';
 import { ReduxState } from '../../redux/index';
 import "./UserStatusSelector.scss"
-import { Link } from 'react-router-dom';
+import { Link, withRouter, RouteComponentProps } from 'react-router-dom';
 import Routes from '../../utilities/Routes';
 import { translate } from '../../localization/AutoIntlProvider';
 import { EventStreamManagerConnectionChangedEvent, EventStreamManager } from '../../managers/EventStreamManager';
@@ -13,6 +13,7 @@ import { DropdownItem } from 'reactstrap';
 import { UserStatusIndicator } from './UserStatusIndicator';
 import { OverflowMenuItem, OverflowMenuItemType, createDropdownItem } from './OverflowMenu';
 import { WindowAppManager } from '../../managers/WindowAppManager';
+import { NavigationUtilities } from '../../utilities/NavigationUtilities';
 
 export const sendUserStatus = (status: UserStatus) => {
     WindowAppManager.sendOutgoingOnSocket(
@@ -31,15 +32,16 @@ interface ReduxStateProps
     language:number,
     count:number
 }
-type Props = ReduxStateProps & OwnProps
+interface ReduxDispatchProps
+{
+}
+type Props = ReduxStateProps & ReduxDispatchProps & OwnProps & RouteComponentProps<any>
 export interface State {
     connected:boolean,
     retry:number,
     interval: (NodeJS.Timer|null)
 }
-let counter = 1
 class UserStatusSelector extends React.Component<Props, State> {
-
     observers:any[] = []
     constructor(props:Props) {
         super(props);
@@ -70,8 +72,7 @@ class UserStatusSelector extends React.Component<Props, State> {
     }
     signOut = () => (event: React.SyntheticEvent<any>) =>
     {
-        // navigate to Route SignOut
-        window.location.replace(Routes.SIGNOUT)
+        NavigationUtilities.navigateToSignOut(this.props.history);
     }
     renderStatusSelector = () =>
     {
@@ -121,6 +122,7 @@ class UserStatusSelector extends React.Component<Props, State> {
 }
 
 const mapStateToProps = (state:ReduxState, ownProps: OwnProps):ReduxStateProps => {
+    let counter = 1;
     const profile = state.authentication.profile
     const c = counter
     counter++
@@ -130,4 +132,4 @@ const mapStateToProps = (state:ReduxState, ownProps: OwnProps):ReduxStateProps =
         language:state.language.language,
     }
 }
-export default connect<ReduxStateProps, void, OwnProps>(mapStateToProps, null)(UserStatusSelector)
+export default withRouter(connect<ReduxStateProps, ReduxDispatchProps, OwnProps>(mapStateToProps, null)(UserStatusSelector))

@@ -1,19 +1,19 @@
 import ApiClient from '../network/ApiClient';
 import { translate } from '../localization/AutoIntlProvider';
 type RouteEntry = {
-    path:string 
+    path:string
     title:() => string
 }
 export default abstract class Routes {
     static ANY = "*"
     static ELECTRON = "/**/electron.html"
     static ROOT = "/"
-    static PROFILE_UPDATE = "/profile/update"
-    static SIGNIN = "/signin"
-    static SIGNOUT = "/signout"
+    static PROFILE_UPDATE = "/profile/update/"
+    static SIGNIN = "/signin/"
+    static SIGNOUT = "/signout/"
     static CONVERSATION_CREATE = "/conversation/create/"
     static SEARCH = "/search/"
-    static UPDATE_TOOL = "/app-update"
+    static UPDATE_TOOL = "/app-update/"
     static NEWSFEED = "/newsfeed/"
     static CHANGELOG = "/changelog/"
     static DEVELOPER_TOOL = {path:"/developer-tool", title:() => {return translate("admin.developertool")}}
