@@ -80,6 +80,7 @@ export default class Autocomplete extends React.Component<Props, State> {
     componentWillUnmount = () => {
         
         document.removeEventListener("keydown", this.onKeyDown)
+        this.component = null
     }
     handleItemClick = (item:AutocompleteSectionItem, event:any) => {
         if(!item)

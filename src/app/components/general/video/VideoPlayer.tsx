@@ -60,6 +60,9 @@ export default class VideoPlayer extends React.Component<Props,State> {
         playsInline:true, 
         isVisible:false
     }
+    componentWillUnmount = () => {
+        this.videoRef = null
+    }
     static canPlay(url:string, extension?:string) {
         return (extension && VIDEO_EXTENSIONS.test("." + extension)) || Youtube.canPlay(url) || Vimeo.canPlay(url) || VIDEO_EXTENSIONS.test(url) || AUDIO_EXTENSIONS.test(url)
     }

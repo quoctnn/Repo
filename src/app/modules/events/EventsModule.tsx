@@ -47,6 +47,10 @@ class EventsModule extends React.Component<Props, State> {
             }
         }
     }
+    componentWillUnmount = () => {
+        this.tempMenuData = null
+        this.eventsList = null
+    }
     shouldReloadList = (prevProps:Props) => {
         return this.props.community && prevProps.community && this.props.community.id != prevProps.community.id
     }

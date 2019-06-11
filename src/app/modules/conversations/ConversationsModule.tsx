@@ -76,6 +76,11 @@ class ConversationsModule extends React.Component<Props, State> {
         this.observers.push(observer)
 
     }
+    componentWillUnmount = () => {
+        this.observers.forEach(o => o.remove())
+        this.observers = null
+        this.conversationsList = null
+    }
     processConversationRemoved = (...args:any[]) => {
         let data:{conversation:number, temporary:boolean} = args[0]
         const isActive = this.props.routeConversationId == data.conversation.toString()
@@ -112,11 +117,6 @@ class ConversationsModule extends React.Component<Props, State> {
         {
             this.navigateToFirstConversation()
         }
-    }
-    componentWillUnmount = () =>
-    {
-        this.observers.forEach(o => o.remove())
-        this.observers = null
     }
     processIncomingConversation = (...args:any[]) =>
     {

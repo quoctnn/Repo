@@ -188,6 +188,11 @@ export default  {
         statusAttributesId: (id:number) => {
             return `/api/v2/status-attributes/${id}/`
         },
+        //Task attributes
+        taskAttributes:'/api/v2/task-attributes/',
+        taskAttributesId: (id:number) => {
+            return `/api/v2/task-attributes/${id}/`
+        },
         // Other
         postUrl: '/api/v2/status/',
         postCommentsUrl: (id:number) => {

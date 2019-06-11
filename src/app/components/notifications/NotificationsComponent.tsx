@@ -4,8 +4,11 @@ import "./NotificationsComponent.scss"
 import ApiClient from '../../network/ApiClient';
 import { ToastManager } from '../../managers/ToastManager';
 import { translate } from "../../localization/AutoIntlProvider";
-import { UnhandledNotifications, NotificationGroupKey, ContextNaturalKey, Invitation } from '../../types/intrasocial_types';
+import { UnhandledNotifications, NotificationGroupKey, InvitationNotification, UserProfile } from '../../types/intrasocial_types';
 import NotificationGroup from "./NotificationGroup";
+import { AuthenticationManager } from "../../managers/AuthenticationManager";
+import { ReduxState } from "../../redux";
+import { connect } from "react-redux";
 
 type OwnProps = {
 
@@ -14,9 +17,12 @@ type State = {
     notifications:UnhandledNotifications
     open:{[key:string]:boolean}
 }
-type Props = OwnProps
+type ReduxStateProps = {
+    authenticatedUser:UserProfile
+}
+type Props = OwnProps & ReduxStateProps
 
-export default class NotificationsComponent extends React.Component<Props, State> {
+class NotificationsComponent extends React.Component<Props, State> {
 
     constructor(props:Props){
         super(props)
@@ -51,11 +57,11 @@ export default class NotificationsComponent extends React.Component<Props, State
         })
     }
 
-    handleInvitationCompleted = (key:NotificationGroupKey) => (invitationId:number) => {
+    handleNotificationCompleted = (key:NotificationGroupKey) => (id:number) => {
         this.setState((prevState:State) => {
             const notifications = {...prevState.notifications}
-            const content = notifications[key] as Invitation[]
-            const index = content.findIndex(c => c.id == invitationId)
+            const content = notifications[key] as InvitationNotification[]
+            const index = content.findIndex(c => c.id == id)
             if(index > -1)
             {
                 content.splice(index, 1)
@@ -69,7 +75,7 @@ export default class NotificationsComponent extends React.Component<Props, State
             return null
         const open = this.state.open[group.key]
         const key = group.key as NotificationGroupKey
-        return <NotificationGroup onInvitationCompleted={this.handleInvitationCompleted(key)} key={key} open={open} toggleCollapse={this.toggleCollapse(group.key)} notificationKey={key} values={group.value} />
+        return <NotificationGroup authenticatedUser={this.props.authenticatedUser} onNotificationCompleted={this.handleNotificationCompleted(key)} key={key} open={open} toggleCollapse={this.toggleCollapse(group.key)} notificationKey={key} values={group.value} />
     }
     renderNotificationsList = () => {
         if(!this.state.notifications)
@@ -89,3 +95,9 @@ export default class NotificationsComponent extends React.Component<Props, State
         );
     }
 }
+const mapStateToProps = (state:ReduxState, ownProps: OwnProps):ReduxStateProps => {
+    return {
+        authenticatedUser: AuthenticationManager.getAuthenticatedUser()
+    }
+}
+export default connect<ReduxStateProps, {}, OwnProps>(mapStateToProps, null)(NotificationsComponent);

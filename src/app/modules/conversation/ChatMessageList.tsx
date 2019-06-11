@@ -28,6 +28,13 @@ export class ChatMessageList extends React.Component<Props & React.HTMLAttribute
         super(props)
         this.readObserver.onActiveStateChanged = this.readObserverActiveStateChanged
     }
+    componentWillUnmount = () => {
+        this.readObserver.save()
+        this.readObserver.cleanup()
+        this.readObserver = null
+        this.SCROLL_POSITION = null
+        this.listRef = null
+    }
     readObserverActiveStateChanged = (isActive:boolean) => {
         if(isActive)
         {
@@ -72,11 +79,6 @@ export class ChatMessageList extends React.Component<Props & React.HTMLAttribute
         {
             this.scrollListToBottom()
         }
-    }
-    componentWillUnmount = () => {
-        this.readObserver.save()
-        this.readObserver.cleanup()
-        this.readObserver = null
     }
     listUpdateAfterInitialRender(prevProps:Props, currentProps:Props) {
         return prevProps.messages.length != 0 &&

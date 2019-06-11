@@ -31,8 +31,6 @@ import "./Overrides.scss"
 import { Changelog } from './components/Changelog';
 import SimpleDialog from "./components/general/dialogs/SimpleDialog";
 import { translate } from "./localization/AutoIntlProvider";
-import TestA from './components/testComponents/TestA';
-import TestB from "./components/testComponents/TestB";
 
 
 const WithModal = (Component: any, title?:string) =>
@@ -164,8 +162,6 @@ class Main extends React.Component<Props, State> {
                                         <Route path={Routes.ADMIN_DASHBOARD_BUILDER.path} component={DashboardBuilderPage} />
                                     }
                                     <Redirect from={Routes.ELECTRON} to={Routes.ROOT} />
-                                    <Route path="/tests/testA" component={TestA} />
-                                    <Route path="/tests/testB" component={TestB} />
                                     <Route path={Routes.DEVELOPER_TOOL.path} component={DevTool} />
                                     <Route path={Routes.taskUrl(":communityname", ":projectname", ":taskid")} component={PathLoadedTaskPage} />
                                     <Route path={Routes.eventUrl(":communityname", ":eventname")} component={PathLoadedEventPage} exact={true} />

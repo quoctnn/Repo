@@ -57,6 +57,10 @@ class TasksModule extends React.Component<Props, State> {
             }
         }
     }
+    componentWillUnmount = () => {
+        this.tempMenuData = null
+        this.taskList = null
+    }
     componentDidUpdate = (prevProps:Props, prevState:State) => {
         if(this.contextDataChanged(prevState.menuData, prevProps))
         {

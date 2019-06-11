@@ -38,6 +38,9 @@ class FilesModule extends React.Component<Props, State> {
             isLoading:false,
         }
     }
+    componentWillUnmount = () => {
+        this.filesList = null
+    }
     shouldReloadList = (prevProps:Props) => {
         return this.props.contextObject && prevProps.contextObject && this.props.contextObject.id != prevProps.contextObject.id
     }

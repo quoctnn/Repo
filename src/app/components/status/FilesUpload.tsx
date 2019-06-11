@@ -56,6 +56,12 @@ class FilesUpload extends React.Component<Props, State> {
           queueWorking:false,
         }
     }
+    componentWillUnmount = () => {
+        this.cleanup()
+        this.filesList = null
+        this.fileUploaderService.clearQueue()
+        this.fileUploaderService = null
+    }
     onQueueUpdated = (queue: FileQueueObject[]) => {
         const completed = queue.length == 0 || queue.filter(f => f.isError()).length == queue.length
         const onComplete = completed ? this.props.onFileQueueComplete : undefined
@@ -92,9 +98,6 @@ class FilesUpload extends React.Component<Props, State> {
     cleanup = () => {
         const files = this.state.files
         files.forEach(file => URL.revokeObjectURL(file.file.preview));
-    }
-    componentWillUnmount = () => {
-        this.cleanup()
     }
     removeUploadedFile = (file:UploadedFile) => {
         this.props.onFileRemoved && this.props.onFileRemoved(file)

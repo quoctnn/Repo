@@ -128,6 +128,14 @@ export default class ApiClient
             callback(null, status, error)
         })
     }
+    static deleteTaskAttribute(id:number, callback:ApiClientCallback<any>){
+        let url = Constants.apiRoute.taskAttributesId(id)
+        AjaxRequest.delete(url, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
     static getEmbedCards(urls:string[], callback:ApiClientCallback<EmbedCardItem[]>){
         const url = Constants.apiRoute.embedlyApiEndpoint + "?" + this.getQueryString({urls})
         AjaxRequest.get(url, (data, status, request) => {

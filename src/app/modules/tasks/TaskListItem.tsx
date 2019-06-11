@@ -35,6 +35,12 @@ export default class TaskListItem extends React.Component<Props, State> {
             
         }
     }
+
+    componentWillUnmount = () => {
+        this.timepicker = null
+        this.timecomposer = null
+        this.statuscomposer = null
+    }
     shouldComponentUpdate = (nextProps:Props, nextState:State) => {
         const ret =  nextProps.task.updated_at != this.props.task.updated_at || 
                 nextProps.task.serialization_date != this.props.task.serialization_date || 

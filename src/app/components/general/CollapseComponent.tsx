@@ -32,6 +32,9 @@ export default class CollapseComponent extends React.PureComponent<Props & React
                 nextState.state != this.state.state
 
     }*/
+    componentWillUnmount = () => {
+        this.container = null
+    }
     componentDidUpdate = (prevProps:Props, prevState:State) => {
         //open -> sh -> none
         //close -> sh -> 0

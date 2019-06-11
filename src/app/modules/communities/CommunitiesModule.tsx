@@ -41,6 +41,10 @@ class CommunitiesModule extends React.Component<Props, State> {
             }
         }
     }
+    componentWillUnmount = () => {
+        this.tempMenuData = null
+        this.communitiesList = null
+    }
     componentDidUpdate = (prevProps:Props) => {
         if(prevProps.breakpoint != this.props.breakpoint && this.props.breakpoint < ResponsiveBreakpoint.standard && this.state.isLoading)
         {

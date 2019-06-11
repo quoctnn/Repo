@@ -1,10 +1,7 @@
 import * as React from "react";
-import { Status, StatusActions, ObjectAttributeType, Permission, IntraSocialType, ContextNaturalKey } from '../../types/intrasocial_types';
+import { Status, StatusActions, ObjectAttributeType, Permission, IntraSocialType } from '../../types/intrasocial_types';
 import { Avatar } from "../general/Avatar";
 import { userAvatar, userFullName, getTextContent } from '../../utilities/Utilities';
-import Moment from "react-moment";
-import * as moment from 'moment-timezone';
-let timezone = moment.tz.guess();
 
 import { translate } from "../../localization/AutoIntlProvider";
 import { ProfileManager } from "../../managers/ProfileManager";
@@ -23,6 +20,7 @@ import ReactButton from "./ReactButton";
 import { IntraSocialLink } from "../general/IntraSocialLink";
 import { Button } from "reactstrap";
 import StackedAvatars from "../general/StackedAvatars";
+import { TimeComponent } from "../general/TimeComponent";
 
 interface OwnProps
 {
@@ -81,6 +79,8 @@ export class StatusComponent extends React.Component<Props, State> {
             this.observer.disconnect()
         }
         this.observer = null
+        this.element = null
+        this.intersectionRef = null
     }
     shouldComponentUpdate(nextProps:Props, nextState:State)
     {
@@ -101,17 +101,7 @@ export class StatusComponent extends React.Component<Props, State> {
         return ret
     }
     getTimestamp = (createdAt:string) => {
-        if (!createdAt) {
-            return translate("Publishing...")
-        }
-        // Add one minute to the current date to give some room for time inaccuracy
-        let created = moment.utc(createdAt).tz(timezone).toDate();
-        let now = moment.utc().tz(timezone).toDate()
-        if (created <= now) {
-            return <Moment interval={60000} fromNow={true} date={created} />
-        } else {
-            return <Moment interval={60000} fromNow={true} date={now} />
-        }
+        return <TimeComponent placeholder={translate("Publishing...")} date={createdAt} />
     }
     onReadMore = (event:any) => {
         this.setState({readMoreActive:true})

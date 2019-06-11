@@ -9,6 +9,7 @@ import { userAvatar } from '../../utilities/Utilities';
 import ApiClient from '../../network/ApiClient';
 import Moment from 'react-moment';
 import * as moment from 'moment-timezone';
+import { TimeComponent } from '../../components/general/TimeComponent';
 let timezone = moment.tz.guess();
 
 type OwnProps = {
@@ -41,13 +42,7 @@ export default class ActivityItem extends React.Component<Props, State> {
         return ProfileManager.getProfiles(this.props.activity.actors)
     }
     getTimestamp = (createdAt:string) => {
-        let created = moment.utc(createdAt).tz(timezone).toDate();
-        let now = moment.utc().tz(timezone).toDate()
-        if (created <= now) {
-            return <Moment interval={60000} fromNow={true} date={created} />
-        } else {
-            return <Moment interval={60000} fromNow={true} date={now} />
-        }
+        return <TimeComponent date={createdAt} />
     }
     renderAvatar= (profile:UserProfile) => {
         return(

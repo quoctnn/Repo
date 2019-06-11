@@ -132,6 +132,11 @@ button{@include var(color, primary-text-color);}
     cursor: pointer;
     display: inline;
 }
+.no-link{
+    color:inherit;
+    font-weight: inherit;
+    white-space: normal;
+}
 .link-text:hover, a:hover, .text.link:hover, .btn-link:hover
 {
     @include var(color, link-color);

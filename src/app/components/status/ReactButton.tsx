@@ -37,6 +37,11 @@ export default class ReactButton extends React.Component<Props, State>
             popoverOpen:false
         }
     }
+    componentWillUnmount = () => {
+        this.ref = null
+        this.containerRef = null
+        this.popoverContainerRef = null
+    }
     shouldComponentUpdate(nextProps:Props, nextState:State) {
         return nextProps.reaction != this.props.reaction || this.state.reactionsOpen != nextState.reactionsOpen || this.state.popoverOpen != nextState.popoverOpen
     }

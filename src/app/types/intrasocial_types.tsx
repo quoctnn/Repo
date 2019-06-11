@@ -49,13 +49,44 @@ export type TempStatus = {
   mentions: number[]
   pending?:boolean
 }
-export type Invitation = {
+export type InvitationNotification = {
     id:number
     context_object: any
     invited_by:number
     created_at:string
     message?:string
 }
+export type StatusNotification = {
+    id:number
+    level: number
+    owner:number
+    created_at:string
+    context_natural_key?: ContextNaturalKey
+    context_object_id?: number
+    context_object:ContextObject
+} & Linkable
+export enum TaskNotificationAction {
+    ASSIGNED = "assigned",
+    RESPONSIBLE = "responsible",
+    VERIFICATION = "verification",
+}
+export type TaskNotification = {
+    id:number
+    user:number
+    created_at:string
+    title:string
+    action:TaskNotificationAction
+    project:Project 
+} & Linkable
+export type AttentionNotification = {
+    id:number
+    created_by:number
+    created_at:string
+    message?:string
+} & Linkable
+export type ReminderNotification = {
+    datetime:string
+} & AttentionNotification
 export enum NotificationGroupKey 
 {
     COMMUNITY_INVITATIONS = "community_invitations",
@@ -77,19 +108,26 @@ export enum NotificationGroupKey
 }
 export type UnhandledNotifications = {
     //invitations
-    community_invitations:Invitation[]
-    group_invitations:Invitation[]
-    event_invitations:Invitation[]
-    friendship_invitations:Invitation[]
-    //
+    community_invitations:InvitationNotification[]
+    group_invitations:InvitationNotification[]
+    event_invitations:InvitationNotification[]
+    friendship_invitations:InvitationNotification[]
+
     unread_conversations:Conversation[]
-    task_notifications:any
-    task_reminders:any
-    task_attentions:any
-    status_notifications:any
-    status_reminders:StatusObjectAttribute[]
-    status_attentions:StatusObjectAttribute[]
+
+    status_notifications:StatusNotification[]
+    status_reminders:ReminderNotification[]
+    status_attentions:AttentionNotification[]
+
+    task_notifications:TaskNotification[]
+    task_reminders:ReminderNotification[]
+    task_attentions:AttentionNotification[]
+
     reported_content:ReportResult[]
+    //requests 
+    community_requests:any[]
+    group_requests:any[]
+    event_requests:any[]
 }
 export type ContextObject = {
      name:string

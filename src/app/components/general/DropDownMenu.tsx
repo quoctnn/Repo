@@ -25,6 +25,9 @@ export class DropDownMenu extends React.Component<Props, State> {
             popoverVisible:false
         }
     }
+    componentWillUnmount = () => {
+        this.triggerRef = null
+    }
     onTriggerClick = (e:React.SyntheticEvent) => {
         e.preventDefault()
         if(!this.state.popoverRemoved)

@@ -36,7 +36,6 @@ type State = {
 }
 type Props = OwnProps & React.HTMLAttributes<HTMLElement> & ReduxStateProps
 class ConversationListItem extends React.Component<Props, State> {
-    static maxVisibleAvatars = 5
     constructor(props:Props) {
         super(props);
         this.state = {
@@ -88,9 +87,6 @@ class ConversationListItem extends React.Component<Props, State> {
         }
         let myId = authenticatedProfile.id
         let title = ConversationUtilities.getConversationTitle(this.props.conversation, myId)
-        let users = ProfileManager.getProfiles(conversation.users.filter(i => i != myId).slice(0, ConversationListItem.maxVisibleAvatars))
-        const avatars = users.map(u => userAvatar( u )).filter(a => !nullOrUndefined(a))
-        const size = 44
         const cl = classnames("conversation-list-item", className, {active:isActive})
         const ddOptions = this.getOptionMenuItems()
         const hasUnsentMessages = queueLength > 0
@@ -99,12 +95,7 @@ class ConversationListItem extends React.Component<Props, State> {
                 <Link className="d-flex button-link" to={conversation.uri || "#"}>
                     <div className="conversation-item-body d-flex align-items-center">
                         <div>
-                            <Avatar images={avatars} size={size} borderColor="white" borderWidth={2}>
-                                    {!!this.props.children && this.props.children
-                                        || conversation.unread_messages.length > 0 &&
-                                        <div className="notification-badge bg-success text-white text-truncate"><span>{conversation.unread_messages.length}</span></div>
-                                    }
-                            </Avatar>
+                            {ConversationUtilities.getAvatar(conversation, myId, this.props.children)}
                         </div>
                         <div className="d-flex flex-column text-truncate right-content">
                             <div className="title-row d-flex">

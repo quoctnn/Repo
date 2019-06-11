@@ -4,7 +4,7 @@ import { AvatarStateColor } from '../../types/intrasocial_types';
 import { UserStatusIndicator } from './UserStatusIndicator';
 require("./Avatar.scss");
 
-export interface Props {
+type Props = {
     size?:number
     borderWidth?:number,
     borderColor?:string,

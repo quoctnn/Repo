@@ -42,6 +42,9 @@ class TimesheetModule extends React.Component<Props, State> {
             isLoading:false,
         }
     }
+    componentWillUnmount = () => {
+        this.timesheetList = null
+    }
     shouldReloadList = (prevProps:Props) => {
         return this.props.contextObject && prevProps.contextObject && this.props.contextObject.id != prevProps.contextObject.id
     }

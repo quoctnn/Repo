@@ -1,11 +1,15 @@
+import * as React from "react";
 import { ProfileManager } from '../managers/ProfileManager';
 import { Conversation, Message, UserProfile } from '../types/intrasocial_types';
-import { nullOrUndefined } from './Utilities';
+import { nullOrUndefined, userAvatar } from './Utilities';
 import { translate } from '../localization/AutoIntlProvider';
 import { AuthenticationManager } from '../managers/AuthenticationManager';
+import { Avatar } from "../components/general/Avatar";
 
 export class ConversationUtilities 
 {
+    static maxVisibleAvatars = 5
+    static avatarSize = 44
     static getConversationTitle = (conversation: Conversation, me?:number) => {
         if(conversation.title)
             return conversation.title
@@ -26,6 +30,16 @@ export class ConversationUtilities
                 return p.first_name
             return "Unknown User"
         }).join(", ")
+    }
+    static getAvatar = (conversation: Conversation, me:number, children?: React.ReactNode) => {
+        let users = ProfileManager.getProfiles(conversation.users.filter(i => i != me).slice(0, ConversationUtilities.maxVisibleAvatars))
+        const avatars = users.map(u => userAvatar( u )).filter(a => !nullOrUndefined(a))
+        return <Avatar images={avatars} size={ConversationUtilities.avatarSize} borderColor="white" borderWidth={2}>
+                        {!!children && children
+                            || conversation.unread_messages.length > 0 &&
+                            <div className="notification-badge bg-success text-white text-truncate"><span>{conversation.unread_messages.length}</span></div>
+                        }
+                </Avatar>
     }
     static getChatMessagePreview(userId:number,text:string,file:File, mentions:number[], conversation:Conversation):Message {
 

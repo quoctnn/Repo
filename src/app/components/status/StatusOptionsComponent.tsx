@@ -48,6 +48,9 @@ export default class StatusOptionsComponent extends React.Component<Props, State
             selectedMembers:[]
         }
     }
+    componentWillUnmount = () => {
+        this.statusEditorRef = null
+    }
     nextAttributesEqual = (attributes:SimpleObjectAttribute[]) => {
         const a = attributes || []
         const b = this.props.status.attributes || []

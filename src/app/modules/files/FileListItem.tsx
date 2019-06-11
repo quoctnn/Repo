@@ -68,6 +68,9 @@ export default class FileListItem extends React.Component<Props, State> {
             name:props.file.filename
         }
     }
+    componentWillUnmount = () => {
+        this.imagaRef = null
+    }
     shouldComponentUpdate = (nextProps:Props, nextState:State) => {
         const ret =  nextProps.file != this.props.file ||
                     nextState.visible != this.state.visible || 

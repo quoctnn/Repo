@@ -451,11 +451,12 @@ export class NewsfeedComponent extends React.Component<Props, State> {
         return new StatusCommentLoader(loader.statusId, loader.currentCommentsCount, loader.totalCommentsCount, loader.level)
     }
     getClonedStatusComposer = (composer:StatusComposer) => {
-
         const comp = new StatusComposer(composer.statusId,composer.communityId, composer.contextObjectId, composer.contextNaturalKey, composer.level, composer.content, composer.mentions)
         comp.composerRef = composer.composerRef
         comp.composerFocus = composer.composerFocus
         comp.forceUpdate = composer.forceUpdate
+        debugger
+        composer.composerRef = null
         return comp
     }
     getClonedStatus = (status:Status):Status => {

@@ -56,6 +56,9 @@ export default class NewsfeedMenu extends React.Component<Props, State> {
             searchResult:null,
         }
     }
+    componentWillUnmount = () => {
+        this.contextSearch = null
+    }
     includeSubContextChanged = (event:React.ChangeEvent<HTMLInputElement>) => {
         this.setState({includeSubContext:event.target.checked}, this.sendUpdate)
     }
