@@ -14,6 +14,9 @@ export class NavigationUtilities {
     private static routerNavigationPreventionReleaseCallback: () => void = null
     private static protectedNavigations = new Map<string, boolean>()
 
+    static navigateToSignOut = (history: H.History) => {
+        history.push(Routes.SIGNOUT)
+    }
     static navigateToSearch = (history: H.History, query:string) => {
         history.push(Routes.searchUrl(query))
     }
@@ -23,7 +26,7 @@ export class NavigationUtilities {
     static navigateToProfile = (history: H.History, profile:UserProfile) => {
         history.push(Routes.profileUrl(profile.slug_name))
     }
-    static navigateToConversation = (history: H.History, conversationId:number|string) => 
+    static navigateToConversation = (history: H.History, conversationId:number|string) =>
     {
         history.push(Routes.conversationUrl(conversationId, true))
     }
@@ -105,7 +108,7 @@ export class NavigationUtilities {
         NavigationUtilities.routerNavigationPreventionReleaseCallback && NavigationUtilities.routerNavigationPreventionReleaseCallback()
     }
     static isNavigationProtected = (keys:string[]) => {
-        return keys.some(key => NavigationUtilities.protectedNavigations.has(key)) 
+        return keys.some(key => NavigationUtilities.protectedNavigations.has(key))
     }
     static protectNavigation = (key:string, enabled:boolean) => {
         enabled ? NavigationUtilities.protectedNavigations.set(key, enabled) : NavigationUtilities.protectedNavigations.delete(key)
