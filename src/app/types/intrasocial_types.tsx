@@ -59,7 +59,7 @@ export type InvitationNotification = {
 export type StatusNotification = {
     id:number
     level: number
-    owner:number
+    created_by:number
     created_at:string
     context_natural_key?: ContextNaturalKey
     context_object_id?: number
@@ -85,7 +85,7 @@ export type TaskNotification = {
     created_at:string
     title:string
     action:TaskNotificationAction
-    project:Project 
+    project:Project
 } & Linkable
 export type AttentionNotification = {
     id:number
@@ -102,7 +102,7 @@ export type MembershipRequestNotification = {
     request_by:UserProfile
     created_at:string
 }
-export enum NotificationGroupKey 
+export enum NotificationGroupKey
 {
     COMMUNITY_INVITATIONS = "community_invitations",
     GROUP_INVITATIONS = "group_invitations",
@@ -118,7 +118,7 @@ export enum NotificationGroupKey
     STATUS_NOTIFICATIONS = "status_notifications",
     STATUS_REMINDERS = "status_reminders",
     STATUS_ATTENTIONS = "status_attentions",
-    
+
     REPORTED_CONTENT = "reported_content",
 
     COMMUNITY_REQUESTS = "community_requests",
@@ -143,7 +143,7 @@ export type UnhandledNotifications = {
     task_attentions:AttentionNotification[]
 
     reported_content:ReportNotification[]
-    //requests 
+    //requests
     community_requests:MembershipRequestNotification[]
     group_requests:MembershipRequestNotification[]
     event_requests:MembershipRequestNotification[]
