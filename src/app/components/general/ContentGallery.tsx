@@ -81,9 +81,11 @@ export class Gallery360ImageComponent extends GalleryComponent<{ width:number, h
             this.observer.disconnect()
             this.observer = null
         }
-        this.r360.detachRoot && this.r360.detachRoot(this.surfaceId)
-        this.r360.stop && this.r360.stop()
-        this.r360 = null
+        if (this.r360) {
+            this.r360.detachRoot && this.r360.detachRoot(this.surfaceId)
+            this.r360.stop && this.r360.stop()
+            this.r360 = null
+        }
         this.surfaceId = null
         this.container = null
         this.currentHeight = null
