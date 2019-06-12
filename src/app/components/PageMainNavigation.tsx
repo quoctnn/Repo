@@ -61,7 +61,9 @@ class PageMainNavigation extends React.Component<Props, {}> {
                     <div className="center flex-grow-1 d-flex justify-content-around align-items-end" style={{gridArea: "1 / 4 / span 1 / span 6"}}>
                         <a onClick={this.navigateToCommunity} href="#">{translate("common.community")}</a>
                         <Link to={Routes.ROOT}>{translate("common.dashboard")}</Link>
-                        <Link to={Routes.conversationUrl(null)}>{translate("common.messages")}</Link>
+                        { !profile.is_anonymous &&
+                            <Link to={Routes.conversationUrl(null)}>{translate("common.messages")}</Link>
+                        }
                     </div>
                     <div className="right" style={{gridArea: "1 / 10 / span 1 / span 3"}}>
                         <div className="profile-box d-flex align-items-center mr-1  flex-row-reverse">

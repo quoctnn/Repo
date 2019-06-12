@@ -22,21 +22,22 @@ export class ChatMessageList extends React.Component<Props & React.HTMLAttribute
     SCROLL_POSITION:any = null
     wasAtBottomBeforeUpdate:boolean = false
     scrollToBottomThreshold = 50
-    private readObserver = new ReadObserver("messageReads", ApiClient.setMessagesRead, 1000)
+    private readObserver = null;
     private listRef = React.createRef<HTMLDivElement>()
     constructor(props:Props) {
         super(props)
-        this.readObserver.onActiveStateChanged = this.readObserverActiveStateChanged
     }
     componentWillUnmount = () => {
-        this.readObserver.save()
-        this.readObserver.cleanup()
-        this.readObserver = null
+        if (!!this.readObserver) {
+            this.readObserver.save()
+            this.readObserver.cleanup()
+            this.readObserver = null
+        }
         this.SCROLL_POSITION = null
         this.listRef = null
     }
     readObserverActiveStateChanged = (isActive:boolean) => {
-        if(isActive)
+        if(isActive && !this.props.current_user.is_anonymous)
         {
             this.readObserver.clearObservables()
             this.forceUpdate()
@@ -47,10 +48,15 @@ export class ChatMessageList extends React.Component<Props & React.HTMLAttribute
             this.scrollListToBottom()
         }
         this.SCROLL_POSITION = new ScrollPosition(document.querySelector('.message-list'))
-        const listRef = this.listRef.current
-        if(listRef)
+        if (!this.props.current_user.is_anonymous)
         {
-            this.readObserver.initialize(listRef)
+            this.readObserver = new ReadObserver("messageReads", ApiClient.setMessagesRead, 1000)
+            this.readObserver.onActiveStateChanged = this.readObserverActiveStateChanged
+            const listRef = this.listRef.current
+            if(listRef)
+            {
+                this.readObserver.initialize(listRef)
+            }
         }
     }
     registerObservee = (id:number) => (element:Element) => {
@@ -65,7 +71,7 @@ export class ChatMessageList extends React.Component<Props & React.HTMLAttribute
         if (this.listUpdateAfterInitialRender(this.props, nextProps)) {
             this.SCROLL_POSITION.prepareFor('up')
         }
-        this.wasAtBottomBeforeUpdate = this.listRef.current.scrollTop + this.listRef.current.offsetHeight >= this.listRef.current.scrollHeight - this.scrollToBottomThreshold 
+        this.wasAtBottomBeforeUpdate = this.listRef.current.scrollTop + this.listRef.current.offsetHeight >= this.listRef.current.scrollHeight - this.scrollToBottomThreshold
     }
 
     componentDidUpdate = (prevProps:Props, prevState) => {
@@ -82,7 +88,7 @@ export class ChatMessageList extends React.Component<Props & React.HTMLAttribute
     }
     listUpdateAfterInitialRender(prevProps:Props, currentProps:Props) {
         return prevProps.messages.length != 0 &&
-            (prevProps.messages.length < currentProps.messages.length)  
+            (prevProps.messages.length < currentProps.messages.length)
     }
     scrollListToBottom() {
         this.listRef.current.scrollTop = this.listRef.current.scrollHeight
@@ -91,7 +97,7 @@ export class ChatMessageList extends React.Component<Props & React.HTMLAttribute
         let userId = this.props.current_user.id;
         return (message.user == userId) ? MessagePosition.RIGHT : MessagePosition.LEFT
     }
-    onChatScroll = (event) => 
+    onChatScroll = (event) =>
     {
         if (event.currentTarget.scrollTop == 0) { // On top
             this.props.chatDidScrollToTop()
@@ -135,7 +141,7 @@ export class ChatMessageList extends React.Component<Props & React.HTMLAttribute
                 if(!isMessageFromCurrentUser)
                 {
                     let user = ProfileManager.getProfileById(message.user)
-                    str = `${user.first_name}, ${str}` 
+                    str = `${user.first_name}, ${str}`
                     avatar = userAvatar(user)
                 }
                 components.push(
@@ -145,7 +151,7 @@ export class ChatMessageList extends React.Component<Props & React.HTMLAttribute
             const observerRegister = (message.user == current_user.id || message.read_by.contains(current_user.id) || this.readObserver.getReads().contains(message.id)) ? undefined : this.registerObservee(message.id)
             components.push(
 
-                <ChatMessage 
+                <ChatMessage
                         innerRef={observerRegister}
                         data={message}
                         key={message.id}
