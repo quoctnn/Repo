@@ -639,6 +639,15 @@ export default class ApiClient
             callback(null, status, error)
         })
     }
+    static markTaskAsRead(id:number, callback:ApiClientCallback<any>)
+    {
+        let url = Constants.apiRoute.taskMarkAsReadUrl(id)
+        AjaxRequest.get(url, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
     static getPage<T>(endpoint:string, limit:number, offset:number,callback:ApiClientFeedPageCallback<T>)
     {
         let url = endpoint + "?" + this.getQueryString({ limit, offset})
@@ -680,6 +689,22 @@ export default class ApiClient
             callback(null, status, error)
         })
     }
+    static groupMembershipRequestAccept = (id:number, callback:ApiClientCallback<any>) => {
+        let url = Constants.apiRoute.groupMembershipRequestAcceptUrl(id)
+        AjaxRequest.get(url, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
+    static groupMembershipRequestDelete(id:number, callback:ApiClientCallback<any>){
+        let url = Constants.apiRoute.groupMembershipRequestDeleteUrl(id)
+        AjaxRequest.delete(url, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
     static communityInvitationAccept = (invitation:number, callback:ApiClientCallback<any>) => {
         let url = Constants.apiRoute.communityInvitationAcceptUrl(invitation)
         AjaxRequest.get(url, (data, status, request) => {
@@ -690,6 +715,22 @@ export default class ApiClient
     }
     static communityInvitationDelete(invitation:number, callback:ApiClientCallback<any>){
         let url = Constants.apiRoute.communityInvitationDeleteUrl(invitation)
+        AjaxRequest.delete(url, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
+    static communityMembershipRequestAccept = (id:number, callback:ApiClientCallback<any>) => {
+        let url = Constants.apiRoute.communityMembershipRequestAcceptUrl(id)
+        AjaxRequest.get(url, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
+    static communityMembershipRequestDelete(id:number, callback:ApiClientCallback<any>){
+        let url = Constants.apiRoute.communityMembershipRequestDeleteUrl(id)
         AjaxRequest.delete(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
@@ -714,6 +755,22 @@ export default class ApiClient
     }
     static eventInvitationDelete(invitation:number, callback:ApiClientCallback<any>){
         let url = Constants.apiRoute.eventInvitationDeleteUrl(invitation)
+        AjaxRequest.delete(url, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
+    static eventMembershipRequestAccept = (id:number, callback:ApiClientCallback<any>) => {
+        let url = Constants.apiRoute.eventMembershipRequestAcceptUrl(id)
+        AjaxRequest.get(url, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
+    static eventMembershipRequestDelete(id:number, callback:ApiClientCallback<any>){
+        let url = Constants.apiRoute.eventMembershipRequestDeleteUrl(id)
         AjaxRequest.delete(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {

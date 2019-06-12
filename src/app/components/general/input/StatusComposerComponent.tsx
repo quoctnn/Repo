@@ -257,7 +257,7 @@ export class StatusComposerComponent extends React.Component<Props, State> {
                 canSubmit={canSubmit}
                 onHandleUploadClick={uploadHandler}
                 ref={this.formRef}
-                content={this.state.text}
+                content={this.props.content}
                 mentionSearch={this.handleMentionSearch}
                 mentions={this.props.mentions}
                 onSubmit={this.handleSubmit}

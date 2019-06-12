@@ -9,6 +9,7 @@ import NotificationGroup from "./NotificationGroup";
 import { AuthenticationManager } from "../../managers/AuthenticationManager";
 import { ReduxState } from "../../redux";
 import { connect } from "react-redux";
+import { nullOrUndefined } from "../../utilities/Utilities";
 
 type OwnProps = {
 
@@ -24,6 +25,7 @@ type Props = OwnProps & ReduxStateProps
 
 class NotificationsComponent extends React.Component<Props, State> {
 
+    private collapsibleDefaultOpen = true
     constructor(props:Props){
         super(props)
         this.state = {
@@ -43,12 +45,12 @@ class NotificationsComponent extends React.Component<Props, State> {
             ToastManager.showErrorToast(error, status, translate("notification.error.fetching"))
         })
     }
-    toggleCollapse = (key:string) => () => {
+    toggleCollapseSingleOpen = (key:string) => () => {
 
         this.setState((prevState:State) => {
 
             let openStates = {...prevState.open}
-            const open = openStates[key]
+            let open = openStates[key]
             if(open)
                 return {open:{}}
             openStates = {}
@@ -56,7 +58,18 @@ class NotificationsComponent extends React.Component<Props, State> {
             return {open:openStates}
         })
     }
+    toggleCollapseIndividualOpen = (key:string) => () => {
 
+        this.setState((prevState:State) => {
+
+            let openStates = {...prevState.open}
+            let open = openStates[key]
+            if(nullOrUndefined(open) && this.collapsibleDefaultOpen)
+                open = true
+            openStates[key] = !open
+            return {open:openStates}
+        })
+    }
     handleNotificationCompleted = (key:NotificationGroupKey) => (id:number) => {
         this.setState((prevState:State) => {
             const notifications = {...prevState.notifications}
@@ -73,9 +86,11 @@ class NotificationsComponent extends React.Component<Props, State> {
     renderNotificationGroup = (group:{key:string, value:any[]}) => {
         if(group.value.length == 0)
             return null
-        const open = this.state.open[group.key]
+        let open = this.state.open[group.key]
+        if(nullOrUndefined(open) && this.collapsibleDefaultOpen)
+            open = true
         const key = group.key as NotificationGroupKey
-        return <NotificationGroup authenticatedUser={this.props.authenticatedUser} onNotificationCompleted={this.handleNotificationCompleted(key)} key={key} open={open} toggleCollapse={this.toggleCollapse(group.key)} notificationKey={key} values={group.value} />
+        return <NotificationGroup authenticatedUser={this.props.authenticatedUser} onNotificationCompleted={this.handleNotificationCompleted(key)} key={key} open={open} toggleCollapse={this.toggleCollapseIndividualOpen(group.key)} notificationKey={key} values={group.value} />
     }
     renderNotificationsList = () => {
         if(!this.state.notifications)

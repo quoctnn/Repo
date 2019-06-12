@@ -22,7 +22,7 @@ export default class CollapseComponent extends React.PureComponent<Props & React
     {
         super(props)
         this.state = {
-            state:CollapseState.removeContent,
+            state:props.visible ? CollapseState.open : CollapseState.removeContent,
             contentVisible:false,
         }
     }

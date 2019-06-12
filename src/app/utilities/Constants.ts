@@ -61,6 +61,12 @@ export default  {
         communityInvitationAcceptUrl: (id:number) => {
             return `/api/v2/community-invitation/${id}/accept/`
         },
+        communityMembershipRequestDeleteUrl: (id:number) => {
+            return `/api/v2/community-memberrequest/${id}/`
+        },
+        communityMembershipRequestAcceptUrl: (id:number) => {
+            return `/api/v2/community-memberrequest/${id}/accept/`
+        },
         communityList:'/api/v2/community/',
         // Profile URLs
         myProfileUrl: '/api/v2/profile/me/',
@@ -90,15 +96,26 @@ export default  {
         groupInvitationAcceptUrl: (id:number) => {
             return `/api/v2/group-invitation/${id}/accept/`
         },
+        groupMembershipRequestDeleteUrl: (id:number) => {
+            return `/api/v2/group-memberrequest/${id}/`
+        },
+        groupMembershipRequestAcceptUrl: (id:number) => {
+            return `/api/v2/group-memberrequest/${id}/accept/`
+        },
         // Project URLs
         projectsUrl: '/api/v2/project/',
         projectDetailUrl: (id:number|string) => {
             return `/api/v2/project/${id}/`
         },
+        //Task
         taskUrl: '/api/v2/task/',
         taskIdUrl: (id:number) => {
             return `/api/v2/task/${id}/`
         },
+        taskMarkAsReadUrl: (id:number) => {
+            return `/api/v2/task/${id}/mark-read/`
+        },
+
         productsPlans: '/api/v1/products/plan/',
         productsSKU: '/api/v1/products/sku/',
 
@@ -152,7 +169,12 @@ export default  {
         eventInvitationDeleteUrl: (id:number) => {
             return `/api/v2/event-invitation/${id}/`
         },
-        
+        eventMembershipRequestDeleteUrl: (id:number) => {
+            return `/api/v2/event-memberrequest/${id}/`
+        },
+        eventMembershipRequestAcceptUrl: (id:number) => {
+            return `/api/v2/event-memberrequest/${id}/accept/`
+        },
         // Recent Activity URLs
         recentActivityUrl: '/api/v2/notification/',
         recentActivityUnreadUrl: '/api/v2/notification/unread-count/',
@@ -184,7 +206,6 @@ export default  {
         },
         //Status attributes
         statusAttributes:'/api/v2/status-attributes/',
-        statusMarkRead:"/api/v2/status/mark-read/",
         statusAttributesId: (id:number) => {
             return `/api/v2/status-attributes/${id}/`
         },
@@ -193,7 +214,8 @@ export default  {
         taskAttributesId: (id:number) => {
             return `/api/v2/task-attributes/${id}/`
         },
-        // Other
+        // Status
+        statusMarkRead:"/api/v2/status/mark-read/",
         postUrl: '/api/v2/status/',
         postCommentsUrl: (id:number) => {
             return `/api/v2/status/${id}/children/`
@@ -207,6 +229,7 @@ export default  {
         postReaction: (id:number) => {
             return `/api/v2/status/${id}/react/`
         },
+        //File
         fileUploadUrl: '/api/v2/file-upload/',
         fileUploadUpdateName: (id:number) => {
             return `/api/v2/file-upload/${id}/update-name/`

@@ -455,7 +455,6 @@ export class NewsfeedComponent extends React.Component<Props, State> {
         comp.composerRef = composer.composerRef
         comp.composerFocus = composer.composerFocus
         comp.forceUpdate = composer.forceUpdate
-        debugger
         composer.composerRef = null
         return comp
     }

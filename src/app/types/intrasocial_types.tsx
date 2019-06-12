@@ -52,7 +52,7 @@ export type TempStatus = {
 export type InvitationNotification = {
     id:number
     context_object: any
-    invited_by:number
+    invited_by:UserProfile
     created_at:string
     message?:string
 }
@@ -66,13 +66,22 @@ export type StatusNotification = {
     context_object:ContextObject
 } & Linkable
 export enum TaskNotificationAction {
+    UPDATED = "updated",
     ASSIGNED = "assigned",
     RESPONSIBLE = "responsible",
     VERIFICATION = "verification",
 }
+export type ReportNotification = {
+    context_natural_key: ContextNaturalKey
+    created_at: string
+    creator: UserProfile
+    id: number
+    tags:string[]
+} & Linkable
 export type TaskNotification = {
     id:number
     user:number
+    created_by:number
     created_at:string
     title:string
     action:TaskNotificationAction
@@ -87,6 +96,12 @@ export type AttentionNotification = {
 export type ReminderNotification = {
     datetime:string
 } & AttentionNotification
+export type MembershipRequestNotification = {
+    id:number
+    context_object: IdentifiableObject & Linkable & AvatarAndCover & {name:string}
+    request_by:UserProfile
+    created_at:string
+}
 export enum NotificationGroupKey 
 {
     COMMUNITY_INVITATIONS = "community_invitations",
@@ -105,6 +120,10 @@ export enum NotificationGroupKey
     STATUS_ATTENTIONS = "status_attentions",
     
     REPORTED_CONTENT = "reported_content",
+
+    COMMUNITY_REQUESTS = "community_requests",
+    GROUP_REQUESTS = "group_requests",
+    EVENT_REQUESTS = "event_requests",
 }
 export type UnhandledNotifications = {
     //invitations
@@ -123,11 +142,11 @@ export type UnhandledNotifications = {
     task_reminders:ReminderNotification[]
     task_attentions:AttentionNotification[]
 
-    reported_content:ReportResult[]
+    reported_content:ReportNotification[]
     //requests 
-    community_requests:any[]
-    group_requests:any[]
-    event_requests:any[]
+    community_requests:MembershipRequestNotification[]
+    group_requests:MembershipRequestNotification[]
+    event_requests:MembershipRequestNotification[]
 }
 export type ContextObject = {
      name:string

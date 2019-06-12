@@ -5,6 +5,7 @@ import { translate } from '../../localization/AutoIntlProvider';
 import NotificationItem from "./NotificationItem";
 import { NotificationGroupKey, InvitationNotification, UserProfile } from '../../types/intrasocial_types';
 import { uniqueId } from '../../utilities/Utilities';
+import { Badge } from "reactstrap";
 
 type OwnProps = {
     notificationKey:NotificationGroupKey
@@ -41,10 +42,11 @@ export default class NotificationGroup extends React.Component<Props, State> {
 
         return(
             <div className={cn}>
-                <div className="d-flex" onClick={this.props.toggleCollapse}>
+                <div className="d-flex header main-content-secondary-background justify-content-between align-items-center" onClick={this.props.toggleCollapse}>
                     <div className="title text-truncate">{translate("notification." + this.props.notificationKey)}</div>
+                    <Badge color="warning" pill={true}>{this.props.values.length}</Badge>
                 </div>
-                <CollapseComponent visible={this.props.open}>
+                <CollapseComponent className="content" visible={this.props.open}>
                     {this.props.values.map(v => <NotificationItem authenticatedUser={this.props.authenticatedUser} key={this.getKey(v)} onNotificationCompleted={this.props.onNotificationCompleted} notificationKey={this.props.notificationKey} value={v} />)}
                 </CollapseComponent>
             </div>
