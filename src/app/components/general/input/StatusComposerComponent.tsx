@@ -158,7 +158,8 @@ export class StatusComposerComponent extends React.Component<Props, State> {
             text: '',
             files: [],
             link: null,
-            mentions: []
+            mentions: [],
+            showDropzone:false
         }, this.canPost);
     }
     onDidType = (unprocessedText:string) => {
