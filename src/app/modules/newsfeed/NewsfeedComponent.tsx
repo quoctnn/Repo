@@ -121,7 +121,7 @@ export class NewsfeedComponent extends React.Component<Props, State> {
     private stashIncomingUpdates = false
     private incomingUpdateCache:IncomingUpdateItem[] = []
     private listRef = React.createRef<List>()
-    private readObserver = new ReadObserver("statusReads", ApiClient.setStatusesRead)
+    private readObserver = null;
     private _mounted = true
     static defaultProps:OwnProps = {
         limit:30,
@@ -140,10 +140,9 @@ export class NewsfeedComponent extends React.Component<Props, State> {
             hasMore:true,
             hasLoaded:false
         }
-        this.readObserver.onActiveStateChanged = this.readObserverActiveStateChanged
     }
     readObserverActiveStateChanged = (isActive:boolean) => {
-        if(isActive)
+        if(isActive && !this.props.authenticatedProfile.is_anonymous)
         {
             this.readObserver.clearObservables()
             this.forceUpdate()
@@ -177,10 +176,14 @@ export class NewsfeedComponent extends React.Component<Props, State> {
     }
     componentDidMount = () =>
     {
-        const listRef = this.listRef.current.listRef.current
-        if(listRef)
-        {
-            this.readObserver.initialize(listRef)
+        if (!this.props.authenticatedProfile.is_anonymous){
+            this.readObserver = new ReadObserver("statusReads", ApiClient.setStatusesRead)
+            this.readObserver.onActiveStateChanged = this.readObserverActiveStateChanged
+            const listRef = this.listRef.current.listRef.current
+            if(listRef)
+            {
+                this.readObserver.initialize(listRef)
+            }
         }
         const obs1 = NotificationCenter.addObserver('eventstream_' + EventStreamMessageType.STATUS_NEW, this.processIncomingStatusNew)
         this.observers.push(obs1)
@@ -212,9 +215,11 @@ export class NewsfeedComponent extends React.Component<Props, State> {
             this.props.scrollParent.removeEventListener("scroll", this.onScroll)
         }
         this.incomingUpdateCache = null
-        this.readObserver.save()
-        this.readObserver.cleanup()
-        this.readObserver = null
+        if(!!this.readObserver){
+            this.readObserver.save()
+            this.readObserver.cleanup()
+            this.readObserver = null
+        }
         this.listRef = null
         this._mounted = false
     }
@@ -980,7 +985,10 @@ export class NewsfeedComponent extends React.Component<Props, State> {
     renderStatus = (authUser:UserProfile, item:Status, isComment:boolean, index:number, color:string, isLast:boolean) =>
     {
         const cn = classnames(color, {"last":isLast})
-        const observerRegister = (item.temporary || item.read || this.readObserver.getReads().contains(item.id)) ? undefined : this.registerObservee(item.id)
+        let observerRegister = undefined;
+        if (!this.props.authenticatedProfile.is_anonymous){
+            observerRegister = (item.temporary || item.read || this.readObserver.getReads().contains(item.id)) ? undefined : this.registerObservee(item.id)
+        }
         return <StatusComponent
                     innerRef={observerRegister}
                     canUpload={true}

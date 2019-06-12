@@ -313,7 +313,7 @@ class ConversationsModule extends React.Component<Props, State> {
         return items.filter(i => !i.temporary).length
     }
     onDidLoadData = (offset:number) => {
-        if(offset == 0)
+        if(offset == 0 && this.props.activeConversation == null)
         {
             this.navigateToFirstConversation()
         }
