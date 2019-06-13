@@ -2,7 +2,6 @@ import * as React from 'react';
 import Emoji from "../components/general/Emoji";
 import Constants from "../utilities/Constants";
 import { translate } from "../localization/AutoIntlProvider";
-import { Notification } from '../../../old_source/types/intrasocial_types2';
 
 export interface Verb
 {
