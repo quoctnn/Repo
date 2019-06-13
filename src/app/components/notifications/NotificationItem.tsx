@@ -1,6 +1,6 @@
 import * as React from "react";
 import classnames = require("classnames");
-import { NotificationGroupKey, InvitationNotification, Community, Group, UserProfile, Event, Conversation, StatusNotification, AttentionNotification, ReminderNotification, TaskNotification, TaskNotificationAction, ReportResult, ReportNotification, MembershipRequestNotification } from '../../types/intrasocial_types';
+import { NotificationGroupKey, InvitationNotification, Community, Group, UserProfile, Event, Conversation, StatusNotification, AttentionNotification, ReminderNotification, TaskNotification, TaskNotificationAction, ReportResult, ReportNotification, MembershipRequestNotification, NotificationObject, ConversationNotification } from '../../types/intrasocial_types';
 import ApiClient from '../../network/ApiClient';
 import { ToastManager } from '../../managers/ToastManager';
 import { translate } from '../../localization/AutoIntlProvider';
@@ -48,7 +48,7 @@ const InvitationComponent = (props:InvitationComponentProps) => {
 }
 type InvitationProps = {
     invitation:InvitationNotification
-    onCompleted:(id:number) => void
+    onCompleted:(key:NotificationGroupKey, id:number) => void
 }
 const CommunityInvitation = (props:InvitationProps) => {
     const join = () => {
@@ -70,7 +70,7 @@ const CommunityInvitation = (props:InvitationProps) => {
         })
     }
     const sendCompleted = () => {
-        props.onCompleted(props.invitation.id)
+        props.onCompleted(props.invitation.type, props.invitation.id)
     }
     const community = props.invitation.context_object as Community
     const avatar = communityAvatar(community)
@@ -104,7 +104,7 @@ const GroupInvitation = (props:InvitationProps) => {
         })
     }
     const sendCompleted = () => {
-        props.onCompleted(props.invitation.id)
+        props.onCompleted(props.invitation.type, props.invitation.id)
     }
     const group = props.invitation.context_object as Group
     const avatar = groupAvatar(group)
@@ -147,7 +147,7 @@ const FriendshipInvitation = (props:InvitationProps) => {
         })
     }
     const sendCompleted = () => {
-        props.onCompleted(props.invitation.id)
+        props.onCompleted(props.invitation.type, props.invitation.id)
     }
     const profile = props.invitation.context_object as UserProfile
     const avatar = userAvatar(profile)
@@ -189,7 +189,7 @@ const EventInvitation = (props:InvitationProps) => {
         })
     }
     const sendCompleted = () => {
-        props.onCompleted(props.invitation.id)
+        props.onCompleted(props.invitation.type, props.invitation.id)
     }
     const event = props.invitation.context_object as Event
     const avatar = eventAvatar(event)
@@ -205,9 +205,9 @@ const EventInvitation = (props:InvitationProps) => {
             </InvitationComponent>
 }
 type UnreadConversationProps = {
-    conversation:Conversation
+    conversation:ConversationNotification
     authenticatedUser:UserProfile
-    onCompleted:(id:number) => void
+    onCompleted:(key:NotificationGroupKey, id:number) => void
 }
 const UnreadConversation = (props:UnreadConversationProps) => {
     const markAsRead = () => {
@@ -220,7 +220,7 @@ const UnreadConversation = (props:UnreadConversationProps) => {
         })
     }
     const sendCompleted = () => {
-        props.onCompleted(props.conversation.id)
+        props.onCompleted(props.conversation.type, props.conversation.id)
     }
     const time = (props.conversation.last_message && props.conversation.last_message.created_at) || props.conversation.updated_at
     const title = ConversationUtilities.getConversationTitle(props.conversation)
@@ -233,7 +233,7 @@ const UnreadConversation = (props:UnreadConversationProps) => {
 }
 type StatusNotificationProps = {
     notification:StatusNotification
-    onCompleted:(id:number) => void
+    onCompleted:(key:NotificationGroupKey, id:number) => void
 }
 const StatusNotificationComponent = (props:StatusNotificationProps) => {
     const markAsRead = () => {
@@ -246,7 +246,7 @@ const StatusNotificationComponent = (props:StatusNotificationProps) => {
         })
     }
     const sendCompleted = () => {
-        props.onCompleted(props.notification.id)
+        props.onCompleted(props.notification.type, props.notification.id)
     }
     const getAction = () => {
         switch (props.notification.level) {
@@ -267,12 +267,11 @@ const StatusNotificationComponent = (props:StatusNotificationProps) => {
 }
 type AttentionProps = {
     notification:AttentionNotification
-    onCompleted:(id:number) => void
-    type:NotificationGroupKey
+    onCompleted:(key:NotificationGroupKey, id:number) => void
 }
 const AttentionComponent = (props:AttentionProps) => {
     const getEndpoint = () => {
-        switch (props.type) {
+        switch (props.notification.type) {
             case NotificationGroupKey.TASK_ATTENTIONS: return ApiClient.deleteTaskAttribute
             case NotificationGroupKey.STATUS_ATTENTIONS: return ApiClient.deleteStatusAttribute
             default:return null
@@ -292,12 +291,12 @@ const AttentionComponent = (props:AttentionProps) => {
         }
     }
     const sendCompleted = () => {
-        props.onCompleted(props.notification.id)
+        props.onCompleted(props.notification.type, props.notification.id)
     }
     const profile = ProfileManager.getProfileById(props.notification.created_by)
     const ownerName = userFullName(profile, null) || translate("Someone")
     const time = props.notification.created_at
-    const action = translate(`notification.attention.${props.type}`)
+    const action = translate(`notification.attention.${props.notification.type}`)
     const title = <Link className="no-link" to={props.notification.uri}><span className="link-text">{ownerName}</span> {action}</Link>
     const avatar = userAvatar(profile)
     const avatarLink = profile && profile.uri
@@ -308,12 +307,11 @@ const AttentionComponent = (props:AttentionProps) => {
 }
 type ReminderProps = {
     notification:ReminderNotification
-    onCompleted:(id:number) => void
-    type:NotificationGroupKey
+    onCompleted:(key:NotificationGroupKey, id:number) => void
 }
 const ReminderComponent = (props:ReminderProps) => {
     const getEndpoint = () => {
-        switch (props.type) {
+        switch (props.notification.type) {
             case NotificationGroupKey.TASK_REMINDERS: return ApiClient.deleteTaskAttribute
             case NotificationGroupKey.STATUS_REMINDERS: return ApiClient.deleteStatusAttribute
             default:return null
@@ -333,10 +331,10 @@ const ReminderComponent = (props:ReminderProps) => {
         }
     }
     const sendCompleted = () => {
-        props.onCompleted(props.notification.id)
+        props.onCompleted(props.notification.type, props.notification.id)
     }
     const time = props.notification.datetime
-    const action = translate(`notification.reminder.${props.type}`)
+    const action = translate(`notification.reminder.${props.notification.type}`)
     const title = <Link className="no-link" to={props.notification.uri}>{action}</Link>
     const style:React.CSSProperties = {width:Avatar.defaultProps.size, height:Avatar.defaultProps.size, borderRadius:"50%"}
     const avatar = <div className="primary-theme-bg d-flex justify-content-center align-items-center" style={style}>
@@ -350,7 +348,7 @@ const ReminderComponent = (props:ReminderProps) => {
 }
 type TaskNotificationProps = {
     notification:TaskNotification
-    onCompleted:(id:number) => void
+    onCompleted:(key:NotificationGroupKey, id:number) => void
 }
 const TaskNotificationComponent = (props:TaskNotificationProps) => {
     const markAsRead = () => {
@@ -363,7 +361,7 @@ const TaskNotificationComponent = (props:TaskNotificationProps) => {
         })
     }
     const sendCompleted = () => {
-        props.onCompleted(props.notification.id)
+        props.onCompleted(props.notification.type, props.notification.id)
     }
     const getAction = () => {
         const action = props.notification.action || TaskNotificationAction.UPDATED
@@ -386,7 +384,7 @@ const TaskNotificationComponent = (props:TaskNotificationProps) => {
 }
 type ReportedContentNotificationProps = {
     notification:ReportNotification
-    onCompleted:(id:number) => void
+    onCompleted:(key:NotificationGroupKey, id:number) => void
 }
 const ReportedContentComponent = (props:ReportedContentNotificationProps) => {
     const profile = props.notification.creator
@@ -404,12 +402,11 @@ const ReportedContentComponent = (props:ReportedContentNotificationProps) => {
 }
 type MembershipRequestProps = {
     notification:MembershipRequestNotification
-    onCompleted:(id:number) => void
-    type:NotificationGroupKey
+    onCompleted:(key:NotificationGroupKey, id:number) => void
 }
 const MembershipRequestComponent = (props:MembershipRequestProps) => {
     const getAcceptEndpoint = () => {
-        switch (props.type) {
+        switch (props.notification.type) {
             case NotificationGroupKey.EVENT_REQUESTS: return ApiClient.eventMembershipRequestAccept
             case NotificationGroupKey.GROUP_REQUESTS: return ApiClient.groupMembershipRequestAccept
             case NotificationGroupKey.COMMUNITY_REQUESTS: return ApiClient.communityMembershipRequestAccept
@@ -417,7 +414,7 @@ const MembershipRequestComponent = (props:MembershipRequestProps) => {
         }
     }
     const getDismissEndpoint = () => {
-        switch (props.type) {
+        switch (props.notification.type) {
             case NotificationGroupKey.EVENT_REQUESTS: return ApiClient.eventMembershipRequestDelete
             case NotificationGroupKey.GROUP_REQUESTS: return ApiClient.groupMembershipRequestDelete
             case NotificationGroupKey.COMMUNITY_REQUESTS: return ApiClient.communityMembershipRequestDelete
@@ -451,12 +448,12 @@ const MembershipRequestComponent = (props:MembershipRequestProps) => {
         }
     }
     const sendCompleted = () => {
-        props.onCompleted(props.notification.id)
+        props.onCompleted(props.notification.type, props.notification.id)
     }
     const time = props.notification.created_at
     const requesterName = userFullName(props.notification.request_by, null) || translate("Someone")
     const contextName = props.notification.context_object.name
-    const action = translate(`notification.membership.${props.type}`)
+    const action = translate(`notification.membership.${props.notification.type}`)
     const title =   <Link className="no-link" to={props.notification.context_object.uri}>
                         <span className="link-text">{requesterName}</span>
                         {" "}{action}{" "}
@@ -471,9 +468,8 @@ const MembershipRequestComponent = (props:MembershipRequestProps) => {
 }
 /////////
 type OwnProps = {
-    notificationKey:NotificationGroupKey
-    value:any
-    onNotificationCompleted:(id:number) => void
+    value:NotificationObject
+    onNotificationCompleted:(key:NotificationGroupKey, id:number) => void
     authenticatedUser:UserProfile
 }
 type State = {
@@ -491,7 +487,7 @@ export default class NotificationItem extends React.Component<Props, State> {
 
     }
     renderItem = () => {
-        switch(this.props.notificationKey)
+        switch(this.props.value.type)
         {
             case NotificationGroupKey.GROUP_INVITATIONS:
                 return <GroupInvitation invitation={this.props.value as InvitationNotification} onCompleted={this.props.onNotificationCompleted}  />
@@ -503,7 +499,7 @@ export default class NotificationItem extends React.Component<Props, State> {
                 return <FriendshipInvitation invitation={this.props.value as InvitationNotification} onCompleted={this.props.onNotificationCompleted}  />
 
             case NotificationGroupKey.UNREAD_CONVERSATIONS:
-                return <UnreadConversation authenticatedUser={this.props.authenticatedUser} conversation={this.props.value as Conversation} onCompleted={this.props.onNotificationCompleted}/>
+                return <UnreadConversation authenticatedUser={this.props.authenticatedUser} conversation={this.props.value as ConversationNotification} onCompleted={this.props.onNotificationCompleted}/>
             
             case NotificationGroupKey.REPORTED_CONTENT:
                 return <ReportedContentComponent notification={this.props.value as ReportNotification} onCompleted={this.props.onNotificationCompleted}/>
@@ -515,15 +511,15 @@ export default class NotificationItem extends React.Component<Props, State> {
 
             case NotificationGroupKey.TASK_ATTENTIONS:
             case NotificationGroupKey.STATUS_ATTENTIONS:
-                    return <AttentionComponent type={this.props.notificationKey} notification={this.props.value as AttentionNotification} onCompleted={this.props.onNotificationCompleted}/>
+                    return <AttentionComponent notification={this.props.value as AttentionNotification} onCompleted={this.props.onNotificationCompleted}/>
             case NotificationGroupKey.TASK_REMINDERS:
             case NotificationGroupKey.STATUS_REMINDERS:
-                    return <ReminderComponent type={this.props.notificationKey} notification={this.props.value as ReminderNotification} onCompleted={this.props.onNotificationCompleted}/>
+                    return <ReminderComponent notification={this.props.value as ReminderNotification} onCompleted={this.props.onNotificationCompleted}/>
             
             case NotificationGroupKey.COMMUNITY_REQUESTS:
             case NotificationGroupKey.GROUP_REQUESTS:
             case NotificationGroupKey.EVENT_REQUESTS:
-                return <MembershipRequestComponent type={this.props.notificationKey} notification={this.props.value as MembershipRequestNotification} onCompleted={this.props.onNotificationCompleted}/>
+                return <MembershipRequestComponent notification={this.props.value as MembershipRequestNotification} onCompleted={this.props.onNotificationCompleted}/>
             default:return <div>Test</div>
         }
     }

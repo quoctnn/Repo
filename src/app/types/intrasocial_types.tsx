@@ -2,6 +2,7 @@ import * as React from 'react';
 import Emoji from "../components/general/Emoji";
 import Constants from "../utilities/Constants";
 import { translate } from "../localization/AutoIntlProvider";
+import { Notification } from '../../../old_source/types/intrasocial_types2';
 
 export interface Verb
 {
@@ -49,22 +50,24 @@ export type TempStatus = {
   mentions: number[]
   pending?:boolean
 }
+//notifications
+export type NotificationObject = {
+    type:NotificationGroupKey
+} & IdentifiableObject
 export type InvitationNotification = {
-    id:number
     context_object: any
     invited_by:UserProfile
     created_at:string
     message?:string
-}
+} & NotificationObject
 export type StatusNotification = {
-    id:number
     level: number
     owner:number
     created_at:string
     context_natural_key?: ContextNaturalKey
     context_object_id?: number
     context_object:ContextObject
-} & Linkable
+} & Linkable & NotificationObject
 export enum TaskNotificationAction {
     UPDATED = "updated",
     ASSIGNED = "assigned",
@@ -75,33 +78,29 @@ export type ReportNotification = {
     context_natural_key: ContextNaturalKey
     created_at: string
     creator: UserProfile
-    id: number
     tags:string[]
-} & Linkable
+} & Linkable & NotificationObject
 export type TaskNotification = {
-    id:number
     user:number
     created_by:number
     created_at:string
     title:string
     action:TaskNotificationAction
     project:Project 
-} & Linkable
+} & Linkable & NotificationObject
 export type AttentionNotification = {
-    id:number
     created_by:number
     created_at:string
     message?:string
-} & Linkable
+} & Linkable & NotificationObject
 export type ReminderNotification = {
     datetime:string
 } & AttentionNotification
 export type MembershipRequestNotification = {
-    id:number
     context_object: IdentifiableObject & Linkable & AvatarAndCover & {name:string}
     request_by:UserProfile
     created_at:string
-}
+} & NotificationObject
 export enum NotificationGroupKey 
 {
     COMMUNITY_INVITATIONS = "community_invitations",
@@ -125,6 +124,7 @@ export enum NotificationGroupKey
     GROUP_REQUESTS = "group_requests",
     EVENT_REQUESTS = "event_requests",
 }
+export type ConversationNotification = Conversation & NotificationObject
 export type UnhandledNotifications = {
     //invitations
     community_invitations:InvitationNotification[]
@@ -132,7 +132,7 @@ export type UnhandledNotifications = {
     event_invitations:InvitationNotification[]
     friendship_invitations:InvitationNotification[]
 
-    unread_conversations:Conversation[]
+    unread_conversations:ConversationNotification[]
 
     status_notifications:StatusNotification[]
     status_reminders:ReminderNotification[]
