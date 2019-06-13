@@ -4,12 +4,13 @@ import "./NotificationsComponent.scss"
 import ApiClient from '../../network/ApiClient';
 import { ToastManager } from '../../managers/ToastManager';
 import { translate } from "../../localization/AutoIntlProvider";
-import { UnhandledNotifications, NotificationGroupKey, InvitationNotification, UserProfile, NotificationObject } from '../../types/intrasocial_types';
+import { UnhandledNotifications, NotificationGroupKey, UserProfile, NotificationObject } from '../../types/intrasocial_types';
 import NotificationGroup from "./NotificationGroup";
 import { AuthenticationManager } from "../../managers/AuthenticationManager";
 import { ReduxState } from "../../redux";
 import { connect } from "react-redux";
 import { nullOrUndefined } from "../../utilities/Utilities";
+import { NotificationManager } from "../../managers/NotificationManager";
 
 type OwnProps = {
 
@@ -47,6 +48,9 @@ class NotificationsComponent extends React.Component<Props, State> {
             ToastManager.showErrorToast(error, status, translate("notification.error.fetching"))
         })
     }
+    componentWillUnmount = () => {
+        NotificationManager.updateNotificationsCount()
+    }
     toggleCollapseSingleOpen = (key:string) => () => {
 
         this.setState((prevState:State) => {
@@ -74,12 +78,22 @@ class NotificationsComponent extends React.Component<Props, State> {
     }
     handleNotificationCompleted = (key:NotificationGroupKey, id:number) => {
         this.setState((prevState:State) => {
-            const notifications = {...prevState.notifications}
-            const content = notifications[key] as InvitationNotification[]
-            const index = content.findIndex(c => c.id == id)
-            if(index > -1)
+            const notifications = [...prevState.notifications]
+            let found = false
+            for (let i = 0; i < notifications.length; i++) {
+                const values = notifications[i].values
+                for (let j = 0; j < values.length; j++) {
+                    const notification = values[j]
+                    if(notification.id == id && notification.type == key)
+                    {
+                        found = true
+                        values.splice(j, 1)
+                        break;
+                    }
+                }
+            }
+            if(found)
             {
-                content.splice(index, 1)
                 return {notifications}
             }
             return
@@ -146,9 +160,9 @@ class NotificationsComponent extends React.Component<Props, State> {
             }
         })
         if(reminders.length > 0)
-            list.push({key:translate("notification.group.reminders"), values:reminders, iconClassName:"far fa-bell"})
+            list.push({key:translate("notification.group.reminders"), values:reminders, iconClassName:"far fa-clock"})
         if(requestsAndInvitations.length > 0)
-            list.push({key:translate("notification.group.requests_invitations"), values:requestsAndInvitations, iconClassName:"far fa-bell"})
+            list.push({key:translate("notification.group.requests_invitations"), values:requestsAndInvitations, iconClassName:"fas fa-user-friends"})
         if(activity.length > 0)
             list.push({key:translate("notification.group.activity"), values:activity, iconClassName:"far fa-bell"})
         if(reports.length > 0)

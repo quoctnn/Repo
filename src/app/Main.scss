@@ -171,6 +171,17 @@ button{@include var(color, primary-text-color);}
     background-image: linear-gradient(to left, #{map-get($root, secondary-theme-color)}, #{map-get($root, primary-theme-color)});
     background-image: linear-gradient(to left, var(--secondary-theme-color), var(--primary-theme-color));
 }
+.badge-notification-container{
+    position: relative;
+    .badge-notification{
+        position: absolute;
+        top:0;
+        right: -10px;
+    }
+}
+.badge-notification{
+    font-size: 0.7rem;
+}
 .theme-box{
     color:white;
     border-radius: 8px;

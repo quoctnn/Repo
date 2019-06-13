@@ -14,6 +14,7 @@ import { ApplicationManager } from './ApplicationManager';
 import { WindowAppManager } from './WindowAppManager';
 import { ThemeManager } from './ThemeManager';
 import { ConversationManager } from './ConversationManager';
+import { NotificationManager } from './NotificationManager';
 const initializeManagers = () => 
 {
     ApplicationManager.setup()
@@ -32,5 +33,6 @@ const initializeManagers = () =>
     WindowAppManager.setup()
     ThemeManager.setup()
     ConversationManager.setup()
+    NotificationManager.setup()
 }
 export default initializeManagers

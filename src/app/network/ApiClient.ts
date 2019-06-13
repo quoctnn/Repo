@@ -2,7 +2,7 @@ import Constants from "../utilities/Constants";
 import {AjaxRequest} from "./AjaxRequest";
 import { EndpointManager } from '../managers/EndpointManager';
 var $ = require("jquery")
-import { Status, UserProfile, UploadedFile, Community, Group, Conversation, Project, Message, Event, Task, ElasticSearchType, ObjectAttributeType, StatusObjectAttribute, EmbedCardItem, ReportTag, ContextNaturalKey, ReportResult, Dashboard, Timesheet, Coordinate, RecentActivity, UnhandledNotifications } from '../types/intrasocial_types';
+import { Status, UserProfile, UploadedFile, Community, Group, Conversation, Project, Message, Event, Task, ElasticSearchType, ObjectAttributeType, StatusObjectAttribute, EmbedCardItem, ReportTag, ContextNaturalKey, ReportResult, Dashboard, Timesheet, Coordinate, RecentActivity, UnhandledNotifications, UnreadNotificationCounts } from '../types/intrasocial_types';
 import { nullOrUndefined } from '../utilities/Utilities';
 import moment = require("moment");
 import { Settings } from "../utilities/Settings";
@@ -772,6 +772,14 @@ export default class ApiClient
     static eventMembershipRequestDelete(id:number, callback:ApiClientCallback<any>){
         let url = Constants.apiRoute.eventMembershipRequestDeleteUrl(id)
         AjaxRequest.delete(url, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
+    static getUnreadNotifications(callback:ApiClientCallback<UnreadNotificationCounts>){
+        let url = Constants.apiRoute.notificationUnreadUrl
+        AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
             callback(null, status, error)

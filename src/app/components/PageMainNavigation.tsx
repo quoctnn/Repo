@@ -13,6 +13,7 @@ import { translate } from "../localization/AutoIntlProvider";
 import { CommunityManager } from "../managers/CommunityManager";
 import { NavigationUtilities } from "../utilities/NavigationUtilities";
 import CommunitySelector from "./general/community/CommunitySelector";
+import { Badge } from "reactstrap";
 export interface OwnProps
 {
     primaryItemImage:string
@@ -21,6 +22,7 @@ export interface OwnProps
 interface ReduxStateProps
 {
     profile:UserProfile
+    unreadConversations:number
 }
 interface ReduxDispatchProps
 {
@@ -59,10 +61,13 @@ class PageMainNavigation extends React.Component<Props, {}> {
                 <div className="menu-row" >
                     <PageMainMenu className="d-flex justify-content-center align-items-end" style={{gridArea: "1 / 1 / span 1 / span 3"}}/>
                     <div className="center flex-grow-1 d-flex justify-content-around align-items-end" style={{gridArea: "1 / 4 / span 1 / span 6"}}>
-                        <a onClick={this.navigateToCommunity} href="#">{translate("common.community")}</a>
-                        <Link to={Routes.ROOT}>{translate("common.dashboard")}</Link>
+                        <a className="btn" onClick={this.navigateToCommunity} href="#">{translate("common.community")}</a>
+                        <Link className="btn" to={Routes.ROOT}>{translate("common.dashboard")}</Link>
                         { !profile.is_anonymous &&
-                            <Link to={Routes.conversationUrl(null)}>{translate("common.messages")}</Link>
+                            <Link to={Routes.conversationUrl(null)} className="btn">
+                                {translate("common.messages")}
+                                {this.props.unreadConversations > 0 && <Badge pill={true} color="danger" className="ml-1 badge-notification">{this.props.unreadConversations}</Badge>}
+                            </Link>
                         }
                     </div>
                     <div className="right" style={{gridArea: "1 / 10 / span 1 / span 3"}}>
@@ -83,6 +88,7 @@ class PageMainNavigation extends React.Component<Props, {}> {
 const mapStateToProps = (state:ReduxState, ownProps: OwnProps):ReduxStateProps => {
       return {
         profile:state.authentication.profile,
+        unreadConversations:state.unreadNotifications.conversations
       }
   }
   const mapDispatchToProps = (dispatch:any, ownProps: OwnProps):ReduxDispatchProps => {

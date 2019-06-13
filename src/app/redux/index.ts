@@ -18,6 +18,7 @@ import application from "./application";
 import { conversationStore } from './conversationStore';
 import messageQueue, { MessageQueue } from "./messageQueue";
 import tempCache, { TempCache } from './tempCache';
+import { unreadNotifications, UnreadNotifications } from './unreadNotifications';
 const rootPersistConfig:PersistConfig = {
     key: 'root',
     storage: storage,
@@ -31,7 +32,7 @@ const rootPersistConfig:PersistConfig = {
   }
 const rootReducer = combineReducers({
     authentication, language, theme, endpoint, embedlyStore, communityStore, profileStore,
-    groupStore, activeCommunity, eventStore, taskStore, projectStore, application, conversationStore, messageQueue, tempCache
+    groupStore, activeCommunity, eventStore, taskStore, projectStore, application, conversationStore, messageQueue, tempCache, unreadNotifications,
 })
 export default persistReducer(rootPersistConfig, rootReducer)
 export interface ReduxState
@@ -52,5 +53,6 @@ export interface ReduxState
     application:{loaded:boolean}
     messageQueue:MessageQueue
     tempCache:TempCache
+    unreadNotifications:UnreadNotifications
     _persist:any
 }

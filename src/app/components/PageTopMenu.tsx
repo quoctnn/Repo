@@ -2,7 +2,7 @@ import * as React from "react";
 import "./PageTopMenu.scss"
 import { ReduxState } from "../redux";
 import { connect } from "react-redux";
-import { Button, Popover, PopoverBody, ModalHeader, Modal, ModalBody, ModalFooter, DropdownItem } from "reactstrap";
+import { Button, Popover, PopoverBody, ModalHeader, Modal, ModalBody, ModalFooter, DropdownItem, Badge } from "reactstrap";
 import { withRouter, RouteComponentProps } from "react-router-dom";
 import Routes from "../utilities/Routes";
 import { UserProfile } from "../types/intrasocial_types";
@@ -21,6 +21,7 @@ interface OwnProps
 interface ReduxStateProps
 {
     profile:UserProfile
+    unreadNotifications:number
 }
 interface ReduxDispatchProps
 {
@@ -181,8 +182,14 @@ class PageTopMenu extends React.Component<Props, State> {
         return(
             <div id="page-top-menu">
                 <Button onClick={this.showSearchPanel} color="link"><i className="fas fa-search"></i></Button>
-                <Button onClick={this.toggleNotificationPanel} color="link"><i className="fas fa-bell"></i></Button>
-                <Button onClick={this.showFilesPanel} color="link"><i className="fas fa-cloud"></i></Button>
+                {!this.props.profile.is_anonymous && 
+                <>
+                    <Button onClick={this.toggleNotificationPanel} color="link" className="badge-notification-container">
+                        <i className="fas fa-bell"></i>
+                        {this.props.unreadNotifications > 0 && <Badge pill={true} color="danger" className="badge-notification">{this.props.unreadNotifications}</Badge>}
+                    </Button>
+                    <Button onClick={this.showFilesPanel} color="link"><i className="fas fa-cloud"></i></Button>
+                </>}
                 <Button onClick={this.showMainPanel} color="link"><i className="fas fa-cog"></i></Button>
                 {this.renderPopover()}
                 {this.renderDeveloperTool()}
@@ -193,7 +200,8 @@ class PageTopMenu extends React.Component<Props, State> {
 }
 const mapStateToProps = (state:ReduxState, ownProps: OwnProps):ReduxStateProps => {
   return {
-    profile:state.authentication.profile
+    profile:state.authentication.profile,
+    unreadNotifications:state.unreadNotifications.notifications
   }
 }
 const mapDispatchToProps = (dispatch:any, ownProps: OwnProps):ReduxDispatchProps => {

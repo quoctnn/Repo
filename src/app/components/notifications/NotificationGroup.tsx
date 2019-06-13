@@ -36,7 +36,7 @@ export default class NotificationGroup extends React.Component<Props, State> {
             <div className={cn}>
                 <div className="d-flex header main-content-secondary-background justify-content-between align-items-center" onClick={this.props.toggleCollapse}>
                     <div className="title text-truncate">
-                        {this.props.iconClassName && <i className={this.props.iconClassName}></i>}
+                        {this.props.iconClassName && <i className={this.props.iconClassName + " mr-2"}></i>}
                         {this.props.title}
                     </div>
                     <Badge color="warning" pill={true}>{this.props.values.length}</Badge>

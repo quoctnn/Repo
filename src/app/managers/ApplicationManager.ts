@@ -20,6 +20,7 @@ import { resetEndpointAction } from '../redux/endpoint';
 import { resetThemeAction } from '../redux/theme';
 import { resetActiveCommunityAction } from '../redux/activeCommunity';
 import { resetEmbedlyStoreAction } from '../components/general/embedly/redux';
+import { resetUnreadNotificationsAction } from '../redux/unreadNotifications';
 
 export type ApplicationData = {
     dashboards:Dashboard[]
@@ -36,6 +37,7 @@ export type LoadingProgress = {
     text:string
 }
 export const ApplicationManagerLoadingProgressNotification = "ApplicationManagerLoadingProgressNotification"
+export const ApplicationManagerApplicationLoadedNotification = "ApplicationManagerApplicationLoadedNotification"
 export abstract class ApplicationManager
 {
     private static applicationData:ApplicationData = null
@@ -119,6 +121,7 @@ export abstract class ApplicationManager
         const authUser = AuthenticationManager.getAuthenticatedUser()
         authUser && CommunityManager.setInitialCommunity(authUser.active_community)
         ApplicationManager.getStore().dispatch(setApplicationLoadedAction(true))
+        NotificationCenter.push(ApplicationManagerApplicationLoadedNotification,[])
     }
     static hardReset = () => {
         const dispatch = ApplicationManager.getStore().dispatch
@@ -142,6 +145,7 @@ export abstract class ApplicationManager
         dispatch(resetTasksAction())
         dispatch(resetProjectsAction())
         dispatch(resetConversationsAction())
+        dispatch(resetUnreadNotificationsAction())
     }
     private static getStore = ():Store<ReduxState,any> =>
     {

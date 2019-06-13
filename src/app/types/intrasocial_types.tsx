@@ -23,6 +23,24 @@ export interface SimpleNotification
     verb:Verb
 }
 */
+export type UnreadNotificationCounts = {
+    community_invitations:number
+    group_invitations:number
+    event_invitations:number
+    friendship_invitations:number
+    unread_conversations:number
+    status_notifications:number
+    status_reminders:number
+    status_attentions:number
+    task_notifications:number
+    task_reminders:number
+    task_attentions:number
+    reported_content:number
+    community_requests:number
+    group_requests:number
+    event_requests:number
+    total:number
+}
 export type RecentActivity =
 {
     id:number
@@ -38,6 +56,7 @@ export type RecentActivity =
     uri:string
     actors:number[]
     mentions:number[]
+    notifications:UnreadNotificationCounts
 }
 export type TempStatus = {
   text: string
