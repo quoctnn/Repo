@@ -255,7 +255,7 @@ const StatusNotificationComponent = (props:StatusNotificationProps) => {
             default:return translate("status.action.comment.comment")
         }
     }
-    const profile = ProfileManager.getProfileById(props.notification.owner)
+    const profile = ProfileManager.getProfileById(props.notification.created_by)
     const ownerName = userFullName(profile, null) || translate("Someone")
     const time = props.notification.created_at
     const title = <Link className="no-link" to={props.notification.uri}><span className="link-text">{ownerName}</span> {getAction()} <span className="link-text">{props.notification.context_object.name}</span></Link>
@@ -495,7 +495,7 @@ export default class NotificationItem extends React.Component<Props, State> {
                 return <CommunityInvitation invitation={this.props.value as InvitationNotification} onCompleted={this.props.onNotificationCompleted}  />
             case NotificationGroupKey.EVENT_INVITATIONS:
                 return <EventInvitation invitation={this.props.value as InvitationNotification} onCompleted={this.props.onNotificationCompleted}  />
-            case NotificationGroupKey.FRIENDSHIP_INVITATIONS: 
+            case NotificationGroupKey.FRIENDSHIP_INVITATIONS:
                 return <FriendshipInvitation invitation={this.props.value as InvitationNotification} onCompleted={this.props.onNotificationCompleted}  />
 
             case NotificationGroupKey.UNREAD_CONVERSATIONS:

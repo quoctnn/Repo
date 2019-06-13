@@ -62,7 +62,7 @@ export type InvitationNotification = {
 } & NotificationObject
 export type StatusNotification = {
     level: number
-    owner:number
+    created_by:number
     created_at:string
     context_natural_key?: ContextNaturalKey
     context_object_id?: number
@@ -117,7 +117,7 @@ export enum NotificationGroupKey
     STATUS_NOTIFICATIONS = "status_notifications",
     STATUS_REMINDERS = "status_reminders",
     STATUS_ATTENTIONS = "status_attentions",
-    
+
     REPORTED_CONTENT = "reported_content",
 
     COMMUNITY_REQUESTS = "community_requests",
@@ -143,7 +143,7 @@ export type UnhandledNotifications = {
     task_attentions:AttentionNotification[]
 
     reported_content:ReportNotification[]
-    //requests 
+    //requests
     community_requests:MembershipRequestNotification[]
     group_requests:MembershipRequestNotification[]
     event_requests:MembershipRequestNotification[]
