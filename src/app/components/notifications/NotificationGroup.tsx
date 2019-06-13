@@ -1,7 +1,6 @@
 import * as React from "react";
 import classnames = require("classnames");
 import CollapseComponent from "../general/CollapseComponent";
-import { translate } from '../../localization/AutoIntlProvider';
 import NotificationItem from "./NotificationItem";
 import { NotificationGroupKey, UserProfile, NotificationObject } from '../../types/intrasocial_types';
 import { Badge } from "reactstrap";
@@ -14,6 +13,7 @@ type OwnProps = {
     authenticatedUser:UserProfile
     title:string
     iconClassName?:string
+    onClose:() => void
 }
 type State = {
 
@@ -45,7 +45,8 @@ export default class NotificationGroup extends React.Component<Props, State> {
                     {this.props.values.map(v => <NotificationItem 
                                                     authenticatedUser={this.props.authenticatedUser} 
                                                     key={this.getKey(v)} 
-                                                    onNotificationCompleted={this.props.onNotificationCompleted} 
+                                                    onClose={this.props.onClose}
+                                                    onCompleted={this.props.onNotificationCompleted} 
                                                     value={v} />)}
                 </CollapseComponent>
             </div>

@@ -13,7 +13,7 @@ import { nullOrUndefined } from "../../utilities/Utilities";
 import { NotificationManager } from "../../managers/NotificationManager";
 
 type OwnProps = {
-
+    onClose:() => void
 }
 type NotificationGroupObject = {key:string, values:NotificationObject[], iconClassName?:string }
 type State = {
@@ -128,6 +128,7 @@ class NotificationsComponent extends React.Component<Props, State> {
                     onNotificationCompleted={this.handleNotificationCompleted} 
                     key={object.key} 
                     open={open} 
+                    onClose={this.props.onClose}
                     toggleCollapse={this.toggleCollapseIndividualOpen(object.key)} 
                     title={object.key} 
                     values={object.values} />

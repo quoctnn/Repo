@@ -146,7 +146,7 @@ class PageTopMenu extends React.Component<Props, State> {
     }
     renderNotificationsPanel = () => {
         return <SimpleDialog className="notifications-modal" header={translate("Notifications")} visible={this.state.notificationsPanelVisible} didCancel={this.toggleNotificationPanel}>
-                    <NotificationsComponent />
+                    <NotificationsComponent onClose={this.toggleNotificationPanel} />
                 </SimpleDialog>
     }
     renderDeveloperTool = () => {

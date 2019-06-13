@@ -14,47 +14,50 @@ import { TimeComponent } from "../general/TimeComponent";
 import { ConversationUtilities } from '../../utilities/ConversationUtilities';
 import { MessageContent } from "../../modules/conversation/MessageContent";
 
-type InvitationComponentProps = {
-    link?:string
-    avatar:React.ReactNode
-    avatarLink?:string
-    title:React.ReactNode
-    children?:React.ReactNode
-    message?:React.ReactNode
-    createdAt:string
+type NotificationEvents = {
+    onCompleted: (key: NotificationGroupKey, id: number) => void
+    onClose: () => void
 }
-const InvitationComponent = (props:InvitationComponentProps) => {
+type InvitationComponentProps = {
+    link?: string
+    avatar: React.ReactNode
+    avatarLink?: string
+    title: React.ReactNode
+    children?: React.ReactNode
+    message?: React.ReactNode
+    createdAt: string
+    onClose: () => void
+}
+const InvitationComponent = (props: InvitationComponentProps) => {
 
     const avt = typeof props.avatar == "string" ? <Avatar image={props.avatar} /> : props.avatar
-    const avatar = !!props.avatarLink ? <Link to={props.avatarLink}>{avt}</Link> : avt
-    const header = !!props.link ? <Link to={props.link} className="title">{props.title}</Link> : props.title
+    const avatar = !!props.avatarLink ? <Link onClick={props.onClose} to={props.avatarLink}>{avt}</Link> : avt
+    const header = !!props.link ? <Link onClick={props.onClose} to={props.link} className="title">{props.title}</Link> : props.title
     return <ListItem className="invitation p-2" hasAction={true}>
-                <div className="d-flex w-100">
-                    {avatar}
-                    <div className="primary-text profile d-flex flex-column flex-grow-1 ml-2 text-truncate">
-                        <div className="d-flex justify-content-between">
-                            {header}
-                            <div className="ml-1 small-text flex-shrink-0">
-                                <TimeComponent date={props.createdAt} />
-                            </div>
-                        </div>
-                        {props.message && <div className="secondary-text medium-small-text message mb-1">{props.message}</div>}
-                        {props.children && <div className="d-flex">
-                            {props.children}
-                        </div>}
+        <div className="d-flex w-100">
+            {avatar}
+            <div className="primary-text profile d-flex flex-column flex-grow-1 ml-2 text-truncate">
+                <div className="d-flex justify-content-between">
+                    {header}
+                    <div className="ml-1 small-text flex-shrink-0">
+                        <TimeComponent date={props.createdAt} />
                     </div>
                 </div>
-            </ListItem>
+                {props.message && <div className="secondary-text medium-small-text message mb-1">{props.message}</div>}
+                {props.children && <div className="d-flex">
+                    {props.children}
+                </div>}
+            </div>
+        </div>
+    </ListItem>
 }
 type InvitationProps = {
-    invitation:InvitationNotification
-    onCompleted:(key:NotificationGroupKey, id:number) => void
-}
-const CommunityInvitation = (props:InvitationProps) => {
+    invitation: InvitationNotification
+} & NotificationEvents
+const CommunityInvitation = (props: InvitationProps) => {
     const join = () => {
         ApiClient.communityInvitationAccept(props.invitation.id, (data, status, error) => {
-            if(!error)
-            {
+            if (!error) {
                 sendCompleted()
             }
             ToastManager.showErrorToast(error, status, translate("invitation.error.respond"))
@@ -62,8 +65,7 @@ const CommunityInvitation = (props:InvitationProps) => {
     }
     const dismiss = () => {
         ApiClient.communityInvitationDelete(props.invitation.id, (data, status, error) => {
-            if(!error)
-            {
+            if (!error) {
                 sendCompleted()
             }
             ToastManager.showErrorToast(error, status, translate("invitation.error.respond"))
@@ -78,17 +80,16 @@ const CommunityInvitation = (props:InvitationProps) => {
     const title = community.name
     const profile = props.invitation.invited_by
     const inviterName = userFullName(profile, null) || translate("Someone")
-    const message = <><Link to={profile.uri}>{inviterName}</Link> {translate("invitation.invite.join")}</>
-    return <InvitationComponent avatarLink={link} createdAt={props.invitation.created_at} title={title} link={link} avatar={avatar} message={message}>
-                <Button onClick={join} color="secondary" size="xs">{translate("invitation.join")}</Button>
-                <Button outline={true} className="ml-1" onClick={dismiss} color="secondary" size="xs">{translate("invitation.dismiss")}</Button>
-            </InvitationComponent>
+    const message = <><Link onClick={props.onClose} to={profile.uri}>{inviterName}</Link> {translate("invitation.invite.join")}</>
+    return <InvitationComponent onClose={props.onClose} avatarLink={link} createdAt={props.invitation.created_at} title={title} link={link} avatar={avatar} message={message}>
+        <Button onClick={join} color="secondary" size="xs">{translate("invitation.join")}</Button>
+        <Button outline={true} className="ml-1" onClick={dismiss} color="secondary" size="xs">{translate("invitation.dismiss")}</Button>
+    </InvitationComponent>
 }
-const GroupInvitation = (props:InvitationProps) => {
+const GroupInvitation = (props: InvitationProps) => {
     const join = () => {
         ApiClient.groupInvitationAccept(props.invitation.id, (data, status, error) => {
-            if(!error)
-            {
+            if (!error) {
                 sendCompleted()
             }
             ToastManager.showErrorToast(error, status, translate("invitation.error.respond"))
@@ -96,8 +97,7 @@ const GroupInvitation = (props:InvitationProps) => {
     }
     const dismiss = () => {
         ApiClient.groupInvitationDelete(props.invitation.id, (data, status, error) => {
-            if(!error)
-            {
+            if (!error) {
                 sendCompleted()
             }
             ToastManager.showErrorToast(error, status, translate("invitation.error.respond"))
@@ -112,17 +112,16 @@ const GroupInvitation = (props:InvitationProps) => {
     const title = group.name
     const profile = props.invitation.invited_by
     const inviterName = userFullName(profile, null) || translate("Someone")
-    const message = <><Link to={profile.uri}>{inviterName}</Link> {translate("invitation.invite.join")}</>
-    return <InvitationComponent avatarLink={link} createdAt={props.invitation.created_at} title={title} link={link} avatar={avatar} message={message}>
-                <Button onClick={join} color="secondary" size="xs">{translate("invitation.join")}</Button>
-                <Button outline={true} className="ml-1" onClick={dismiss} color="secondary" size="xs">{translate("invitation.dismiss")}</Button>
-            </InvitationComponent>
+    const message = <><Link onClick={props.onClose} to={profile.uri}>{inviterName}</Link> {translate("invitation.invite.join")}</>
+    return <InvitationComponent onClose={props.onClose} avatarLink={link} createdAt={props.invitation.created_at} title={title} link={link} avatar={avatar} message={message}>
+        <Button onClick={join} color="secondary" size="xs">{translate("invitation.join")}</Button>
+        <Button outline={true} className="ml-1" onClick={dismiss} color="secondary" size="xs">{translate("invitation.dismiss")}</Button>
+    </InvitationComponent>
 }
-const FriendshipInvitation = (props:InvitationProps) => {
+const FriendshipInvitation = (props: InvitationProps) => {
     const accept = () => {
         ApiClient.friendInvitationAccept(props.invitation.id, (data, status, error) => {
-            if(!error)
-            {
+            if (!error) {
                 sendCompleted()
             }
             ToastManager.showErrorToast(error, status, translate("invitation.error.respond"))
@@ -130,8 +129,7 @@ const FriendshipInvitation = (props:InvitationProps) => {
     }
     const dismiss = () => {
         ApiClient.friendInvitationDelete(props.invitation.id, false, (data, status, error) => {
-            if(!error)
-            {
+            if (!error) {
                 sendCompleted()
             }
             ToastManager.showErrorToast(error, status, translate("invitation.error.respond"))
@@ -139,8 +137,7 @@ const FriendshipInvitation = (props:InvitationProps) => {
     }
     const block = () => {
         ApiClient.friendInvitationDelete(props.invitation.id, true, (data, status, error) => {
-            if(!error)
-            {
+            if (!error) {
                 sendCompleted()
             }
             ToastManager.showErrorToast(error, status, translate("invitation.error.respond"))
@@ -154,17 +151,16 @@ const FriendshipInvitation = (props:InvitationProps) => {
     const link = profile.uri || "#"
     const title = userFullName(profile, null) || translate("Someone")
     const message = props.invitation.message
-    return <InvitationComponent avatarLink={link} createdAt={props.invitation.created_at} title={title} link={link} avatar={avatar} message={message}>
-                <Button onClick={accept} color="secondary" size="xs">{translate("invitation.accept")}</Button>
-                <Button outline={true} className="ml-1" onClick={dismiss} color="secondary" size="xs">{translate("invitation.dismiss")}</Button>
-                <Button outline={true} className="ml-1" onClick={block} color="secondary" size="xs">{translate("invitation.block")}</Button>
-            </InvitationComponent>
+    return <InvitationComponent onClose={props.onClose} avatarLink={link} createdAt={props.invitation.created_at} title={title} link={link} avatar={avatar} message={message}>
+        <Button onClick={accept} color="secondary" size="xs">{translate("invitation.accept")}</Button>
+        <Button outline={true} className="ml-1" onClick={dismiss} color="secondary" size="xs">{translate("invitation.dismiss")}</Button>
+        <Button outline={true} className="ml-1" onClick={block} color="secondary" size="xs">{translate("invitation.block")}</Button>
+    </InvitationComponent>
 }
-const EventInvitation = (props:InvitationProps) => {
+const EventInvitation = (props: InvitationProps) => {
     const going = () => {
         ApiClient.eventInvitationGoing(props.invitation.id, (data, status, error) => {
-            if(!error)
-            {
+            if (!error) {
                 sendCompleted()
             }
             ToastManager.showErrorToast(error, status, translate("invitation.error.respond"))
@@ -172,8 +168,7 @@ const EventInvitation = (props:InvitationProps) => {
     }
     const notGoing = () => {
         ApiClient.eventInvitationNotGoing(props.invitation.id, (data, status, error) => {
-            if(!error)
-            {
+            if (!error) {
                 sendCompleted()
             }
             ToastManager.showErrorToast(error, status, translate("invitation.error.respond"))
@@ -181,8 +176,7 @@ const EventInvitation = (props:InvitationProps) => {
     }
     const dismiss = () => {
         ApiClient.eventInvitationDelete(props.invitation.id, (data, status, error) => {
-            if(!error)
-            {
+            if (!error) {
                 sendCompleted()
             }
             ToastManager.showErrorToast(error, status, translate("invitation.error.respond"))
@@ -197,23 +191,21 @@ const EventInvitation = (props:InvitationProps) => {
     const title = event.name
     const profile = props.invitation.invited_by
     const inviterName = userFullName(profile, null) || translate("Someone")
-    const message = <><Link to={profile.uri}>{inviterName}</Link> {translate("invitation.invite.attend")}</>
-    return <InvitationComponent avatarLink={link} createdAt={props.invitation.created_at} title={title} link={link} avatar={avatar} message={message}>
-                <Button onClick={going} color="secondary" size="xs">{translate("invitation.going")}</Button>
-                <Button outline={true} className="ml-1" onClick={notGoing} color="secondary" size="xs">{translate("invitation.not.going")}</Button>
-                <Button outline={true} className="ml-1" onClick={dismiss} color="secondary" size="xs">{translate("invitation.dismiss")}</Button>
-            </InvitationComponent>
+    const message = <><Link onClick={props.onClose} to={profile.uri}>{inviterName}</Link> {translate("invitation.invite.attend")}</>
+    return <InvitationComponent onClose={props.onClose} avatarLink={link} createdAt={props.invitation.created_at} title={title} link={link} avatar={avatar} message={message}>
+        <Button onClick={going} color="secondary" size="xs">{translate("invitation.going")}</Button>
+        <Button outline={true} className="ml-1" onClick={notGoing} color="secondary" size="xs">{translate("invitation.not.going")}</Button>
+        <Button outline={true} className="ml-1" onClick={dismiss} color="secondary" size="xs">{translate("invitation.dismiss")}</Button>
+    </InvitationComponent>
 }
 type UnreadConversationProps = {
-    conversation:ConversationNotification
-    authenticatedUser:UserProfile
-    onCompleted:(key:NotificationGroupKey, id:number) => void
-}
-const UnreadConversation = (props:UnreadConversationProps) => {
+    conversation: ConversationNotification
+    authenticatedUser: UserProfile
+} & NotificationEvents
+const UnreadConversation = (props: UnreadConversationProps) => {
     const markAsRead = () => {
         ApiClient.markConversationAsRead(props.conversation.id, (data, status, error) => {
-            if(!error)
-            {
+            if (!error) {
                 sendCompleted()
             }
             ToastManager.showErrorToast(error, status, translate("invitation.error.respond"))
@@ -226,20 +218,18 @@ const UnreadConversation = (props:UnreadConversationProps) => {
     const title = ConversationUtilities.getConversationTitle(props.conversation)
     const link = props.conversation.uri
     const avatar = ConversationUtilities.getAvatar(props.conversation, props.authenticatedUser.id)
-    const message = props.conversation.last_message && <div className="text-truncate"><MessageContent message={props.conversation.last_message} simpleMode={true}/></div> || ""
-    return <InvitationComponent avatarLink={link} createdAt={time} title={title} link={link} avatar={avatar} message={message}>
-                <Button onClick={markAsRead} color="secondary" size="xs">{translate("notification.action.mark.read")}</Button>
-            </InvitationComponent>
+    const message = props.conversation.last_message && <div className="text-truncate"><MessageContent message={props.conversation.last_message} simpleMode={true} /></div> || ""
+    return <InvitationComponent onClose={props.onClose} avatarLink={link} createdAt={time} title={title} link={link} avatar={avatar} message={message}>
+        <Button onClick={markAsRead} color="secondary" size="xs">{translate("notification.action.mark.read")}</Button>
+    </InvitationComponent>
 }
 type StatusNotificationProps = {
-    notification:StatusNotification
-    onCompleted:(key:NotificationGroupKey, id:number) => void
-}
-const StatusNotificationComponent = (props:StatusNotificationProps) => {
+    notification: StatusNotification
+} & NotificationEvents
+const StatusNotificationComponent = (props: StatusNotificationProps) => {
     const markAsRead = () => {
         ApiClient.setStatusesRead([props.notification.id], (data, status, error) => {
-            if(!error)
-            {
+            if (!error) {
                 sendCompleted()
             }
             ToastManager.showErrorToast(error, status, translate("notification.error.respond"))
@@ -250,40 +240,37 @@ const StatusNotificationComponent = (props:StatusNotificationProps) => {
     }
     const getAction = () => {
         switch (props.notification.level) {
-            case 0:return translate("status.action.status.new")
-            case 1:return translate("status.action.status.comment")
-            default:return translate("status.action.comment.comment")
+            case 0: return translate("status.action.status.new")
+            case 1: return translate("status.action.status.comment")
+            default: return translate("status.action.comment.comment")
         }
     }
     const profile = ProfileManager.getProfileById(props.notification.created_by)
     const ownerName = userFullName(profile, null) || translate("Someone")
     const time = props.notification.created_at
-    const title = <Link className="no-link" to={props.notification.uri}><span className="link-text">{ownerName}</span> {getAction()} <span className="link-text">{props.notification.context_object.name}</span></Link>
+    const title = <Link onClick={props.onClose} className="no-link" to={props.notification.uri}><span className="link-text">{ownerName}</span> {getAction()} <span className="link-text">{props.notification.context_object.name}</span></Link>
     const avatar = userAvatar(profile)
     const avatarLink = profile && profile.uri
-    return <InvitationComponent avatarLink={avatarLink} createdAt={time} title={title} avatar={avatar}>
-                <Button onClick={markAsRead} color="secondary" size="xs">{translate("notification.action.mark.read")}</Button>
-            </InvitationComponent>
+    return <InvitationComponent onClose={props.onClose} avatarLink={avatarLink} createdAt={time} title={title} avatar={avatar}>
+        <Button onClick={markAsRead} color="secondary" size="xs">{translate("notification.action.mark.read")}</Button>
+    </InvitationComponent>
 }
 type AttentionProps = {
-    notification:AttentionNotification
-    onCompleted:(key:NotificationGroupKey, id:number) => void
-}
-const AttentionComponent = (props:AttentionProps) => {
+    notification: AttentionNotification
+} & NotificationEvents
+const AttentionComponent = (props: AttentionProps) => {
     const getEndpoint = () => {
         switch (props.notification.type) {
             case NotificationGroupKey.TASK_ATTENTIONS: return ApiClient.deleteTaskAttribute
             case NotificationGroupKey.STATUS_ATTENTIONS: return ApiClient.deleteStatusAttribute
-            default:return null
+            default: return null
         }
     }
     const endpoint = getEndpoint()
     const setCompleted = () => {
-        if(endpoint)
-        {
+        if (endpoint) {
             endpoint(props.notification.id, (data, status, error) => {
-                if(!error)
-                {
+                if (!error) {
                     sendCompleted()
                 }
                 ToastManager.showErrorToast(error, status, translate("notification.error.respond"))
@@ -297,33 +284,30 @@ const AttentionComponent = (props:AttentionProps) => {
     const ownerName = userFullName(profile, null) || translate("Someone")
     const time = props.notification.created_at
     const action = translate(`notification.attention.${props.notification.type}`)
-    const title = <Link className="no-link" to={props.notification.uri}><span className="link-text">{ownerName}</span> {action}</Link>
+    const title = <Link onClick={props.onClose} className="no-link" to={props.notification.uri}><span className="link-text">{ownerName}</span> {action}</Link>
     const avatar = userAvatar(profile)
     const avatarLink = profile && profile.uri
     const message = props.notification.message
-    return <InvitationComponent message={message} avatarLink={avatarLink} createdAt={time} title={title} avatar={avatar}>
-               {endpoint && <Button onClick={setCompleted} color="secondary" size="xs">{translate("notification.action.set.completed")}</Button>}
-            </InvitationComponent>
+    return <InvitationComponent onClose={props.onClose} message={message} avatarLink={avatarLink} createdAt={time} title={title} avatar={avatar}>
+        {endpoint && <Button onClick={setCompleted} color="secondary" size="xs">{translate("notification.action.set.completed")}</Button>}
+    </InvitationComponent>
 }
 type ReminderProps = {
-    notification:ReminderNotification
-    onCompleted:(key:NotificationGroupKey, id:number) => void
-}
-const ReminderComponent = (props:ReminderProps) => {
+    notification: ReminderNotification
+} & NotificationEvents
+const ReminderComponent = (props: ReminderProps) => {
     const getEndpoint = () => {
         switch (props.notification.type) {
             case NotificationGroupKey.TASK_REMINDERS: return ApiClient.deleteTaskAttribute
             case NotificationGroupKey.STATUS_REMINDERS: return ApiClient.deleteStatusAttribute
-            default:return null
+            default: return null
         }
     }
     const endpoint = getEndpoint()
     const setCompleted = () => {
-        if(endpoint)
-        {
+        if (endpoint) {
             endpoint(props.notification.id, (data, status, error) => {
-                if(!error)
-                {
+                if (!error) {
                     sendCompleted()
                 }
                 ToastManager.showErrorToast(error, status, translate("notification.error.respond"))
@@ -335,26 +319,24 @@ const ReminderComponent = (props:ReminderProps) => {
     }
     const time = props.notification.datetime
     const action = translate(`notification.reminder.${props.notification.type}`)
-    const title = <Link className="no-link" to={props.notification.uri}>{action}</Link>
-    const style:React.CSSProperties = {width:Avatar.defaultProps.size, height:Avatar.defaultProps.size, borderRadius:"50%"}
+    const title = <Link onClick={props.onClose} className="no-link" to={props.notification.uri}>{action}</Link>
+    const style: React.CSSProperties = { width: Avatar.defaultProps.size, height: Avatar.defaultProps.size, borderRadius: "50%" }
     const avatar = <div className="primary-theme-bg d-flex justify-content-center align-items-center" style={style}>
-                        <i className="fas fa-bell"></i>
-                    </div>
+        <i className="fas fa-bell"></i>
+    </div>
     const avatarLink = props.notification.uri
     const message = props.notification.message
-    return <InvitationComponent message={message} avatarLink={avatarLink} createdAt={time} title={title} avatar={avatar}>
-               {endpoint && <Button onClick={setCompleted} color="secondary" size="xs">{translate("notification.action.set.completed")}</Button>}
-            </InvitationComponent>
+    return <InvitationComponent onClose={props.onClose} message={message} avatarLink={avatarLink} createdAt={time} title={title} avatar={avatar}>
+        {endpoint && <Button onClick={setCompleted} color="secondary" size="xs">{translate("notification.action.set.completed")}</Button>}
+    </InvitationComponent>
 }
 type TaskNotificationProps = {
-    notification:TaskNotification
-    onCompleted:(key:NotificationGroupKey, id:number) => void
-}
-const TaskNotificationComponent = (props:TaskNotificationProps) => {
+    notification: TaskNotification
+} & NotificationEvents
+const TaskNotificationComponent = (props: TaskNotificationProps) => {
     const markAsRead = () => {
         ApiClient.markTaskAsRead(props.notification.id, (data, status, error) => {
-            if(!error)
-            {
+            if (!error) {
                 sendCompleted()
             }
             ToastManager.showErrorToast(error, status, translate("notification.error.respond"))
@@ -370,47 +352,45 @@ const TaskNotificationComponent = (props:TaskNotificationProps) => {
     const profile = ProfileManager.getProfileById(props.notification.created_by)
     const creatorName = userFullName(profile, null) || translate("Someone")
     const time = props.notification.created_at
-    const title =   <Link className="no-link" to={props.notification.uri}>
-                        <span className="link-text">{creatorName}</span>
-                        {" "}{getAction()}{" "}
-                        <span className="link-text">{props.notification.title}</span>
-                        {" "}{translate("task.in_project")}{" "}<span className="link-text">{props.notification.project.name}</span>
-                    </Link>
+    const title = <Link onClick={props.onClose} className="no-link" to={props.notification.uri}>
+        <span className="link-text">{creatorName}</span>
+        {" "}{getAction()}{" "}
+        <span className="link-text">{props.notification.title}</span>
+        {" "}{translate("task.in_project")}{" "}<span className="link-text">{props.notification.project.name}</span>
+    </Link>
     const avatar = userAvatar(profile)
     const avatarLink = profile && profile.uri
-    return <InvitationComponent avatarLink={avatarLink} createdAt={time} title={title} avatar={avatar}>
-                <Button onClick={markAsRead} color="secondary" size="xs">{translate("notification.action.mark.read")}</Button>
-            </InvitationComponent>
+    return <InvitationComponent onClose={props.onClose} avatarLink={avatarLink} createdAt={time} title={title} avatar={avatar}>
+        <Button onClick={markAsRead} color="secondary" size="xs">{translate("notification.action.mark.read")}</Button>
+    </InvitationComponent>
 }
 type ReportedContentNotificationProps = {
-    notification:ReportNotification
-    onCompleted:(key:NotificationGroupKey, id:number) => void
-}
-const ReportedContentComponent = (props:ReportedContentNotificationProps) => {
+    notification: ReportNotification
+} & NotificationEvents
+const ReportedContentComponent = (props: ReportedContentNotificationProps) => {
     const profile = props.notification.creator
     const creatorName = userFullName(profile, null) || translate("Someone")
     const time = props.notification.created_at
-    const title =   <Link className="no-link" to={props.notification.uri}>
-                        <span className="link-text">{creatorName}</span>
-                        {" "}{translate("report.action.reported")}{" "}{translate("common.context_key.singular." + props.notification.context_natural_key )}
-                    </Link>
+    const title = <Link onClick={props.onClose} className="no-link" to={props.notification.uri}>
+        <span className="link-text">{creatorName}</span>
+        {" "}{translate("report.action.reported")}{" "}{translate("common.context_key.singular." + props.notification.context_natural_key)}
+    </Link>
     const avatar = userAvatar(profile)
     const avatarLink = profile && profile.uri
-    const message = props.notification.tags.map((t,i) => <Badge className={i > 0 ? "ml-1" : undefined} key={"tag_"+ t} color="info">{translate("report.tag." + t)}</Badge>)
-    return <InvitationComponent avatarLink={avatarLink} createdAt={time} title={title} avatar={avatar} message={message}>
-            </InvitationComponent>
+    const message = props.notification.tags.map((t, i) => <Badge className={i > 0 ? "ml-1" : undefined} key={"tag_" + t} color="info">{translate("report.tag." + t)}</Badge>)
+    return <InvitationComponent onClose={props.onClose} avatarLink={avatarLink} createdAt={time} title={title} avatar={avatar} message={message}>
+    </InvitationComponent>
 }
 type MembershipRequestProps = {
-    notification:MembershipRequestNotification
-    onCompleted:(key:NotificationGroupKey, id:number) => void
-}
-const MembershipRequestComponent = (props:MembershipRequestProps) => {
+    notification: MembershipRequestNotification
+} & NotificationEvents
+const MembershipRequestComponent = (props: MembershipRequestProps) => {
     const getAcceptEndpoint = () => {
         switch (props.notification.type) {
             case NotificationGroupKey.EVENT_REQUESTS: return ApiClient.eventMembershipRequestAccept
             case NotificationGroupKey.GROUP_REQUESTS: return ApiClient.groupMembershipRequestAccept
             case NotificationGroupKey.COMMUNITY_REQUESTS: return ApiClient.communityMembershipRequestAccept
-            default:return null
+            default: return null
         }
     }
     const getDismissEndpoint = () => {
@@ -418,17 +398,15 @@ const MembershipRequestComponent = (props:MembershipRequestProps) => {
             case NotificationGroupKey.EVENT_REQUESTS: return ApiClient.eventMembershipRequestDelete
             case NotificationGroupKey.GROUP_REQUESTS: return ApiClient.groupMembershipRequestDelete
             case NotificationGroupKey.COMMUNITY_REQUESTS: return ApiClient.communityMembershipRequestDelete
-            default:return null
+            default: return null
         }
     }
     const acceptEndpoint = getAcceptEndpoint()
     const dismissEndpoint = getDismissEndpoint()
     const acceptRequest = () => {
-        if(acceptEndpoint)
-        {
+        if (acceptEndpoint) {
             acceptEndpoint(props.notification.id, (data, status, error) => {
-                if(!error)
-                {
+                if (!error) {
                     sendCompleted()
                 }
                 ToastManager.showErrorToast(error, status, translate("notification.error.respond"))
@@ -436,11 +414,9 @@ const MembershipRequestComponent = (props:MembershipRequestProps) => {
         }
     }
     const dismissRequest = () => {
-        if(dismissEndpoint)
-        {
+        if (dismissEndpoint) {
             dismissEndpoint(props.notification.id, (data, status, error) => {
-                if(!error)
-                {
+                if (!error) {
                     sendCompleted()
                 }
                 ToastManager.showErrorToast(error, status, translate("notification.error.respond"))
@@ -454,24 +430,23 @@ const MembershipRequestComponent = (props:MembershipRequestProps) => {
     const requesterName = userFullName(props.notification.request_by, null) || translate("Someone")
     const contextName = props.notification.context_object.name
     const action = translate(`notification.membership.${props.notification.type}`)
-    const title =   <Link className="no-link" to={props.notification.context_object.uri}>
-                        <span className="link-text">{requesterName}</span>
-                        {" "}{action}{" "}
-                        <span className="link-text">{contextName}</span>
-                    </Link>
+    const title = <Link onClick={props.onClose} className="no-link" to={props.notification.context_object.uri}>
+        <span className="link-text">{requesterName}</span>
+        {" "}{action}{" "}
+        <span className="link-text">{contextName}</span>
+    </Link>
     const avatar = userAvatar(props.notification.request_by)
     const avatarLink = props.notification.request_by.uri
-    return <InvitationComponent avatarLink={avatarLink} createdAt={time} title={title} avatar={avatar}>
-               {acceptEndpoint && <Button onClick={acceptRequest} color="secondary" size="xs">{translate("notification.action.accept")}</Button>}
-               {dismissEndpoint && <Button outline={true} className="ml-1" onClick={dismissRequest} color="secondary" size="xs">{translate("invitation.dismiss")}</Button>}
-            </InvitationComponent>
+    return <InvitationComponent onClose={props.onClose} avatarLink={avatarLink} createdAt={time} title={title} avatar={avatar}>
+        {acceptEndpoint && <Button onClick={acceptRequest} color="secondary" size="xs">{translate("notification.action.accept")}</Button>}
+        {dismissEndpoint && <Button outline={true} className="ml-1" onClick={dismissRequest} color="secondary" size="xs">{translate("invitation.dismiss")}</Button>}
+    </InvitationComponent>
 }
 /////////
 type OwnProps = {
-    value:NotificationObject
-    onNotificationCompleted:(key:NotificationGroupKey, id:number) => void
-    authenticatedUser:UserProfile
-}
+    value: NotificationObject
+    authenticatedUser: UserProfile
+} & NotificationEvents
 type State = {
 
 }
@@ -479,53 +454,52 @@ type Props = OwnProps
 
 export default class NotificationItem extends React.Component<Props, State> {
 
-    constructor(props:Props){
+    constructor(props: Props) {
         super(props)
         this.state = {
-            open:false,
+            open: false,
         }
 
     }
     renderItem = () => {
-        switch(this.props.value.type)
-        {
+        switch (this.props.value.type) {
             case NotificationGroupKey.GROUP_INVITATIONS:
-                return <GroupInvitation invitation={this.props.value as InvitationNotification} onCompleted={this.props.onNotificationCompleted}  />
+                return <GroupInvitation onClose={this.props.onClose} invitation={this.props.value as InvitationNotification} onCompleted={this.props.onCompleted} />
             case NotificationGroupKey.COMMUNITY_INVITATIONS:
-                return <CommunityInvitation invitation={this.props.value as InvitationNotification} onCompleted={this.props.onNotificationCompleted}  />
+                return <CommunityInvitation onClose={this.props.onClose} invitation={this.props.value as InvitationNotification} onCompleted={this.props.onCompleted} />
             case NotificationGroupKey.EVENT_INVITATIONS:
-                return <EventInvitation invitation={this.props.value as InvitationNotification} onCompleted={this.props.onNotificationCompleted}  />
+                return <EventInvitation onClose={this.props.onClose} invitation={this.props.value as InvitationNotification} onCompleted={this.props.onCompleted} />
             case NotificationGroupKey.FRIENDSHIP_INVITATIONS:
-                return <FriendshipInvitation invitation={this.props.value as InvitationNotification} onCompleted={this.props.onNotificationCompleted}  />
+                return <FriendshipInvitation onClose={this.props.onClose} invitation={this.props.value as InvitationNotification} onCompleted={this.props.onCompleted} />
 
             case NotificationGroupKey.UNREAD_CONVERSATIONS:
-                return <UnreadConversation authenticatedUser={this.props.authenticatedUser} conversation={this.props.value as ConversationNotification} onCompleted={this.props.onNotificationCompleted}/>
-            
+                return <UnreadConversation onClose={this.props.onClose} authenticatedUser={this.props.authenticatedUser} conversation={this.props.value as ConversationNotification} onCompleted={this.props.onCompleted} />
+
             case NotificationGroupKey.REPORTED_CONTENT:
-                return <ReportedContentComponent notification={this.props.value as ReportNotification} onCompleted={this.props.onNotificationCompleted}/>
+                return <ReportedContentComponent onClose={this.props.onClose} notification={this.props.value as ReportNotification} onCompleted={this.props.onCompleted} />
 
             case NotificationGroupKey.STATUS_NOTIFICATIONS:
-                return <StatusNotificationComponent notification={this.props.value as StatusNotification} onCompleted={this.props.onNotificationCompleted}/>
+                return <StatusNotificationComponent onClose={this.props.onClose} notification={this.props.value as StatusNotification} onCompleted={this.props.onCompleted} />
             case NotificationGroupKey.TASK_NOTIFICATIONS:
-                return <TaskNotificationComponent notification={this.props.value as TaskNotification} onCompleted={this.props.onNotificationCompleted}/>
+                return <TaskNotificationComponent onClose={this.props.onClose} notification={this.props.value as TaskNotification} onCompleted={this.props.onCompleted} />
 
             case NotificationGroupKey.TASK_ATTENTIONS:
             case NotificationGroupKey.STATUS_ATTENTIONS:
-                    return <AttentionComponent notification={this.props.value as AttentionNotification} onCompleted={this.props.onNotificationCompleted}/>
+                return <AttentionComponent onClose={this.props.onClose} notification={this.props.value as AttentionNotification} onCompleted={this.props.onCompleted} />
             case NotificationGroupKey.TASK_REMINDERS:
             case NotificationGroupKey.STATUS_REMINDERS:
-                    return <ReminderComponent notification={this.props.value as ReminderNotification} onCompleted={this.props.onNotificationCompleted}/>
-            
+                return <ReminderComponent onClose={this.props.onClose} notification={this.props.value as ReminderNotification} onCompleted={this.props.onCompleted} />
+
             case NotificationGroupKey.COMMUNITY_REQUESTS:
             case NotificationGroupKey.GROUP_REQUESTS:
             case NotificationGroupKey.EVENT_REQUESTS:
-                return <MembershipRequestComponent notification={this.props.value as MembershipRequestNotification} onCompleted={this.props.onNotificationCompleted}/>
-            default:return <div>Test</div>
+                return <MembershipRequestComponent onClose={this.props.onClose} notification={this.props.value as MembershipRequestNotification} onCompleted={this.props.onCompleted} />
+            default: return <div>Test</div>
         }
     }
     render() {
         const cn = classnames("notification-item");
-        return(
+        return (
             <div className={cn}>
                 {this.renderItem()}
             </div>
