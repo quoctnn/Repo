@@ -22,21 +22,40 @@ type State = {
 }
 type ReduxStateProps = {
     authenticatedUser:UserProfile
+    unreadNotifications:number
 }
 type Props = OwnProps & ReduxStateProps
 
 class NotificationsComponent extends React.Component<Props, State> {
 
     private collapsibleDefaultOpen = true
+    private preventNextReload = false
     constructor(props:Props){
         super(props)
         this.state = {
             notifications:[],
             open:{}
         }
-
     }
     componentDidMount = () => {
+        this.reloadNotifications()
+    }
+    componentWillUnmount = () => {
+        NotificationManager.updateNotificationsCount()
+    }
+    componentDidUpdate = (prevProps:Props) => {
+        if(this.preventNextReload)
+        {
+            this.preventNextReload = false 
+            return
+        }
+        const currentCount = this.state.notifications.reduce((a, b) => a += b.values.length , 0)
+        if(this.props.unreadNotifications != currentCount)
+        {
+            this.reloadNotifications()
+        }
+    }
+    reloadNotifications = () => {
         ApiClient.getNotifications((notifications, status, error) => {
             if(!!notifications)
             {
@@ -47,9 +66,6 @@ class NotificationsComponent extends React.Component<Props, State> {
             }
             ToastManager.showErrorToast(error, status, translate("notification.error.fetching"))
         })
-    }
-    componentWillUnmount = () => {
-        NotificationManager.updateNotificationsCount()
     }
     toggleCollapseSingleOpen = (key:string) => () => {
 
@@ -94,6 +110,7 @@ class NotificationsComponent extends React.Component<Props, State> {
             }
             if(found)
             {
+                this.preventNextReload = true
                 return {notifications}
             }
             return
@@ -180,7 +197,9 @@ class NotificationsComponent extends React.Component<Props, State> {
 }
 const mapStateToProps = (state:ReduxState, ownProps: OwnProps):ReduxStateProps => {
     return {
-        authenticatedUser: AuthenticationManager.getAuthenticatedUser()
+        authenticatedUser: AuthenticationManager.getAuthenticatedUser(),
+        unreadNotifications:state.unreadNotifications.notifications
+
     }
 }
 export default connect<ReduxStateProps, {}, OwnProps>(mapStateToProps, null)(NotificationsComponent);
