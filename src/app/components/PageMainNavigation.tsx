@@ -56,7 +56,9 @@ class PageMainNavigation extends React.Component<Props, {}> {
                             </div>
                         </div>
                     </div>
-                    <div className="center flex-grow-1"></div>
+                    <div className="center flex-grow-1 d-flex">
+                        
+                    </div>
                 </div>
                 <div className="menu-row" >
                     <PageMainMenu className="d-flex justify-content-center align-items-end" style={{gridArea: "1 / 1 / span 1 / span 3"}}/>

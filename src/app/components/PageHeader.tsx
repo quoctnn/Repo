@@ -5,6 +5,7 @@ import classnames = require("classnames");
 import PageMainNavigation from "./PageMainNavigation";
 import PageTopMenu from "./PageTopMenu";
 import Logo from "./general/images/Logo";
+import TopNavigation from "./navigation/TopNavigation";
 
 interface OwnProps
 {
@@ -16,20 +17,20 @@ type Props = OwnProps
 
 export default class PageHeader extends React.Component<Props, {}> {
     render() {
+        return <TopNavigation />
         const { coverImage } = this.props
         const cn = classnames({"no-image": !coverImage}, {"fallback": coverImage});
-        return(
-            <div id="page-header" className={cn}>
-                <CoverImage id="page-header-cover-image" src={coverImage}>
-                </CoverImage>
-                <div className="page-top-navigation">
-                    <Logo className="intrawork-logo" progress={0}/>
-                    <div className="flex-grow-1"></div>
-                    <PageTopMenu />
+        return(<div id="page-header" className={cn}>
+                    <CoverImage id="page-header-cover-image" src={coverImage}>
+                    </CoverImage>
+                    <div className="page-top-navigation">
+                        <Logo className="intrawork-logo" progress={0}/>
+                        <div className="flex-grow-1"></div>
+                        <PageTopMenu />
+                    </div>
+                    <PageMainNavigation primaryItemImage={this.props.primaryItemImage} primaryItemTitle={this.props.primaryItemTitle} />
+                    <div className="circle"></div>
                 </div>
-                <PageMainNavigation primaryItemImage={this.props.primaryItemImage} primaryItemTitle={this.props.primaryItemTitle} />
-                <div className="circle"></div>
-            </div>
         );
     }
 }

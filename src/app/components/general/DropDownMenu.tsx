@@ -6,6 +6,7 @@ type Props = {
     items:(() => OverflowMenuItem[]) | OverflowMenuItem[]
     className?:string
     triggerClass:string
+    modifiers?:any
 }
 type DefaultProps = {
 
@@ -58,16 +59,19 @@ export class DropDownMenu extends React.Component<Props, State> {
         if(!open)
             return null
         const items =  Array.isArray(this.props.items) ? this.props.items : this.props.items()
-        return <Popover className="dropdown-menu-popover" 
+        const cn = classnames("dropdown-menu-popover", this.props.className)
+        return <Popover className={cn}
                         delay={0} 
                         trigger="legacy" 
                         placement="bottom" 
                         hideArrow={false} 
                         isOpen={this.state.popoverVisible} 
                         target={this.triggerRef.current} 
-                        toggle={this.closePopoverPanel}>
+                        toggle={this.closePopoverPanel}
+                        modifiers={this.props.modifiers}
+                        >
                     <PopoverBody className="pl-0 pr-0">
-                        {items.map(i => createDropdownItem(i))}
+                        {items.map(i => createDropdownItem(i, this.closePopoverPanel))}
                     </PopoverBody>
                 </Popover>
     }

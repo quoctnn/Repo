@@ -1,0 +1,20 @@
+@import "../../Config";
+#top-navigation{
+    height: 60px;
+    .profile-box{
+        .user-status-indicator{
+            bottom: -2px;
+            right: -2px;
+        }
+    }
+    .logo{
+        @include var(fill, primary-theme-color);
+    }
+    .top-navigation-content{
+        z-index: 1050;
+        width:100%;
+        position:fixed;
+        top:0px;
+        height: 60px;
+    }
+}

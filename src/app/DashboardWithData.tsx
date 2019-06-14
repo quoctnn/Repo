@@ -6,6 +6,7 @@ import WindowResponsiveComponent from "./components/general/observers/WindowResp
 import DashboardComponent from "./Dashboard";
 import { translate } from "./localization/AutoIntlProvider";
 export const DashboardWithData = (props:{category:string, updateKey?:string}) => {
+    return null
     const dashboards = ApplicationManager.getDashboards(props.category)
     const dashboard = dashboards[0] 
     if(!dashboard)

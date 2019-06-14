@@ -11,6 +11,7 @@ type Props = {
     image?:string,
     images?:string[],
     statusColor?:AvatarStateColor,
+    innerRef?: (element:HTMLElement) => void
 }
 export class Avatar extends React.PureComponent<Props & React.HTMLAttributes<HTMLElement>, {}> {
     static defaultProps:Props = {
@@ -28,7 +29,7 @@ export class Avatar extends React.PureComponent<Props & React.HTMLAttributes<HTM
     }
     render() 
     {
-        const {image, images, borderColor, borderWidth, size, children, className, statusColor,...rest} = this.props
+        const {image, images, borderColor, borderWidth, size, children, className, statusColor, innerRef ,...rest} = this.props
         let imgs:string[] = []
         if(image)
             imgs.push(image)
@@ -38,7 +39,7 @@ export class Avatar extends React.PureComponent<Props & React.HTMLAttributes<HTM
         const length = imgUrls.length
         return(
             
-            <div {...rest} className={"avatar" + (className ? " " + className : "")} >
+            <div {...rest} className={"avatar" + (className ? " " + className : "")} ref={this.props.innerRef} >
                 <div className="image-container" style={{borderWidth:borderWidth + "px", borderColor:borderColor, width:size + "px", height:size + "px", borderStyle:"solid"}}>
                     {imgUrls.map((img, index) => {
                         const key = `image_${length}_${index}`

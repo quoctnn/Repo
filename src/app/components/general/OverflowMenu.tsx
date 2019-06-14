@@ -30,7 +30,11 @@ type State = {
     items:OverflowMenuItem[]
     needsUpdate:boolean
 }
-export const createDropdownItem = (item:OverflowMenuItem) => {
+export const createDropdownItem = (item:OverflowMenuItem, toggle?:() => void) => {
+    const click = (e) => {
+        item.onPress && item.onPress(e)
+        toggle && toggle()
+    }
     const useStackedIcons = !!item.iconStackClass && !!item.iconClass
     const props:Partial<DropdownItemProps> = {}
     if(item.type == OverflowMenuItemType.header)
@@ -39,8 +43,7 @@ export const createDropdownItem = (item:OverflowMenuItem) => {
         props.divider = true
     if(item.disabled)
         props.disabled = true
-    const toggle = !!item.toggleMenu
-    return (<DropdownItem active={item.active}  {...props} toggle={toggle} key={item.id} onClick={item.onPress} className="clickable">
+    return (<DropdownItem active={item.active}  {...props} toggle={!!item.toggleMenu} key={item.id} onClick={click} className="clickable">
                     {!useStackedIcons && item.iconClass && <i className={item.iconClass}></i>}
                     {useStackedIcons && <span className="fa-menu-icon-stack">
                         <i className={item.iconClass}></i>
