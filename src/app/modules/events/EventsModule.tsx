@@ -17,11 +17,11 @@ import SimpleModule from '../SimpleModule';
 import { ContextManager } from '../../managers/ContextManager';
 import { EventSorting } from './EventsMenu';
 import { ButtonGroup, Button } from 'reactstrap';
+import { CommonModuleProps } from '../Module';
 type OwnProps = {
     className?:string
     breakpoint:ResponsiveBreakpoint
-    contextNaturalKey?:ContextNaturalKey
-}
+} & CommonModuleProps
 type State = {
     menuVisible:boolean
     isLoading:boolean
@@ -36,6 +36,9 @@ type Props = OwnProps & RouteComponentProps<any> & ReduxStateProps & ReduxDispat
 class EventsModule extends React.Component<Props, State> {
     tempMenuData:EventsMenuData = null
     eventsList = React.createRef<ListComponent<Event>>()
+    static defaultProps:CommonModuleProps = {
+        pageSize:15,
+    }
     constructor(props:Props) {
         super(props);
         this.state = {
@@ -81,7 +84,7 @@ class EventsModule extends React.Component<Props, State> {
         let ordering = this.state.menuData.sorting
         let upcoming = this.state.menuData.upcoming
         const communityId = this.props.community && this.props.community.id
-        ApiClient.getEvents(communityId, 30, offset, ordering, upcoming, (data, status, error) => {
+        ApiClient.getEvents(communityId, this.props.pageSize, offset, ordering, upcoming, (data, status, error) => {
             completion(data)
             ToastManager.showErrorToast(error)
         })
@@ -121,17 +124,24 @@ class EventsModule extends React.Component<Props, State> {
         return <>
             {!this.props.community && <LoadingSpinner key="loading"/>}
             {this.props.community && <ListComponent<Event>
+                loadMoreOnScroll={!this.props.showLoadMore}
                 ref={this.eventsList} onLoadingStateChanged={this.feedLoadingStateChanged} fetchData={this.fetchEvents} renderItem={this.renderEvent} />}
             </>
     }
+    renderModalContent = () => {
+        return <EventsModule {...this.props} pageSize={50} style={{height:undefined, maxHeight:undefined}} showLoadMore={false} showInModal={false} isModal={true}/>
+    }
     render()
     {
-        const {history, match, location, staticContext, contextNaturalKey, community, ...rest} = this.props
+        const {history, match, location, staticContext, contextNaturalKey, community, pageSize, showLoadMore, showInModal, isModal, ...rest} = this.props
         const {breakpoint, className} = this.props
         const cn = classnames("events-module", className)
         const menu = <EventsMenu data={this.state.menuData} onUpdate={this.menuDataUpdated}  />
         const headerContent = this.renderSorting()
+        const renderModalContent = !showInModal || isModal ? undefined : this.renderModalContent
         return (<SimpleModule {...rest}
+                    showHeaderTitle={!isModal}
+                    renderModalContent={renderModalContent}
                     className={cn}
                     headerClick={this.headerClick}
                     breakpoint={breakpoint}

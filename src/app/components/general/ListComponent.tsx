@@ -7,6 +7,8 @@ import LoadingSpinner from '../../components/LoadingSpinner';
 import { IdentifiableObject } from '../../types/intrasocial_types';
 import EmptyBox from './images/EmptyBox';
 import IceCream from './images/IceCream';
+import { Button } from 'reactstrap';
+import { translate } from '../../localization/AutoIntlProvider';
 
 export const ListComponentHeader = (props:{title:React.ReactNode}) => {
     return (
@@ -21,7 +23,7 @@ class ListComponentDivider extends React.Component{
         )
     }
 }
-type Props<T> = {
+type OwnProps<T> = {
     className?:string
     onLoadingStateChanged?:(isLoading:boolean) => void
     scrollParent?:any
@@ -36,6 +38,11 @@ type Props<T> = {
     offsetCountFilter?:(items:T[]) => number
     onDidLoadData?:(offset:number) => void
 }
+type DefaultProps = {
+
+    loadMoreOnScroll?:boolean
+}
+type Props<T> = OwnProps<T> & DefaultProps
 type State<T> = {
     items:T[]
     isLoading: boolean
@@ -50,6 +57,9 @@ type State<T> = {
 }
 export default class ListComponent<T extends IdentifiableObject> extends React.Component<Props<T>, State<T>> {
     private listRef = React.createRef<List>()
+    static defaultProps:DefaultProps = {
+        loadMoreOnScroll:true
+    }
     constructor(props:Props<T>) {
         super(props);
         this.state = {
@@ -238,9 +248,14 @@ export default class ListComponent<T extends IdentifiableObject> extends React.C
         }
         return null
     }
+    renderLoadMoreButton = () => {
+        if(!this.props.loadMoreOnScroll && this.state.hasMore && !this.state.isLoading)
+            return <div className="d-flex justify-content-center p-1"><Button onClick={this.handleLoadMore} size="xs">{translate("common.load.more")}</Button></div>
+        return null
+    }
     renderItems = () => {
         const cn = classnames("list-component-list vertical-scroll", this.props.className)
-        const scroll = this.props.scrollParent ? undefined : this.onScroll
+        const scroll = this.props.loadMoreOnScroll ? (this.props.scrollParent ? undefined : this.onScroll) : undefined
         const listItems = this.props.sortItems ? this.props.sortItems(this.state.items) : this.state.items
         let items = listItems.map(i => {
                             return this.props.renderItem(i)
@@ -250,6 +265,7 @@ export default class ListComponent<T extends IdentifiableObject> extends React.C
                     onScroll={scroll}
                     className={cn}>
                     {items}
+                    {this.renderLoadMoreButton()}
                     {this.renderEmpty()}
                     {this.renderError()}
                 </List>)

@@ -18,11 +18,11 @@ import SimpleModule from '../SimpleModule';
 import { ContextManager } from '../../managers/ContextManager';
 import { ButtonGroup, Button } from 'reactstrap';
 import { GroupSorting } from './GroupsMenu';
+import { CommonModuleProps } from '../Module';
 type OwnProps = {
     className?:string
     breakpoint:ResponsiveBreakpoint
-    contextNaturalKey?:ContextNaturalKey
-}
+} & CommonModuleProps
 type State = {
     menuVisible:boolean
     isLoading:boolean
@@ -37,6 +37,9 @@ type Props = OwnProps & RouteComponentProps<any> & ReduxStateProps & ReduxDispat
 class GroupsModule extends React.Component<Props, State> {
     tempMenuData:GroupsMenuData = null
     groupsList = React.createRef<ListComponent<Group>>()
+    static defaultProps:CommonModuleProps = {
+        pageSize:15,
+    }
     constructor(props:Props) {
         super(props);
         this.state = {
@@ -86,7 +89,7 @@ class GroupsModule extends React.Component<Props, State> {
     fetchGroups = (offset:number, completion:(items:PaginationResult<Group>) => void ) => {
         let ordering = this.state.menuData.sorting
         const communityId = this.props.community && this.props.community.id
-        ApiClient.getGroups(communityId, 30, offset, ordering, (data, status, error) => {
+        ApiClient.getGroups(communityId, this.props.pageSize, offset, ordering, (data, status, error) => {
             completion(data)
             ToastManager.showErrorToast(error)
         })
@@ -97,7 +100,7 @@ class GroupsModule extends React.Component<Props, State> {
     renderContent = () => {
         return <>
             {!this.props.community && <LoadingSpinner key="loading"/>}
-            {this.props.community && <ListComponent<Group> ref={this.groupsList} onLoadingStateChanged={this.feedLoadingStateChanged} fetchData={this.fetchGroups} renderItem={this.renderGroup} />}
+            {this.props.community && <ListComponent<Group> loadMoreOnScroll={!this.props.showLoadMore} ref={this.groupsList} onLoadingStateChanged={this.feedLoadingStateChanged} fetchData={this.fetchGroups} renderItem={this.renderGroup} />}
             </>
     }
     onMenuToggle = (visible:boolean) => {
@@ -125,14 +128,20 @@ class GroupsModule extends React.Component<Props, State> {
                     )}
                 </ButtonGroup>)
     }
+    renderModalContent = () => {
+        return <GroupsModule {...this.props} pageSize={50} style={{height:undefined, maxHeight:undefined}} showLoadMore={false} showInModal={false} isModal={true}/>
+    }
     render()
     {
-        const {history, match, location, staticContext, contextNaturalKey, community, ...rest} = this.props
+        const {history, match, location, staticContext, contextNaturalKey, community, pageSize, showLoadMore, showInModal, isModal, ...rest} = this.props
         const {breakpoint, className} = this.props
         const cn = classnames("groups-module", className)
         const menu = <GroupsMenu data={this.state.menuData} onUpdate={this.menuDataUpdated}  />
         const headerContent = this.renderSorting()
+        const renderModalContent = !showInModal || isModal ? undefined : this.renderModalContent
         return (<SimpleModule {...rest}
+                    showHeaderTitle={!isModal}
+                    renderModalContent={renderModalContent}
                     className={cn}
                     headerClick={this.headerClick}
                     breakpoint={breakpoint}

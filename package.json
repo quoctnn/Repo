@@ -87,6 +87,7 @@
     "react-process-string": "^1.2.0",
     "react-router-dom": "^4.3.1",
     "react-select": "^2.4.1",
+    "react-sticky-box": "^0.8.0",
     "react-toastify": "^4.1.0",
     "react-visibility-sensor": "^5.0.2",
     "reactstrap": "^7.1.0",

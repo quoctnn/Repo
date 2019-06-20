@@ -379,7 +379,7 @@ export class NewsfeedComponent extends React.Component<Props, State> {
     }
     onScroll = (event) =>
     {
-        if(this.listRef.current.listRef.current != event.target)
+        if(!this.props.scrollParent && this.listRef.current.listRef.current != event.target)
             return
         let isAtBottom = false
         if(event.target instanceof Document)

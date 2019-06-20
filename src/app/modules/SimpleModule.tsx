@@ -8,7 +8,10 @@ import ModuleHeader from './ModuleHeader';
 import ModuleMenuTrigger from './ModuleMenuTrigger';
 import ModuleContent from './ModuleContent';
 import ModuleMenu from './ModuleMenu';
-type Props = {
+import { Button } from 'reactstrap';
+import { translate } from '../localization/AutoIntlProvider';
+import SimpleDialog from '../components/general/dialogs/SimpleDialog';
+type OwnProps = {
     className?:string
     breakpoint:ResponsiveBreakpoint
     contextNaturalKey?:ContextNaturalKey
@@ -19,15 +22,29 @@ type Props = {
     headerContent?: React.ReactNode
     headerClick?:(event:React.SyntheticEvent<any>) => void
     isLoading:boolean
+    style?: React.CSSProperties
+    modalLinkTitle?:string
+    renderModalContent?:() => JSX.Element
 }
+type DefaultProps = {
+    showHeader:boolean
+    showHeaderTitle:boolean
+}
+type Props = OwnProps & DefaultProps
 type State = {
     menuVisible:boolean
+    modalVisible:boolean
 }
-export default class SimpleModule extends React.Component<Props, State> {  
+export default class SimpleModule extends React.Component<Props, State> {
+    static defaultProps:DefaultProps = {
+        showHeader:true,
+        showHeaderTitle:true
+    }
     constructor(props:Props) {
         super(props);
         this.state = {
             menuVisible:false,
+            modalVisible:false
         }
     }
     toggleMenuClick = (e:React.SyntheticEvent<any>) => {
@@ -40,23 +57,45 @@ export default class SimpleModule extends React.Component<Props, State> {
     sendMenuToggled = () => {
         this.props.onMenuToggle && this.props.onMenuToggle(this.state.menuVisible)
     }
+    renderShowInModalButton = () => {
+        if(!this.props.renderModalContent)
+            return null
+        return <div className="d-flex justify-content-center p-1"><Button color="link" onClick={this.toggleModal} size="xs">{this.props.modalLinkTitle || translate("common.see.all")}</Button></div>
+    }
+    toggleModal = () => {
+        this.setState((prevState:State) => {
+            return {modalVisible:!prevState.modalVisible}
+        })
+    }
+
+    renderModal = () => {
+        if(!this.props.renderModalContent)
+            return
+            
+        return <SimpleDialog scrollable={false} className="module-modal has-module" header={this.props.headerTitle} visible={this.state.modalVisible} didCancel={this.toggleModal}>
+                    {this.props.renderModalContent()}
+                </SimpleDialog>
+    }
     render()
     {
-        const {breakpoint, className, contextNaturalKey,children, menu, onMenuToggle: onMenuVisibilityChanged, headerTitle: title, isLoading,  headerClick, headerContent,  ...rest} = this.props
+        const {breakpoint, className, contextNaturalKey,children, menu, onMenuToggle: onMenuVisibilityChanged, headerTitle: title, isLoading,  headerClick, headerContent, showHeader,  ...rest} = this.props
         const cn = classnames("simple-module", className, {"menu-visible":this.state.menuVisible})
+        const headerTitle = this.props.showHeaderTitle && title
         const headClick = breakpoint < ResponsiveBreakpoint.standard ? headerClick : undefined
         const headerClass = classnames({link:headClick})
         return (<Module {...rest} className={cn}>
-                    <ModuleHeader className={headerClass} onClick={headClick} loading={isLoading} headerTitle={title}>
-                        {headerContent}
-                        {menu && <ModuleMenuTrigger onClick={this.toggleMenuClick} />}
-                    </ModuleHeader>
+                    { showHeader &&
+                        <ModuleHeader className={headerClass} onClick={headClick} loading={isLoading} headerTitle={headerTitle}>
+                            {headerContent}
+                            {menu && <ModuleMenuTrigger onClick={this.toggleMenuClick} />}
+                        </ModuleHeader>
+                    }
                     {breakpoint >= ResponsiveBreakpoint.standard && //do not render for small screens
-                        <>
-                            <ModuleContent>
-                                {children}
-                            </ModuleContent>
-                        </>
+                        <ModuleContent>
+                        {children}
+                        {this.renderShowInModalButton()}
+                        {this.renderModal()}
+                        </ModuleContent>
                     }
                     <ModuleMenu visible={this.state.menuVisible}>
                         {menu}

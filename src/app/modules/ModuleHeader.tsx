@@ -26,7 +26,7 @@ export default class ModuleHeader extends React.Component<Props & React.HTMLAttr
                     {this.renderLoading()}
                     <div className="spacer flex-grow-1 flex-shrink-1"></div>
                 </div>
-            {children}
+                {children}
             </div>
         );
     }

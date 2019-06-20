@@ -17,34 +17,38 @@ import SimpleModule from '../SimpleModule';
 import { ContextManager } from '../../managers/ContextManager';
 import { ButtonGroup, Button } from 'reactstrap';
 import { AuthenticationManager } from '../../managers/AuthenticationManager';
+import { CommonModuleProps } from '../Module';
 
 type OwnProps = {
-    className?:string
-    breakpoint:ResponsiveBreakpoint
-    contextNaturalKey?:ContextNaturalKey
-}
+    className?: string
+    breakpoint: ResponsiveBreakpoint
+} & CommonModuleProps
 type State = {
-    menuVisible:boolean
-    isLoading:boolean
-    menuData:TasksMenuData
+    menuVisible: boolean
+    isLoading: boolean
+    menuData: TasksMenuData
 }
 
 type ReduxStateProps = {
-    contextObject:Permissible & IdentifiableObject
+    contextObject: Permissible & IdentifiableObject
 }
 type ReduxDispatchProps = {
 }
 type Props = OwnProps & RouteComponentProps<any> & ReduxDispatchProps & ReduxStateProps
 class TasksModule extends React.Component<Props, State> {
-    tempMenuData:TasksMenuData = null
+    tempMenuData: TasksMenuData = null
     taskList = React.createRef<ListComponent<Task>>()
-    constructor(props:Props) {
+
+    static defaultProps: CommonModuleProps = {
+        pageSize: 15,
+    }
+    constructor(props: Props) {
         super(props);
         this.state = {
-            menuVisible:false,
-            isLoading:false,
-            menuData:{
-                project:null,
+            menuVisible: false,
+            isLoading: false,
+            menuData: {
+                project: null,
                 state: [],
                 priority: [],
                 assignedTo: null,
@@ -52,8 +56,8 @@ class TasksModule extends React.Component<Props, State> {
                 tags: [],
                 category: null,
                 term: null,
-                creator:null,
-                notAssigned:null,
+                creator: null,
+                notAssigned: null,
             }
         }
     }
@@ -61,149 +65,134 @@ class TasksModule extends React.Component<Props, State> {
         this.tempMenuData = null
         this.taskList = null
     }
-    componentDidUpdate = (prevProps:Props, prevState:State) => {
-        if(this.contextDataChanged(prevState.menuData, prevProps))
-        {
+    componentDidUpdate = (prevProps: Props, prevState: State) => {
+        if (this.contextDataChanged(prevState.menuData, prevProps)) {
             this.taskList.current.reload()
         }
         //turn off loading spinner if feed is removed
-        if(prevProps.breakpoint != this.props.breakpoint && this.props.breakpoint < ResponsiveBreakpoint.standard && this.state.isLoading)
-        {
-            this.setState({isLoading:false})
+        if (prevProps.breakpoint != this.props.breakpoint && this.props.breakpoint < ResponsiveBreakpoint.standard && this.state.isLoading) {
+            this.setState({ isLoading: false })
         }
     }
     headerClick = (e) => {
         const context = this.state.menuData.project
         //NavigationUtilities.navigateToNewsfeed(this.props.history, context && context.type, context && context.id, this.state.includeSubContext)
     }
-    feedLoadingStateChanged = (isLoading:boolean) => {
-        this.setState({isLoading})
+    feedLoadingStateChanged = (isLoading: boolean) => {
+        this.setState({ isLoading })
     }
-    menuDataUpdated = (data:TasksMenuData) => {
+    menuDataUpdated = (data: TasksMenuData) => {
         this.tempMenuData = data
     }
-    contextDataChanged = (prevData:TasksMenuData, prevProps:Props) => {
+    contextDataChanged = (prevData: TasksMenuData, prevProps: Props) => {
         const data = this.state.menuData
         return !prevData.state.isEqual(data.state) ||
-                !prevData.tags.isEqual(data.tags) ||
-                !prevData.priority.isEqual(data.priority) ||
-                prevData.project != data.project ||
-                prevData.assignedTo != data.assignedTo ||
-                prevData.creator != data.creator ||
-                prevData.notAssigned != data.notAssigned ||
-                prevData.category != data.category ||
-                prevData.responsible != data.responsible ||
-                prevData.term != data.term ||
-                prevProps.contextObject && !this.props.contextObject ||
-                !prevProps.contextObject && this.props.contextObject ||
-                prevProps.contextObject && this.props.contextObject && prevProps.contextObject.id != this.props.contextObject.id
+            !prevData.tags.isEqual(data.tags) ||
+            !prevData.priority.isEqual(data.priority) ||
+            prevData.project != data.project ||
+            prevData.assignedTo != data.assignedTo ||
+            prevData.creator != data.creator ||
+            prevData.notAssigned != data.notAssigned ||
+            prevData.category != data.category ||
+            prevData.responsible != data.responsible ||
+            prevData.term != data.term ||
+            prevProps.contextObject && !this.props.contextObject ||
+            !prevProps.contextObject && this.props.contextObject ||
+            prevProps.contextObject && this.props.contextObject && prevProps.contextObject.id != this.props.contextObject.id
     }
     getContextData = () => {
         const data = this.state.menuData
-        if(!data.project && this.props.contextNaturalKey == ContextNaturalKey.PROJECT && this.props.contextObject)
-        {
+        if (!data.project && this.props.contextNaturalKey == ContextNaturalKey.PROJECT && this.props.contextObject) {
             const project = this.props.contextObject as Project
-            data.project = {label:`[${project.name}]`, id:project.id, type:this.props.contextNaturalKey, value:this.props.contextNaturalKey + "_" + project.id}
+            data.project = { label: `[${project.name}]`, id: project.id, type: this.props.contextNaturalKey, value: this.props.contextNaturalKey + "_" + project.id }
         }
         return data
     }
-    updateTaskItem = (task:Task) =>
-    {
+    updateTaskItem = (task: Task) => {
         task.serialization_date = new Date().toISOString()
         this.taskList.current.updateItem(task)
     }
-    updateTimeSpent(task:Task, hours:number, minutes:number)
-    {
+    updateTimeSpent(task: Task, hours: number, minutes: number) {
         task.updated_at = new Date().toISOString()
         task.serialization_date = new Date().toISOString()
     }
-    navigateToAction = (task:Task, action:TaskActions, extra?:any, completion?:(success:boolean) => void) =>
-    {
-        const logWarn = () =>
-        {
+    navigateToAction = (task: Task, action: TaskActions, extra?: any, completion?: (success: boolean) => void) => {
+        const logWarn = () => {
             console.warn("Missing Action handler for: ", action, extra)
         }
-        switch(action)
-        {
+        switch (action) {
             case TaskActions.setPriority:
-            {
-                if(task.priority != extra.priority)
                 {
-                    ApiClient.updateTask(task.id, {priority:extra.priority}, (data, status, error) => {
-                        const success = !!data
-                        if(success)
-                        {
-                            this.updateTaskItem(data)
-                            ToastManager.showInfoToast(translate("task.state.changed"), `${translate("task.priority." + task.priority)} > ${translate("task.priority." + data.priority)}`)
-                        }
-                        completion && completion(success)
-                        ToastManager.showErrorToast(error)
-                    })
+                    if (task.priority != extra.priority) {
+                        ApiClient.updateTask(task.id, { priority: extra.priority }, (data, status, error) => {
+                            const success = !!data
+                            if (success) {
+                                this.updateTaskItem(data)
+                                ToastManager.showInfoToast(translate("task.state.changed"), `${translate("task.priority." + task.priority)} > ${translate("task.priority." + data.priority)}`)
+                            }
+                            completion && completion(success)
+                            ToastManager.showErrorToast(error)
+                        })
+                    }
+                    else {
+                        completion && completion(false)
+                    }
+                    break;
                 }
-                else {
-                    completion && completion(false)
-                }
-                break;
-            }
             case TaskActions.setState:
-            {
-                if(task.state != extra.state)
                 {
-                    ApiClient.updateTask(task.id, {state:extra.state}, (data, status, error) => {
-                        const success = !!data
-                        if(success)
-                        {
-                            this.updateTaskItem(data)
-                            ToastManager.showInfoToast(translate("task.state.changed"), `${translate("task.state." + task.state)} > ${translate("task.state." + data.state)}`)
+                    if (task.state != extra.state) {
+                        ApiClient.updateTask(task.id, { state: extra.state }, (data, status, error) => {
+                            const success = !!data
+                            if (success) {
+                                this.updateTaskItem(data)
+                                ToastManager.showInfoToast(translate("task.state.changed"), `${translate("task.state." + task.state)} > ${translate("task.state." + data.state)}`)
+                            }
+                            completion && completion(success)
+                            ToastManager.showErrorToast(error)
+                        })
+                    }
+                    else {
+                        completion && completion(false)
+                    }
+                    break;
+                }
+            case TaskActions.addTime:
+                {
+                    ApiClient.createTimesheet(task.id, extra.description, extra.date, extra.hours, extra.minutes, (timesheet, status, error) => {
+                        const success = !!timesheet
+                        if (success) {
+                            const taskClone = { ...task }
+                            this.updateTimeSpent(taskClone, timesheet.hours, timesheet.minutes)
+                            this.updateTaskItem(taskClone)
+                            ToastManager.showInfoToast(translate("task.timesheet.added"), task.title)
                         }
                         completion && completion(success)
                         ToastManager.showErrorToast(error)
                     })
+                    break;
                 }
-                else {
-                    completion && completion(false)
-                }
-                break;
-            }
-            case TaskActions.addTime:
-            {
-                ApiClient.createTimesheet(task.id, extra.description, extra.date, extra.hours, extra.minutes, (timesheet, status, error) => {
-                    const success = !!timesheet
-                    if(success)
-                    {
-                        const taskClone = {...task}
-                        this.updateTimeSpent(taskClone, timesheet.hours, timesheet.minutes)
-                        this.updateTaskItem(taskClone)
-                        ToastManager.showInfoToast(translate("task.timesheet.added"), task.title)
-                    }
-                    completion && completion(success)
-                    ToastManager.showErrorToast(error)
-                })
-                break;
-            }
             case TaskActions.addStatus:
-            {
-                const tempStatus = StatusUtilities.getStatusPreview(ContextNaturalKey.TASK, task.id, extra.message, extra.mentions, extra.files)
-                ApiClient.createStatus(tempStatus, (newStatus, requestStatus, error) => {
-                    const success = !!newStatus
-                    if(success)
-                    {
-                        ToastManager.showInfoToast(translate("task.status.added"), task.title)
-                    }
-                    completion && completion(success)
-                    ToastManager.showErrorToast(error)
-                })
-                break;
-            }
-            default:logWarn()
+                {
+                    const tempStatus = StatusUtilities.getStatusPreview(ContextNaturalKey.TASK, task.id, extra.message, extra.mentions, extra.files)
+                    ApiClient.createStatus(tempStatus, (newStatus, requestStatus, error) => {
+                        const success = !!newStatus
+                        if (success) {
+                            ToastManager.showInfoToast(translate("task.status.added"), task.title)
+                        }
+                        completion && completion(success)
+                        ToastManager.showErrorToast(error)
+                    })
+                    break;
+                }
+            default: logWarn()
         }
     }
-    navigateToActionWithTask = (taskId:number) => (action:TaskActions, extra?:any, completion?:(success:boolean) => void) =>
-    {
+    navigateToActionWithTask = (taskId: number) => (action: TaskActions, extra?: any, completion?: (success: boolean) => void) => {
         const task = this.taskList.current.getItemById(taskId)
         this.navigateToAction(task, action, extra, completion)
     }
-    fetchTasks = (offset:number, completion:(items:PaginationResult<Task>) => void ) => {
+    fetchTasks = (offset: number, completion: (items: PaginationResult<Task>) => void) => {
         const data = this.getContextData()
         const project = data.project && data.project.id
         const state = data.state
@@ -215,25 +204,30 @@ class TasksModule extends React.Component<Props, State> {
         const term = data.term
         const creator = data.creator
         const notAssigned = data.notAssigned
-        ApiClient.getTasks(30, offset,project, state, priority, tags, assignedTo, responsible, creator, notAssigned, category, term, (data, status, error) => {
+        ApiClient.getTasks(this.props.pageSize, offset, project, state, priority, tags, assignedTo, responsible, creator, notAssigned, category, term, (data, status, error) => {
             completion(data)
             ToastManager.showErrorToast(error)
         })
     }
-    renderTask = (task:Task) =>  {
+    renderTask = (task: Task) => {
         return <TaskListItem
-                onActionPress={this.navigateToActionWithTask(task.id)}
-                task={task}
-                communityId={-1}
-                key={"task_"+task.id} />
+            onActionPress={this.navigateToActionWithTask(task.id)}
+            task={task}
+            communityId={-1}
+            key={"task_" + task.id} />
     }
     renderContent = () => {
-        return <ListComponent<Task> ref={this.taskList} onLoadingStateChanged={this.feedLoadingStateChanged} fetchData={this.fetchTasks} renderItem={this.renderTask} />
+        return <ListComponent<Task>
+            loadMoreOnScroll={!this.props.showLoadMore}
+            ref={this.taskList}
+            onLoadingStateChanged={this.feedLoadingStateChanged}
+            fetchData={this.fetchTasks}
+            renderItem={this.renderTask} />
     }
-    onMenuToggle = (visible:boolean) => {
-        const newState:Partial<State> = {}
+    onMenuToggle = (visible: boolean) => {
+        const newState: Partial<State> = {}
         newState.menuVisible = visible
-        if(!visible && this.tempMenuData) // update menudata
+        if (!visible && this.tempMenuData) // update menudata
         {
             newState.menuData = this.tempMenuData
             this.tempMenuData = null
@@ -241,64 +235,69 @@ class TasksModule extends React.Component<Props, State> {
         this.setState(newState as State)
     }
     toggleAssignedTo = () => {
-        const md = {...this.state.menuData}
+        const md = { ...this.state.menuData }
         md.assignedTo = !!md.assignedTo ? undefined : AuthenticationManager.getAuthenticatedUser().id
-        this.setState({menuData:md})
+        this.setState({ menuData: md })
     }
     toggleResponsible = () => {
-        const md = {...this.state.menuData}
+        const md = { ...this.state.menuData }
         md.responsible = !!md.responsible ? undefined : AuthenticationManager.getAuthenticatedUser().id
-        this.setState({menuData:md})
+        this.setState({ menuData: md })
     }
     toggleCreator = () => {
-        const md = {...this.state.menuData}
+        const md = { ...this.state.menuData }
         md.creator = !!md.creator ? undefined : AuthenticationManager.getAuthenticatedUser().id
-        this.setState({menuData:md})
+        this.setState({ menuData: md })
     }
     renderFilters = () => {
-        if(this.state.menuVisible)
+        if (this.state.menuVisible)
             return null
         return (<ButtonGroup className="header-filter-group">
-                    <Button size="xs" active={!!this.state.menuData.assignedTo} onClick={this.toggleAssignedTo} color="light">
-                        <span>A</span>{/* <i className="fas fa-calendar-check"></i>*/} 
-                    </Button>
-                    <Button size="xs" active={!!this.state.menuData.responsible} onClick={this.toggleResponsible} color="light">
-                        <span>R</span>{/* <i className="fas fa-user-check"></i>*/} 
-                    </Button>
-                    <Button size="xs" active={!!this.state.menuData.creator} onClick={this.toggleCreator} color="light">
-                        <span>C</span>{/* <i className="fas fa-user-check"></i>*/} 
-                    </Button>
-                </ButtonGroup>)
+            <Button size="xs" active={!!this.state.menuData.assignedTo} onClick={this.toggleAssignedTo} color="light">
+                <span>A</span>{/* <i className="fas fa-calendar-check"></i>*/}
+            </Button>
+            <Button size="xs" active={!!this.state.menuData.responsible} onClick={this.toggleResponsible} color="light">
+                <span>R</span>{/* <i className="fas fa-user-check"></i>*/}
+            </Button>
+            <Button size="xs" active={!!this.state.menuData.creator} onClick={this.toggleCreator} color="light">
+                <span>C</span>{/* <i className="fas fa-user-check"></i>*/}
+            </Button>
+        </ButtonGroup>)
     }
-    render()
-    {
-        const {history, match, location, staticContext, contextNaturalKey, contextObject, ...rest} = this.props
-        const {breakpoint, className} = this.props
+    renderModalContent = () => {
+        return <TasksModule {...this.props} pageSize={50} style={{ height: undefined, maxHeight: undefined }} showLoadMore={false} showInModal={false} isModal={true} />
+    }
+    render() {
+        const { history, match, location, staticContext, contextNaturalKey, contextObject, pageSize, showLoadMore, showInModal, isModal, ...rest } = this.props
+        const { breakpoint, className } = this.props
         const cn = classnames("tasks-module", className)
         const disableContextSearch = !!contextNaturalKey
-        const menu = <TaskMenu data={this.state.menuData} onUpdate={this.menuDataUpdated} disableContextSearch={disableContextSearch}  />
+        const menu = <TaskMenu data={this.state.menuData} onUpdate={this.menuDataUpdated} disableContextSearch={disableContextSearch} />
         const headerContent = this.renderFilters()
+        const renderModalContent = !showInModal || isModal ? undefined : this.renderModalContent
         return (<SimpleModule {...rest}
-                    className={cn}
-                    headerClick={this.headerClick}
-                    breakpoint={breakpoint}
-                    isLoading={this.state.isLoading}
-                    onMenuToggle={this.onMenuToggle}
-                    menu={menu}
-                    headerContent={headerContent}
-                    headerTitle={translate("task.module.title")}>
-                {this.renderContent()}
-                </SimpleModule>)
+            className={cn}
+            headerClick={this.headerClick}
+            breakpoint={breakpoint}
+            isLoading={this.state.isLoading}
+            onMenuToggle={this.onMenuToggle}
+            menu={menu}
+            headerContent={headerContent}
+            showHeaderTitle={!isModal}
+            renderModalContent={renderModalContent}
+            headerTitle={translate("task.module.title")}>
+            {this.renderContent()}
+        </SimpleModule>)
     }
 }
-const mapStateToProps = (state:ReduxState, ownProps: OwnProps & RouteComponentProps<any>):ReduxStateProps => {
+const mapStateToProps = (state: ReduxState, ownProps: OwnProps & RouteComponentProps<any>): ReduxStateProps => {
 
     const contextObject = ContextManager.getContextObject(ownProps.location.pathname, ownProps.contextNaturalKey)
     return {
         contextObject
     }
 }
-const mapDispatchToProps = (dispatch:ReduxState, ownProps: OwnProps):ReduxDispatchProps => {
+const mapDispatchToProps = (dispatch: ReduxState, ownProps: OwnProps): ReduxDispatchProps => {
     return {
     }
 }

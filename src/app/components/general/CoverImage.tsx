@@ -2,17 +2,17 @@ import * as React from 'react';
 import { SecureImage } from './SecureImage';
 import classnames = require('classnames');
 require("./CoverImage.scss");
-interface Props {
+type OwnProps = {
     src:string
-    id:string
-    className:string
+    id?:string
+    className?:string
+}
+type DefaultProps = {
     addShadowOverlay:boolean
 }
+type Props = OwnProps & DefaultProps
 export class CoverImage extends React.Component<Props, {}> {
-    static defaultProps:Props = {
-        src:null,
-        id:null,
-        className:undefined,
+    static defaultProps:DefaultProps = {
         addShadowOverlay:true
     }
     constructor(props:Props) {

@@ -3,11 +3,12 @@ import * as ReactDOM from "react-dom";
 import classnames from 'classnames';
 import { DashboardComponents} from "../Dashboard";
 import { ResponsiveBreakpoint } from "./general/observers/ResponsiveComponent";
-import { GridLayout } from "../types/intrasocial_types";
-import { parseJSONObject } from "../utilities/Utilities";
+import { GridColumns, Module, GridColumn } from '../types/intrasocial_types';
+import { Col } from "reactstrap";
+import StickyBox from "./external/StickyBox";
 
 type OwnProps = {
-    grid:GridLayout
+    grid:GridColumns
     className?:string,
     childClassName?:string,
     id?:string
@@ -28,6 +29,7 @@ type Props = OwnProps & DefaultProps
 export class Grid extends React.PureComponent<Props, State> {
     static modeFillClass = "dash-fill"
     bodyClassAdded = false
+    private keyDict:{[key:string]:number} = {}
     static defaultProps:DefaultProps = {
         enableAnimation:true,
         breakpoint:ResponsiveBreakpoint.mini,
@@ -135,40 +137,60 @@ export class Grid extends React.PureComponent<Props, State> {
             oldBox.top - newBox.top
         ];
     }
-    render = () => {
-        const modules = this.props.grid.grid_modules
-        const cn = classnames("module-grid", this.props.className)
-        const rows = modules.reduce((a, b) => Math.max(a, b.height + b.row), 0) - 1
-        const style:React.CSSProperties = this.props.fill ? {gridAutoRows:`minmax(100px, calc(${100 / rows}% - 15px))`} : undefined
+    fixKey = (key:string) => {
+        let dk = this.keyDict[key]
+        if(!dk)
+        {
+            this.keyDict[key] = 1
+            return key
+        }
+        else {
+            dk += 1
+            this.keyDict[key] = dk
+            return key + "_" + dk
+        }
+    }
+    renderModule = (module:Module) => {
+        const key = this.fixKey("module_" + module.id)
+        const props:any = module.properties || {}
         const ccn = classnames("module-grid-item", this.props.className)
-        const dict:{[key:string]:number} = {}
-        const fixKey = (key:string) => {
-            let dk = dict[key]
-            if(!dk)
-            {
-                dict[key] = 1
-                return key
-            }
-            else {
-                dk += 1
-                dict[key] = dk
-                return key + "_" + dk
-            }
+        console.log("key", key)
+        props.key = key
+        props.ref = key
+        props.className = ccn
+        props.breakpoint = this.props.breakpoint
+        return DashboardComponents.getComponent(module.type, props)
+    }
+    renderRow = (columns:GridColumn[], level:number) => {
+        const cn = classnames("row", {"fill" : this.props.fill})
+        const colCN = classnames({"fill" : this.props.fill})
+        return  <div className={cn}>
+                    {columns.map(c => {
+                        const key = "col_" + c.id + "_" + level
+                        if(c.module)
+                            return <Col className={colCN} key={key} xs={c.width}>{this.renderModule(c.module)}</Col>
+                        else return  <Col className={colCN} key={key} xs={c.width}>{this.renderColumns(c, c.children, level + 1)}</Col>
+                    })}
+                </div>
+    }
+    renderColumns = (parent: GridColumn, columns:GridColumn[], level:number) => {
+        if(columns.length == 0)
+            return null
+        const useSticky = !!parent && parent.sticky
+        const cn = classnames({"container" :  !parent, "fill" : this.props.fill})
+        if(useSticky){
+            return <StickyBox className={cn} offsetTop={75} offsetBottom={20}>
+                        {this.renderRow(columns, level)}
+                    </StickyBox>
 
         }
-        return(
-            <div className={cn} style={style}>
-                {modules.map(m => {
-                    const key = fixKey("module_" + m.module.id)
-                    const props:any = parseJSONObject(m.module.properties) || {}
-                    props.key = key
-                    props.ref = key
-                    props.className = ccn
-                    props.style = {gridColumn:m.column + "/ span " + m.width, gridRow: m.row + " / span " + m.height}
-                    props.breakpoint = this.props.breakpoint
-                    return DashboardComponents.getComponent(m.module.type, props)
-                })}
-            </div>
-        );
+        return <div className={cn}>
+                    {this.renderRow(columns, level)}
+                </div>
+    }
+    render = () => {
+        this.keyDict = {}
+        const columns = this.props.grid.columns
+        return this.renderColumns(null, columns, 0)
     }
 }

@@ -6,7 +6,7 @@ import NewsfeedModule from './modules/newsfeed/NewsfeedModule';
 import Module from "./modules/Module";
 import ModuleContent from "./modules/ModuleContent";
 import ModuleHeader from "./modules/ModuleHeader";
-import { Dashboard, GridLayout } from './types/intrasocial_types';
+import { Dashboard, GridColumns, GridColumn } from './types/intrasocial_types';
 import TasksModule from "./modules/tasks/TasksModule";
 import GroupsModule from "./modules/groups/GroupsModule";
 import GroupDetailsModule from "./modules/groups/GroupDetailsModule";
@@ -23,9 +23,11 @@ import ConversationsModule from "./modules/conversations/ConversationsModule";
 import TaskDetailsModule from "./modules/tasks/TaskDetailsModule";
 import ConversationModule from "./modules/conversation/ConversationModule";
 import ActivityModule from "./modules/activity/ActivityModule";
+import CoverModule from "./modules/cover/CoverModule";
 
 type DemoProps = {
     text?:string
+    height?:number
 }
 
 class DemoComponent extends React.Component<DemoProps, {}> {
@@ -34,8 +36,8 @@ class DemoComponent extends React.Component<DemoProps, {}> {
         super(props)
     }
     render = () => {
-        const {text, ...rest} = this.props
-        return <Module {...rest}>
+        const {text, height, ...rest} = this.props
+        return <Module {...rest} style={{height:height}}>
                 <ModuleHeader headerTitle={"Header"}></ModuleHeader>
                 <ModuleContent>{this.props.text || "Test"}</ModuleContent>
                 </Module>
@@ -61,6 +63,7 @@ export namespace DashboardComponents {
         "ConversationsModule":ConversationsModule,
         "ConversationModule":ConversationModule,
         "RecentActivityModule":ActivityModule,
+        "CoverModule":CoverModule,
     }
     export function getComponent(type: string, props:any) {
         const comp = componentMap[type]
@@ -79,7 +82,7 @@ type OwnProps =
     updateKey?:string
 }
 type State = {
-    defaultGrid:GridLayout
+    defaultGrid:GridColumns
 }
 type Props = OwnProps
 export default class DashboardComponent extends React.Component<Props, State> {
@@ -87,14 +90,22 @@ export default class DashboardComponent extends React.Component<Props, State> {
     {
         super(props)
         const grid = {...this.findGridLayout(0, false), id:-1, min_width:ResponsiveBreakpoint.standard}
-        grid.grid_modules = (grid.grid_modules || []).map(m => {return {...m, module:{...m.module}}})
-        let rowStart = 1
-        grid.grid_modules.forEach(m => {
-            m.column = 1
-            m.row = rowStart
-            m.width = 12
-            rowStart += m.height
-        })
+        const gridColumns:GridColumn[] = []
+        const loop = (columns:GridColumn[]) => {
+            columns.forEach(c => {
+                if(c.module)
+                {
+                    const clone = {...c, module:{...c.module}}
+                    clone.width = 12
+                    gridColumns.push(clone)
+                }
+                else 
+                    loop(c.children)
+            })
+        }
+        loop(grid.columns || [])
+        grid.title += "_generated"
+        grid.columns = gridColumns
         this.state = {
             defaultGrid:grid,
         }
@@ -111,12 +122,12 @@ export default class DashboardComponent extends React.Component<Props, State> {
             return breakpoint >= i.min_width
         })
         ret = ret || (useDefaultAsFallback ? this.state.defaultGrid : this.props.dashboard.grid_layouts[this.props.dashboard.grid_layouts.length - 1])
-        //console.log("resolving:", breakpoint,"got:", ret)
+        console.log("resolving:", breakpoint,"got:", ret)
         return ret
     }
     renderContent = () => {
         return (<>
-                    <div className="dashboard-components m-2 m-sm-3 m-md-3">
+                    <div className="dashboard-components">
                         {this.renderModules()}
                     </div>
                 </>)

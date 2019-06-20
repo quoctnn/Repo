@@ -3,7 +3,7 @@ import Embedly from '../components/general/embedly/Embedly';
 const processString = require('react-process-string');
 import Routes from './Routes';
 import * as React from 'react';
-import { UserProfile, StatusActions, Community, Project, Group, Event, IntraSocialType, Coordinate, SimpleUserProfile } from '../types/intrasocial_types';
+import { UserProfile, StatusActions, Community, Project, Group, Event, IntraSocialType, Coordinate, SimpleUserProfile, ContextNaturalKey } from '../types/intrasocial_types';
 import {Text} from '../components/general/Text';
 import Constants from '../utilities/Constants';
 import { translate } from '../localization/AutoIntlProvider';
@@ -78,7 +78,21 @@ export function eventAvatar(event:Event, thumbnail = false) {
         return thumbnail ? event.avatar_thumbnail || event.avatar : event.avatar || event.avatar_thumbnail
     return Constants.resolveUrl( Constants.defaultImg.eventAvatar )()
 }
-
+export function contextCover(contextObject:any, contextNaturalKey:ContextNaturalKey, thumbnail = false):string {
+    if(contextObject)
+        return thumbnail ? contextObject.cover_thumbnail || contextObject.cover_cropped : contextObject.cover_cropped || contextObject.cover_thumbnail
+    return contextDefaultCover(contextNaturalKey)
+}
+export function contextDefaultCover(contextNaturalKey:ContextNaturalKey) {
+    switch (contextNaturalKey) {
+        case ContextNaturalKey.COMMUNITY: return Constants.resolveUrl(Constants.defaultImg.community)()
+        case ContextNaturalKey.EVENT: return Constants.resolveUrl(Constants.defaultImg.event)()
+        case ContextNaturalKey.GROUP: return Constants.resolveUrl(Constants.defaultImg.group)()
+        case ContextNaturalKey.PROJECT: return Constants.resolveUrl(Constants.defaultImg.project)()
+        case ContextNaturalKey.USER: return Constants.resolveUrl(Constants.defaultImg.user)()
+        default:return null
+    }
+}
 export function userCover(user:UserProfile, thumbnail = false) {
     if(user)
         return thumbnail ? user.cover_thumbnail || user.cover_cropped : user.cover_cropped || user.cover_thumbnail

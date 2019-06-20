@@ -4,6 +4,7 @@ $headerHeight:40px;
     position: relative;
     flex: 1;
     border-radius: 8px;
+    overflow: hidden;
     .module-header
     {
         height: $headerHeight;

@@ -6,7 +6,6 @@ import WindowResponsiveComponent from "./components/general/observers/WindowResp
 import DashboardComponent from "./Dashboard";
 import { translate } from "./localization/AutoIntlProvider";
 export const DashboardWithData = (props:{category:string, updateKey?:string}) => {
-    return null
     const dashboards = ApplicationManager.getDashboards(props.category)
     const dashboard = dashboards[0] 
     if(!dashboard)
@@ -14,9 +13,9 @@ export const DashboardWithData = (props:{category:string, updateKey?:string}) =>
         return <div>{translate("dashboard.error.not.found")}</div>
     }
     dashboard.grid_layouts = dashboard.grid_layouts.filter(gl => {
-        if(gl.grid_modules.length == 0)
+        if(gl.columns.length == 0)
         {
-            console.error("Dashboard grid '" + gl.title + "' does not contain any modules")
+            console.error("Dashboard grid '" + gl.title + "' does not contain any columns")
             return false
         }
         return true

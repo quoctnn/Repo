@@ -826,28 +826,26 @@ export type Module = {
     name:string
     type:string
     disabled:boolean
-    properties:string
+    properties:Object
 }
-export type GridModule = {
+export type GridColumn = {
     id:number
     module:Module
-    title:string
-    column:number
-    row:number
     width:number
-    height:number
-    grid_layout:number
+    children:GridColumn[]
+    index:number
+    sticky?:boolean
 }
-export type GridLayout = {
+export type GridColumns = {
     id:number
-    grid_modules:GridModule[]
+    columns:GridColumn[]
     title:string
     min_width:number
     fill:boolean
 }
 export type Dashboard = {
     id:number
-    grid_layouts:GridLayout[]
+    grid_layouts:GridColumns[]
     created_at:string
     updated_at:string
     hidden:boolean

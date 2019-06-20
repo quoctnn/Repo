@@ -15,11 +15,11 @@ import { ToastManager } from '../../managers/ToastManager';
 import FileListItem from './FileListItem';
 import { ContextManager } from '../../managers/ContextManager';
 import { AuthenticationManager } from '../../managers/AuthenticationManager';
+import { CommonModuleProps } from '../Module';
 type OwnProps = {
     className?:string
     breakpoint:ResponsiveBreakpoint
-    contextNaturalKey?:ContextNaturalKey
-}
+} & CommonModuleProps
 type State = {
     isLoading:boolean
 }
@@ -32,6 +32,9 @@ type ReduxDispatchProps = {
 type Props = OwnProps & RouteComponentProps<any> & ReduxStateProps & ReduxDispatchProps
 class FilesModule extends React.Component<Props, State> {  
     filesList = React.createRef<ListComponent<UploadedFile>>()
+    static defaultProps:CommonModuleProps = {
+        pageSize:15,
+    }
     constructor(props:Props) {
         super(props);
         this.state = {
@@ -62,7 +65,7 @@ class FilesModule extends React.Component<Props, State> {
     }
     fetchFiles = (offset:number, completion:(items:PaginationResult<UploadedFile>) => void ) => {
         const contextId = (this.props.contextObject && this.props.contextObject.id) || undefined
-        ApiClient.getFiles(this.props.contextNaturalKey, contextId, 10, offset, (data, status, error) => {
+        ApiClient.getFiles(this.props.contextNaturalKey, contextId, this.props.pageSize, offset, (data, status, error) => {
             completion(data)
             ToastManager.showErrorToast(error)
         })
@@ -88,26 +91,33 @@ class FilesModule extends React.Component<Props, State> {
     }
     renderContent = (contextObject:Permissible) => {
 
-        const {} = this.props
+        const {showLoadMore} = this.props
         return <>
             {!contextObject && <LoadingSpinner key="loading"/>}
             {contextObject && <ListComponent<UploadedFile> 
                         ref={this.filesList} 
                         onLoadingStateChanged={this.feedLoadingStateChanged} 
                         fetchData={this.fetchFiles} 
+                        loadMoreOnScroll={!showLoadMore}
                         renderItem={this.renderFile} className="files-module-list" />}
             </>
     }
+    renderModalContent = () => {
+        return <FilesModule {...this.props} pageSize={50} style={{height:undefined, maxHeight:undefined}} showLoadMore={false} showInModal={false} isModal={true}/>
+    }
     render()
     {
-        const {history, match, location, staticContext, contextNaturalKey, contextObject,authenticatedUser, ...rest} = this.props
+        const {history, match, location, staticContext, contextNaturalKey, contextObject,authenticatedUser, pageSize, showLoadMore, showInModal, isModal, ...rest} = this.props
         const {breakpoint, className} = this.props
         const cn = classnames("files-module", className)
+        const renderModalContent = !showInModal || isModal ? undefined : this.renderModalContent
         return (<SimpleModule {...rest} 
+                    showHeader={!isModal}
                     className={cn} 
                     headerClick={this.headerClick} 
                     breakpoint={breakpoint} 
                     isLoading={this.state.isLoading} 
+                    renderModalContent={renderModalContent}
                     headerTitle={translate("files.module.title")}>
                 {this.renderContent(contextObject)}
                 </SimpleModule>)

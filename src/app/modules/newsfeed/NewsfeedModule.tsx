@@ -229,6 +229,7 @@ class NewsfeedModule extends React.Component<Props, State> {
                                     contextNaturalKey={resolvedContextNaturalKey}
                                     contextObjectId={resolvedContextObjectId}
                                     filter={this.state.filter}
+                                    scrollParent={window}
                                     />
                             </ModuleContent>
                             <ModuleFooter>NewsFeed Footer</ModuleFooter>

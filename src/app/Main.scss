@@ -45,6 +45,17 @@ ul,li{ list-style-type: none; padding: 0;}
 .push-right {
     margin-left: auto;
 }
+.modal-dialog.has-module{
+    .modal-body{
+        padding: 0;
+        .module{
+            border-radius: 0;
+            .module-content{
+                max-height: 500px;
+            }
+        }
+    }
+}
 .modal-title {
     display: block;
     width: 100%;
@@ -314,6 +325,12 @@ body.dash-fill
     &, #app-root, #main, #main-content, #content-block, .window-responsive-component,.dashboard-container, #dashboard-page, #dashboard, .dashboard-components, .module-grid{
         flex:1;
         flex-direction: column;
+        display: flex;
+        height: 100%;
+    }
+    .fill{
+
+        flex:1;
         display: flex;
         height: 100%;
     }
