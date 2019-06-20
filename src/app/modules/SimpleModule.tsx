@@ -78,7 +78,7 @@ export default class SimpleModule extends React.Component<Props, State> {
     }
     render()
     {
-        const {breakpoint, className, contextNaturalKey,children, menu, onMenuToggle: onMenuVisibilityChanged, headerTitle: title, isLoading,  headerClick, headerContent, showHeader,  ...rest} = this.props
+        const { breakpoint, className, contextNaturalKey,children, menu, onMenuToggle: onMenuVisibilityChanged, headerTitle: title, isLoading,  headerClick, headerContent, showHeader, showHeaderTitle, renderModalContent,  ...rest} = this.props
         const cn = classnames("simple-module", className, {"menu-visible":this.state.menuVisible})
         const headerTitle = this.props.showHeaderTitle && title
         const headClick = breakpoint < ResponsiveBreakpoint.standard ? headerClick : undefined

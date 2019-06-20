@@ -5,11 +5,10 @@ import { ContextNaturalKey, Permissible } from "../../types/intrasocial_types";
 import classnames = require("classnames");
 import SimpleModule from "../SimpleModule";
 import { ReduxState } from "../../redux";
-import { connect } from "react-redux";
+import { connect, DispatchProp } from "react-redux";
 import { withRouter, RouteComponentProps } from "react-router";
 import { ContextManager } from "../../managers/ContextManager";
 import { contextCover } from '../../utilities/Utilities';
-import { SecureImage } from "../../components/general/SecureImage";
 import { CoverImage } from '../../components/general/CoverImage';
 
 type OwnProps = 
@@ -19,7 +18,7 @@ type OwnProps =
     contextNaturalKey?:ContextNaturalKey
     height?:number
 }
-type Props = OwnProps & ReduxStateProps & RouteComponentProps<any>
+type Props = OwnProps & ReduxStateProps & RouteComponentProps<any> & DispatchProp
 type ReduxStateProps = {
     contextObject:Permissible
 }
@@ -36,7 +35,7 @@ class CoverModule extends React.Component<Props, State> {
         return <CoverImage className="flex-grow-1" src={cover} />
     }
     render() {
-        const {contextNaturalKey, height, history, match, location, contextObject, ...rest} = this.props
+        const {contextNaturalKey, height, history, match, location, contextObject, staticContext, dispatch, ...rest} = this.props
         const {breakpoint, className} = this.props
         const cn = classnames("cover-module d-flex", className)
         return (<SimpleModule style={{height:this.props.height}} {...rest} 

@@ -247,6 +247,7 @@ var translations = {
     "notification.group.requests_invitations":"Member requests and invitations",
     "notification.group.activity":"Activity",
     "notification.group.reports":"Reports",
+    "common.load.more":"Load more",
   },
   no: {
     "search.placeholder": "Søk ...",
@@ -497,6 +498,7 @@ var translations = {
     "notification.group.requests_invitations":"Medlemsforespørsler og invitasjoner",
     "notification.group.activity":"Aktivitet",
     "notification.group.reports":"Rapporter",
+    "common.load.more":"Last flere",
   },
   en: {
     "search.placeholder": "Search ...",
@@ -754,6 +756,7 @@ var translations = {
     "notification.group.requests_invitations":"Member requests and invitations",
     "notification.group.activity":"Activity",
     "notification.group.reports":"Reports",
+    "common.load.more":"Load more",
   }
 };
 

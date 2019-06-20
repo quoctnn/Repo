@@ -151,6 +151,8 @@ export class Grid extends React.PureComponent<Props, State> {
         }
     }
     renderModule = (module:Module) => {
+        if(module.disabled)
+            return null
         const key = this.fixKey("module_" + module.id)
         const props:any = module.properties || {}
         const ccn = classnames("module-grid-item", this.props.className)
