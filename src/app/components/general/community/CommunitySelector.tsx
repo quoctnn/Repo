@@ -48,12 +48,15 @@ class CommunitySelector extends React.Component<Props, State> {
     componentWillUnmount = () => {
     }
     setMainCommunity = (community:Community) => (e:React.SyntheticEvent<any>) => {
-        if (community)
-            ApiClient.setMainCommunity(community.id, () => {
-                // TODO: Move Toast to eventlistener 'eventstream_community.main'
-                ToastManager.showInfoToast(translate("Main community changed"), community.name)
+        if (community) {
+            if (this.props.mainCommunity == community) {
                 this.props.history.push(Routes.communityUrl(community.slug_name))
-            })
+            } else {
+                ApiClient.setMainCommunity(community.id, () => {
+                    this.props.history.push(Routes.communityUrl(community.slug_name))
+                })
+            }
+        }
     }
     showAllCommunities = (event: React.SyntheticEvent<any>) => {
         window.alert("Not implemented")
@@ -117,12 +120,12 @@ class CommunitySelector extends React.Component<Props, State> {
         selectableDropdownItems.push({id:"all", type:OverflowMenuItemType.option, title:translate("common.see.all"), onPress:this.showAllCommunities})
         const cn = classnames("dropdown-menu-popover", "community-selector-dropdown")
         return <Popover className={cn}
-                        delay={0} 
-                        trigger="legacy" 
-                        placement="bottom" 
-                        hideArrow={false} 
-                        isOpen={this.state.popoverVisible} 
-                        target={this.triggerRef} 
+                        delay={0}
+                        trigger="legacy"
+                        placement="bottom"
+                        hideArrow={false}
+                        isOpen={this.state.popoverVisible}
+                        target={this.triggerRef}
                         toggle={this.closePopoverPanel}
                         >
                     <PopoverBody className="pl-0 pr-0">
@@ -146,7 +149,7 @@ class CommunitySelector extends React.Component<Props, State> {
 }
 
 const mapStateToProps = (state:ReduxState, ownProps:OwnProps) => {
-    const mainCommunity = CommunityManager.getCommunityById(state.activeCommunity.activeCommunity) 
+    const mainCommunity = CommunityManager.getCommunityById(state.activeCommunity.activeCommunity)
     const communities = state.communityStore.allIds
     return {
         mainCommunity,

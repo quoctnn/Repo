@@ -33,8 +33,6 @@ export default class CommunityListItem extends React.Component<Props, State> {
         e.stopPropagation()
         if (community)
             ApiClient.setMainCommunity(community.id, () => {
-                // TODO: Move Toast to eventlistener 'eventstream_community.main'
-                ToastManager.showInfoToast(translate("Main community changed"), community.name)
             })
     }
     render()

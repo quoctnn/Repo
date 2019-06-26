@@ -14,14 +14,20 @@ import { Link } from "react-router-dom";
 import Routes from "../utilities/Routes";
 export abstract class CommunityManager
 {
-    static setup = () => 
+    static setup = () =>
     {
         NotificationCenter.addObserver('eventstream_' + EventStreamMessageType.COMMUNITY_UPDATE, CommunityManager.processCommunityUpdate)
         NotificationCenter.addObserver('eventstream_' + EventStreamMessageType.COMMUNITY_DELETE, CommunityManager.processCommunityDelete)
+        NotificationCenter.addObserver('eventstream_' + EventStreamMessageType.COMMUNITY_MAIN, CommunityManager.processCommunityMainChanged)
     }
     static processCommunityDelete = (...args:any[]) => {
         let communityId = args[0]['community_id'] as number;
         CommunityManager.removeCommunity(communityId)
+    }
+    static processCommunityMainChanged = (...args:any[]) => {
+        let communityId = args[0]['community_id'] as number;
+        const community = CommunityManager.getCommunityById(communityId)
+        ToastManager.showInfoToast(translate("Main community changed"), community.name)
     }
     static processCommunityUpdate = (...args:any[]) => {
         let communityId = args[0]['community_id'] as number;
@@ -51,7 +57,7 @@ export abstract class CommunityManager
             CommunityManager.applyCommunityTheme(CommunityManager.getActiveCommunity())
         }
     }
-    static getCommunity = (communityId:string):Community|null => 
+    static getCommunity = (communityId:string):Community|null =>
     {
         const communityStore = CommunityManager.getStore().getState().communityStore
         const isNumber = communityId.isNumber()
@@ -69,11 +75,11 @@ export abstract class CommunityManager
         }
         return null
     }
-    static getCommunityById = (communityId:number):Community|null => 
+    static getCommunityById = (communityId:number):Community|null =>
     {
         return CommunityManager.getStore().getState().communityStore.byId[communityId]
     }
-    static ensureCommunityExists = (communityId:string|number, completion?:(community:Community) => void) => 
+    static ensureCommunityExists = (communityId:string|number, completion?:(community:Community) => void) =>
     {
         const id = communityId.toString()
         let community = CommunityManager.getCommunity(id)
@@ -84,14 +90,14 @@ export abstract class CommunityManager
                 {
                     CommunityManager.storeCommunities([data])
                 }
-                else 
+                else
                 {
                     console.log("error fetching community", error)
                 }
                 completion && completion(data)
             })
         }
-        else 
+        else
         {
             completion && completion(community)
         }
@@ -131,7 +137,7 @@ export abstract class CommunityManager
                 CommunityManager.setActiveCommunity(communityId)
                 return
             }
-        } 
+        }
         //fallback current active community
         const currentActiveCommunity = CommunityManager.getCommunityById(currentActiveCommunityId)
         if(currentActiveCommunity)
@@ -143,7 +149,7 @@ export abstract class CommunityManager
         const active = communityIds[0]
         if(active)
             CommunityManager.setActiveCommunity(active)
-        else 
+        else
             console.error("NO COMMUNITY AVAILABLE")
     }
     static getActiveCommunity = () => {
@@ -177,6 +183,6 @@ export abstract class CommunityManager
     }
     private static getStore = ():Store<ReduxState,any> =>
     {
-        return window.store 
+        return window.store
     }
 }
