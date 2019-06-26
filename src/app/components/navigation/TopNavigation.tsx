@@ -4,7 +4,7 @@ import { ReduxState } from "../../redux";
 import { UserProfile } from "../../types/intrasocial_types";
 import { connect } from "react-redux";
 import { Link, withRouter, RouteComponentProps } from "react-router-dom";
-import { Button, Badge, NavLink } from "reactstrap";
+import { Button, Badge } from "reactstrap";
 import SimpleDialog from "../general/dialogs/SimpleDialog";
 import NotificationsComponent from "../notifications/NotificationsComponent";
 import { translate } from "../../localization/AutoIntlProvider";
@@ -14,6 +14,7 @@ import Routes from "../../utilities/Routes";
 import UserMenu from "../UserMenu";
 import classnames = require("classnames");
 import CommunitySelector from "../general/community/CommunitySelector";
+import BreadcrumbNavigation from "./BreadcrumbNavigation";
 
 type OwnProps = {
 }
@@ -81,6 +82,7 @@ class TopNavigation extends React.Component<Props, State> {
                 <div className="top-navigation-content d-flex main-content-background align-items-center px-2 drop-shadow">
                     <CommunitySelector />
                     <div className="main-border-color-background mx-2" style={{ width: 1, height: "75%" }}></div>
+                    <BreadcrumbNavigation />
                     {this.renderMenuLinks()}
                     { !profile.is_anonymous &&
                         <Button onClick={this.toggleNotificationPanel} color="link" className="badge-notification-container">

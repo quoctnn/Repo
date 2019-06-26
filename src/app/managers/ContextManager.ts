@@ -17,7 +17,7 @@ export type ResolvedContextObject = {
 }
 type StringDictionary = {[key:string]:string}
 type KeyValuePair = {key:string, value:string}
-type ResolvedContextObjects = {
+export type ResolvedContextObjects = {
     task?:Task
     project?:Project
     community?:Community
@@ -152,12 +152,16 @@ export abstract class ContextManager
         const resolved:ResolvedContextObjects = {success:false}
         const entries = ContextManager.dictionaryToEntries(dict)
         entries.forEach(entry => {
-            const objectResolver = ContextManager.objectFetchers[entry.key]
-            if(objectResolver)
+            const segmentKey = ContextSegmentKey.parse(entry.key)
+            if(segmentKey)
             {
-                objectResolver(entry.value, (object) => {
-                    resolved[entry.key] = object
-                })
+                const val = dict[segmentKey]
+                if(val)
+                {
+                    const object = ContextManager.objectResolvers[segmentKey](val)
+                    if(object)
+                        resolved[entry.key] = object
+                } 
             }
         })
         const resolvedLength = entries.map(e => resolved[e.key]).filter(o => !nullOrUndefined(o)).length

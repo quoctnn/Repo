@@ -40,6 +40,20 @@ export namespace ContextSegmentKey {
             default:return null
         }
     }
+    export const parse = (value:string):ContextSegmentKey|null =>
+    {
+        switch (value)
+        {
+            case ContextSegmentKey.GROUP : return ContextSegmentKey.GROUP
+            case ContextSegmentKey.COMMUNITY : return ContextSegmentKey.COMMUNITY
+            case ContextSegmentKey.USER : return ContextSegmentKey.USER
+            case ContextSegmentKey.PROJECT : return ContextSegmentKey.PROJECT
+            case ContextSegmentKey.EVENT : return ContextSegmentKey.EVENT
+            case ContextSegmentKey.TASK : return ContextSegmentKey.TASK
+            case ContextSegmentKey.CONVERSATION : return ContextSegmentKey.CONVERSATION
+            default : return null
+        }
+    }
 }
 export namespace ContextNaturalKey {
     export function defaultAvatarForKey(key: ContextNaturalKey) {
