@@ -41,6 +41,8 @@ type OwnProps<T> = {
 type DefaultProps = {
 
     loadMoreOnScroll?:boolean
+    allowDivider?:boolean
+
 }
 type Props<T> = OwnProps<T> & DefaultProps
 type State<T> = {
@@ -58,7 +60,8 @@ type State<T> = {
 export default class ListComponent<T extends IdentifiableObject> extends React.Component<Props<T>, State<T>> {
     private listRef = React.createRef<List>()
     static defaultProps:DefaultProps = {
-        loadMoreOnScroll:true
+        loadMoreOnScroll:true,
+        allowDivider:true
     }
     constructor(props:Props<T>) {
         super(props);
@@ -208,8 +211,9 @@ export default class ListComponent<T extends IdentifiableObject> extends React.C
             if(data && data.results)
             {
                 let newData = data.results
-                let divider = data.divider
-                if (divider == data.count) divider=null
+                let divider = this.props.allowDivider && data.divider
+                if (divider == data.count) 
+                    divider = null
                 if(requestId == this.state.requestId)
                 {
                     this.setState((prevState:State<T>) => {

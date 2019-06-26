@@ -3,134 +3,143 @@ import Embedly from '../components/general/embedly/Embedly';
 const processString = require('react-process-string');
 import Routes from './Routes';
 import * as React from 'react';
-import { UserProfile, StatusActions, Community, Project, Group, Event, IntraSocialType, Coordinate, SimpleUserProfile, ContextNaturalKey } from '../types/intrasocial_types';
-import {Text} from '../components/general/Text';
+import { UserProfile, StatusActions, Community, Project, Group, Event, Coordinate, SimpleUserProfile, ContextNaturalKey } from '../types/intrasocial_types';
+import { Text } from '../components/general/Text';
 import Constants from '../utilities/Constants';
 import { translate } from '../localization/AutoIntlProvider';
 import { IntraSocialLink } from '../components/general/IntraSocialLink';
 import * as moment from 'moment-timezone';
 import Link from '../components/general/Link';
-import { string } from 'prop-types';
 let timezone = moment.tz.guess()
-export const getDomainName = (url:string) =>  {
+export const getDomainName = (url: string) => {
     var url_parts = url.split("/")
     var domain_name_parts = url_parts[2].split(":")
     var domain_name = domain_name_parts[0]
     return domain_name
 }
-export const parseJSONObject = (param:string) => {
+export const parseJSONObject = (param: string) => {
     try {
         const data = JSON.parse(param)
-        if(typeof data == "object")
+        if (typeof data == "object")
             return data
-    } catch(e) {
+    } catch (e) {
         return null
     }
     return null
 }
 
-export function userFullName(user:SimpleUserProfile | UserProfile, fallback?:string) {
-    if(!user)
-    {
-        if(fallback !== undefined)
+export function userFullName(user: SimpleUserProfile | UserProfile, fallback?: string) {
+    if (!user) {
+        if (fallback !== undefined)
             return fallback
-        return  "Anonymous"
+        return "Anonymous"
     }
     if (user.first_name) {
         return `${user.first_name} ${user.last_name}`;
     }
     const un = (user as UserProfile).username
-    if(un)
-        return un 
-    if(fallback !== undefined)
+    if (un)
+        return un
+    if (fallback !== undefined)
         return fallback
     return "No name";
 }
-export function isAdmin(user:UserProfile) {
+export function isAdmin(user: UserProfile) {
     return user && (user.is_superuser || user.is_staff)
 }
-export function communityName(community:Community) {
+export function communityName(community: Community) {
     return (community && community.name) || translate("community.active.empty")
 }
 
-export function userAvatar(user:UserProfile, thumbnail = false) {
-    if(user)
-        return thumbnail ? user.avatar_thumbnail || user.avatar : user.avatar || user.avatar_thumbnail
-    return Constants.resolveUrl( Constants.defaultImg.user )()
+export function userAvatar(user: UserProfile, thumbnail = false) {
+    let val: string = null
+    if (user)
+        val = thumbnail ? user.avatar_thumbnail || user.avatar : user.avatar || user.avatar_thumbnail
+    return val || Constants.resolveUrl(Constants.defaultImg.user)()
 }
-export function communityAvatar(community:Community, thumbnail = false) {
-    if(community)
-        return thumbnail ? community.avatar_thumbnail || community.avatar : community.avatar || community.avatar_thumbnail
-    return Constants.resolveUrl( Constants.defaultImg.communityAvatar )()
+export function communityAvatar(community: Community, thumbnail = false) {
+    let val: string = null
+    if (community)
+        val = thumbnail ? community.avatar_thumbnail || community.avatar : community.avatar || community.avatar_thumbnail
+    return val || Constants.resolveUrl(Constants.defaultImg.communityAvatar)()
 }
-export function groupAvatar(group:Group, thumbnail = false) {
-    if(group)
-        return thumbnail ? group.avatar_thumbnail || group.avatar : group.avatar || group.avatar_thumbnail
-    return Constants.resolveUrl( Constants.defaultImg.groupAvatar )()
+export function groupAvatar(group: Group, thumbnail = false) {
+    let val: string = null
+    if (group)
+        val = thumbnail ? group.avatar_thumbnail || group.avatar : group.avatar || group.avatar_thumbnail
+    return val || Constants.resolveUrl(Constants.defaultImg.groupAvatar)()
 }
-export function projectAvatar(project:Project, thumbnail = false) {
-    if(project)
-        return thumbnail ? project.avatar_thumbnail || project.avatar : project.avatar || project.avatar_thumbnail
-    return Constants.resolveUrl( Constants.defaultImg.projectAvatar )()
+export function projectAvatar(project: Project, thumbnail = false) {
+    let val: string = null
+    if (project)
+        val = thumbnail ? project.avatar_thumbnail || project.avatar : project.avatar || project.avatar_thumbnail
+    return val || Constants.resolveUrl(Constants.defaultImg.projectAvatar)()
 }
-export function eventAvatar(event:Event, thumbnail = false) {
-    if(event)
-        return thumbnail ? event.avatar_thumbnail || event.avatar : event.avatar || event.avatar_thumbnail
-    return Constants.resolveUrl( Constants.defaultImg.eventAvatar )()
+export function eventAvatar(event: Event, thumbnail = false) {
+    let val: string = null
+    if (event)
+        val = thumbnail ? event.avatar_thumbnail || event.avatar : event.avatar || event.avatar_thumbnail
+    return val || Constants.resolveUrl(Constants.defaultImg.eventAvatar)()
 }
-export function contextCover(contextObject:any, contextNaturalKey:ContextNaturalKey, thumbnail = false):string {
-    if(contextObject)
-        return thumbnail ? contextObject.cover_thumbnail || contextObject.cover_cropped : contextObject.cover_cropped || contextObject.cover_thumbnail
-    return contextDefaultCover(contextNaturalKey)
+export function contextCover(contextObject: any, contextNaturalKey: ContextNaturalKey, thumbnail = false): string {
+    let val: string = null
+    if (contextObject)
+        val = thumbnail ? contextObject.cover_thumbnail || contextObject.cover_cropped : contextObject.cover_cropped || contextObject.cover_thumbnail
+    return val || contextDefaultCover(contextNaturalKey)
 }
-export function contextDefaultCover(contextNaturalKey:ContextNaturalKey) {
+export function contextDefaultCover(contextNaturalKey: ContextNaturalKey) {
     switch (contextNaturalKey) {
         case ContextNaturalKey.COMMUNITY: return Constants.resolveUrl(Constants.defaultImg.community)()
         case ContextNaturalKey.EVENT: return Constants.resolveUrl(Constants.defaultImg.event)()
         case ContextNaturalKey.GROUP: return Constants.resolveUrl(Constants.defaultImg.group)()
         case ContextNaturalKey.PROJECT: return Constants.resolveUrl(Constants.defaultImg.project)()
         case ContextNaturalKey.USER: return Constants.resolveUrl(Constants.defaultImg.user)()
-        default:return null
+        default: return null
     }
 }
-export function userCover(user:UserProfile, thumbnail = false) {
-    if(user)
-        return thumbnail ? user.cover_thumbnail || user.cover_cropped : user.cover_cropped || user.cover_thumbnail
-    return Constants.resolveUrl(Constants.defaultImg.user)()
+export function userCover(user: UserProfile, thumbnail = false) {
+    let val: string = null
+    if (user)
+        val = thumbnail ? user.cover_thumbnail || user.cover_cropped : user.cover_cropped || user.cover_thumbnail
+    return val || Constants.resolveUrl(Constants.defaultImg.user)()
 }
-export function communityCover(community:Community, thumbnail = false) {
-    if(community)
-        return thumbnail ? community.cover_thumbnail || community.cover_cropped : community.cover_cropped || community.cover_thumbnail
-    return Constants.resolveUrl(Constants.defaultImg.community)()
+export function communityCover(community: Community, thumbnail = false) {
+    let val: string = null
+    if (community)
+        val = thumbnail ? community.cover_thumbnail || community.cover_cropped : community.cover_cropped || community.cover_thumbnail
+    return val || Constants.resolveUrl(Constants.defaultImg.community)()
 }
-export function projectCover(project:Project, thumbnail = false) {
-    if(project)
-        return thumbnail ? project.cover_thumbnail || project.cover_cropped : project.cover_cropped || project.cover_thumbnail
-    return Constants.resolveUrl(Constants.defaultImg.project)()
+export function projectCover(project: Project, thumbnail = false) {
+    let val: string = null
+    if (project)
+        val = thumbnail ? project.cover_thumbnail || project.cover_cropped : project.cover_cropped || project.cover_thumbnail
+    return val || Constants.resolveUrl(Constants.defaultImg.project)()
 }
-export function groupCover(group:Group, thumbnail = false) {
-    if(group)
-        return thumbnail ? group.cover_thumbnail || group.cover_cropped : group.cover_cropped || group.cover_thumbnail
-    return Constants.resolveUrl(Constants.defaultImg.group)()
+export function groupCover(group: Group, thumbnail = false) {
+    let val: string = null
+    if (group)
+        val = thumbnail ? group.cover_thumbnail || group.cover_cropped : group.cover_cropped || group.cover_thumbnail
+    return val || Constants.resolveUrl(Constants.defaultImg.group)()
 }
-export function eventCover(event:Event, thumbnail = false) {
-    if(event)
-        return thumbnail ? event.cover_thumbnail || event.cover_cropped : event.cover_cropped || event.cover_thumbnail
-    return Constants.resolveUrl(Constants.defaultImg.event)()
+export function eventCover(event: Event, thumbnail = false) {
+    let val: string = null
+    if (event)
+        val = thumbnail ? event.cover_thumbnail || event.cover_cropped : event.cover_cropped || event.cover_thumbnail
+    return val || Constants.resolveUrl(Constants.defaultImg.event)()
 }
 
-export const coordinateIsValid = (coordinate:Coordinate) => {
+export const coordinateIsValid = (coordinate: Coordinate) => {
     return coordinate && coordinate.lat && coordinate.lon
 }
 export enum DateFormat {
     date = "L LT",
-    day = "L", 
+    day = "L",
     time = "LT"
 }
-export const stringToDateFormat = (string:string, format?:DateFormat ) => {
+export const stringToDateFormat = (string: string, format?: DateFormat) => {
     return moment(string).tz(timezone).format(format || DateFormat.date)
 }
-export const stringToDate = (string?:string) => {
+export const stringToDate = (string?: string) => {
     return moment(string).tz(timezone)
 }
 export const EMAIL_REGEX = /(\b\s+)(([a-zA-Z0-9\-\_\.])+@[a-zA-Z\_]+?(\.[a-zA-Z]{2,6})+)/gm
@@ -146,57 +155,52 @@ export const SENTENCES_REGEX = /[^\.!\?]+[\.!\?]+|[^\.!\?]+$/g
 export const truncate = (text, maxChars) => {
     return text.length > (maxChars - 3) ? text.substring(0, maxChars - 3) + '...' : text;
 }
-export function getTextContent(prefixId:string, 
-                                text:string, 
-                                mentions:UserProfile[], 
-                                includeEmbedlies:boolean, 
-                                onLinkPress:(action:StatusActions, extra?:Object) => void, 
-                                truncateLength:number = 0,
-                                linebreakLimit:number = 0)
-{
-    var processed:any = null
+export function getTextContent(prefixId: string,
+    text: string,
+    mentions: UserProfile[],
+    includeEmbedlies: boolean,
+    onLinkPress: (action: StatusActions, extra?: Object) => void,
+    truncateLength: number = 0,
+    linebreakLimit: number = 0) {
+    var processed: any = null
     var config = []
-    let embedlyArr:{[id:string]:JSX.Element} = {}
+    let embedlyArr: { [id: string]: JSX.Element } = {}
     let seed = 0
-    const getKey = (key:string ) => {
+    const getKey = (key: string) => {
         return `${prefixId}_${key}_${seed++}`
     }
     const embedlies = {
         regex: URL_REGEX,
-        fn: (key, result) => 
-        {
-            if(includeEmbedlies)
-            {
+        fn: (key, result) => {
+            if (includeEmbedlies) {
                 embedlyArr[result[0]] = <Embedly renderOnError={false} key={getKey("embedly_" + result[0])} url={result[0]} />
             }
-            return (<Link key={getKey("link_" + result[0])} title={result[0]} to={result[0]}>{truncate(result[0], 50 )}</Link>)
+            return (<Link key={getKey("link_" + result[0])} title={result[0]} to={result[0]}>{truncate(result[0], 50)}</Link>)
         }
     }
     config.push(embedlies)
     if (Settings.searchEnabled) {
         const hashtags = {
             regex: HASHTAG_REGEX_WITH_HIGHLIGHT,
-            fn: (key, result) => 
-            {
+            fn: (key, result) => {
                 const href = Routes.searchUrl(result[0])//result[1] == without #
-                return (<Text title={translate("search.for") + " " +  result[0]} key={getKey("hashtag" + result[0])} href={href}>{result[0]}</Text>)
+                return (<Text title={translate("search.for") + " " + result[0]} key={getKey("hashtag" + result[0])} href={href}>{result[0]}</Text>)
             }
         }
         config.push(hashtags)
     }
     const breaks = {
         regex: LINEBREAK_REGEX,
-        fn: (key, result) => 
-        {
+        fn: (key, result) => {
             return (<br key={uniqueId()} />)
         }
     }
     config.push(breaks)
     const mentionSearch = mentions.map(user => {
         return {
-            regex:new RegExp("@" + user.username.replace("+","\\+"), 'g'),
+            regex: new RegExp("@" + user.username.replace("+", "\\+"), 'g'),
             fn: (key, result) => {
-                return <IntraSocialLink key={getKey(key)} to={user} type={IntraSocialType.profile}>{userFullName(user)}</IntraSocialLink>
+                return <IntraSocialLink key={getKey(key)} to={user} type={ContextNaturalKey.USER}>{userFullName(user)}</IntraSocialLink>
             }
         }
     }).filter(o => o)
@@ -205,60 +209,53 @@ export function getTextContent(prefixId:string,
     const embedKeys = Object.keys(embedlyArr)
     let flatten = flattenElements(processed)
     let hasMore = false
-    if(truncateLength > 0)
-    {
-        const truncatedResult = truncateElements(flatten, truncateLength,linebreakLimit)
+    if (truncateLength > 0) {
+        const truncatedResult = truncateElements(flatten, truncateLength, linebreakLimit)
         flatten = truncatedResult.result
         hasMore = truncatedResult.rest.length > 0
     }
-    const ret:{textContent:JSX.Element[], linkCards:JSX.Element[], hasMore:boolean} = {textContent:flatten, linkCards:[], hasMore}
-    if(includeEmbedlies && embedKeys.length > 0)
-    {
+    const ret: { textContent: JSX.Element[], linkCards: JSX.Element[], hasMore: boolean } = { textContent: flatten, linkCards: [], hasMore }
+    if (includeEmbedlies && embedKeys.length > 0) {
         ret.linkCards = embedKeys.map(k => embedlyArr[k])
     }
     return ret
 }
-export const flattenElements = (arr:any):JSX.Element[] => {
-    if(typeof arr == "string" && !Array.isArray(arr))
-    {
+export const flattenElements = (arr: any): JSX.Element[] => {
+    if (typeof arr == "string" && !Array.isArray(arr)) {
         return arr as any
     }
     let result = []
     for (let i = 0; i < arr.length; i++) {
         const item = arr[i]
-        if(typeof item != "string" && Array.isArray(item))
-        {
+        if (typeof item != "string" && Array.isArray(item)) {
             result = result.concat(flattenElements(item))
         }
         else {
-            if(typeof item != "string" || item.length > 0)
+            if (typeof item != "string" || item.length > 0)
                 result.push(item)
         }
     }
     return result
 }
-const truncateElements = (arr:JSX.Element[], limit:number, linebreakLimit:number) => {
-    let result:JSX.Element[] = []
-    let rest:JSX.Element[] = []
+const truncateElements = (arr: JSX.Element[], limit: number, linebreakLimit: number) => {
+    let result: JSX.Element[] = []
+    let rest: JSX.Element[] = []
     let banked = 0
     let linebreaks = 0
     const processLinebreaks = linebreakLimit > 0
-    const bank = (item:any, length:number, ignoreIfEmpty = false, isLinebreak = false) => {
-        if(!ignoreIfEmpty ||  length > 0)
-        {
-            if(processLinebreaks && isLinebreak)
-            {
+    const bank = (item: any, length: number, ignoreIfEmpty = false, isLinebreak = false) => {
+        if (!ignoreIfEmpty || length > 0) {
+            if (processLinebreaks && isLinebreak) {
                 linebreaks += 1
-                if(linebreaks >= linebreakLimit)
+                if (linebreaks >= linebreakLimit)
                     done = true
             }
-            if(done)
+            if (done)
                 rest.push(item)
-            else 
-            {
+            else {
                 result.push(item)
                 banked += length
-                if(banked > limit)
+                if (banked > limit)
                     done = true
             }
         }
@@ -266,19 +263,16 @@ const truncateElements = (arr:JSX.Element[], limit:number, linebreakLimit:number
     let done = false
     for (let i = 0; i < arr.length; i++) {
         const item = arr[i]
-        if(done)
-        {
+        if (done) {
             bank(item, 0, true)
         }
-        if(typeof item == "string")
-        {
+        if (typeof item == "string") {
             const str = item as string
             const len = str.length
-            if(len + banked > limit) //too big, split string
+            if (len + banked > limit) //too big, split string
             {
                 const sentences = str.match(SENTENCES_REGEX)
-                if(sentences.length > 0)
-                {
+                if (sentences.length > 0) {
                     for (let si = 0; si < sentences.length; si++) {
                         const sentence = sentences[si];
                         bank(sentence, sentence.length, true)
@@ -289,12 +283,11 @@ const truncateElements = (arr:JSX.Element[], limit:number, linebreakLimit:number
                     bank(str, len, true)
                 }
             }
-            else 
-            {
+            else {
                 bank(str, len, true)
             }
         }
-        else if(item.props && item.props.children && typeof item.props.children == "string")//must be type 'Text'
+        else if (item.props && item.props.children && typeof item.props.children == "string")//must be type 'Text'
         {
             bank(item, item.props.children.length)
         }
@@ -302,13 +295,12 @@ const truncateElements = (arr:JSX.Element[], limit:number, linebreakLimit:number
             bank(item, 0, false, true)
         }
     }
-    return {result,length:banked, rest} 
+    return { result, length: banked, rest }
 }
-export function rawMarkup(text, mentions:any[]) {
+export function rawMarkup(text, mentions: any[]) {
     var markup = text
     if (Settings.searchEnabled) {
-        markup = markup.replace(HASHTAG_REGEX_WITH_HIGHLIGHT, (hashTag) =>
-        {
+        markup = markup.replace(HASHTAG_REGEX_WITH_HIGHLIGHT, (hashTag) => {
             let tag = hashTag.replace(TAG_REGEX, "")
             let href = `${Routes.SEARCH}?term=${encodeURIComponent(tag)}`
             return `<a href="${href}">${hashTag}</a>`
@@ -331,15 +323,14 @@ export function rawMarkup(text, mentions:any[]) {
 
     // Replace mentions (@username) with user first name
     if (mentions !== undefined) {
-        mentions.map(function (user) 
-        {
+        mentions.map(function (user) {
             let el = `<a href="${Routes.profileUrl(user.slug_name)}" data-toggle="tooltip" title="${userFullName(user)}">${user.first_name + " " + user.last_name}</a>`
             // let elementHTML = "<a href=" + user.absolute_url + ">" + user.first_name + "</a>";
-            let regexExpression = new RegExp("@" + user.username.replace("+","\\+"), 'g');
+            let regexExpression = new RegExp("@" + user.username.replace("+", "\\+"), 'g');
             markup = markup.replace(regexExpression, el);
         });
     }
-    return {__html: markup};
+    return { __html: markup };
 }
 
 /**
@@ -347,7 +338,7 @@ export function rawMarkup(text, mentions:any[]) {
  * 
  * http://kirbysayshi.com/2013/08/19/maintaining-scroll-position-knockoutjs-list.html
  */
-export function ScrollPosition(node:HTMLElement) {
+export function ScrollPosition(node: HTMLElement) {
     this.node = node;
     this.previousScrollHeightMinusTop = 0;
     this.readyFor = 'up';
@@ -367,8 +358,7 @@ ScrollPosition.prototype.prepareFor = function (direction) {
     this.readyFor = direction || 'up';
     this.previousScrollHeightMinusTop = this.node.scrollHeight - this.node.scrollTop;
 }
-export function cloneDictKeys(dict:{})
-{
+export function cloneDictKeys(dict: {}) {
     let keys = Object.keys(dict)
     let newDict = {}
     keys.forEach(key => {
@@ -376,11 +366,10 @@ export function cloneDictKeys(dict:{})
     })
     return newDict
 }
-export const nullOrUndefined = (any) => 
-{
+export const nullOrUndefined = (any) => {
     return any === null || any === undefined
 }
-export const uniqueId = () =>  {
+export const uniqueId = () => {
     return Math.random().toString(36).substr(2, 16);
 }
 export const filterArray = (array, text) => {
@@ -388,32 +377,32 @@ export const filterArray = (array, text) => {
     filteredArray = array.filter(object => {
         const query = text.toLowerCase();
         return object.toLowerCase().startsWith(query);
-    }); 
+    });
     return filteredArray;
 }
 
-export function compareObjects(o1:object, o2:object){
-    for(var p in o1){
-        if(o1.hasOwnProperty(p)){
-            if(o1[p] !== o2[p]){
+export function compareObjects(o1: object, o2: object) {
+    for (var p in o1) {
+        if (o1.hasOwnProperty(p)) {
+            if (o1[p] !== o2[p]) {
                 return false;
             }
         }
     }
-    for(var p in o2){
-        if(o2.hasOwnProperty(p)){
-            if(o1[p] !== o2[p]){
+    for (var p in o2) {
+        if (o2.hasOwnProperty(p)) {
+            if (o1[p] !== o2[p]) {
                 return false;
             }
         }
     }
     return true;
 }
-  
+
 export const normalizeIndex = (selectedIndex, max) => {
     let index = selectedIndex % max;
     if (index < 0) {
-    index += max;
+        index += max;
     }
     return index;
 }

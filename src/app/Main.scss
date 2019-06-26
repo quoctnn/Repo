@@ -7,11 +7,11 @@
     }
     &::-webkit-scrollbar-track { background: transparent; }
     &::-webkit-scrollbar-thumb {
-        @include var(background, secondary-theme-color);
+        @include var(background, secondary-text-color);
         border-radius:50vw;
     }
     &::-webkit-scrollbar-thumb:hover {
-        @include var(background, primary-theme-color);
+        @include var(background, primary-text-color);
     }
 }
 //standard overrides
@@ -322,7 +322,7 @@ content: "\f1c1";
 
 body.dash-fill
 {
-    &, #app-root, #main, #main-content, #content-block, .window-responsive-component,.dashboard-container, #dashboard-page, #dashboard, .dashboard-components, .module-grid{
+    &, #app-root, #main, #main-content, #content-block, .window-responsive-component,.dashboard-container, .dashboard-container > .content, #dashboard, .dashboard-components{
         flex:1;
         flex-direction: column;
         display: flex;

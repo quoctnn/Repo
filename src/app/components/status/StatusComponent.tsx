@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Status, StatusActions, ObjectAttributeType, Permission, IntraSocialType } from '../../types/intrasocial_types';
+import { Status, StatusActions, ObjectAttributeType, Permission, ContextNaturalKey } from '../../types/intrasocial_types';
 import { Avatar } from "../general/Avatar";
 import { userAvatar, userFullName, getTextContent } from '../../utilities/Utilities';
 
@@ -176,7 +176,7 @@ export class StatusComponent extends React.Component<Props, State> {
         return(<div ref={this.props.innerRef} className={cn}>
                 <div className="d-flex">
                     <div className="flex-shrink-0 header-left">
-                        <IntraSocialLink to={this.props.status.owner} type={IntraSocialType.profile}>
+                        <IntraSocialLink to={this.props.status.owner} type={ContextNaturalKey.USER}>
                             <Avatar size={avatarSize} image={userAvatar(status.owner, true)}/>
                         </IntraSocialLink>
                     </div>
@@ -184,7 +184,7 @@ export class StatusComponent extends React.Component<Props, State> {
                         <div className="d-flex header-center-content text-truncate">
                             <div className="text-truncate flex-grow-1 d-flex flex-wrap header-center-left">
                                 <div className="text-truncate">
-                                    <IntraSocialLink to={this.props.status.owner} type={IntraSocialType.profile}>
+                                    <IntraSocialLink to={this.props.status.owner} type={ContextNaturalKey.USER}>
                                         <div className="title text-truncate">{userFullName(this.props.status.owner)}</div>
                                     </IntraSocialLink>
                                 </div>

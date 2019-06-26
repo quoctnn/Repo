@@ -258,6 +258,11 @@ export default  {
             return `/api/v2/${context_type}/${context_object_id}/report/`
         },
         reportTags:'/api/v2/report/tags/',
+        //favorites
+        favoritesUrl:"/api/v2/favorites/",
+        updateFavoriteUrl: (id:number) => {
+            return `/api/v2/favorites/${id}/`
+        },
     },
 
     urlsRoute: {

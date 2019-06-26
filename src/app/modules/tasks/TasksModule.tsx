@@ -20,7 +20,6 @@ import { AuthenticationManager } from '../../managers/AuthenticationManager';
 import { CommonModuleProps } from '../Module';
 
 type OwnProps = {
-    className?: string
     breakpoint: ResponsiveBreakpoint
 } & CommonModuleProps
 type State = {

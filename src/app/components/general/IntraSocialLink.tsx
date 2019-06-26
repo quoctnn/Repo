@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Community, Group, Project, Event, Task, UserProfile, IntraSocialType, Linkable } from "../../types/intrasocial_types";
+import { Community, Group, Project, Event, Task, UserProfile, Linkable, ContextNaturalKey } from "../../types/intrasocial_types";
 import { Link } from "react-router-dom";
 import { translate } from '../../localization/AutoIntlProvider';
 import { userFullName, nullOrUndefined } from '../../utilities/Utilities';
@@ -8,51 +8,53 @@ import { Settings } from '../../utilities/Settings';
 
 type Props = {
     to:Linkable
-    type?:IntraSocialType
-} & React.HTMLAttributes<HTMLElement>
+    type?:ContextNaturalKey
+    name?:string
+} & React.AnchorHTMLAttributes<HTMLAnchorElement> & React.ClassAttributes<Link>
+
 export const IntraSocialLink = (props:Props) => {
 
-    const {to, type, title, children, className,  ...rest} = props
+    const {to, type, title, children, className, name,  ...rest} = props
     const renderTitle = Settings.renderLinkTitle
     let newTitle = renderTitle ? title : undefined
     if(renderTitle && !newTitle && !nullOrUndefined( type ))
     {
         switch(type)
         {
-            case IntraSocialType.community:
+            case ContextNaturalKey.COMMUNITY:
             {
                 const obj = to as Community
-                newTitle = `${translate("common.community")} ${obj.name}`
+                newTitle = `${translate("common.community")} ${name || obj.name}`
                 break;
             }
-            case IntraSocialType.group:
+            case ContextNaturalKey.GROUP:
             {
                 const obj = to as Group
-                newTitle = `${translate("common.group")} ${obj.name}`
+                newTitle = `${translate("common.group")} ${name || obj.name}`
                 break;
             }
-            case IntraSocialType.project:
+            case ContextNaturalKey.PROJECT:
             {
                 const obj = to as Project
-                newTitle = `${translate("common.project")} ${obj.name}`
+                newTitle = `${translate("common.project")} ${name || obj.name}`
                 break;
             }
-            case IntraSocialType.event:
+            case ContextNaturalKey.EVENT:
             {
                 const obj = to as Event
-                newTitle = `${translate("common.event")} ${obj.name}`
+                newTitle = `${translate("common.event")} ${name || obj.name}`
                 break;
             }
-            case IntraSocialType.profile:
+            case ContextNaturalKey.USER:
             {
                 const obj = to as UserProfile
-                newTitle = `${translate("common.profile")} ${userFullName(obj)}`
+                newTitle = `${translate("common.profile")} ${name || userFullName(obj)}`
                 break;
             }
-            case IntraSocialType.task:
+            case ContextNaturalKey.TASK:
             {
                 const obj = to as Task
-                newTitle = `${translate("common.task")} ${obj.title}`
+                newTitle = `${translate("common.task")} ${name || obj.title}`
                 break;
             }
             default:{

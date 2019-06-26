@@ -2,7 +2,105 @@ import * as React from 'react';
 import Emoji from "../components/general/Emoji";
 import Constants from "../utilities/Constants";
 import { translate } from "../localization/AutoIntlProvider";
+import { userFullName, groupCover, communityCover, userCover, projectCover, eventCover } from '../utilities/Utilities';
 
+
+
+export enum ContextNaturalKey
+{
+    GROUP = "group.group",
+    COMMUNITY = "core.community",
+    USER = "auth.user",
+    PROJECT = "project.project",
+    TASK = "project.task",
+    EVENT = "event.event",
+    NEWSFEED = "newsfeed",
+    CONVERSATION = "conversation",
+}
+export enum ContextSegmentKey
+{
+    GROUP = "group",
+    COMMUNITY = "community",
+    USER = "profile",
+    PROJECT = "project",
+    TASK = "task",
+    EVENT = "event",
+    CONVERSATION = "conversation"
+}
+export namespace ContextSegmentKey {
+    export function keyForNaturalKey(key: ContextNaturalKey) {
+        switch(key){
+            case ContextNaturalKey.GROUP: return ContextSegmentKey.GROUP
+            case ContextNaturalKey.COMMUNITY: return ContextSegmentKey.COMMUNITY
+            case ContextNaturalKey.USER: return ContextSegmentKey.USER
+            case ContextNaturalKey.PROJECT: return ContextSegmentKey.PROJECT
+            case ContextNaturalKey.EVENT: return ContextSegmentKey.EVENT
+            case ContextNaturalKey.TASK: return ContextSegmentKey.TASK
+            case ContextNaturalKey.CONVERSATION: return ContextSegmentKey.CONVERSATION
+            default:return null
+        }
+    }
+}
+export namespace ContextNaturalKey {
+    export function defaultAvatarForKey(key: ContextNaturalKey) {
+        switch(key){
+            case ContextNaturalKey.GROUP: return Constants.resolveUrl(Constants.defaultImg.groupAvatar)()
+            case ContextNaturalKey.COMMUNITY: return Constants.resolveUrl(Constants.defaultImg.communityAvatar)()
+            case ContextNaturalKey.USER: return Constants.resolveUrl(Constants.defaultImg.userAvatar)()
+            case ContextNaturalKey.PROJECT: return Constants.resolveUrl(Constants.defaultImg.projectAvatar)()
+            case ContextNaturalKey.EVENT: return Constants.resolveUrl(Constants.defaultImg.eventAvatar)()
+            default:return null
+        }
+    }
+    export function iconClassForKey(key: ContextNaturalKey) {
+        switch(key){
+            case ContextNaturalKey.GROUP: return "fas fa-users"
+            case ContextNaturalKey.COMMUNITY: return "fas fa-globe"
+            case ContextNaturalKey.USER: return "fas fa-user"
+            case ContextNaturalKey.PROJECT: return "fas fa-clipboard-list"
+            case ContextNaturalKey.EVENT: return "fas fa-calendar-day"
+            case ContextNaturalKey.TASK: return "fas fa-tasks"
+            default:return null
+        }
+    }
+    export function elasticTypeForKey(key: ContextNaturalKey) {
+        switch(key){
+            case ContextNaturalKey.GROUP: return ElasticSearchType.GROUP
+            case ContextNaturalKey.COMMUNITY: return ElasticSearchType.COMMUNITY
+            case ContextNaturalKey.USER: return ElasticSearchType.USER
+            case ContextNaturalKey.PROJECT: return ElasticSearchType.PROJECT
+            case ContextNaturalKey.EVENT: return ElasticSearchType.EVENT
+            case ContextNaturalKey.TASK: return ElasticSearchType.TASK
+            default:return null
+        }
+    }
+    export function nameForContextObject(key: ContextNaturalKey, contextObject:any) {
+        switch(key){
+            case ContextNaturalKey.GROUP: return (contextObject as Group).name
+            case ContextNaturalKey.COMMUNITY: return (contextObject as Community).name
+            case ContextNaturalKey.USER: return userFullName((contextObject as UserProfile))
+            case ContextNaturalKey.PROJECT: return (contextObject as Project).name
+            case ContextNaturalKey.EVENT: return (contextObject as Event).name
+            case ContextNaturalKey.TASK: return (contextObject as Task).title
+            default:return null
+        }
+    }
+    export function coverForContextObject(key: ContextNaturalKey, contextObject:any, thumbnail:boolean = false) {
+        switch(key){
+            case ContextNaturalKey.GROUP: return groupCover(contextObject as Group, thumbnail)
+            case ContextNaturalKey.COMMUNITY: return communityCover(contextObject as Community, thumbnail)
+            case ContextNaturalKey.USER: return userCover(contextObject as UserProfile, thumbnail)
+            case ContextNaturalKey.PROJECT: return projectCover(contextObject as Project, thumbnail)
+            case ContextNaturalKey.EVENT: return eventCover(contextObject as Event, thumbnail)
+            case ContextNaturalKey.TASK: return null
+            default:return null
+        }
+    }
+}
+export enum DraggableType {
+    favorite = "favorite",
+    group = "group.group"
+}
 export interface Verb
 {
     id:number
@@ -67,6 +165,63 @@ export type TempStatus = {
   parent:number,
   mentions: number[]
   pending?:boolean
+}
+export enum ProjectSorting {
+    recentActivity = "recent_activity",
+    recent = "recent",
+    mostUsed = "most_used",
+    AtoZ = "alphabetically",
+}
+export namespace ProjectSorting {
+    export const all = [
+        ProjectSorting.recentActivity,
+        ProjectSorting.recent,
+        ProjectSorting.mostUsed,
+        ProjectSorting.AtoZ,
+    ]
+    export function translatedText(type: ProjectSorting) {
+        switch(type){
+            case ProjectSorting.recentActivity: return translate("common.sorting.recentActivity")
+            case ProjectSorting.recent: return translate("common.sorting.recent")
+            case ProjectSorting.mostUsed: return translate("common.sorting.mostUsed")
+            case ProjectSorting.AtoZ: return translate("common.sorting.AtoZ")
+            default: return "N/A"
+        }
+    }
+    export function icon(type: ProjectSorting) {
+        switch(type){
+            case ProjectSorting.recent: return <i className="fa fa-user-clock"></i>
+            case ProjectSorting.mostUsed: return <i className="fa fa-burn"></i>
+            default: return  <i className="fa fa-question"></i>
+        }
+    }
+}
+export enum GroupSorting {
+    recent = "recent",
+    mostUsed = "most_used",
+    AtoZ = "alphabetically",
+}
+export namespace GroupSorting {
+    export const all = [
+        GroupSorting.recent,
+        GroupSorting.mostUsed,
+        GroupSorting.AtoZ
+    ]
+    export function translatedText(type: GroupSorting) {
+        switch(type){
+            case GroupSorting.recent: return translate("common.sorting.recent")
+            case GroupSorting.mostUsed: return translate("common.sorting.mostUsed")
+            case GroupSorting.AtoZ: return translate("common.sorting.AtoZ")
+            default: return "N/A"
+        }
+    }
+    export function icon(type: GroupSorting) {
+        switch(type){
+            case GroupSorting.recent: return <i className="fa fa-user-clock"></i>
+            case GroupSorting.mostUsed: return <i className="fa fa-burn"></i>
+            default: return  <i className="fa fa-question"></i>
+        }
+    }
 }
 //notifications
 export type NotificationObject = {
@@ -323,64 +478,6 @@ export namespace ObjectAttributeType {
         }
     }
 }
-export enum ContextNaturalKey
-{
-    GROUP = "group.group",
-    COMMUNITY = "core.community",
-    USER = "auth.user",
-    PROJECT = "project.project",
-    TASK = "project.task",
-    EVENT = "event.event",
-    NEWSFEED = "newsfeed",
-    CONVERSATION = "conversation",
-}
-export enum ContextSegmentKey
-{
-    GROUP = "group",
-    COMMUNITY = "community",
-    USER = "profile",
-    PROJECT = "project",
-    TASK = "task",
-    EVENT = "event",
-    CONVERSATION = "conversation"
-}
-export namespace ContextSegmentKey {
-    export function keyForNaturalKey(key: ContextNaturalKey) {
-        switch(key){
-            case ContextNaturalKey.GROUP: return ContextSegmentKey.GROUP
-            case ContextNaturalKey.COMMUNITY: return ContextSegmentKey.COMMUNITY
-            case ContextNaturalKey.USER: return ContextSegmentKey.USER
-            case ContextNaturalKey.PROJECT: return ContextSegmentKey.PROJECT
-            case ContextNaturalKey.EVENT: return ContextSegmentKey.EVENT
-            case ContextNaturalKey.TASK: return ContextSegmentKey.TASK
-            case ContextNaturalKey.CONVERSATION: return ContextSegmentKey.CONVERSATION
-            default:return null
-        }
-    }
-}
-export namespace ContextNaturalKey {
-    export function avatarForKey(key: ContextNaturalKey) {
-        switch(key){
-            case ContextNaturalKey.GROUP: return Constants.resolveUrl(Constants.defaultImg.groupAvatar)()
-            case ContextNaturalKey.COMMUNITY: return Constants.resolveUrl(Constants.defaultImg.communityAvatar)()
-            case ContextNaturalKey.USER: return Constants.resolveUrl(Constants.defaultImg.userAvatar)()
-            case ContextNaturalKey.PROJECT: return Constants.resolveUrl(Constants.defaultImg.projectAvatar)()
-            case ContextNaturalKey.EVENT: return Constants.resolveUrl(Constants.defaultImg.eventAvatar)()
-            default:return null
-        }
-    }
-    export function elasticTypeForKey(key: ContextNaturalKey) {
-        switch(key){
-            case ContextNaturalKey.GROUP: return ElasticSearchType.GROUP
-            case ContextNaturalKey.COMMUNITY: return ElasticSearchType.COMMUNITY
-            case ContextNaturalKey.USER: return ElasticSearchType.USER
-            case ContextNaturalKey.PROJECT: return ElasticSearchType.PROJECT
-            case ContextNaturalKey.EVENT: return ElasticSearchType.EVENT
-            case ContextNaturalKey.TASK: return ElasticSearchType.TASK
-            default:return null
-        }
-    }
-}
 export type ContextItem = {
     label:string
     id:number
@@ -518,9 +615,7 @@ export type Conversation =
     temporary?:boolean
 
 } & Linkable & IdentifiableObject & Permissible
-export enum IntraSocialType{
-    community, profile, project, group, event, task
-}
+
 export type ICommunity = {
     cover_thumbnail: string
     avatar_thumbnail:string
@@ -578,6 +673,13 @@ export type Group = {
     updated_at: string
 } & AvatarAndCover & Linkable & Permissible & IdentifiableObject
 
+export type Favorite = {
+    index:number
+    object_natural_key:ContextNaturalKey
+    image:string
+    object:ContextObject
+    object_id:number
+} & IdentifiableObject
 export type Coordinate = {
     lat:number
     lon:number

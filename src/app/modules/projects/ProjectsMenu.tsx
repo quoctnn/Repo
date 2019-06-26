@@ -1,38 +1,10 @@
 import * as React from "react";
 import { translate } from '../../localization/AutoIntlProvider';
 import { FormGroup, Label, ButtonGroup, Button } from 'reactstrap';
+import { ProjectSorting } from "../../types/intrasocial_types";
 
 
-export enum ProjectSorting {
-    recentActivity = "recent_activity",
-    recent = "recent",
-    mostUsed = "most_used",
-    AtoZ = "alphabetically",
-}
-export namespace ProjectSorting {
-    export const all = [
-        ProjectSorting.recentActivity,
-        ProjectSorting.recent,
-        ProjectSorting.mostUsed,
-        ProjectSorting.AtoZ,
-    ]
-    export function translatedText(type: ProjectSorting) {
-        switch(type){
-            case ProjectSorting.recentActivity: return translate("common.sorting.recentActivity")
-            case ProjectSorting.recent: return translate("common.sorting.recent")
-            case ProjectSorting.mostUsed: return translate("common.sorting.mostUsed")
-            case ProjectSorting.AtoZ: return translate("common.sorting.AtoZ")
-            default: return "N/A"
-        }
-    }
-    export function icon(type: ProjectSorting) {
-        switch(type){
-            case ProjectSorting.recent: return <i className="fa fa-user-clock"></i>
-            case ProjectSorting.mostUsed: return <i className="fa fa-burn"></i>
-            default: return  <i className="fa fa-question"></i>
-        }
-    }
-}
+
 export enum ProjectFilter {
     responsible = "responsible",
     assigned = "assigned"

@@ -1,34 +1,9 @@
 import * as React from "react";
 import { ButtonGroup, Button, FormGroup, Label } from 'reactstrap';
 import { translate } from '../../localization/AutoIntlProvider';
+import { GroupSorting } from "../../types/intrasocial_types";
 
-export enum GroupSorting {
-    recent = "recent",
-    mostUsed = "most_used",
-    AtoZ = "alphabetically",
-}
-export namespace GroupSorting {
-    export const all = [
-        GroupSorting.recent,
-        GroupSorting.mostUsed,
-        GroupSorting.AtoZ
-    ]
-    export function translatedText(type: GroupSorting) {
-        switch(type){
-            case GroupSorting.recent: return translate("common.sorting.recent")
-            case GroupSorting.mostUsed: return translate("common.sorting.mostUsed")
-            case GroupSorting.AtoZ: return translate("common.sorting.AtoZ")
-            default: return "N/A"
-        }
-    }
-    export function icon(type: GroupSorting) {
-        switch(type){
-            case GroupSorting.recent: return <i className="fa fa-user-clock"></i>
-            case GroupSorting.mostUsed: return <i className="fa fa-burn"></i>
-            default: return  <i className="fa fa-question"></i>
-        }
-    }
-}
+
 export type GroupsMenuData = {
     sorting:GroupSorting
 }

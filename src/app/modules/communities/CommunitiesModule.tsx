@@ -17,7 +17,6 @@ import SimpleModule from '../SimpleModule';
 import { CommonModuleProps } from '../Module';
 
 type OwnProps = {
-    className?: string
     breakpoint: ResponsiveBreakpoint
     isMember?: boolean
 } & CommonModuleProps

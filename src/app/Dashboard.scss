@@ -1,3 +1,4 @@
+@import "./Config";
 #dashboard
 {
     > .dashboard-components{
@@ -19,6 +20,18 @@
         max-width: initial;
     }
 }
+body.has-side-menu {
+    .dashboard-container
+    {
+        margin-left: $sideMenuInactiveWidth;
+    }
+    &.side-menu-locked{
+        .dashboard-container
+        {
+            margin-left: $sideMenuActiveWidth;
+        }
+    }
+}
 .dashboard-container{
     #page-header + *{
         position: relative;
@@ -28,14 +41,6 @@
 body.rb-200
 {
     #dashboard{
-        > .dashboard-components
-        {
-            .module-grid
-            {
-                grid-auto-rows:initial;
-                grid-gap: 8px;
-            }
-        }
         .module-grid-item{
             min-height: 0;
         }

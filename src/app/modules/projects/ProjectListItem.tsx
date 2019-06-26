@@ -1,7 +1,7 @@
 import * as React from 'react'
 import classnames from "classnames"
 import "./ProjectListItem.scss"
-import { Project, IntraSocialType } from '../../types/intrasocial_types';
+import { Project, ContextNaturalKey } from '../../types/intrasocial_types';
 import { SecureImage } from '../../components/general/SecureImage';
 import { projectCover } from '../../utilities/Utilities';
 import { translate } from '../../localization/AutoIntlProvider';
@@ -30,7 +30,7 @@ export default class ProjectListItem extends React.Component<Props, State> {
         const {project, className, children, ...rest} = this.props
         const projectClass = classnames("project-list-item", className)
         const cover = projectCover(project, true)
-        return (<IntraSocialLink to={project} type={IntraSocialType.project} {...rest} className={projectClass}>
+        return (<IntraSocialLink to={project} type={ContextNaturalKey.PROJECT} {...rest} className={projectClass}>
                     <div className="drop-shadow">
                         <div className="top">
                             <SecureImage className="img" setBearer={true} setAsBackground={true} url={cover}/>

@@ -1,10 +1,16 @@
 @import "../../Config";
 #top-navigation{
-    height: 60px;
-    .profile-box{
-        .user-status-indicator{
-            bottom: -2px;
-            right: -2px;
+    height: $topMenuHeight;
+    #user-menu{
+        height: 100%;
+        align-items: center;
+        .trigger{
+            height: 100%;
+            cursor: pointer;
+            .user-status-indicator{
+                bottom: -2px;
+                right: -2px;
+            }
         }
     }
     .logo{
@@ -15,6 +21,6 @@
         width:100%;
         position:fixed;
         top:0px;
-        height: 60px;
+        height: $topMenuHeight;
     }
 }

@@ -69,8 +69,7 @@ type ArrayItem =
     index:number
     object:FeedListItem
 }
-interface OwnProps
-{
+type OwnProps = {
     limit:number
     contextNaturalKey?:ContextNaturalKey
     contextObjectId?:number
@@ -82,21 +81,17 @@ interface OwnProps
     onLoadingStateChanged?:(isLoading:boolean) => void
     isResolvingContext?:boolean
 }
-interface RouteProps
-{
+type RouteProps = {
     history:any
     location: any
     match:any
 }
-interface ReduxStateProps
-{
+type ReduxStateProps = {
     authenticatedProfile:UserProfile,
 }
-interface ReduxDispatchProps
-{
+type ReduxDispatchProps = {
 }
-interface State
-{
+type State = {
     activeCommentLoaders:{[index:number]:StatusCommentLoader}
     items:FeedListItem[]
     isLoading: boolean
@@ -104,16 +99,16 @@ interface State
     hasMore:boolean
     hasLoaded:boolean
 }
-interface IncomingUpdateItem{
+type IncomingUpdateItem = {
     type:string
     status_id:number
     parent_id?:number
 }
-interface IncomingInteractionItem extends IncomingUpdateItem {
+type IncomingInteractionItem = {
     interaction_id:number
     reaction:string
     user_id:number
-}
+} & IncomingUpdateItem
 type Props = ReduxStateProps & ReduxDispatchProps & OwnProps & RouteProps
 export class NewsfeedComponent extends React.Component<Props, State> {
     private isOdd:boolean = false
@@ -1249,8 +1244,8 @@ const mapStateToProps = (state:ReduxState, ownProps: OwnProps):ReduxStateProps =
         authenticatedProfile:state.authentication.profile,
     }
 }
-const mapDispatchToProps = (dispatch:any, ownProps: OwnProps):ReduxDispatchProps => {
-    return {
-    }
+const mergeProps = (stateProps, dispatchProps, ownProps) => 
+{ 
+    return {...ownProps, ...stateProps}
 }
-export default withRouter(connect<ReduxStateProps, ReduxDispatchProps, OwnProps>(mapStateToProps, mapDispatchToProps, null, { withRef: true })(NewsfeedComponent))
+export default withRouter(connect(mapStateToProps, undefined, mergeProps, { forwardRef:true })(NewsfeedComponent))

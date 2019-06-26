@@ -25,6 +25,7 @@ export enum EventStreamMessageType {
     COMMUNITY_UPDATE = "community.update",
     COMMUNITY_DELETE = "community.delete",
     NOTIFICATIONS_UNHANDLED = "notifications.unhandled",
+    FAVORITES_UPDATE = "favorites.update",
 
 }
 export const eventStreamNotificationPrefix = "eventstream_"

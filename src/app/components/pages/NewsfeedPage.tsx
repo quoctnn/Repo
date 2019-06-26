@@ -19,7 +19,9 @@ export default class NewsfeedPage extends React.Component<Props & React.HTMLAttr
                         includeSubContext={includeSubContext} 
                         contextNaturalKey={match.params.contextNaturalKey} 
                         contextObjectId={match.params.contextObjectId} 
-                        scrollParent={window} />
+                        scrollParent={window} 
+                        //authenticatedProfile={null}
+                        />
                 </div>
         );
     }

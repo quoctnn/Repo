@@ -57,7 +57,7 @@ class ProjectPage extends React.Component<Props, State>
             <div id="project-page" className="dashboard-container">
                 {!hasData && this.renderNotFound()}
                 {hasData && 
-                    <div className="content dashboard-container">
+                    <div className="content">
                         {this.renderHeader(project, community)}
                         <DashboardWithData category="project" />
                     </div>

@@ -21,6 +21,7 @@ import { resetThemeAction } from '../redux/theme';
 import { resetActiveCommunityAction } from '../redux/activeCommunity';
 import { resetEmbedlyStoreAction } from '../components/general/embedly/redux';
 import { resetUnreadNotificationsAction } from '../redux/unreadNotifications';
+import { FavoriteManager } from './FavoriteManager';
 
 export type ApplicationData = {
     dashboards:Dashboard[]
@@ -69,6 +70,7 @@ export abstract class ApplicationManager
         requests.push({name:"Communities", action:ApplicationManager.fetchCommunities})
         requests.push({name:"Profile", action:ApplicationManager.fetchProfile})
         requests.push({name:"Contacts", action:ApplicationManager.fetchContacts})
+        requests.push({name:"Favorites", action:ApplicationManager.fetchFavorites})
         let requestsCompleted = 0
         const requestCompleter = (request:RequestObject) => {
             requestsCompleted += 1
@@ -94,7 +96,7 @@ export abstract class ApplicationManager
         })
     }
     private static fetchCommunities = (completion:() => void) => {
-        ApiClient.getCommunities(true, ListOrdering.ALPHABETICAL, 100, 0, (data, status, error) => {
+        ApiClient.getCommunities(true, ListOrdering.ALPHABETICALLY, 100, 0, (data, status, error) => {
             const communities = (data && data.results) || []
             CommunityManager.storeCommunities(communities)
             completion()
@@ -113,6 +115,14 @@ export abstract class ApplicationManager
         ApiClient.getProfiles(100, 0, (data, status, error) => {
             const profiles = (data && data.results) || []
             ProfileManager.storeProfiles(profiles)
+            completion()
+            ToastManager.showErrorToast(error)
+        })
+    }
+    private static fetchFavorites = (completion:() => void) => {
+        ApiClient.getFavorites((data, status, error) => {
+            const favorites = (data && data.results) || []
+            FavoriteManager.setFavoritesToStore(favorites)
             completion()
             ToastManager.showErrorToast(error)
         })

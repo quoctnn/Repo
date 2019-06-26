@@ -248,6 +248,7 @@ var translations = {
     "notification.group.activity":"Activity",
     "notification.group.reports":"Reports",
     "common.load.more":"Load more",
+    "menu.favorites":"Favorites",
   },
   no: {
     "search.placeholder": "Søk ...",
@@ -499,6 +500,7 @@ var translations = {
     "notification.group.activity":"Aktivitet",
     "notification.group.reports":"Rapporter",
     "common.load.more":"Last flere",
+    "menu.favorites":"Favoritter",
   },
   en: {
     "search.placeholder": "Search ...",
@@ -757,6 +759,7 @@ var translations = {
     "notification.group.activity":"Activity",
     "notification.group.reports":"Reports",
     "common.load.more":"Load more",
+    "menu.favorites":"Favorites",
   }
 };
 

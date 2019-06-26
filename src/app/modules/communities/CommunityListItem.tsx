@@ -1,7 +1,7 @@
 import * as React from 'react'
 import classnames from "classnames"
 import "./CommunityListItem.scss"
-import { Community, IntraSocialType } from '../../types/intrasocial_types';
+import { Community, ContextNaturalKey } from '../../types/intrasocial_types';
 import { communityCover } from '../../utilities/Utilities';
 import { SecureImage } from '../../components/general/SecureImage';
 import { IntraSocialLink } from '../../components/general/IntraSocialLink';
@@ -42,7 +42,7 @@ export default class CommunityListItem extends React.Component<Props, State> {
         const {community, className, ...rest} = this.props
         const communityClass = classnames("community-list-item", className)
         const cover = communityCover(community, true)
-        return (<IntraSocialLink to={community} type={IntraSocialType.community} {...rest} className={communityClass}>
+        return (<IntraSocialLink to={community} type={ContextNaturalKey.COMMUNITY} {...rest} className={communityClass}>
                     <div className="drop-shadow hover-card">
                         <SecureImage className="img top" setBearer={true} setAsBackground={true} url={cover}/>
                         <div className="bottom d-flex align-items-center flex-row">

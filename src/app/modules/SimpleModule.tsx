@@ -25,6 +25,7 @@ type OwnProps = {
     style?: React.CSSProperties
     modalLinkTitle?:string
     renderModalContent?:() => JSX.Element
+    moduleRef?:React.LegacyRef<HTMLDivElement>
 }
 type DefaultProps = {
     showHeader:boolean

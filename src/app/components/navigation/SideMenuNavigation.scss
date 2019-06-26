@@ -1,0 +1,199 @@
+@import "../../Config";
+$rowHeight:49px;
+$gridItemHeight:70px;
+#side-menu-navigation
+{
+    cursor: pointer;
+    > * {
+        flex-shrink: 0;
+    }
+    z-index: 1050;
+    border-top-right-radius: 8px;
+    width: $sideMenuInactiveWidth;
+    position: fixed;
+    top: 75px;
+    left: 0;
+    bottom: 0;
+    transition-timing-function: ease-in-out;
+    transition-property: width;
+    display: flex;
+    flex-direction: column;
+    .spacer{
+        height: 1px;
+        max-height: 1px;
+    }
+    .footer{
+        margin: 8px;
+        flex-direction: row-reverse;
+        display: flex;
+    }
+    .menu-grid-item{
+        border-radius: 4px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        width: 65px;
+        @include var(background-color, main-content-secondary-background);
+        flex-shrink: 0;
+        margin:2px;
+        position: relative;
+        height: 70px;
+        .cover{
+            height: 40px;
+            object-fit: cover;
+        }
+        .footer{
+            padding: 2px;
+            display: flex;
+            height: 30px;
+            font-size: 0.65em;
+            justify-content: center;
+            align-items: center;
+        }
+        img{
+            user-select: none;
+        }
+        .icon{
+            display: flex;
+            position: absolute;
+            top: 28px;
+            left:(65px - 20px) / 2;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            font-size: 0.8em;
+            justify-content: center;
+            align-items: center;
+            @include var(background-color, main-content-secondary-background);
+        }
+    }
+    .hbar{
+        transition-timing-function: ease-in-out;
+        transition-property: height, margin;
+        flex-shrink: 0;
+        align-self: center;
+    }
+    .menu-content{
+        overflow-y: auto;
+        padding: 0;
+        overflow-x: hidden;
+        display: flex;
+        flex-direction: column;
+        -webkit-overflow-scrolling: touch;
+        flex-grow: 1;
+        flex-shrink: inherit;
+    }
+    .menu-toolbar{
+        justify-content: center;
+        transition-timing-function: ease-in-out;
+        transition-property: height;
+        height: 0;
+        overflow: hidden;
+        .menu-button{
+            transition-timing-function: ease-in-out;
+            transition-property: all,transform;
+            height: $rowHeight;
+        }
+    }
+    .menu-block{
+        flex-shrink: 0;
+        .menu-block-side{
+            height: $rowHeight;
+            align-items: initial;
+        }
+        .menu-block-content{
+            min-width: 0;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            .iw-collapse{
+                flex-shrink: 0;
+                width: 215px;
+            }
+        }
+        .menu-block-header{
+            align-items: center;
+            display: flex;
+            height: $rowHeight;
+            font-size: 1.2em;
+            text-transform: uppercase;
+            cursor: pointer;
+        }
+        &.active{
+            .menu-block-side{
+                height: 100%;
+            }
+        }
+    }
+    &.mode-grid{
+        .iw-collapse{
+            flex-direction: row;
+            flex-wrap: wrap;
+            //height: $gridItemHeight * 2 + 4 * 2;
+        }
+    }
+    .intrawork-logo{
+        @include var(fill, primary-theme-color);
+        height: $rowHeight;
+        margin: 9px;
+    }
+    .intrawork-logo-small{
+        @include var(fill, primary-theme-color);
+        height: $rowHeight;
+        transition-timing-function: ease-in-out;
+        transition-property: height;
+        margin: 0 auto;
+    }
+    .menu-header{
+        height: $rowHeight;
+        justify-content: center;
+        align-items: center;
+    }
+    .menu-button{
+        &.menu-toggle{
+            cursor: pointer;
+        }
+        justify-content: center;
+        align-items: center;
+        font-size: 1.6em;
+        display: flex;
+        height: 100%;
+        width: $sideMenuInactiveWidth;
+        flex-shrink: 0;
+        i{
+            align-self: center;
+        }
+    }
+    .mode-switch{
+        transform: rotate(-180deg);
+    }
+    .anim-icon-button
+    {
+        transition-timing-function: ease-in-out;
+        transition-property: transform;
+    }
+    &.active{
+        cursor: initial;
+        width: $sideMenuActiveWidth;
+        .menu-toolbar{
+            height: 35px !important;
+            .menu-button{
+                height: 35px !important;
+                transform:scale(0.7);
+                &.mode-switch{
+                    transform: rotate(-180deg) scale(0.7);
+                }
+            }
+        }
+        .intrawork-logo-small{
+            height: 0;
+        }
+        .anim-icon-button
+        {
+            transform: rotate(-180deg);
+        }
+        &.locked{
+
+        }
+    }
+}

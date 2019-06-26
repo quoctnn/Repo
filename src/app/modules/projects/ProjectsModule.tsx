@@ -4,14 +4,14 @@ import classnames from "classnames"
 import "./ProjectsModule.scss"
 import { ResponsiveBreakpoint } from '../../components/general/observers/ResponsiveComponent';
 import { translate } from '../../localization/AutoIntlProvider';
-import { ContextNaturalKey, Community, Project } from '../../types/intrasocial_types';
+import { ContextNaturalKey, Community, Project, ProjectSorting } from '../../types/intrasocial_types';
 import ListComponent from '../../components/general/ListComponent';
 import ApiClient, { PaginationResult } from '../../network/ApiClient';
 import { ToastManager } from '../../managers/ToastManager';
 import { connect } from 'react-redux';
 import { ReduxState } from '../../redux';
 import ProjectsMenu from './ProjectsMenu';
-import { ProjectsMenuData, ProjectSorting } from './ProjectsMenu';
+import { ProjectsMenuData } from './ProjectsMenu';
 import ProjectListItem from './ProjectListItem';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import SimpleModule from '../SimpleModule';
@@ -19,7 +19,6 @@ import { ContextManager } from '../../managers/ContextManager';
 import { ButtonGroup, Button } from 'reactstrap';
 import { CommonModuleProps } from '../Module';
 type OwnProps = {
-    className?:string
     breakpoint:ResponsiveBreakpoint
 } & CommonModuleProps
 type State = {

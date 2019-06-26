@@ -52,7 +52,7 @@ class ConversationsPage extends React.Component<Props, State>
         const {community} = this.props
         return(
             <div id="conversations-page" className="dashboard-container">
-                <div className="content dashboard-container">
+                <div className="content">
                     {this.renderHeader(community)}
                     <DashboardWithData category="conversations" updateKey={this.props.updateKey} />
                 </div>

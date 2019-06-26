@@ -5,7 +5,7 @@ import "./GroupsModule.scss"
 import { ResponsiveBreakpoint } from '../../components/general/observers/ResponsiveComponent';
 import { translate } from '../../localization/AutoIntlProvider';
 import CircularLoadingSpinner from '../../components/general/CircularLoadingSpinner';
-import { ContextNaturalKey, Group, Community } from '../../types/intrasocial_types';
+import { ContextNaturalKey, Group, Community, GroupSorting } from '../../types/intrasocial_types';
 import GroupsMenu, { GroupsMenuData } from './GroupsMenu';
 import ListComponent from '../../components/general/ListComponent';
 import ApiClient, { PaginationResult } from '../../network/ApiClient';
@@ -17,11 +17,20 @@ import LoadingSpinner from '../../components/LoadingSpinner';
 import SimpleModule from '../SimpleModule';
 import { ContextManager } from '../../managers/ContextManager';
 import { ButtonGroup, Button } from 'reactstrap';
-import { GroupSorting } from './GroupsMenu';
 import { CommonModuleProps } from '../Module';
+import SimpleGroupListItem from './SimpleGroupListItem';
+export enum GroupsRenderMode {
+    simple, normal
+}
 type OwnProps = {
-    className?:string
     breakpoint:ResponsiveBreakpoint
+}
+type DefaultProps = {
+    sorting:GroupSorting
+    showHeader:boolean
+    renderMode:GroupsRenderMode
+    excludeCommunityFilter:boolean
+    allowListDivider:boolean
 } & CommonModuleProps
 type State = {
     menuVisible:boolean
@@ -33,12 +42,17 @@ type ReduxStateProps = {
 }
 type ReduxDispatchProps = {
 }
-type Props = OwnProps & RouteComponentProps<any> & ReduxStateProps & ReduxDispatchProps
+type Props = OwnProps & RouteComponentProps<any> & ReduxStateProps & ReduxDispatchProps & DefaultProps
 class GroupsModule extends React.Component<Props, State> {
     tempMenuData:GroupsMenuData = null
     groupsList = React.createRef<ListComponent<Group>>()
-    static defaultProps:CommonModuleProps = {
+    static defaultProps:DefaultProps = {
         pageSize:15,
+        sorting:GroupSorting.recent,
+        showHeader:true,
+        renderMode:GroupsRenderMode.normal,
+        excludeCommunityFilter:false,
+        allowListDivider:true
     }
     constructor(props:Props) {
         super(props);
@@ -46,7 +60,7 @@ class GroupsModule extends React.Component<Props, State> {
             menuVisible:false,
             isLoading:false,
             menuData:{
-                sorting:GroupSorting.recent
+                sorting:props.sorting
             }
         }
     }
@@ -55,7 +69,7 @@ class GroupsModule extends React.Component<Props, State> {
         this.groupsList = null
     }
     shouldReloadList = (prevProps:Props) => {
-        return this.props.community && prevProps.community && this.props.community.id != prevProps.community.id
+        return !this.props.excludeCommunityFilter && this.props.community && prevProps.community && this.props.community.id != prevProps.community.id
     }
     componentDidUpdate = (prevProps:Props, prevState:State) => {
         if(this.shouldReloadList(prevProps) || this.contextDataChanged(prevState.menuData, prevProps))
@@ -88,20 +102,21 @@ class GroupsModule extends React.Component<Props, State> {
     }
     fetchGroups = (offset:number, completion:(items:PaginationResult<Group>) => void ) => {
         let ordering = this.state.menuData.sorting
-        const communityId = this.props.community && this.props.community.id
+        const communityId = this.props.excludeCommunityFilter ? null : this.props.community && this.props.community.id
         ApiClient.getGroups(communityId, this.props.pageSize, offset, ordering, (data, status, error) => {
             completion(data)
             ToastManager.showErrorToast(error)
         })
     }
     renderGroup = (group:Group) =>  {
+        if(this.props.renderMode == GroupsRenderMode.simple)
+            return <SimpleGroupListItem key={group.id} group={group}/>
         return <GroupListItem key={group.id} group={group} />
     }
     renderContent = () => {
-        return <>
-            {!this.props.community && <LoadingSpinner key="loading"/>}
-            {this.props.community && <ListComponent<Group> loadMoreOnScroll={!this.props.showLoadMore} ref={this.groupsList} onLoadingStateChanged={this.feedLoadingStateChanged} fetchData={this.fetchGroups} renderItem={this.renderGroup} />}
-            </>
+        if(this.props.excludeCommunityFilter || this.props.community)
+            return <ListComponent<Group> allowDivider={this.props.allowListDivider} loadMoreOnScroll={!this.props.showLoadMore} ref={this.groupsList} onLoadingStateChanged={this.feedLoadingStateChanged} fetchData={this.fetchGroups} renderItem={this.renderGroup} />
+        return <LoadingSpinner key="loading"/>
     }
     onMenuToggle = (visible:boolean) => {
         const newState:Partial<State> = {}
@@ -133,13 +148,14 @@ class GroupsModule extends React.Component<Props, State> {
     }
     render()
     {
-        const {history, match, location, staticContext, contextNaturalKey, community, pageSize, showLoadMore, showInModal, isModal, ...rest} = this.props
+        const {history, match, location, staticContext, contextNaturalKey, community, pageSize, showLoadMore, showInModal, isModal, showHeader, sorting, renderMode, excludeCommunityFilter, allowListDivider,  ...rest} = this.props
         const {breakpoint, className} = this.props
         const cn = classnames("groups-module", className)
         const menu = <GroupsMenu data={this.state.menuData} onUpdate={this.menuDataUpdated}  />
         const headerContent = this.renderSorting()
         const renderModalContent = !showInModal || isModal ? undefined : this.renderModalContent
         return (<SimpleModule {...rest}
+                    showHeader={showHeader}
                     showHeaderTitle={!isModal}
                     renderModalContent={renderModalContent}
                     className={cn}

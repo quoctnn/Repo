@@ -613,12 +613,12 @@ export class SearcQueryManager
     static convertResultItem = (item:any, onItemSelect:(event:React.SyntheticEvent<any>, item:AutocompleteSectionItem) => void):AutocompleteSectionItem => {
         switch(item.object_type)
         {
-            case ElasticSearchType.COMMUNITY:return new AutocompleteSectionItem(item.django_id, item.slug, item.name, null, null, null, ElasticSearchType.COMMUNITY, item.avatar || ContextNaturalKey.avatarForKey(ContextNaturalKey.COMMUNITY) , onItemSelect, null)
-            case ElasticSearchType.GROUP:return new AutocompleteSectionItem(item.django_id, item.slug, item.name, null, null, null, ElasticSearchType.GROUP, item.avatar || ContextNaturalKey.avatarForKey(ContextNaturalKey.GROUP), onItemSelect, null)
-            case ElasticSearchType.USER:return new AutocompleteSectionItem(item.django_id, item.slug, item.user_name, null, null, null, ElasticSearchType.USER, item.avatar || ContextNaturalKey.avatarForKey(ContextNaturalKey.USER), onItemSelect, null)
-            case ElasticSearchType.PROJECT:return new AutocompleteSectionItem(item.django_id, item.slug, item.name, null, null, null, ElasticSearchType.PROJECT, item.avatar || ContextNaturalKey.avatarForKey(ContextNaturalKey.PROJECT), onItemSelect, null)
-            case ElasticSearchType.TASK:return new AutocompleteSectionItem(item.django_id, item.slug, item.title, null, null, null, ElasticSearchType.TASK, item.avatar || ContextNaturalKey.avatarForKey(ContextNaturalKey.TASK), onItemSelect, null)
-            case ElasticSearchType.EVENT:return new AutocompleteSectionItem(item.django_id, item.slug, item.name, null, null, null, ElasticSearchType.EVENT, item.avatar || ContextNaturalKey.avatarForKey(ContextNaturalKey.EVENT), onItemSelect, null)
+            case ElasticSearchType.COMMUNITY:return new AutocompleteSectionItem(item.django_id, item.slug, item.name, null, null, null, ElasticSearchType.COMMUNITY, item.avatar || ContextNaturalKey.defaultAvatarForKey(ContextNaturalKey.COMMUNITY) , onItemSelect, null)
+            case ElasticSearchType.GROUP:return new AutocompleteSectionItem(item.django_id, item.slug, item.name, null, null, null, ElasticSearchType.GROUP, item.avatar || ContextNaturalKey.defaultAvatarForKey(ContextNaturalKey.GROUP), onItemSelect, null)
+            case ElasticSearchType.USER:return new AutocompleteSectionItem(item.django_id, item.slug, item.user_name, null, null, null, ElasticSearchType.USER, item.avatar || ContextNaturalKey.defaultAvatarForKey(ContextNaturalKey.USER), onItemSelect, null)
+            case ElasticSearchType.PROJECT:return new AutocompleteSectionItem(item.django_id, item.slug, item.name, null, null, null, ElasticSearchType.PROJECT, item.avatar || ContextNaturalKey.defaultAvatarForKey(ContextNaturalKey.PROJECT), onItemSelect, null)
+            case ElasticSearchType.TASK:return new AutocompleteSectionItem(item.django_id, item.slug, item.title, null, null, null, ElasticSearchType.TASK, item.avatar || ContextNaturalKey.defaultAvatarForKey(ContextNaturalKey.TASK), onItemSelect, null)
+            case ElasticSearchType.EVENT:return new AutocompleteSectionItem(item.django_id, item.slug, item.name, null, null, null, ElasticSearchType.EVENT, item.avatar || ContextNaturalKey.defaultAvatarForKey(ContextNaturalKey.EVENT), onItemSelect, null)
             
             default: return null
         }

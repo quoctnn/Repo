@@ -57,7 +57,7 @@ class EventPage extends React.Component<Props, State>
             <div id="event-page" className="dashboard-container">
                 {!hasData && this.renderNotFound()}
                 {hasData && 
-                    <div className="content dashboard-container">
+                    <div className="content">
                         {this.renderHeader(event, community)}
                         <DashboardWithData category="event" />
                     </div>

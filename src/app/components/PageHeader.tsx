@@ -6,6 +6,7 @@ import PageMainNavigation from "./PageMainNavigation";
 import PageTopMenu from "./PageTopMenu";
 import Logo from "./general/images/Logo";
 import TopNavigation from "./navigation/TopNavigation";
+import SideMenuNavigation from "./navigation/SideMenuNavigation";
 
 interface OwnProps
 {
@@ -17,7 +18,7 @@ type Props = OwnProps
 
 export default class PageHeader extends React.Component<Props, {}> {
     render() {
-        return <TopNavigation />
+        return null
         const { coverImage } = this.props
         const cn = classnames({"no-image": !coverImage}, {"fallback": coverImage});
         return(<div id="page-header" className={cn}>

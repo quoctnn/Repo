@@ -16,7 +16,6 @@ import { ToastManager } from '../../managers/ToastManager';
 import { ContextManager } from '../../managers/ContextManager';
 import { CommonModuleProps } from '../Module';
 type OwnProps = {
-    className?:string
     breakpoint:ResponsiveBreakpoint
 }
 type DefaultProps = {

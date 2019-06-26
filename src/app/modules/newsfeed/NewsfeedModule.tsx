@@ -149,7 +149,7 @@ class NewsfeedModule extends React.Component<Props, State> {
     }
     onAddStatusActionPress = (action: StatusActions, extra?: any, completion?: (success: boolean) => void) => {
         this.blurStatusComposer()
-        const instance = this.newsfeedComponent.wrappedInstance as NewsfeedComponent
+        const instance = this.newsfeedComponent as NewsfeedComponent
         if(instance)
             instance.createNewStatus(extra.message, extra.mentions, extra.files, completion )
     }
@@ -191,6 +191,9 @@ class NewsfeedModule extends React.Component<Props, State> {
         }
         return null
     }
+    connectRef = (ref) => {
+        this.newsfeedComponent = ref
+    }
     render()
     {
         const {breakpoint, history, match, location, staticContext, className, contextNaturalKey, contextObjectId, contextObject, includeSubContext, ...rest} = this.props
@@ -199,7 +202,6 @@ class NewsfeedModule extends React.Component<Props, State> {
         const resolvedContextNaturalKey = this.state.contextNaturalKey || this.props.contextNaturalKey
         const resolvedContextObjectId =  this.state.contextObjectId || this.props.contextObjectId
         const filter = this.state.filter
-        const r = {wrappedComponentRef:(c) => this.newsfeedComponent = c}
         const disableContextSearch = !!contextNaturalKey && !!contextObjectId
         const showComposer = !!this.props.contextNaturalKey && !!this.props.contextObjectId
         const composer = showComposer ? this.renderStatusComposer(resolvedContextNaturalKey, resolvedContextObjectId) : undefined
@@ -223,7 +225,7 @@ class NewsfeedModule extends React.Component<Props, State> {
                     {breakpoint >= ResponsiveBreakpoint.standard && //do not render for small screens
                         <>
                             <ModuleContent>
-                                <NewsfeedComponentRouted {...r}
+                                <NewsfeedComponentRouted wrappedComponentRef={this.connectRef}
                                     onLoadingStateChanged={this.feedLoadingStateChanged}
                                     includeSubContext={this.state.includeSubContext}
                                     contextNaturalKey={resolvedContextNaturalKey}

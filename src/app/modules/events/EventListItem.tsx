@@ -1,7 +1,7 @@
 import * as React from 'react'
 import classnames from "classnames"
 import "./EventListItem.scss"
-import { Event, IntraSocialType } from '../../types/intrasocial_types';
+import { Event, ContextNaturalKey } from '../../types/intrasocial_types';
 import { eventCover, stringToDateFormat, DateFormat } from '../../utilities/Utilities';
 import { SecureImage } from '../../components/general/SecureImage';
 import { IntraSocialLink } from '../../components/general/IntraSocialLink';
@@ -30,7 +30,7 @@ export default class EventListItem extends React.Component<Props, State> {
         const {event, className, children, ...rest} = this.props
         const eventClass = classnames("event-list-item", className)
         const cover = eventCover(event, true)
-        return (<IntraSocialLink to={event} type={IntraSocialType.event} {...rest} className={eventClass}>
+        return (<IntraSocialLink to={event} type={ContextNaturalKey.EVENT} {...rest} className={eventClass}>
                     <div className="drop-shadow">
                         <SecureImage className="top img" setBearer={true} setAsBackground={true} url={cover}>
                             <div className="flex-grow-1"></div>

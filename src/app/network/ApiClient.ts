@@ -2,7 +2,7 @@ import Constants from "../utilities/Constants";
 import {AjaxRequest} from "./AjaxRequest";
 import { EndpointManager } from '../managers/EndpointManager';
 var $ = require("jquery")
-import { Status, UserProfile, UploadedFile, Community, Group, Conversation, Project, Message, Event, Task, ElasticSearchType, ObjectAttributeType, StatusObjectAttribute, EmbedCardItem, ReportTag, ContextNaturalKey, ReportResult, Dashboard, Timesheet, Coordinate, RecentActivity, UnhandledNotifications, UnreadNotificationCounts } from '../types/intrasocial_types';
+import { Status, UserProfile, UploadedFile, Community, Group, Conversation, Project, Message, Event, Task, ElasticSearchType, ObjectAttributeType, StatusObjectAttribute, EmbedCardItem, ReportTag, ContextNaturalKey, ReportResult, Dashboard, Timesheet, Coordinate, RecentActivity, UnhandledNotifications, UnreadNotificationCounts, GroupSorting, ProjectSorting, Favorite } from '../types/intrasocial_types';
 import { nullOrUndefined } from '../utilities/Utilities';
 import moment = require("moment");
 import { Settings } from "../utilities/Settings";
@@ -18,7 +18,7 @@ export type ApiStatusCommentsCallback<T> = (data: StatusCommentsResult<T>, statu
 
 
 export enum ListOrdering {
-    ALPHABETICAL = "alphabetical",
+    ALPHABETICALLY = "alphabetically",
     LAST_USED = "last-used",
     MOST_USED = "most-used",
 }
@@ -482,7 +482,7 @@ export default class ApiClient
             callback(null, status, error)
         })
     }
-    static getGroups(community:number, limit:number, offset:number, ordering:string, callback:ApiClientFeedPageCallback<Group>)
+    static getGroups(community:number, limit:number, offset:number, ordering:GroupSorting, callback:ApiClientFeedPageCallback<Group>)
     {
         let url = Constants.apiRoute.groupsUrl + "?" + this.getQueryString({community, limit, offset, ordering})
         AjaxRequest.get(url, (data, status, request) => {
@@ -491,6 +491,7 @@ export default class ApiClient
             callback(null, status, error)
         })
     }
+    
     static getGroup(groupId:string, callback:ApiClientCallback<Group>)
     {
         let url = Constants.apiRoute.groupUrl(groupId)
@@ -519,7 +520,7 @@ export default class ApiClient
             callback(null, status, error)
         })
     }
-    static getProjects(community:number, limit:number, offset:number, ordering:string, responsible:boolean, assigned:boolean, callback:ApiClientFeedPageCallback<Project>)
+    static getProjects(community:number, limit:number, offset:number, ordering:ProjectSorting, responsible:boolean, assigned:boolean, callback:ApiClientFeedPageCallback<Project>)
     {
         let url = Constants.apiRoute.projectsUrl + "?" + this.getQueryString({community, limit, offset, ordering, responsible, assigned})
         AjaxRequest.get(url, (data, status, request) => {
@@ -564,6 +565,46 @@ export default class ApiClient
             this.sendMessage(message, callback)
         }
         
+    }
+    static getFavorites(callback:ApiClientFeedPageCallback<Favorite>)
+    {
+        let url = Constants.apiRoute.favoritesUrl + "?" + this.getQueryString({limit:100})
+        AjaxRequest.get(url, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
+    static createFavorite(object_natural_key:ContextNaturalKey, object_id:number, index:number, callback:ApiClientCallback<Favorite>)
+    {
+        let url = Constants.apiRoute.favoritesUrl
+        const data:Partial<Favorite> = {}
+        data.object_natural_key = object_natural_key
+        data.object_id = object_id
+        if(index)
+            data.index = index
+        AjaxRequest.postJSON(url, data, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
+    static updateFavorite(id:number, object_natural_key:ContextNaturalKey, object_id:number, index:number, callback:ApiClientCallback<Favorite>)
+    {
+        let url = Constants.apiRoute.updateFavoriteUrl(id)
+        AjaxRequest.patchJSON(url, {object_natural_key, object_id, index}, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
+    static deleteFavorite(id:number, callback:ApiClientCallback<any>){
+        let url = Constants.apiRoute.updateFavoriteUrl(id)
+        AjaxRequest.delete(url, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
     }
     private static sendMessage(message:Message, callback:ApiClientCallback<Message>){
         var data = { conversation: message.conversation, text: message.text, uid: message.uid, mentions:message.mentions, files:(message.files || []).map(f => f.id) }

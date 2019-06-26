@@ -19,7 +19,6 @@ import { EventSorting } from './EventsMenu';
 import { ButtonGroup, Button } from 'reactstrap';
 import { CommonModuleProps } from '../Module';
 type OwnProps = {
-    className?:string
     breakpoint:ResponsiveBreakpoint
 } & CommonModuleProps
 type State = {

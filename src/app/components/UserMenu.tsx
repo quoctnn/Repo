@@ -139,8 +139,10 @@ class UserMenu extends React.Component<Props, State> {
         if (!this.props.profile || this.props.profile.is_anonymous)
             return <Link className="btn btn-sm btn-outline-secondary" to={Routes.SIGNIN}>{translate("Sign in")}</Link>
         const currentStatus = UserStatus.getObject(profile.user_status)
-        return <Avatar onClick={this.onTriggerClick} innerRef={(ref) => this.triggerRef = ref} image={userAvatar(this.props.profile, true)} size={40} statusColor={currentStatus && currentStatus.color} >
+        return <div ref={(ref) => this.triggerRef = ref} className="trigger d-flex align-items-center">
+                    <Avatar onClick={this.onTriggerClick} image={userAvatar(this.props.profile, true)} size={40} statusColor={currentStatus && currentStatus.color} >
                     </Avatar>
+                </div>
     }
     render() {
         const cn = classnames("d-flex", this.props.className)

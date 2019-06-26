@@ -59,7 +59,7 @@ class TaskPage extends React.Component<Props, State>
             <div id="task-page" className="dashboard-container">
                 {!hasData && this.renderNotFound()}
                 {hasData && 
-                    <div className="content dashboard-container">
+                    <div className="content">
                         {this.renderHeader(community)}
                         <DashboardWithData category="task" />
                     </div>

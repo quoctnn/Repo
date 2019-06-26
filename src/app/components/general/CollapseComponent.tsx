@@ -1,23 +1,33 @@
 import * as React from 'react';
 import classNames from 'classnames';
 import "./CollapseComponent.scss"
+import { uniqueId } from '../../utilities/Utilities';
 
-enum CollapseState{
+export enum CollapseState{
     insertContent, opening, open, closing, closed, removeContent
 }
-export interface Props 
-{
+type OwnProps = {
     visible:boolean
 }
+type DefaultProps = {
+    animationDuration:number
+    removeContentOnCollapsed:boolean
+}
+type Props = DefaultProps & OwnProps & React.HTMLAttributes<HTMLDivElement>
 interface State 
 {
     state:CollapseState
     contentVisible:boolean
 }
-export default class CollapseComponent extends React.PureComponent<Props & React.HTMLAttributes<HTMLDivElement>, State> 
+export default class CollapseComponent extends React.PureComponent<Props, State> 
 {     
-    animationDuration = 250
     container = React.createRef<HTMLDivElement>();
+    count:number = 0
+    id = uniqueId()
+    static defaultProps:DefaultProps = {
+        animationDuration : 250,
+        removeContentOnCollapsed:true
+    }
     constructor(props:Props)
     {
         super(props)
@@ -74,7 +84,7 @@ export default class CollapseComponent extends React.PureComponent<Props & React
                 if(prevState.state == CollapseState.closed)
                     return {state: CollapseState.removeContent}
             })
-        }, this.animationDuration + 100);
+        }, this.props.animationDuration + 100);
     }
     setOpenState = () => {
         setTimeout(() => {
@@ -82,24 +92,27 @@ export default class CollapseComponent extends React.PureComponent<Props & React
                 if(prevState.state == CollapseState.opening)
                     return {state: CollapseState.open}
             })
-        }, this.animationDuration + 100);
+        }, this.props.animationDuration + 100);
     }
     maxHeightForState = () => {
         switch(this.state.state)
         {
-            case CollapseState.opening: return this.container.current.scrollHeight + "px";
+            case CollapseState.opening: return this.container.current.scrollHeight;
             case CollapseState.open: return "none";
-            case CollapseState.closing: return this.container.current.scrollHeight + "px";
+            case CollapseState.closing: return this.container.current.scrollHeight;
             default: return 0;
         }
     }
+    log = (text:string) => {
+        console.log(this.id, text, this.state.state,  this.count++ )
+    }
     render() 
     {
-        const {className, visible, children, style, ...rest} = this.props
+        const {className, visible, children, style, animationDuration,removeContentOnCollapsed, ...rest} = this.props
         const newStyle = style || {}
-        newStyle.transition = `max-height ${this.animationDuration}ms ease-in-out`
+        newStyle.transition = `max-height ${this.props.animationDuration}ms ease-in-out`
         newStyle.maxHeight = this.maxHeightForState()
-        const renderChildren = this.state.state != CollapseState.removeContent 
+        const renderChildren = !removeContentOnCollapsed || this.state.state != CollapseState.removeContent 
         return (
             <div {...rest} ref={this.container} style={newStyle} className={classNames("iw-collapse", `iw-collapse-${status}`, className)} >
                 {renderChildren && children}

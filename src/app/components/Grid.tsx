@@ -30,6 +30,7 @@ export class Grid extends React.PureComponent<Props, State> {
     static modeFillClass = "dash-fill"
     bodyClassAdded = false
     private keyDict:{[key:string]:number} = {}
+    private moduleRefs:{[key:string]:Element} = {}
     static defaultProps:DefaultProps = {
         enableAnimation:true,
         breakpoint:ResponsiveBreakpoint.mini,
@@ -75,8 +76,8 @@ export class Grid extends React.PureComponent<Props, State> {
             if(keys.length > 0) {
                 let rects = {}
                 keys.forEach(key => {
-                    var domNode = ReactDOM.findDOMNode(this.refs[key]);
-                    var boundingBox = (domNode as any).getBoundingClientRect();
+                    var domNode = this.moduleRefs[key]
+                    var boundingBox = domNode.getBoundingClientRect();
                     rects[key] = boundingBox
                 })
                 this.setState({rects:rects})
@@ -85,11 +86,11 @@ export class Grid extends React.PureComponent<Props, State> {
     }
     getKeys = () =>
     {
-        return Object.keys(this.refs)
+        return Object.keys(this.moduleRefs)
     }
     animateAndDestroy = (key:string, n) =>
     {
-        var domNode = ReactDOM.findDOMNode(this.refs[key]) as any
+        var domNode = this.moduleRefs[key] as any
         requestAnimationFrame(() => {
             requestAnimationFrame(() =>  {
             domNode.style.opacity = "0";
@@ -99,7 +100,7 @@ export class Grid extends React.PureComponent<Props, State> {
     }
     animateAndTransform = (key:string, n) =>
         {
-        var domNode = ReactDOM.findDOMNode(this.refs[key]) as any;
+        var domNode = this.moduleRefs[key] as any
 
         var [dX, dY] = this.getPositionDelta(domNode, key);
 
@@ -116,12 +117,12 @@ export class Grid extends React.PureComponent<Props, State> {
     {
         var isNotMovable = !key;
         var isNew = !this.state.rects[key];
-        var isDestroyed = !this.refs[key];
+        var isDestroyed = !this.moduleRefs[key];
 
         if(isDestroyed) return 2;
         if(isNotMovable || isNew) return;
 
-        var domNode = ReactDOM.findDOMNode(this.refs[key]);
+        var domNode = this.moduleRefs[key]
         var [dX, dY] = this.getPositionDelta(domNode, key);
         var isStationary = dX === 0 && dY === 0;
 
@@ -150,6 +151,9 @@ export class Grid extends React.PureComponent<Props, State> {
             return key + "_" + dk
         }
     }
+    connectRef = (key:string) => (ref) => {
+        this.moduleRefs[key] = ref
+    }
     renderModule = (module:Module) => {
         if(module.disabled)
             return null
@@ -158,7 +162,7 @@ export class Grid extends React.PureComponent<Props, State> {
         const ccn = classnames("module-grid-item", this.props.className)
         console.log("key", key)
         props.key = key
-        props.ref = key
+        props.moduleRef = this.connectRef(key)
         props.className = ccn
         props.breakpoint = this.props.breakpoint
         return DashboardComponents.getComponent(module.type, props)

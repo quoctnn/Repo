@@ -1,7 +1,11 @@
-#community-selector button
+#community-selector
 {
-    cursor: pointer;
-    .community-indicator{
-        margin-right: 4px;
+    height: 100%;
+    .trigger{
+        height: 100%;
+        cursor: pointer;
+        .community-indicator{
+            margin-right: 4px;
+        }
     }
 }

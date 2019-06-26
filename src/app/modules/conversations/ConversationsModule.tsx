@@ -27,12 +27,11 @@ import { NavigationUtilities } from '../../utilities/NavigationUtilities';
 import ConfirmDialog from '../../components/general/dialogs/ConfirmDialog';
 import ButtonGroup from 'reactstrap/lib/ButtonGroup';
 import Button from 'reactstrap/lib/Button';
+import { CommonModuleProps } from '../Module';
 type IsTypingStore = {[conversation:number]:{[user:number]:NodeJS.Timer}}
 type OwnProps = {
-    className?:string
     breakpoint:ResponsiveBreakpoint
-    contextNaturalKey?:ContextNaturalKey
-}
+} & CommonModuleProps
 type DefaultProps = {
     activeConversation:number
     preventShowTypingInChatId:number,
@@ -430,8 +429,8 @@ const mapStateToProps = (state:ReduxState, ownProps: OwnProps & RouteComponentPr
         routeConversationId: conversationId
     }
 }
-const mapDispatchToProps = (dispatch:ReduxState, ownProps: OwnProps):ReduxDispatchProps => {
-    return {
-    }
+const mergeProps = (stateProps, dispatchProps, ownProps) => 
+{ 
+    return {...ownProps, ...stateProps}
 }
-export default withRouter(connect<ReduxStateProps, ReduxDispatchProps, OwnProps>(mapStateToProps, mapDispatchToProps)(ConversationsModule))
+export default withRouter(connect(mapStateToProps, undefined)(ConversationsModule))
