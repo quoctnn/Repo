@@ -501,9 +501,9 @@ export default class ApiClient
             callback(null, status, error)
         })
     }
-    static getTimesheets(user:number, project:number, task:number, limit:number, offset:number,callback:ApiClientFeedPageCallback<Timesheet>)
+    static getTimesheets(community:number, user:number, project:number, task:number, limit:number, offset:number,callback:ApiClientFeedPageCallback<Timesheet>)
     {
-        let url = Constants.apiRoute.timeSheetUrl + "?" + this.getQueryString({user, project, task, limit, offset})
+        let url = Constants.apiRoute.timeSheetUrl + "?" + this.getQueryString({community, user, project, task, limit, offset})
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {

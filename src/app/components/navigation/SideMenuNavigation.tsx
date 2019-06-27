@@ -14,6 +14,11 @@ import { IntraSocialLink } from "../general/IntraSocialLink";
 import { SecureImage } from "../general/SecureImage";
 import { useDrag } from 'react-dnd'
 import ToggleSwitch from "../general/ToggleSwitch";
+import SimpleDialog from "../general/dialogs/SimpleDialog";
+import FilesModule from "../../modules/files/FilesModule";
+import { ResponsiveBreakpoint } from "../general/observers/ResponsiveComponent";
+import Routes from '../../utilities/Routes';
+import { Link } from "react-router-dom";
 
 type ContextItemProps = {
     name?:string
@@ -270,11 +275,13 @@ class SideMenuNavigation extends React.Component<Props, State> {
         this.state = {
             open: false,
             mode: MenuViewMode.list,
-            closeMenuOnNavigation:true
+            closeMenuOnNavigation:true,
         }
         document.body.classList.add(SideMenuNavigation.bodyClass)
     }
     outsideTrigger = (e:MouseEvent) => {
+        if(this.isDialogVisible())
+            return
         if(!this.contentRef.current.contains(e.target as any))
             this.toggleMenu()
     }
@@ -339,6 +346,9 @@ class SideMenuNavigation extends React.Component<Props, State> {
             return { closeMenuOnNavigation:!active }
         })
     }
+    isDialogVisible = () => {
+        return document.body.classList.contains("modal-open")
+    }
     render() {
         const openMenu = !this.state.open ? this.toggleMenu : undefined
         const mode = this.state.mode
@@ -352,12 +362,15 @@ class SideMenuNavigation extends React.Component<Props, State> {
                 {this.renderHeader()}
                 <div className="hbar main-border-color-background align-self-center" style={{ height: borderHeight, width: "90%", transitionDuration: transDur}}></div>
                 <div className="menu-toolbar d-flex" style={{ transitionDuration: transDur }}>
-                        <div className="menu-button">
+                        <Link to={{pathname:Routes.CHANGELOG, state:{modal:true}}} className="menu-button">
+                            <i className="fas fa-info-circle"></i>
+                        </Link>
+                        <Link to={Routes.DEVELOPER_TOOL.path} className="menu-button">
                             <i className="fas fa-cog"></i>
-                        </div>
-                        <div className="menu-button">
+                        </Link>
+                        <Link to={Routes.FILES} className="menu-button">
                             <i className="fas fa-cloud"></i>
-                        </div>
+                        </Link>
                         <div className="menu-button mode-switch" onClick={this.toggleMode} style={{ transitionDuration: transDur }}>
                             <i className={modeIconClass}></i>
                         </div>

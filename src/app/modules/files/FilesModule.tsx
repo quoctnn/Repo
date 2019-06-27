@@ -3,7 +3,7 @@ import { withRouter, RouteComponentProps } from "react-router-dom";
 import classnames from "classnames"
 import "./FilesModule.scss"
 import { ResponsiveBreakpoint } from '../../components/general/observers/ResponsiveComponent';
-import { ContextNaturalKey, Permissible, UploadedFile, IdentifiableObject, UserProfile } from '../../types/intrasocial_types';
+import { Permissible, UploadedFile, IdentifiableObject, UserProfile, ContextNaturalKey } from '../../types/intrasocial_types';
 import { connect } from 'react-redux';
 import { ReduxState } from '../../redux';
 import LoadingSpinner from '../../components/LoadingSpinner';
@@ -91,9 +91,10 @@ class FilesModule extends React.Component<Props, State> {
     renderContent = (contextObject:Permissible) => {
 
         const {showLoadMore} = this.props
+        const waiting = this.props.contextNaturalKey && !contextObject
         return <>
-            {!contextObject && <LoadingSpinner key="loading"/>}
-            {contextObject && <ListComponent<UploadedFile> 
+            {waiting && <LoadingSpinner key="loading"/>}
+            {!waiting && <ListComponent<UploadedFile> 
                         ref={this.filesList} 
                         onLoadingStateChanged={this.feedLoadingStateChanged} 
                         fetchData={this.fetchFiles} 

@@ -8,10 +8,11 @@ import { ReduxState } from "../../redux";
 import { connect, DispatchProp } from "react-redux";
 import { withRouter, RouteComponentProps } from "react-router";
 import { ContextManager } from "../../managers/ContextManager";
-import { contextCover } from '../../utilities/Utilities';
+import { contextCover, contextAvatar } from '../../utilities/Utilities';
 import { CoverImage } from '../../components/general/CoverImage';
 import { FavoriteManager } from '../../managers/FavoriteManager';
 import { Button } from "reactstrap";
+import { Avatar } from "../../components/general/Avatar";
 
 type OwnProps = 
 {
@@ -34,14 +35,16 @@ class CoverModule extends React.Component<Props, State> {
         }
     }
     renderContent = () => {
-        const cover = contextCover(this.props.contextObject, this.props.contextNaturalKey, false)
+        const cover = contextCover(this.props.contextObject as any, false, this.props.contextNaturalKey, )
         const isFavorite = !!this.props.favorite
         const cn = classnames("favorite-button", {active:isFavorite})
         const icon = isFavorite ? "fas fa-star" : "far fa-star"
+        const image = contextAvatar(this.props.contextObject as any, false, this.props.contextNaturalKey)
         return <CoverImage className="flex-grow-1" src={cover} >
                     <Button onClick={this.toggleFavorite} color="link" className={cn}>
                         <i className={icon}></i>
                     </Button>
+                    <Avatar image={image} size={100} />
                 </CoverImage>
     }
     toggleFavorite = () => {

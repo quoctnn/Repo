@@ -110,10 +110,18 @@ export default class DashboardComponent extends React.Component<Props, State> {
             defaultGrid:grid,
         }
     }
+    countModules = (columns:GridColumn[] = []):number => {
+        let cnt = 0
+        columns.forEach(c => {
+            cnt += this.countModules(c.children || []) + (c.module ? 1 : 0)
+        })
+        return cnt
+    }
     renderModules = () =>
     {
         const grid = this.findGridLayout(this.props.breakpoint, true)
-        const fill = this.props.breakpoint > ResponsiveBreakpoint.standard && grid.fill
+        const modulesCount = this.countModules( grid.columns || [])
+        const fill = (modulesCount == 1 || this.props.breakpoint > ResponsiveBreakpoint.standard) && grid.fill
         return (<Grid updateKey={this.props.updateKey} fill={fill} grid={grid} breakpoint={this.props.breakpoint} enableAnimation={true} />)
     }
     findGridLayout = (breakpoint: number, useDefaultAsFallback:boolean) => {

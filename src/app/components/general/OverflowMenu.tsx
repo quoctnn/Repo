@@ -43,14 +43,14 @@ export const createDropdownItem = (item:OverflowMenuItem, toggle?:() => void) =>
         props.divider = true
     if(item.disabled)
         props.disabled = true
-    return (<DropdownItem active={item.active}  {...props} toggle={!!item.toggleMenu} key={item.id} onClick={click} className="clickable">
+    return (<DropdownItem active={item.active}  {...props} toggle={!!item.toggleMenu} key={item.id} onClick={click} className="clickable text-truncate d-flex">
                     {!useStackedIcons && item.iconClass && <i className={item.iconClass}></i>}
                     {useStackedIcons && <span className="fa-menu-icon-stack">
                         <i className={item.iconClass}></i>
                         <i className={item.iconStackClass + " fa-menu-icon-stacked"}></i>
                     </span>}
                     {item.children}
-                    {item.title}
+                    <span className="text-truncate">{item.title}</span>
             </DropdownItem>)
 }
 export class OverflowMenu extends React.Component<Props, State> {

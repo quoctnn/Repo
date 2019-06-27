@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { connect } from 'react-redux'
-import { Community } from '../../../types/intrasocial_types';
+import { Community, ContextNaturalKey } from '../../../types/intrasocial_types';
 import { ReduxState } from '../../../redux/index';
 import "./CommunitySelector.scss"
 import { translate } from '../../../localization/AutoIntlProvider';
@@ -12,7 +12,7 @@ import Routes from '../../../utilities/Routes';
 import { withRouter, RouteComponentProps } from 'react-router-dom';
 import { DropDownMenu } from '../DropDownMenu';
 import { Avatar } from '../Avatar';
-import { communityAvatar } from '../../../utilities/Utilities';
+import { communityAvatar, contextAvatar } from '../../../utilities/Utilities';
 import classnames = require('classnames');
 import { Popover, PopoverBody } from 'reactstrap';
 
@@ -113,7 +113,8 @@ class CommunitySelector extends React.Component<Props, State> {
                 type:OverflowMenuItemType.option,
                 title: community.name,
                 onPress:this.setMainCommunity(community),
-                toggleMenu:false
+                toggleMenu:false,
+                children:<Avatar className="mr-1" size={24} image={contextAvatar(community, true, ContextNaturalKey.COMMUNITY)} />
             }
         })
         selectableDropdownItems.push({id:"divider1", type:OverflowMenuItemType.divider})

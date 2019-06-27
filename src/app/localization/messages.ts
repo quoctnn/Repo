@@ -249,6 +249,10 @@ var translations = {
     "notification.group.reports":"Reports",
     "common.load.more":"Load more",
     "menu.favorites":"Favorites",
+    "conversation.preventarchive.description":"Are you sure you want to archive this conversation?",
+    "conversation.preventarchive.title":"Archive conversation",
+    "Changelog":"Changelog",
+    "always visible":"always visible",
   },
   no: {
     "search.placeholder": "Søk ...",
@@ -501,6 +505,10 @@ var translations = {
     "notification.group.reports":"Rapporter",
     "common.load.more":"Last flere",
     "menu.favorites":"Favoritter",
+    "conversation.preventarchive.description":"Er du sikker på at du vil arkivere samtalen?",
+    "conversation.preventarchive.title":"Arkiver samtale",
+    "Changelog":"Changelog",
+    "always visible":"alltid synlig",
   },
   en: {
     "search.placeholder": "Search ...",
@@ -760,6 +768,10 @@ var translations = {
     "notification.group.reports":"Reports",
     "common.load.more":"Load more",
     "menu.favorites":"Favorites",
+    "conversation.preventarchive.description":"Are you sure you want to archive this conversation?",
+    "conversation.preventarchive.title":"Archive conversation",
+    "Changelog":"Changelog",
+    "always visible":"always visible",
   }
 };
 

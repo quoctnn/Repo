@@ -22,7 +22,6 @@ import { isAdmin } from "./utilities/Utilities";
 import EventPage from "./components/pages/EventPage";
 import DashboardBuilderPage from "./components/pages/admin/DashboardBuilderPage";
 import { ContextManager } from "./managers/ContextManager";
-import DevTool from "./components/dev/DevTool";
 import LoadingSpinner from "./components/LoadingSpinner";
 import { CommunityManager } from "./managers/CommunityManager";
 import ConversationsPage from "./components/pages/ConversationsPage";
@@ -35,6 +34,8 @@ import TopNavigation from "./components/navigation/TopNavigation";
 import SideMenuNavigation from "./components/navigation/SideMenuNavigation";
 import { DndProvider } from 'react-dnd'
 import HTML5Backend from 'react-dnd-html5-backend'
+import FilesPage from "./components/pages/FilesPage";
+import DevToolPage from './components/pages/DevToolPage';
 
 
 const WithModal = (Component: any, title?: string) =>
@@ -167,7 +168,7 @@ class Main extends React.Component<Props, State> {
                                         <Route path={Routes.ADMIN_DASHBOARD_BUILDER.path} component={DashboardBuilderPage} />
                                     }
                                     <Redirect from={Routes.ELECTRON} to={Routes.ROOT} />
-                                    <Route path={Routes.DEVELOPER_TOOL.path} component={DevTool} />
+                                    <Route path={Routes.DEVELOPER_TOOL.path} component={DevToolPage} />
                                     <Route path={Routes.taskUrl(":communityname", ":projectname", ":taskid")} component={PathLoadedTaskPage} />
                                     <Route path={Routes.eventUrl(":communityname", ":eventname")} component={PathLoadedEventPage} exact={true} />
                                     <Route path={Routes.projectUrl(":communityname", ":projectname")} component={PathLoadedProjectPage} exact={true} />
@@ -179,6 +180,7 @@ class Main extends React.Component<Props, State> {
                                     <Route path={Routes.SIGNOUT} component={Signout} />
                                     <Route path={Routes.ROOT} exact={true} component={PathLoadedDashboardPage} />
                                     <Route path={Routes.conversationUrl(":conversationId?")} exact={true} component={PathLoadedConversationsPage} />
+                                    <Route path={Routes.FILES} exact={true} component={FilesPage} />
                                     <Route path={Routes.ELECTRON} component={PathLoadedDashboardPage} />
                                     <Route path={Routes.ANY} component={Error404} />
                                 </Switch>

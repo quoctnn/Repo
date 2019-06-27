@@ -126,6 +126,12 @@
     .status-content-inner{
         border-radius: 8px;
         padding:4px 8px;
+        display: inline-block;
+        align-self: flex-start;
+        &.large{
+            display: block;
+            align-self: initial;
+        }
     }
     &.comment {
         padding-left: 5px;

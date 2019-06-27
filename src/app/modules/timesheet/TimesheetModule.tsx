@@ -68,7 +68,8 @@ class TimesheetModule extends React.Component<Props, State> {
         const userId = this.props.contextNaturalKey == ContextNaturalKey.USER ? contextId : undefined
         const projectId = this.props.contextNaturalKey == ContextNaturalKey.PROJECT ? contextId : undefined
         const taskId = this.props.contextNaturalKey == ContextNaturalKey.TASK ? contextId : undefined
-        ApiClient.getTimesheets(userId, projectId, taskId, this.props.pageSize, offset, (data, status, error) => {
+        const communityId = this.props.contextNaturalKey == ContextNaturalKey.COMMUNITY ? contextId : undefined
+        ApiClient.getTimesheets(communityId, userId, projectId, taskId, this.props.pageSize, offset, (data, status, error) => {
             completion(data)
             ToastManager.showErrorToast(error)
         })

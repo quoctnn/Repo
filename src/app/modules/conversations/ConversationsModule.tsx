@@ -4,7 +4,7 @@ import classnames from "classnames"
 import "./ConversationsModule.scss"
 import { ResponsiveBreakpoint } from '../../components/general/observers/ResponsiveComponent';
 import { ContextNaturalKey, Conversation, UserProfile } from '../../types/intrasocial_types';
-import { connect } from 'react-redux';
+import { connect, DispatchProp } from 'react-redux';
 import { ReduxState } from '../../redux';
 import SimpleModule from '../SimpleModule';
 import { translate } from '../../localization/AutoIntlProvider';
@@ -31,7 +31,7 @@ import { CommonModuleProps } from '../Module';
 type IsTypingStore = {[conversation:number]:{[user:number]:NodeJS.Timer}}
 type OwnProps = {
     breakpoint:ResponsiveBreakpoint
-} & CommonModuleProps
+} & CommonModuleProps & DispatchProp
 type DefaultProps = {
     activeConversation:number
     preventShowTypingInChatId:number,
@@ -397,6 +397,7 @@ class ConversationsModule extends React.Component<Props, State> {
             createNewConversation,
             tempConversation,
             routeConversationId,
+            dispatch,
             ...rest} = this.props
 
         const {breakpoint, className} = this.props

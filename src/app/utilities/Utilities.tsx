@@ -3,7 +3,7 @@ import Embedly from '../components/general/embedly/Embedly';
 const processString = require('react-process-string');
 import Routes from './Routes';
 import * as React from 'react';
-import { UserProfile, StatusActions, Community, Project, Group, Event, Coordinate, SimpleUserProfile, ContextNaturalKey } from '../types/intrasocial_types';
+import { UserProfile, StatusActions, Community, Project, Group, Event, Coordinate, SimpleUserProfile, ContextNaturalKey, AvatarAndCover } from '../types/intrasocial_types';
 import { Text } from '../components/general/Text';
 import Constants from '../utilities/Constants';
 import { translate } from '../localization/AutoIntlProvider';
@@ -81,11 +81,17 @@ export function eventAvatar(event: Event, thumbnail = false) {
         val = thumbnail ? event.avatar_thumbnail || event.avatar : event.avatar || event.avatar_thumbnail
     return val || Constants.resolveUrl(Constants.defaultImg.eventAvatar)()
 }
-export function contextCover(contextObject: any, contextNaturalKey: ContextNaturalKey, thumbnail = false): string {
+export function contextCover(contextObject: AvatarAndCover, thumbnail = false, contextNaturalKey?: ContextNaturalKey): string {
     let val: string = null
     if (contextObject)
         val = thumbnail ? contextObject.cover_thumbnail || contextObject.cover_cropped : contextObject.cover_cropped || contextObject.cover_thumbnail
-    return val || contextDefaultCover(contextNaturalKey)
+    return val || (contextNaturalKey && contextDefaultAvatar(contextNaturalKey))
+}
+export function contextAvatar(contextObject: AvatarAndCover, thumbnail = false, contextNaturalKey?: ContextNaturalKey): string {
+    let val: string = null
+    if (contextObject)
+        val = thumbnail ? contextObject.avatar_thumbnail || contextObject.avatar : contextObject.avatar || contextObject.avatar_thumbnail
+    return val || (contextNaturalKey && contextDefaultAvatar(contextNaturalKey))
 }
 export function contextDefaultCover(contextNaturalKey: ContextNaturalKey) {
     switch (contextNaturalKey) {
@@ -94,6 +100,16 @@ export function contextDefaultCover(contextNaturalKey: ContextNaturalKey) {
         case ContextNaturalKey.GROUP: return Constants.resolveUrl(Constants.defaultImg.group)()
         case ContextNaturalKey.PROJECT: return Constants.resolveUrl(Constants.defaultImg.project)()
         case ContextNaturalKey.USER: return Constants.resolveUrl(Constants.defaultImg.user)()
+        default: return null
+    }
+}
+export function contextDefaultAvatar(contextNaturalKey: ContextNaturalKey) {
+    switch (contextNaturalKey) {
+        case ContextNaturalKey.COMMUNITY: return Constants.resolveUrl(Constants.defaultImg.communityAvatar)()
+        case ContextNaturalKey.EVENT: return Constants.resolveUrl(Constants.defaultImg.eventAvatar)()
+        case ContextNaturalKey.GROUP: return Constants.resolveUrl(Constants.defaultImg.groupAvatar)()
+        case ContextNaturalKey.PROJECT: return Constants.resolveUrl(Constants.defaultImg.projectAvatar)()
+        case ContextNaturalKey.USER: return Constants.resolveUrl(Constants.defaultImg.userAvatar)()
         default: return null
     }
 }

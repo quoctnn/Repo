@@ -95,6 +95,20 @@ $gridItemHeight:70px;
             height: $rowHeight;
         }
     }
+    .menu-button{
+        cursor: pointer;
+        justify-content: center;
+        align-items: center;
+        font-size: 1.6em;
+        display: flex;
+        height: 100%;
+        width: $sideMenuInactiveWidth;
+        flex-shrink: 0;
+        i{
+            align-self: center;
+        }
+        text-decoration: none;
+    }
     .menu-block{
         flex-shrink: 0;
         .menu-block-side{
@@ -121,6 +135,7 @@ $gridItemHeight:70px;
         }
         &.active{
             .menu-block-side{
+                cursor: initial;
                 height: 100%;
             }
         }
@@ -148,21 +163,6 @@ $gridItemHeight:70px;
         height: $rowHeight;
         justify-content: center;
         align-items: center;
-    }
-    .menu-button{
-        &.menu-toggle{
-            cursor: pointer;
-        }
-        justify-content: center;
-        align-items: center;
-        font-size: 1.6em;
-        display: flex;
-        height: 100%;
-        width: $sideMenuInactiveWidth;
-        flex-shrink: 0;
-        i{
-            align-self: center;
-        }
     }
     .mode-switch{
         transform: rotate(-180deg);

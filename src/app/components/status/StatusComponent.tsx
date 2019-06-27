@@ -173,6 +173,8 @@ export class StatusComponent extends React.Component<Props, State> {
         let communityId = status.community && status.community.id ? status.community.id : null
         const readBy = this.props.status.read_by || []
         //console.log("Render Status ", status.id)
+        const large = files.length > 0 || linkCards.length > 0
+        const statusContentClass = classnames("status-content-inner main-content-secondary-background", {large:large})
         return(<div ref={this.props.innerRef} className={cn}>
                 <div className="d-flex">
                     <div className="flex-shrink-0 header-left">
@@ -182,7 +184,7 @@ export class StatusComponent extends React.Component<Props, State> {
                     </div>
                     <div className="d-flex header-center flex-grow-1">
                         <div className="d-flex header-center-content text-truncate">
-                            <div className="text-truncate flex-grow-1 d-flex flex-wrap header-center-left">
+                            <div className="text-truncate flex-grow-1 d-flex flex-wrap header-center-left align-self-center">
                                 <div className="text-truncate">
                                     <IntraSocialLink to={this.props.status.owner} type={ContextNaturalKey.USER}>
                                         <div className="title text-truncate">{userFullName(this.props.status.owner)}</div>
@@ -208,14 +210,16 @@ export class StatusComponent extends React.Component<Props, State> {
                                 {readBy.length > 0 && this.renderStatusRead(status)}
                             </div>
                         </div>
-                        {isComment && <div className="status-content-inner main-content-secondary-background">{this.renderTextContent(textContent, hasMore)}
+                        {isComment && <div className={statusContentClass}>
+                            {this.renderTextContent(textContent, hasMore)}
                             {files.length > 0 && <ContentGallery files={files}/>}
                             {linkCards.length > 0 && linkCards}
                         </div>}
                     </div>
                 </div>
                 <div className="status-content">
-                    {!isComment && <div className="status-content-inner main-content-secondary-background">{this.renderTextContent(textContent, hasMore)}
+                    {!isComment && <div className={statusContentClass}>
+                    {this.renderTextContent(textContent, hasMore)}
                     {files.length > 0 && <ContentGallery files={files}/>}
                     {linkCards.length > 0 && linkCards}
                     </div>}

@@ -9,4 +9,12 @@
         right: 0;
         color: white;
     }
+    .avatar{
+        position: absolute;
+        bottom: 8px;
+        right: 8px;
+        .image-container{
+            border-radius: 8px;
+        }
+    }
 }

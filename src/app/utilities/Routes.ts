@@ -16,6 +16,7 @@ export default abstract class Routes {
     static UPDATE_TOOL = "/app-update/"
     static NEWSFEED = "/newsfeed/"
     static CHANGELOG = "/changelog/"
+    static FILES = "/files/"
     static DEVELOPER_TOOL = {path:"/developer-tool", title:() => {return translate("admin.developertool")}}
     static ADMIN_DASHBOARD_BUILDER:RouteEntry = {path:"/admin/dashboard-builder/", title:() => {return translate("admin.dashboard.builder")}}
 

@@ -273,6 +273,20 @@ button{@include var(color, primary-text-color);}
 .dropdown-item{
     cursor: pointer;
 }
+body.has-side-menu {
+    .page
+    {
+        margin-left: $sideMenuInactiveWidth;    
+        margin-top: 15px;
+        margin-bottom: 15px;
+    }
+    &.side-menu-locked{
+        .page
+        {
+            margin-left: $sideMenuActiveWidth;
+        }
+    }
+}
 /******************************************************************************
  * File icons
 /*****************************************************************************/

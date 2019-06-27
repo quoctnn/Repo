@@ -40,17 +40,17 @@ export class Grid extends React.PureComponent<Props, State> {
         this.state = {items:[], rects:{}}
     }
     componentDidUpdate = (prevProps:Props) => {
-        if(this.props.fill != prevProps.fill && this.props.breakpoint != prevProps.breakpoint)
+        if((this.props.fill && !this.bodyClassAdded || !this.props.fill && this.bodyClassAdded))
         {
-            if(this.props.fill && this.props.breakpoint > ResponsiveBreakpoint.standard)
-            {
-                this.bodyClassAdded = true
-                document.body.classList.add(Grid.modeFillClass)
-            }
-            else
+            if(this.bodyClassAdded)
             {
                 this.bodyClassAdded = false
                 document.body.classList.remove(Grid.modeFillClass)
+            }
+            else
+            {
+                this.bodyClassAdded = true
+                document.body.classList.add(Grid.modeFillClass)
             }
         }
         if(this.props.enableAnimation)

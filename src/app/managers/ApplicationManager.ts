@@ -24,7 +24,7 @@ import { resetUnreadNotificationsAction } from '../redux/unreadNotifications';
 import { FavoriteManager } from './FavoriteManager';
 
 export type ApplicationData = {
-    dashboards:Dashboard[]
+    dashboards:{[key:string]:Dashboard}
     communitiesLoaded:boolean
     profileLoaded:boolean
     contactsLoaded:boolean
@@ -48,17 +48,26 @@ export abstract class ApplicationManager
     }
     private static resetData = (resetCachedData:boolean) => {
         
-        ApplicationManager.applicationData = {dashboards:[], communitiesLoaded:false, profileLoaded:false, contactsLoaded:false}
+        ApplicationManager.applicationData = {dashboards:{}, communitiesLoaded:false, profileLoaded:false, contactsLoaded:false}
         if(resetCachedData)
         {
             ApplicationManager.reset()
         }
     }
     static getDashboards = (category:string) => {
-        const all = ApplicationManager.applicationData.dashboards
-        const dashboards = all.filter(d => d.category == category)
-        dashboards.forEach(db => db.grid_layouts.sort((a, b) => b.min_width - a.min_width))
-        return dashboards
+        const all = ApplicationManager.applicationData.dashboards[category]
+        all.grid_layouts = all.grid_layouts.sort((a, b) => b.min_width - a.min_width)
+        return all
+    }
+    static setDashboard = (dashboard:Dashboard) => {
+        ApplicationManager.applicationData.dashboards[dashboard.category] = dashboard
+    }
+    static setAllDashboards = (dashboards:Dashboard[]) => {
+        const db = {}
+        dashboards.forEach(d => {
+            db[d.category] = d
+        })
+        ApplicationManager.applicationData.dashboards = db
     }
     static loadApplication = (resetCachedData:boolean) => {
         console.log("loadApplication")
@@ -90,7 +99,7 @@ export abstract class ApplicationManager
     private static fetchDashboards = (completion:() => void) => {
         ApiClient.getDashboards((data, status, error) => {
             const dashboards = (data && data.results) || []
-            ApplicationManager.applicationData.dashboards = dashboards
+            ApplicationManager.setAllDashboards(dashboards)
             completion()
             ToastManager.showErrorToast(error)
         })
