@@ -1,4 +1,4 @@
-const isTouchDevice = () => 
+const isTouchDevice = () =>
 {
     const w = window as any
     var prefixes = ' -webkit- -moz- -o- -ms- '.split(' ');
@@ -13,7 +13,7 @@ const isTouchDevice = () =>
     var query = ['(', prefixes.join('touch-enabled),('), 'heartz', ')'].join('');
     return mq(query);
   }
-export interface ISettings 
+export interface ISettings
 {
     isProduction:boolean,
     isElectron:boolean,
@@ -53,5 +53,5 @@ export const Settings:ISettings = {
     statusLinebreakLimit:5,
     renderLinkTitle:true,
     mapboxAccessToken:"pk.eyJ1IjoiaW50cmFob3VzZSIsImEiOiJjaXJsc3lmc3gwMDJyaGpuaHdvb2oxYnM5In0.2Um0WFRpufTR55w9_6ALDQ",
-    allowReact360:true
+    allowReact360:false
 }

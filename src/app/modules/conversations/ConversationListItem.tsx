@@ -86,6 +86,7 @@ class ConversationListItem extends React.Component<Props, State> {
             return null
         }
         let myId = authenticatedProfile.id
+        ProfileManager.ensureProfilesExists(conversation.users, () => {})
         let title = ConversationUtilities.getConversationTitle(this.props.conversation, myId)
         const cl = classnames("conversation-list-item", className, {active:isActive})
         const ddOptions = this.getOptionMenuItems()
