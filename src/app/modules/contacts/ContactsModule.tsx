@@ -114,7 +114,7 @@ class ContactsModule extends React.PureComponent<Props, State> {
                             ref={this.contactList} 
                             reloadContext={uniqueId()}
                             fetchData={this.fetchContacts} 
-                            loadMoreOnScroll={true}
+                            loadMoreOnScroll={false}
                             renderItem={this.renderContact} 
                             className="grid" />
             </SimpleModule>

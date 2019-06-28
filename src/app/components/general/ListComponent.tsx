@@ -140,14 +140,16 @@ export default class ListComponent<T extends IdentifiableObject> extends React.C
         {
             this.props.scrollParent.addEventListener("scroll", this.onScroll)
         }
+        //console.log("componentDidMount", this.props.reloadContext)
         this.setState((prevState:State<T>) => ({ // first load
             isLoading: true,
             requestId:prevState.requestId + 1
         }), this.loadData)
     }
     componentDidUpdate = (prevProps:Props<T>, prevState:State<T>) => {
-        if(prevProps.reloadContext != this.props.reloadContext)
+        if(prevProps.reloadContext != this.props.reloadContext && !this.state.isLoading)
         {
+            //console.log("componentDidUpdate", this.props.reloadContext)
             this.setState((prevState:State<T>) => ({
                 isRefreshing: true,
                 isLoading: true,
@@ -207,6 +209,8 @@ export default class ListComponent<T extends IdentifiableObject> extends React.C
     {
         const offset = this.getOffset()
         const requestId = this.state.requestId
+
+        //console.log("loadData", this.props.reloadContext)
         this.props.fetchData(offset, (data) => {
             if(data && data.results)
             {
@@ -216,6 +220,7 @@ export default class ListComponent<T extends IdentifiableObject> extends React.C
                     divider = null
                 if(requestId == this.state.requestId)
                 {
+                    //console.log("setData", this.props.reloadContext)
                     this.setState((prevState:State<T>) => {
                         const items = prevState.items
                         const d = offset == 0 ?  newData :  [...items, ...newData]
