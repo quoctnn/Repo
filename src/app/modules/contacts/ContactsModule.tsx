@@ -81,15 +81,10 @@ class ContactsModule extends React.PureComponent<Props, State> {
         return it
     }
     fetchContacts = (offset:number, completion:(items:PaginationResult<UserProfile>) => void ) => {
-        const spacer:UserProfile = {spacer:true} as any
         let contacts = this.props.contacts
-        if(contacts.length > 0)
-            contacts = contacts.concat([spacer])
         completion({results:contacts, count:contacts.length})
     }
     renderContact = (contact:UserProfile) => {
-        if((contact as any).spacer)
-            return <div className="spacer flex-grow-1 flex-shrink-1" style={{height:1}}></div>
         const userStatus = UserStatus.getObject(contact.user_status)
         return <div className="avatar-profile main-content-secondary-background" key={"contact_" + contact.id}>
                     <Link className="d-flex flex-column" to={Routes.profileUrl(contact.slug_name)}>
