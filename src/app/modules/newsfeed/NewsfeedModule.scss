@@ -18,12 +18,13 @@ $headerComposerFullHeight:232px;
                 {
                     transition:min-height 200ms ease-in-out, width 200ms ease-in-out;
                     min-height:24px;
-                } 
+                }
             }
         }
     }
     .module-menu{
         top:$headerHeight;
+
     }
     .status-composer-backdrop{
         background: #000;
@@ -38,6 +39,7 @@ $headerComposerFullHeight:232px;
     }
     .module-header {
         height: $headerHeight;
+        margin-top: 0;
         align-items: center;
         transition:min-height 200ms ease-in-out,height 200ms ease-in-out, width 200ms ease-in-out;
         .module-header-title-left{
@@ -80,7 +82,7 @@ $headerComposerFullHeight:232px;
                             min-height: 200px;
                         }
                     }
-                } 
+                }
                 .header-filter-group, .module-menu-trigger{
                     flex-basis: 0px;
                     overflow: hidden;
@@ -89,5 +91,5 @@ $headerComposerFullHeight:232px;
             }
         }
     }
-    
+
 }
