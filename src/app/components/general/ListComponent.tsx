@@ -289,7 +289,7 @@ export default class ListComponent<T extends IdentifiableObject> extends React.C
         {
             if(this.props.renderEmpty)
                 return this.props.renderEmpty()
-            return <div className="d-flex justify-content-center align-items-center h-100"><EmptyBox className="img-responsive" width="100" height="100" style={{maxWidth:100, height:"auto"}}/></div>
+            return <div className="d-flex mb-3 justify-content-center align-items-center h-100"><EmptyBox className="img-responsive" width="100" height="100" style={{maxWidth:100, height:"auto"}}/></div>
         }
         return null
     }
