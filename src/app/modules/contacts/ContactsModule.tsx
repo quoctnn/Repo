@@ -82,7 +82,9 @@ class ContactsModule extends React.PureComponent<Props, State> {
     }
     fetchContacts = (offset:number, completion:(items:PaginationResult<UserProfile>) => void ) => {
         const spacer:UserProfile = {spacer:true} as any
-        const contacts = this.props.contacts.concat([spacer])
+        let contacts = this.props.contacts
+        if(contacts.length > 0)
+            contacts = contacts.concat([spacer])
         completion({results:contacts, count:contacts.length})
     }
     renderContact = (contact:UserProfile) => {
@@ -125,7 +127,7 @@ class ContactsModule extends React.PureComponent<Props, State> {
 }
 const mapStateToProps = (state:ReduxState, ownProps: OwnProps):ReduxStateProps => 
 {
-    const contacts = state.profileStore.allIds.map(id => state.profileStore.byId[id])
+    const contacts = []//state.profileStore.allIds.map(id => state.profileStore.byId[id])
     return {
         contacts,
         authenticatedUser:state.authentication.profile,
