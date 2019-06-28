@@ -47,7 +47,7 @@ export abstract class ApplicationManager
         ApplicationManager.resetData(false)
     }
     private static resetData = (resetCachedData:boolean) => {
-        
+
         ApplicationManager.applicationData = {dashboards:{}, communitiesLoaded:false, profileLoaded:false, contactsLoaded:false}
         if(resetCachedData)
         {
@@ -165,6 +165,7 @@ export abstract class ApplicationManager
         dispatch(resetProjectsAction())
         dispatch(resetConversationsAction())
         dispatch(resetUnreadNotificationsAction())
+        location.reload()
     }
     private static getStore = ():Store<ReduxState,any> =>
     {
