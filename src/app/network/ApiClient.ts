@@ -19,8 +19,9 @@ export type ApiStatusCommentsCallback<T> = (data: StatusCommentsResult<T>, statu
 
 export enum ListOrdering {
     ALPHABETICALLY = "alphabetically",
-    LAST_USED = "last-used",
-    MOST_USED = "most-used",
+    RECENT = "recent",
+    MOST_USED = "most_used",
+    RECENT_ACTIVIY = "recent_activity"
 }
 export default class ApiClient
 {
@@ -491,7 +492,7 @@ export default class ApiClient
             callback(null, status, error)
         })
     }
-    
+
     static getGroup(groupId:string, callback:ApiClientCallback<Group>)
     {
         let url = Constants.apiRoute.groupUrl(groupId)
@@ -564,7 +565,7 @@ export default class ApiClient
         else {
             this.sendMessage(message, callback)
         }
-        
+
     }
     static getFavorites(callback:ApiClientFeedPageCallback<Favorite>)
     {
@@ -647,12 +648,12 @@ export default class ApiClient
                 {
                     m.files.push(file)
                 }
-                else 
+                else
                 {
                     m.files = [file]
                 }
             }
-            else 
+            else
             {
                 m.tempFile = Object.assign({}, m.tempFile)
                 m.tempFile.progress = 0

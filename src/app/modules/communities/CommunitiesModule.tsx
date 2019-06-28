@@ -68,7 +68,7 @@ class CommunitiesModule extends React.Component<Props, State> {
     }
     fetchCommunities = (offset: number, completion: (items: PaginationResult<Community>) => void) => {
         const isMember = this.props.isMember || true
-        ApiClient.getCommunities(isMember, ListOrdering.LAST_USED, this.props.pageSize, offset, (data, status, error) => {
+        ApiClient.getCommunities(isMember, ListOrdering.MOST_USED, this.props.pageSize, offset, (data, status, error) => {
             completion(data)
             ToastManager.showErrorToast(error)
         })
