@@ -253,6 +253,8 @@ var translations = {
     "conversation.preventarchive.title":"Archive conversation",
     "Changelog":"Changelog",
     "always visible":"always visible",
+    "common.page.profile":"Profile page",
+    "contacts.module.title":"Contacts",
   },
   no: {
     "search.placeholder": "Søk ...",
@@ -509,6 +511,8 @@ var translations = {
     "conversation.preventarchive.title":"Arkiver samtale",
     "Changelog":"Changelog",
     "always visible":"alltid synlig",
+    "common.page.profile":"Profilside",
+    "contacts.module.title":"Kontakter",
   },
   en: {
     "search.placeholder": "Search ...",
@@ -772,6 +776,8 @@ var translations = {
     "conversation.preventarchive.title":"Archive conversation",
     "Changelog":"Changelog",
     "always visible":"always visible",
+    "common.page.profile":"Profile page",
+    "contacts.module.title":"Contacts",
   }
 };
 

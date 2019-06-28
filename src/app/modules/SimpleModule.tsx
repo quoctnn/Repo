@@ -91,13 +91,11 @@ export default class SimpleModule extends React.Component<Props, State> {
                             {menu && <ModuleMenuTrigger onClick={this.toggleMenuClick} />}
                         </ModuleHeader>
                     }
-                    {breakpoint >= ResponsiveBreakpoint.standard && //do not render for small screens
-                        <ModuleContent>
+                    <ModuleContent>
                         {children}
                         {this.renderShowInModalButton()}
                         {this.renderModal()}
-                        </ModuleContent>
-                    }
+                    </ModuleContent>
                     <ModuleMenu visible={this.state.menuVisible}>
                         {menu}
                     </ModuleMenu>

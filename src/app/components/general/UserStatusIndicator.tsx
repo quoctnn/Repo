@@ -1,19 +1,19 @@
 import * as React from 'react';
-import { AvatarStateColor } from '../../types/intrasocial_types';
+import { AvatarStatusColor } from '../../types/intrasocial_types';
 import classnames = require('classnames');
 
 export interface Props {
     size?:number
     borderWidth?:number,
     borderColor?:string,
-    statusColor:AvatarStateColor,
+    statusColor:AvatarStatusColor,
 }
 export class UserStatusIndicator extends React.PureComponent<Props & React.HTMLAttributes<HTMLElement>, {}> {
     static defaultProps:Props = {
         size:50,
         borderWidth:0,
         borderColor:"none",
-        statusColor:AvatarStateColor.NONE,
+        statusColor:AvatarStatusColor.NONE,
     }
     imageStyles:{[key:string]:React.CSSProperties} = {}
     constructor(props:Props)

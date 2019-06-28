@@ -13,7 +13,7 @@ Added:
 * SideMenuNavigation
 * Cover module
 * Favorite system
-* Files page (currently with one viewing option)
+* Files page with grid and list mode (grid mode items will be large elements in next release)
 * Developer tools page
 * Notification panel
 

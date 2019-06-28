@@ -24,4 +24,15 @@
         margin-top: 0;
         height: 5px;
     }
+    .grid{
+        &[class*="grid-size-"] > *{
+            width: 8.33%;
+        }
+        @for $i from 1 through 12 {
+            $width: percentage(1 / $i);
+            &.grid-size-#{$i} > *{
+                width: $width;
+            }
+        }
+    }
 }

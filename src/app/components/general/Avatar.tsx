@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { SecureImage } from './SecureImage';
-import { AvatarStateColor } from '../../types/intrasocial_types';
+import { AvatarStatusColor } from '../../types/intrasocial_types';
 import { UserStatusIndicator } from './UserStatusIndicator';
 require("./Avatar.scss");
 
@@ -10,7 +10,7 @@ type Props = {
     borderColor?:string,
     image?:string,
     images?:string[],
-    statusColor?:AvatarStateColor,
+    statusColor?:AvatarStatusColor,
     innerRef?: (element:HTMLElement) => void
 }
 export class Avatar extends React.PureComponent<Props & React.HTMLAttributes<HTMLElement>, {}> {
@@ -19,7 +19,7 @@ export class Avatar extends React.PureComponent<Props & React.HTMLAttributes<HTM
         borderWidth:0,
         borderColor:"none",
         image:null,
-        statusColor:AvatarStateColor.NONE,
+        statusColor:AvatarStatusColor.NONE,
         
     }
     imageStyles:{[key:string]:React.CSSProperties} = {}
@@ -47,7 +47,7 @@ export class Avatar extends React.PureComponent<Props & React.HTMLAttributes<HTM
                     })}
                 </div>
                 {children}
-                {statusColor != AvatarStateColor.NONE && 
+                {statusColor != AvatarStatusColor.NONE && 
                     <UserStatusIndicator size={15} borderColor="white" statusColor={statusColor} borderWidth={2}/>
                 }
             </div>

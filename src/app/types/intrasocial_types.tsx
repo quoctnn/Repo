@@ -892,7 +892,7 @@ export abstract class StatusReactionUtilities
         return StatusReactionUtilities.emojiForReaction(props)
     }
 }
-export enum AvatarStateColor
+export enum AvatarStatusColor
 {
     GREEN = "#01d100",
     ORANGE = "orange",
@@ -910,16 +910,16 @@ export enum UserStatus {
 }
 export type UserStatusItem = {
     type:UserStatus
-    color:AvatarStateColor
+    color:AvatarStatusColor
     translation:() => string
 }
 const UserStatusObjects:{[key:string]:UserStatusItem} = {
-    active:{type:UserStatus.active, color:AvatarStateColor.GREEN, translation:() => UserStatus.getTranslation(UserStatus.active)},
-    away:{type:UserStatus.away, color:AvatarStateColor.ORANGE, translation:() => UserStatus.getTranslation(UserStatus.away)},
-    unavailable:{type:UserStatus.unavailable, color:AvatarStateColor.NONE, translation:() => UserStatus.getTranslation(UserStatus.unavailable)},
-    dnd:{type:UserStatus.dnd, color:AvatarStateColor.RED, translation:() => UserStatus.getTranslation(UserStatus.dnd)},
-    vacation:{type:UserStatus.vacation, color:AvatarStateColor.GRAY, translation:() => UserStatus.getTranslation(UserStatus.vacation)},
-    invisible:{type:UserStatus.invisible, color:AvatarStateColor.NONE, translation:() => UserStatus.getTranslation(UserStatus.invisible)},
+    active:{type:UserStatus.active, color:AvatarStatusColor.GREEN, translation:() => UserStatus.getTranslation(UserStatus.active)},
+    away:{type:UserStatus.away, color:AvatarStatusColor.ORANGE, translation:() => UserStatus.getTranslation(UserStatus.away)},
+    unavailable:{type:UserStatus.unavailable, color:AvatarStatusColor.NONE, translation:() => UserStatus.getTranslation(UserStatus.unavailable)},
+    dnd:{type:UserStatus.dnd, color:AvatarStatusColor.RED, translation:() => UserStatus.getTranslation(UserStatus.dnd)},
+    vacation:{type:UserStatus.vacation, color:AvatarStatusColor.GRAY, translation:() => UserStatus.getTranslation(UserStatus.vacation)},
+    invisible:{type:UserStatus.invisible, color:AvatarStatusColor.NONE, translation:() => UserStatus.getTranslation(UserStatus.invisible)},
 }
 export namespace UserStatus {
 

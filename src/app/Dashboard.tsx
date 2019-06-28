@@ -24,6 +24,7 @@ import TaskDetailsModule from "./modules/tasks/TaskDetailsModule";
 import ConversationModule from "./modules/conversation/ConversationModule";
 import ActivityModule from "./modules/activity/ActivityModule";
 import CoverModule from "./modules/cover/CoverModule";
+import ContactsModule from "./modules/contacts/ContactsModule";
 
 type DemoProps = {
     text?:string
@@ -64,6 +65,7 @@ export namespace DashboardComponents {
         "ConversationModule":ConversationModule,
         "RecentActivityModule":ActivityModule,
         "CoverModule":CoverModule,
+        "ContactsModule":ContactsModule,
     }
     export function getComponent(type: string, props:any) {
         const comp = componentMap[type]

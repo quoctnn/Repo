@@ -99,6 +99,9 @@ class UserMenu extends React.Component<Props, State> {
     signOut = (event: React.SyntheticEvent<any>) => {
         NavigationUtilities.navigateToSignOut(this.props.history);
     }
+    navigateToProfile = () => {
+        NavigationUtilities.navigateToProfile(this.props.history, this.props.profile);
+    }
     renderPopover = () =>
     {
         const open = !this.state.popoverRemoved || this.state.popoverVisible
@@ -117,6 +120,7 @@ class UserMenu extends React.Component<Props, State> {
             }
         })
         selectableDropdownItems.push({id:"divider1", type:OverflowMenuItemType.divider})
+        selectableDropdownItems.push({id:"profile", type:OverflowMenuItemType.option, title:translate("common.page.profile"), onPress:this.navigateToProfile})
         selectableDropdownItems.push({id:"all", type:OverflowMenuItemType.option, title:translate("Sign out"), onPress:this.signOut})
         const cn = classnames("dropdown-menu-popover", "user-status-dropdown")
         return <Popover className={cn}

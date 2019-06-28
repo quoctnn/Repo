@@ -43,9 +43,8 @@ type ReduxDispatchProps = {
 type Props = OwnProps & RouteComponentProps<any> & ReduxStateProps & ReduxDispatchProps
 class FilesModule extends React.Component<Props, State> {  
     filesList = React.createRef<ListComponent<UploadedFile>>()
-    static defaultProps:CommonModuleProps = {
-        pageSize:15,
-    }
+    private calculatedPageSize = 15
+    private defaultPageSize = 15
     constructor(props:Props) {
         super(props);
         this.state = {
@@ -79,7 +78,8 @@ class FilesModule extends React.Component<Props, State> {
     }
     fetchFiles = (offset:number, completion:(items:PaginationResult<UploadedFile>) => void ) => {
         const contextId = (this.props.contextObject && this.props.contextObject.id) || undefined
-        ApiClient.getFiles(this.props.contextNaturalKey, contextId, this.props.pageSize, offset, (data, status, error) => {
+        const pageSize = this.props.pageSize || this.calculatedPageSize
+        ApiClient.getFiles(this.props.contextNaturalKey, contextId, pageSize, offset, (data, status, error) => {
             completion(data)
             ToastManager.showErrorToast(error)
         })
@@ -103,31 +103,30 @@ class FilesModule extends React.Component<Props, State> {
     isListMode = () => {
         return this.state.menuData.viewMode == ListViewMode.list
     }
+    getCalculatedPageSize = (columns:number, height:number, itemHeight:number) => {
+        const ps = Math.max(1, height / itemHeight ) * columns
+        return Math.ceil( Math.max(this.defaultPageSize, ps * 2) )
+    }
     renderContent = (contextObject:Permissible) => {
 
         const {showLoadMore} = this.props
         const waiting = this.props.contextNaturalKey && !contextObject
         if(waiting)
             return <LoadingSpinner key="loading"/>
-        const cn = classnames("files-module-list", {grid:!this.isListMode()})
-        if(this.isListMode())
-        {
-            return <ListComponent<UploadedFile> 
-            ref={this.filesList} 
-            onLoadingStateChanged={this.feedLoadingStateChanged} 
-            fetchData={this.fetchFiles} 
-            loadMoreOnScroll={!showLoadMore}
-            renderItem={this.renderFile} 
-            className={cn} />
-        }
-        return <ResizeObserverColumnsComponent targetColumnWidth={200} 
+        const isListMode = this.isListMode()
+        const targetWidth = isListMode ? 100000 : 200
+        const updateKey = this.state.menuData.viewMode.toString()
+        return <ResizeObserverColumnsComponent className="d-flex flex-column" updateKey={updateKey} targetColumnWidth={targetWidth} 
                 render={(state) => {
-                return <ListComponent<UploadedFile> 
+                    const cn = classnames("files-module-list grid")
+                    this.calculatedPageSize = this.getCalculatedPageSize(state.colums, state.height, isListMode ? 76 : 76 /*200*/)
+                    return <ListComponent<UploadedFile> 
                             ref={this.filesList} 
                             onLoadingStateChanged={this.feedLoadingStateChanged} 
                             fetchData={this.fetchFiles} 
                             loadMoreOnScroll={!showLoadMore}
                             renderItem={this.renderFile} 
+                            reloadContext={updateKey}
                             className={cn + " grid-size-" + state.colums} />
             }}></ResizeObserverColumnsComponent>
     }
@@ -151,10 +150,9 @@ class FilesModule extends React.Component<Props, State> {
     }
     render()
     {
-        const {history, match, location, staticContext, contextNaturalKey, contextObject,authenticatedUser, pageSize, showLoadMore, showInModal, isModal, ...rest} = this.props
-        const {breakpoint, className} = this.props
+        const {breakpoint, className, history, match, location, staticContext, contextNaturalKey, contextObject,authenticatedUser, pageSize, showLoadMore, showInModal, isModal, ...rest} = this.props
         const cn = classnames("files-module", className)
-        const headerContent = undefined //this.renderHeaderContent()
+        const headerContent = this.renderHeaderContent()
         const renderModalContent = !showInModal || isModal ? undefined : this.renderModalContent
         return (<SimpleModule {...rest} 
                     showHeader={!isModal}

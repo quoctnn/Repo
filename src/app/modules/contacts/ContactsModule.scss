@@ -1,0 +1,59 @@
+@import "../../Config";
+.contacts-module {
+    > ul {
+        overflow-y: auto;
+        height:100%;
+    }
+    .grid{
+        justify-content: space-evenly;
+    }
+    .avatar-profile
+    {
+        width: 65px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        border-radius: 4px;
+        margin: 0 0.25em 0.5em 0.25em;
+        .header{
+            height: 40px;
+            justify-content: center;
+            align-items: center;
+        }
+        .footer{
+            height: 20px;
+            padding: 2px;
+            font-size: 0.65em;
+            justify-content: center;
+            align-items: center;
+        }
+        .avatar {
+            .user-status-indicator{
+                bottom: -2px;
+                width: 12px !important;
+                height: 12px !important;
+            }
+        }
+        .typing-indicator:after,.typing-indicator:before
+        {
+            display: none;
+        }
+        .typing-indicator
+        {
+            padding: 1px;
+            margin-top: 0;
+        }
+        .typing-indicator-container
+        {
+            position: absolute;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            background-color: #a09c9c80;
+            border-radius: 50%;
+            top: 0;
+        }
+    }
+}
