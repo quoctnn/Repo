@@ -67,7 +67,7 @@ class TopNavigation extends React.Component<Props, State> {
         return <div className="flex-grow-1 d-flex justify-content-center">
                     <Link className={communityLinkClass} to={communityLink}>{translate("common.community")}</Link>
                     <Link className={dashboardClass} to={dashboardLink}>{translate("common.dashboard")}</Link>
-                    { !profile.is_anonymous &&
+                    { profile && !profile.is_anonymous &&
                         <Link to={conversationsLink} className={conversationsLinkClass}>
                             {translate("common.messages")}
                             {this.props.unreadConversations > 0 && <Badge pill={true} color="danger" className="ml-1 badge-notification">{this.props.unreadConversations}</Badge>}

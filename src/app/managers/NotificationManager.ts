@@ -24,7 +24,7 @@ export abstract class NotificationManager
     }
     static updateNotificationsCount = () => {
         const user = AuthenticationManager.getAuthenticatedUser()
-        if(!user.is_anonymous)
+        if(user && !user.is_anonymous)
         {
             ApiClient.getUnreadNotifications((notifications, status, error) => {
                 if(!!notifications && !error)

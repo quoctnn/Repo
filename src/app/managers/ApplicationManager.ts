@@ -165,7 +165,6 @@ export abstract class ApplicationManager
         dispatch(resetProjectsAction())
         dispatch(resetConversationsAction())
         dispatch(resetUnreadNotificationsAction())
-        location.reload()
     }
     private static getStore = ():Store<ReduxState,any> =>
     {
