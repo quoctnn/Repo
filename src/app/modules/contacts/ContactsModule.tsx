@@ -57,7 +57,8 @@ class ContactsModule extends React.PureComponent<Props, State> {
     {
         let object = args[0]
         let user = object.user
-        if(user == this.props.authenticatedUser.id)
+        const authUserId = this.props.authenticatedUser && this.props.authenticatedUser.id
+        if(user == authUserId)
         {
             return
         }
@@ -122,7 +123,7 @@ class ContactsModule extends React.PureComponent<Props, State> {
 const mapStateToProps = (state:ReduxState, ownProps: OwnProps):ReduxStateProps => 
 {
     const authenticatedUser = state.authentication.profile
-    const contacts = state.profileStore.allIds.map(id => state.profileStore.byId[id]).filter(u => u.id != authenticatedUser.id)
+    const contacts = (authenticatedUser && authenticatedUser.id && state.profileStore.allIds.map(id => state.profileStore.byId[id]).filter(u => u.id != authenticatedUser.id)) || []
     return {
         contacts,
         authenticatedUser,
