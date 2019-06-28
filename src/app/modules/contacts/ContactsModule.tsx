@@ -1,5 +1,5 @@
 import * as React from "react";
-import { connect } from 'react-redux'
+import { connect, DispatchProp } from 'react-redux'
 import "./ContactsModule.scss"
 import { UserProfile, UserStatus } from '../../types/intrasocial_types';
 import { NotificationCenter } from "../../utilities/NotificationCenter";
@@ -22,7 +22,7 @@ import { uniqueId } from '../../utilities/Utilities';
 
 type OwnProps = {
     breakpoint:ResponsiveBreakpoint
-} & CommonModuleProps
+} & CommonModuleProps & DispatchProp
 type ReduxStateProps = {
     authenticatedUser:UserProfile
     contacts:UserProfile[]
@@ -100,14 +100,13 @@ class ContactsModule extends React.PureComponent<Props, State> {
                         </div>
                         <div className="d-flex footer">
                             <div className="text-truncate">{contact.first_name + " " + contact.last_name}</div>
-                            {contact.biography && <div className="text-truncate">{contact.biography}</div>}
                         </div>
                     </Link>
                 </div>
     }
     render = () => 
     {
-        const {className, breakpoint, contextNaturalKey,authenticatedUser, pageSize, showLoadMore, showInModal, isModal, contacts, ...rest} = this.props
+        const {className, breakpoint, contextNaturalKey,authenticatedUser, pageSize, showLoadMore, showInModal, isModal, contacts, dispatch, ...rest} = this.props
         const cn = classnames("contacts-module", className)
         return <SimpleModule {...rest} 
                 showHeader={!isModal}
@@ -127,10 +126,11 @@ class ContactsModule extends React.PureComponent<Props, State> {
 }
 const mapStateToProps = (state:ReduxState, ownProps: OwnProps):ReduxStateProps => 
 {
-    const contacts = []//state.profileStore.allIds.map(id => state.profileStore.byId[id])
+    const authenticatedUser = state.authentication.profile
+    const contacts = state.profileStore.allIds.map(id => state.profileStore.byId[id]).filter(u => u.id != authenticatedUser.id)
     return {
         contacts,
-        authenticatedUser:state.authentication.profile,
+        authenticatedUser,
     }
 }
 
