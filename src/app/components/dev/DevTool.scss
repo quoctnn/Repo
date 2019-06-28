@@ -2,7 +2,6 @@
 
 #dev-tool
 {
-    min-width: 700px;
     @include var(color, primary-text-color);
 
     .dropdown-toggle

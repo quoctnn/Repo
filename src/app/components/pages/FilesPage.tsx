@@ -20,7 +20,8 @@ export default class FilesPage extends React.Component<Props, State>
             name: "",
             type: "FilesModule",
             disabled: false,
-            properties: {}}
+            properties: {}
+        }
         const columns:GridColumn[] = [{id: 0,
             module: module,
             width: 12,

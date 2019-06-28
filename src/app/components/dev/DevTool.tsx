@@ -320,7 +320,7 @@ class DevTool extends React.PureComponent<Props, State> {
         return (
         <div id="dev-tool">
             <div className="jumbotron">
-            {this.props.showTitle && <h1 className="display-4">{translate("admin.developertool")}</h1>}
+            {this.props.showTitle && <h1 className="display-4 text-truncate">{translate("admin.developertool")}</h1>}
             <div>
                 <Form>
                 <div className="form-group row">

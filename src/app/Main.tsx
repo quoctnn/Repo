@@ -78,20 +78,31 @@ type State = {
 type PathLoaderProps = {
 
 } & RouteComponentProps<any>
-type PathLoaderState = { loading: boolean }
+type PathLoaderState = { loading: boolean, key:string }
 const PathLoader = (Component: any, extractKey: (path: string) => string, forceUpdate?: (path: string) => string) =>
     class WithLoading extends React.Component<PathLoaderProps, PathLoaderState> {
         constructor(props: PathLoaderProps) {
             super(props)
             this.state = {
-                loading: true
+                loading: true,
+                key:null
             }
         }
         shouldComponentUpdate = (nextProps: PathLoaderProps, nextState: PathLoaderState) => {
-            const ret = extractKey(nextProps.location.pathname) != extractKey(this.props.location.pathname) ||
+            const newKey = extractKey(nextProps.location.pathname)
+            const ret = newKey != this.state.key ||
                 nextState.loading != this.state.loading ||
                 ((!!forceUpdate && forceUpdate(nextProps.location.pathname) != forceUpdate(this.props.location.pathname)) || false)
             return ret
+        }
+        static getDerivedStateFromProps = (props: PathLoaderProps, state: PathLoaderState): Partial<PathLoaderState> => {
+            const newKey = extractKey(props.location.pathname)
+            const setLoading = newKey != state.key
+            if(setLoading)
+            {
+                return {key:newKey, loading:true}
+            }
+            return null
         }
         componentDidMount = () => {
             this.update()
@@ -109,12 +120,17 @@ const PathLoader = (Component: any, extractKey: (path: string) => string, forceU
                 this.setState({ loading: false })
             })
         }
+        renderLoading = () => {
+            return <div key="loading" className="page">
+                        <LoadingSpinner />
+                    </div>
+        }
         render() {
             const { loading } = this.state
             const updateKey = forceUpdate && forceUpdate(this.props.location.pathname)
             const key = extractKey(location.pathname)
             //console.log("HOC update", key, updateKey)
-            return loading ? <LoadingSpinner /> : <Component key={key} {...this.props} updateKey={updateKey} />
+            return loading ? this.renderLoading() : <Component key={key} {...this.props} updateKey={updateKey} />
         }
     }
 const PathLoadedProfilePage = PathLoader(ProfilePage, (path) => { return path })

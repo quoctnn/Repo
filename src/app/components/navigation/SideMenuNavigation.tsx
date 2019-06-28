@@ -7,18 +7,16 @@ import classnames from 'classnames';
 import Logo from "../general/images/Logo";
 import { translate } from "../../localization/AutoIntlProvider";
 import CollapseComponent from "../general/CollapseComponent";
-import { GroupSorting, Group, Project, ProjectSorting, ContextNaturalKey, Favorite, DraggableType } from '../../types/intrasocial_types';
+import { GroupSorting, Group, Project, ProjectSorting, ContextNaturalKey, Favorite, DraggableType, Community } from '../../types/intrasocial_types';
 import ApiClient from "../../network/ApiClient";
 import LogoSmall from "../general/images/LogoSmall";
 import { IntraSocialLink } from "../general/IntraSocialLink";
 import { SecureImage } from "../general/SecureImage";
 import { useDrag } from 'react-dnd'
 import ToggleSwitch from "../general/ToggleSwitch";
-import SimpleDialog from "../general/dialogs/SimpleDialog";
-import FilesModule from "../../modules/files/FilesModule";
-import { ResponsiveBreakpoint } from "../general/observers/ResponsiveComponent";
 import Routes from '../../utilities/Routes';
 import { Link } from "react-router-dom";
+import { ContextManager } from "../../managers/ContextManager";
 
 type ContextItemProps = {
     name?:string
@@ -179,10 +177,15 @@ const favoritesMapStateToProps = (state: ReduxState, ownProps: FavoritesOwnProps
     }
 }
 const FavoritesConnected = connect<FavoriteReduxStateProps, {}, FavoritesOwnProps>(favoritesMapStateToProps, null)(Favorites)
-type TopGroupsProps = {
+
+type TopGroupsReduxStateProps = {
+    community:Community
+}
+type TopGroupsOwnProps = {
     mode: MenuViewMode
     onItemSelected:() => void
 }
+type TopGroupsProps = TopGroupsOwnProps & TopGroupsReduxStateProps & RouteComponentProps<any>
 type TopGroupsState = {
     list: Group[]
 }
@@ -196,8 +199,15 @@ class TopGroups extends React.Component<TopGroupsProps, TopGroupsState> {
     componentDidMount = () => {
         this.fetchGroups()
     }
+    componentDidUpdate = (prevProps:TopProjectsProps) => {
+        if(this.props.community != prevProps.community)
+        {
+            this.fetchGroups()
+        }
+    }
     fetchGroups = () => {
-        ApiClient.getGroups(null, 5, 0, GroupSorting.mostUsed, (data, status, error) => {
+        const communityId = (this.props.community && this.props.community.id) || null
+        ApiClient.getGroups(communityId, 5, 0, GroupSorting.mostUsed, (data, status, error) => {
             const list = (data && data.results) || []
             this.setState((prevState: TopGroupsState) => {
                 return { list }
@@ -216,10 +226,23 @@ class TopGroups extends React.Component<TopGroupsProps, TopGroupsState> {
                 </>
     }
 }
-type TopProjectsProps = {
+const mapTopGroupsStateToProps = (state: ReduxState, ownProps: TopGroupsOwnProps & RouteComponentProps<any>): TopGroupsReduxStateProps => {
+
+    const community = ContextManager.getContextObject(ownProps.location.pathname, ContextNaturalKey.COMMUNITY) as Community
+    return {
+        community
+    }
+}
+const ConnectedTopGroups = withRouter(connect(mapTopGroupsStateToProps, null)(TopGroups))
+type TopProjectsReduxStateProps = {
+    community:Community
+}
+type TopProjectsOwnProps = {
+
     mode: MenuViewMode
     onItemSelected:() => void
 }
+type TopProjectsProps = TopProjectsOwnProps & TopProjectsReduxStateProps & RouteComponentProps<any>
 type TopProjectsState = {
     list: Project[]
 }
@@ -231,10 +254,17 @@ class TopProjects extends React.Component<TopProjectsProps, TopProjectsState> {
         }
     }
     componentDidMount = () => {
-        this.fetchGroups()
+        this.fetchProjects()
     }
-    fetchGroups = () => {
-        ApiClient.getProjects(null, 5, 0, ProjectSorting.mostUsed, null, null, (data, status, error) => {
+    componentDidUpdate = (prevProps:TopProjectsProps) => {
+        if(this.props.community != prevProps.community)
+        {
+            this.fetchProjects()
+        }
+    }
+    fetchProjects = () => {
+        const communityId = (this.props.community && this.props.community.id) || null
+        ApiClient.getProjects(communityId, 5, 0, ProjectSorting.mostUsed, null, null, (data, status, error) => {
             const list = (data && data.results) || []
             this.setState((prevState: TopProjectsState) => {
                 return { list }
@@ -253,19 +283,25 @@ class TopProjects extends React.Component<TopProjectsProps, TopProjectsState> {
                 </>
     }
 }
+const mapTopProjectsStateToProps = (state: ReduxState, ownProps: TopProjectsOwnProps & RouteComponentProps<any>): TopProjectsReduxStateProps => {
+
+    const community = ContextManager.getContextObject(ownProps.location.pathname, ContextNaturalKey.COMMUNITY) as Community
+    return {
+        community
+    }
+}
+const ConnectedTopProjects = withRouter(connect(mapTopProjectsStateToProps, null)(TopProjects))
 
 type OwnProps = {
 }
-type Props = OwnProps & ReduxStateProps & RouteComponentProps<any>
+type Props = OwnProps
 
-type ReduxStateProps = {
-}
 type State = {
     open: boolean
     mode: MenuViewMode
     closeMenuOnNavigation:boolean
 }
-class SideMenuNavigation extends React.Component<Props, State> {
+export default class SideMenuNavigation extends React.Component<Props, State> {
     static bodyClass = "has-side-menu"
     static sideMenuLockedClass = "side-menu-locked"
     static animationDuration = 300
@@ -383,11 +419,11 @@ class SideMenuNavigation extends React.Component<Props, State> {
                     </MenuBlock>
                     <div className="hbar main-border-color-background align-self-center" style={{ height: borderHeight, width: "90%" , transitionDuration: transDur}}></div>
                     <MenuBlock removeContentOnCollapsed={false} animationDuration={SideMenuNavigation.animationDuration} open={this.state.open} icon="fas fa-users" title={translate("Groups")}>
-                        <TopGroups onItemSelected={this.handleLinkItemSelected} mode={mode} />
+                        <ConnectedTopGroups onItemSelected={this.handleLinkItemSelected} mode={mode} />
                     </MenuBlock>
                     <div className="hbar main-border-color-background align-self-center" style={{ height: borderHeight, width: "90%" , transitionDuration: transDur}}></div>
                     <MenuBlock removeContentOnCollapsed={false} animationDuration={SideMenuNavigation.animationDuration} open={this.state.open} icon="fas fa-clipboard-list" title={translate("Projects")}>
-                        <TopProjects onItemSelected={this.handleLinkItemSelected} mode={mode} />
+                        <ConnectedTopProjects onItemSelected={this.handleLinkItemSelected} mode={mode} />
                     </MenuBlock>
                 </div>
                 {this.state.open && 
@@ -403,11 +439,3 @@ class SideMenuNavigation extends React.Component<Props, State> {
         );
     }
 }
-const mapStateToProps = (state: ReduxState, ownProps: OwnProps): ReduxStateProps => {
-    return {
-        profile: state.authentication.profile,
-        unreadNotifications: state.unreadNotifications.notifications,
-        unreadConversations: state.unreadNotifications.conversations
-    }
-}
-export default withRouter(connect<ReduxStateProps, {}, OwnProps>(mapStateToProps, null)(SideMenuNavigation))

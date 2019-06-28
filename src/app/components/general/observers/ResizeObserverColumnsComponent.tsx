@@ -1,36 +1,38 @@
 import * as React from 'react';
 import ResizeObserver from 'resize-observer-polyfill'
-import { ResponsiveBreakpoint } from './ResponsiveComponent';
 type OwnProps = 
 {
     className?:string
     render:(state:State) => React.ReactNode
+    targetColumnWidth:number
 }
 type Props = OwnProps
 type State = {
-    breakpoint:ResponsiveBreakpoint
+    colums:number
 }
-export class ResizeObserverComponent extends React.Component<Props,State> {
+export class ResizeObserverColumnsComponent extends React.Component<Props,State> {
     observer = null
-    container = null
+    container = React.createRef<HTMLDivElement>()
     constructor(props:Props) {
       super(props);
-      this.state = { breakpoint: ResponsiveBreakpoint.mini }
+      this.state = { colums: 0 }
       this.observer = null;
-      this.container = null;
     }
     componentDidMount() {
         this.observer = new ResizeObserver((entries, observer) => {
             for (const entry of entries) {
-                const {left, top, width, height} = entry.contentRect;
-                const bp = ResponsiveBreakpoint.parse(width)
-                if(bp != this.state.breakpoint)
+                const {width} = entry.contentRect
+                const currentCols = this.state.colums
+                const newCols = Math.floor( Math.max(1, width / this.props.targetColumnWidth) )
+                if(currentCols != newCols)
                 {
-                    this.setState({breakpoint:bp})
+                    this.setState(() => {
+                        return {colums:newCols}
+                    })
                 }
             }
         });
-        this.observer.observe(this.container);
+        this.observer.observe(this.container.current);
     }
     componentWillUnmount() {
         if (this.observer) {
@@ -40,7 +42,7 @@ export class ResizeObserverComponent extends React.Component<Props,State> {
     render() {
         var {children, render, ...rest} = this.props
       return (
-        <div {...rest} ref={div => { this.container = div; }}  >
+        <div {...rest} ref={this.container}  >
           {render(this.state)}
         </div>
       );

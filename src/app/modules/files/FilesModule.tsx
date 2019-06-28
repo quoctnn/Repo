@@ -16,11 +16,23 @@ import FileListItem from './FileListItem';
 import { ContextManager } from '../../managers/ContextManager';
 import { AuthenticationManager } from '../../managers/AuthenticationManager';
 import { CommonModuleProps } from '../Module';
+import FileGridItem from './FileGridItem';
+import { ButtonGroup, Button } from 'reactstrap';
+import { ResizeObserverColumnsComponent } from '../../components/general/observers/ResizeObserverColumnsComponent';
+export type FilesMenuData = {
+    viewMode:ListViewMode
+}
+export enum ListViewMode {
+    list,
+    grid
+}
 type OwnProps = {
     breakpoint:ResponsiveBreakpoint
+    viewMode?:ListViewMode
 } & CommonModuleProps
 type State = {
     isLoading:boolean
+    menuData:FilesMenuData
 }
 type ReduxStateProps = {
     contextObject:Permissible & IdentifiableObject
@@ -38,6 +50,9 @@ class FilesModule extends React.Component<Props, State> {
         super(props);
         this.state = {
             isLoading:false,
+            menuData:{
+                viewMode:props.viewMode || ListViewMode.list
+            }
         }
     }
     componentWillUnmount = () => {
@@ -81,26 +96,55 @@ class FilesModule extends React.Component<Props, State> {
         })
     }
     renderFile = (file:UploadedFile) =>  {
-        //const rename = file.user == this.props.authenticatedUser.id ? this.handleRenameFile : undefined
-        return <FileListItem 
-                key={file.id} 
-                file={file} 
-                //onRename={rename}
-                />
+        if(this.state.menuData.viewMode == ListViewMode.list)
+            return <FileListItem key={file.id} file={file} />
+        return <FileGridItem key={file.id} file={file} />
+    }
+    isListMode = () => {
+        return this.state.menuData.viewMode == ListViewMode.list
     }
     renderContent = (contextObject:Permissible) => {
 
         const {showLoadMore} = this.props
         const waiting = this.props.contextNaturalKey && !contextObject
-        return <>
-            {waiting && <LoadingSpinner key="loading"/>}
-            {!waiting && <ListComponent<UploadedFile> 
-                        ref={this.filesList} 
-                        onLoadingStateChanged={this.feedLoadingStateChanged} 
-                        fetchData={this.fetchFiles} 
-                        loadMoreOnScroll={!showLoadMore}
-                        renderItem={this.renderFile} className="files-module-list" />}
-            </>
+        if(waiting)
+            return <LoadingSpinner key="loading"/>
+        const cn = classnames("files-module-list", {grid:!this.isListMode()})
+        if(this.isListMode())
+        {
+            return <ListComponent<UploadedFile> 
+            ref={this.filesList} 
+            onLoadingStateChanged={this.feedLoadingStateChanged} 
+            fetchData={this.fetchFiles} 
+            loadMoreOnScroll={!showLoadMore}
+            renderItem={this.renderFile} 
+            className={cn} />
+        }
+        return <ResizeObserverColumnsComponent targetColumnWidth={200} 
+                render={(state) => {
+                return <ListComponent<UploadedFile> 
+                            ref={this.filesList} 
+                            onLoadingStateChanged={this.feedLoadingStateChanged} 
+                            fetchData={this.fetchFiles} 
+                            loadMoreOnScroll={!showLoadMore}
+                            renderItem={this.renderFile} 
+                            className={cn + " grid-size-" + state.colums} />
+            }}></ResizeObserverColumnsComponent>
+    }
+    toggleViewMode = () => {
+        this.setState((prevState:State) => {
+            const menuData = {...prevState.menuData}
+            menuData.viewMode = this.isListMode() ? ListViewMode.grid : ListViewMode.list
+            return {menuData}
+        })
+    }
+    renderHeaderContent = () => {
+        const viewModeIconClass = this.state.menuData.viewMode == ListViewMode.list ? "fas fa-th-large" : "fas fa-th-list"
+        return (<ButtonGroup className="header-filter-group">
+                    <Button size="xs" onClick={this.toggleViewMode} color="light">
+                        <i className={viewModeIconClass}></i>
+                    </Button>
+                </ButtonGroup>)
     }
     renderModalContent = () => {
         return <FilesModule {...this.props} pageSize={50} style={{height:undefined, maxHeight:undefined}} showLoadMore={false} showInModal={false} isModal={true}/>
@@ -110,6 +154,7 @@ class FilesModule extends React.Component<Props, State> {
         const {history, match, location, staticContext, contextNaturalKey, contextObject,authenticatedUser, pageSize, showLoadMore, showInModal, isModal, ...rest} = this.props
         const {breakpoint, className} = this.props
         const cn = classnames("files-module", className)
+        const headerContent = undefined //this.renderHeaderContent()
         const renderModalContent = !showInModal || isModal ? undefined : this.renderModalContent
         return (<SimpleModule {...rest} 
                     showHeader={!isModal}
@@ -118,6 +163,7 @@ class FilesModule extends React.Component<Props, State> {
                     breakpoint={breakpoint} 
                     isLoading={this.state.isLoading} 
                     renderModalContent={renderModalContent}
+                    headerContent={headerContent}
                     headerTitle={translate("files.module.title")}>
                 {this.renderContent(contextObject)}
                 </SimpleModule>)
