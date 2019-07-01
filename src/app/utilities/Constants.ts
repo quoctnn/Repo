@@ -9,6 +9,8 @@ export default  {
     apiRoute: {
         login:"/api/v1/auth/oup/login/",
         nativeLogin:"/api/v1/auth-oup/native-login/",
+        // Version
+        versionUrl:"/api/v2/version/basic/",
         // Purchases
         invoiceListUrl: '/api/v1/invoice/',
         getInvoiceItem: (id:number) => {

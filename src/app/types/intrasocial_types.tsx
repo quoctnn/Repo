@@ -976,6 +976,13 @@ export type Dashboard = {
 //DASHBOARD END
 
 
+export type VersionInfo = {
+    major_version:number
+    minor_version:number
+    version_string:string
+    release_date:string
+}
+
 export type Timesheet = {
     id:number
     created_at:string

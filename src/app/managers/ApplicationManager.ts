@@ -22,6 +22,9 @@ import { resetActiveCommunityAction } from '../redux/activeCommunity';
 import { resetEmbedlyStoreAction } from '../components/general/embedly/redux';
 import { resetUnreadNotificationsAction } from '../redux/unreadNotifications';
 import { FavoriteManager } from './FavoriteManager';
+import { Settings } from '../utilities/Settings';
+import { Redirect } from 'react-router';
+import { noop } from 'react-select/lib/utils';
 
 export type ApplicationData = {
     dashboards:{[key:string]:Dashboard}
@@ -45,6 +48,14 @@ export abstract class ApplicationManager
     static setup = () =>
     {
         ApplicationManager.resetData(false)
+        ApplicationManager.fetchBackendInfo((result, message) => {
+            switch (result) {
+                case (0):
+                    break;
+                default:
+                    alert("There was an error while connecting to the backend server.\n" + message);
+            }
+        })
     }
     private static resetData = (resetCachedData:boolean) => {
 
@@ -70,10 +81,8 @@ export abstract class ApplicationManager
         ApplicationManager.applicationData.dashboards = db
     }
     static loadApplication = (resetCachedData:boolean) => {
-        console.log("loadApplication")
         ApplicationManager.resetData(resetCachedData)
         ApplicationManager.getStore().dispatch(setApplicationLoadedAction(false))
-
         const requests:RequestObject[] = []
         requests.push({name:"Dashboards", action:ApplicationManager.fetchDashboards})
         requests.push({name:"Communities", action:ApplicationManager.fetchCommunities})
@@ -96,6 +105,27 @@ export abstract class ApplicationManager
             r.action(() => {requestCompleter(r)})
         })
     }
+    private static fetchBackendInfo = (completion:(result:number, message:string) => void) => {
+        const compatibility = {major_version: Settings.compatMajor, minor_version: Settings.compatMinor}
+        ApiClient.getBackendVersionInfo((data, status) => {
+            const versionInfo = data;
+            if (status == 'error') {
+                completion(2, "Could not establish contact with backend server!")
+            } else {
+                if (compatibility.major_version < versionInfo.major_version ||
+                        (compatibility.minor_version < versionInfo.minor_version &&
+                         compatibility.major_version == versionInfo.major_version)
+                    ) {
+                        completion(1, "Backend version: " + versionInfo.version_string + " is not compatible")
+                    }
+                else {
+                    console.info("Backend version:", versionInfo);
+                }
+            }
+            completion(0, "")
+        })
+    }
+
     private static fetchDashboards = (completion:() => void) => {
         ApiClient.getDashboards((data, status, error) => {
             const dashboards = (data && data.results) || []
