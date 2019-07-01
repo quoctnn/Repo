@@ -90,6 +90,7 @@
     "react-router-dom": "^5.0.1",
     "react-select": "^2.4.1",
     "react-sticky-box": "^0.8.0",
+    "react-tabs": "^3.0.0",
     "react-toastify": "^4.1.0",
     "react-visibility-sensor": "^5.0.2",
     "reactstrap": "^7.1.0",

@@ -273,7 +273,7 @@ export type TaskNotification = {
     created_at:string
     title:string
     action:TaskNotificationAction
-    project:Project 
+    project:Project
 } & Linkable & NotificationObject
 export type AttentionNotification = {
     created_by:number
@@ -288,7 +288,7 @@ export type MembershipRequestNotification = {
     request_by:UserProfile
     created_at:string
 } & NotificationObject
-export enum NotificationGroupKey 
+export enum NotificationGroupKey
 {
     COMMUNITY_INVITATIONS = "community_invitations",
     GROUP_INVITATIONS = "group_invitations",
@@ -951,6 +951,7 @@ export type GridColumn = {
     children:GridColumn[]
     index:number
     sticky?:boolean
+    tabbed_layout?:boolean
 }
 export type GridColumns = {
     id:number

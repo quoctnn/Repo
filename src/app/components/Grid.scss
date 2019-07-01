@@ -1,0 +1,21 @@
+@import "../Config";
+
+.react-tabs .tab-list{
+    display: inline-flex;
+    width: 100%;
+    margin: 0px 0 8px;
+    text-align: center;
+    @include var(background-color, background-color);
+    border-radius: 8px;
+}
+.react-tabs .tab-list .tab-item {
+    font-size: 20px;
+}
+
+.react-tabs .tab-list .react-tabs__tab--selected {
+    @include var(color, primary-theme-color);
+}
+
+.react-tabs .row .react-tabs__tab-panel--selected {
+    width: 100%;
+}

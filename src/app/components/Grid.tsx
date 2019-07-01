@@ -6,6 +6,9 @@ import { ResponsiveBreakpoint } from "./general/observers/ResponsiveComponent";
 import { GridColumns, Module, GridColumn } from '../types/intrasocial_types';
 import { Col } from "reactstrap";
 import StickyBox from "./external/StickyBox";
+import "./Grid.scss";
+import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
+//import "react-tabs/style/react-tabs.css";
 
 type OwnProps = {
     grid:GridColumns
@@ -154,26 +157,45 @@ export class Grid extends React.PureComponent<Props, State> {
     connectRef = (key:string) => (ref) => {
         this.moduleRefs[key] = ref
     }
+    renderTabbedLayout = (columns:GridColumn[], level:number) => {
+        const cn = classnames("tab-list")
+        let tabWidth = 12
+        if (columns) {
+            tabWidth = 12 / columns.length
+        }
+        const colCN = classnames("tab-item", "col-" + tabWidth)
+        columns.map(c => {return c.module.name})
+        return <Tabs>
+                    <TabList className={cn}>
+                        {columns.map(c => {
+                            return <Tab className={colCN}>{c.module.name}</Tab>
+                        })}
+                    </TabList>
+                    {this.renderRow(columns, level, true)}
+            </Tabs>
+
+    }
     renderModule = (module:Module) => {
         if(module.disabled)
             return null
         const key = this.fixKey("module_" + module.id)
         const props:any = module.properties || {}
         const ccn = classnames("module-grid-item", this.props.className)
-        console.log("key", key)
         props.key = key
         props.moduleRef = this.connectRef(key)
         props.className = ccn
         props.breakpoint = this.props.breakpoint
         return DashboardComponents.getComponent(module.type, props)
     }
-    renderRow = (columns:GridColumn[], level:number) => {
+    renderRow = (columns:GridColumn[], level:number, tabbed?:boolean) => {
         const cn = classnames("row", {"fill" : this.props.fill})
         const colCN = classnames({"fill" : this.props.fill})
         return  <div className={cn}>
                     {columns.map(c => {
                         const key = "col_" + c.id + "_" + level
-                        if(c.module)
+                        if(tabbed && c.module)
+                            return <TabPanel className={colCN} key={key} xs={c.width}>{this.renderModule(c.module)}</TabPanel>
+                        else if(c.module)
                             return <Col className={colCN} key={key} xs={c.width}>{this.renderModule(c.module)}</Col>
                         else return  <Col className={colCN} key={key} xs={c.width}>{this.renderColumns(c, c.children, level + 1)}</Col>
                     })}
@@ -183,16 +205,29 @@ export class Grid extends React.PureComponent<Props, State> {
         if(columns.length == 0)
             return null
         const useSticky = !!parent && parent.sticky
+        const useTabbed = !!parent && parent.tabbed_layout
         const cn = classnames({"container" :  !parent, "fill" : this.props.fill})
-        if(useSticky){
+        if (useTabbed && useSticky) {
+            return <StickyBox className={cn} offsetTop={75} offsetBottom={20}>
+                        {this.renderTabbedLayout(columns, level)}
+                    </StickyBox>
+        }
+        else if(useSticky){
             return <StickyBox className={cn} offsetTop={75} offsetBottom={20}>
                         {this.renderRow(columns, level)}
                     </StickyBox>
 
         }
-        return <div className={cn}>
-                    {this.renderRow(columns, level)}
-                </div>
+        else if(useTabbed){
+            return <div className={cn}>
+                {this.renderTabbedLayout(columns, level)}
+            </div>
+        }
+        else {
+            return <div className={cn}>
+                {this.renderRow(columns, level)}
+            </div>
+}
     }
     render = () => {
         this.keyDict = {}
