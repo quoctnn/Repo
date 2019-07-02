@@ -3,6 +3,30 @@ Task schedule
 -->
 
 
+v0.5.2 | XX.07.2019
+-----------------------------------------
+
+Added:
+======
+
+* Tabbed layout for modules
+* Support for Subgroup listing in GroupModule
+
+
+Changes:
+========
+
+* Many small adjustments to content in Sidebar Menu
+* Anonymous users no longer has a dashboard
+
+
+Bugfixes:
+=========
+
+* Fixed some nullpointers
+
+<hr/>
+
 v0.5.1 | r27.06.2019
 -----------------------------------------
 
@@ -25,6 +49,8 @@ Changes:
 * Modified list modules to support "load more" and "show in dialog" ++
 * Centered status/post header and updated status "bubble" size
 
+
+<hr/>
 
 v0.5.0 | r31.05.2019
 -----------------------------------------

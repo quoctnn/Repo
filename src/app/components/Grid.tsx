@@ -80,8 +80,10 @@ export class Grid extends React.PureComponent<Props, State> {
                 let rects = {}
                 keys.forEach(key => {
                     var domNode = this.moduleRefs[key]
-                    var boundingBox = domNode.getBoundingClientRect();
-                    rects[key] = boundingBox
+                    if (domNode) {
+                        var boundingBox = domNode.getBoundingClientRect();
+                        rects[key] = boundingBox
+                    }
                 })
                 this.setState({rects:rects})
             }

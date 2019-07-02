@@ -25,6 +25,10 @@ import ConversationModule from "./modules/conversation/ConversationModule";
 import ActivityModule from "./modules/activity/ActivityModule";
 import CoverModule from "./modules/cover/CoverModule";
 import ContactsModule from "./modules/contacts/ContactsModule";
+import { AuthenticationManager } from "./managers/AuthenticationManager";
+import { NavigationUtilities } from './utilities/NavigationUtilities';
+import { withRouter, RouteComponentProps } from 'react-router-dom';
+import { EndpointManager } from './managers/EndpointManager';
 
 type DemoProps = {
     text?:string
@@ -86,8 +90,9 @@ type OwnProps =
 type State = {
     defaultGrid:GridColumns
 }
-type Props = OwnProps
-export default class DashboardComponent extends React.Component<Props, State> {
+type Props = OwnProps & RouteComponentProps<any>
+
+class DashboardComponent extends React.Component<Props, State> {
     constructor(props:Props)
     {
         super(props)
@@ -101,7 +106,7 @@ export default class DashboardComponent extends React.Component<Props, State> {
                     clone.width = 12
                     gridColumns.push(clone)
                 }
-                else 
+                else
                     loop(c.children)
             })
         }
@@ -118,6 +123,13 @@ export default class DashboardComponent extends React.Component<Props, State> {
             cnt += this.countModules(c.children || []) + (c.module ? 1 : 0)
         })
         return cnt
+    }
+    componentDidMount = () => {
+        const profile = AuthenticationManager.getAuthenticatedUser()
+        if (profile && profile.is_anonymous) {
+            const endpoint = EndpointManager.currentEndpoint()
+            NavigationUtilities.navigateToCommunity(this.props.history, endpoint.defaultCommunity)
+        }
     }
     renderModules = () =>
     {
@@ -150,3 +162,4 @@ export default class DashboardComponent extends React.Component<Props, State> {
         );
     }
 }
+export default withRouter(DashboardComponent)

@@ -39,6 +39,7 @@ type State = {
 }
 type ReduxStateProps = {
     community: Community
+    group: Group
 }
 type ReduxDispatchProps = {
 }
@@ -103,7 +104,8 @@ class GroupsModule extends React.Component<Props, State> {
     fetchGroups = (offset:number, completion:(items:PaginationResult<Group>) => void ) => {
         let ordering = this.state.menuData.sorting
         const communityId = this.props.excludeCommunityFilter ? null : this.props.community && this.props.community.id
-        ApiClient.getGroups(communityId, this.props.pageSize, offset, ordering, (data, status, error) => {
+        const groupId = this.props.group && this.props.group.id
+        ApiClient.getGroups(communityId, groupId, this.props.pageSize, offset, ordering, (data, status, error) => {
             completion(data)
             ToastManager.showErrorToast(error)
         })
@@ -165,7 +167,7 @@ class GroupsModule extends React.Component<Props, State> {
                     onMenuToggle={this.onMenuToggle}
                     menu={menu}
                     headerContent={headerContent}
-                    headerTitle={translate("groups.module.title")}>
+                    headerTitle={this.props.group ? translate("groups.module.subgroups") : translate("groups.module.title")}>
                 {this.renderContent()}
                 </SimpleModule>)
     }
@@ -173,8 +175,10 @@ class GroupsModule extends React.Component<Props, State> {
 const mapStateToProps = (state:ReduxState, ownProps: OwnProps & RouteComponentProps<any>):ReduxStateProps => {
 
     const community = ContextManager.getContextObject(ownProps.location.pathname, ContextNaturalKey.COMMUNITY) as Community
+    const group = ContextManager.getContextObject(ownProps.location.pathname, ContextNaturalKey.GROUP) as Group
     return {
-        community
+        community,
+        group
     }
 }
 const mapDispatchToProps = (dispatch:ReduxState, ownProps: OwnProps):ReduxDispatchProps => {

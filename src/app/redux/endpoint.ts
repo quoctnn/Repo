@@ -10,27 +10,32 @@ export enum EndpointLoginType {
 export interface ApiEndpoint {
     endpoint: string;
     loginType: EndpointLoginType;
+    defaultCommunity: number;
     websocket: string;
 }
 export const availableEndpoints: ApiEndpoint[] = [
     {
         endpoint: 'http://alesund-dev.intra.work:8000',
         loginType: EndpointLoginType.NATIVE,
+        defaultCommunity: 1,
         websocket: 'ws://alesund-dev.intra.work:8000/socket/'
     },
     {
         endpoint: 'http://192.168.15.28:8000',
         loginType: EndpointLoginType.NATIVE,
+        defaultCommunity: 3,
         websocket: 'ws://192.168.15.28:8000/socket/'
     },
     {
         endpoint: 'https://dev.intra.work',
         loginType: EndpointLoginType.API,
+        defaultCommunity: 27,
         websocket: 'wss://dev.intra.work/socket/'
     },
     {
         endpoint: 'http://127.0.0.1:8000/',
         loginType: EndpointLoginType.NATIVE,
+        defaultCommunity: 3,
         websocket: 'ws://127.0.0.1:8000/socket/'
     },
 ]

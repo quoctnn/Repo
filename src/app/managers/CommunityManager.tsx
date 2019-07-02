@@ -60,18 +60,20 @@ export abstract class CommunityManager
     static getCommunity = (communityId:string):Community|null =>
     {
         const communityStore = CommunityManager.getStore().getState().communityStore
-        const isNumber = communityId.isNumber()
-        var communityKey = communityStore.allIds.find(cid =>  {
-            const comm =  communityStore.byId[cid]
-            return comm.slug_name == communityId
-        })
-        if(communityKey)
-        {
-            return communityStore.byId[communityKey]
-        }
-        if(isNumber)
-        {
-            return CommunityManager.getCommunityById(parseInt(communityId))
+        if (communityId) {
+            const isNumber = communityId.isNumber()
+            var communityKey = communityStore.allIds.find(cid =>  {
+                const comm =  communityStore.byId[cid]
+                return comm.slug_name == communityId
+            })
+            if(communityKey)
+            {
+                return communityStore.byId[communityKey]
+            }
+            if(isNumber)
+            {
+                return CommunityManager.getCommunityById(parseInt(communityId))
+            }
         }
         return null
     }

@@ -638,6 +638,7 @@ export type ICommunity = {
     slug_name:string
     primary_color:string
     secondary_color:string
+    chapters?:boolean
 } & Linkable & IdentifiableObject
 
 export type Community = {

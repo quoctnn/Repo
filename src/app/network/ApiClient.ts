@@ -495,9 +495,9 @@ export default class ApiClient
             callback(null, status, error)
         })
     }
-    static getGroups(community:number, limit:number, offset:number, ordering:GroupSorting, callback:ApiClientFeedPageCallback<Group>)
+    static getGroups(community:number, parent:number, limit:number, offset:number, ordering:GroupSorting, callback:ApiClientFeedPageCallback<Group>)
     {
-        let url = Constants.apiRoute.groupsUrl + "?" + this.getQueryString({community, limit, offset, ordering})
+        let url = Constants.apiRoute.groupsUrl + "?" + this.getQueryString({community, parent, limit, offset, ordering})
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {

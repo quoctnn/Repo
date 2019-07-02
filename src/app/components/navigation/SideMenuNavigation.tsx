@@ -7,7 +7,7 @@ import classnames from 'classnames';
 import Logo from "../general/images/Logo";
 import { translate } from "../../localization/AutoIntlProvider";
 import CollapseComponent from "../general/CollapseComponent";
-import { GroupSorting, Group, Project, ProjectSorting, ContextNaturalKey, Favorite, DraggableType, Community } from '../../types/intrasocial_types';
+import { GroupSorting, Group, Project, ProjectSorting, ContextNaturalKey, Favorite, DraggableType, Community, UserProfile } from '../../types/intrasocial_types';
 import ApiClient from "../../network/ApiClient";
 import LogoSmall from "../general/images/LogoSmall";
 import { IntraSocialLink } from "../general/IntraSocialLink";
@@ -17,6 +17,7 @@ import ToggleSwitch from "../general/ToggleSwitch";
 import Routes from '../../utilities/Routes';
 import { Link } from "react-router-dom";
 import { ContextManager } from "../../managers/ContextManager";
+import { AuthenticationManager } from '../../managers/AuthenticationManager';
 
 type ContextItemProps = {
     name?:string
@@ -207,7 +208,7 @@ class TopGroups extends React.Component<TopGroupsProps, TopGroupsState> {
     }
     fetchGroups = () => {
         const communityId = (this.props.community && this.props.community.id) || null
-        ApiClient.getGroups(communityId, 5, 0, GroupSorting.mostUsed, (data, status, error) => {
+        ApiClient.getGroups(communityId, null, 6, 0, GroupSorting.mostUsed, (data, status, error) => {
             const list = (data && data.results) || []
             this.setState((prevState: TopGroupsState) => {
                 return { list }
@@ -264,7 +265,7 @@ class TopProjects extends React.Component<TopProjectsProps, TopProjectsState> {
     }
     fetchProjects = () => {
         const communityId = (this.props.community && this.props.community.id) || null
-        ApiClient.getProjects(communityId, 5, 0, ProjectSorting.mostUsed, null, null, (data, status, error) => {
+        ApiClient.getProjects(communityId, 6, 0, ProjectSorting.mostUsed, null, null, (data, status, error) => {
             const list = (data && data.results) || []
             this.setState((prevState: TopProjectsState) => {
                 return { list }
@@ -294,14 +295,18 @@ const ConnectedTopProjects = withRouter(connect(mapTopProjectsStateToProps, null
 
 type OwnProps = {
 }
-type Props = OwnProps
+type ReduxStateProps = {
+    community:Community
+    profile:UserProfile
+}
+type Props = OwnProps & ReduxStateProps
 
 type State = {
     open: boolean
     mode: MenuViewMode
     closeMenuOnNavigation:boolean
 }
-export default class SideMenuNavigation extends React.Component<Props, State> {
+class SideMenuNavigation extends React.Component<Props, State> {
     static bodyClass = "has-side-menu"
     static sideMenuLockedClass = "side-menu-locked"
     static animationDuration = 300
@@ -310,7 +315,7 @@ export default class SideMenuNavigation extends React.Component<Props, State> {
         super(props)
         this.state = {
             open: false,
-            mode: MenuViewMode.list,
+            mode: MenuViewMode.grid,
             closeMenuOnNavigation:true,
         }
         document.body.classList.add(SideMenuNavigation.bodyClass)
@@ -328,7 +333,7 @@ export default class SideMenuNavigation extends React.Component<Props, State> {
         {
             if(this.state.open && this.state.closeMenuOnNavigation)
                 document.addEventListener('mousedown', this.outsideTrigger)
-            else 
+            else
                 document.removeEventListener('mousedown', this.outsideTrigger)
         }
         if(closeBehaviourChanged)
@@ -393,6 +398,9 @@ export default class SideMenuNavigation extends React.Component<Props, State> {
         const modeIconClass = classnames("anim-icon-button", modeIcon)
         const borderHeight = this.state.open ? 1 : 0
         const transDur = SideMenuNavigation.animationDuration + "ms"
+        const chapters = this.props.community && this.props.community.chapters
+        const anonUser = this.props.profile.is_anonymous
+        const noProjects = chapters || anonUser
         return (
             <div ref={this.contentRef} onClick={openMenu} id="side-menu-navigation" className={cn} style={{ transitionDuration: transDur }}>
                 {this.renderHeader()}
@@ -401,12 +409,14 @@ export default class SideMenuNavigation extends React.Component<Props, State> {
                         <Link to={{pathname:Routes.CHANGELOG, state:{modal:true}}} className="menu-button">
                             <i className="fas fa-info-circle"></i>
                         </Link>
-                        <Link to={Routes.DEVELOPER_TOOL.path} className="menu-button">
-                            <i className="fas fa-cog"></i>
-                        </Link>
-                        <Link to={Routes.FILES} className="menu-button">
-                            <i className="fas fa-cloud"></i>
-                        </Link>
+                        { anonUser || <>
+                            <Link to={Routes.DEVELOPER_TOOL.path} className="menu-button">
+                                <i className="fas fa-cog"></i>
+                            </Link>
+                            <Link to={Routes.FILES} className="menu-button">
+                                <i className="fas fa-cloud"></i>
+                            </Link>
+                        </> }
                         <div className="menu-button mode-switch" onClick={this.toggleMode} style={{ transitionDuration: transDur }}>
                             <i className={modeIconClass}></i>
                         </div>
@@ -414,19 +424,27 @@ export default class SideMenuNavigation extends React.Component<Props, State> {
                 <div className="hbar main-border-color-background align-self-center" style={{ height: borderHeight, width: "90%" , transitionDuration: transDur}}></div>
                 <LogoSmall className="intrawork-logo-small" />
                 <div className="menu-content vertical-scroll">
-                    <MenuBlock animationDuration={SideMenuNavigation.animationDuration} open={this.state.open} icon="fas fa-star" title={translate("menu.favorites")}>
-                        <FavoritesConnected onItemSelected={this.handleLinkItemSelected} mode={mode} />
-                    </MenuBlock>
-                    <div className="hbar main-border-color-background align-self-center" style={{ height: borderHeight, width: "90%" , transitionDuration: transDur}}></div>
+                    { anonUser || <>
+                        <MenuBlock animationDuration={SideMenuNavigation.animationDuration} open={this.state.open} icon="fas fa-star" title={translate("menu.favorites")}>
+                            <FavoritesConnected onItemSelected={this.handleLinkItemSelected} mode={mode} />
+                        </MenuBlock>
+                        <div className="hbar main-border-color-background align-self-center" style={{ height: borderHeight, width: "90%" , transitionDuration: transDur}}></div>
+                    </>}
+                    { chapters &&
+                        <MenuBlock removeContentOnCollapsed={false} animationDuration={SideMenuNavigation.animationDuration} open={this.state.open} icon="fas fa-users" title={translate("Chapters")}>
+                        </MenuBlock>
+                    }
                     <MenuBlock removeContentOnCollapsed={false} animationDuration={SideMenuNavigation.animationDuration} open={this.state.open} icon="fas fa-users" title={translate("Groups")}>
                         <ConnectedTopGroups onItemSelected={this.handleLinkItemSelected} mode={mode} />
                     </MenuBlock>
-                    <div className="hbar main-border-color-background align-self-center" style={{ height: borderHeight, width: "90%" , transitionDuration: transDur}}></div>
-                    <MenuBlock removeContentOnCollapsed={false} animationDuration={SideMenuNavigation.animationDuration} open={this.state.open} icon="fas fa-clipboard-list" title={translate("Projects")}>
-                        <ConnectedTopProjects onItemSelected={this.handleLinkItemSelected} mode={mode} />
-                    </MenuBlock>
+                    { noProjects || <>
+                        <div className="hbar main-border-color-background align-self-center" style={{ height: borderHeight, width: "90%" , transitionDuration: transDur}}></div>
+                        <MenuBlock removeContentOnCollapsed={false} animationDuration={SideMenuNavigation.animationDuration} open={this.state.open} icon="fas fa-clipboard-list" title={translate("Projects")}>
+                            <ConnectedTopProjects onItemSelected={this.handleLinkItemSelected} mode={mode} />
+                        </MenuBlock>
+                    </>}
                 </div>
-                {this.state.open && 
+                {this.state.open &&
                     <>
                         <div className="spacer flex-grow-1 flex-shrink-1"></div>
                         <div className="footer d-flex">
@@ -439,3 +457,14 @@ export default class SideMenuNavigation extends React.Component<Props, State> {
         );
     }
 }
+
+const mapStateToProps = (state: ReduxState, ownProps: OwnProps & RouteComponentProps<any>): ReduxStateProps => {
+
+    const community = ContextManager.getContextObject(ownProps.location.pathname, ContextNaturalKey.COMMUNITY) as Community
+    const profile = AuthenticationManager.getAuthenticatedUser()
+    return {
+        community,
+        profile
+    }
+}
+export default withRouter(connect(mapStateToProps, null)(SideMenuNavigation))

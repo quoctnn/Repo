@@ -163,7 +163,7 @@ export abstract class ApplicationManager
             const favorites = (data && data.results) || []
             FavoriteManager.setFavoritesToStore(favorites)
             completion()
-            ToastManager.showErrorToast(error)
+            //ToastManager.showErrorToast(error)
         })
     }
     private static setApplicationLoaded = () => {
