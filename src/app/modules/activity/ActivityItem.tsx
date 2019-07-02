@@ -7,10 +7,8 @@ import { Avatar } from '../../components/general/Avatar';
 import { ProfileManager } from '../../managers/ProfileManager';
 import { userAvatar } from '../../utilities/Utilities';
 import ApiClient from '../../network/ApiClient';
-import Moment from 'react-moment';
 import * as moment from 'moment-timezone';
 import { TimeComponent } from '../../components/general/TimeComponent';
-let timezone = moment.tz.guess();
 
 type OwnProps = {
     activity:RecentActivity
@@ -59,11 +57,7 @@ export default class ActivityItem extends React.Component<Props, State> {
         const profiles = this.fetchProfiles()
         return (<Link key={activity.id} onClick={this.handleActivityClick} to={activity.uri || "#"} {...rest} className={cl}>
                     <div className="d-flex flex-row hover-card activity-content">
-                        <div className="avatar-list">
-                            {profiles.slice(0,2).map((profile) => {
-                                return(this.renderAvatar(profile))
-                            })}
-                        </div>
+                        <Avatar images={profiles.slice(0,4).map((user) => {return user.avatar_thumbnail})} size={40} borderColor="white" borderWidth={2}></Avatar>
                         <div>
                             <div className="text-truncate activity-text">
                                 {text}
