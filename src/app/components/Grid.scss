@@ -10,10 +10,18 @@
 }
 .react-tabs .tab-list .tab-item {
     font-size: 20px;
+    &:hover{
+        cursor: pointer;
+        @include var(color, link-color);
+    }
 }
 
 .react-tabs .tab-list .react-tabs__tab--selected {
     @include var(color, primary-theme-color);
+    &:hover{
+        cursor: default;
+        @include var(color, primary-theme-color);
+    }
 }
 
 .react-tabs .row .react-tabs__tab-panel--selected {

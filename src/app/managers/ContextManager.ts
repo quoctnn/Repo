@@ -1,5 +1,5 @@
 import {  Store } from 'redux';
-import { ReduxState } from '../redux'; 
+import { ReduxState } from '../redux';
 import { ProfileManager } from '../managers/ProfileManager';
 import {  nullOrUndefined } from '../utilities/Utilities';
 import { GroupManager } from '../managers/GroupManager';
@@ -9,6 +9,8 @@ import { TaskManager } from './TaskManager';
 import { ProjectManager } from './ProjectManager';
 import { ContextNaturalKey, Permissible, Task, Community, Project, UserProfile, Group, Event, ContextSegmentKey, IdentifiableObject, Conversation } from '../types/intrasocial_types';
 import { ConversationManager } from './ConversationManager';
+import { AuthenticationManager } from './AuthenticationManager';
+import Routes from '../utilities/Routes';
 
 export type ResolvedContextObject = {
     contextNaturalKey:ContextNaturalKey
@@ -33,7 +35,7 @@ export abstract class ContextManager
 {
     static objectFetchers:{[key:string]:(id:string, completion:(object:Permissible & IdentifiableObject) => void) => void} = {}
     static objectResolvers:{[key:string]:(id:string) => Permissible & IdentifiableObject} = {}
-    static setup = () => 
+    static setup = () =>
     {
         ContextManager.objectFetchers[ContextSegmentKey.COMMUNITY] = CommunityManager.ensureCommunityExists
         ContextManager.objectFetchers[ContextSegmentKey.PROJECT] = ProjectManager.ensureProjectExists as any
@@ -57,7 +59,7 @@ export abstract class ContextManager
         if(segments.length > 0 && segments.length % 2 == 0)
         {
             for (let index = 0; index < segments.length; index += 2) {
-                dict[segments[index]] = segments[index + 1] 
+                dict[segments[index]] = segments[index + 1]
             }
         }
         return dict
@@ -138,8 +140,13 @@ export abstract class ContextManager
     }
     static getContextObject = (path:string, contextNaturalKey:ContextNaturalKey) => {
         const segmentKey = ContextSegmentKey.keyForNaturalKey(contextNaturalKey)
+        const user = AuthenticationManager.getAuthenticatedUser()
         if(segmentKey)
         {
+            if(path === Routes.ROOT && segmentKey === ContextSegmentKey.USER && !user.is_anonymous){
+                const val = AuthenticationManager.getAuthenticatedUser().slug_name
+                return ContextManager.objectResolvers[segmentKey](val)
+            }
             const dict = ContextManager.pathToDictionary(path)
             const val = dict[segmentKey]
             if(val)
@@ -161,7 +168,7 @@ export abstract class ContextManager
                     const object = ContextManager.objectResolvers[segmentKey](val)
                     if(object)
                         resolved[entry.key] = object
-                } 
+                }
             }
         })
         const resolvedLength = entries.map(e => resolved[e.key]).filter(o => !nullOrUndefined(o)).length
@@ -170,7 +177,7 @@ export abstract class ContextManager
     }
     static getParentContextObject = (pathname:string) => {
 
-    } 
+    }
     private static getStore = ():Store<ReduxState,any> =>
     {
         return window.store
