@@ -22,7 +22,7 @@ export class SimpleAvatar extends React.PureComponent<Props & React.HTMLAttribut
     {
         super(props)
     }
-    render() 
+    render()
     {
         let images:string[] = []
         if(this.props.image)
@@ -31,12 +31,12 @@ export class SimpleAvatar extends React.PureComponent<Props & React.HTMLAttribut
             images = images.concat( this.props.images )
         var imgUrls = images.slice(0,4)
         return(
-            
+
             <div onClick={this.props.onClick}  className={"avatar" + (this.props.className ? " " + this.props.className : "")} >
                 <div className="image-container" style={{borderWidth:this.props.borderWidth + "px", borderColor:this.props.borderColor, width:this.props.size + "px", height:this.props.size + "px", borderStyle:"solid"}}>
                     {imgUrls.map((img, index) => {
                         const key = `image_${length}_${index}`
-                        return <SecureImage setAsBackground={true} key={img} className={"image multi " + key} url={img}></SecureImage>
+                        return <SecureImage setAsBackground={true} key={key} className={"image multi " + key} url={img}></SecureImage>
                     })}
                 </div>
                 {this.props.children}
