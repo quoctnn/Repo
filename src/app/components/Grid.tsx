@@ -170,7 +170,7 @@ export class Grid extends React.PureComponent<Props, State> {
         return <Tabs>
                     <TabList className={cn}>
                         {columns.map(c => {
-                            return <Tab className={colCN}>{c.module.name}</Tab>
+                            return <Tab className={colCN} key={c.id}>{c.module.name}</Tab>
                         })}
                     </TabList>
                     {this.renderRow(columns, level, true)}

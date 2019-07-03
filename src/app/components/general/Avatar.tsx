@@ -38,7 +38,6 @@ export class Avatar extends React.PureComponent<Props & React.HTMLAttributes<HTM
         var imgUrls = imgs/*.map(i => IntraSocialUtilities.appendAuthorizationTokenToUrl(i))*/.slice(0,4)
         const length = imgUrls.length
         return(
-
             <div {...rest} className={"avatar" + (className ? " " + className : "")} ref={this.props.innerRef} >
                 <div className="image-container" style={{borderWidth:borderWidth + "px", borderColor:borderColor, width:size + "px", height:size + "px", borderStyle:"solid"}}>
                     {imgUrls.map((img, index) => {
