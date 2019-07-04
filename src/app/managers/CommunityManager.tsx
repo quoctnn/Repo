@@ -81,11 +81,11 @@ export abstract class CommunityManager
     {
         return CommunityManager.getStore().getState().communityStore.byId[communityId]
     }
-    static ensureCommunityExists = (communityId:string|number, completion?:(community:Community) => void) =>
+    static ensureCommunityExists = (communityId:string|number, completion?:(community:Community) => void, forceUpdate?: boolean) =>
     {
         const id = communityId.toString()
         let community = CommunityManager.getCommunity(id)
-        if(!community)
+        if(!community || forceUpdate)
         {
             ApiClient.getCommunity(id, (data, status, error) => {
                 if(data)

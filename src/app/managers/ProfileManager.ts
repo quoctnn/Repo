@@ -55,11 +55,11 @@ export abstract class ProfileManager
         }
         return profile
     }
-    static ensureProfileExists = (profileId:string|number, completion:(profile:UserProfile) => void) =>
+    static ensureProfileExists = (profileId:string|number, completion:(profile:UserProfile) => void, forceUpdate?: boolean) =>
     {
         const id = profileId.toString()
         let profile = ProfileManager.getProfile(id)
-        if(!profile)
+        if(!profile || forceUpdate)
         {
             ApiClient.getProfile(id, (data, status, error) => {
                 if(data)

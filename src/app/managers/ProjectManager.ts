@@ -5,17 +5,17 @@ import { ReduxState } from '../redux';
 import { addProjectsAction } from '../redux/projectStore';
 export abstract class ProjectManager
 {
-    static setup = () => 
+    static setup = () =>
     {
     }
     static storeProjects = (projects:Project[]) => {
         ProjectManager.getStore().dispatch(addProjectsAction(projects))
     }
-    static getProjectById = (projectId:number):Project|null => 
+    static getProjectById = (projectId:number):Project|null =>
     {
         return ProjectManager.getStore().getState().projectStore.byId[projectId]
     }
-    static getProject = (projectId:string):Project|null => 
+    static getProject = (projectId:string):Project|null =>
     {
         const projectStore = ProjectManager.getStore().getState().projectStore
         const isNumber = projectId.isNumber()
@@ -33,25 +33,25 @@ export abstract class ProjectManager
         }
         return null
     }
-    static ensureProjectExists = (projectId:string|number, completion:(project:Project) => void) => 
+    static ensureProjectExists = (projectId:string|number, completion:(project:Project) => void, forceUpdate?: boolean) =>
     {
         const id = projectId.toString()
         let project = ProjectManager.getProject(id)
-        if(!project)
+        if(!project || forceUpdate)
         {
             ApiClient.getProject(id, (data, status, error) => {
                 if(data)
                 {
                     ProjectManager.storeProjects([data])
                 }
-                else 
+                else
                 {
                     console.log("error fetching project", error)
                 }
                 completion(data)
             })
         }
-        else 
+        else
         {
             completion(project)
         }
@@ -59,6 +59,6 @@ export abstract class ProjectManager
     }
     private static getStore = ():Store<ReduxState,any> =>
     {
-        return window.store 
+        return window.store
     }
 }

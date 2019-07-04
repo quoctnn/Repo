@@ -9,22 +9,22 @@ import { DashboardWithData } from "../../DashboardWithData";
 import { Error404 } from '../../views/error/Error404';
 import { ProfileManager } from "../../managers/ProfileManager";
 import { userCover, userAvatar, userFullName } from "../../utilities/Utilities";
-export interface OwnProps 
+export interface OwnProps
 {
     match:any,
 }
-interface ReduxStateProps 
+interface ReduxStateProps
 {
     profile:UserProfile
 }
-interface ReduxDispatchProps 
+interface ReduxDispatchProps
 {
 }
-interface State 
+interface State
 {
 }
 type Props = ReduxStateProps & ReduxDispatchProps & OwnProps
-class ProfilePage extends React.Component<Props, State> 
+class ProfilePage extends React.Component<Props, State>
 {
     constructor(props:Props) {
         super(props);
@@ -32,7 +32,11 @@ class ProfilePage extends React.Component<Props, State>
             loading:false
         }
     }
-    renderLoading = () => 
+    componentDidMount = () => {
+        if (this.props.profile)
+            ProfileManager.ensureProfileExists(this.props.profile.id, () => {}, true)
+    }
+    renderLoading = () =>
     {
         return (<LoadingSpinner />)
     }
@@ -51,7 +55,7 @@ class ProfilePage extends React.Component<Props, State>
         return(
             <div id="project-page" className="dashboard-container">
                 {!hasData && this.renderNotFound()}
-                {hasData && 
+                {hasData &&
                     <div className="content">
                         {this.renderHeader(profile)}
                         <DashboardWithData category="profile" />

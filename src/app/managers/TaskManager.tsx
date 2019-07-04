@@ -5,17 +5,17 @@ import { ReduxState } from '../redux';
 import { addTasksAction } from '../redux/taskStore';
 export abstract class TaskManager
 {
-    static setup = () => 
+    static setup = () =>
     {
     }
     static storeTasks = (tasks:Task[]) => {
         TaskManager.getStore().dispatch(addTasksAction(tasks))
     }
-    static getTask = (taskId:number|string):Task|null => 
+    static getTask = (taskId:number|string):Task|null =>
     {
         return TaskManager.getStore().getState().taskStore.byId[taskId]
     }
-    static ensureTaskExists = (taskId:number|string, completion:(task:Task) => void) => 
+    static ensureTaskExists = (taskId:number|string, completion:(task:Task) => void, forceUpdate?: boolean) =>
     {
         if(!taskId.isNumber())
         {
@@ -23,7 +23,7 @@ export abstract class TaskManager
             return
         }
         let task = TaskManager.getTask(taskId)
-        if(!task)
+        if(!task || forceUpdate)
         {
             const id = parseInt(taskId.toString())
             ApiClient.getTask(id, (data, status, error) => {
@@ -31,14 +31,14 @@ export abstract class TaskManager
                 {
                     TaskManager.storeTasks([data])
                 }
-                else 
+                else
                 {
                     console.log("error fetching task", error)
                 }
                 completion(data)
             })
         }
-        else 
+        else
         {
             completion(task)
         }
@@ -46,6 +46,6 @@ export abstract class TaskManager
     }
     private static getStore = ():Store<ReduxState,any> =>
     {
-        return window.store 
+        return window.store
     }
 }

@@ -11,24 +11,24 @@ import { CommunityManager } from "../../managers/CommunityManager";
 import { Error404 } from "../../views/error/Error404";
 import { TaskManager } from "../../managers/TaskManager";
 import { communityAvatar, communityName, communityCover } from "../../utilities/Utilities";
-export interface OwnProps 
+export interface OwnProps
 {
     match:any,
 }
-interface ReduxStateProps 
+interface ReduxStateProps
 {
     community:Community
     project:Project
     task:Task
 }
-interface ReduxDispatchProps 
+interface ReduxDispatchProps
 {
 }
-interface State 
+interface State
 {
 }
 type Props = ReduxStateProps & ReduxDispatchProps & OwnProps
-class TaskPage extends React.Component<Props, State> 
+class TaskPage extends React.Component<Props, State>
 {
     constructor(props:Props) {
         super(props);
@@ -36,16 +36,20 @@ class TaskPage extends React.Component<Props, State>
             loading:false
         }
     }
-    renderLoading = () => 
+    componentDidMount = () => {
+        if (this.props.task)
+            TaskManager.ensureTaskExists(this.props.task.id, () => {}, true)
+    }
+    renderLoading = () =>
     {
         return (<LoadingSpinner />)
     }
     renderHeader(community:Community)
     {
-        return (<PageHeader 
-                    coverImage={communityCover(community)} 
-                    primaryItemImage={communityAvatar(community, true)} 
-                    primaryItemTitle={communityName(community)}  
+        return (<PageHeader
+                    coverImage={communityCover(community)}
+                    primaryItemImage={communityAvatar(community, true)}
+                    primaryItemTitle={communityName(community)}
                     />
                 )
     }
@@ -58,7 +62,7 @@ class TaskPage extends React.Component<Props, State>
         return(
             <div id="task-page" className="dashboard-container">
                 {!hasData && this.renderNotFound()}
-                {hasData && 
+                {hasData &&
                     <div className="content">
                         {this.renderHeader(community)}
                         <DashboardWithData category="task" />

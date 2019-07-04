@@ -5,17 +5,17 @@ import { ReduxState } from '../redux';
 import { addGroupsAction } from '../redux/groupStore';
 export abstract class GroupManager
 {
-    static setup = () => 
+    static setup = () =>
     {
     }
     static storeGroups = (groups:Group[]) => {
         GroupManager.getStore().dispatch(addGroupsAction(groups))
     }
-    static getGroupById = (groupId:number):Group|null => 
+    static getGroupById = (groupId:number):Group|null =>
     {
         return GroupManager.getStore().getState().groupStore.byId[groupId]
     }
-    static getGroup = (groupId:string):Group|null => 
+    static getGroup = (groupId:string):Group|null =>
     {
         const groupStore = GroupManager.getStore().getState().groupStore
         const isNumber = groupId.isNumber()
@@ -68,25 +68,25 @@ export abstract class GroupManager
         let compareString = group.name
         return compareString.toLowerCase().indexOf(query.toLowerCase()) > -1
     }
-    static ensureGroupExists = (groupId:string|number, completion:(group:Group) => void) => 
+    static ensureGroupExists = (groupId:string|number, completion:(group:Group) => void, forceUpdate?: boolean) =>
     {
         const id = groupId.toString()
         let group = GroupManager.getGroup(id)
-        if(!group)
+        if(!group || forceUpdate)
         {
             ApiClient.getGroup(id, (data, status, error) => {
                 if(data)
                 {
                     GroupManager.storeGroups([data])
                 }
-                else 
+                else
                 {
                     console.log("error fetching group", error)
                 }
                 completion(data)
             })
         }
-        else 
+        else
         {
             completion(group)
         }
@@ -94,6 +94,6 @@ export abstract class GroupManager
     }
     private static getStore = ():Store<ReduxState,any> =>
     {
-        return window.store 
+        return window.store
     }
 }

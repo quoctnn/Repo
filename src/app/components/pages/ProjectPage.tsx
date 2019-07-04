@@ -10,23 +10,23 @@ import { ProjectManager } from "../../managers/ProjectManager";
 import { CommunityManager } from "../../managers/CommunityManager";
 import { Error404 } from "../../views/error/Error404";
 import { communityAvatar, communityName, communityCover, projectCover } from "../../utilities/Utilities";
-export interface OwnProps 
+export interface OwnProps
 {
     match:any,
 }
-interface ReduxStateProps 
+interface ReduxStateProps
 {
     community:Community
     project:Project
 }
-interface ReduxDispatchProps 
+interface ReduxDispatchProps
 {
 }
-interface State 
+interface State
 {
 }
 type Props = ReduxStateProps & ReduxDispatchProps & OwnProps
-class ProjectPage extends React.Component<Props, State> 
+class ProjectPage extends React.Component<Props, State>
 {
     constructor(props:Props) {
         super(props);
@@ -34,16 +34,20 @@ class ProjectPage extends React.Component<Props, State>
             loading:false
         }
     }
-    renderLoading = () => 
+    componentDidMount = () => {
+        if (this.props.project)
+            ProjectManager.ensureProjectExists(this.props.project.id, () => {}, true)
+    }
+    renderLoading = () =>
     {
         return (<LoadingSpinner />)
     }
     renderHeader(project:Project, community:Community)
     {
-        return (<PageHeader 
-                    coverImage={projectCover(project)} 
-                    primaryItemImage={communityAvatar(community, true)} 
-                    primaryItemTitle={communityName(community)}  
+        return (<PageHeader
+                    coverImage={projectCover(project)}
+                    primaryItemImage={communityAvatar(community, true)}
+                    primaryItemTitle={communityName(community)}
                     />
                 )
     }
@@ -56,7 +60,7 @@ class ProjectPage extends React.Component<Props, State>
         return(
             <div id="project-page" className="dashboard-container">
                 {!hasData && this.renderNotFound()}
-                {hasData && 
+                {hasData &&
                     <div className="content">
                         {this.renderHeader(project, community)}
                         <DashboardWithData category="project" />

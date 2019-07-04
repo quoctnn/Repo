@@ -2,30 +2,30 @@ import * as React from "react";
 import { connect } from 'react-redux'
 import "./CommunityPage.scss"
 import { Community } from "../../types/intrasocial_types";
-import { CommunityManager } from "../../managers/CommunityManager";
+import { CommunityManager } from '../../managers/CommunityManager';
 import LoadingSpinner from "../LoadingSpinner";
 import { ReduxState } from "../../redux";
 import PageHeader from "../PageHeader";
 import { DashboardWithData } from "../../DashboardWithData";
 import { Error404 } from '../../views/error/Error404';
 import { communityAvatar, communityName, communityCover } from "../../utilities/Utilities";
-export interface OwnProps 
+export interface OwnProps
 {
     match:any,
 }
-interface ReduxStateProps 
+interface ReduxStateProps
 {
     communityid:string
     community:Community
 }
-interface ReduxDispatchProps 
+interface ReduxDispatchProps
 {
 }
-interface State 
+interface State
 {
 }
 type Props = ReduxStateProps & ReduxDispatchProps & OwnProps
-class CommunityPage extends React.Component<Props, State> 
+class CommunityPage extends React.Component<Props, State>
 {
     constructor(props:Props) {
         super(props);
@@ -33,16 +33,20 @@ class CommunityPage extends React.Component<Props, State>
             loading:false
         }
     }
-    renderLoading = () => 
+    componentDidMount = () => {
+        if (this.props.communityid)
+            CommunityManager.ensureCommunityExists(this.props.communityid, null, true)
+    }
+    renderLoading = () =>
     {
         return (<LoadingSpinner />)
     }
     renderHeader(community:Community)
     {
-        return (<PageHeader 
-                    coverImage={communityCover(community)} 
-                    primaryItemImage={communityAvatar(community, true)} 
-                    primaryItemTitle={communityName(community)}  
+        return (<PageHeader
+                    coverImage={communityCover(community)}
+                    primaryItemImage={communityAvatar(community, true)}
+                    primaryItemTitle={communityName(community)}
                     />
                 )
     }
@@ -55,7 +59,7 @@ class CommunityPage extends React.Component<Props, State>
         return(
             <div id="project-page" className="dashboard-container">
                 {!hasData && this.renderNotFound()}
-                {hasData && 
+                {hasData &&
                     <div className="content">
                         {this.renderHeader(community)}
                         <DashboardWithData category="community" />

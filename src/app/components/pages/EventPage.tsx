@@ -10,23 +10,23 @@ import { CommunityManager } from "../../managers/CommunityManager";
 import { Error404 } from "../../views/error/Error404";
 import { communityAvatar, communityName, eventCover } from "../../utilities/Utilities";
 import { EventManager } from "../../managers/EventManager";
-export interface OwnProps 
+export interface OwnProps
 {
     match:any,
 }
-interface ReduxStateProps 
+interface ReduxStateProps
 {
     community:Community
     event:Event
 }
-interface ReduxDispatchProps 
+interface ReduxDispatchProps
 {
 }
-interface State 
+interface State
 {
 }
 type Props = ReduxStateProps & ReduxDispatchProps & OwnProps
-class EventPage extends React.Component<Props, State> 
+class EventPage extends React.Component<Props, State>
 {
     constructor(props:Props) {
         super(props);
@@ -34,16 +34,20 @@ class EventPage extends React.Component<Props, State>
             loading:false
         }
     }
-    renderLoading = () => 
+    componentDidMount = () => {
+        if (this.props.event)
+            EventManager.ensureEventExists(this.props.event.id, () => {}, true)
+    }
+    renderLoading = () =>
     {
         return (<LoadingSpinner />)
     }
     renderHeader(event:Event, community:Community)
     {
-        return (<PageHeader 
-                    coverImage={eventCover(event)} 
-                    primaryItemImage={communityAvatar(community, true)} 
-                    primaryItemTitle={communityName(community)}  
+        return (<PageHeader
+                    coverImage={eventCover(event)}
+                    primaryItemImage={communityAvatar(community, true)}
+                    primaryItemTitle={communityName(community)}
                     />
                 )
     }
@@ -56,7 +60,7 @@ class EventPage extends React.Component<Props, State>
         return(
             <div id="event-page" className="dashboard-container">
                 {!hasData && this.renderNotFound()}
-                {hasData && 
+                {hasData &&
                     <div className="content">
                         {this.renderHeader(event, community)}
                         <DashboardWithData category="event" />
