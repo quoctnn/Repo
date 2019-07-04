@@ -825,7 +825,9 @@ export enum StatusReaction
     LIKE = "like",
     HEART = "heart",
     SAD = "sad",
-    JOY = "joy"
+    JOY = "joy",
+    DISLIKE = "dislike",
+    COMPLETE = "complete"
 }
 export enum StatusReactionStyle {
     emoji, icon
@@ -850,6 +852,8 @@ export abstract class StatusReactionUtilities
             case StatusReaction.JOY : return StatusReaction.JOY
             case StatusReaction.HEART : return StatusReaction.HEART
             case StatusReaction.SAD : return StatusReaction.SAD
+            case StatusReaction.DISLIKE : return StatusReaction.DISLIKE
+            case StatusReaction.COMPLETE : return StatusReaction.COMPLETE
             default : return StatusReaction.LIKE
         }
     }
@@ -880,7 +884,13 @@ export abstract class StatusReactionUtilities
                                                     <Emoji symbol="😂" label={props.reaction} />
                                                 </span>
             case StatusReaction.HEART : return  <span className={StatusReactionUtilities.classNameForReactionContainer(props)} onClick={props.onClick}>
-                                                    <Emoji symbol="😍" label={props.reaction} />
+                                                    <Emoji symbol="❤️" label={props.reaction} />
+                                                </span>
+            case StatusReaction.DISLIKE : return  <span className={StatusReactionUtilities.classNameForReactionContainer(props)} onClick={props.onClick}>
+                                                    <Emoji symbol="👎" label={props.reaction} />
+                                                </span>
+            case StatusReaction.COMPLETE : return  <span className={StatusReactionUtilities.classNameForReactionContainer(props)} onClick={props.onClick}>
+                                                    <Emoji symbol="✔️" label={props.reaction} />
                                                 </span>
             case StatusReaction.LIKE : return   <span className={StatusReactionUtilities.classNameForReactionContainer(props)} onClick={props.onClick}>
                                                     {reactionStyle == StatusReactionStyle.emoji && <Emoji symbol="👍" label={props.reaction} />}
