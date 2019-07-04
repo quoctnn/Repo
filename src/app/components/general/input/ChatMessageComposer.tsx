@@ -226,6 +226,7 @@ export class ChatMessageComposer extends React.Component<Props,State> {
             const editorState = EditorState.push(this.state.editorState, ContentState.createFromText(''), "remove-range");
             this.setState({plainText: '', editorState})
             NavigationUtilities.protectNavigation(this.protectKey, false);
+            this.focusEnd()
         }
         return false
     }
@@ -295,7 +296,7 @@ export class ChatMessageComposer extends React.Component<Props,State> {
         NavigationUtilities.protectNavigation(this.protectKey, text != "")
         const hasChanged = this.state.plainText != text
         const f = hasChanged ? this.sendDidType : undefined
-        this.setState({plainText:text, editorState:state}, f)
+         this.setState({plainText:text, editorState:state}, f)
     }
     private getProcessedText = () => {
         if(!this.state.editorState)
