@@ -732,6 +732,7 @@ export type Project = {
     privacy: string
     tasks: number
     tags: string[]
+    managers: number[]
     members: number[]
     members_count: number
     created_at: string

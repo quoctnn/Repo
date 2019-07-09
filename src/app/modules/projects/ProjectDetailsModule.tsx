@@ -17,6 +17,7 @@ import { DetailsMembers } from '../../components/details/DetailsMembers';
 import { DetailsContent } from '../../components/details/DetailsContent';
 import { ContextManager } from '../../managers/ContextManager';
 import classNames from 'classnames';
+import StackedAvatars from '../../components/general/StackedAvatars';
 type OwnProps = {
     breakpoint:ResponsiveBreakpoint
     contextNaturalKey: ContextNaturalKey
@@ -82,8 +83,18 @@ class ProjectDetailsModule extends React.Component<Props, State> {
                     }
                     <ModuleFooter>
                     { project && project.permission >= Permission.read &&
-                            <DetailsMembers members={project.members} />
-                        }
+                        <div className="details-module d-flex flex-row">
+                            <div className="details-members-left flex-grow-1">
+                            { project.managers &&
+                                <div>
+                                    {translate('project.managers')}
+                                    <StackedAvatars userIds={project.managers} />
+                                </div>
+                            }
+                            </div>
+                        <DetailsMembers members={project.members} />
+                    </div>
+                }
                     </ModuleFooter>
                 </Module>)
     }
