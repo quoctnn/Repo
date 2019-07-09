@@ -148,7 +148,11 @@
 
         }
     }
-    .status-footer{
-        justify-content: space-around;
+    .status-footer > div{
+        //justify-content: space-around;
+        margin-left: 8px;
+    }
+    .comments-reply{
+        margin-top: 3px;
     }
 }

@@ -62,9 +62,9 @@ export default class StatusOptionsComponent extends React.Component<Props, State
                 nextProps.status.serialization_date != this.props.status.serialization_date ||
                 nextState.showEditDialog != this.state.showEditDialog ||
                 nextState.showDeleteDialog != this.state.showDeleteDialog ||
-                nextState.showReportDialog != this.state.showReportDialog || 
-                nextState.showAttentionDialog != this.state.showAttentionDialog || 
-                !nextState.selectedMembers.isEqual(this.state.selectedMembers) || 
+                nextState.showReportDialog != this.state.showReportDialog ||
+                nextState.showAttentionDialog != this.state.showAttentionDialog ||
+                !nextState.selectedMembers.isEqual(this.state.selectedMembers) ||
                 !this.nextAttributesEqual(nextProps.status.attributes)
         return updated
     }
@@ -108,8 +108,8 @@ export default class StatusOptionsComponent extends React.Component<Props, State
         const visible = this.state.showReportDialog
         if(!visible)
             return null
-        return <ReportStatusDialog 
-                    status={this.props.status} 
+        return <ReportStatusDialog
+                    status={this.props.status}
                     visible={visible}
                     didCancel={this.toggleReportModal}
                     />
@@ -124,7 +124,7 @@ export default class StatusOptionsComponent extends React.Component<Props, State
         this.setState({selectedMembers})
     }
     renderAttentionDialog = () => {
-        const visible = this.state.showAttentionDialog 
+        const visible = this.state.showAttentionDialog
         if(!visible)
             return null
         let contacts = []
@@ -137,7 +137,7 @@ export default class StatusOptionsComponent extends React.Component<Props, State
                 contacts = ProfileManager.getProfiles(community.members)
             }
         }
-        return <SelectUsersDialog 
+        return <SelectUsersDialog
                     contacts={contacts}
                     title={translate("status.dialog.attention.title")}
                     visible={visible}
@@ -149,7 +149,7 @@ export default class StatusOptionsComponent extends React.Component<Props, State
                     singleSelect={true}
                     />
     }
-    showCopied = () => 
+    showCopied = () =>
     {
         ToastManager.showInfoToast(translate("Link copied!"))
     }
@@ -187,7 +187,7 @@ export default class StatusOptionsComponent extends React.Component<Props, State
     closeAttentionModal = () => {
         this.setState({showAttentionDialog:false})
     }
-    toggleAttentionModal = () => { 
+    toggleAttentionModal = () => {
         const attributes = this.props.status.attributes || []
         const active = attributes.find(a => a.attribute == ObjectAttributeType.attention)
         if(active)
@@ -206,7 +206,7 @@ export default class StatusOptionsComponent extends React.Component<Props, State
         const active = attributes.find(a => a.attribute == attribute)
         if(active)
             this.props.onActionPress(StatusActions.deleteAttribute, {id:active.id})
-        else 
+        else
             this.props.onActionPress(StatusActions.createAttribute, {type:attribute})
     }
     toggleStar = () => {
@@ -223,7 +223,7 @@ export default class StatusOptionsComponent extends React.Component<Props, State
 
         const status = this.props.status
         const attributes = status.attributes || []
-        const items:OverflowMenuItem[] = [] 
+        const items:OverflowMenuItem[] = []
         if((this.props.isOwner && status.permission >= Permission.post) || status.permission >= Permission.moderate)
         {
             const shieldClass =  Permission.usesElevatedPrivileges(status.permission) ? "fas fa-shield-alt" : undefined
@@ -242,7 +242,7 @@ export default class StatusOptionsComponent extends React.Component<Props, State
             //star
             const starred = !!attributes.find(a => a.attribute == ObjectAttributeType.important)
             items.push({id:"5",title:translate(starred ? "Unstar item": "Star item"), iconClass:ObjectAttributeType.iconForType(ObjectAttributeType.important, starred), onPress:this.toggleStar, toggleMenu:false, type:OverflowMenuItemType.option})
-            
+
             const permission = PermissionManager.permissionForStatus(this.props.status)
             if(permission == Permission.admin)
             {
@@ -261,9 +261,9 @@ export default class StatusOptionsComponent extends React.Component<Props, State
         const overflowButtonClass = this.props.overflowButtonClass || "fas fa-ellipsis-v"
         return (
             <span className={cn}>
-                <span className="dropdown dropdown-options">
+                <div className="dropdown dropdown-options">
                     <OverflowMenu refresh={this.props.status.serialization_date} fetchItems={this.fetchItems} maxVisible={this.props.maxVisible} buttonIconClass={overflowButtonClass} />
-                </span>
+                </div>
                 {this.renderEditDialog()}
                 {this.renderRemoveDialog()}
                 {this.renderReportDialog()}

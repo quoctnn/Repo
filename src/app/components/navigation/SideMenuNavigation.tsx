@@ -366,16 +366,14 @@ class SideMenuNavigation extends React.Component<Props, State> {
         })
     }
     renderHeader = () => {
-        const closeMenu = this.state.open ? this.closeOnNavigation : undefined
         return <div className="menu-header d-flex" >
             {this.state.open &&
                 <Logo className="intrawork-logo" progress={0} />
+                ||
+                <LogoSmall className="intrawork-logo-small" />
             }
             <div className="spacer flex-grow-1 flex-shrink-1"></div>
             {this.state.open && <div className="main-border-color-background ml-2" style={{ width: 1, height: "75%" }}></div>}
-            <div className="menu-button menu-toggle" onClick={closeMenu} >
-                <i className="anim-icon-button fas fa-chevron-right" style={{ transitionDuration: SideMenuNavigation.animationDuration + "ms" }}></i>
-            </div>
         </div>
     }
     handleLinkItemSelected = () => {
@@ -392,6 +390,7 @@ class SideMenuNavigation extends React.Component<Props, State> {
     }
     render() {
         const openMenu = !this.state.open ? this.toggleMenu : undefined
+        const closeMenu = this.state.open ? this.closeOnNavigation : undefined
         const mode = this.state.mode
         const cn = classnames("main-content-background drop-shadow", mode,  { active: this.state.open })
         const modeIcon = mode == MenuViewMode.list ? "fas fa-th-large" : "fas fa-th-list"
@@ -422,7 +421,6 @@ class SideMenuNavigation extends React.Component<Props, State> {
                         </div>
                 </div>
                 <div className="hbar main-border-color-background align-self-center" style={{ height: borderHeight, width: "90%" , transitionDuration: transDur}}></div>
-                <LogoSmall className="intrawork-logo-small" />
                 <div className="menu-content vertical-scroll">
                     { anonUser || <>
                         <MenuBlock animationDuration={SideMenuNavigation.animationDuration} open={this.state.open} icon="fas fa-star" title={translate("menu.favorites")}>
@@ -444,15 +442,17 @@ class SideMenuNavigation extends React.Component<Props, State> {
                         </MenuBlock>
                     </>}
                 </div>
-                {this.state.open &&
-                    <>
-                        <div className="spacer flex-grow-1 flex-shrink-1"></div>
-                        <div className="footer d-flex">
+                    <div className="spacer flex-grow-1 flex-shrink-1"></div>
+                    <div className="footer menu-bottom d-flex">
+                        {this.state.open && <div className="d-flex flex-grow-1">
                             <ToggleSwitch active={!this.state.closeMenuOnNavigation} onStateChanged={this.handleToggleStateChange} />
-                            <span className="mr-1">{translate("always visible")}</span>
+                            <span className="mr-1 text-truncate">{translate("always visible")}</span>
                         </div>
-                    </>
-                }
+                        }
+                        <div className="menu-toggle flex-shrink-1" onClick={closeMenu} >
+                            <i className="anim-icon-button fas fa-chevron-right" style={{ transitionDuration: SideMenuNavigation.animationDuration + "ms" }}></i>
+                        </div>
+                    </div>
             </div>
         );
     }

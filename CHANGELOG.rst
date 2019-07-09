@@ -18,6 +18,9 @@ Changes:
 
 * Many small adjustments to content in Sidebar Menu
 * Anonymous users no longer has a dashboard
+* You can only see whom has read your own posts
+* Compacted the status options
+* Moved side menu arrow down to bottom
 
 
 Bugfixes:

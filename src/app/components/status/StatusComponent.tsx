@@ -86,7 +86,7 @@ export class StatusComponent extends React.Component<Props, State> {
     {
         const nextStatus = nextProps.status
         const status = this.props.status
-        let ret:boolean =  nextStatus.id != status.id || 
+        let ret:boolean =  nextStatus.id != status.id ||
         nextProps.innerRef != this.props.innerRef ||
         nextStatus.comments != status.comments ||
         nextStatus.updated_at != status.updated_at ||
@@ -207,7 +207,7 @@ export class StatusComponent extends React.Component<Props, State> {
                                         </div>
                                     </div>
                                 }
-                                {readBy.length > 0 && this.renderStatusRead(status)}
+                                {readBy.length > 0 && status.owner.id == authorizedUserId && this.renderStatusRead(status)}
                             </div>
                         </div>
                         {isComment && <div className={statusContentClass}>

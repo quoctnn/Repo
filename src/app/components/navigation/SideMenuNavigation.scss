@@ -23,10 +23,25 @@ $gridItemHeight:70px;
         max-height: 1px;
     }
     .footer{
-        margin: 8px;
-        flex-direction: row-reverse;
-        display: flex;
+        margin-left: 8px;
+        height: 35px;
+        .mr-1{
+            margin-left: 8px;
+        }
+        .menu-toggle{
+            cursor: pointer;
+            text-align: center;
+            width: 60px;
+            &.mode-switch{
+                transform: rotate(-180deg);
+            }
+        }
     }
+    .menu-bottom{
+        margin: 8px;
+        height: unset;
+    }
+
     .menu-grid-item{
         border-radius: 4px;
         overflow: hidden;
@@ -41,14 +56,6 @@ $gridItemHeight:70px;
         .cover{
             height: 40px;
             object-fit: cover;
-        }
-        .footer{
-            padding: 2px;
-            display: flex;
-            height: 30px;
-            font-size: 0.65em;
-            justify-content: center;
-            align-items: center;
         }
         img{
             user-select: none;
@@ -89,7 +96,7 @@ $gridItemHeight:70px;
         transition-property: height;
         height: 0;
         overflow: hidden;
-        .menu-button{
+        .menu-toggle{
             transition-timing-function: ease-in-out;
             transition-property: all,transform;
             height: $rowHeight;
@@ -150,11 +157,13 @@ $gridItemHeight:70px;
     .intrawork-logo{
         @include var(fill, primary-theme-color);
         height: $rowHeight;
+        width: 100%;
         margin: 9px;
     }
     .intrawork-logo-small{
         @include var(fill, primary-theme-color);
         height: $rowHeight;
+        width: 100%;
         transition-timing-function: ease-in-out;
         transition-property: height;
         margin: 0 auto;
@@ -177,16 +186,13 @@ $gridItemHeight:70px;
         width: $sideMenuActiveWidth;
         .menu-toolbar{
             height: 35px !important;
-            .menu-button{
-                height: 35px !important;
-                transform:scale(0.7);
-                &.mode-switch{
-                    transform: rotate(-180deg) scale(0.7);
-                }
-            }
         }
-        .intrawork-logo-small{
-            height: 0;
+        .menu-button{
+            height: 35px !important;
+            transform:scale(0.7);
+            &.mode-switch{
+                transform: rotate(-180deg) scale(0.7);
+            }
         }
         .anim-icon-button
         {
