@@ -24,6 +24,8 @@ Bugfixes:
 =========
 
 * Fixed some nullpointers
+* Sending all whitespaces in message causes error
+
 
 <hr/>
 

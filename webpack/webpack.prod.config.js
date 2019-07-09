@@ -23,7 +23,7 @@ config.module.rules.unshift(
         path.resolve(__dirname, "../node_modules/react-360-web")
     ],use: [
       {
-        loader: 'babel-loader',
+        loader: 'babel-loader?cacheDirectory',
         options: {
           presets: []
         }
@@ -105,7 +105,7 @@ module.exports = merge(config, {
           }
         }
       }),
-      new OptimizeCSSAssetsPlugin({})
+        new OptimizeCSSAssetsPlugin({})
     ]
   }
 });
