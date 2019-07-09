@@ -313,7 +313,9 @@ export class ChatMessageComposer extends React.Component<Props,State> {
         return {text, mentions:Object.keys(mentions).map(k => parseInt(k))}
     }
     canSubmit = () => {
-        const canSubmit = this.state.plainText.length >= this.props.minimumTextLength
+        // Trim whitespaces from text input. Sending only whitespace is invalid.
+        const textLength = this.state.plainText.replace(/\s/g, '').length
+        const canSubmit = textLength >= this.props.minimumTextLength
         if( !nullOrUndefined( this.props.canSubmit) )
             return canSubmit && this.props.canSubmit
         return canSubmit
