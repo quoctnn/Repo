@@ -22,5 +22,8 @@
         position:fixed;
         top:0px;
         height: $topMenuHeight;
+        .fa {
+            margin-right: 6px;
+        }
     }
 }

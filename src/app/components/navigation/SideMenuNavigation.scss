@@ -25,6 +25,7 @@ $gridItemHeight:70px;
     .footer{
         margin-left: 8px;
         height: 35px;
+        font-size: em(0.65);
         .mr-1{
             margin-left: 8px;
         }
@@ -59,6 +60,14 @@ $gridItemHeight:70px;
         }
         img{
             user-select: none;
+        }
+        .footer{
+            margin: 4px;
+            display: flex;
+            height: 30px;
+            font-size: 0.65em;
+            justify-content: center;
+            align-items: center;
         }
         .icon{
             display: flex;
@@ -96,7 +105,7 @@ $gridItemHeight:70px;
         transition-property: height;
         height: 0;
         overflow: hidden;
-        .menu-toggle{
+        .menu-button{
             transition-timing-function: ease-in-out;
             transition-property: all,transform;
             height: $rowHeight;
@@ -186,12 +195,12 @@ $gridItemHeight:70px;
         width: $sideMenuActiveWidth;
         .menu-toolbar{
             height: 35px !important;
-        }
-        .menu-button{
-            height: 35px !important;
-            transform:scale(0.7);
-            &.mode-switch{
-                transform: rotate(-180deg) scale(0.7);
+            .menu-button{
+                height: 35px !important;
+                transform:scale(0.7);
+                &.mode-switch{
+                    transform: rotate(-180deg) scale(0.7);
+                }
             }
         }
         .anim-icon-button

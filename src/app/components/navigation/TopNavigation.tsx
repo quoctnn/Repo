@@ -68,13 +68,13 @@ class TopNavigation extends React.Component<Props, State> {
                     { profile && !profile.is_anonymous &&
                         <>
                             <Link className={communityLinkClass} to={communityLink}>
-                                {translate("common.community")}
+                                <i className="fa fa-globe" />{translate("common.community")}
                             </Link>
                             <Link className={dashboardClass} to={dashboardLink}>
-                                {translate("common.dashboard")}
+                                <i className="fa fa-tachometer-alt" />{translate("common.dashboard")}
                             </Link>
                             <Link to={conversationsLink} className={conversationsLinkClass}>
-                                {translate("common.messages")}
+                                <i className="fa fa-comment" />{translate("common.messages")}
                                 {this.props.unreadConversations > 0 && <Badge pill={true} color="danger" className="ml-1 badge-notification">{this.props.unreadConversations}</Badge>}
                             </Link>
                         </>

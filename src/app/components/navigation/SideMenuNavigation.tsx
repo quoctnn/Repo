@@ -201,14 +201,11 @@ class TopGroups extends React.Component<TopGroupsProps, TopGroupsState> {
         this.fetchGroups()
     }
     componentDidUpdate = (prevProps:TopProjectsProps) => {
-        if(this.props.community != prevProps.community)
-        {
-            this.fetchGroups()
-        }
+        this.fetchGroups()
     }
     fetchGroups = () => {
-        const communityId = (this.props.community && this.props.community.id) || null
-        ApiClient.getGroups(communityId, null, 6, 0, GroupSorting.mostUsed, (data, status, error) => {
+        //const communityId = (this.props.community && this.props.community.id) || null
+        ApiClient.getGroups(null, null, 6, 0, GroupSorting.mostUsed, (data, status, error) => {
             const list = (data && data.results) || []
             this.setState((prevState: TopGroupsState) => {
                 return { list }
@@ -258,14 +255,11 @@ class TopProjects extends React.Component<TopProjectsProps, TopProjectsState> {
         this.fetchProjects()
     }
     componentDidUpdate = (prevProps:TopProjectsProps) => {
-        if(this.props.community != prevProps.community)
-        {
-            this.fetchProjects()
-        }
+        this.fetchProjects()
     }
     fetchProjects = () => {
-        const communityId = (this.props.community && this.props.community.id) || null
-        ApiClient.getProjects(communityId, 6, 0, ProjectSorting.mostUsed, null, null, (data, status, error) => {
+        //const communityId = (this.props.community && this.props.community.id) || null
+        ApiClient.getProjects(null, 6, 0, ProjectSorting.mostUsed, null, null, (data, status, error) => {
             const list = (data && data.results) || []
             this.setState((prevState: TopProjectsState) => {
                 return { list }
