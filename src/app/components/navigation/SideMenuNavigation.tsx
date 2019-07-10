@@ -201,7 +201,7 @@ class TopGroups extends React.Component<TopGroupsProps, TopGroupsState> {
         this.fetchGroups()
     }
     componentDidUpdate = (prevProps:TopProjectsProps) => {
-        this.fetchGroups()
+        //this.fetchGroups()
     }
     fetchGroups = () => {
         //const communityId = (this.props.community && this.props.community.id) || null
@@ -255,7 +255,7 @@ class TopProjects extends React.Component<TopProjectsProps, TopProjectsState> {
         this.fetchProjects()
     }
     componentDidUpdate = (prevProps:TopProjectsProps) => {
-        this.fetchProjects()
+        //this.fetchProjects()
     }
     fetchProjects = () => {
         //const communityId = (this.props.community && this.props.community.id) || null
