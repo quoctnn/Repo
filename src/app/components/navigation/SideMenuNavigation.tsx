@@ -179,14 +179,11 @@ const favoritesMapStateToProps = (state: ReduxState, ownProps: FavoritesOwnProps
 }
 const FavoritesConnected = connect<FavoriteReduxStateProps, {}, FavoritesOwnProps>(favoritesMapStateToProps, null)(Favorites)
 
-type TopGroupsReduxStateProps = {
-    community:Community
-}
 type TopGroupsOwnProps = {
     mode: MenuViewMode
     onItemSelected:() => void
 }
-type TopGroupsProps = TopGroupsOwnProps & TopGroupsReduxStateProps & RouteComponentProps<any>
+type TopGroupsProps = TopGroupsOwnProps & RouteComponentProps<any>
 type TopGroupsState = {
     list: Group[]
 }
@@ -200,11 +197,12 @@ class TopGroups extends React.Component<TopGroupsProps, TopGroupsState> {
     componentDidMount = () => {
         this.fetchGroups()
     }
-    componentDidUpdate = (prevProps:TopProjectsProps) => {
-        //this.fetchGroups()
+    componentDidUpdate = (prevProps:TopGroupsProps) => {
+        if (this.props.location.pathname != prevProps.location.pathname) {
+            this.fetchGroups()
+        }
     }
     fetchGroups = () => {
-        //const communityId = (this.props.community && this.props.community.id) || null
         ApiClient.getGroups(null, null, 6, 0, GroupSorting.mostUsed, (data, status, error) => {
             const list = (data && data.results) || []
             this.setState((prevState: TopGroupsState) => {
@@ -224,23 +222,13 @@ class TopGroups extends React.Component<TopGroupsProps, TopGroupsState> {
                 </>
     }
 }
-const mapTopGroupsStateToProps = (state: ReduxState, ownProps: TopGroupsOwnProps & RouteComponentProps<any>): TopGroupsReduxStateProps => {
-
-    const community = ContextManager.getContextObject(ownProps.location.pathname, ContextNaturalKey.COMMUNITY) as Community
-    return {
-        community
-    }
-}
-const ConnectedTopGroups = withRouter(connect(mapTopGroupsStateToProps, null)(TopGroups))
-type TopProjectsReduxStateProps = {
-    community:Community
-}
+const ConnectedTopGroups = withRouter(TopGroups)
 type TopProjectsOwnProps = {
 
     mode: MenuViewMode
     onItemSelected:() => void
 }
-type TopProjectsProps = TopProjectsOwnProps & TopProjectsReduxStateProps & RouteComponentProps<any>
+type TopProjectsProps = TopProjectsOwnProps & RouteComponentProps<any>
 type TopProjectsState = {
     list: Project[]
 }
@@ -255,10 +243,11 @@ class TopProjects extends React.Component<TopProjectsProps, TopProjectsState> {
         this.fetchProjects()
     }
     componentDidUpdate = (prevProps:TopProjectsProps) => {
-        //this.fetchProjects()
+        if (this.props.location.pathname != prevProps.location.pathname) {
+            this.fetchProjects()
+        }
     }
     fetchProjects = () => {
-        //const communityId = (this.props.community && this.props.community.id) || null
         ApiClient.getProjects(null, 6, 0, ProjectSorting.mostUsed, null, null, (data, status, error) => {
             const list = (data && data.results) || []
             this.setState((prevState: TopProjectsState) => {
@@ -278,14 +267,7 @@ class TopProjects extends React.Component<TopProjectsProps, TopProjectsState> {
                 </>
     }
 }
-const mapTopProjectsStateToProps = (state: ReduxState, ownProps: TopProjectsOwnProps & RouteComponentProps<any>): TopProjectsReduxStateProps => {
-
-    const community = ContextManager.getContextObject(ownProps.location.pathname, ContextNaturalKey.COMMUNITY) as Community
-    return {
-        community
-    }
-}
-const ConnectedTopProjects = withRouter(connect(mapTopProjectsStateToProps, null)(TopProjects))
+const ConnectedTopProjects = withRouter(TopProjects)
 
 type OwnProps = {
 }

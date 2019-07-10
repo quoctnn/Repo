@@ -9,6 +9,7 @@ import StickyBox from "./external/StickyBox";
 import "./Grid.scss";
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 //import "react-tabs/style/react-tabs.css";
+import { translate } from '../localization/AutoIntlProvider';
 
 type OwnProps = {
     grid:GridColumns
@@ -166,11 +167,15 @@ export class Grid extends React.PureComponent<Props, State> {
             tabWidth = 12 / columns.length
         }
         const colCN = classnames("tab-item", "col-" + tabWidth)
-        columns.map(c => {return c.module.name})
         return <Tabs>
                     <TabList className={cn}>
                         {columns.map(c => {
-                            return <Tab className={colCN} key={c.id}>{c.module.name}</Tab>
+                            const props:{tabname?:string} = c.module.properties || {}
+                            let tabName = c.module.name
+                            if (props.tabname) {
+                                tabName = translate(props.tabname)
+                            }
+                            return <Tab className={colCN} key={c.id}>{tabName}</Tab>
                         })}
                     </TabList>
                     {this.renderRow(columns, level, true)}

@@ -14,11 +14,14 @@ import { FavoriteManager } from '../../managers/FavoriteManager';
 import { Button } from "reactstrap";
 import { Avatar } from "../../components/general/Avatar";
 
-type OwnProps = 
+type OwnProps =
 {
     className?:string
     breakpoint:ResponsiveBreakpoint
     contextNaturalKey?:ContextNaturalKey
+    coverImage?:string
+    hideAvatar?:boolean
+    hideFavorites?:boolean
     height?:number
 }
 type Props = OwnProps & ReduxStateProps & RouteComponentProps<any> & DispatchProp
@@ -35,32 +38,36 @@ class CoverModule extends React.Component<Props, State> {
         }
     }
     renderContent = () => {
-        const cover = contextCover(this.props.contextObject as any, false, this.props.contextNaturalKey, )
+        const cover = this.props.coverImage || contextCover(this.props.contextObject as any, false, this.props.contextNaturalKey, )
         const isFavorite = !!this.props.favorite
         const cn = classnames("favorite-button", {active:isFavorite})
         const icon = isFavorite ? "fas fa-star" : "far fa-star"
         const image = contextAvatar(this.props.contextObject as any, false, this.props.contextNaturalKey)
         return <CoverImage className="flex-grow-1" src={cover} >
-                    <Button onClick={this.toggleFavorite} color="link" className={cn}>
-                        <i className={icon}></i>
-                    </Button>
-                    <Avatar image={image} size={100} />
+                    {this.props.hideFavorites ||
+                        <Button onClick={this.toggleFavorite} color="link" className={cn}>
+                            <i className={icon}></i>
+                        </Button>
+                    }
+                    {this.props.hideAvatar ||
+                        <Avatar image={image} size={100} />
+                    }
                 </CoverImage>
     }
     toggleFavorite = () => {
         if(!!this.props.favorite)
             FavoriteManager.removeFavorite(this.props.favorite.id)
-        else 
+        else
             FavoriteManager.createFavorite(this.props.contextNaturalKey, this.props.contextObject.id)
     }
     render() {
-        const {contextNaturalKey, height, history, match, location, contextObject, staticContext, dispatch, ...rest} = this.props
+        const {contextNaturalKey, coverImage, hideAvatar, hideFavorites, height, favorite,history, match, location, contextObject, staticContext, dispatch, ...rest} = this.props
         const {breakpoint, className} = this.props
         const cn = classnames("cover-module d-flex", className)
-        return (<SimpleModule style={{height:this.props.height}} {...rest} 
-                    className={cn} 
-                    breakpoint={breakpoint} 
-                    isLoading={false} 
+        return (<SimpleModule style={{height:this.props.height}} {...rest}
+                    className={cn}
+                    breakpoint={breakpoint}
+                    isLoading={false}
                     showHeader={false}
                     >
                     {this.renderContent()}

@@ -52,7 +52,7 @@ export default class CommunityListItem extends React.Component<Props, State> {
                                 <i className="fa fa-user"></i>
                             </div>
                             <div className="title text-truncate">{community.name}</div>
-                            <Button className="theme-bg-gradient set-main" onClick={this.setMainCommunity(community)} title={translate("Select as main community")}><i className="fa fa-plus"/></Button>
+                            <Button className="theme-bg-gradient set-main" onClick={this.setMainCommunity(community)} title={translate("common.community.set.main")}><i className="fa fa-plus"/></Button>
                         </div>
                     </div>
                 </IntraSocialLink>)
