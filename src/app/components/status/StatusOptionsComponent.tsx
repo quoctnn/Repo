@@ -260,7 +260,7 @@ export default class StatusOptionsComponent extends React.Component<Props, State
         const cn = classnames("status-options", this.props.className)
         const overflowButtonClass = this.props.overflowButtonClass || "fas fa-ellipsis-v"
         return (
-            <span className={cn}>
+            <div className={cn}>
                 <div className="dropdown dropdown-options">
                     <OverflowMenu refresh={this.props.status.serialization_date} fetchItems={this.fetchItems} maxVisible={this.props.maxVisible} buttonIconClass={overflowButtonClass} />
                 </div>
@@ -268,7 +268,7 @@ export default class StatusOptionsComponent extends React.Component<Props, State
                 {this.renderRemoveDialog()}
                 {this.renderReportDialog()}
                 {this.renderAttentionDialog()}
-            </span>
+            </div>
         )
     }
 }
