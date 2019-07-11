@@ -2,7 +2,9 @@ import * as React from 'react';
 import Emoji from "../components/general/Emoji";
 import Constants from "../utilities/Constants";
 import { translate } from "../localization/AutoIntlProvider";
-import { userFullName, groupCover, communityCover, userCover, projectCover, eventCover } from '../utilities/Utilities';
+import { userFullName, groupCover, communityCover, userCover, projectCover, eventCover, communityName } from '../utilities/Utilities';
+import { communityStore } from '../redux/communityStore';
+import { CommunityManager } from '../managers/CommunityManager';
 
 
 
@@ -72,7 +74,7 @@ export namespace ContextNaturalKey {
             case ContextNaturalKey.COMMUNITY: return "fas fa-globe"
             case ContextNaturalKey.USER: return "fas fa-user"
             case ContextNaturalKey.PROJECT: return "fas fa-clipboard-list"
-            case ContextNaturalKey.EVENT: return "fas fa-calendar-day"
+            case ContextNaturalKey.EVENT: return "fas fa-calendar"
             case ContextNaturalKey.TASK: return "fas fa-tasks"
             default:return null
         }
@@ -88,14 +90,47 @@ export namespace ContextNaturalKey {
             default:return null
         }
     }
-    export function nameForContextObject(key: ContextNaturalKey, contextObject:any) {
+    export function nameForContextObject(key: ContextNaturalKey, contextObject:any, communityName?:boolean) {
+        let obj;
         switch(key){
-            case ContextNaturalKey.GROUP: return (contextObject as Group).name
+            case ContextNaturalKey.GROUP:
+                obj = contextObject as Group
+                if (communityName){
+                    const community = CommunityManager.getCommunityById(obj.community)
+                    if (community) {
+                        return obj.name + " - " + community.name
+                    }
+                }
+                return obj.name
             case ContextNaturalKey.COMMUNITY: return (contextObject as Community).name
             case ContextNaturalKey.USER: return userFullName((contextObject as UserProfile))
-            case ContextNaturalKey.PROJECT: return (contextObject as Project).name
-            case ContextNaturalKey.EVENT: return (contextObject as Event).name
-            case ContextNaturalKey.TASK: return (contextObject as Task).title
+            case ContextNaturalKey.PROJECT:
+                obj = contextObject as Project
+                if (communityName){
+                    const community = CommunityManager.getCommunityById(obj.community)
+                    if (community) {
+                        return obj.name + " - " + community.name
+                    }
+                }
+                return obj.name
+            case ContextNaturalKey.EVENT:
+                obj = contextObject as Event
+                if (communityName){
+                    const community = CommunityManager.getCommunityById(obj.community)
+                    if (community) {
+                        return obj.name + " - " + community.name
+                    }
+                }
+                return obj.name
+            case ContextNaturalKey.TASK:
+                obj = contextObject as Task
+                if (communityName){
+                    const community = CommunityManager.getCommunityById(obj.community)
+                    if (community) {
+                        return obj.title + " - " + community.name
+                    }
+                }
+                return obj.title
             default:return null
         }
     }

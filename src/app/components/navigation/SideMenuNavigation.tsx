@@ -50,7 +50,7 @@ const ContextListItem = (props:ContextItemProps ) => {
 }
 const ContextGridItem = (props: ContextItemProps) => {
     const getName = () => {
-        return ContextNaturalKey.nameForContextObject(props.contextNaturalKey, props.contextObject)
+        return ContextNaturalKey.nameForContextObject(props.contextNaturalKey, props.contextObject, true)
     }
     const getCover = () => {
         return ContextNaturalKey.coverForContextObject(props.contextNaturalKey, props.contextObject, true)
