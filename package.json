@@ -85,7 +85,7 @@
     "react-measure": "^2.2.3",
     "react-moment": "^0.7.9",
     "react-moment-input": "^0.2.15",
-    "react-native": "^0.55.4",
+    "react-native": "^0.60.4",
     "react-process-string": "^1.2.0",
     "react-router-dom": "^5.0.1",
     "react-select": "^2.4.1",
