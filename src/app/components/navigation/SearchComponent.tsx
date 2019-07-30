@@ -736,15 +736,14 @@ export class SearchComponent extends React.Component<Props, State> {
         if(isLoading)
             resultCountStyle.visibility = "hidden"
         return (<>
-
-                    <div className="search-result-header">
-                        <div style={resultCountStyle} className="search-result-count">{count + " " + translate("results")}</div>
-                        <div className="sorting">
-                            {this.renderSortOptions()}
-                        </div>
-                    </div>
                     <div className="search-results">
                     <div className="left">
+                        <div className="search-result-header">
+                            <div style={resultCountStyle} className="search-result-count">{count + " " + translate("results")}</div>
+                            <div className="sorting">
+                                {this.renderSortOptions()}
+                            </div>
+                        </div>
                         <CursorList items={items} />
                         {isLoading && <LoadingSpinner />}
                     </div>
