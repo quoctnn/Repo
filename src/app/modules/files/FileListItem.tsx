@@ -83,6 +83,7 @@ export default class FileListItem extends React.Component<Props, State> {
     }
     handleFileClick = (event:React.SyntheticEvent<any>) => {
         event.preventDefault()
+        event.stopPropagation()
         const file = this.props.file
         if(file.custom)
         {

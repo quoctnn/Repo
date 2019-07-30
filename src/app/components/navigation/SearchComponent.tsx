@@ -701,8 +701,8 @@ export class SearchComponent extends React.Component<Props, State> {
             resultCountStyle.visibility = "hidden"
         return (<>
 
-                    <div style={resultCountStyle} className="search-result-header">
-                        <div className="search-result-count">{count + " " + translate("results")}</div>
+                    <div className="search-result-header">
+                        <div style={resultCountStyle} className="search-result-count">{count + " " + translate("results")}</div>
                         <div className="sorting">
                             {this.renderSortOptions()}
                         </div>
