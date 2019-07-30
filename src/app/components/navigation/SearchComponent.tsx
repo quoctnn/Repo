@@ -2,12 +2,12 @@ import * as React from "react";
 import classnames from 'classnames';
 import "./SearchComponent.scss"
 import { ContextSearchData, SearchOption, SearcQueryManager, SearchEntityType } from "../general/input/contextsearch/extensions";
-import { ElasticSearchType, SearchHistory, ContextNaturalKey, GenericElasticResult, ElasticResultCommunity, ElasticResultStatus, ElasticResultEvent, ElasticResultTask, ElasticResultProject, ElasticResultUser, ElasticResultGroup, ElasticResultFile, Event, UploadedFile } from '../../types/intrasocial_types';
+import { ElasticSearchType, SearchHistory, ContextNaturalKey, GenericElasticResult, ElasticResultCommunity, ElasticResultStatus, ElasticResultEvent, ElasticResultTask, ElasticResultProject, ElasticResultUser, ElasticResultGroup, ElasticResultFile, Event, UploadedFile, UploadedFileType, ElasticSearchBucketAggregation } from '../../types/intrasocial_types';
 import ApiClient, { ElasticResult, SearchArguments } from "../../network/ApiClient";
 import { Avatar } from '../general/Avatar';
 import { SearchBox } from "../general/input/contextsearch/SearchBox";
 import { EditorState } from "draft-js";
-import { nullOrUndefined, truncate, userFullName } from "../../utilities/Utilities";
+import { nullOrUndefined, truncate, userFullName, stringToDateFormat, getTextContent } from '../../utilities/Utilities';
 import { FormGroup, Label, Input, Button } from "reactstrap";
 import { translate } from "../../localization/AutoIntlProvider";
 import CursorList from "../general/input/contextsearch/CursorList";
@@ -21,38 +21,24 @@ import { EventManager } from "../../managers/EventManager";
 import { TaskManager } from "../../managers/TaskManager";
 import { TimeComponent } from "../general/TimeComponent";
 import { ProfileManager } from "../../managers/ProfileManager";
-import FileListItem from "../../modules/files/FileListItem";
 import LoadingSpinner from "../LoadingSpinner";
 import { InsertEntity } from '../general/input/contextsearch/extensions/index';
-import { OverflowMenuItem, OverflowMenuItemType } from "../general/OverflowMenu";
+import {OverflowMenuItemType } from "../general/OverflowMenu";
 import { DropDownMenu } from "../general/DropDownMenu";
 import { DateTimePicker } from "../general/input/DateTimePicker";
 import { Moment } from "moment";
 import * as moment from "moment-timezone";
+import { SecureImage } from "../general/SecureImage";
+import PhotoSwipeComponent from "../general/gallery/PhotoSwipeComponent";
+import { IntraSocialUtilities } from "../../utilities/IntraSocialUtilities";
+import SimpleDialog from "../general/dialogs/SimpleDialog";
+import StickyBox from "../external/StickyBox";
 let timezone = moment.tz.guess()
 
 type BreadcrumbData = {community?:number, group?:number, event?:number, project?:number, task?:number, profile?:number}
 export enum SearchSortOptions {
     relevance = "relevance",
     date = "date"
-}
-export interface Props {
-    onClose:() => void
-}
-export interface State {
-
-    searchActive:boolean
-    activeSearchType:ElasticSearchType
-    searchData:ContextSearchData
-    searchResult:ElasticResult<GenericElasticResult>
-    searchHistory:SearchHistory[]
-    searchTypeFilters:ElasticSearchType[]
-    requestId:number
-    hasMore:boolean
-    isLoading:boolean
-    searchSortValue:SearchSortOptions
-    fromDate:Moment
-    toDate:Moment
 }
 const allowedSearchContextFilters:SearchOption[] = []
 allowedSearchContextFilters.push(new SearchOption("community", null, 2,  ElasticSearchType.COMMUNITY, ["user", "group", "event", "project", "task", ], "newsfeed.menu.filter.community.description"))
@@ -84,6 +70,135 @@ const SearchResultItem = (props: {className?:string, left?:React.ReactNode, head
                 </div>
                 {right && <div className="right">{right}</div>}
             </div>)
+}
+const getTextForField = (object:GenericElasticResult, field:string, maxTextLength:number) => {
+    var origFieldVal = object[field] || ""
+    if (object.highlights)
+    {
+        var higlightValues = object.highlights[field]
+        if(higlightValues && higlightValues.length > 0)
+        {
+            let highlight = higlightValues[0]
+            let start = origFieldVal.substring(0, Math.min(10, origFieldVal.length))
+            let preEndPos = Math.min(10, origFieldVal.length)
+            let end = origFieldVal.substring(origFieldVal.length - preEndPos)
+            if(!highlight.startsWith(start))
+            {
+                highlight = "&hellip; " + highlight
+            }
+            if(!highlight.endsWith(end))
+            {
+                highlight = highlight +  " &hellip;"
+            }
+            return highlight
+        }
+    }
+    if( maxTextLength )
+    {
+        origFieldVal = truncateWithBoundary(origFieldVal, maxTextLength, true)
+    }
+    return origFieldVal
+}
+const truncateWithBoundary = (value:string, n:number, useWordBoundary:boolean) => {
+    if (value.length <= n) { return value; }
+    var subString = value.substr(0, n-1);
+    return (useWordBoundary
+        ? subString.substr(0, subString.lastIndexOf(' '))
+        : subString) + "&hellip;";
+}
+const breadcrumbs = (data:BreadcrumbData, onNavigate:(uri:string) => (event:React.SyntheticEvent) => void) => {
+    const {community, group, event, project, task, profile} = data
+    let breadcrumbs:LinkObject[] = []
+    if(community)
+    {
+        const communityObject = CommunityManager.getCommunityById(community)
+        if(communityObject)
+            breadcrumbs.push({uri:communityObject.uri, title:communityObject.name})
+    }
+    if(group)
+    {
+        const groupObject = GroupManager.getGroupById(group)
+        if(groupObject)
+            breadcrumbs.push({uri:groupObject.uri, title:groupObject.name})
+    }
+    if(event)
+    {
+        const eventObject = EventManager.getEventById(event)
+        if(eventObject)
+            breadcrumbs.push({uri:eventObject.uri, title:eventObject.name})
+    }
+    if(project)
+    {
+        const projectObject = ProjectManager.getProjectById(project)
+        if(projectObject)
+            breadcrumbs.push({uri:projectObject.uri, title:projectObject.name})
+    }
+    if(task)
+    {
+        const taskObject = TaskManager.getTask(task)
+        if(taskObject)
+            breadcrumbs.push({uri:taskObject.uri, title:taskObject.title})
+    }
+    if(profile)
+    {
+        const profileObject = ProfileManager.getProfileById(profile)
+        if(profileObject)
+            breadcrumbs.push({uri:profileObject.uri, title:userFullName(profileObject)})
+    }
+    breadcrumbs = breadcrumbs.filter(e => !nullOrUndefined(e))
+    const arr:JSX.Element[] = []
+    breadcrumbs.forEach((s,i) => {
+        arr.push(<Link onClick={onNavigate(s.uri)} className="primary-theme-color medium-text" key={"link_" + i} to={s.uri}>{truncate(s.title, 20)}</Link>)
+        if(i < breadcrumbs.length - 1)
+            arr.push(<i key={"sep_" + i} className="fas fa-caret-right mx-1"></i>)
+    })
+    return arr
+}
+
+const breadcrumbsFromContext = (contextNaturalKey:ContextNaturalKey, contextObjectId:number, onNavigate:(uri:string) => (event:React.SyntheticEvent) => void, breadcrumbData?:BreadcrumbData) => {
+    const data:BreadcrumbData = breadcrumbData || {}
+    switch (contextNaturalKey) {
+        case ContextNaturalKey.COMMUNITY:
+            data.community = contextObjectId
+            break;
+        case ContextNaturalKey.GROUP:
+            data.group = contextObjectId
+            break;
+        case ContextNaturalKey.EVENT:
+            data.event = contextObjectId
+            break;
+        case ContextNaturalKey.PROJECT:
+            data.project = contextObjectId
+            break;
+        case ContextNaturalKey.TASK:
+            data.task = contextObjectId
+            break;
+        case ContextNaturalKey.USER:
+            data.profile = contextObjectId
+            break;
+        default:
+            break;
+    }
+    return breadcrumbs(data, onNavigate)
+}
+export interface Props {
+    onClose:() => void
+    visible:boolean
+}
+export interface State {
+
+    searchActive:boolean
+    activeSearchType:ElasticSearchType
+    searchData:ContextSearchData
+    searchResult:ElasticResult<GenericElasticResult>
+    searchHistory:SearchHistory[]
+    searchTypeFilters:ElasticSearchType[]
+    requestId:number
+    hasMore:boolean
+    isLoading:boolean
+    searchSortValue:SearchSortOptions
+    fromDate:Moment
+    toDate:Moment
 }
 export class SearchComponent extends React.Component<Props, State> {
     
@@ -259,9 +374,12 @@ export class SearchComponent extends React.Component<Props, State> {
             tags:data.tags,
             date_sort:sortOnDate,
             from_date:fromDate || undefined,
-            to_date:toDate || undefined
+            to_date:toDate || undefined,
+            use_simple_query_string:hasActiveSearchType
         }
         ApiClient.search2(this.pageSize, offset, args,(searchResult, status, error) => {
+            if(!searchResult)
+                return
             this.setState((prevState) => {
                 if(requestId == prevState.requestId)
                 {
@@ -291,7 +409,7 @@ export class SearchComponent extends React.Component<Props, State> {
         })
     }
     renderSearchBox = () => {
-        const cn = classnames("border-1",{"active":this.state.searchActive})
+        const cn = classnames({"active":this.state.searchActive})
         return <SearchBox id="global_search" className={cn}
                 onFocus={this.onSearchFocus}
                 onBlur={this.onSearchBlur}
@@ -301,6 +419,7 @@ export class SearchComponent extends React.Component<Props, State> {
                 placeholder={"Search"}
                 data={this.state.searchData}
                 multiline={false}
+                useClearButtonWithText={true}
                 allowedSearchOptions={allowedSearchContextFilters}
                 
         />
@@ -308,6 +427,15 @@ export class SearchComponent extends React.Component<Props, State> {
     setSearchQuery = (text:string) => () =>  {
         let state = this.editorState()
         state = SearcQueryManager.clearState(state)
+        state = SearcQueryManager.appendText(text, true, state)
+        state = SearcQueryManager.appendText(" ", true, state)
+        this.applyState(state)
+    }
+    appendSearchQuery = (text:string) => () =>  {
+        let state = this.editorState()
+        const currentText = state.getCurrentContent().getPlainText()
+        if(currentText.length > 0 && currentText[currentText.length - 1] != " ")
+            state = SearcQueryManager.appendText(" ", true, state)
         state = SearcQueryManager.appendText(text, true, state)
         state = SearcQueryManager.appendText(" ", true, state)
         this.applyState(state)
@@ -336,6 +464,22 @@ export class SearchComponent extends React.Component<Props, State> {
             })
             
         })
+    }
+    renderHashtags = () => {
+        const aggregations = this.state.searchResult && this.state.searchResult.stats && this.state.searchResult.stats.aggregations || {}
+        const topTags:ElasticSearchBucketAggregation = aggregations && aggregations.top_tags
+        if(topTags && topTags.buckets && topTags.buckets.length > 0)
+        {
+            return <div className="tags-list">
+                {topTags.buckets.map(t => {
+                    const str = "#" + t.key
+                        return <div key={str} className="tag-item" onClick={this.appendSearchQuery(str)}>
+                                {str}
+                                </div>
+                    })}
+                </div>
+        }
+        return null
     }
     renderSearchHistory = () => {
         
@@ -404,52 +548,16 @@ export class SearchComponent extends React.Component<Props, State> {
                     />
                 </div>
     }
-    getTextForField(object:GenericElasticResult, field:string, maxTextLength:number)
-    {
-        var origFieldVal = object[field] || ""
-        if (object.highlights)
-        {
-            var higlightValues = object.highlights[field]
-            if(higlightValues && higlightValues.length > 0)
-            {
-                let highlight = higlightValues[0]
-                let start = origFieldVal.substring(0, Math.min(10, origFieldVal.length))
-                let preEndPos = Math.min(10, origFieldVal.length)
-                let end = origFieldVal.substring(origFieldVal.length - preEndPos)
-                if(!highlight.startsWith(start))
-                {
-                    highlight = "&hellip; " + highlight
-                }
-                if(!highlight.endsWith(end))
-                {
-                    highlight = highlight +  " &hellip;"
-                }
-                return highlight
-            }
-        }
-        if( maxTextLength )
-        {
-            origFieldVal = this.truncate(origFieldVal, maxTextLength, true)
-        }
-        return origFieldVal
-    }
-    truncate(value:string, n:number, useWordBoundary:boolean)
-    {
-        if (value.length <= n) { return value; }
-        var subString = value.substr(0, n-1);
-        return (useWordBoundary
-           ? subString.substr(0, subString.lastIndexOf(' '))
-           : subString) + "&hellip;";
-    }
+    
     renderCommunityItem = (item:ElasticResultCommunity) => {
         const avatar = item.avatar || ContextNaturalKey.defaultAvatarForKey(ElasticSearchType.contextNaturalKeyForType(item.object_type))
         const left = <Avatar image={avatar} size={36} />
         const members = item.members || []
         const footer = <div className="text-bolder">{`${members.length} ${members.length > 1 ? translate("Members") : translate("Member")}`}</div>
-        const d = this.getTextForField(item, "description", 300)
+        const d = getTextForField(item, "description", 300)
         const description = <span dangerouslySetInnerHTML={{__html: d}}></span>
         const right = ElasticSearchType.nameForKey( item.object_type )
-        const n = this.getTextForField(item, "name", 150)
+        const n = getTextForField(item, "name", 150)
         const name = <span dangerouslySetInnerHTML={{__html: n}}></span>
         return <SearchResultItem className={item.object_type.toLowerCase()} header={name} description={description} footer={footer} left={left} right={right} />
     }
@@ -457,22 +565,22 @@ export class SearchComponent extends React.Component<Props, State> {
         const avatar = item.avatar || ContextNaturalKey.defaultAvatarForKey(ElasticSearchType.contextNaturalKeyForType(item.object_type))
         const left = <Avatar image={avatar} size={36} />
         const members = item.members || []
-        const breadcrumbs = this.breadcrumbs({community:item.community, group:item.parent_id})
-        const footer = <div className="text-bolder">{`${members.length} ${members.length > 1 ? translate("Members") : translate("Member")}`}{" "}{breadcrumbs}</div>
-        const d = this.getTextForField(item, "description", 300)
+        const bc = breadcrumbs({community:item.community, group:item.parent_id}, this.navigateToLocation)
+        const footer = <div className="text-bolder">{`${members.length} ${members.length > 1 ? translate("Members") : translate("Member")}`}{" "}{bc}</div>
+        const d = getTextForField(item, "description", 300)
         const description = <span dangerouslySetInnerHTML={{__html: d}}></span>
         const right = ElasticSearchType.nameForKey( item.object_type )
-        const n = this.getTextForField(item, "name", 150)
+        const n = getTextForField(item, "name", 150)
         const name = <span dangerouslySetInnerHTML={{__html: n}}></span>
         return <SearchResultItem className={item.object_type.toLowerCase()} header={name} description={description} footer={footer} left={left} right={right} />
     }
     renderUserItem = (item:ElasticResultUser) => {
         const avatar = item.avatar || ContextNaturalKey.defaultAvatarForKey(ElasticSearchType.contextNaturalKeyForType(item.object_type))
         const left = <Avatar image={avatar} size={36} style={{borderRadius:"6px"}} />
-        const d = this.getTextForField(item, "biography", 300)
+        const d = getTextForField(item, "biography", 300)
         const description = <span dangerouslySetInnerHTML={{__html: d}}></span>
         const right = ElasticSearchType.nameForKey( item.object_type )
-        const n = this.getTextForField(item, "user_name", 150)
+        const n = getTextForField(item, "user_name", 150)
         const name = <span dangerouslySetInnerHTML={{__html: n}}></span>
         return <SearchResultItem className={item.object_type.toLowerCase()} header={name} description={description} left={left} right={right} />
     }
@@ -480,12 +588,12 @@ export class SearchComponent extends React.Component<Props, State> {
         const avatar = item.avatar || ContextNaturalKey.defaultAvatarForKey(ElasticSearchType.contextNaturalKeyForType(item.object_type))
         const left = <Avatar image={avatar} size={36} />
         const members = item.members || []
-        const breadcrumbs = this.breadcrumbs({community:item.community})
-        const footer = <div className="text-bolder">{`${members.length} ${members.length > 1 ? translate("Members") : translate("Member")}`}{" "}{breadcrumbs}</div>
-        const d = this.getTextForField(item, "description", 300)
+        const bc = breadcrumbs({community:item.community}, this.navigateToLocation)
+        const footer = <div className="text-bolder">{`${members.length} ${members.length > 1 ? translate("Members") : translate("Member")}`}{" "}{bc}</div>
+        const d = getTextForField(item, "description", 300)
         const description = <span dangerouslySetInnerHTML={{__html: d}}></span>
         const right = ElasticSearchType.nameForKey( item.object_type )
-        const n = this.getTextForField(item, "name", 150)
+        const n = getTextForField(item, "name", 150)
         const name = <span dangerouslySetInnerHTML={{__html: n}}></span>
         return <SearchResultItem className={item.object_type.toLowerCase()} header={name} description={description} footer={footer} left={left} right={right} />
     }
@@ -494,88 +602,15 @@ export class SearchComponent extends React.Component<Props, State> {
         window.app.navigateToRoute(url)
         this.props.onClose()
     }
-    breadcrumbsFromContext = (contextNaturalKey:ContextNaturalKey, contextObjectId:number, breadcrumbData?:BreadcrumbData) => {
-        const data:BreadcrumbData = breadcrumbData || {}
-        switch (contextNaturalKey) {
-            case ContextNaturalKey.COMMUNITY:
-                data.community = contextObjectId
-                break;
-            case ContextNaturalKey.GROUP:
-                data.group = contextObjectId
-                break;
-            case ContextNaturalKey.EVENT:
-                data.event = contextObjectId
-                break;
-            case ContextNaturalKey.PROJECT:
-                data.project = contextObjectId
-                break;
-            case ContextNaturalKey.TASK:
-                data.task = contextObjectId
-                break;
-            case ContextNaturalKey.USER:
-                data.profile = contextObjectId
-                break;
-            default:
-                break;
-        }
-        return this.breadcrumbs(data)
-    }
-    breadcrumbs = (data:BreadcrumbData) => {
-        const {community, group, event, project, task, profile} = data
-        let breadcrumbs:LinkObject[] = []
-        if(community)
-        {
-            const communityObject = CommunityManager.getCommunityById(community)
-            if(communityObject)
-                breadcrumbs.push({uri:communityObject.uri, title:communityObject.name})
-        }
-        if(group)
-        {
-            const groupObject = GroupManager.getGroupById(group)
-            if(groupObject)
-                breadcrumbs.push({uri:groupObject.uri, title:groupObject.name})
-        }
-        if(event)
-        {
-            const eventObject = EventManager.getEventById(event)
-            if(eventObject)
-                breadcrumbs.push({uri:eventObject.uri, title:eventObject.name})
-        }
-        if(project)
-        {
-            const projectObject = ProjectManager.getProjectById(project)
-            if(projectObject)
-                breadcrumbs.push({uri:projectObject.uri, title:projectObject.name})
-        }
-        if(task)
-        {
-            const taskObject = TaskManager.getTask(task)
-            if(taskObject)
-                breadcrumbs.push({uri:taskObject.uri, title:taskObject.title})
-        }
-        if(profile)
-        {
-            const profileObject = ProfileManager.getProfileById(profile)
-            if(profileObject)
-                breadcrumbs.push({uri:profileObject.uri, title:userFullName(profileObject)})
-        }
-        breadcrumbs = breadcrumbs.filter(e => !nullOrUndefined(e))
-        const arr:JSX.Element[] = []
-        breadcrumbs.forEach((s,i) => {
-            arr.push(<Link className="primary-theme-color medium-text" key={"link_" + i} to={s.uri}>{truncate(s.title, 20)}</Link>)
-            if(i < breadcrumbs.length - 1)
-                arr.push(<i key={"sep_" + i} className="fas fa-caret-right mx-1"></i>)
-        })
-        return arr
-    }
+    
     renderTaskItem = (item:ElasticResultTask) => {
-        const breadcrumbs = this.breadcrumbs({community:item.community, project:item.project_id, task:item.parent_id    })
+        const bc = breadcrumbs({community:item.community, project:item.project_id, task:item.parent_id    }, this.navigateToLocation)
         const left = <i className={ElasticSearchType.iconClassForKey(item.object_type)}></i>
-        const footer = <div className="text-bolder">{breadcrumbs}</div>
-        const d = this.getTextForField(item, "description", 300)
+        const footer = <div className="text-bolder">{bc}</div>
+        const d = getTextForField(item, "description", 300)
         const description = <span dangerouslySetInnerHTML={{__html: d}}></span>
         const right = ElasticSearchType.nameForKey( item.object_type )
-        const t = this.getTextForField(item, "title", 150)
+        const t = getTextForField(item, "title", 150)
         const title = <span dangerouslySetInnerHTML={{__html: t}}></span>
         return <SearchResultItem className={item.object_type.toLowerCase()} header={title} description={description} footer={footer} left={left} right={right} />
     }
@@ -583,38 +618,36 @@ export class SearchComponent extends React.Component<Props, State> {
         const avatar = item.avatar || ContextNaturalKey.defaultAvatarForKey(ElasticSearchType.contextNaturalKeyForType(item.object_type))
         const left = <Avatar image={avatar} size={36} />
         const members = item.members || []
-        const breadcrumbs = this.breadcrumbs({community:item.community, event:item.parent_id})
-        const footer = <div className="text-bolder">{`${members.length} ${translate("Going")}`}{" "}{breadcrumbs}</div>
-        const d = this.getTextForField(item, "description", 300)
+        const bc = breadcrumbs({community:item.community, event:item.parent_id}, this.navigateToLocation)
+        const footer = <>
+                            <div>
+                                <i className="far fa-calendar-alt"></i>
+                                {" "}{stringToDateFormat(item.start_date)} - {stringToDateFormat(item.end_date)}
+                            </div>
+                            <div className="text-bolder">{`${members.length} ${translate("Going")}`}{" "}{bc}</div>
+                        </>
+        const d = getTextForField(item, "description", 300)
         const description = <span dangerouslySetInnerHTML={{__html: d}}></span>
         const right = ElasticSearchType.nameForKey( item.object_type )
-        const n = this.getTextForField(item, "name", 150)
+        const n = getTextForField(item, "name", 150)
         const name = <span dangerouslySetInnerHTML={{__html: n}}></span>
         return <SearchResultItem className={item.object_type.toLowerCase()} header={name} description={description} footer={footer} left={left} right={right} />
     }
     renderStatusItem = (item:ElasticResultStatus) => {
         const avatar = item.profile_avatar || ContextNaturalKey.defaultAvatarForKey(ElasticSearchType.contextNaturalKeyForType(ElasticSearchType.USER))
         const left = <Avatar image={avatar} size={36} />
-        const breadcrumbs = this.breadcrumbsFromContext(item.context_natural_key, item.context_object_id)
-        const footer = <div className="text-bolder">{breadcrumbs}{" "}<TimeComponent date={item.created_at} /> </div>
-        const text = this.getTextForField(item, "text", 300)//item.text && truncate( IntraSocialUtilities.htmlToText(item.text), 300)
+        const bc = breadcrumbsFromContext(item.context_natural_key, item.context_object_id, this.navigateToLocation)
+        const footer = <div className="text-bolder">{bc}{" "}<TimeComponent date={item.created_at} /> </div>
+        const text = getTextForField(item, "text", 300)//item.text && truncate( IntraSocialUtilities.htmlToText(item.text), 300)
         const description = <span dangerouslySetInnerHTML={{__html: text}}></span>
         const right = ElasticSearchType.nameForKey( item.object_type )
-        const un = this.getTextForField(item, "user_name", 150)
+        const un = getTextForField(item, "user_name", 150)
         const user_name = <span dangerouslySetInnerHTML={{__html: un}}></span>
         return <SearchResultItem className={item.object_type.toLowerCase()} header={user_name} description={description} footer={footer} left={left} right={right} />
     }
     renderFileItem = (item:ElasticResultFile) => {
 
-        const left = <FileListItem dropShadow={false} showImageOnly={true} file={item as any as UploadedFile} />
-        const creatorLink = this.breadcrumbs({profile:item.user_id})
-        const breadcrumbs = this.breadcrumbsFromContext(item.context_natural_key, item.context_object_id)
-        const hasBreadcrumbs = breadcrumbs.length > 0
-        const footer = <div className="text-bolder">{creatorLink}{hasBreadcrumbs ? " " + translate("in_context") + " ": ""}{breadcrumbs}{" "}<TimeComponent date={item.created_at} /> </div>
-        const right = ElasticSearchType.nameForKey( item.object_type )
-        const fn = this.getTextForField(item, "filename", 150)
-        const filename = <span dangerouslySetInnerHTML={{__html: fn}}></span>
-        return <SearchResultItem className={item.object_type.toLowerCase()} header={filename} footer={footer} left={left} right={right} />
+        return <FileResultItem file={item} onNavigate={this.navigateToLocation} />
     }
     renderResultItem = (item:GenericElasticResult) => {
         switch (item.object_type) {
@@ -689,8 +722,11 @@ export class SearchComponent extends React.Component<Props, State> {
                             }
                             else //navigate to item
                             {
-                                window.app.navigateToRoute(r.uri)
-                                this.props.onClose()
+                                if(r.uri)
+                                {
+                                    window.app.navigateToRoute(r.uri)
+                                    this.props.onClose()
+                                }
                             }
                         }}>
                         {this.renderResultItem(r)}
@@ -712,7 +748,7 @@ export class SearchComponent extends React.Component<Props, State> {
                         <CursorList items={items} />
                         {isLoading && <LoadingSpinner />}
                     </div>
-                    <div className="right">
+                    <StickyBox className="right" offsetTop={6} offsetBottom={6}>
                         <div className="filter-header">{translate("search.filter.types.title")}</div>
                         {allowedSearchTypeFilters.map(tf => {
                             const checked = this.state.searchTypeFilters.contains(tf)
@@ -727,7 +763,7 @@ export class SearchComponent extends React.Component<Props, State> {
                             </FormGroup>
                         })}
                         {this.renderSearchDateFilter()}
-                    </div>
+                    </StickyBox>
                 </div></>)
     }
     renderDebug = () => {
@@ -735,15 +771,123 @@ export class SearchComponent extends React.Component<Props, State> {
         return <div>{this.state.searchData.query}</div>
     }
     render = () => {
-        return (
-            <div className="search-component">
-                {this.renderSearchBox()}
-                {/*this.renderDebug()*/}
-                {this.renderSearchHistory()}
-                {this.renderSearchTypeFiltersList()}
-                {this.renderSearchResult()}
+        const header =  <div className="search-component">
+                        {this.renderSearchBox()}
+                        {this.renderSearchHistory()}
+                        {this.renderHashtags()}
+                        </div>
+        return (<SimpleDialog header={header} onScroll={this.onDidScroll} fade={false} centered={false} className="search-modal" visible={this.props.visible} didCancel={this.props.onClose}>
+                    <div className="search-component">
+                        {this.renderSearchTypeFiltersList()}
+                        {this.renderSearchResult()}
+                    </div>
+                </SimpleDialog>)
+    }
+}
+type FileResultItemProps = {
+    file:ElasticResultFile
+    onNavigate:(uri:string) => (event:React.SyntheticEvent) => void
+}
+type FileResultItemState = {
+    visible:boolean
+}
+export default class FileResultItem extends React.Component<FileResultItemProps, FileResultItemState> {
+    imagaRef = React.createRef<HTMLDivElement>()
+    constructor(props:FileResultItemProps) {
+        super(props);
+        this.state = {
+            visible:false
+        }
+    }
+    componentWillUnmount = () => {
+        this.imagaRef = null
+    }
+    shouldComponentUpdate = (nextProps:FileResultItemProps, nextState:FileResultItemState) => {
+        const ret =  nextProps.file != this.props.file ||
+                    nextState.visible != this.state.visible 
+        return ret
+    }
+    handleFileClick = (event:React.SyntheticEvent<any>) => {
+        event.preventDefault()
+        //event.stopPropagation()
+        const file = this.props.file
+        if(file.type != UploadedFileType.IMAGE && file.type != UploadedFileType.IMAGE360)
+        {
+            this.downloadCurrent()
+        }
+        else {
+            this.setState({visible:true})
+        }
+    }
+    downloadCurrent = () => {
+        const file = this.props.file
+        if(file.file && file.filename){
+            const url = IntraSocialUtilities.appendAuthorizationTokenToUrl(file.file)
+            var element = document.createElement("a")
+            element.setAttribute("href", url)
+            element.setAttribute("download", file.filename)
+            element.setAttribute("target", "_blank")
+            element.setAttribute("crossOrigin", "anonymous")
+            element.style.display = "none"
+            document.body.appendChild(element)
+            element.click()
+            document.body.removeChild(element)
+        }
+    }
+    onModalClose = () => 
+    {
+        this.setState({visible:false})
+    }
+    renderModal = () => 
+    {
+        if(!this.state.visible)
+            return null
+        const options:PhotoSwipe.Options = {index:0, getThumbBoundsFn:(index) => {
+            const child = this.imagaRef && this.imagaRef.current
+            if(child)
+            {
+                const rect = child.getBoundingClientRect()
+                var pageYScroll = window.pageYOffset || document.documentElement.scrollTop
+                return {x:rect.left, y:rect.top + pageYScroll, w:rect.width}
+            }
+            return null
+        }}
+        return <PhotoSwipeComponent items={[this.props.file as any as UploadedFile]} options={options} visible={this.state.visible} onClose={this.onModalClose}/>
+    }
+    renderName = () => {
+        return <div className="text-truncate">{this.props.file.filename}</div>
+    }
+    preventDefault = (e:React.SyntheticEvent) => {
+        event.preventDefault()
+        event.stopPropagation()
+    }
+    renderContent = () => {
 
-            </div>
-        );
+        const item = this.props.file
+        const hasThumbnail = !!item.thumbnail
+        const cn = classnames("img-container", item.type, item.extension)
+        const left = <div ref={this.imagaRef} className={cn}>
+                        {hasThumbnail && <SecureImage className="img-responsive sec-img" setBearer={true} setAsBackground={true} url={item.thumbnail}  /> 
+                        ||
+                        <i className="fa file-icon"></i>
+                        }
+                    </div>
+        const creatorLink = breadcrumbs({profile:item.user_id}, this.props.onNavigate)
+        const bc = breadcrumbsFromContext(item.context_natural_key, item.context_object_id, this.props.onNavigate)
+        const hasBreadcrumbs = bc.length > 0
+        const footer = <div className="text-bolder">{creatorLink}{hasBreadcrumbs ? " " + translate("in_context") + " ": ""}{bc}{" "}<TimeComponent date={item.created_at} /> </div>
+        const right = ElasticSearchType.nameForKey( item.object_type )
+        const fn = getTextForField(item, "filename", 150)
+        const filename = <span dangerouslySetInnerHTML={{__html: fn}}></span>
+        return <SearchResultItem className={item.object_type.toLowerCase()} header={filename} footer={footer} left={left} right={right} />
+    }
+    render()
+    {
+        const {file} = this.props 
+        const cl = classnames("", file.type, file.extension)
+        return (<div onClick={this.handleFileClick} className={cl}> 
+                    {this.renderContent()}
+                    {this.renderModal()}
+                </div>)
     }
 }

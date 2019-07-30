@@ -283,6 +283,7 @@ var translations = {
     "search.filter.date_end.title":"End date",
     "Date":"Date",
     "Hours":"Hours",
+    "input.text.clear":"Clear",
   },
   no: {
     "search.placeholder": "Søk ...",
@@ -569,6 +570,7 @@ var translations = {
     "search.filter.date_end.title":"Sluttdato",
     "Date":"Dato",
     "Hours":"Tid",
+    "input.text.clear":"Tøm",
   },
   en: {
     "search.placeholder": "Search ...",
@@ -862,6 +864,7 @@ var translations = {
     "search.filter.date_end.title":"End date",
     "Date":"Date",
     "Hours":"Hours",
+    "input.text.clear":"Clear",
   }
 };
 

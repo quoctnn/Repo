@@ -39,7 +39,7 @@ export const getFileUrl = (file:UploadedFile) => {
 export const getImageUrl = (file:UploadedFile, preferFullVersion:boolean) => {
 
     let img:string = null
-    if((file.type ==  UploadedFileType.IMAGE && file.extension.toLowerCase() == "gif") || file.type ==  UploadedFileType.IMAGE360)
+    if((file.type == UploadedFileType.IMAGE && file.extension.toLowerCase() == "gif") || file.type ==  UploadedFileType.IMAGE360)
         img = file.file
     if(!img)
         img = preferFullVersion ?  (file.image || file.thumbnail)  : (file.thumbnail || file.image)

@@ -11,6 +11,7 @@ import { Progress, Badge, InputGroup, Input, InputGroupAddon } from 'reactstrap'
 import { translate } from '../../localization/AutoIntlProvider';
 import { nullOrUndefined } from '../../utilities/Utilities';
 import { OverflowMenu, OverflowMenuItem } from '../../components/general/OverflowMenu';
+import { IntraSocialUtilities } from '../../utilities/IntraSocialUtilities';
 
 type InputFieldProps = {
     value:string
@@ -21,6 +22,7 @@ type InputFieldProps = {
     focusBorder?:boolean
     className?:string
     inputClassName?:string
+    children?: React.ReactNode
 }
 export class InputField extends React.Component<InputFieldProps, {}> {
     inputRef:HTMLInputElement = null
@@ -83,7 +85,7 @@ export default class FileListItem extends React.Component<Props, State> {
     }
     handleFileClick = (event:React.SyntheticEvent<any>) => {
         event.preventDefault()
-        event.stopPropagation()
+        //event.stopPropagation()
         const file = this.props.file
         if(file.custom)
         {
@@ -102,7 +104,8 @@ export default class FileListItem extends React.Component<Props, State> {
         const file = this.props.file
         if(file.file && file.filename){
             var element = document.createElement("a")
-            element.setAttribute("href", file.file)
+            const url = IntraSocialUtilities.appendAuthorizationTokenToUrl(file.file)
+            element.setAttribute("href", url)
             element.setAttribute("download", file.filename)
             element.setAttribute("target", "_blank")
             element.setAttribute("crossOrigin", "anonymous")
@@ -225,11 +228,14 @@ export default class FileListItem extends React.Component<Props, State> {
                 </div>
     }
     renderContent = () => {
-        const {file, onRemove, onRetryUpload, dropShadow} = this.props
+
+        const {file, onRemove, onRetryUpload, dropShadow, children} = this.props
+        const hasChildren = !!children
         const cn = classnames("d-flex file-content hover-card", {"drop-shadow":dropShadow})
         return <div className={cn}>
-                    {this.renderImageContent()}
-                    {this.renderDetails()}
+                    {!hasChildren && this.renderImageContent()}
+                    {!hasChildren && this.renderDetails()}
+                    {children}
                     {this.renderModal()}
                 </div>
     }
@@ -238,9 +244,9 @@ export default class FileListItem extends React.Component<Props, State> {
         const {file, className, children, onRename, onRemove, useLink, onRetryUpload, showImageOnly, dropShadow,    ...rest} = this.props
         const cl = classnames("file-list-item file-item", className, file.type, file.extension)
         if(useLink)
-            return (<Link onClick={this.handleFileClick} to={"#"} {...rest} className={cl}> 
+            return (<div onClick={this.handleFileClick} {...rest} className={cl}> 
                         {this.renderContent()}
-                    </Link>)
+                    </div>)
         return (<div {...rest} className={cl}>{this.renderContent()}</div>)
     }
 }

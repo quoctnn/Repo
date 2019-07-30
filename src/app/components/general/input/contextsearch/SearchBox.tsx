@@ -4,8 +4,9 @@ import {Editor, EditorState, ContentState, convertToRaw, CompositeDecorator, Mod
 import { SearcQueryManager, searchDecorators, searchEntities, SearchEntityType, SearchOption, InsertEntity, ContextSearchData } from "./extensions";
 import classnames from "classnames";
 import "./SearchBox.scss"
+import { translate } from '../../../../localization/AutoIntlProvider';
 
-type Props = {
+type OwnProps = {
     onChange:(es:EditorState) => void
     placeholder?:string
     data:ContextSearchData
@@ -18,13 +19,21 @@ type Props = {
     onClick?:(event:React.SyntheticEvent<any>) => void
     allowedSearchOptions:SearchOption[]
     multiline:boolean
+
 }
+type DefaultProps = {
+    useClearButtonWithText:boolean
+}
+type Props = OwnProps & DefaultProps
 type State = {
     editorState:EditorState
     text:string
 }
 export class SearchBox extends React.Component<Props, State>{
     search = React.createRef<Editor>();
+    static defaultProps:DefaultProps = {
+        useClearButtonWithText:false
+    }
     constructor(props:Props)
     {
         super(props)
@@ -105,7 +114,8 @@ export class SearchBox extends React.Component<Props, State>{
     }
     render() {
         let clearVisible = this.state.editorState.getCurrentContent().getPlainText().length > 0
-        let cl = clearVisible ? "fa fa-times-circle searchclear" : "hidden searchclear"
+        const useClearButtonWithText = this.props.useClearButtonWithText
+        let cl = classnames("searchclear", {"fa fa-times-circle":clearVisible && !useClearButtonWithText , "hidden":!clearVisible})
         const cn = classnames("search-box anim-transition", this.props.className)
         const editorClass = classnames("editor form-control", {"multiline": this.props.multiline})
         return (
@@ -121,7 +131,9 @@ export class SearchBox extends React.Component<Props, State>{
                     placeholder={this.props.placeholder}
                     ref={this.search}
                 />
-                <span className={cl} onMouseDown={this.onTouchDown} onClick={this.clearTerm}></span>
+                <span className={cl} onMouseDown={this.onTouchDown} onClick={this.clearTerm}>
+                    {this.props.useClearButtonWithText && translate("input.text.clear")}
+                </span>
             </div>
           </div>
         )

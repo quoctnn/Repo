@@ -11,6 +11,7 @@ import { Progress, Badge } from 'reactstrap';
 import { translate } from '../../localization/AutoIntlProvider';
 import { OverflowMenu, OverflowMenuItem } from '../../components/general/OverflowMenu';
 import { InputField } from './FileListItem';
+import { IntraSocialUtilities } from '../../utilities/IntraSocialUtilities';
 
 
 type OwnProps = {
@@ -68,7 +69,8 @@ export default class FileGridItem extends React.Component<Props, State> {
         const file = this.props.file
         if(file.file && file.filename){
             var element = document.createElement("a")
-            element.setAttribute("href", file.file)
+            const url = IntraSocialUtilities.appendAuthorizationTokenToUrl(file.file)
+            element.setAttribute("href", url)
             element.setAttribute("download", file.filename)
             element.setAttribute("target", "_blank")
             element.setAttribute("crossOrigin", "anonymous")

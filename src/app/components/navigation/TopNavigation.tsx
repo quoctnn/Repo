@@ -62,13 +62,8 @@ class TopNavigation extends React.Component<Props, State> {
                     <NotificationsComponent onClose={this.toggleNotificationPanel} />
                 </SimpleDialog>
     }
-    onSearchScroll = (event: React.UIEvent<any>) => {
-        this.searchComponent && this.searchComponent.current && this.searchComponent.current.onDidScroll(event)
-    }
     renderSearchPanel = () => {
-        return <SimpleDialog onScroll={this.onSearchScroll} fade={false} centered={false} className="search-modal" visible={this.state.searchPanelVisible} didCancel={this.toggleSearchPanel}>
-                    <SearchComponent ref={this.searchComponent} onClose={this.toggleSearchPanel}/>
-                </SimpleDialog>
+        return <SearchComponent onClose={this.toggleSearchPanel} visible={this.state.searchPanelVisible}/>
     }
     renderMenuLinks = () => {
 

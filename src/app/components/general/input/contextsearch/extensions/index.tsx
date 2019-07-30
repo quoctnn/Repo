@@ -247,7 +247,7 @@ export class SearcQueryManager
                 {
                     nextToken.accepted = true
                     const appendTilde = !HASHTAG_REGEX_NO_GLOBAL.test(nextTokenValue)
-                    acceptedFilters[filterName] = appendTilde ?  "*" + nextTokenValue + "*" : nextTokenValue
+                    acceptedFilters[filterName] = appendTilde ? nextTokenValue + "*" : nextTokenValue
                 }
             }
         }
@@ -285,7 +285,7 @@ export class SearcQueryManager
                 {
                     nextToken.accepted = true
                     const appendTilde = !HASHTAG_REGEX_NO_GLOBAL.test(nextTokenValue)
-                    filters[filterName] = appendTilde ?  "*" + nextTokenValue + "*" : nextTokenValue
+                    filters[filterName] = appendTilde ?  nextTokenValue + "*" : nextTokenValue
                 }
             }
         }

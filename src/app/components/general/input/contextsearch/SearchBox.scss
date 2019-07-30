@@ -16,6 +16,10 @@
     #searchclear, .searchclear {
         font-size: 18px;
         color: #ccc;
+        cursor: pointer;
+        &.hidden{
+            display: none;
+        }
     }
     .DraftEditor-root
     {

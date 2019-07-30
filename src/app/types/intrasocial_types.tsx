@@ -508,6 +508,8 @@ export type ElasticResultEvent = {
     is_parent:boolean
     parent_id:number
     slug:string
+    start_date:string
+    end_date:string
 } & GenericElasticResult & ElasticResultCreator
 export type ElasticResultFile = {
     filename:string
@@ -518,6 +520,7 @@ export type ElasticResultFile = {
     image_width:number
     image_height:number
     size:number
+    image?:string
     context_natural_key:ContextNaturalKey
     context_object_id:number
 } & GenericElasticResult & ElasticResultCreator
@@ -547,7 +550,15 @@ export enum ElasticSearchType
     STATUS = "Status",
     UPLOADED_FILE = "UploadedFile"
 }
-
+export type ElasticSearchBucket = {
+    key:string
+    doc_count:number
+}
+export type ElasticSearchBucketAggregation = {
+    buckets:ElasticSearchBucket[]
+    doc_count_error_upper_bound:number
+    sum_other_doc_count:number
+}
 export namespace ElasticSearchType {
 
     export function contextNaturalKeyForType(key: ElasticSearchType) {
