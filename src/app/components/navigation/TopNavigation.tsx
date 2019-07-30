@@ -1,7 +1,7 @@
 import * as React from "react";
 import "./TopNavigation.scss"
 import { ReduxState } from "../../redux";
-import { UserProfile } from "../../types/intrasocial_types";
+import { UserProfile, ElasticSearchType, ContextNaturalKey, SearchHistory } from '../../types/intrasocial_types';
 import { connect } from "react-redux";
 import { Link, withRouter, RouteComponentProps } from "react-router-dom";
 import { Button, Badge } from "reactstrap";
@@ -15,6 +15,7 @@ import UserMenu from "../UserMenu";
 import classnames = require("classnames");
 import CommunitySelector from "../general/community/CommunitySelector";
 import BreadcrumbNavigation from "./BreadcrumbNavigation";
+import { SearchComponent } from "./SearchComponent";
 
 type OwnProps = {
 }
@@ -27,12 +28,15 @@ type ReduxStateProps = {
 }
 type State = {
     notificationsPanelVisible:boolean
+    searchPanelVisible:boolean
 }
 class TopNavigation extends React.Component<Props, State> {
+    searchComponent = React.createRef<SearchComponent>()
     constructor(props:Props) {
         super(props)
         this.state = {
             notificationsPanelVisible:false,
+            searchPanelVisible:false,
         }
     }
     navigateToCommunity = (event:React.SyntheticEvent<any>) => {
@@ -48,9 +52,22 @@ class TopNavigation extends React.Component<Props, State> {
             return {notificationsPanelVisible:!prevState.notificationsPanelVisible}
         })
     }
+    toggleSearchPanel = (e?:React.SyntheticEvent<any>) => {
+        this.setState((prevState:State) => {
+            return {searchPanelVisible:!prevState.searchPanelVisible}
+        })
+    }
     renderNotificationsPanel = () => {
         return <SimpleDialog className="notifications-modal" header={translate("Notifications")} visible={this.state.notificationsPanelVisible} didCancel={this.toggleNotificationPanel}>
                     <NotificationsComponent onClose={this.toggleNotificationPanel} />
+                </SimpleDialog>
+    }
+    onSearchScroll = (event: React.UIEvent<any>) => {
+        this.searchComponent && this.searchComponent.current && this.searchComponent.current.onDidScroll(event)
+    }
+    renderSearchPanel = () => {
+        return <SimpleDialog onScroll={this.onSearchScroll} fade={false} centered={false} className="search-modal" visible={this.state.searchPanelVisible} didCancel={this.toggleSearchPanel}>
+                    <SearchComponent ref={this.searchComponent} onClose={this.toggleSearchPanel}/>
                 </SimpleDialog>
     }
     renderMenuLinks = () => {
@@ -93,15 +110,21 @@ class TopNavigation extends React.Component<Props, State> {
                     <BreadcrumbNavigation />
                     {this.renderMenuLinks()}
                     { !profile.is_anonymous &&
-                        <Button onClick={this.toggleNotificationPanel} color="link" className="badge-notification-container">
-                            <i className="fas fa-bell"></i>
-                            {this.props.unreadNotifications > 0 && <Badge pill={true} color="danger" className="badge-notification">{this.props.unreadNotifications}</Badge>}
-                        </Button>
+                        <>
+                            <Button onClick={this.toggleNotificationPanel} color="link" className="badge-notification-container">
+                                <i className="fas fa-bell"></i>
+                                {this.props.unreadNotifications > 0 && <Badge pill={true} color="danger" className="badge-notification">{this.props.unreadNotifications}</Badge>}
+                            </Button>
+                            <Button onClick={this.toggleSearchPanel} color="link" className="">
+                                <i className="fas fa-search"></i>
+                            </Button>
+                        </>
                     }
                     <div className="main-border-color-background mx-2" style={{ width: 1, height: "75%" }}></div>
                     <UserMenu />
                 </div>
                 {this.renderNotificationsPanel()}
+                {this.renderSearchPanel()}
             </div>
         );
     }

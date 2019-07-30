@@ -166,7 +166,7 @@ export class Grid extends React.PureComponent<Props, State> {
         if (columns) {
             tabWidth = 12 / columns.length
         }
-        const colCN = classnames("tab-item", "col-" + tabWidth)
+        const colCN = classnames("tab-item text-truncate", "col-" + tabWidth,)
         return <Tabs>
                     <TabList className={cn}>
                         {columns.map(c => {

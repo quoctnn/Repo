@@ -8,6 +8,7 @@ type DefaultProps = {
     showCloseButton:boolean
     centered:boolean
     scrollable:boolean
+    fade:boolean
 }
 type Props = {
     header?:React.ReactNode
@@ -16,6 +17,7 @@ type Props = {
     visible:boolean
     didCancel:() => void
     className?:string
+    onScroll?: (event: React.UIEvent<any>) => void
 } & DefaultProps
 type State =
 {
@@ -25,7 +27,8 @@ export default class SimpleDialog extends React.Component<Props, State> {
         zIndex:1070,
         showCloseButton:true,
         centered:true,
-        scrollable:true
+        scrollable:true,
+        fade:true,
     }
     constructor(props:Props) {
         super(props);
@@ -46,14 +49,14 @@ export default class SimpleDialog extends React.Component<Props, State> {
         const headerToggle = this.props.showCloseButton ? this.props.didCancel : undefined
         return(
             <div>
-                <Modal centered={this.props.centered} toggle={this.props.didCancel} zIndex={this.props.zIndex} isOpen={this.props.visible} className={cn}>
+                <Modal fade={this.props.fade} centered={this.props.centered} toggle={this.props.didCancel} zIndex={this.props.zIndex} isOpen={this.props.visible} className={cn}>
                     {
                         this.props.header && 
                         <ModalHeader toggle={headerToggle}>
                             {this.props.header}
                         </ModalHeader>
                     }
-                    <ModalBody className="vertical-scroll">
+                    <ModalBody className="vertical-scroll" onScroll={this.props.onScroll}>
                         {this.props.children}
                     </ModalBody>
                     {

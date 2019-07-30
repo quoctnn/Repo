@@ -6,7 +6,8 @@ import { Status, UserProfile, UploadedFile, Community, Group, Conversation, Proj
          ElasticSearchType, ObjectAttributeType, StatusObjectAttribute, EmbedCardItem, ReportTag,
          ContextNaturalKey, ReportResult, Dashboard, Timesheet, Coordinate, RecentActivity,
          UnhandledNotifications, UnreadNotificationCounts, GroupSorting, ProjectSorting, Favorite,
-         VersionInfo } from '../types/intrasocial_types';
+         VersionInfo, 
+         SearchHistory} from '../types/intrasocial_types';
 import { nullOrUndefined } from '../utilities/Utilities';
 import moment = require("moment");
 import { Settings } from "../utilities/Settings";
@@ -19,7 +20,20 @@ export type ElasticResult<T> = PaginationResult<T> & ElasticExtensionResult
 export type ApiClientFeedPageCallback<T> = (data: PaginationResult<T>, status:string, error:string|null) => void;
 export type ApiClientCallback<T> = (data: T|null, status:string, error:string|null) => void;
 export type ApiStatusCommentsCallback<T> = (data: StatusCommentsResult<T>, status:string, error:string|null) => void;
-
+export type SearchArguments = {
+    term?:string
+    types?:ElasticSearchType[]
+    use_simple_query_string?:boolean
+    include_results?:boolean
+    include_suggestions?:boolean
+    include_aggregations?:boolean
+    slim_types?:boolean
+    filters?:{[key:string]:string}
+    tags?:string[]
+    date_sort?:boolean
+    from_date?:string
+    to_date?:string
+}
 
 export enum ListOrdering {
     ALPHABETICALLY = "alphabetically",
@@ -109,6 +123,30 @@ export default class ApiClient
             callback(null, status, error)
         })
     }
+    static getSearchHistory(callback:ApiClientFeedPageCallback<SearchHistory>){
+        const url = Constants.apiRoute.getSearchHistoryUrl
+        AjaxRequest.get(url, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
+    static deleteSearchHistory(id:number, callback:ApiClientCallback<any>){
+        const url = Constants.apiRoute.removeSearchHistoryUrl(id)
+        AjaxRequest.delete(url, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
+    static createSearchHistory(term:string, callback:ApiClientFeedPageCallback<SearchHistory>){
+        const url = Constants.apiRoute.createSearchHistoryUrl
+        AjaxRequest.postJSON(url, {term}, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
     static createStatusAttribute(status:number, attribute:ObjectAttributeType, user:number, callback:ApiClientCallback<StatusObjectAttribute>){
         const endpoint = Constants.apiRoute.statusAttributes
         AjaxRequest.postJSON(endpoint, {status, attribute, user}, (data, status, request) => {
@@ -157,19 +195,9 @@ export default class ApiClient
             callback(null, status, error)
         })
     }
-    static search(  limit:number,
-                    offset:number,
-                    term :string,
-                    types:ElasticSearchType[],
-                    use_simple_query_string:boolean = true,
-                    include_results:boolean = true,
-                    include_suggestions:boolean = false,
-                    slim_types:boolean = true,
-                    filters:{[key:string]:string},
-                    tags:string[],
-                    callback:ApiClientCallback<ElasticResult<any>>){
+    static search2( limit:number, offset:number, params:SearchArguments, callback:ApiClientCallback<ElasticResult<any>>){
         let url = Constants.apiRoute.searchUrl + "?" + this.getQueryString({limit, offset})
-        AjaxRequest.postJSON(url, {term, include_results, include_suggestions, slim_types, types, use_simple_query_string, filters, tags}, (data, status, request) => {
+        AjaxRequest.postJSON(url, params, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
             callback(null, status, error)

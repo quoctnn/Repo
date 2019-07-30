@@ -7,7 +7,7 @@ import { ContextManager, ResolvedContextObjects } from "../../managers/ContextMa
 import { communityName, userFullName, truncate } from '../../utilities/Utilities';
 import { ConversationUtilities } from '../../utilities/ConversationUtilities';
 
-type LinkObject = {
+export type LinkObject = {
     uri:string
     title:string
 }

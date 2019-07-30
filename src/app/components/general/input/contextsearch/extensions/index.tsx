@@ -89,6 +89,7 @@ export class ContextSearchData{
     tags:string[]
     filters: {[key:string]:string}
     originalText: string
+    focusOffset:number = 0
     constructor(data:{filters:{[key:string]:string}, query: string, tags: string[], tokens: SearchToken[], stateTokens:SearchToken[], originalText: string}) {
         this.filters = data.filters
         this.query = data.query
@@ -198,7 +199,7 @@ export class SearcQueryManager
                 const searchableEntitiesKeys = Object.keys(searchEntities)
                 for (let index = 0; index < searchableEntitiesKeys.length; index++) {
                     const se = searchEntities[searchableEntitiesKeys[index]]
-                    if(se.regex(searchOptions).test(currentToken))
+                    if(searchOptions.length > 0 && se.regex(searchOptions).test(currentToken))
                     {
                         extra.type = se.type
                         extra.data = {name:currentToken, id:-1, key:null, title:null}
@@ -542,9 +543,9 @@ export class SearcQueryManager
         }
     }
 
-    static getActiveSearchType = (searchData:ContextSearchData, selectionOffset:number, searchOptions:SearchOption[]):ElasticSearchType => {
+    static getActiveSearchType = (searchData:ContextSearchData, selectionOffset:number, searchOptions:SearchOption[], searchClosest:boolean = false):ElasticSearchType => {
         let activeSearchTypeIndex = searchData.tokens.findIndex(t => t.start <= selectionOffset && t.end >= selectionOffset)
-        if(activeSearchTypeIndex == -1)
+        if(searchClosest && activeSearchTypeIndex == -1)
         {
             const closestTokenLeft = [...searchData.tokens].reverse().find(t => t.end <= selectionOffset)
             if(closestTokenLeft)

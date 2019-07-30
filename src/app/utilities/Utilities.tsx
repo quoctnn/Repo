@@ -169,7 +169,7 @@ export const IS_ONLY_LINK_REGEX = /^(\b(https?|ftp):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.
 export const LINEBREAK_REGEX = /\r?\n|\r/g
 export const SENTENCES_REGEX = /[^\.!\?]+[\.!\?]+|[^\.!\?]+$/g
 export const truncate = (text, maxChars) => {
-    return text.length > (maxChars - 3) ? text.substring(0, maxChars - 3) + '...' : text;
+    return text && text.length > (maxChars - 3) ? text.substring(0, maxChars - 3) + '...' : text;
 }
 export function getTextContent(prefixId: string,
     text: string,

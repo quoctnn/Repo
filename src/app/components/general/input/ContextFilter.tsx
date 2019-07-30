@@ -3,6 +3,7 @@ import AsyncSelect from 'react-select/lib/Async'
 import classnames from "classnames"
 import { ContextItem, ElasticSearchType, ContextNaturalKey } from '../../../types/intrasocial_types';
 import ApiClient from '../../../network/ApiClient';
+import { SearchArguments } from '../../../network/ApiClient';
 require("./ContextFilter.scss");
 
 export type ContextValue = ContextItem & {value:string}
@@ -50,7 +51,13 @@ export class ContextFilter extends React.PureComponent<Props & React.HTMLAttribu
     }
     searchOptions = (text:string) => {
         return new Promise((resolve) => {
-            return ApiClient.search(10, 0, "*" + text + "*", ContextFilter.searchTypes,false , true, false, true,{},[], (data,status,error) => {
+            const args:SearchArguments = {
+                term:"*" + text + "*",
+                types:ContextFilter.searchTypes,
+                include_results:true,
+                slim_types:true,
+            }
+            return ApiClient.search2(10, 0, args, (data,status,error) => {
                 const d = data && data.results || []
                 resolve(this.groupResultItems( d.map(r => convertElasticResultItem(r)).filter(r => r != null)) )
             })

@@ -5,7 +5,7 @@ import { ObjectAttributeType, ElasticSearchType } from "../../types/intrasocial_
 import { SearcQueryManager, SearchEntityType, SearchOption, InsertEntity, ContextSearchData, SearchToken } from "../../components/general/input/contextsearch/extensions";
 import { ContextSearch } from "../../components/general/input/contextsearch/ContextSearch";
 import { AutocompleteSection, AutocompleteSectionItem } from "../../components/general/input/contextsearch/Autocomplete";
-import ApiClient, { ElasticResult } from "../../network/ApiClient";
+import ApiClient, { ElasticResult, SearchArguments } from "../../network/ApiClient";
 import { nullOrUndefined } from "../../utilities/Utilities";
 
 type Props =
@@ -98,7 +98,15 @@ export default class NewsfeedMenu extends React.Component<Props, State> {
         this.setState({selectedSearchContext:data, sections, focusOffset, activeSearchType}, this.sendUpdate)
         if(searchForbidden)
             return;
-        ApiClient.search(10, 0, q, types, false, true, false, true, this.getRealFilters(data.filters), data.tags,(searchResult, status, error) => {
+        const args:SearchArguments = {
+            term:q,
+            types,
+            include_results:true,
+            slim_types:true,
+            filters:this.getRealFilters(data.filters),
+            tags:data.tags,
+        }
+        ApiClient.search2(10, 0, args,(searchResult, status, error) => {
             const sections = this.getAutocompleteSections(data, focusOffset, searchResult)
             this.setState({selectedSearchContext:data, sections, focusOffset, activeSearchType, searchResult})
         })

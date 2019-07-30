@@ -1,6 +1,6 @@
 import * as React from 'react';
 import classnames from "classnames"
-import ApiClient from '../../network/ApiClient';
+import ApiClient, { SearchArguments } from '../../network/ApiClient';
 import { ElasticSearchType, ContextNaturalKey } from '../../types/intrasocial_types';
 import { ContextValue } from '../../components/general/input/ContextFilter';
 import { AsyncSelectIW } from '../../components/general/input/AsyncSelectIW';
@@ -43,7 +43,13 @@ export class ProjectFilter extends React.PureComponent<Props & React.HTMLAttribu
     }
     searchOptions = (text:string) => {
         return new Promise((resolve) => {
-            return ApiClient.search(10, 0, "*" + text + "*", ProjectFilter.searchTypes, false , true, false, true,{}, [], (data,status,error) => {
+            const args:SearchArguments = {
+                term:"*" + text + "*",
+                types:ProjectFilter.searchTypes,
+                include_results:true,
+                slim_types:true,
+            }
+            return ApiClient.search2(10, 0, args, (data,status,error) => {
                 const d = data && data.results || []
                 resolve(d.map(r => this.convertResultItem(r)).filter(r => r != null))
             })

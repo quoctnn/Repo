@@ -2,8 +2,7 @@ import * as React from 'react';
 import Emoji from "../components/general/Emoji";
 import Constants from "../utilities/Constants";
 import { translate } from "../localization/AutoIntlProvider";
-import { userFullName, groupCover, communityCover, userCover, projectCover, eventCover, communityName } from '../utilities/Utilities';
-import { communityStore } from '../redux/communityStore';
+import { userFullName, groupCover, communityCover, userCover, projectCover, eventCover } from '../utilities/Utilities';
 import { CommunityManager } from '../managers/CommunityManager';
 
 
@@ -450,6 +449,93 @@ export namespace Permission {
         return permission == Permission.moderate || permission == Permission.admin || permission == Permission.superuser
     }
 }
+export type GenericElasticResult = {
+    object_type:ElasticSearchType
+    django_id:number
+    created_at:string
+    uri:string
+    highlights:{[key:string]:string[]}
+}
+export type ElasticResultCreator = {
+    user_id:number
+    user_name:string
+    profile_uri:string
+    profile_avatar:string
+}
+export type ElasticResultCommunity = {
+    avatar:string
+    cover:string
+    description:string
+    members:number[]
+    name:string
+    slug:string
+} & GenericElasticResult & ElasticResultCreator
+export type ElasticResultGroup = {
+    is_parent:boolean
+    parent_id:number
+    community:number 
+    slug:string
+} & GenericElasticResult & ElasticResultCommunity
+export type ElasticResultProject = {
+    avatar:string
+    cover:string
+    community:number 
+    description:string
+    has_documents:boolean
+    members:number[]
+    name:string
+    slug:string
+} & GenericElasticResult & ElasticResultCreator
+export type ElasticResultTask = {
+    community:number
+    project_id:number
+    responsible_id:number
+    responsible_name:string
+    title:string
+    description:string
+    has_documents:boolean
+    is_parent:boolean
+    parent_id:number
+    slug:string
+} & GenericElasticResult & ElasticResultCreator
+export type ElasticResultEvent = {
+    avatar:string
+    cover:string
+    community:number
+    name:string
+    description:string
+    members:number[]
+    is_parent:boolean
+    parent_id:number
+    slug:string
+} & GenericElasticResult & ElasticResultCreator
+export type ElasticResultFile = {
+    filename:string
+    file:string
+    type:UploadedFileType
+    extension:string
+    thumbnail:string
+    image_width:number
+    image_height:number
+    size:number
+    context_natural_key:ContextNaturalKey
+    context_object_id:number
+} & GenericElasticResult & ElasticResultCreator
+export type ElasticResultStatus = {
+    has_documents:boolean
+    is_root_node:boolean
+    parent_id:number
+    text:string
+    context_natural_key:ContextNaturalKey
+    context_object_id:number
+} & GenericElasticResult & ElasticResultCreator
+export type ElasticResultUser = {
+    avatar:string
+    biography:string
+    cover:string
+    slug:string
+    user_name:string
+} & GenericElasticResult
 export enum ElasticSearchType
 {
     GROUP = "Group",
@@ -474,6 +560,22 @@ export namespace ElasticSearchType {
             case ElasticSearchType.TASK: return ContextNaturalKey.TASK
             default:return null
         }
+    }
+    export function iconClassForKey(key: ElasticSearchType) {
+        switch(key){
+            case ElasticSearchType.GROUP: return "fas fa-users"
+            case ElasticSearchType.COMMUNITY: return "fas fa-globe"
+            case ElasticSearchType.USER: return "fas fa-user"
+            case ElasticSearchType.PROJECT: return "fas fa-clipboard-list"
+            case ElasticSearchType.EVENT: return "fas fa-calendar"
+            case ElasticSearchType.TASK: return "fas fa-tasks"
+            case ElasticSearchType.UPLOADED_FILE: return "fas fa-file"
+            case ElasticSearchType.STATUS: return "fas fa-rss"
+            default:return null
+        }
+    }
+    export function nameForKey(key: ElasticSearchType) {
+        return translate("elasticsearch.type.name." + key)
     }
 }
 export type SimpleObjectAttribute = {
@@ -505,6 +607,7 @@ export type ReportResult = {
     moderator: number
     tags:string[]
 }
+export type SearchHistory = { id: number, term: string}
 export enum ObjectAttributeType
 {
     important = "important",

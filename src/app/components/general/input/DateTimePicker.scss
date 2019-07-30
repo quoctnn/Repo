@@ -1,3 +1,4 @@
+@import "../../../Config";
 .date-time-picker{
     .r-calendar, .r-time{
         min-width: 250px;
@@ -18,5 +19,16 @@
             }
         }
 
+    }
+}
+.date-time-picker-input{
+    .input-group{
+        @include var(background-color, main-content-secondary-background);
+        border-radius: 0.25rem;
+        input, .input-group-append > button{
+            background: transparent;
+            border:0;
+            @include var(color, primary-text-color);
+        }
     }
 }

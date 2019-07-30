@@ -7,14 +7,23 @@ import { Popover, PopoverBody, Input, InputGroup, Button, InputGroupAddon, Butto
 import { uniqueId } from '../../../utilities/Utilities';
 import * as Slider from 'react-input-slider';
 import "./DateTimePicker.scss"
-type Props = {
+type OwnProps = {
     onChange?: (value:moment.Moment, name:string) => void,
     value?:moment.Moment,
     max?: moment.Moment,
     min?: moment.Moment,
+    format?:string
+    placeholder?:string
 }
+type DefaultProps = {
+    allowHoursPicker:boolean
+}
+type Props = OwnProps & DefaultProps
 export class DateTimePicker extends React.Component<Props, {}>{
     input = React.createRef<MomentInput>();
+    static defaultProps:DefaultProps = {
+        allowHoursPicker:true
+    }
     constructor(props:Props)
     {
         super(props)
@@ -26,7 +35,7 @@ export class DateTimePicker extends React.Component<Props, {}>{
         this.input = null;
     }
     render(){
-        const format = `YYYY-MM-DD H[${translate("date.format.hours")}] m[${translate("date.format.minutes")}]`
+        const format = this.props.format || `YYYY-MM-DD H[${translate("date.format.hours")}] m[${translate("date.format.minutes")}]`
         return (<MomentInput
                     ref={this.input}
                     format={format}
@@ -39,6 +48,9 @@ export class DateTimePicker extends React.Component<Props, {}>{
                     value={this.props.value}
                     max={this.props.max}
                     min={this.props.min}
+                    allowHoursPicker={this.props.allowHoursPicker}
+                    className="date-time-picker-input"
+                    placeholder={this.props.placeholder}
                 ></MomentInput>)
     }
 }
@@ -69,6 +81,8 @@ type MomentInputDefaultProps = {
     inputClassName: string
     daysOfWeek: string[]
     translations:object
+    allowHoursPicker:boolean
+    placeholder:string
 }
 type MomentInputState = {
     isOpen:boolean
@@ -95,7 +109,9 @@ class MomentInput extends React.Component<MomentInputProps, MomentInputState> {
         translations: {},
         format:"YYYY-MM-DD HH:mm",
         inputClassName:"",
-        daysOfWeek:['Sun','Mon','Tue','Wed','Thu','Fri','Sat']
+        daysOfWeek:['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],
+        allowHoursPicker:true,
+        placeholder:""
     }
     getValue = () => {
         return this.state.date
@@ -105,7 +121,7 @@ class MomentInput extends React.Component<MomentInputProps, MomentInputState> {
         this.state = {
             selected: (props.value || moment()).clone(),
             activeTab: props.tab,
-            date:props.value.clone(),
+            date:props.value && props.value.clone(),
             textValue: "",
             isValid: true,
             isOpen:props.isOpen
@@ -188,6 +204,11 @@ class MomentInput extends React.Component<MomentInputProps, MomentInputState> {
     inputClick = (e) => {
         if(!this.state.isOpen)
             this.toggleIsOpen()
+    }
+    inputClear = (e:React.SyntheticEvent) => {
+        if (this.props.onChange)
+            this.props.onChange(null, this.props.name)
+        this.setState({selected: moment(), date: null, textValue: "", isValid: true});
     }
     toggleIsOpen = () => {
 
@@ -318,18 +339,23 @@ class MomentInput extends React.Component<MomentInputProps, MomentInputState> {
         const { options, onSave, today, value, style, className, inputClassName, inputStyle, name, readOnly, format, icon, translations, position} = this.props;
         const {selected, activeTab, date, isOpen, textValue, isValid} = this.state;
         let inputValue = value ? value.format(format) : (date ? date.format(format): "");
+        const hasInputValue = inputValue && inputValue.length > 0
         const id = "momentinput_" + this._id
         return (
             <div style={style} className={className} ref={node => this.node = node}>
                 <InputGroup id={id} className={inputClassName} >
-                    <Input className="btn-rounded"
+                    <Input className=""
                             value={inputValue || textValue}
                             readOnly={readOnly}
                             onClick={this.inputClick}
                             onChange={this.onTextChange}
+                            placeholder={this.props.placeholder}
                             style={inputStyle}/>
                     <InputGroupAddon addonType="append">
-                        <Button className="btn-rounded" onClick={this.inputClick}><i className="far fa-calendar-alt"></i></Button>
+                        {hasInputValue && <Button className="" onClick={this.inputClear}>
+                            <i className="fa fa-times-circle"  />
+                        </Button>}
+                        <Button className="" onClick={this.inputClick}><i className="far fa-calendar-alt"></i></Button>
                     </InputGroupAddon>
                 </InputGroup>
                 {isOpen &&
@@ -340,10 +366,10 @@ class MomentInput extends React.Component<MomentInputProps, MomentInputState> {
                                     <Button className={"flex-grow-1" +((activeTab===0 || activeTab===2) ? " active" : "")}
                                         onClick={()=> {this.onActiveTab(0)}}><i className="far fa-calendar-alt"></i>&nbsp;{translate("Date")}
                                     </Button>
-                                    <Button
+                                    {this.props.allowHoursPicker && <Button
                                         className={"flex-grow-1" + (activeTab===1 ? " active" : "")}
                                         onClick={()=> {this.onActiveTab(1)}}><i className="far fa-clock"></i>&nbsp;{translate("Hours")}
-                                    </Button>
+                                    </Button>} 
                                 </ButtonGroup>
                             }
                             <div className="tabs">

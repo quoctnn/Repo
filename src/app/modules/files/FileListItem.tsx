@@ -50,6 +50,8 @@ type OwnProps = {
 }
 type DefaultProps = {
     useLink:boolean
+    showImageOnly:boolean
+    dropShadow:boolean
 }
 type State = {
     visible:boolean
@@ -59,7 +61,9 @@ type Props = OwnProps & React.HTMLAttributes<HTMLElement> & DefaultProps
 export default class FileListItem extends React.Component<Props, State> {
     imagaRef = React.createRef<HTMLDivElement>()
     static defaultProps:DefaultProps = {
-        useLink:true
+        useLink:true,
+        showImageOnly:false,
+        dropShadow:true
     }
     constructor(props:Props) {
         super(props);
@@ -168,58 +172,69 @@ export default class FileListItem extends React.Component<Props, State> {
         event.preventDefault()
         event.stopPropagation()
     }
-    renderContent = () => {
-        const {file, onRemove, onRetryUpload} = this.props
-        const fileSize = FileUtilities.humanFileSize(file.size || 0)
+    renderImageContent = () => {
+        const {file} = this.props
         const hasThumbnail = !!file.thumbnail
-        return <div className="d-flex file-content drop-shadow hover-card">
-                    <div ref={this.imagaRef}  className="img-container">
-                        {hasThumbnail && <SecureImage className="img-responsive sec-img" setBearer={!file.custom} setAsBackground={true} url={file.thumbnail}  /> 
-                        ||
-                        <i className="fa file-icon"></i>
+        return <div ref={this.imagaRef}  className="img-container">
+                {hasThumbnail && <SecureImage className="img-responsive sec-img" setBearer={!file.custom} setAsBackground={true} url={file.thumbnail}  /> 
+                ||
+                <i className="fa file-icon"></i>
+                }
+            </div>
+    }
+    renderDetails = () => {
+        const {file, onRemove, onRetryUpload, showImageOnly} = this.props
+        if(showImageOnly)
+            return null
+        const fileSize = FileUtilities.humanFileSize(file.size || 0)
+        return  <div className="d-flex flex-grow-1 flex-column content-container">
+                    <div className="d-flex">
+                        {this.renderName()}
+                        {false && 
+                            <OverflowMenu refresh={"str"} fetchItems={this.fetchMenuItems} maxVisible={0} buttonIconClass="fas fa-ellipsis-v" />
                         }
                     </div>
-                    <div className="d-flex flex-grow-1 flex-column content-container">
-                        <div className="d-flex">
-                            {this.renderName()}
-                            {false && 
-                                <OverflowMenu refresh={"str"} fetchItems={this.fetchMenuItems} maxVisible={0} buttonIconClass="fas fa-ellipsis-v" />
-                            }
+                    <div className="d-flex text-muted text-truncate align-items-center">
+                        <div className="text-truncate medium-small-text">{fileSize}</div>
+                        <div className="flex-grow-1 d-flex">
+                        {(file.uploading || file.uploadProgress > 0) && 
+                            <Progress value={file.uploadProgress} className="ml-1 mr-1 flex-grow-1" >
+                            {file.uploadProgress + "%"}
+                            </Progress>
+                        }
+                        {file.hasError && 
+                            <Badge className="ml-1 mr-1" color="danger">{translate("common.upload.error")}</Badge>
+                        }
                         </div>
-                        <div className="d-flex text-muted text-truncate align-items-center">
-                            <div className="text-truncate medium-small-text">{fileSize}</div>
-                            <div className="flex-grow-1 d-flex">
-                            {(file.uploading || file.uploadProgress > 0) && 
-                                <Progress value={file.uploadProgress} className="ml-1 mr-1 flex-grow-1" >
-                                {file.uploadProgress + "%"}
-                                </Progress>
-                            }
-                            {file.hasError && 
-                                <Badge className="ml-1 mr-1" color="danger">{translate("common.upload.error")}</Badge>
-                            }
-                            </div>
-                            {!!onRetryUpload &&
-                                <Button color="link" className="retry-button" onClick={this.onFileRetry(file)} size="xs">
-                                    <i className="fas fa-redo-alt"></i>
-                                </Button>
-                            }
-                            {!!onRemove && 
-                                <Button color="link" className="remove-button" onClick={this.onFileRemove(file)} size="xs">
-                                    <i className="fas fa-trash-alt"></i>
-                                </Button>
-                            }
-                            {file.type == UploadedFileType.IMAGE360 &&
-                                <Badge className="badge-theme ml-1 mr-1">360</Badge>
-                            }
-                            <Badge className="badge-theme ml-1 mr-1">{file.extension}</Badge>
-                        </div>
+                        {!!onRetryUpload &&
+                            <Button color="link" className="retry-button" onClick={this.onFileRetry(file)} size="xs">
+                                <i className="fas fa-redo-alt"></i>
+                            </Button>
+                        }
+                        {!!onRemove && 
+                            <Button color="link" className="remove-button" onClick={this.onFileRemove(file)} size="xs">
+                                <i className="fas fa-trash-alt"></i>
+                            </Button>
+                        }
+                        {file.type == UploadedFileType.IMAGE360 &&
+                            <Badge className="badge-theme ml-1 mr-1">360</Badge>
+                        }
+                        <Badge className="badge-theme ml-1 mr-1">{file.extension}</Badge>
                     </div>
-                {this.renderModal()}
+                </div>
+    }
+    renderContent = () => {
+        const {file, onRemove, onRetryUpload, dropShadow} = this.props
+        const cn = classnames("d-flex file-content hover-card", {"drop-shadow":dropShadow})
+        return <div className={cn}>
+                    {this.renderImageContent()}
+                    {this.renderDetails()}
+                    {this.renderModal()}
                 </div>
     }
     render()
     {
-        const {file, className, children, onRename, onRemove, useLink, onRetryUpload,  ...rest} = this.props
+        const {file, className, children, onRename, onRemove, useLink, onRetryUpload, showImageOnly, dropShadow,    ...rest} = this.props
         const cl = classnames("file-list-item file-item", className, file.type, file.extension)
         if(useLink)
             return (<Link onClick={this.handleFileClick} to={"#"} {...rest} className={cl}> 

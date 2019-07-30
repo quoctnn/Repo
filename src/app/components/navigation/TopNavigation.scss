@@ -27,3 +27,13 @@
         }
     }
 }
+.search-modal{
+    margin-left: auto;
+    max-width: 90%;
+    margin-right: auto;
+    .modal-title{
+        width:100%;
+        overflow: auto;
+        overflow-y: hidden;
+    }
+}
