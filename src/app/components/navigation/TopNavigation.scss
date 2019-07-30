@@ -14,7 +14,8 @@
         }
     }
     .logo{
-        @include var(fill, primary-theme-color);
+        fill: #428bca;
+        height: 50px;
     }
     .top-navigation-content{
         z-index: 1050;

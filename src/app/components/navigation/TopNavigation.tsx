@@ -16,6 +16,7 @@ import classnames = require("classnames");
 import CommunitySelector from "../general/community/CommunitySelector";
 import BreadcrumbNavigation from "./BreadcrumbNavigation";
 import { SearchComponent } from "./SearchComponent";
+import Logo from "../general/images/Logo";
 
 type OwnProps = {
 }
@@ -91,7 +92,7 @@ class TopNavigation extends React.Component<Props, State> {
                             </Link>
                         </>
                         ||
-                        <div>PLACEHOLDER FOR ADS - PLACEHOLDER FOR ADS - PLACEHOLDER FOR ADS</div>
+                        <Logo className="logo" progress={0} />
                     }
                 </div>
     }
