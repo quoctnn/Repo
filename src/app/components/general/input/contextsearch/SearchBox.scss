@@ -30,7 +30,7 @@
         outline: 0;
         box-shadow: none;
         width: 100%;
-        padding-right: 25px;
+        padding-right: 48px;
         background: none;
         color:#5c5a5c;
         outline: 0 !important;
@@ -110,6 +110,7 @@
             height: 20px;
             margin: auto;
             transform: translate(0, -10px);
+            margin-bottom: 3px;
         }
         .public-DraftEditor-content[contenteditable=true] {
             display: block;

@@ -192,6 +192,7 @@ export interface State {
     searchData:ContextSearchData
     searchResult:ElasticResult<GenericElasticResult>
     searchHistory:SearchHistory[]
+    lastLoggedHistory:string
     searchTypeFilters:ElasticSearchType[]
     requestId:number
     hasMore:boolean
@@ -217,6 +218,7 @@ export class SearchComponent extends React.Component<Props, State> {
             searchData:new ContextSearchData({tokens:[], query:"", tags:[], filters:{}, stateTokens:[], originalText:""}),
             searchResult:null,
             searchHistory:[],
+            lastLoggedHistory:null,
             searchTypeFilters:[],
             requestId:0,
             hasMore:false,
@@ -397,13 +399,13 @@ export class SearchComponent extends React.Component<Props, State> {
         })
     }
     logSearch = (term:string) => {
-        if(!term || term.length == 0)
+        if(!term || term.length == 0 || term == this.state.lastLoggedHistory)
             return
         ApiClient.createSearchHistory(term, (data, status, error) => {
             if(data && data.results)
             {
                 this.setState((prevState:State) => {
-                    return {searchHistory:data.results}
+                    return {searchHistory:data.results, lastLoggedHistory:term}
                 })
             }
         })
@@ -744,10 +746,11 @@ export class SearchComponent extends React.Component<Props, State> {
                                 {this.renderSortOptions()}
                             </div>
                         </div>
+                        {this.renderHashtags()}
                         <CursorList items={items} />
                         {isLoading && <LoadingSpinner />}
                     </div>
-                    <StickyBox className="right" offsetTop={6} offsetBottom={6}>
+                    <StickyBox className="right" offsetTop={0} offsetBottom={0}>
                         <div className="filter-header">{translate("search.filter.types.title")}</div>
                         {allowedSearchTypeFilters.map(tf => {
                             const checked = this.state.searchTypeFilters.contains(tf)
@@ -773,7 +776,6 @@ export class SearchComponent extends React.Component<Props, State> {
         const header =  <div className="search-component">
                         {this.renderSearchBox()}
                         {this.renderSearchHistory()}
-                        {this.renderHashtags()}
                         </div>
         return (<SimpleDialog header={header} onScroll={this.onDidScroll} fade={false} centered={false} className="search-modal" visible={this.props.visible} didCancel={this.props.onClose}>
                     <div className="search-component">
