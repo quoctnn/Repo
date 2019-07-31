@@ -17,14 +17,14 @@ export const availableEndpoints: ApiEndpoint[] = [
     {
         endpoint: 'https://intra.work',
         loginType: EndpointLoginType.API,
-        defaultCommunity: 2,
+        defaultCommunity: 132,
         websocket: 'wss://intra.work/socket/'
     }
 ]
 export const allowedUsers: string[] = [
     "godoppl@gmail.com",
     "kimandre@intrahouse.com",
-    "andre@intrahouse.com",
+    "andre",
     "leslie@intrahouse.com",
     "divya@intrahouse.com",
     "karen@intrahouse.com",
