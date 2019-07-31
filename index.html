@@ -20,14 +20,14 @@
         <!-- End Google Tag Manager -->
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta http-equiv="Content-Security-Policy"
-            content="script-src 'self' 'unsafe-eval' blob:;
+            content="script-src 'unsafe-eval' https://cdn.intra.work/ https://www.google-analytics.com/ blob:;
                      img-src * data:;
-                     style-src 'self' 'unsafe-inline' https://fonts.googleapis.com/;
-                     font-src 'self' https://fonts.gstatic.com/;
-                     default-src 'self' https://dev.intra.work/ wss://dev.intra.work/ https://cdn.embedly.com/ https://*.mapbox.com/"/>
-        <title>intraSocial</title>
-        <link rel="stylesheet" href="/app/fonts.css" type="text/css"/>
-        <link rel="stylesheet" href="/app/main.css" type="text/css"/>
+                     style-src 'unsafe-inline' https://cdn.intra.work/;
+                     font-src https://cdn.intra.work/;
+                     default-src 'self' https://intra.work/ wss://intra.work/ https://cdn.embedly.com/ https://*.mapbox.com/"/>
+        <title>beta.intra.work - 0.5.3</title>
+        <link rel="stylesheet" href="https://cdn.intra.work/0.5.3/0/app/fonts.css" type="text/css"/>
+        <link rel="stylesheet" href="https://cdn.intra.work/0.5.3/0/app/main.css" type="text/css"/>
     </head>
     <body>
         <!-- Google Tag Manager (noscript) -->
@@ -36,13 +36,7 @@
         <!-- End Google Tag Manager (noscript) -->
         <div id="app-root"></div>
 
-        <!-- Dependencies -->
-
-        <!--<script src="/app/react360/react360.bundle.js"></script>
-        <script src="/node_modules/react/umd/react.development.js"></script>
-        <script src="/node_modules/react-dom/umd/react-dom.development.js"></script>-->
-
         <!-- Main -->
-        <script src="/app/bundle.js"></script>
+        <script src="https://cdn.intra.work/0.5.3/0/app/bundle.js"></script>
     </body>
 </html>

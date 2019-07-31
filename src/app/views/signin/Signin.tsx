@@ -43,17 +43,17 @@ class Signin extends React.Component<Props, {}> {
 
         e.preventDefault()
         let endpoint = EndpointManager.currentEndpoint()
-        if(endpoint.loginType == EndpointLoginType.API)
-        {
-           ApiClient.apiLogin(this.emailInput!.value, this.passwordInput!.value, this.loginCallback)
-        }
-        else if(endpoint.loginType == EndpointLoginType.NATIVE)
-        {
-            if (allowedUsers.contains(this.emailInput)) {
-                ApiClient.nativeLogin(this.emailInput!.value, this.passwordInput!.value, this.loginCallback)
-            } else {
-                this.loginCallback(null, null, "Login not allowed");
+        if (allowedUsers.length == 0 || allowedUsers.contains(this.emailInput!.value)) {
+            if(endpoint.loginType == EndpointLoginType.API)
+            {
+                ApiClient.apiLogin(this.emailInput!.value, this.passwordInput!.value, this.loginCallback)
             }
+            else if(endpoint.loginType == EndpointLoginType.NATIVE)
+            {
+                ApiClient.nativeLogin(this.emailInput!.value, this.passwordInput!.value, this.loginCallback)
+            }
+        } else {
+            this.loginCallback(null, null, "User is not in whitelist");
         }
     }
     render = () => {
@@ -68,7 +68,7 @@ class Signin extends React.Component<Props, {}> {
                         <p className="lead">{translate("Enter your email address and password")}</p>
                         <Form>
                             <FormGroup>
-                                <Input type="text" autoComplete="username" name="email" innerRef={(input) => { this.emailInput = input }} defaultValue="leslie@intrahouse.com" placeholder={translate("Email")} />
+                                <Input type="text" autoComplete="username" name="email" innerRef={(input) => { this.emailInput = input }} placeholder={translate("Email")} />
                             </FormGroup>
                             <FormGroup>
                                 <Input autoComplete="current-password" name="password" innerRef={(input) => { this.passwordInput = input }} type="password" placeholder={translate("Password")} />
