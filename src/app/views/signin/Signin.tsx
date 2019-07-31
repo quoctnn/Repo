@@ -6,13 +6,13 @@ import { connect } from 'react-redux'
 import { AuthenticationManager } from '../../managers/AuthenticationManager'
 import { ToastManager } from '../../managers/ToastManager'
 import { ReduxState } from '../../redux'
-import { EndpointLoginType } from '../../redux/endpoint'
+import { EndpointLoginType, allowedUsers} from '../../redux/endpoint';
 import { EndpointManager } from '../../managers/EndpointManager'
 import "./Signin.scss"
 import { translate } from '../../localization/AutoIntlProvider';
 
 type OwnProps = {
-    
+
 }
 type ReduxStateProps = {
     apiEndpoint?:number,
@@ -40,7 +40,7 @@ class Signin extends React.Component<Props, {}> {
         this.props.history.push(from)
     }
     doSignin = (e) => {
-        
+
         e.preventDefault()
         let endpoint = EndpointManager.currentEndpoint()
         if(endpoint.loginType == EndpointLoginType.API)
@@ -49,8 +49,11 @@ class Signin extends React.Component<Props, {}> {
         }
         else if(endpoint.loginType == EndpointLoginType.NATIVE)
         {
-            ApiClient.nativeLogin(this.emailInput!.value, this.passwordInput!.value, this.loginCallback)
-
+            if (allowedUsers.contains(this.emailInput)) {
+                ApiClient.nativeLogin(this.emailInput!.value, this.passwordInput!.value, this.loginCallback)
+            } else {
+                this.loginCallback(null, null, "Login not allowed");
+            }
         }
     }
     render = () => {

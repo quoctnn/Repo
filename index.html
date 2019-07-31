@@ -20,11 +20,14 @@
         <!-- End Google Tag Manager -->
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta http-equiv="Content-Security-Policy"
-            content="worker-src 'self' blob:;
-                    default-src 'unsafe-eval' 'self' 'unsafe-inline' *;
-                    img-src 'self' * data: blob:;"/>
+            content="script-src 'self' 'unsafe-eval' blob:;
+                     img-src * data:;
+                     style-src 'self' 'unsafe-inline' https://fonts.googleapis.com/;
+                     font-src 'self' https://fonts.gstatic.com/;
+                     default-src 'self' https://dev.intra.work/ wss://dev.intra.work/ https://cdn.embedly.com/ https://*.mapbox.com/"/>
         <title>intraSocial</title>
         <link rel="stylesheet" href="/app/fonts.css" type="text/css"/>
+        <link rel="stylesheet" href="/app/main.css" type="text/css"/>
     </head>
     <body>
         <!-- Google Tag Manager (noscript) -->
@@ -35,11 +38,11 @@
 
         <!-- Dependencies -->
 
-         <!--<script src="/app/react360/react360.bundle.js"></script>-->
+        <!--<script src="/app/react360/react360.bundle.js"></script>
         <script src="/node_modules/react/umd/react.development.js"></script>
-        <script src="/node_modules/react-dom/umd/react-dom.development.js"></script>
+        <script src="/node_modules/react-dom/umd/react-dom.development.js"></script>-->
 
         <!-- Main -->
-        <script src="/bundle.js"></script>
+        <script src="/app/bundle.js"></script>
     </body>
 </html>
