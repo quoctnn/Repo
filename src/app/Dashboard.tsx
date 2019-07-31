@@ -128,7 +128,8 @@ class DashboardComponent extends React.Component<Props, State> {
         const profile = AuthenticationManager.getAuthenticatedUser()
         if (profile && profile.is_anonymous) {
             const endpoint = EndpointManager.currentEndpoint()
-            NavigationUtilities.navigateToCommunity(this.props.history, endpoint.defaultCommunity)
+            if (this.props.history.location.pathname == "/")
+                NavigationUtilities.navigateToCommunity(this.props.history, endpoint.defaultCommunity)
         }
     }
     renderModules = () =>

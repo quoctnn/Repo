@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { connect } from 'react-redux'
-import { Community, ContextNaturalKey } from '../../../types/intrasocial_types';
+import { Community, ContextNaturalKey, UserProfile } from '../../../types/intrasocial_types';
 import { ReduxState } from '../../../redux/index';
 import "./CommunitySelector.scss"
 import { translate } from '../../../localization/AutoIntlProvider';
@@ -15,12 +15,14 @@ import { Avatar } from '../Avatar';
 import { communityAvatar, contextAvatar } from '../../../utilities/Utilities';
 import classnames = require('classnames');
 import { Popover, PopoverBody } from 'reactstrap';
+import { AuthenticationManager } from '../../../managers/AuthenticationManager';
 
 type OwnProps = {
 }
 type ReduxStateProps = {
     mainCommunity:Community,
-    communities:number[]
+    communities:number[],
+    profile:UserProfile
 }
 type Props = ReduxStateProps & OwnProps & RouteComponentProps<any>
 type State = {
@@ -52,9 +54,14 @@ class CommunitySelector extends React.Component<Props, State> {
             if (this.props.mainCommunity == community) {
                 this.props.history.push(Routes.communityUrl(community.slug_name))
             } else {
-                ApiClient.setMainCommunity(community.id, () => {
+                if (this.props.profile.is_anonymous) {
+                    CommunityManager.setInitialCommunity(community.id);
                     this.props.history.push(Routes.communityUrl(community.slug_name))
-                })
+                } else {
+                    ApiClient.setMainCommunity(community.id, () => {
+                        this.props.history.push(Routes.communityUrl(community.slug_name))
+                    })
+                }
             }
         }
     }
@@ -152,9 +159,12 @@ class CommunitySelector extends React.Component<Props, State> {
 const mapStateToProps = (state:ReduxState, ownProps:OwnProps) => {
     const mainCommunity = CommunityManager.getCommunityById(state.activeCommunity.activeCommunity)
     const communities = state.communityStore.allIds
+    const profile = AuthenticationManager.getAuthenticatedUser()
+
     return {
         mainCommunity,
-        communities
+        communities,
+        profile
     }
 }
 export default withRouter(connect(mapStateToProps, null)(CommunitySelector))
