@@ -34,7 +34,9 @@ export interface ISettings
     allowReact360:boolean
     compatMajor:number
     compatMinor:number
-    CdnHost:string
+    CDN:boolean
+    CDNHost:string
+    CDNPath:string
 }
 export const Settings:ISettings = {
     isProduction : process.env.NODE_ENV === "production",
@@ -59,5 +61,7 @@ export const Settings:ISettings = {
     allowReact360:false,
     compatMajor:0,
     compatMinor:6,
-    CdnHost:null
+    CDN:false,
+    CDNHost:"",
+    CDNPath:"",
 }
