@@ -13,7 +13,6 @@ import { ContextManager } from "../../../managers/ContextManager";
 import ApiClient from '../../../network/ApiClient';
 import { stringToDateFormat, DateFormat, stringToDate } from '../../../utilities/Utilities';
 import * as moment from 'moment-timezone';
-import { Avatar } from "../../../components/general/Avatar";
 import CVListItem from '../CVListItem';
 
 type OwnProps = {
