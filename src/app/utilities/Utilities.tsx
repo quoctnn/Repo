@@ -150,7 +150,9 @@ export const coordinateIsValid = (coordinate: Coordinate) => {
 export enum DateFormat {
     date = "L LT",
     day = "L",
-    time = "LT"
+    time = "LT",
+    monthYear = "MMM YYYY",
+    year = "YYYY"
 }
 export const stringToDateFormat = (string: string, format?: DateFormat) => {
     return moment(string).tz(timezone).format(format || DateFormat.date)
@@ -288,7 +290,7 @@ const truncateElements = (arr: JSX.Element[], limit: number, linebreakLimit: num
             if (len + banked > limit) //too big, split string
             {
                 const sentences = str.match(SENTENCES_REGEX)
-                if (sentences.length > 0) {
+                if (sentences && sentences.length > 0) {
                     for (let si = 0; si < sentences.length; si++) {
                         const sentence = sentences[si];
                         bank(sentence, sentence.length, true)
