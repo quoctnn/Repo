@@ -741,8 +741,23 @@ export class NewsfeedComponent extends React.Component<Props, State> {
         //!tempid && !old
         else // update parent
         {
-            const composerIndex = this.findStatusComposerIndexByStatusId(comment.parent)
-            this.insertObject(comment, composerIndex)
+            let insertIndex = -1
+            insertIndex = this.findStatusComposerIndexByStatusId(comment.parent)
+            if(insertIndex == -1)
+            {
+                // find last index of object that has same parent
+                insertIndex = this.findLastCommentIndexByStatusId(comment.parent)
+                if(insertIndex > -1)
+                        insertIndex += 1
+                else
+                {
+                    // if not found, insert after parent 
+                    insertIndex = this.findIndexByStatusId(comment.parent)
+                    if(insertIndex > -1)
+                        insertIndex += 1
+                }
+            }
+            this.insertObject(comment, insertIndex)
             updateParent()
         }
         this.updateItems(updateArray, onUpdateCompleted)
