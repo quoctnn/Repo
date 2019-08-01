@@ -34,6 +34,7 @@ export interface ISettings
     allowReact360:boolean
     compatMajor:number
     compatMinor:number
+    CdnHost:string
 }
 export const Settings:ISettings = {
     isProduction : process.env.NODE_ENV === "production",
@@ -57,5 +58,6 @@ export const Settings:ISettings = {
     mapboxAccessToken:"pk.eyJ1IjoiaW50cmFob3VzZSIsImEiOiJjaXJsc3lmc3gwMDJyaGpuaHdvb2oxYnM5In0.2Um0WFRpufTR55w9_6ALDQ",
     allowReact360:false,
     compatMajor:0,
-    compatMinor:6
+    compatMinor:6,
+    CdnHost:null
 }

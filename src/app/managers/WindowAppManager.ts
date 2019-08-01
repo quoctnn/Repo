@@ -11,6 +11,7 @@ import { ThemeManager } from './ThemeManager';
 import { resetMessageQueueAction } from '../redux/messageQueue';
 import { ApplicationManager } from './ApplicationManager';
 import { CommunityManager } from './CommunityManager';
+import { Settings } from '../utilities/Settings';
 
 const url = require('url');
 const path = require("path")
@@ -32,13 +33,13 @@ export type AppWindowObject = {
 }
 export abstract class WindowAppManager
 {
-    static setup = () => 
+    static setup = () =>
     {
         if(!window.appRoot)
             window.appRoot = "/app/"
         window.app = {
             deleteCommunity:WindowAppManager.deleteCachedCommunity,
-            resetProjectStore:WindowAppManager.resetProjectStore, 
+            resetProjectStore:WindowAppManager.resetProjectStore,
             resetEventStore:WindowAppManager.resetEventStore,
             sendOutgoingOnSocket:WindowAppManager.sendOutgoingOnSocket,
             sendInboundOnSocket:WindowAppManager.sendInboundOnSocket,
@@ -85,7 +86,7 @@ export abstract class WindowAppManager
         return window.app.socket && window.app.socket.readyState == ReconnectingWebSocket.OPEN
     }
     static navigateToRoute = (route:string, modal = false) => {
-        window.routerHistory.push(route, {modal}) 
+        window.routerHistory.push(route, {modal})
     }
     static sendInboundOnSocket = (data:{type:string, data:any}) => {
         if(!data || !data.type)
@@ -99,12 +100,12 @@ export abstract class WindowAppManager
         return url.format({
             pathname: path.join(window.appRoot, file),
             protocol: location.protocol,
-            host:location.host,
+            host:Settings.CdnHost ? Settings.CdnHost : location.host,
             slashes: true,
         })
     }
     private static getStore = ():Store<ReduxState,any> =>
     {
-        return window.store 
+        return window.store
     }
 }
