@@ -61,7 +61,7 @@ export const Settings:ISettings = {
     allowReact360:false,
     compatMajor:0,
     compatMinor:6,
-    CDN:false,
-    CDNHost:"",
-    CDNPath:"",
+    CDN:true,
+    CDNHost:"cdn.intra.work",
+    CDNPath:"5.3.0/2",
 }
