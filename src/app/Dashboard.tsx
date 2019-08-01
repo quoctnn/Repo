@@ -29,6 +29,13 @@ import { AuthenticationManager } from "./managers/AuthenticationManager";
 import { NavigationUtilities } from './utilities/NavigationUtilities';
 import { withRouter, RouteComponentProps } from 'react-router-dom';
 import { EndpointManager } from './managers/EndpointManager';
+import ProfileLanguageModule from "./modules/profileModules/language/ProfileLanguageModule";
+import ProfileExperienceModule from "./modules/profileModules/experience/ProfileExperienceModule";
+import ProfileEducationModule from "./modules/profileModules/education/ProfileEducationModule";
+import ProfileDetailsModule from "./modules/profileModules/details/ProfileDetailsModule";
+import ProfileCertificationModule from "./modules/profileModules/certifications/ProfileCertificationModule";
+import ProfileAboutModule from "./modules/profileModules/about/ProfileAboutModule";
+import ProfileVolunteeringModule from "./modules/profileModules/volunteering/ProfileVolunteeringModule";
 
 type DemoProps = {
     text?:string
@@ -70,6 +77,14 @@ export namespace DashboardComponents {
         "RecentActivityModule":ActivityModule,
         "CoverModule":CoverModule,
         "ContactsModule":ContactsModule,
+        //Profile
+        "ProfileLanguageModule":ProfileLanguageModule,//
+        "ProfileExperienceModule":ProfileExperienceModule,//
+        "ProfileEducationModule":ProfileEducationModule,//
+        "ProfileDetailsModule":ProfileDetailsModule,//
+        "ProfileCertificationModule":ProfileCertificationModule,//
+        "ProfileAboutModule":ProfileAboutModule,//
+        "ProfileVolunteeringModule":ProfileVolunteeringModule
     }
     export function getComponent(type: string, props:any) {
         const comp = componentMap[type]
