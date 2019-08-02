@@ -125,7 +125,7 @@ class DevTool extends React.PureComponent<Props, State> {
     hideInfoBox = () => {
         this.setState({info:undefined, infoTarget:undefined})
     }
-    renderInfoBox = () => 
+    renderInfoBox = () =>
     {
         const data = this.state.info
         const target = this.state.infoTarget
@@ -172,7 +172,7 @@ class DevTool extends React.PureComponent<Props, State> {
         </div>
         );
     }
-    
+
     renderSendOnWebSocket() {
         return (
         <>
@@ -207,9 +207,9 @@ class DevTool extends React.PureComponent<Props, State> {
     }
     renderSendInboundOnWebSocket = () => {
         return (
-            <> 
+            <>
                 <div className="input-group">
-                    <input 
+                    <input
                         value={this.state.websocketInboundData}
                         onChange={e => {
                             this.setState({ websocketInboundData: e.target.value });
@@ -340,41 +340,6 @@ class DevTool extends React.PureComponent<Props, State> {
                     </div>
                 </div>
                 <div className="form-group row">
-                    <label htmlFor="api" className="col-sm-4 col-form-label">
-                    {translate("Api Endpoint")}
-                    </label>
-                    <div className="col-sm-8" id="api">
-                    {this.renderEndpointSelector()}
-                    </div>
-                </div>
-                <div className="form-group row">
-                    <label
-                    htmlFor="accessToken"
-                    className="col-sm-4 col-form-label"
-                    >
-                    {translate("Access Token")}
-                    </label>
-                    <div className="col-sm-8" id="accessToken">
-                    {this.renderAccessTokenInput()}
-                    </div>
-                </div>
-                <div className="form-group row">
-                    <label htmlFor="sendSocket" className="col-sm-4 col-form-label">
-                    {translate("Send WebSocket")}
-                    </label>
-                    <div className="col-sm-8" id="sendSocket">
-                    {this.renderSendOnWebSocket()}
-                    </div>
-                </div>
-                <div className="form-group row">
-                    <label htmlFor="sendInboundSocket" className="col-sm-4 col-form-label">
-                    {translate("Send Inbound WebSocket")}
-                    </label>
-                    <div className="col-sm-8" id="sendInboundSocket">
-                    {this.renderSendInboundOnWebSocket()}
-                    </div>
-                </div>
-                <div className="form-group row">
                     <label htmlFor="clearStore" className="col-sm-4 col-form-label">
                     {translate("common.reset.soft")}
                     </label>
@@ -421,7 +386,7 @@ const mapDispatchToProps = dispatch => {
             dispatch(setLanguageAction(index));
         },
         setApiEndpoint: (index:number) => {
-            
+
             AuthenticationManager.signOut()
             dispatch(setEndpointAction(index));
         },
