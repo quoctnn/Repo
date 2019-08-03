@@ -1,8 +1,8 @@
-const { app, Menu, ipcMain, BrowserWindow } = require('electron')
-const i18n = new(require('./translations/i18n'))
+const { app, Menu, ipcMain, BrowserWindow } = require('electron');
+const i18n = new(require('./translations/i18n'));
 const path = require('path');
 const url = require('url');
-const name = app.getName()
+const name = app.getName();
 const themeMenu = {
     label:'Theme',
     id:'theme.menu',
@@ -251,8 +251,8 @@ if (process.platform === 'darwin') {
   )
 }
 
-const menu = Menu.buildFromTemplate(template)
-Menu.setApplicationMenu(menu)
+const menu = Menu.buildFromTemplate(template);
+Menu.setApplicationMenu(menu);
 
 ipcMain.on('themeUpdated', (event, msg) => {
     const themeMenu = menu.getMenuItemById("theme.menu")

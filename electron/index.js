@@ -2,6 +2,8 @@ const {app, BrowserWindow, ipcMain, shell} = require('electron');
 const path = require('path');
 const url = require('url');
 
+if (require('electron-squirrel-startup')) app.quit();
+
 let win;
 let modal;
 function createWindow() {
@@ -15,7 +17,6 @@ function createWindow() {
             contextIsolation: false,
             preload: path.join(__dirname, './preload.js'),
             nativeWindowOpen:true,
-
         }
     })
 
