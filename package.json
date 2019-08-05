@@ -79,6 +79,7 @@
     "react-dom": "^16.8.6",
     "react-dropzone": "^10.1.5",
     "react-dropzone-component": "^3.2.0",
+    "react-facebook-login": "^4.1.1",
     "react-html5video": "^2.5.1",
     "react-id-swiper": "^1.6.8",
     "react-mapbox-gl": "^4.2.1",

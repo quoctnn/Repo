@@ -37,6 +37,7 @@ export interface ISettings
     CDN:boolean
     CDNHost:string
     CDNPath:string
+    FBAppId:string
 }
 export const Settings:ISettings = {
     isProduction : process.env.NODE_ENV === "production",
@@ -64,4 +65,5 @@ export const Settings:ISettings = {
     CDN:false,
     CDNHost:"",
     CDNPath:"",
+    FBAppId:"1011246482308121"
 }
