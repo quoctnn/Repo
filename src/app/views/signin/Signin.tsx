@@ -1,7 +1,7 @@
 import * as React from 'react'
-import { FacebookLogin } from 'react-facebook-login';
-import { GoogleLogin } from 'react-google-login';
-import { LinkedIn } from 'react-linkedin-login';
+import FacebookLogin from 'react-facebook-login';
+import GoogleLogin from 'react-google-login';
+import LinkedIn from 'linkedin-login-for-react';
 import ApiClient from '../../network/ApiClient'
 import { Button, Input , Form , FormGroup} from 'reactstrap'
 import { withRouter, RouteComponentProps} from 'react-router-dom'
@@ -97,18 +97,19 @@ class Signin extends React.Component<Props, {}> {
                                 responseType="token,granted_scopes"
                                 scope="email"
                                 callback={this.doFacebookSignin}
-                            />
+                            /><br></br>
                             <GoogleLogin
                                 clientId={Settings.GoogleClientID}
                                 buttonText="Sign in with Google"
                                 onSuccess={this.doGoogleSignin}
                                 onFailure={this.doGoogleSignin}
                                 cookiePolicy={'single_host_origin'}
-                            />
+                            /><br></br>
                             <LinkedIn
                                 clientId={Settings.LinkedInClientID}
                                 callback={this.doLinkedInSignin}
-                                text='Sign in with LinkedIn' /></>
+                                text='Sign in with LinkedIn' />
+                        </>
                         }
                     </div>
                 </div>
