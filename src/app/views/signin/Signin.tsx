@@ -1,4 +1,5 @@
 import * as React from 'react'
+import FacebookLogin from 'react-facebook-login';
 import ApiClient from '../../network/ApiClient'
 import { Button, Input , Form , FormGroup} from 'reactstrap'
 import { withRouter, RouteComponentProps} from 'react-router-dom'
@@ -10,6 +11,7 @@ import { EndpointLoginType, allowedUsers} from '../../redux/endpoint';
 import { EndpointManager } from '../../managers/EndpointManager'
 import "./Signin.scss"
 import { translate } from '../../localization/AutoIntlProvider';
+import { Settings } from '../../utilities/Settings';
 
 type OwnProps = {
 
@@ -56,6 +58,11 @@ class Signin extends React.Component<Props, {}> {
             this.loginCallback(null, null, "User is not in whitelist");
         }
     }
+    doFacebookSignin = (response) => {
+        console.log(">>>>>>>>>>>>>FB RESPONSE:", response)
+        //var facebookAuthURL = `https://www.facebook.com/v3.2/dialog/oauth?client_id=1011246482308121&redirect_uri=https://sso.oneuserprofile.com/auth/realms/intraWork/broker/facebook/endpoint&response_type=token,granted_scopes&scope=email&display=popup`;
+
+    }
     render = () => {
         let endpoint = EndpointManager.currentEndpoint().endpoint
         endpoint = endpoint.replace(/(^\w+:|)\/\//, '');
@@ -77,6 +84,13 @@ class Signin extends React.Component<Props, {}> {
                                 <Button type="submit" color="info" onClick={this.doSignin}>{translate("Sign in")}</Button>
                             </FormGroup>
                         </Form>
+                        <FacebookLogin
+                            appId={Settings.FBAppId}
+                            autoLoad={false}
+                            responseType="token,granted_scopes"
+                            scope="email"
+                            callback={this.doFacebookSignin}
+                        />
                     </div>
                 </div>
             </div>
