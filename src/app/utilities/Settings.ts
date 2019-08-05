@@ -38,6 +38,8 @@ export interface ISettings
     CDNHost:string
     CDNPath:string
     FBAppId:string
+    GoogleClientID:string
+    LinkedInClientID:string
 }
 export const Settings:ISettings = {
     isProduction : process.env.NODE_ENV === "production",
@@ -64,6 +66,8 @@ export const Settings:ISettings = {
     compatMinor:6,
     CDN:true,
     CDNHost:"cdn.intra.work",
-    CDNPath:"5.3.0/2",
-    FBAppId:"1011246482308121"
+    CDNPath:"0.5.3/9",
+    FBAppId:"1011246482308121",
+    GoogleClientID:"506961766547-9ocgkcnjrkg72v26licv1n6s2a6u2lh7.apps.googleusercontent.com",
+    LinkedInClientID:"78xd4ygq4gvmh8"
 }

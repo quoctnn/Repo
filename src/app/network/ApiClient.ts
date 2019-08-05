@@ -498,7 +498,7 @@ export default class ApiClient
             callback(null, status, error)
         })
     }
-    static apiLogin(email:string, password:string,callback:ApiClientCallback<{token:string|null}>)
+    static apiLogin(email:string, password:string, callback:ApiClientCallback<{token:string|null}>)
     {
         AjaxRequest.post(Constants.apiRoute.login,`username=${email}&password=${password}`, (data, status, request) => {
             callback(data, status, null)
@@ -506,7 +506,7 @@ export default class ApiClient
             callback(null, status, error)
         })
     }
-    static apiFacebookLogin(accessToken:string, provider:string,callback:ApiClientCallback<{token:string|null}>)
+    static apiSocialLogin(accessToken:string, provider:string, callback:ApiClientCallback<{token:string|null}>)
     {
         AjaxRequest.post(Constants.apiRoute.socialLogin,`access_token=${accessToken}&provider=${provider}`, (data, status, request) => {
             callback(data, status, null)

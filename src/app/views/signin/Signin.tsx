@@ -1,5 +1,7 @@
 import * as React from 'react'
 import FacebookLogin from 'react-facebook-login';
+import GoogleLogin from 'react-google-login';
+import LinkedIn from 'linkedin-login-for-react';
 import ApiClient from '../../network/ApiClient'
 import { Button, Input , Form , FormGroup} from 'reactstrap'
 import { withRouter, RouteComponentProps} from 'react-router-dom'
@@ -59,7 +61,18 @@ class Signin extends React.Component<Props, {}> {
         }
     }
     doFacebookSignin = (response) => {
-        ApiClient.apiFacebookLogin(response.accessToken, "facebook", this.loginCallback)
+        ApiClient.apiSocialLogin(response.accessToken, "facebook", this.loginCallback)
+    }
+    doGoogleSignin = (response) => {
+        console.log(response)
+        const token = response.hg.id_token //FIXME
+        ApiClient.apiSocialLogin(token, "google", this.loginCallback)
+    }
+    doLinkedInSignin = (error, code, redirectUri) => {
+        if (error) {
+            console.error(error)
+        }
+        ApiClient.apiSocialLogin(code, "linkedin", this.loginCallback)
     }
     render = () => {
         const endpoint = EndpointManager.currentEndpoint()
@@ -82,14 +95,26 @@ class Signin extends React.Component<Props, {}> {
                                 <Button type="submit" color="info" onClick={this.doSignin}>{translate("Sign in")}</Button>
                             </FormGroup>
                         </Form>
-                        { endpoint.loginType == EndpointLoginType.API &&
+                        { endpoint.loginType == EndpointLoginType.API && <>
                             <FacebookLogin
                                 appId={Settings.FBAppId}
                                 autoLoad={false}
                                 responseType="token,granted_scopes"
                                 scope="email"
                                 callback={this.doFacebookSignin}
-                            />
+                            /><br></br>
+                            <GoogleLogin
+                                clientId={Settings.GoogleClientID}
+                                buttonText="Sign in with Google"
+                                onSuccess={this.doGoogleSignin}
+                                onFailure={this.doGoogleSignin}
+                                cookiePolicy={'single_host_origin'}
+                            /><br></br>
+                            <LinkedIn
+                                clientId={Settings.LinkedInClientID}
+                                callback={this.doLinkedInSignin}
+                                text='Sign in with LinkedIn' />
+                        </>
                         }
                     </div>
                 </div>
