@@ -52,23 +52,20 @@ class Signin extends React.Component<Props, {}> {
         else if(endpoint.loginType == EndpointLoginType.NATIVE)
         {
             ApiClient.nativeLogin(this.emailInput!.value, this.passwordInput!.value, this.loginCallback)
-
         }
     }
     doFacebookSignin = (response) => {
-        console.log(">>>>>>>>>>>>>FB RESPONSE:", response)
-        //var facebookAuthURL = `https://www.facebook.com/v3.2/dialog/oauth?client_id=1011246482308121&redirect_uri=https://sso.oneuserprofile.com/auth/realms/intraWork/broker/facebook/endpoint&response_type=token,granted_scopes&scope=email&display=popup`;
-
+        ApiClient.apiFacebookLogin(response.accessToken, "facebook", this.loginCallback)
     }
     render = () => {
-        let endpoint = EndpointManager.currentEndpoint().endpoint
-        endpoint = endpoint.replace(/(^\w+:|)\/\//, '');
-        endpoint = endpoint.replace(/(:\d+$)/, '');
+        const endpoint = EndpointManager.currentEndpoint()
+        let endpointName = endpoint.endpoint.replace(/(^\w+:|)\/\//, '');
+        endpointName = endpointName.replace(/(:\d+$)/, '');
         return(
             <div id="sign-in">
                 <div className="jumbotron">
                     <div className="container">
-                        <h2 >{translate("Sign in to") + " " + endpoint}</h2>
+                        <h2 >{translate("Sign in to") + " " + endpointName}</h2>
                         <p className="lead">{translate("Enter your email address and password")}</p>
                         <Form>
                             <FormGroup>
@@ -81,13 +78,15 @@ class Signin extends React.Component<Props, {}> {
                                 <Button type="submit" color="info" onClick={this.doSignin}>{translate("Sign in")}</Button>
                             </FormGroup>
                         </Form>
-                        <FacebookLogin
-                            appId={Settings.FBAppId}
-                            autoLoad={false}
-                            responseType="token,granted_scopes"
-                            scope="email"
-                            callback={this.doFacebookSignin}
-                        />
+                        { endpoint.loginType == EndpointLoginType.API &&
+                            <FacebookLogin
+                                appId={Settings.FBAppId}
+                                autoLoad={false}
+                                responseType="token,granted_scopes"
+                                scope="email"
+                                callback={this.doFacebookSignin}
+                            />
+                        }
                     </div>
                 </div>
             </div>
