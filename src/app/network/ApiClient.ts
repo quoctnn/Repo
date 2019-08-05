@@ -6,7 +6,7 @@ import { Status, UserProfile, UploadedFile, Community, Group, Conversation, Proj
          ElasticSearchType, ObjectAttributeType, StatusObjectAttribute, EmbedCardItem, ReportTag,
          ContextNaturalKey, ReportResult, Dashboard, Timesheet, Coordinate, RecentActivity,
          UnhandledNotifications, UnreadNotificationCounts, GroupSorting, ProjectSorting, Favorite,
-         VersionInfo, 
+         VersionInfo,
          SearchHistory} from '../types/intrasocial_types';
 import { nullOrUndefined } from '../utilities/Utilities';
 import moment = require("moment");
@@ -501,6 +501,14 @@ export default class ApiClient
     static apiLogin(email:string, password:string,callback:ApiClientCallback<{token:string|null}>)
     {
         AjaxRequest.post(Constants.apiRoute.login,`username=${email}&password=${password}`, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
+    static apiFacebookLogin(accessToken:string, provider:string,callback:ApiClientCallback<{token:string|null}>)
+    {
+        AjaxRequest.post(Constants.apiRoute.socialLogin,`access_token=${accessToken}&provider=${provider}`, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
             callback(null, status, error)
