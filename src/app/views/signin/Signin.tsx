@@ -105,10 +105,11 @@ class Signin extends React.Component<Props, {}> {
                                 onFailure={this.doGoogleSignin}
                                 cookiePolicy={'single_host_origin'}
                             /><br></br>
-                            <LinkedIn
+                            {/* Linkedin provider on login API is broken...
+                                <LinkedIn
                                 clientId={Settings.LinkedInClientID}
                                 callback={this.doLinkedInSignin}
-                                text='Sign in with LinkedIn' />
+                                text='Sign in with LinkedIn' /> */}
                         </>
                         }
                     </div>
