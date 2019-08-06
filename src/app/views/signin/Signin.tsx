@@ -61,18 +61,17 @@ class Signin extends React.Component<Props, {}> {
         }
     }
     doFacebookSignin = (response) => {
-        ApiClient.apiSocialLogin(response.accessToken, "facebook", this.loginCallback)
+        ApiClient.apiSocialLogin("facebook", response.accessToken, null, null, this.loginCallback)
     }
     doGoogleSignin = (response) => {
-        console.log(response)
-        const token = response.hg.id_token //FIXME
-        ApiClient.apiSocialLogin(token, "google", this.loginCallback)
+        ApiClient.apiSocialLogin("google", response.accessToken, null, response.tokenId, this.loginCallback)
     }
     doLinkedInSignin = (error, code, redirectUri) => {
         if (error) {
             console.error(error)
         }
-        ApiClient.apiSocialLogin(code, "linkedin", this.loginCallback)
+        console.log(code)
+        ApiClient.apiSocialLogin("linkedin", null, code, null, this.loginCallback)
     }
     render = () => {
         const endpoint = EndpointManager.currentEndpoint()

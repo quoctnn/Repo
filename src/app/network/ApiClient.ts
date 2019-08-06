@@ -506,9 +506,13 @@ export default class ApiClient
             callback(null, status, error)
         })
     }
-    static apiSocialLogin(accessToken:string, provider:string, callback:ApiClientCallback<{token:string|null}>)
+    static apiSocialLogin(provider:string, accessToken:string|null, code:string|null, id_token:string|null, callback:ApiClientCallback<{token:string|null}>)
     {
-        AjaxRequest.post(Constants.apiRoute.socialLogin,`access_token=${accessToken}&provider=${provider}`, (data, status, request) => {
+        let urlparams = `provider=${provider}`
+        if (accessToken) urlparams += `&access_token=${accessToken}`
+        if (code) urlparams += `&code=${code}`
+        if (id_token) urlparams += `&id_token=${id_token}`
+        AjaxRequest.post(Constants.apiRoute.socialLogin, urlparams, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
             callback(null, status, error)
