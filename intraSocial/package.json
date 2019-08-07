@@ -1,7 +1,7 @@
 {
   "name": "intrasocial",
   "productName": "intraSocial",
-  "version": "0.5.3",
+  "version": "0.5.4",
   "description": "intraSocial ALPHA - For testing purposes only",
   "main": "app/index.js",
   "scripts": {
@@ -15,36 +15,7 @@
   "author": "Frank G",
   "license": "Private",
   "config": {
-    "forge": {
-      "make_targets": {
-        "win32": [
-          "squirrel"
-        ],
-        "darwin": [
-          "zip"
-        ],
-        "linux": [
-          "deb",
-          "rpm"
-        ]
-      },
-      "electronPackagerConfig": {
-        "packageManager": "npm"
-      },
-      "electronWinstallerConfig": {
-        "name": "intrasocial"
-      },
-      "electronInstallerDebian": {},
-      "electronInstallerRedhat": {},
-      "github_repository": {
-        "owner": "",
-        "name": ""
-      },
-      "windowsStoreConfig": {
-        "packageName": "",
-        "name": "intrasocial"
-      }
-    }
+    "forge": "./forge.config.js"
   },
   "dependencies": {
     "electron-compile": "^6.4.4",
