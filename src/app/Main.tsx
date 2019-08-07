@@ -17,6 +17,7 @@ import ProjectPage from "./components/pages/ProjectPage";
 import TaskPage from "./components/pages/TaskPage";
 import GroupPage from "./components/pages/GroupPage";
 import ProfilePage from "./components/pages/ProfilePage";
+import StatusPage from "./components/pages/StatusPage";
 import { PrivateRoute } from "./components/router/PrivateRoute";
 import { isAdmin } from "./utilities/Utilities";
 import EventPage from "./components/pages/EventPage";
@@ -185,10 +186,11 @@ class Main extends React.Component<Props, State> {
                                     }
                                     <Redirect from={Routes.ELECTRON} to={Routes.ROOT} />
                                     <Route path={Routes.DEVELOPER_TOOL.path} component={DevToolPage} />
+                                    <Route path={Routes.statusUrl(":statusid")} component={StatusPage} />
                                     <Route path={Routes.taskUrl(":communityname", ":projectname", ":taskid")} component={PathLoadedTaskPage} />
                                     <Route path={Routes.eventUrl(":communityname", ":eventname")} component={PathLoadedEventPage} exact={true} />
                                     <Route path={Routes.projectUrl(":communityname", ":projectname")} component={PathLoadedProjectPage} exact={true} />
-                                    <Route path={Routes.groupUrl(":communityname", ":groupname")} component={PathLoadedGroupPage} exact={true} />
+                                    <Route path={Routes.groupUrl(":communityname", ":groupname")} component={PathLoadedGroupPage} exact={true}  />
                                     <PrivateRoute path={Routes.profileUrl(":profilename")} component={PathLoadedProfilePage} />
                                     <Route path={Routes.communityUrl(":communityname")} component={PathLoadedCommunityPage} exact={true} />
                                     <Route path={Routes.newsfeedUrl(":contextNaturalKey?", ":contextObjectId?")} component={NewsfeedPage} />

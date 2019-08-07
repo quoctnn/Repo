@@ -23,7 +23,12 @@ export abstract class AuthenticationManager
         console.log("AuthenticationManager setup")
         NotificationCenter.addObserver('eventstream_' + EventStreamMessageType.CLIENT_STATUS_CHANGE, AuthenticationManager.processIncomingUserUpdate)
         NotificationCenter.addObserver('eventstream_' + EventStreamMessageType.COMMUNITY_MAIN, AuthenticationManager.processSwitchedMainCommunity)
-        NotificationCenter.addObserver('eventstream_' + EventStreamMessageType.ACTIVITY_NEW, AuthenticationManager.newActivityReceived)
+        NotificationCenter.addObserver('eventstream_' + EventStreamMessageType.ACTIVITY_NEW, AuthenticationManager.newActivityReceived)    
+        NotificationCenter.addObserver('eventstream_' + EventStreamMessageType.CLIENT_UPDATE, AuthenticationManager.processClientUpdate)
+    }
+    private static processClientUpdate(...args:any[]) {
+        let profile = args[0]
+        AuthenticationManager.setUpdatedProfileStatus(profile)
     }
 
     static newActivityReceived = (...args:any[]) => {
@@ -122,7 +127,7 @@ export abstract class AuthenticationManager
         if (profile && profile.user_status == UserStatus.away){
             WindowAppManager.sendOutgoingOnSocket(
                 JSON.stringify({
-                type: EventStreamMessageType.USER_LAST_SEEN,
+                type: EventStreamMessageType.CLIENT_LAST_SEEN,
                 data: { seconds: AuthenticationManager.lastUserActivity }
                 })
             )
@@ -144,7 +149,7 @@ export abstract class AuthenticationManager
                     AuthenticationManager.lastUserActivity += AuthenticationManager.keepAliveFrequency;
                     WindowAppManager.sendOutgoingOnSocket(
                         JSON.stringify({
-                        type: EventStreamMessageType.USER_LAST_SEEN,
+                        type: EventStreamMessageType.CLIENT_LAST_SEEN,
                         data: { seconds: AuthenticationManager.lastUserActivity }
                         })
                     );

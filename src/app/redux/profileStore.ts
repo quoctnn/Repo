@@ -7,13 +7,15 @@ export enum ProfileStoreActionTypes {
 export interface AddProfilesAction{
     type:string
     profiles:UserProfile[]
+    force?:boolean
 }
 export interface ResetProfilesAction{
     type:string
 }
-export const addProfilesAction = (profiles: UserProfile[]):AddProfilesAction => ({
+export const addProfilesAction = (profiles: UserProfile[], force?:boolean):AddProfilesAction => ({
     type: ProfileStoreActionTypes.AddProfiles,
-    profiles
+    profiles,
+    force
 })
 export const resetProfilesAction = ():ResetProfilesAction => ({
     type: ProfileStoreActionTypes.Reset,
@@ -32,7 +34,7 @@ const addProfiles = (state, action:AddProfilesAction) => {
     profiles.forEach(p => {
         let id = p.id
         let old = state[id]
-        if(!old || !old.last_seen || !p.last_seen || new Date(old.last_seen) < new Date(p.last_seen)) // update
+        if(action.force || !old || !old.last_seen || !p.last_seen || new Date(old.last_seen) < new Date(p.last_seen)) // update
         {
             newState[p.id] = p
         }

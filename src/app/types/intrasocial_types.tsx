@@ -4,7 +4,115 @@ import Constants from "../utilities/Constants";
 import { translate } from "../localization/AutoIntlProvider";
 import { userFullName, groupCover, communityCover, userCover, projectCover, eventCover } from '../utilities/Utilities';
 import { CommunityManager } from '../managers/CommunityManager';
+export enum CrashLogLevel{
+    info = "info",
+    debug = "debug",
+    warning = "warning",
+    error = "error",
+}
+export enum ObjectHiddenReason{
+    blocked = "blocked",
+    deleted = "deleted",
+    review = "review",
+    unknown = "unknown",
+}
+export enum LanguageProficiency{
+    ELEMENTARY = "ELEMENTARY",
+    LIMITED_WORKING = "LIMITED_WORKING",
+    PROFESSIONAL_WORKING = "PROFESSIONAL_WORKING",
+    FULL_PROFESSIONAL = "FULL_PROFESSIONAL",
+    NATIVE_OR_BILINGUAL = "NATIVE_OR_BILINGUAL",
+}
+export enum VolunteeringCause{
+    animalRights = "animalRights",
+    artsAndCulture = "artsAndCulture",
+    children = "children",
+    civilRights = "civilRights",
+    economicEmpowerment = "economicEmpowerment",
+    education = "education",
+    environment = "environment",
+    health = "health",
+    humanRights = "humanRights",
+    humanitarianRelief = "humanitarianRelief",
+    politics = "politics",
+    povertyAlleviation = "povertyAlleviation",
+    scienceAndTechnology = "scienceAndTechnology",
+    socialServices = "socialServices",
+}
+export type ProfileLanguage = {
+    name:string 
+    hidden:boolean 
+    hidden_reason:ObjectHiddenReason
+    linkedin_id?:string
+    proficiency:LanguageProficiency
 
+} & IdentifiableObject
+export type ProfileCertification = {
+    name:string 
+    hidden:boolean 
+    hidden_reason:ObjectHiddenReason
+    linkedin_id?:string
+    start_date?:string
+    end_date?:string
+    authority?:string
+    license_number?:string
+    url?:string
+    company?:ProfileCompany
+
+} & IdentifiableObject
+export type ProfileEducation = {
+    name:string 
+    hidden:boolean 
+    hidden_reason:ObjectHiddenReason
+    linkedin_id?:string
+    start_date?:string
+    end_date?:string
+    activities?:string
+    fields_of_study?:string
+    grade?:string
+    notes?:string
+    program?:string
+    rich_media_associations?:string
+    school?:ProfileCompany
+
+} & IdentifiableObject
+export type ProfilePosition = {
+    name:string 
+    hidden:boolean 
+    hidden_reason:ObjectHiddenReason
+    linkedin_id?:string
+
+    title?:string
+    description?:string
+    location_name?:string
+    start_date?:string
+    end_date?:string
+    rich_media_associations?:string
+    company?:ProfileCompany
+
+} & IdentifiableObject
+export type ProfileVolunteeringExperience = {
+    hidden:boolean 
+    hidden_reason:ObjectHiddenReason
+    linkedin_id?:string
+    role:string
+    cause:VolunteeringCause
+    description?:string
+    start_date?:string
+    end_date?:string
+    company?:ProfileCompany
+
+} & IdentifiableObject
+
+export type ProfileCompany = {
+    name:string 
+    hidden:boolean 
+    hidden_reason:ObjectHiddenReason
+    linkedin_id?:string
+    description?:string
+    url?:string
+    avatar_original?:string
+} & IdentifiableObject
 
 
 export enum ContextNaturalKey
@@ -400,6 +508,8 @@ export type Status = {
     temporary:boolean
     visibility?:number[]
     level?:number
+    position:number
+    highlightMode?:boolean
 } & TempStatus & Permissible
 
 export interface FileUpload
@@ -803,7 +913,10 @@ export type SimpleUserProfile = {
     first_name: string,
     last_name: string,
 } & IdentifiableObject
-
+export type ProfileConnections = {
+    count:number
+    ids:number[]
+}
 export type UserProfile = {
     email:string|null
     locale:string|null
@@ -821,6 +934,7 @@ export type UserProfile = {
     is_superuser:boolean
     connections?:number[]
     active_community?:number
+    mutual_contacts:ProfileConnections
 } & SimpleUserProfile & AvatarAndCover & Linkable & Permissible
 
 export type Group = {
@@ -1127,7 +1241,7 @@ export type Dashboard = {
     created_at:string
     updated_at:string
     hidden:boolean
-    hidden_reason:string
+    hidden_reason:ObjectHiddenReason
     position:number
     title:string
     slug:string

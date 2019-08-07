@@ -60,8 +60,8 @@ export const Settings:ISettings = {
     mapboxAccessToken:"pk.eyJ1IjoiaW50cmFob3VzZSIsImEiOiJjaXJsc3lmc3gwMDJyaGpuaHdvb2oxYnM5In0.2Um0WFRpufTR55w9_6ALDQ",
     allowReact360:false,
     compatMajor:0,
-    compatMinor:6,
     CDN:false,
     CDNHost:"",
     CDNPath:"",
+    compatMinor:7
 }

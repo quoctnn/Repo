@@ -92,10 +92,12 @@ export class StatusComponent extends React.Component<Props, State> {
         nextStatus.updated_at != status.updated_at ||
         nextStatus.serialization_date != status.serialization_date ||
         nextStatus.reaction_count != status.reaction_count ||
+        nextStatus.highlightMode != status.highlightMode ||
         nextState.renderPlaceholder != this.state.renderPlaceholder ||
         nextState.readMoreActive != this.state.readMoreActive ||
         nextProps.className != this.props.className ||
         nextState.refresh != this.state.refresh
+
         //nextStatus.reactions != status.reactions
         //console.log("status id:" + status.id, ret,(status.children_ids || []).length, (nextStatus.children_ids|| []).length, )
         return ret
@@ -167,7 +169,7 @@ export class StatusComponent extends React.Component<Props, State> {
         const truncateLength = this.state.readMoreActive ? 0 : Settings.statusTruncationLength
         const content = getTextContent(status.id.toString(), status.text, mentions, true, onActionPress, truncateLength, Settings.statusLinebreakLimit)
         const {textContent, linkCards, hasMore} = content
-        const cn = classnames("status-component", className, "lvl" + (status.level || 0) , "sid-" + status.id, {comment:isComment})
+        const cn = classnames("status-component", className, "lvl" + (status.level || 0) , "sid-" + status.id + "_p_" + (status.position || 0), {comment:isComment, highlight:status.highlightMode})
         const avatarSize = isComment ? 40 : 50
         const files = status.files || []
         let communityId = status.community && status.community.id ? status.community.id : null

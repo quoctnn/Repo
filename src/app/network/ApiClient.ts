@@ -7,11 +7,16 @@ import { Status, UserProfile, UploadedFile, Community, Group, Conversation, Proj
          ContextNaturalKey, ReportResult, Dashboard, Timesheet, Coordinate, RecentActivity,
          UnhandledNotifications, UnreadNotificationCounts, GroupSorting, ProjectSorting, Favorite,
          VersionInfo, 
-         SearchHistory} from '../types/intrasocial_types';
+         SearchHistory,
+         ProfileCertification,
+         ProfileEducation,
+         ProfilePosition,
+         CrashLogLevel} from '../types/intrasocial_types';
 import { nullOrUndefined } from '../utilities/Utilities';
 import moment = require("moment");
 import { Settings } from "../utilities/Settings";
 import { ConversationManager } from '../managers/ConversationManager';
+import { ProfileLanguage, ProfileVolunteeringExperience } from '../types/intrasocial_types';
 export type PaginationResult<T> = {results:T[], count:number, previous?:string, next?:string, divider?:number}
 export type ElasticSuggestion = {text:string, offset:number, length:number, options:[]}
 export type ElasticExtensionResult = {stats:{suggestions:{[key:string]:ElasticSuggestion}, aggregations:{[key:string]:any}}}
@@ -207,6 +212,15 @@ export default class ApiClient
     {
         const inclParent = includeParent ? true : undefined
         let url = Constants.apiRoute.postCommentsUrl(parent) + "?" + this.getQueryString({children, indices:position, parent:inclParent })
+        AjaxRequest.get(url, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
+    static statusSingle(id:number, callback:ApiStatusCommentsCallback<Status>)
+    {
+        let url = Constants.apiRoute.statusSingle(id)
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
@@ -867,6 +881,55 @@ export default class ApiClient
             callback(null, status, error)
         })
     }
+    static getLanguages(limit:number, offset:number, user:number, callback:ApiClientFeedPageCallback<ProfileLanguage>){
+        let url = Constants.apiRoute.languageUrl + "?" + this.getQueryString({limit, offset, user})
+        AjaxRequest.get(url, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
+    static getCertifications(limit:number, offset:number, user:number, callback:ApiClientFeedPageCallback<ProfileCertification>){
+        let url = Constants.apiRoute.certificationUrl + "?" + this.getQueryString({limit, offset, user})
+        AjaxRequest.get(url, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
+    static getEducations(limit:number, offset:number, user:number, callback:ApiClientFeedPageCallback<ProfileEducation>){
+        let url = Constants.apiRoute.educationUrl + "?" + this.getQueryString({limit, offset, user})
+        AjaxRequest.get(url, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
+    static getPositions(limit:number, offset:number, user:number, callback:ApiClientFeedPageCallback<ProfilePosition>){
+        let url = Constants.apiRoute.positionUrl + "?" + this.getQueryString({limit, offset, user})
+        AjaxRequest.get(url, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
+    static getVolunteering(limit:number, offset:number, user:number, callback:ApiClientFeedPageCallback<ProfileVolunteeringExperience>){
+        let url = Constants.apiRoute.volunteeringUrl + "?" + this.getQueryString({limit, offset, user})
+        AjaxRequest.get(url, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
+    static sendCrashReport(level:CrashLogLevel, message:string, stack:string, componentStack:string , callback:ApiClientCallback<any>){
+        const url = Constants.apiRoute.createCrashReportUrl
+        AjaxRequest.postJSON(url,  { level, message, stack, componentStack}, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
+    
 }
 export class FileUploader
 {

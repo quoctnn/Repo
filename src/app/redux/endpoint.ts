@@ -41,10 +41,9 @@ export const availableEndpoints: ApiEndpoint[] = [
     {
         endpoint: 'https://intra.work',
         loginType: EndpointLoginType.API,
-        defaultCommunity: 132,
+        defaultCommunity: 127,
         websocket: 'wss://intra.work/socket/'
-    }
-
+    },
 ]
 const defaultEndpoint = Settings.isElectron ? 2 : 0
 export interface SetEndpointAction{

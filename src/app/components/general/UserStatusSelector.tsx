@@ -9,9 +9,8 @@ import { Link, withRouter, RouteComponentProps } from 'react-router-dom';
 import Routes from '../../utilities/Routes';
 import { translate } from '../../localization/AutoIntlProvider';
 import { EventStreamManagerConnectionChangedEvent, EventStreamManager } from '../../managers/EventStreamManager';
-import { DropdownItem } from 'reactstrap';
 import { UserStatusIndicator } from './UserStatusIndicator';
-import { OverflowMenuItem, OverflowMenuItemType, createDropdownItem } from './OverflowMenu';
+import { OverflowMenuItem, OverflowMenuItemType } from './OverflowMenu';
 import { WindowAppManager } from '../../managers/WindowAppManager';
 import { NavigationUtilities } from '../../utilities/NavigationUtilities';
 import classnames = require('classnames');
@@ -20,7 +19,7 @@ import { DropDownMenu } from './DropDownMenu';
 export const sendUserStatus = (status: UserStatus) => {
     WindowAppManager.sendOutgoingOnSocket(
         JSON.stringify({
-            type: EventStreamMessageType.USER_UPDATE,
+            type: EventStreamMessageType.CLIENT_UPDATE,
             data: { status: status }
         })
     );

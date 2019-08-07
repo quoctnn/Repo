@@ -1,9 +1,12 @@
-.module-footer .details-members .avatar-stacked{
+.avatar-stacked{
     margin:8px;
     margin-bottom:16px;
     display:flex;
     flex-direction:row-reverse;
 }
-.module-footer .details-members .avatar-stacked .avatar{
-    width:32px;
+.avatar-stacked > a{
+    margin-left: -16px;
+    &:last-child{
+        margin-left: 0;
+    }
 }
