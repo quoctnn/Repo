@@ -3,7 +3,8 @@ node_modules/
 .vscode/
 webpack/webpack-stats-dev.json
 app/
-intra.work-BETA/
+intra.work-BETA/app/
+intra.work-BETA/out/
 intraSocial/app/
 intraSocial/out/
 !src/app/
