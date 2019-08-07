@@ -17,6 +17,7 @@ import { ProfileManager } from '../../managers/ProfileManager';
 import SimpleDialog from '../general/dialogs/SimpleDialog';
 import StatusEditorComponent from '../general/input/StatusEditorComponent';
 import { NavigationUtilities } from '../../utilities/NavigationUtilities';
+import Routes from '../../utilities/Routes';
 type Props = {
     className?:string
     status:Status
@@ -173,8 +174,12 @@ export default class StatusOptionsComponent extends React.Component<Props, State
             return { showDeleteDialog: !previousState.showDeleteDialog };
         });
     }
-    copyLink = () => {
-
+    copyLink = (event:React.MouseEvent) => {
+        if(event.shiftKey)
+        {
+            window.app.navigateToRoute(Routes.statusUrl(this.props.status.id))
+            return
+        }
         let permaLink = StatusUtilities.getPermaLink(this.props.status.id)
         IntraSocialUtilities.copyToClipboard(permaLink)
         this.showCopied()

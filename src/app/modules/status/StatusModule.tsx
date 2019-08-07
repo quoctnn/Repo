@@ -63,7 +63,7 @@ class StatusModule extends React.Component<Props, State>
                     parent.children = (data.results || [])//.sort((a, b) => b.position - a.position)
                     parent.comments = data.count
                 }
-                this.highlightStatus(parent, statusId)
+                parent && this.highlightStatus(parent, statusId)
                 this.setState((prevState:State) => {
                     return {status:parent, isLoading:false, hasLoaded:true}
                 })
