@@ -2,7 +2,8 @@ node_modules/
 .git/
 .vscode/
 webpack/webpack-stats-dev.json
-intraSocial-linux-x64/
-intraSocial-darwin-x64/
 app/
+intra.work-BETA/
+intraSocial/app/
+intraSocial/out/
 !src/app/

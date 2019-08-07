@@ -9,6 +9,7 @@ export default  {
     apiRoute: {
         login:"/api/v1/auth/oup/login/",
         nativeLogin:"/api/v1/auth-oup/native-login/",
+        socialLogin:"/api/v1/auth-oup/social-login/",
         // Version
         versionUrl:"/api/v2/version/basic/",
         // Purchases

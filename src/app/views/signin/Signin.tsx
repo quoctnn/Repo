@@ -1,4 +1,7 @@
 import * as React from 'react'
+import FacebookLogin from 'react-facebook-login';
+import GoogleLogin from 'react-google-login';
+import LinkedIn from 'linkedin-login-for-react';
 import ApiClient from '../../network/ApiClient'
 import { Button, Input , Form , FormGroup} from 'reactstrap'
 import { withRouter, RouteComponentProps} from 'react-router-dom'
@@ -10,9 +13,10 @@ import { EndpointLoginType } from '../../redux/endpoint'
 import { EndpointManager } from '../../managers/EndpointManager'
 import "./Signin.scss"
 import { translate } from '../../localization/AutoIntlProvider';
+import { Settings } from '../../utilities/Settings';
 
 type OwnProps = {
-    
+
 }
 type ReduxStateProps = {
     apiEndpoint?:number,
@@ -40,7 +44,7 @@ class Signin extends React.Component<Props, {}> {
         this.props.history.push(from)
     }
     doSignin = (e) => {
-        
+
         e.preventDefault()
         let endpoint = EndpointManager.currentEndpoint()
         if(endpoint.loginType == EndpointLoginType.API)
@@ -50,18 +54,30 @@ class Signin extends React.Component<Props, {}> {
         else if(endpoint.loginType == EndpointLoginType.NATIVE)
         {
             ApiClient.nativeLogin(this.emailInput!.value, this.passwordInput!.value, this.loginCallback)
-
         }
     }
+    doFacebookSignin = (response) => {
+        ApiClient.apiSocialLogin("facebook", response.accessToken, null, null, this.loginCallback)
+    }
+    doGoogleSignin = (response) => {
+        ApiClient.apiSocialLogin("google", response.accessToken, null, response.tokenId, this.loginCallback)
+    }
+    doLinkedInSignin = (error, code, redirectUri) => {
+        if (error) {
+            console.error(error)
+        }
+        console.log(code)
+        ApiClient.apiSocialLogin("linkedin", null, code, null, this.loginCallback)
+    }
     render = () => {
-        let endpoint = EndpointManager.currentEndpoint().endpoint
-        endpoint = endpoint.replace(/(^\w+:|)\/\//, '');
-        endpoint = endpoint.replace(/(:\d+$)/, '');
+        const endpoint = EndpointManager.currentEndpoint()
+        let endpointName = endpoint.endpoint.replace(/(^\w+:|)\/\//, '');
+        endpointName = endpointName.replace(/(:\d+$)/, '');
         return(
             <div id="sign-in">
                 <div className="jumbotron">
                     <div className="container">
-                        <h2 >{translate("Sign in to") + " " + endpoint}</h2>
+                        <h2 >{translate("Sign in to") + " " + endpointName}</h2>
                         <p className="lead">{translate("Enter your email address and password")}</p>
                         <Form>
                             <FormGroup>
@@ -74,6 +90,28 @@ class Signin extends React.Component<Props, {}> {
                                 <Button type="submit" color="info" onClick={this.doSignin}>{translate("Sign in")}</Button>
                             </FormGroup>
                         </Form>
+                        { endpoint.loginType == EndpointLoginType.API && <>
+                            <FacebookLogin
+                                appId={Settings.FBAppId}
+                                autoLoad={false}
+                                responseType="token,granted_scopes"
+                                scope="email"
+                                callback={this.doFacebookSignin}
+                            /><br></br>
+                            <GoogleLogin
+                                clientId={Settings.GoogleClientID}
+                                buttonText="Sign in with Google"
+                                onSuccess={this.doGoogleSignin}
+                                onFailure={this.doGoogleSignin}
+                                cookiePolicy={'single_host_origin'}
+                            /><br></br>
+                            {/* Linkedin provider on login API is broken...
+                                <LinkedIn
+                                clientId={Settings.LinkedInClientID}
+                                callback={this.doLinkedInSignin}
+                                text='Sign in with LinkedIn' /> */}
+                        </>
+                        }
                     </div>
                 </div>
             </div>
