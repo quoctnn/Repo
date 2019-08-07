@@ -26,7 +26,7 @@ interface State
 {
 }
 type Props = ReduxStateProps & ReduxDispatchProps & OwnProps
-class ProjectPage extends React.Component<Props, State>
+class GroupPage extends React.Component<Props, State>
 {
     constructor(props:Props) {
         super(props);
@@ -81,4 +81,4 @@ const mapStateToProps = (state:ReduxState, ownProps:OwnProps) => {
         group,
     }
 }
-export default connect<ReduxStateProps, null, OwnProps>(mapStateToProps, null)(ProjectPage);
+export default connect<ReduxStateProps, null, OwnProps>(mapStateToProps, null)(GroupPage);

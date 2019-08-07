@@ -20,7 +20,7 @@ import { userAvatar } from '../utilities/Utilities';
 export const sendUserStatus = (status: UserStatus) => {
     WindowAppManager.sendOutgoingOnSocket(
         JSON.stringify({
-            type: EventStreamMessageType.USER_UPDATE,
+            type: EventStreamMessageType.CLIENT_UPDATE,
             data: { status: status }
         })
     );

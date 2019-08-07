@@ -21,9 +21,9 @@ export default class CVListItem extends React.PureComponent<Props, State> {
     render = () => 
     {
         const {avatar, className, title, description} = this.props
-        const cn = classnames("cv-list-item d-flex", className)
+        const cn = classnames("cv-list-item d-flex m-1", className)
         return <div className={cn}>
-                    {avatar && <Avatar image={avatar} size={40}/>}
+                    {avatar && <Avatar className="mr-1" image={avatar} size={40} />}
                     <div className="d-flex flex-column justify-content-center">
                         <div className="primary-text">{title}</div>
                         {description && 

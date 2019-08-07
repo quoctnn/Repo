@@ -4,6 +4,12 @@ import Constants from "../utilities/Constants";
 import { translate } from "../localization/AutoIntlProvider";
 import { userFullName, groupCover, communityCover, userCover, projectCover, eventCover } from '../utilities/Utilities';
 import { CommunityManager } from '../managers/CommunityManager';
+export enum CrashLogLevel{
+    info = "info",
+    debug = "debug",
+    warning = "warning",
+    error = "error",
+}
 export enum ObjectHiddenReason{
     blocked = "blocked",
     deleted = "deleted",
@@ -502,6 +508,8 @@ export type Status = {
     temporary:boolean
     visibility?:number[]
     level?:number
+    position:number
+    highlightMode?:boolean
 } & TempStatus & Permissible
 
 export interface FileUpload
@@ -905,7 +913,10 @@ export type SimpleUserProfile = {
     first_name: string,
     last_name: string,
 } & IdentifiableObject
-
+export type ProfileConnections = {
+    count:number
+    ids:number[]
+}
 export type UserProfile = {
     email:string|null
     locale:string|null
@@ -923,6 +934,7 @@ export type UserProfile = {
     is_superuser:boolean
     connections?:number[]
     active_community?:number
+    mutual_contacts:ProfileConnections
 } & SimpleUserProfile & AvatarAndCover & Linkable & Permissible
 
 export type Group = {

@@ -219,6 +219,9 @@ export default  {
         },
         // Status
         statusMarkRead:"/api/v2/status/mark-read/",
+        statusSingle: (id:number) => {
+            return `/api/v2/status/${id}/single/`
+        },
         postUrl: '/api/v2/status/',
         postCommentsUrl: (id:number) => {
             return `/api/v2/status/${id}/children/`
@@ -273,6 +276,9 @@ export default  {
         educationUrl:"/api/v2/cv/education/",
         positionUrl:"/api/v2/cv/position/",
         volunteeringUrl:"/api/v2/cv/volunteering/",
+
+        //
+        createCrashReportUrl:"/api/v2/crash-report/new/"
     },
 
     urlsRoute: {

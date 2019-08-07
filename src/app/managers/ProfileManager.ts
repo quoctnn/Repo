@@ -30,7 +30,7 @@ export abstract class ProfileManager
     }
     private static processIncomingUserUpdate(...args:any[]) {
         let profile = args[0]
-        ProfileManager.storeProfiles([profile])
+        ProfileManager.storeProfiles([profile], true)
     }
     static getProfile = (profileId:string):UserProfile|null =>
     {
@@ -219,11 +219,11 @@ export abstract class ProfileManager
             profiles.unshift(authUser.id)
         return profiles
     }
-    static storeProfiles = (profiles:UserProfile[]) => {
-        ProfileManager.getStore().dispatch(addProfilesAction(profiles))
+    static storeProfiles = (profiles:UserProfile[], force?:boolean) => {
+        ProfileManager.getStore().dispatch(addProfilesAction(profiles, force))
     }
-    static storeProfile = (profile:UserProfile) => {
-        ProfileManager.getStore().dispatch(addProfilesAction([profile]))
+    static storeProfile = (profile:UserProfile, force?:boolean) => {
+        ProfileManager.getStore().dispatch(addProfilesAction([profile], force))
     }
     static searchProfileIdsEnsureExists = (query:string, profiles:number[], completion:(profiles:UserProfile[]) => void) => {
         ProfileManager.ensureProfilesExists(profiles, () => {

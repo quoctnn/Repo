@@ -27,6 +27,7 @@ export default abstract class Routes {
     private static GROUP = "/group/"
     private static EVENT = "/event/"
     private static CONVERSATION = "/conversation/"
+    private static STATUS = "/status/"
     private static ERROR_NOT_FOUND = "/error404/"
 
     static searchUrl = (query:string) => {
@@ -50,6 +51,9 @@ export default abstract class Routes {
     }
     static profileUrl = (profile:string|number) => {
         return `${Routes.PROFILE}${profile}/`
+    }
+    static statusUrl = (status:string|number) => {
+        return `${Routes.STATUS}${status}/`
     }
     static conversationUrl = (conversation:string|number, includeTrailingSlash:boolean = true) => {
         return `${Routes.CONVERSATION}${conversation || ""}${!!conversation && includeTrailingSlash ? "/": ""}`

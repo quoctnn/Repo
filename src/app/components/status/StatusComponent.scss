@@ -37,7 +37,6 @@
             display:flex;
             flex-direction:row-reverse;
             .avatar {
-                width:16px;
             }
         }
         .context {
@@ -154,5 +153,12 @@
     }
     .comments-reply{
         margin-top: 3px;
+    }
+    &:not(.highlight){
+        transition: background-color 1500ms linear;
+    }
+    &.highlight{
+        transition: background-color 0ms linear;
+        @include var(background-color, highlight-background-color);
     }
 }

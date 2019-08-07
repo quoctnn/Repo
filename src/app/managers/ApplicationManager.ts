@@ -153,7 +153,7 @@ export abstract class ApplicationManager
     private static fetchContacts = (completion:() => void) => {
         ApiClient.getProfiles(100, 0, (data, status, error) => {
             const profiles = (data && data.results) || []
-            ProfileManager.storeProfiles(profiles)
+            ProfileManager.storeProfiles(profiles, true)
             completion()
             ToastManager.showErrorToast(error)
         })

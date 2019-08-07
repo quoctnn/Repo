@@ -73,7 +73,8 @@ class ProfileEducationModule extends React.PureComponent<Props, State> {
         return this.state.educations.map((education, i) => {
             const avatar = education.school && education.school.avatar_original
             const dates = this.getDateString(education.start_date, education.end_date)
-            const title = <>{education.name}{", "}{education.fields_of_study}{" "}{translate("at")}{" "}{education.school && education.school.name || education.school}
+            const fos = !!education.fields_of_study ? ", " + education.fields_of_study : undefined
+            const title = <>{education.name}{fos}{" "}{translate("at")}{" "}{education.school && education.school.name || education.school}
             {" "}<span className="medium-small-text">{dates}</span></>
             const description = education.notes
             return <CVListItem avatar={avatar} key={education.id} className="edu-item" title={title} description={description} />

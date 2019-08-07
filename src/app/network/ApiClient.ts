@@ -10,7 +10,8 @@ import { Status, UserProfile, UploadedFile, Community, Group, Conversation, Proj
          SearchHistory,
          ProfileCertification,
          ProfileEducation,
-         ProfilePosition} from '../types/intrasocial_types';
+         ProfilePosition,
+         CrashLogLevel} from '../types/intrasocial_types';
 import { nullOrUndefined } from '../utilities/Utilities';
 import moment = require("moment");
 import { Settings } from "../utilities/Settings";
@@ -211,6 +212,15 @@ export default class ApiClient
     {
         const inclParent = includeParent ? true : undefined
         let url = Constants.apiRoute.postCommentsUrl(parent) + "?" + this.getQueryString({children, indices:position, parent:inclParent })
+        AjaxRequest.get(url, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
+    static statusSingle(id:number, callback:ApiStatusCommentsCallback<Status>)
+    {
+        let url = Constants.apiRoute.statusSingle(id)
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
@@ -906,6 +916,14 @@ export default class ApiClient
     static getVolunteering(limit:number, offset:number, user:number, callback:ApiClientFeedPageCallback<ProfileVolunteeringExperience>){
         let url = Constants.apiRoute.volunteeringUrl + "?" + this.getQueryString({limit, offset, user})
         AjaxRequest.get(url, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
+    static sendCrashReport(level:CrashLogLevel, message:string, stack:string, componentStack:string , callback:ApiClientCallback<any>){
+        const url = Constants.apiRoute.createCrashReportUrl
+        AjaxRequest.postJSON(url,  { level, message, stack, componentStack}, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
             callback(null, status, error)

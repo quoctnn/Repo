@@ -29,6 +29,7 @@ import { AuthenticationManager } from "./managers/AuthenticationManager";
 import { activateCrosstabAuthenticationSync } from "./redux/crosstabAuthenticationSync";
 import { ThemeManager } from "./managers/ThemeManager";
 import { NavigationUtilities } from "./utilities/NavigationUtilities";
+import GlobalErrorBoundary from "./components/error/GlobalErrorBoundary";
 
 
 const store = createStore(appReducer, applyMiddleware(...middleWares));
@@ -54,16 +55,16 @@ const persistor = persistStore(store, {}, () => {
 export const App = (props: any) => {
     return (
     <Provider store={store}>
-        <>
+        <GlobalErrorBoundary>
             <ChannelEventStream />
-                <PersistGate loading={null} persistor={persistor}>
-                    <AutoIntlProvider>
-                            <Router getUserConfirmation={NavigationUtilities.getProtectedNavigationConfirmation}>
-                                <Main />
-                            </Router>
-                    </AutoIntlProvider>
-                </PersistGate>
-        </>
+            <PersistGate loading={null} persistor={persistor}>
+                <AutoIntlProvider>
+                        <Router getUserConfirmation={NavigationUtilities.getProtectedNavigationConfirmation}>
+                            <Main />
+                        </Router>
+                </AutoIntlProvider>
+            </PersistGate>
+        </GlobalErrorBoundary>
     </Provider>
   );
 };

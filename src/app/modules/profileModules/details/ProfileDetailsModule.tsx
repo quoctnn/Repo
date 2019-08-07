@@ -8,17 +8,58 @@ import { ReduxState } from "../../../redux";
 import { ContextManager } from "../../../managers/ContextManager";
 import { withRouter, RouteComponentProps } from "react-router";
 import { UserProfile, ContextNaturalKey, ProfilePosition } from "../../../types/intrasocial_types";
-import { userFullName, stringToDate } from '../../../utilities/Utilities';
+import { userFullName, stringToDate, DateFormat } from '../../../utilities/Utilities';
 import ModuleContent from "../../ModuleContent";
 import ModuleHeader from "../../ModuleHeader";
 import ApiClient from "../../../network/ApiClient";
 import { translate } from "../../../localization/AutoIntlProvider";
+import { AuthenticationManager } from '../../../managers/AuthenticationManager';
+import StackedAvatars from "../../../components/general/StackedAvatars";
+import { Link } from "react-router-dom";
+import { Moment } from "moment-timezone";
+import moment = require("moment");
+
+type TimezoneInfoProps = {
+    timezone:string
+}
+type TimezoneInfoState = {
+    time:Moment
+}
+class TimezoneInfo extends React.PureComponent<TimezoneInfoProps, TimezoneInfoState> {
+    private interval:NodeJS.Timer = null
+    constructor(props:TimezoneInfoProps){
+        super(props)
+        this.state = {
+            time: moment().clone().tz(this.props.timezone)
+        }
+    }
+    componentDidMount = () => {
+        this.interval = setInterval(() => {
+            this.setState((prevState:TimezoneInfoState) => {
+                return {time:moment().clone().tz(this.props.timezone)}
+            })
+        }, 1000)
+    }
+    componentWillUnmount = () => {
+        if(this.interval)
+        {
+            clearInterval(this.interval)
+            this.interval = null
+        }
+    }
+    render = () => {    
+        return <div className="timezone-info">
+                {this.state.time.format("[GMT] Z [- " + translate("Now") + "] LT")}
+                </div>
+    }
+}
 
 type OwnProps = {
     breakpoint:ResponsiveBreakpoint
 } & CommonModuleProps & DispatchProp
 type ReduxStateProps = {
     profile:UserProfile
+    authenticatedProfile:UserProfile
 }
 type ReduxDispatchProps ={
 }
@@ -63,15 +104,65 @@ class ProfileDetailsModule extends React.PureComponent<Props, State> {
             })
         })
     }
+    renderTimezoneInfo = () => {
+        if(this.props.profile && this.props.profile.timezone)
+            return <TimezoneInfo timezone={this.props.profile.timezone} />
+        return null
+    }
+    renderConnections = () => {
+        const {profile, authenticatedProfile} = this.props
+        if(profile && authenticatedProfile)
+        {
+            let connections:number[] = []
+            let numberOfConnections = 0
+            if(profile.id == authenticatedProfile.id)
+            {
+                connections = authenticatedProfile.connections.slice(0, 5)
+                numberOfConnections = authenticatedProfile.connections.length
+            }
+            else {
+                connections = profile.mutual_contacts.ids
+                numberOfConnections = profile.mutual_contacts.count
+            }
+            if(connections.length > 0)
+            {
+                return  <div className="d-flex justify-content-between align-items-center">
+                             <div className="d-flex flex-column">
+                                <div className="">
+                                    {translate("Connections")}
+                                </div>
+                                <div className="">
+                                    {`${numberOfConnections} ${translate("People")}`}
+                                </div>
+                            </div>
+                            <div className="d-flex flex-column align-items-end">
+                                <Link to="#">{translate("common.see.all")}</Link>
+                                <StackedAvatars userIds={connections} />
+                            </div>
+                        </div>
+            }
+        }
+        return null
+    }
+    renderCommonFriends = () => {
+        
+        const {profile, authenticatedProfile} = this.props
+        if(profile && authenticatedProfile && profile.id != authenticatedProfile.id)
+            return <div className="medium-small-text">{translate("profile.friends.common.count").format(profile.mutual_friends.length)}</div>
+        return null
+    }
     renderContent = () => {
         const position = this.state.latestJob
         return <>
                 {position && <div className="latest-position">{position.name}{" "}{translate("at")}{" "}{position.company && position.company.name || position.company}</div>}
+                {this.renderConnections()}
+                {this.renderCommonFriends()}
+                {this.renderTimezoneInfo()}
                 </>
     }
     render = () => 
     {
-        const {className, breakpoint, contextNaturalKey, pageSize, showLoadMore, showInModal, isModal, dispatch, staticContext, profile, history, location, match,  ...rest} = this.props
+        const {className, breakpoint, contextNaturalKey, pageSize, showLoadMore, showInModal, isModal, dispatch, staticContext, profile, authenticatedProfile, history, location, match,  ...rest} = this.props
         const title = userFullName(profile)
         const cn = classnames("profile-details-module", className)
         return (<Module {...rest} className={cn}>
@@ -89,7 +180,8 @@ class ProfileDetailsModule extends React.PureComponent<Props, State> {
 const mapStateToProps = (state:ReduxState, ownProps: OwnProps & RouteComponentProps<any>):ReduxStateProps => {
     const resolved = ContextManager.getContextObject(ownProps.location.pathname, ContextNaturalKey.USER)
     return {
-        profile:resolved as any as UserProfile
+        profile:resolved as any as UserProfile,
+        authenticatedProfile:AuthenticationManager.getAuthenticatedUser()
     }
 }
 export default withRouter(connect(mapStateToProps, null)(ProfileDetailsModule))
