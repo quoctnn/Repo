@@ -4,7 +4,7 @@ import classnames from "classnames"
 import "./ProjectsModule.scss"
 import { ResponsiveBreakpoint } from '../../components/general/observers/ResponsiveComponent';
 import { translate } from '../../localization/AutoIntlProvider';
-import { ContextNaturalKey, Community, Project, ProjectSorting } from '../../types/intrasocial_types';
+import { ContextNaturalKey, Community, Project, ProjectSorting, Group } from '../../types/intrasocial_types';
 import ListComponent from '../../components/general/ListComponent';
 import ApiClient, { PaginationResult } from '../../network/ApiClient';
 import { ToastManager } from '../../managers/ToastManager';
@@ -28,6 +28,7 @@ type State = {
 }
 type ReduxStateProps = {
     community: Community
+    group: Group
 }
 type ReduxDispatchProps = {
 }
@@ -85,7 +86,8 @@ class ProjectsModule extends React.Component<Props, State> {
     fetchProjects = (offset:number, completion:(items:PaginationResult<Project>) => void ) => {
         const md = this.state.menuData
         const communityId = this.props.community && this.props.community.id
-        ApiClient.getProjects(communityId, this.props.pageSize, offset, md.sorting, md.responsible, md.assigned, (data, status, error) => {
+        const groupId = this.props.group && this.props.group.id
+        ApiClient.getProjects(communityId, groupId, this.props.pageSize, offset, md.sorting, md.responsible, md.assigned, (data, status, error) => {
             completion(data)
             ToastManager.showErrorToast(error)
         })
@@ -122,7 +124,7 @@ class ProjectsModule extends React.Component<Props, State> {
     renderContent = () => {
         return <>
             {!this.props.community && <LoadingSpinner key="loading"/>}
-            {this.props.community && <ListComponent<Project> ref={this.projectsList} 
+            {this.props.community && <ListComponent<Project> ref={this.projectsList}
                         loadMoreOnScroll={!this.props.showLoadMore} onLoadingStateChanged={this.feedLoadingStateChanged} fetchData={this.fetchProjects} renderItem={this.renderProject} />}
             </>
     }
@@ -155,8 +157,10 @@ class ProjectsModule extends React.Component<Props, State> {
 const mapStateToProps = (state:ReduxState, ownProps: OwnProps  & RouteComponentProps<any>):ReduxStateProps => {
 
     const community = ContextManager.getContextObject(ownProps.location.pathname, ContextNaturalKey.COMMUNITY) as Community
+    const group = ContextManager.getContextObject(ownProps.location.pathname, ContextNaturalKey.GROUP) as Group
     return {
-        community
+        community,
+        group
     }
 }
 const mapDispatchToProps = (dispatch:ReduxState, ownProps: OwnProps):ReduxDispatchProps => {
