@@ -57,7 +57,7 @@ export class ProjectFilter extends React.PureComponent<Props & React.HTMLAttribu
     }
     searchOptions2 = (text:string) => {
         return new Promise((resolve) => {
-            return ApiClient.getProjects(null,20,0, null, false, false, (data, status, error) => {
+            return ApiClient.getProjects(null, null, 20, 0, null, false, false, (data, status, error) => {
                 const options:ContextValue[] = data.results.map(p => {return {value:ContextNaturalKey.PROJECT + "_" + p.id, label:p.name, id:p.id, type:ContextNaturalKey.PROJECT}})
                 resolve([{options:options, label:ContextNaturalKey.PROJECT}])
             })

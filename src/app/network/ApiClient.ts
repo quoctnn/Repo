@@ -6,7 +6,7 @@ import { Status, UserProfile, UploadedFile, Community, Group, Conversation, Proj
          ElasticSearchType, ObjectAttributeType, StatusObjectAttribute, EmbedCardItem, ReportTag,
          ContextNaturalKey, ReportResult, Dashboard, Timesheet, Coordinate, RecentActivity,
          UnhandledNotifications, UnreadNotificationCounts, GroupSorting, ProjectSorting, Favorite,
-         VersionInfo, 
+         VersionInfo,
          SearchHistory,
          ProfileCertification,
          ProfileEducation,
@@ -551,7 +551,8 @@ export default class ApiClient
     }
     static getGroups(community:number, parent:number, limit:number, offset:number, ordering:GroupSorting, callback:ApiClientFeedPageCallback<Group>)
     {
-        let url = Constants.apiRoute.groupsUrl + "?" + this.getQueryString({community, parent, limit, offset, ordering})
+        const subgroups = parent ? true : false
+        let url = Constants.apiRoute.groupsUrl + "?" + this.getQueryString({community, parent, subgroups, limit, offset, ordering})
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
@@ -577,19 +578,20 @@ export default class ApiClient
             callback(null, status, error)
         })
     }
-    static getEvents(community:number, limit:number, offset:number, ordering:string, upcoming:boolean, callback:ApiClientFeedPageCallback<Event>)
+    static getEvents(community:number, parent:number, group:number, limit:number, offset:number, ordering:string, upcoming:boolean, callback:ApiClientFeedPageCallback<Event>)
     {
         let start_date = upcoming ? "&start_after=" : "&start_before="
-        let url = Constants.apiRoute.eventsUrl + "?" + this.getQueryString({community, limit, offset, ordering}) + start_date + moment().format("YYYY-MM-DD")
+        let sessions = parent ? true : false
+        let url = Constants.apiRoute.eventsUrl + "?" + this.getQueryString({community, limit, offset, ordering, parent, sessions, group}) + start_date + moment().format("YYYY-MM-DD")
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
             callback(null, status, error)
         })
     }
-    static getProjects(community:number, limit:number, offset:number, ordering:ProjectSorting, responsible:boolean, assigned:boolean, callback:ApiClientFeedPageCallback<Project>)
+    static getProjects(community:number, group:number, limit:number, offset:number, ordering:ProjectSorting, responsible:boolean, assigned:boolean, callback:ApiClientFeedPageCallback<Project>)
     {
-        let url = Constants.apiRoute.projectsUrl + "?" + this.getQueryString({community, limit, offset, ordering, responsible, assigned})
+        let url = Constants.apiRoute.projectsUrl + "?" + this.getQueryString({community, group, limit, offset, ordering, responsible, assigned})
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
@@ -941,7 +943,7 @@ export default class ApiClient
             callback(null, status, error)
         })
     }
-    
+
 }
 export class FileUploader
 {
