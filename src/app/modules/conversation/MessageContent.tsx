@@ -163,8 +163,8 @@ export class MessageContent extends React.Component<Props,State> {
                         <div className="status text-truncate">{translate("Sending failed")}</div>
                     </div>
                     <div className="d-flex flex-shrink-0">
-                        <button className="btn" onClick={() => ConversationManager.retryQueuedMessage(message)}>{translate("Retry")}</button>
-                        <button className="btn" onClick={() => ConversationManager.removeQueuedMessage(message)}>{translate("Remove")}</button>
+                        <button className="btn link-text" onClick={() => ConversationManager.retryQueuedMessage(message)}>{translate("Retry")}</button>
+                        <button className="btn link-text" onClick={() => ConversationManager.removeQueuedMessage(message)}>{translate("Remove")}</button>
                     </div>
                 </div>)
     }
@@ -186,7 +186,8 @@ export class MessageContent extends React.Component<Props,State> {
                         <div className="status text-truncate">{ FileUtilities.humanFileSize( message.tempFile.size ) + " " + translate("Sending failed")}</div>
                     </div>
                     <div className="d-flex flex-shrink-0">
-                        <button className="btn" onClick={() => ConversationManager.retryQueuedMessage(message)}>{translate("Retry")}</button>
+                        <button className="btn link-text" onClick={() => ConversationManager.retryQueuedMessage(message)}>{translate("Retry")}</button>
+                        <button className="btn link-text" onClick={() => ConversationManager.removeQueuedMessage(message)}>{translate("Remove")}</button>
                     </div>
                 </div>)
     }
@@ -204,7 +205,7 @@ export class MessageContent extends React.Component<Props,State> {
                         <div className="title text-truncate">{translate("The message could not be sent")}</div>
                     </div>
                     <div className="d-flex flex-shrink-0">
-                        <button className="btn" onClick={() => ConversationManager.removeQueuedMessage(message)}>{translate("Remove")}</button>
+                        <button className="btn link-text" onClick={() => ConversationManager.removeQueuedMessage(message)}>{translate("Remove")}</button>
                     </div>
                 </div>)
     }
