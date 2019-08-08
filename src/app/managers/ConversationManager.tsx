@@ -243,7 +243,7 @@ export abstract class ConversationManager
         m.tempFile.progress = 0
         m.tempFile.error = null
         ConversationManager.getStore().dispatch(updateMessageInQueueAction(m))
-        ConversationManager.createMessage(message)
+        ConversationManager.createMessage(m)
     }
     private static getStore = ():Store<ReduxState,any> => 
     {
