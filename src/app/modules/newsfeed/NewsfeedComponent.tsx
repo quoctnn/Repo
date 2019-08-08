@@ -645,8 +645,16 @@ export class NewsfeedComponent extends React.Component<Props, State> {
         console.log("<<START>>")
         let updateArray:ArrayItem[] = []
         let parentStatus = update.parent_id && this.findStatusByStatusId(update.parent_id)
+        const deletedStatus = this.findStatusByStatusId(update.status_id)
+        if(!parentStatus && !deletedStatus)
+        {
+            console.log("No parent status or deleted status, aborting!")
+            return
+        }
         const parentIndex = this.findIndexByStatusId(update.parent_id)
-        let currentIndex = parentIndex
+        const deletedStatusIndex = this.findIndexByStatusId(update.status_id)
+        const deletedStatusLevel = deletedStatus ? deletedStatus.level : parentStatus.level + 1
+        let currentIndex = parentStatus ? parentIndex : deletedStatusIndex
         if(parentStatus)
         {
             const oldCount = parentStatus.comments
@@ -654,9 +662,11 @@ export class NewsfeedComponent extends React.Component<Props, State> {
             parentStatus.comments -= 1
             updateArray.push({index:parentIndex, object:parentStatus})
             console.log(`Adjusting Status(${parentStatus.id}) comments from ${oldCount} to ${parentStatus.comments}`)
-            const deletedStatusLevel = parentStatus.level + 1
             //start looping forward
             currentIndex += 1
+        }
+        if(currentIndex > -1)
+        {
             let insideDeleteScope = false
             const parentTopCommentLoaderIndex = this.findStatusCommentLoaderByStatusId(update.parent_id, false)
             if(parentTopCommentLoaderIndex > -1)
@@ -742,7 +752,6 @@ export class NewsfeedComponent extends React.Component<Props, State> {
                 updateArray.push({index:parentBottomCommentLoaderIndex, object:clone})
                 console.log(`Adjusting parent bottom comment loader(${c.statusId}) position from ${c.position} to ${clone.position}`)
             }
-
         }
         console.log("<<END>>", updateArray)
         if(updateArray.length > 0)

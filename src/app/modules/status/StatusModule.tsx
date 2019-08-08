@@ -16,7 +16,7 @@ type ReduxDispatchProps = {
 }
 type State = {
     isLoading:boolean
-    hasLoaded:boolean
+    loadedStatusId:number
     status:Status
 }
 type Props = ReduxStateProps & ReduxDispatchProps & OwnProps & RouteComponentProps<any>
@@ -26,7 +26,7 @@ class StatusModule extends React.Component<Props, State>
         super(props);
         this.state = {
             isLoading:false,
-            hasLoaded:false,
+            loadedStatusId:null,
             status:null
         }
     }
@@ -48,9 +48,9 @@ class StatusModule extends React.Component<Props, State>
         })
     }
     fetchData = () => {
-        const {hasLoaded, isLoading} = this.state
+        const {loadedStatusId, isLoading} = this.state
         const {statusId} = this.props
-        if(!statusId || hasLoaded || isLoading)
+        if(!statusId || loadedStatusId == statusId || isLoading)
             return
         this.setState((prevState:State) => {
             return {isLoading:true}
@@ -65,7 +65,7 @@ class StatusModule extends React.Component<Props, State>
                 }
                 parent && this.highlightStatus(parent, statusId)
                 this.setState((prevState:State) => {
-                    return {status:parent, isLoading:false, hasLoaded:true}
+                    return {status:parent, isLoading:false, loadedStatusId:statusId}
                 })
             })
         })
@@ -82,7 +82,7 @@ class StatusModule extends React.Component<Props, State>
         return <NewsfeedComponentRouted rootStatus={status} highlightStatusId={this.props.statusId} />
     }
     render() {
-        const {isLoading, hasLoaded, status} = this.state
+        const {isLoading, loadedStatusId: hasLoaded, status} = this.state
         if(isLoading || !hasLoaded)
             return this.renderLoading()
         if(status)
