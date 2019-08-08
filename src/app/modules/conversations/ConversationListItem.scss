@@ -9,6 +9,10 @@
         padding-left: 8px;
         padding-right: 8px;
     }
+    .title-row
+    {
+        justify-content: space-between;
+    }
     .subtitle-row{
         font-size: 0.8em;
         .file-icon::before{

@@ -198,6 +198,16 @@ export class MessageContent extends React.Component<Props,State> {
                     </div>
                 </div>)
     }
+    private renderIllegalContent = (message:Message) => {
+        return (<div className="d-flex align-items-center">
+                    <div className="d-flex flex-column mw0 mr-2">
+                        <div className="title text-truncate">{translate("The message could not be sent")}</div>
+                    </div>
+                    <div className="d-flex flex-shrink-0">
+                        <button className="btn" onClick={() => ConversationManager.removeQueuedMessage(message)}>{translate("Remove")}</button>
+                    </div>
+                </div>)
+    }
     render = () => {
         const {message, simpleMode} = this.props
         const processedContent = this.state.content
@@ -225,7 +235,7 @@ export class MessageContent extends React.Component<Props,State> {
                     {hasContent && this.wrapInMessage(processedContent.content, null, null, message.error )}
                     {hasFiles && this.wrapInMessage(<ContentGallery files={files} setWidth={true}/>,null, null, message.error)}
                     {hasLinks && urls.map(u => this.wrapInMessage(<Embedly renderOnError={false} verticalCard={true} url={u} />, "embed", null, message.error))}
-                    {showError && this.wrapInMessage(translate("The message could not be sent"), null, null, message.error)}
+                    {showError && this.wrapInMessage(this.renderIllegalContent(message), null, null, message.error)}
                 </>
     }
 }
