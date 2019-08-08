@@ -747,10 +747,27 @@ export class NewsfeedComponent extends React.Component<Props, State> {
             if(parentBottomCommentLoaderIndex > -1)
             {
                 const c = this.state.items[parentBottomCommentLoaderIndex] as StatusCommentLoader
-                const clone = this.getClonedStatusCommentsLoader(c)
-                clone.position = clone.position - 1
-                updateArray.push({index:parentBottomCommentLoaderIndex, object:clone})
-                console.log(`Adjusting parent bottom comment loader(${c.statusId}) position from ${c.position} to ${clone.position}`)
+                if(c.position == update.position)//delete if same pos
+                {
+                    const clone = this.getClonedStatusCommentsLoader(c)
+                    clone.position = clone.position - 1
+                    updateArray.push({index:parentBottomCommentLoaderIndex, object:clone})
+                    console.log(`Adjusting parent bottom comment loader(${c.statusId}) position from ${c.position} to ${clone.position}`)
+                }
+                else if(update.position > c.position && c.position ==  parentStatus.comments - 1) // if delete below and there is no more
+                {
+                    updateArray.push({index:parentBottomCommentLoaderIndex, object:null})
+                    console.log(`Deleting parent bottom comment loader(${c.statusId})`)
+                }
+                /*else if(c.position > update.position)//update position
+                {
+                    //updateArray.push({index:parentBottomCommentLoaderIndex, object:null})
+                    //console.log(`Deleting parent bottom comment loader(${c.statusId})`)
+                    const clone = this.getClonedStatusCommentsLoader(c)
+                    clone.position = clone.position - 1
+                    updateArray.push({index:parentBottomCommentLoaderIndex, object:clone})
+                    console.log(`Adjusting parent bottom comment loader(${c.statusId}) position from ${c.position} to ${clone.position}`)
+                }*/
             }
         }
         console.log("<<END>>", updateArray)
