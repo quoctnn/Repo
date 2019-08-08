@@ -639,70 +639,82 @@ export class NewsfeedComponent extends React.Component<Props, State> {
     //after status deleted ok, update current data structure
     postDeleteStatus = (update:IncomingUpdateItem) => {
 
-        const indexesToDelete:number[] = []
-        const status = this.findStatusByStatusId(update.status_id)
-        const statusLevel = status && status.level
-        const parentStatus = update.parent_id && this.findStatusByStatusId(update.parent_id)
-        if(parentStatus)//update parent and commentloader
+        const canUpdatePositions = !nullOrUndefined(update.position)
+        if(!canUpdatePositions)
+            return // wait for server delete
+        console.log("<<START>>")
+        let updateArray:ArrayItem[] = []
+        let parentStatus = update.parent_id && this.findStatusByStatusId(update.parent_id)
+        const parentIndex = this.findIndexByStatusId(update.parent_id)
+        let currentIndex = parentIndex
+        if(parentStatus)
         {
-            const ix = this.findIndexByStatusId(parentStatus.id)
-            if(ix > -1)
+            const oldCount = parentStatus.comments
+            parentStatus = this.getClonedStatus(parentStatus)
+            parentStatus.comments -= 1
+            updateArray.push({index:parentIndex, object:parentStatus})
+            console.log(`Adjusting Status(${parentStatus.id}) comments from ${oldCount} to ${parentStatus.comments}`)
+            const deletedStatusLevel = parentStatus.level + 1
+            //start looping forward
+            currentIndex += 1
+            let insideDeleteScope = false
+            const parentTopCommentLoaderIndex = this.findStatusCommentLoaderByStatusId(update.parent_id, false)
+            if(parentTopCommentLoaderIndex > -1)
             {
-                let updateArray:ArrayItem[] = []
-                const parent = this.getClonedStatus(this.state.items[ix] as Status)
-                const canUpdatePositions = !nullOrUndefined(update.position) 
-                if(canUpdatePositions)
+                const c = this.state.items[parentTopCommentLoaderIndex] as StatusCommentLoader
+                const clone = this.getClonedStatusCommentsLoader(c)
+                clone.position = clone.position - 1
+                const deleteCommentLoader = clone.position == 0
+                updateArray.push({index:parentTopCommentLoaderIndex, object:deleteCommentLoader ? null : clone})
+                console.log(`${deleteCommentLoader? "Deleting" : "Adjusting"} parent top comment loader(${c.statusId}) position from ${c.position} to ${clone.position}`)
+            }
+            while(currentIndex > -1)
+            {
+                const item = this.state.items[currentIndex]
+                if(!item || item.level < deletedStatusLevel) // outside array or item is outside scope
                 {
-                    parent.comments -= 1
-                    updateArray.push({index:ix, object:parent})
-                }
-
-                let currentIndex = ix + 1
-                let deleteSublevels = true
-                while(currentIndex > -1)
-                {
-                    const item = this.state.items[currentIndex]
-                    if(!item)
-                    {
-                        currentIndex = -1
-                        continue
-                    }
-                    const currentLevel = item.level
-                    if(deleteSublevels && statusLevel && currentLevel > statusLevel)
-                    {
-                        //delete subcontent of deleted status
-                        updateArray.push({index:currentIndex, object:null})
-                        currentIndex += 1
-                        continue
-                    }
-                    if(statusLevel && currentLevel < statusLevel ) // out of scope
-                    {
-                        currentIndex = -1
-                        continue
-                    }
-
                     if(item instanceof StatusCommentLoader)
                     {
-                        const c = item as StatusCommentLoader
-                        if(c.statusId == parentStatus.id)
+                        if(item.statusId == update.parent_id) // skip parent comment loaders
                         {
-                            if(canUpdatePositions && c.position > update.position)
+                            currentIndex += 1
+                            continue
+                        }
+                    }
+                    break
+                }
+                if(item.level == deletedStatusLevel )//siblings
+                {
+                    if(item.hasOwnProperty('id'))
+                    {
+                        const c = item as Status
+                        insideDeleteScope = c.id == update.status_id
+                        if(c.position > update.position)//update position
+                        {
+                            const clone = {...c}
+                            clone.position = clone.position - 1
+                            updateArray.push({index:currentIndex, object:clone})
+                            console.log(`Adjusting Status(${c.id}) position from ${c.position} to ${clone.position}`)
+                        }
+                    }
+                    else if(item instanceof StatusCommentLoader)
+                    {
+                        const c = item as StatusCommentLoader
+                        if(c.statusId == update.status_id)
+                        {
+                            updateArray.push({index:currentIndex, object:null})
+                        }
+                        else if(c.statusId == parentStatus.id)
+                        {
+                            if(c.position > update.position)
                             {
                                 const clone = this.getClonedStatusCommentsLoader(c)
                                 clone.position = clone.position - 1
                                 const shouldRemove = clone.position == 0
                                 updateArray.push({index:currentIndex, object:shouldRemove ? null : clone})
-                            }
-                            else if(c.position == parent.comments - 1)
-                            {
-                                updateArray.push({index:currentIndex, object:null})
+                                console.log(`Adjusting comment loader(${c.statusId}) position from ${c.position} to ${clone.position}`)
                             }
                         }
-                        else if(c.statusId == update.status_id)
-                        {
-                            updateArray.push({index:currentIndex, object:null})
-                        }
-                        currentIndex += 1
                     }
                     else if (item instanceof StatusComposer)
                     {
@@ -711,51 +723,30 @@ export class NewsfeedComponent extends React.Component<Props, State> {
                         {
                             updateArray.push({index:currentIndex, object:null})
                         }
-                        currentIndex += 1
-                    }
-                    else {
-                        if(item.hasOwnProperty('id'))
-                        {
-                            const s = item as Status
-                            if(s.id == update.status_id)//remove deleted status
-                            {
-                                updateArray.push({index:currentIndex, object:null})
-                            }
-                            else if(s.parent == parentStatus.id)//update siblings position prop
-                            {
-                                deleteSublevels = false //not below deleted status level anymore
-                                if(canUpdatePositions && s.position > update.position)
-                                {
-                                    const clone = {...s}
-                                    clone.position = clone.position - 1
-                                    updateArray.push({index:currentIndex, object:clone})
-                                }
-                            }
-                            currentIndex += 1
-                        }
                     }
                 }
-                this.updateItems(updateArray)
+                if(insideDeleteScope)
+                {
+                    //delete everything below deleted status level
+                    updateArray.push({index:currentIndex, object:null})
+                }
+                currentIndex += 1
             }
+            //adjust parent bottom comment loader
+            const parentBottomCommentLoaderIndex = this.findStatusCommentLoaderByStatusId(update.parent_id, true)
+            if(parentBottomCommentLoaderIndex > -1)
+            {
+                const c = this.state.items[parentBottomCommentLoaderIndex] as StatusCommentLoader
+                const clone = this.getClonedStatusCommentsLoader(c)
+                clone.position = clone.position - 1
+                updateArray.push({index:parentBottomCommentLoaderIndex, object:clone})
+                console.log(`Adjusting parent bottom comment loader(${c.statusId}) position from ${c.position} to ${clone.position}`)
+            }
+
         }
-        else // root status, remove children, commentLoader and status composer
-        {
-            const commentLoaderTopIndex = this.findStatusCommentLoaderByStatusId(update.status_id, false)
-            if(commentLoaderTopIndex > -1)
-                indexesToDelete.push(commentLoaderTopIndex)
-            const commentLoaderBottomIndex = this.findStatusCommentLoaderByStatusId(update.status_id, true)
-            if(commentLoaderBottomIndex > -1)
-                indexesToDelete.push(commentLoaderBottomIndex)
-            let cIndex = this.findStatusComposerIndexByStatusId(update.status_id)
-            if(cIndex > -1)
-                indexesToDelete.push(cIndex)
-            const childIndexes = this.findCommentIndexesByStatusId(update.status_id)
-            indexesToDelete.push(...childIndexes)
-        }
-        let index = this.findIndexByStatusId(update.status_id)
-        if(index > -1)
-            indexesToDelete.push(index)
-        this.removeObjectsAtIndexes(indexesToDelete)
+        console.log("<<END>>", updateArray)
+        if(updateArray.length > 0)
+            this.updateItems(updateArray)
     }
     deleteStatus = (status:Status) => {
         console.log("deleteStatus", status.id)
@@ -1164,7 +1155,7 @@ export class NewsfeedComponent extends React.Component<Props, State> {
     {
         const key = this.statusLoaderKey(loader)
         const isLoading = this.state.activeCommentLoaders[key] != undefined
-        const cn = classnames(color, "lvl" + loader.level)
+        const cn = classnames(color, "lvl" + loader.level, "sid-" + loader.statusId + "_p_" + (loader.position || 0))
         return <CommentLoader
                     key={"statusloader_" + key}
                     className={cn}
@@ -1174,7 +1165,7 @@ export class NewsfeedComponent extends React.Component<Props, State> {
     }
     getStatusTaggableMembers = (statusId:number) => {
         const status = this.findStatusByStatusId(statusId)
-        return status.visibility
+        return status && status.visibility || []
     }
     findStatusByStatusId = (statusId:number) =>
     {
@@ -1262,9 +1253,8 @@ export class NewsfeedComponent extends React.Component<Props, State> {
             return false
         })
     }
-    findStatusCommentLoaderByStatusId = (statusId:number, loadNewer?:boolean) =>
+    findStatusCommentLoaderByStatusId = (statusId:number, loadNewer:boolean) =>
     {
-        console.log("loadNewer must be supplied")
         return this.state.items.findIndex( o => {
             if(o instanceof StatusCommentLoader)
             {
@@ -1343,23 +1333,21 @@ export class NewsfeedComponent extends React.Component<Props, State> {
             const currentStatus = this.findStatusByStatusId(loader.statusId)
             const commentCount = currentStatus.comments
             const currentComments = this.findCommentsByStatusId(loader.statusId)
-            const index = currentComments.findIndex(c => c.position == loader.position)
-            if(index > -1)
-            {
-                let rest = commentCount - (loader.position + 1)
-                if(currentComments.length > index + 1)
-                {
-                    const nextPosition = currentComments[index + 1].position
-                    if(nextPosition)
-                        rest = nextPosition - loader.position - 1
-                }
-                requestingCount = Math.min(this.props.childrenLimit, rest)
-                offset = loader.position + 1
-            }
-            else 
+            let index = currentComments.findIndex(c => c.position == loader.position)
+            if(index == -1)
             {
                 console.error("Comment not found")
+                index = loader.position
             }
+            let rest = commentCount - (loader.position + 1)
+            if(currentComments.length > index + 1)
+            {
+                const nextPosition = currentComments[index + 1].position
+                if(nextPosition)
+                    rest = nextPosition - loader.position - 1
+            }
+            requestingCount = Math.min(this.props.childrenLimit, rest)
+            offset = loader.position + 1
         }
         else {
             const rest = loader.position
