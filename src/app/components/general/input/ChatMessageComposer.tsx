@@ -283,7 +283,7 @@ export class ChatMessageComposer extends React.Component<Props,State> {
           newEditorState,
           contentState.getSelectionAfter(),
         );
-      }
+    }
     sendDidType = () =>{
         this.props.onDidType(this.state.plainText)
     }
@@ -296,7 +296,9 @@ export class ChatMessageComposer extends React.Component<Props,State> {
         NavigationUtilities.protectNavigation(this.protectKey, text != "")
         const hasChanged = this.state.plainText != text
         const f = hasChanged ? this.sendDidType : undefined
-         this.setState({plainText:text, editorState:state}, f)
+         this.setState(() => {
+            return {plainText:text, editorState:state}
+         }, f)
     }
     private getProcessedText = () => {
         if(!this.state.editorState)

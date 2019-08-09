@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 
-import { EditorState, DraftHandleValue } from 'draft-js';
+import { EditorState, DraftHandleValue, Modifier, SelectionState , } from 'draft-js';
 import Editor from "draft-js-plugins-editor";
 import "draft-js-mention-plugin/lib/plugin.css";
 import "draft-js-emoji-plugin/lib/plugin.css";
@@ -17,7 +17,26 @@ import { userFullName } from "../../../utilities/Utilities";
 require("./MentionEditor.scss");
 
 let theme = {...defaultTheme, emojiSelectPopover:"emojiSelectPopover " + defaultTheme.emojiSelectPopover}
-
+export const emojiReplacements = {
+    ':-)': "😀", 
+    ':)': "😀", 
+    ':]': "😀", 
+    ':-]': "😀", 
+    ':D':"🤣",
+    ':-D':"🤣",
+    ':/':'😕',
+    ':-/':'😕',
+    ':(':'🙁',
+    ':-(':'🙁',
+    ':[':'😡', 
+    ':-[':'😡',
+    '</3':'💔',
+    '<3':'❤️',
+    ':-O':'😲',
+    ':O':'😲',
+    ';)':'😉', 
+    ';-)':'😉'
+}
 export class Mention {
     name: string;
     key: string;
@@ -104,7 +123,7 @@ type OwnProps = {
     mentionSearch:(search:string, completion:(mentions:Mention[]) => void) => void
     onHandleUploadClick?:(event) => void
     placeholder?:string
-    keyBindings?:(event) => void
+    keyBindings?:(event:any) => string
     handleKeyCommand?:(command: string) => DraftHandleValue
 
 }
@@ -281,12 +300,14 @@ export default class MentionEditor extends React.Component<Props, State> {
     {
         e.preventDefault();
         let visible = !this.state.emojiSelectOpen;
-        this.setState({ emojiSelectOpen: visible }, () => {
-        if (visible) {
-            this.addBackDrop();
-        } else {
-            this.removeBackDrop();
-        }
+        this.setState(() => {
+            return { emojiSelectOpen: visible }
+        }, () => {
+            if (visible) {
+                this.addBackDrop();
+            } else {
+                this.removeBackDrop();
+            }
         })
 
     }
@@ -307,9 +328,66 @@ export default class MentionEditor extends React.Component<Props, State> {
         else if(this.props.onHandleUploadClick)
             this.props.onHandleUploadClick(event)
     }
+    private replaceText = (start:number, end:number, text:string, newOffset:number, editorState: EditorState) => {
+        const selection = editorState.getSelection();
+        const block = editorState.getCurrentContent().getBlockForKey(selection.getAnchorKey());
+        const blockSelection = SelectionState
+            .createEmpty(block.getKey())
+            .merge({
+            anchorOffset: start,
+            focusOffset: end,
+          }) as SelectionState
+        let contentState = editorState.getCurrentContent();
+        contentState = Modifier.replaceText(contentState, blockSelection, text)
+        let state = EditorState.push( editorState, contentState, 'insert-characters')
+        const newselection = new SelectionState({
+            anchorKey: block.getKey(),
+            anchorOffset: newOffset,
+            focusKey: block.getKey(),
+            focusOffset: newOffset,
+            isBackward: false,
+        })
+        state = EditorState.forceSelection(
+            state,newselection
+        )
+        this.onChange(state)
+    }
+    onHandleBeforeInput = (chars: string, editorState: EditorState):DraftHandleValue => {
+
+        const selection = editorState.getSelection();
+        const block = editorState.getCurrentContent().getBlockForKey(selection.getAnchorKey());
+        const value = block.getText()
+        const charsInputPos = selection.getEndOffset()
+        const text = value.slice(0, charsInputPos);
+        if(chars == " ")
+        {
+            var word = ""
+            var i = text.length
+            while(i >= 0)
+            {
+                let char = text.substring(i - 1, i)
+                if(char == " " || i == 0)
+                {
+                    let replacement = emojiReplacements[word]
+                    if (replacement)
+                    {
+                        const text = replacement + " "
+                        this.replaceText(i, charsInputPos, text, i + text.length, editorState)
+                        return "handled" 
+                    }
+                }
+                else 
+                {
+                    word = char + word
+                }
+                i--
+            }
+        }
+        return "not-handled"    
+    }
     render = () => {
         const { MentionSuggestions } = this.mentionPlugin;
-        const plugins = [this.emojiPlugin, this.mentionPlugin];
+        const plugins = [this.mentionPlugin];
         return (
         <div ref={this.container} className="mention-editor" onClick={this.focus}>
             <div>
@@ -325,7 +403,9 @@ export default class MentionEditor extends React.Component<Props, State> {
                             onFocus={this.props.onFocus}
                             placeholder={this.props.placeholder}
                             keyBindingFn={this.props.keyBindings}
+                            handleBeforeInput={this.onHandleBeforeInput}
                             handleKeyCommand={this.props.handleKeyCommand}
+                            
                         />
                     </div>
                 </div>

@@ -345,6 +345,8 @@ export class NewsfeedComponent extends React.Component<Props, State> {
         }
         else
         {
+            if(this.props.rootStatus)
+                return
             this.setState({
                 isLoading: true
             }, this.fetchUpdates);

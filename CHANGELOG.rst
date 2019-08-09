@@ -12,6 +12,7 @@ Added:
 * 7 new modules for profile page
 * Page/dialog for logging and displaying errors
 * Added buttons for removing failed temporary conversation messages
+* Added ability to replace text emoji with emoji while typing
 
 Bugfixes:
 =========
