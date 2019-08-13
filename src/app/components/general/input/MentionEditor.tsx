@@ -38,19 +38,22 @@ export const emojiReplacements = {
     ';-)':'😉'
 }
 export class Mention {
-    name: string;
-    key: string;
-    avatar: string;
-    id: number;
-    constructor(name: string, key: string, avatar: string, id: number) {
-        this.name = name;
-        this.avatar = avatar;
-        this.key = key;
-        this.id = id;
+    name: string
+    key: string
+    username:string
+    avatar: string
+    id: number
+    constructor(name: string, key: string, username:string, avatar: string, id: number) {
+        this.name = name
+        this.key = key
+        this.username = username
+        this.avatar = avatar
+        this.id = id
     }
     static fromUser(user:UserProfile)
     {
         return new Mention(userFullName(user),
+        "auth.user:" + user.id,// user.username,
         user.username,
         IntraSocialUtilities.appendAuthorizationTokenToUrl(user.avatar || user.avatar_thumbnail),
         user.id)
@@ -83,7 +86,7 @@ const Entry = (props: EntryProps) => {
             <div className="mentionSuggestionsEntryContainerRight">
             <div className="mentionSuggestionsEntryText">{mention.name}</div>
 
-            <div className="mentionSuggestionsEntryTitle">{mention.key}</div>
+            <div className="mentionSuggestionsEntryTitle">{mention.username}</div>
             </div>
         </div>
         </div>

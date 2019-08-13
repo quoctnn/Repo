@@ -60,7 +60,7 @@ export class MessageContentParser{
             if(!user)
                 return null
             return {
-                regex:new RegExp("@" + user.username.replace("+","\\+"), 'g'),
+                regex:new RegExp("(@auth.user:" + user.id + ")|(" + "@" + user.username.replace("+","\\+") + ")", 'g'),
                 fn: (key, result) => {
                     if(this.simpleMode)
                         return <b key={this.getKey(key)}>{userFullName(user)}</b>

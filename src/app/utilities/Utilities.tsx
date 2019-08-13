@@ -216,7 +216,7 @@ export function getTextContent(prefixId: string,
     config.push(breaks)
     const mentionSearch = mentions.map(user => {
         return {
-            regex: new RegExp("@" + user.username.replace("+", "\\+"), 'g'),
+            regex:new RegExp("(@auth.user:" + user.id + ")|(" + "@" + user.username.replace("+","\\+") + ")", 'g'),
             fn: (key, result) => {
                 return <IntraSocialLink key={getKey(key)} to={user} type={ContextNaturalKey.USER}>{userFullName(user)}</IntraSocialLink>
             }
@@ -316,41 +316,6 @@ const truncateElements = (arr: JSX.Element[], limit: number, linebreakLimit: num
         }
     }
     return { result, length: banked, rest }
-}
-export function rawMarkup(text, mentions: any[]) {
-    var markup = text
-    if (Settings.searchEnabled) {
-        markup = markup.replace(HASHTAG_REGEX_WITH_HIGHLIGHT, (hashTag) => {
-            let tag = hashTag.replace(TAG_REGEX, "")
-            let href = `${Routes.SEARCH}?term=${encodeURIComponent(tag)}`
-            return `<a href="${href}">${hashTag}</a>`
-        });
-    }
-    // Add missing http:// to URLs starting with "www."
-    // TODO: Fix this replacement, is not working
-    markup = markup.replace(URL_WWW_REGEX, 'http://$1');
-
-    // URLs starting with http://, https://, or ftp:// replaced as link
-    markup = markup.replace(URL_REGEX, (group) => {
-        return `<a href="${group}" target="_blank"  data-toggle="tooltip" title="${group}">${truncate(group, 50)}</a>`
-    });
-
-    // Change email addresses to mailto:: links.
-    markup = markup.replace(EMAIL_REGEX, '$1<a href="mailto:$2">$2</a>');
-
-    // Add break lines
-    markup = markup.replace(/(?:\r\n|\r|\n)/g, '<br />');
-
-    // Replace mentions (@username) with user first name
-    if (mentions !== undefined) {
-        mentions.map(function (user) {
-            let el = `<a href="${Routes.profileUrl(user.slug_name)}" data-toggle="tooltip" title="${userFullName(user)}">${user.first_name + " " + user.last_name}</a>`
-            // let elementHTML = "<a href=" + user.absolute_url + ">" + user.first_name + "</a>";
-            let regexExpression = new RegExp("@" + user.username.replace("+", "\\+"), 'g');
-            markup = markup.replace(regexExpression, el);
-        });
-    }
-    return { __html: markup };
 }
 
 /**
