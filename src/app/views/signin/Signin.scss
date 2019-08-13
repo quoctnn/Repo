@@ -25,9 +25,11 @@ $pentagon-side: 150px;
         border-radius: 16px;
         min-width: 700px;
         .left{
-            width: 40%;
+            margin: 20px;
+            width: 60%;
             position: relative;
             svg{
+                display: none;
                 position: absolute;
                 top:0;
                 bottom: 0;
@@ -37,7 +39,7 @@ $pentagon-side: 150px;
             }
         }
         .right{
-            min-width: 60%;
+            display: none;
         }
     }
 }
