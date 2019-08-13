@@ -21,7 +21,8 @@ config.module.rules.unshift(
     test:/\.js$/,
     include: [
         path.resolve(__dirname, "../node_modules/react-360-web")
-    ],use: [
+    ],
+    use: [
       {
         loader: 'babel-loader?cacheDirectory',
         options: {
