@@ -279,6 +279,7 @@ export default class StatusEditorComponent extends React.Component<Props, State>
                 forceUpdate={this.props.forceUpdate}
                 singleLine={this.props.singleLine}
                 minimumTextLength={0}
+                useAdaptiveFontSize={true}
             />
         )
     }

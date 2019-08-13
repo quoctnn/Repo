@@ -7,6 +7,7 @@ import {nullOrUndefined, uniqueId } from '../../../utilities/Utilities';
 import "./ChatMessageComposer.scss"
 import classnames from 'classnames';
 import { NavigationUtilities } from '../../../utilities/NavigationUtilities';
+import { Settings } from '../../../utilities/Settings';
 
 const { isCtrlKeyCommand } = KeyBindingUtil;
 
@@ -144,6 +145,7 @@ type DefaultProps = {
     submitOnEnter:boolean
     singleLine:boolean
     minimumTextLength:number
+    useAdaptiveFontSize:boolean
 }
 type Props = OwnProps & DefaultProps
 interface State
@@ -159,7 +161,8 @@ export class ChatMessageComposer extends React.Component<Props,State> {
         showSubmitButton:true,
         submitOnEnter:false,
         singleLine:false,
-        minimumTextLength:1
+        minimumTextLength:1,
+        useAdaptiveFontSize:false
     }
     getNavigationProtectionKeys = () => {
         return [this.protectKey]
@@ -324,7 +327,8 @@ export class ChatMessageComposer extends React.Component<Props,State> {
     }
     render = () => {
         const canSubmit = this.canSubmit()
-        const cn = classnames("chat-message-composer", this.props.className, {"single-line":this.props.singleLine})
+        const largeText = this.props.useAdaptiveFontSize ? this.state.plainText.length < Settings.StatusAdaptiveFontSizeLimit && this.state.plainText.length > 0 : false
+        const cn = classnames("chat-message-composer", this.props.className, {"single-line":this.props.singleLine, "af":largeText})
         return (
             <div className={cn}>
                 <form className="clearfix" action="." onSubmit={this.handleSubmit}>

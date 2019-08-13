@@ -35,6 +35,7 @@ type OwnProps =
     onFocus?(e: React.SyntheticEvent<{}>): void
     focusEnd?:(f:() => void) => void
     forceUpdate?:string
+    useAdaptiveFontSize?:boolean
 }
 type DefaultProps = {
 
@@ -272,6 +273,7 @@ export class StatusComposerComponent extends React.Component<Props, State> {
                 forceUpdate={this.props.forceUpdate}
                 singleLine={this.props.singleLine}
                 minimumTextLength={0}
+                useAdaptiveFontSize={this.props.useAdaptiveFontSize}
             />
         )
     }

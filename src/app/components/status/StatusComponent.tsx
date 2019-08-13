@@ -176,7 +176,8 @@ export class StatusComponent extends React.Component<Props, State> {
         const readBy = this.props.status.read_by || []
         //console.log("Render Status ", status.id)
         const large = files.length > 0 || linkCards.length > 0
-        const statusContentClass = classnames("status-content-inner main-content-secondary-background", {large:large})
+        const largeText = !isComment && content.length > 0 && content.length < Settings.StatusAdaptiveFontSizeLimit
+        const statusContentClass = classnames("status-content-inner main-content-secondary-background", {large:large, "af":largeText})
         return(<div ref={this.props.innerRef} className={cn}>
                 <div className="d-flex">
                     <div className="flex-shrink-0 header-left">

@@ -227,12 +227,14 @@ export function getTextContent(prefixId: string,
     const embedKeys = Object.keys(embedlyArr)
     let flatten = flattenElements(processed)
     let hasMore = false
+    let length = 0
     if (truncateLength > 0) {
         const truncatedResult = truncateElements(flatten, truncateLength, linebreakLimit)
         flatten = truncatedResult.result
         hasMore = truncatedResult.rest.length > 0
+        length = truncatedResult.length
     }
-    const ret: { textContent: JSX.Element[], linkCards: JSX.Element[], hasMore: boolean } = { textContent: flatten, linkCards: [], hasMore }
+    const ret: { textContent: JSX.Element[], linkCards: JSX.Element[], hasMore: boolean, length:number } = { textContent: flatten, linkCards: [], hasMore, length }
     if (includeEmbedlies && embedKeys.length > 0) {
         ret.linkCards = embedKeys.map(k => embedlyArr[k])
     }

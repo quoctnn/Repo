@@ -184,6 +184,7 @@ class NewsfeedModule extends React.Component<Props, State> {
                         showSubmitButton={this.state.statusComposerFocus}
                         singleLine={!this.state.statusComposerFocus}
                         forceHideDropzone={!this.state.statusComposerFocus}
+                        useAdaptiveFontSize={this.state.statusComposerFocus}
                         //taggableMembers={task.visibility}
                     />
                 </div>

@@ -1173,6 +1173,7 @@ export class NewsfeedComponent extends React.Component<Props, State> {
                     communityId={composer.communityId}
                     focusEnd={f => composer.composerFocus = f}
                     taggableMembers={this.getStatusTaggableMembers(composer.statusId)}
+                    useAdaptiveFontSize={false}
                 />
             )
     }
