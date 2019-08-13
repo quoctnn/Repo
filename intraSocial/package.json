@@ -3,7 +3,7 @@
   "productName": "intraSocial",
   "version": "0.5.4",
   "description": "intraSocial ALPHA - For testing purposes only",
-  "main": "app/index.js",
+  "main": "index.js",
   "scripts": {
     "start": "electron-forge start",
     "package": "electron-forge package",
@@ -23,6 +23,7 @@
   },
   "devDependencies": {
     "@electron-forge/maker-deb": "^6.0.0-beta.44",
+    "@electron-forge/maker-dmg": "^6.0.0-beta.44",
     "@electron-forge/maker-rpm": "^6.0.0-beta.44",
     "@electron-forge/maker-zip": "^6.0.0-beta.44",
     "babel-plugin-transform-async-to-generator": "^6.24.1",
