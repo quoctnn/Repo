@@ -4,6 +4,5 @@ node_modules/
 webpack/webpack-stats-dev.json
 app/
 intra.work-BETA/
-intraSocial/assets/
 intraSocial/out/
 !src/app/
