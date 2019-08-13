@@ -17,7 +17,7 @@ export const availableEndpoints: ApiEndpoint[] = [
     {
         endpoint: 'https://intra.work',
         loginType: EndpointLoginType.API,
-        defaultCommunity: 132,
+        defaultCommunity: 127,
         websocket: 'wss://intra.work/socket/'
     }
 ]

@@ -60,7 +60,7 @@ export class MessageContentParser{
             if(!user)
                 return null
             return {
-                regex:new RegExp("@" + user.username.replace("+","\\+"), 'g'),
+                regex:new RegExp("(@auth.user:" + user.id + ")|(" + "@" + user.username.replace("+","\\+") + ")", 'g'),
                 fn: (key, result) => {
                     if(this.simpleMode)
                         return <b key={this.getKey(key)}>{userFullName(user)}</b>
@@ -163,8 +163,8 @@ export class MessageContent extends React.Component<Props,State> {
                         <div className="status text-truncate">{translate("Sending failed")}</div>
                     </div>
                     <div className="d-flex flex-shrink-0">
-                        <button className="btn" onClick={() => ConversationManager.retryQueuedMessage(message)}>{translate("Retry")}</button>
-                        <button className="btn" onClick={() => ConversationManager.removeQueuedMessage(message)}>{translate("Remove")}</button>
+                        <button className="btn link-text" onClick={() => ConversationManager.retryQueuedMessage(message)}>{translate("Retry")}</button>
+                        <button className="btn link-text" onClick={() => ConversationManager.removeQueuedMessage(message)}>{translate("Remove")}</button>
                     </div>
                 </div>)
     }
@@ -186,7 +186,8 @@ export class MessageContent extends React.Component<Props,State> {
                         <div className="status text-truncate">{ FileUtilities.humanFileSize( message.tempFile.size ) + " " + translate("Sending failed")}</div>
                     </div>
                     <div className="d-flex flex-shrink-0">
-                        <button className="btn" onClick={() => ConversationManager.retryQueuedMessage(message)}>{translate("Retry")}</button>
+                        <button className="btn link-text" onClick={() => ConversationManager.retryQueuedMessage(message)}>{translate("Retry")}</button>
+                        <button className="btn link-text" onClick={() => ConversationManager.removeQueuedMessage(message)}>{translate("Remove")}</button>
                     </div>
                 </div>)
     }
@@ -195,6 +196,16 @@ export class MessageContent extends React.Component<Props,State> {
                     <div className="d-flex flex-column mw0 mr-2">
                         <div className="title text-truncate">{message.tempFile.name}</div>
                         <div className="status text-truncate">{translate("File uploaded. Creating message") }</div>   
+                    </div>
+                </div>)
+    }
+    private renderIllegalContent = (message:Message) => {
+        return (<div className="d-flex align-items-center">
+                    <div className="d-flex flex-column mw0 mr-2">
+                        <div className="title text-truncate">{translate("The message could not be sent")}</div>
+                    </div>
+                    <div className="d-flex flex-shrink-0">
+                        <button className="btn link-text" onClick={() => ConversationManager.removeQueuedMessage(message)}>{translate("Remove")}</button>
                     </div>
                 </div>)
     }
@@ -225,7 +236,7 @@ export class MessageContent extends React.Component<Props,State> {
                     {hasContent && this.wrapInMessage(processedContent.content, null, null, message.error )}
                     {hasFiles && this.wrapInMessage(<ContentGallery files={files} setWidth={true}/>,null, null, message.error)}
                     {hasLinks && urls.map(u => this.wrapInMessage(<Embedly renderOnError={false} verticalCard={true} url={u} />, "embed", null, message.error))}
-                    {showError && this.wrapInMessage(translate("The message could not be sent"), null, null, message.error)}
+                    {showError && this.wrapInMessage(this.renderIllegalContent(message), null, null, message.error)}
                 </>
     }
 }

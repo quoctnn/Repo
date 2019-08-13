@@ -21,7 +21,8 @@ config.module.rules.unshift(
     test:/\.js$/,
     include: [
         path.resolve(__dirname, "../node_modules/react-360-web")
-    ],use: [
+    ],
+    use: [
       {
         loader: 'babel-loader?cacheDirectory',
         options: {
@@ -76,10 +77,10 @@ module.exports = merge(config, {
     new CopyWebpackPlugin([{
       from: 'electron/'
     }]),
-    new CopyWebpackPlugin([{
-      from: 'react360/',
-      to:"react360"
-    }]),
+    // new CopyWebpackPlugin([{
+    //   from: 'react360/',
+    //   to:"react360"
+    // }]),
     new CopyWebpackPlugin([{
       from: 'CHANGELOG.rst',
       to:"assets/docs"

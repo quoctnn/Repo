@@ -1,6 +1,6 @@
 {
   "name": "beta.intra.work",
-  "version": "0.5.3",
+  "version": "0.5.4",
   "description": "intraSocial client (Typescript)",
   "main": "index.js",
   "scripts": {

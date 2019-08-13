@@ -41,10 +41,8 @@
         height: 50px;
         flex-shrink: 0;
     }
-    .status-comment-loader, .comment-form{
-        &.lvl1{
+    .status-comment-loader.lvl1 .status-comment-loader-content, .comment-form.lvl1{
             padding-left: 60px;
-        }
     }
     .status-component {
         &.lvl2{

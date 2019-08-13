@@ -40,6 +40,7 @@ export interface ISettings
     FBAppId:string
     GoogleClientID:string
     LinkedInClientID:string
+    StatusAdaptiveFontSizeLimit:number
 }
 export const Settings:ISettings = {
     isProduction : process.env.NODE_ENV === "production",
@@ -63,11 +64,12 @@ export const Settings:ISettings = {
     mapboxAccessToken:"pk.eyJ1IjoiaW50cmFob3VzZSIsImEiOiJjaXJsc3lmc3gwMDJyaGpuaHdvb2oxYnM5In0.2Um0WFRpufTR55w9_6ALDQ",
     allowReact360:false,
     compatMajor:0,
-    compatMinor:6,
+    compatMinor:7,
     CDN:true,
     CDNHost:"cdn.intra.work",
-    CDNPath:"0.5.3/9",
+    CDNPath:"0.5.4/0",
     FBAppId:"1011246482308121",
     GoogleClientID:"506961766547-9ocgkcnjrkg72v26licv1n6s2a6u2lh7.apps.googleusercontent.com",
-    LinkedInClientID:"78xd4ygq4gvmh8"
+    LinkedInClientID:"78xd4ygq4gvmh8",
+    StatusAdaptiveFontSizeLimit:85
 }

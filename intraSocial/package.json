@@ -1,9 +1,9 @@
 {
-  "name": "intrasocial",
+  "name": "intraSocial",
   "productName": "intraSocial",
-  "version": "0.5.3",
+  "version": "0.5.4",
   "description": "intraSocial ALPHA - For testing purposes only",
-  "main": "app/index.js",
+  "main": "index.js",
   "scripts": {
     "start": "electron-forge start",
     "package": "electron-forge package",
@@ -15,42 +15,17 @@
   "author": "Frank G",
   "license": "Private",
   "config": {
-    "forge": {
-      "make_targets": {
-        "win32": [
-          "squirrel"
-        ],
-        "darwin": [
-          "zip"
-        ],
-        "linux": [
-          "deb",
-          "rpm"
-        ]
-      },
-      "electronPackagerConfig": {
-        "packageManager": "npm"
-      },
-      "electronWinstallerConfig": {
-        "name": "intrasocial"
-      },
-      "electronInstallerDebian": {},
-      "electronInstallerRedhat": {},
-      "github_repository": {
-        "owner": "",
-        "name": ""
-      },
-      "windowsStoreConfig": {
-        "packageName": "",
-        "name": "intrasocial"
-      }
-    }
+    "forge": "./forge.config.js"
   },
   "dependencies": {
     "electron-compile": "^6.4.4",
     "electron-squirrel-startup": "^1.0.0"
   },
   "devDependencies": {
+    "@electron-forge/maker-deb": "^6.0.0-beta.44",
+    "@electron-forge/maker-dmg": "^6.0.0-beta.44",
+    "@electron-forge/maker-rpm": "^6.0.0-beta.44",
+    "@electron-forge/maker-zip": "^6.0.0-beta.44",
     "babel-plugin-transform-async-to-generator": "^6.24.1",
     "babel-preset-env": "^1.7.0",
     "babel-preset-react": "^6.24.1",

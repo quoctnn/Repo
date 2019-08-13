@@ -3,7 +3,12 @@
     display: flex !important;
     width: 100%;
     align-items: center;
-    @include var(background-color, main-content-background);
+    .status-comment-loader-content{
+        display: flex !important;
+        width: 100%;
+        align-items: center;
+        @include var(background-color, main-content-background);
+    }
     .line{
         flex-grow: 1;
         height: 1px;

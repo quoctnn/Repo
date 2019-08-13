@@ -10,7 +10,7 @@ $headerHeight:40px;
         height: $headerHeight;
         display: flex;
         align-items: center;
-        padding: 0.5em 0.7em;
+        padding: 0.5rem 0.7rem;
         margin-top: 0.3rem;
         flex-shrink: 0;
         font-size: 25px;
@@ -64,6 +64,9 @@ $headerHeight:40px;
         flex-direction: column;
         flex:1;
         overflow: hidden;
+        > .content{
+            padding: 0 0.7rem 0.5rem 0.7rem;
+        }
     }
     .module-footer
     {

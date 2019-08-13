@@ -5,8 +5,6 @@ import { Conversation, UserProfile } from '../../types/intrasocial_types';
 import { Link } from 'react-router-dom';
 import { AuthenticationManager } from '../../managers/AuthenticationManager';
 import { ProfileManager } from '../../managers/ProfileManager';
-import { nullOrUndefined, userAvatar } from '../../utilities/Utilities';
-import { Avatar } from '../../components/general/Avatar';
 import { ReduxState } from '../../redux';
 import { connect } from 'react-redux';
 import { ConversationUtilities } from '../../utilities/ConversationUtilities';

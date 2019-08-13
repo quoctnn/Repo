@@ -8,8 +8,13 @@ import { NotificationCenter } from '../utilities/NotificationCenter';
 export enum EventStreamMessageType {
     STATE = "state",
     USER_UPDATE = "user.update",
-    USER_LAST_SEEN = "user.last_seen",
+    USER_ADD = "user.add",
+    USER_REMOVE = "user.remove",
+
+    CLIENT_LAST_SEEN = "client.last_seen",
+    CLIENT_UPDATE = "client.update",
     CLIENT_STATUS_CHANGE = "client.status_change",
+    
     CONVERSATION_TYPING = "conversation.typing",
     CONVERSATION_MESSAGE = "conversation.message",
     CONVERSATION_REMOVE = "conversation.remove",

@@ -51,6 +51,7 @@ export class StatusUtilities
         status.reaction_count = 0
         status.temporary = true
         status.level = parent.level + 1
+        status.position = parent.comments
         return status
     }
     static findPrimaryLink(text:string) {

@@ -4,7 +4,7 @@ import classnames from "classnames"
 import "./EventsModule.scss"
 import { ResponsiveBreakpoint } from '../../components/general/observers/ResponsiveComponent';
 import { translate } from '../../localization/AutoIntlProvider';
-import { ContextNaturalKey, Event, Community } from '../../types/intrasocial_types';
+import { ContextNaturalKey, Event, Community, Group } from '../../types/intrasocial_types';
 import EventsMenu, { EventsMenuData } from './EventsMenu';
 import ListComponent from '../../components/general/ListComponent';
 import ApiClient, { PaginationResult } from '../../network/ApiClient';
@@ -28,6 +28,8 @@ type State = {
 }
 type ReduxStateProps = {
     community: Community
+    event: Event
+    group: Group
 }
 type ReduxDispatchProps = {
 }
@@ -83,7 +85,9 @@ class EventsModule extends React.Component<Props, State> {
         let ordering = this.state.menuData.sorting
         let upcoming = this.state.menuData.upcoming
         const communityId = this.props.community && this.props.community.id
-        ApiClient.getEvents(communityId, this.props.pageSize, offset, ordering, upcoming, (data, status, error) => {
+        const eventId = this.props.event ? this.props.event.id : null
+        const groupId = this.props.group ? this.props.group.id : null
+        ApiClient.getEvents(communityId, eventId, groupId, this.props.pageSize, offset, ordering, upcoming, (data, status, error) => {
             completion(data)
             ToastManager.showErrorToast(error)
         })
@@ -148,7 +152,7 @@ class EventsModule extends React.Component<Props, State> {
                     onMenuToggle={this.onMenuToggle}
                     menu={menu}
                     headerContent={headerContent}
-                    headerTitle={translate("events.module.title")}>
+                    headerTitle={this.props.event ? translate("events.module.sessions") : translate("events.module.title")}>
                 {this.renderContent()}
                 </SimpleModule>)
     }
@@ -156,8 +160,12 @@ class EventsModule extends React.Component<Props, State> {
 const mapStateToProps = (state:ReduxState, ownProps: OwnProps & RouteComponentProps<any>):ReduxStateProps => {
 
     const community = ContextManager.getContextObject(ownProps.location.pathname, ContextNaturalKey.COMMUNITY) as Community
+    const event = ContextManager.getContextObject(ownProps.location.pathname, ContextNaturalKey.EVENT) as Event
+    const group = ContextManager.getContextObject(ownProps.location.pathname, ContextNaturalKey.GROUP) as Group
     return {
-        community
+        community,
+        event,
+        group
     }
 }
 const mapDispatchToProps = (dispatch:ReduxState, ownProps: OwnProps):ReduxDispatchProps => {

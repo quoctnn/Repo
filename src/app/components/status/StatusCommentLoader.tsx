@@ -10,15 +10,16 @@ interface OwnProps
     className?:string
     isLoading:boolean
     loadMoreComments:(e: any) => void
+    loadNewer:boolean
 }
 type Props = OwnProps
 export class StatusCommentLoader extends React.PureComponent<Props, {}> {
     render =  () => 
     {
-        const cn = classnames("btn btn-link primary-text status-comment-loader", this.props.className)
-        const title = translate("Show previous")
-        return ( <div className="status-comment-loader-container">
-                    <Text disabled={this.props.isLoading} className={cn} onPress={this.props.loadMoreComments} title={title}>
+        const cn = classnames("status-comment-loader", this.props.className)
+        const title = this.props.loadNewer ? translate("Show newer") : translate("Show older")
+        return ( <div className={cn}>
+                    <Text disabled={this.props.isLoading} className="status-comment-loader-content btn btn-link primary-text " onPress={this.props.loadMoreComments} title={title}>
                         <div className="line"></div>
                         <div className="button">
                             {!this.props.isLoading && <i className="fa fa-arrow-down"/>} 

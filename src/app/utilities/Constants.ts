@@ -79,6 +79,7 @@ export default  {
         profilesUrl: '/api/v2/profile/',
         profilesV1Url: '/api/v1/profile/',
 
+
         myBusinessDataUrl:"/api/v2/profile/business-data/",
         myPersonalDataUrl:"/api/v2/profile/personal-data/",
         // Friends URLs
@@ -219,6 +220,9 @@ export default  {
         },
         // Status
         statusMarkRead:"/api/v2/status/mark-read/",
+        statusSingle: (id:number) => {
+            return `/api/v2/status/${id}/single/`
+        },
         postUrl: '/api/v2/status/',
         postCommentsUrl: (id:number) => {
             return `/api/v2/status/${id}/children/`
@@ -266,6 +270,16 @@ export default  {
         updateFavoriteUrl: (id:number) => {
             return `/api/v2/favorites/${id}/`
         },
+
+        // CV URLs
+        languageUrl:"/api/v2/cv/language/",
+        certificationUrl:"/api/v2/cv/certification/",
+        educationUrl:"/api/v2/cv/education/",
+        positionUrl:"/api/v2/cv/position/",
+        volunteeringUrl:"/api/v2/cv/volunteering/",
+
+        //
+        createCrashReportUrl:"/api/v2/crash-report/new/"
     },
 
     urlsRoute: {

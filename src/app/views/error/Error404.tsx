@@ -2,8 +2,6 @@ import * as React from "react";
 import "./Error404.scss"
 import { Link } from "react-router-dom";
 import Ufo from "../../components/general/images/Ufo";
-import EmptyBox from "../../components/general/images/EmptyBox";
-import IceCream from "../../components/general/images/IceCream";
 
 type Props = {
 }

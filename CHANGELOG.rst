@@ -2,6 +2,26 @@
 Task schedule
 -->
 
+v0.5.4 | 13.08.2019
+-----------------------------------------
+
+Added:
+======
+
+* Status page with highlighting and capability to load newer/older comments
+* 7 new modules for profile page
+* Page/dialog for logging and displaying errors
+* Added buttons for removing failed temporary conversation messages
+* Added ability to replace text emoji with emoji while typing
+
+Bugfixes:
+=========
+* Fixed crash when UploadedFile did not have any extension
+* Fixed issue with Status text truncation ("read more")
+* Fixed issue with inserting received sub comments
+* Fixed issue with retry sending conversation message
+
+
 v0.5.3 | 31.07.2019
 -----------------------------------------
 

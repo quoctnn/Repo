@@ -248,7 +248,7 @@ class TopProjects extends React.Component<TopProjectsProps, TopProjectsState> {
         }
     }
     fetchProjects = () => {
-        ApiClient.getProjects(null, 6, 0, ProjectSorting.mostUsed, null, null, (data, status, error) => {
+        ApiClient.getProjects(null, null, 6, 0, ProjectSorting.mostUsed, null, null, (data, status, error) => {
             const list = (data && data.results) || []
             this.setState((prevState: TopProjectsState) => {
                 return { list }
