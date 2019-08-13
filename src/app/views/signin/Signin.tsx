@@ -14,6 +14,7 @@ import { EndpointManager } from '../../managers/EndpointManager'
 import "./Signin.scss"
 import { translate } from '../../localization/AutoIntlProvider';
 import { Settings } from '../../utilities/Settings';
+import DashFillComponent from '../../components/general/DashFillComponent';
 
 type OwnProps = {
 
@@ -75,43 +76,59 @@ class Signin extends React.Component<Props, {}> {
         endpointName = endpointName.replace(/(:\d+$)/, '');
         return(
             <div id="sign-in">
-                <div className="jumbotron">
-                    <div className="container">
-                        <h2 >{translate("Sign in to") + " " + endpointName}</h2>
-                        <p className="lead">{translate("Enter your email address and password")}</p>
-                        <Form>
-                            <FormGroup>
-                                <Input type="text" autoComplete="username" name="email" innerRef={(input) => { this.emailInput = input }} defaultValue="leslie@intrahouse.com" placeholder={translate("Email")} />
-                            </FormGroup>
-                            <FormGroup>
-                                <Input autoComplete="current-password" name="password" innerRef={(input) => { this.passwordInput = input }} type="password" placeholder={translate("Password")} />
-                            </FormGroup>
-                            <FormGroup>
-                                <Button type="submit" color="info" onClick={this.doSignin}>{translate("Sign in")}</Button>
-                            </FormGroup>
-                        </Form>
-                        { endpoint.loginType == EndpointLoginType.API && <>
-                            <FacebookLogin
-                                appId={Settings.FBAppId}
-                                autoLoad={false}
-                                responseType="token,granted_scopes"
-                                scope="email"
-                                callback={this.doFacebookSignin}
-                            /><br></br>
-                            <GoogleLogin
-                                clientId={Settings.GoogleClientID}
-                                buttonText="Sign in with Google"
-                                onSuccess={this.doGoogleSignin}
-                                onFailure={this.doGoogleSignin}
-                                cookiePolicy={'single_host_origin'}
-                            /><br></br>
-                            {/* Linkedin provider on login API is broken...
-                                <LinkedIn
-                                clientId={Settings.LinkedInClientID}
-                                callback={this.doLinkedInSignin}
-                                text='Sign in with LinkedIn' /> */}
-                        </>
-                        }
+                <DashFillComponent useFillMode={true}/>
+                <div className="dashboard-container">
+                    <div className="sign-in">
+                        <div className="pentagon">
+                            
+                        </div>
+                        <div className="left">
+                            <svg viewBox="0 0 150 150">
+                                <path d="M0,0 h125 l25,75 l-25,75 h-125z" />
+                            </svg>
+                            <div className="login-panel">
+                                <h2 >{translate("Sign in to") + " " + endpointName}</h2>
+                                <p className="lead">{translate("Enter your email address and password")}</p>
+                                <Form>
+                                    <FormGroup>
+                                        <Input type="text" autoComplete="username" name="email" innerRef={(input) => { this.emailInput = input }} defaultValue="leslie@intrahouse.com" placeholder={translate("Email")} />
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <Input autoComplete="current-password" name="password" innerRef={(input) => { this.passwordInput = input }} type="password" placeholder={translate("Password")} />
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <Button type="submit" color="info" onClick={this.doSignin}>{translate("Sign in")}</Button>
+                                    </FormGroup>
+                                </Form>
+                            </div>
+                            <div className="social-sign-in-panel">
+                                { endpoint.loginType == EndpointLoginType.API && <>
+                                    <FacebookLogin
+                                        appId={Settings.FBAppId}
+                                        autoLoad={false}
+                                        responseType="token,granted_scopes"
+                                        scope="email"
+                                        callback={this.doFacebookSignin}
+                                    /><br></br>
+                                    <GoogleLogin
+                                        clientId={Settings.GoogleClientID}
+                                        buttonText="Sign in with Google"
+                                        onSuccess={this.doGoogleSignin}
+                                        onFailure={this.doGoogleSignin}
+                                        cookiePolicy={'single_host_origin'}
+                                    /><br></br>
+                                    {/* Linkedin provider on login API is broken...
+                                        <LinkedIn
+                                        clientId={Settings.LinkedInClientID}
+                                        callback={this.doLinkedInSignin}
+                                        text='Sign in with LinkedIn' /> */}
+                                </>
+                                }
+                            </div>
+                        </div>
+                        <div className="right">
+                            INFO
+                        </div>
                     </div>
                 </div>
             </div>
