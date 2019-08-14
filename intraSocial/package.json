@@ -3,7 +3,7 @@
   "productName": "intraSocial",
   "version": "0.5.4",
   "description": "intraSocial ALPHA - For testing purposes only",
-  "main": "index.js",
+  "main": "app/index.js",
   "scripts": {
     "start": "electron-forge start",
     "package": "electron-forge package",
