@@ -21,7 +21,7 @@ import { nullOrUndefined } from '../../utilities/Utilities';
 import Logo from '../../components/general/images/Logo';
 
 type SectionComponentProps = {
-    title:string 
+    title:string
     secondaryTitle?:string
     icon:string
     titleFirst?:boolean
@@ -100,7 +100,7 @@ class Signin extends React.Component<Props, {}> {
         const endpoint = EndpointManager.currentEndpoint()
         let endpointName = endpoint.endpoint.replace(/(^\w+:|)\/\//, '');
         endpointName = endpointName.replace(/(:\d+$)/, '');
-        const socialLinksActive = endpoint.loginType == EndpointLoginType.API
+        const socialLinksActive = endpoint.loginType == EndpointLoginType.API && !Settings.isElectron
         return(
             <div id="sign-in">
                 <div className="triangles-bg"></div>
@@ -190,8 +190,8 @@ class Signin extends React.Component<Props, {}> {
                         </div>
                         <div className="footer">
                             <div onClick={this.selectLocale(availableLanguages.indexOf("nb"))} className="locale-selector locale_nb"></div>
-                            <div onClick={this.selectLocale(availableLanguages.indexOf("es"))} className="locale-selector locale_es ml-1"></div>         
-                            <div className="ml-3">{translate("iw_made_in")}</div>   
+                            <div onClick={this.selectLocale(availableLanguages.indexOf("es"))} className="locale-selector locale_es ml-1"></div>
+                            <div className="ml-3">{translate("iw_made_in")}</div>
                         </div>
                     </div>
                 </div>
