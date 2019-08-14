@@ -11,6 +11,7 @@ export default abstract class Routes {
     static PROFILE_UPDATE = "/profile/update/"
     static SIGNIN = "/signin/"
     static SIGNOUT = "/signout/"
+    static SIGNUP = "/signup/"
     static CONVERSATION_CREATE = "/conversation/create/"
     static SEARCH = "/search/"
     static UPDATE_TOOL = "/app-update/"

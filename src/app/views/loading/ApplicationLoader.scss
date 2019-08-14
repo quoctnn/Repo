@@ -1,45 +1,27 @@
 @import "./../../Config";
-$leftcolorstop1: #ee7286;
-$leftcolorstop2: #a980cb;
 
-$rightcolorstop1: #f3dca2;
-$rightcolorstop2: #cb98ce;
+$bgcolorstop1: rgba(46, 103, 217, 0.8);
+$bgcolorstop2: rgba(114, 213, 114, 0.8);
 
-#application-loader{
-    .stop1{
-        stop-color: $leftcolorstop1;
-    }
-    .stop2{
-        stop-color: $leftcolorstop2;
-    }
-    .wave, .right, .left{
-        z-index: -1;
-    }
-    .wave, .right{
-        background-image: linear-gradient(to bottom, $rightcolorstop1, $rightcolorstop2);
-    }
-    .wave {
-        position:fixed;
-        top: 0;
-        height: 100%;
-        width: 300px;
-        margin: 0 auto;
-        left: calc(50% - 150px);
-    }
-    .left{
-        position:fixed;
+#application-loader{    
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    .triangles-bg,.gradient-bg{
+        position: absolute;
+        top:0;
+        bottom: 0;
         left:0;
-        right: 50%;
-        top:0;
-        bottom: 0;
-        background-image: linear-gradient(to bottom, $leftcolorstop1, $leftcolorstop2);
+        right:0;
     }
-    .right{
-        position:fixed;
-        left:50%;
-        right: 0;
-        top:0;
-        bottom: 0;
+    .triangles-bg{
+        background-image: url("../../assets/triangles-grey.png");
+        background-size: cover;
+    }
+    .gradient-bg{
+        background-image: linear-gradient(to right, $bgcolorstop1, $bgcolorstop2);
     }
     .logo{
         max-width: 300px;
