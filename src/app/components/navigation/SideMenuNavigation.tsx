@@ -344,7 +344,7 @@ class SideMenuNavigation extends React.Component<Props, State> {
     renderHeader = () => {
         return <div className="menu-header d-flex" >
             {this.state.open &&
-                <Logo className="intrawork-logo" progress={0} />
+                <Logo idPrefix="side_menu" className="intrawork-logo" progress={0} />
                 ||
                 <LogoSmall className="intrawork-logo-small" />
             }

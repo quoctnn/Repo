@@ -12,6 +12,7 @@ import { resetMessageQueueAction } from '../redux/messageQueue';
 import { ApplicationManager } from './ApplicationManager';
 import { CommunityManager } from './CommunityManager';
 import { Settings } from '../utilities/Settings';
+import { setLanguageAction } from '../redux/language';
 
 const url = require('url');
 const path = require("path")
@@ -30,6 +31,7 @@ export type AppWindowObject = {
     sendMessageElectron:(channel:string, msg:any) => void
     setTheme:(index:number) => void
     navigateToRoute:(route:string, modal?:boolean) => void
+    setLanguage:(index:number) => void
 }
 export abstract class WindowAppManager
 {
@@ -48,12 +50,16 @@ export abstract class WindowAppManager
             sendMessageElectron:WindowAppManager.sendMessageElectron,
             setTheme:WindowAppManager.setTheme,
             resetMessageQueue:WindowAppManager.resetMessageQueue,
-            navigateToRoute:WindowAppManager.navigateToRoute
+            navigateToRoute:WindowAppManager.navigateToRoute,
+            setLanguage:WindowAppManager.setLanguage
         }
         //
     }
     static setTheme = (index:number) => {
         ThemeManager.setTheme(index)
+    }
+    static setLanguage = (index:number) => {
+        WindowAppManager.getStore().dispatch(setLanguageAction(index))
     }
     static sendMessageElectron = (channel:string, msg:any) => {
         if (window.isElectron) {

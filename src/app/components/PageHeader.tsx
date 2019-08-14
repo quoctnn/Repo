@@ -23,7 +23,7 @@ export default class PageHeader extends React.Component<Props, {}> {
                     <CoverImage id="page-header-cover-image" src={coverImage}>
                     </CoverImage>
                     <div className="page-top-navigation">
-                        <Logo className="intrawork-logo" progress={0}/>
+                        <Logo idPrefix="pageHeader" className="intrawork-logo" progress={0}/>
                         <div className="flex-grow-1"></div>
                         <PageTopMenu />
                     </div>

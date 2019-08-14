@@ -35,7 +35,7 @@
   "homepage": "https://github.com/intrahouse/intrasocial-client#readme",
   "dependencies": {
     "@beyonk/google-fonts-webpack-plugin": "^1.2.3",
-    "@fortawesome/fontawesome-free": "^5.2.0",
+    "@fortawesome/fontawesome-free": "^5.10.1",
     "@types/classnames": "^2.2.6",
     "@types/draft-js": "^0.10.24",
     "@types/fbemitter": "^2.0.32",

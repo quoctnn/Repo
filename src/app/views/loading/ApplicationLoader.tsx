@@ -45,20 +45,11 @@ class ApplicationLoader extends React.Component<Props, {progress:LoadingProgress
     render() {
         return(
             <div id="application-loader">
-                <div className="left"></div>
-                <div className="right"></div>
-                <svg className="wave" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice">
-                    <defs>
-                        <linearGradient id="Gradient1" x1="0" x2="0" y1="0" y2="1">
-                            <stop className="stop1" offset="0%"/>
-                            <stop className="stop2" offset="100%"/>
-                        </linearGradient>
-                    </defs>
-                    <path d="M0,00 L60,00 C80,50 30,55 45,100 L0,100z" fill="url(#Gradient1)" />
-                </svg>
+                <div className="triangles-bg"></div>
+                <div className="gradient-bg"></div>
                 <div className="splash-content">
                     <div className="splash-title">{translate("splash.title")}</div>
-                    <Logo className="logo" progress={this.state.progress.percent} />
+                    <Logo idPrefix="app_loader" className="logo" progress={this.state.progress.percent} />
                     <div className="splash-subtitle">{translate("splash.subtitle")}</div>
                 </div>
             </div>

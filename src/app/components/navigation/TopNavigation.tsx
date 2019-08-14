@@ -92,7 +92,7 @@ class TopNavigation extends React.Component<Props, State> {
                             </Link>
                         </>
                         ||
-                        <Logo className="logo" progress={0} />
+                        <Logo idPrefix="top_nav" className="logo" progress={0} />
                     }
                 </div>
     }
