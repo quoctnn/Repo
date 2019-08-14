@@ -4,14 +4,13 @@
         <meta charset="UTF-8" />
         <meta http-equiv="Content-Security-Policy"
         <meta http-equiv="Content-Security-Policy"
-            content="script-src 'unsafe-eval' https://cdn.intra.work/
-                                              https://www.google-analytics.com/
-                                              https://connect.facebook.net/
-                                              https://api.google.com/
-                                              blob:;
-                     img-src * data: blob:;
-                     style-src 'unsafe-inline' https://cdn.intra.work/;
-                     font-src https://cdn.intra.work/;
+            content="script-src 'self' 'unsafe-eval' blob:
+                                       https://www.google-analytics.com/
+                                       https://connect.facebook.net/
+                                       https://api.google.com/;
+                     img-src 'self' * data: blob:;
+                     style-src 'self' 'unsafe-inline';
+                     font-src 'self';
                      default-src 'self' https://intra.work/ wss://intra.work/
                                         https://cdn.embedly.com/ https://*.mapbox.com/
                                         https://staticxx.facebook.com/"/>
