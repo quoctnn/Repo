@@ -1,8 +1,18 @@
-node_modules/
+# Config
 .git/
 .vscode/
-webpack/webpack-stats-dev.json
-app/
+
+# Builds
+/app
+
+# Node
+node_modules/
+
+# intra.work
 intra.work-BETA/
+
+# intraSocial
 intraSocial/out/
-!src/app/
+
+# Webpack
+webpack/webpack-stats-dev.json
