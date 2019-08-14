@@ -104,6 +104,13 @@ export abstract class WindowAppManager
                 pathname: path.join(Settings.CDNPath, window.appRoot, file),
                 slashes: true,
             })
+        } else if (Settings.isElectron) {
+            return url.format({
+                pathname: path.join(window.appRoot, "app", file),
+                protocol: location.protocol,
+                host:location.host,
+                slashes: true,
+            })
         }
         return url.format({
             pathname: path.join(window.appRoot, file),
