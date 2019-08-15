@@ -231,11 +231,12 @@ class NewsfeedModule extends React.Component<Props, State> {
                                     includeSubContext={this.state.includeSubContext}
                                     contextNaturalKey={resolvedContextNaturalKey}
                                     contextObjectId={resolvedContextObjectId}
+                                    contextObject={contextObject}
                                     filter={this.state.filter}
                                     scrollParent={window}
                                     />
                             </ModuleContent>
-                            <ModuleFooter>NewsFeed Footer</ModuleFooter>
+                            <ModuleFooter></ModuleFooter>
                         </>
                     }
                     <ModuleMenu visible={this.state.menuVisible}>

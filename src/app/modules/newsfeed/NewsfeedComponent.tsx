@@ -6,7 +6,7 @@ import { withRouter } from 'react-router';
 import * as Immutable from 'immutable';
 import ApiClient from '../../network/ApiClient';
 import { ReduxState } from '../../redux/index';
-import { UserProfile, Status, UploadedFile, ContextNaturalKey, StatusActions, ObjectAttributeType, Permission } from '../../types/intrasocial_types';
+import { UserProfile, Status, UploadedFile, ContextNaturalKey, StatusActions, ObjectAttributeType, Permission, Permissible } from '../../types/intrasocial_types';
 import { nullOrUndefined, uniqueId } from '../../utilities/Utilities';
 import { ToastManager } from '../../managers/ToastManager';
 import { StatusComponent } from '../../components/status/StatusComponent';
@@ -77,6 +77,7 @@ type OwnProps = {
     limit:number
     contextNaturalKey?:ContextNaturalKey
     contextObjectId?:number
+    contextObject?:Permissible
     includeSubContext?:boolean
     filter:ObjectAttributeType
     defaultChildrenLimit:number//children fetched upfront
@@ -179,6 +180,7 @@ export class NewsfeedComponent extends React.Component<Props, State> {
     componentDidUpdate = (prevProps:Props, prevState:State) => {
         if(this.props.contextNaturalKey != prevProps.contextNaturalKey ||
             this.props.contextObjectId != prevProps.contextObjectId ||
+            this.props.contextObject != prevProps.contextObject ||
             this.props.includeSubContext != prevProps.includeSubContext ||
             this.props.isResolvingContext != prevProps.isResolvingContext ||
             this.props.filter != prevProps.filter)
@@ -891,7 +893,7 @@ export class NewsfeedComponent extends React.Component<Props, State> {
                     insertIndex += 1
                 else
                 {
-                    // if not found, insert after parent 
+                    // if not found, insert after parent
                     insertIndex = this.findIndexByStatusId(comment.parent)
                     if(insertIndex > -1)
                         insertIndex += 1
@@ -1421,7 +1423,18 @@ export class NewsfeedComponent extends React.Component<Props, State> {
     renderEmpty = () => {
         if(!this.state.isLoading && this.state.hasLoaded && this.state.items.length == 0)
         {
-            return <div className="module-content-empty">{translate("common.module.empty")}</div>
+            const {contextObject, filter} = this.props
+            if (filter) {
+                return <div className="module-content-empty">{translate("newsfeed.module.empty")}</div>
+            } else if (contextObject && contextObject.permission >= Permission.post) {
+                return (
+                    <div className="module-content-empty">{translate("newsfeed.module.empty")}
+                        <div className="subtext">{translate("newsfeed.module.nothing.posted")}</div>
+                    </div>
+                )
+            } else {
+                return <div className="module-content-empty">{translate("newsfeed.module.empty")}</div>
+            }
         }
         return null
     }
@@ -1475,8 +1488,8 @@ const mapStateToProps = (state:ReduxState, ownProps: OwnProps):ReduxStateProps =
         authenticatedProfile:state.authentication.profile,
     }
 }
-const mergeProps = (stateProps, dispatchProps, ownProps) => 
-{ 
+const mergeProps = (stateProps, dispatchProps, ownProps) =>
+{
     return {...ownProps, ...stateProps}
 }
 export default withRouter(connect(mapStateToProps, undefined, mergeProps, { forwardRef:true })(NewsfeedComponent))
