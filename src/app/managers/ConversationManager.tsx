@@ -90,8 +90,8 @@ export abstract class ConversationManager
         ConversationManager.getStore().dispatch(addConversationsAction([conversation]))
     }
     private static processIncomingConversationRemove = (...args:any[]) => {
-        let data:{conversation:number} = args[0]
-        ConversationManager.removeConversation(data.conversation)
+        let data:{conversation_id:number} = args[0]
+        ConversationManager.removeConversation(data.conversation_id)
     } 
     private static processIncomingConversationMessage = (...args:any[]) => 
     {
