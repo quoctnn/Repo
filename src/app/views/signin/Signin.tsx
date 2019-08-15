@@ -104,7 +104,7 @@ class Signin extends React.Component<Props, {}> {
         const endpoint = EndpointManager.currentEndpoint()
         let endpointName = endpoint.endpoint.replace(/(^\w+:|)\/\//, '');
         endpointName = endpointName.replace(/(:\d+$)/, '');
-        const socialLinksActive = endpoint.loginType == EndpointLoginType.API && !Settings.isElectron
+        const socialLinksActive = endpoint.loginType == EndpointLoginType.API
         return(
             <div id="sign-in">
                 <div className="triangles-bg"></div>
@@ -131,7 +131,7 @@ class Signin extends React.Component<Props, {}> {
                                     </div>
                                     <Form>
                                         <InputGroup className="form-group form-input">
-                                            <Input type="text" autoComplete="username" name="email" innerRef={(input) => { this.emailInput = input }} defaultValue="leslie@intrahouse.com" placeholder={translate("Email")} />
+                                            <Input type="text" autoComplete="username" name="email" innerRef={(input) => { this.emailInput = input }} placeholder={translate("Email")} />
                                             <InputGroupAddon addonType="append"><i className="fas fa-user"></i></InputGroupAddon>
                                         </InputGroup>
                                         <InputGroup className="form-group form-input">
@@ -143,6 +143,7 @@ class Signin extends React.Component<Props, {}> {
                                         </FormGroup>
                                     </Form>
                                 </div>
+                                { Settings.isElectron ||
                                 <div className="social-sign-in-panel">
                                     <h2 className="social-login-title">{translate("social_login_title")}</h2>
                                     <div className="social-login">
@@ -180,6 +181,7 @@ class Signin extends React.Component<Props, {}> {
                                             text='Sign in with LinkedIn' /> */}
                                     </div>
                                 </div>
+                                }
                             </div>
                             <div className="right">
                                 <div className="intro">{translate("welcome_to")}</div>
