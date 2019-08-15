@@ -251,7 +251,12 @@ export class SearchComponent extends React.Component<Props, State> {
     componentDidMount = () => {
         this.loadSearchHistory()
         if(!nullOrUndefined(this.state.searchData.originalText))
-            this.onSearchDataChanged()
+        {
+            this.setState((prevState:State) => ({
+                isLoading: true,
+                requestId:prevState.requestId + 1
+            }), this.onSearchDataChanged)
+        }
     }
     loadSearchHistory()
     {

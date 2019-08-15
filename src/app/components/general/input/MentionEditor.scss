@@ -89,10 +89,12 @@ mention {
   position: absolute;
   right: -12px;
   z-index: 20000;
-}
-.emojiSelectPopover
-{
-  position: relative !important;
+  .emoji-picker .emoji{
+    box-sizing: initial;
+  }
+  .emoji-picker .search-bar{
+    display: flex;
+  }
 }
 .context-positioning-element
 {
