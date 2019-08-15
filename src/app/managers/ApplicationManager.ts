@@ -151,7 +151,7 @@ export abstract class ApplicationManager
         })
     }
     private static fetchContacts = (completion:() => void) => {
-        ApiClient.getProfiles(100, 0, (data, status, error) => {
+        ApiClient.getProfiles(10000, 0, (data, status, error) => {
             const profiles = (data && data.results) || []
             ProfileManager.storeProfiles(profiles, true)
             completion()
