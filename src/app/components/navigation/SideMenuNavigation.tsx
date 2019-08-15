@@ -18,6 +18,7 @@ import Routes from '../../utilities/Routes';
 import { Link } from "react-router-dom";
 import { ContextManager } from "../../managers/ContextManager";
 import { AuthenticationManager } from '../../managers/AuthenticationManager';
+import { Settings } from '../../utilities/Settings';
 
 type ContextItemProps = {
     name?:string
@@ -384,14 +385,16 @@ class SideMenuNavigation extends React.Component<Props, State> {
                         <Link to={{pathname:Routes.CHANGELOG, state:{modal:true}}} className="menu-button">
                             <i className="fas fa-info-circle"></i>
                         </Link>
-                        { anonUser || <>
+                        { Settings.isElectron ||
                             <Link to={Routes.DEVELOPER_TOOL.path} className="menu-button">
                                 <i className="fas fa-cog"></i>
                             </Link>
+                        }
+                        { anonUser ||
                             <Link to={Routes.FILES} className="menu-button">
                                 <i className="fas fa-cloud"></i>
                             </Link>
-                        </> }
+                        }
                         <div className="menu-button mode-switch" onClick={this.toggleMode} style={{ transitionDuration: transDur }}>
                             <i className={modeIconClass}></i>
                         </div>
