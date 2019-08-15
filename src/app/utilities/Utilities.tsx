@@ -4,12 +4,12 @@ const processString = require('react-process-string');
 import Routes from './Routes';
 import * as React from 'react';
 import { UserProfile, StatusActions, Community, Project, Group, Event, Coordinate, SimpleUserProfile, ContextNaturalKey, AvatarAndCover } from '../types/intrasocial_types';
-import { Text } from '../components/general/Text';
 import Constants from '../utilities/Constants';
 import { translate } from '../localization/AutoIntlProvider';
 import { IntraSocialLink } from '../components/general/IntraSocialLink';
 import * as moment from 'moment-timezone';
 import Link from '../components/general/Link';
+import { Link as ReactLink } from 'react-router-dom';
 let timezone = moment.tz.guess()
 export const getDomainName = (url: string) => {
     var url_parts = url.split("/")
@@ -202,7 +202,7 @@ export function getTextContent(prefixId: string,
             regex: HASHTAG_REGEX_WITH_HIGHLIGHT,
             fn: (key, result) => {
                 const href = Routes.searchUrl(result[0])//result[1] == without #
-                return (<Text title={translate("search.for") + " " + result[0]} key={getKey("hashtag" + result[0])} href={href}>{result[0]}</Text>)
+                return (<ReactLink title={translate("search.for") + " " + result[0]} key={getKey("hashtag" + result[0])} to={{pathname:Routes.SEARCH, state:{modal:true}, search:"term=" + encodeURIComponent(result[0])}}>{result[0]}</ReactLink>)
             }
         }
         config.push(hashtags)
@@ -365,7 +365,37 @@ export const filterArray = (array, text) => {
     });
     return filteredArray;
 }
-
+export const parseQueryString = (queryString:string) => {
+	var dictionary = {};
+	
+	// remove the '?' from the beginning of the
+	// if it exists
+	if (queryString.indexOf('?') === 0) {
+		queryString = queryString.substr(1);
+	}
+	
+	// Step 1: separate out each key/value pair
+	var parts = queryString.split('&amp;');
+	
+	for(var i = 0; i < parts.length; i++) {
+		var p = parts[i];
+		// Step 2: Split Key/Value pair
+		var keyValuePair = p.split('=');
+		
+		// Step 3: Add Key/Value pair to Dictionary object
+		var key = keyValuePair[0];
+		var value = keyValuePair[1];
+		
+		// decode URI encoded string
+		value = decodeURIComponent(value);
+		value = value.replace(/\+/g, ' ');
+		
+		dictionary[key] = value;
+	}
+	
+	// Step 4: Return Dictionary Object
+	return dictionary;
+}
 export function compareObjects(o1: object, o2: object) {
     for (var p in o1) {
         if (o1.hasOwnProperty(p)) {

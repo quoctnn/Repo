@@ -7,7 +7,7 @@ import ApiClient, { ElasticResult, SearchArguments } from "../../network/ApiClie
 import { Avatar } from '../general/Avatar';
 import { SearchBox } from "../general/input/contextsearch/SearchBox";
 import { EditorState } from "draft-js";
-import { nullOrUndefined, truncate, userFullName, stringToDateFormat, getTextContent } from '../../utilities/Utilities';
+import { nullOrUndefined, truncate, userFullName, stringToDateFormat } from '../../utilities/Utilities';
 import { FormGroup, Label, Input, Button } from "reactstrap";
 import { translate } from "../../localization/AutoIntlProvider";
 import CursorList from "../general/input/contextsearch/CursorList";
@@ -184,6 +184,7 @@ const breadcrumbsFromContext = (contextNaturalKey:ContextNaturalKey, contextObje
 export interface Props {
     onClose:() => void
     visible:boolean
+    initialTerm?:string
 }
 export interface State {
 
@@ -201,6 +202,7 @@ export interface State {
     fromDate:Moment
     toDate:Moment
 }
+SearcQueryManager
 export class SearchComponent extends React.Component<Props, State> {
     
     searchTextInput = React.createRef<SearchBox>()
@@ -215,7 +217,7 @@ export class SearchComponent extends React.Component<Props, State> {
         this.state = {
             searchActive:false,
             activeSearchType:null,
-            searchData:new ContextSearchData({tokens:[], query:"", tags:[], filters:{}, stateTokens:[], originalText:""}),
+            searchData:SearcQueryManager.parse(this.props.initialTerm || "", allowedSearchContextFilters),
             searchResult:null,
             searchHistory:[],
             lastLoggedHistory:null,
@@ -248,6 +250,8 @@ export class SearchComponent extends React.Component<Props, State> {
     }
     componentDidMount = () => {
         this.loadSearchHistory()
+        if(!nullOrUndefined(this.state.searchData.originalText))
+            this.onSearchDataChanged()
     }
     loadSearchHistory()
     {
@@ -372,7 +376,7 @@ export class SearchComponent extends React.Component<Props, State> {
             types,
             include_results:true,
             include_aggregations:true,
-            filters:this.getRealFilters(currentFilters),
+            filters:this.getRealFilters(currentFilters),    
             tags:data.tags,
             date_sort:sortOnDate,
             from_date:fromDate || undefined,

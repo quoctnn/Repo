@@ -100,7 +100,7 @@ class Signin extends React.Component<Props, {}> {
         const endpoint = EndpointManager.currentEndpoint()
         let endpointName = endpoint.endpoint.replace(/(^\w+:|)\/\//, '');
         endpointName = endpointName.replace(/(:\d+$)/, '');
-        const socialLinksActive = endpoint.loginType == EndpointLoginType.API
+        const socialLinksActive = endpoint.loginType == EndpointLoginType.API 
         return(
             <div id="sign-in">
                 <div className="triangles-bg"></div>
