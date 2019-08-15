@@ -20,10 +20,6 @@ module.exports = {
                     icon: path.resolve(__dirname, 'app/assets/icons/png/512x512.png')
                 }
             }
-        },
-        {
-            name: '@electron-forge/maker-rpm',
-            config: {}
         }
     ]
 }
