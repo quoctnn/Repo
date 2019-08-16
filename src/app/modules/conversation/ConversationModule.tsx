@@ -490,7 +490,7 @@ class ConversationModule extends React.Component<Props, State> {
         if(conversation)
         {
             const visible = this.state.conversationEditorDialogVisible
-            return <SimpleDialog header={translate("common.conversation")} showCloseButton={true} didCancel={this.toggleConversationEditorDialog} visible={visible}>
+            return <SimpleDialog header={translate("common.conversation.conversation")} showCloseButton={true} didCancel={this.toggleConversationEditorDialog} visible={visible}>
                         <ConversationEditor conversationId={this.props.conversation.id}/>
                     </SimpleDialog>
         }

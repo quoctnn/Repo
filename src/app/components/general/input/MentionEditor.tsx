@@ -5,13 +5,14 @@ import { EditorState, DraftHandleValue, Modifier, SelectionState , } from 'draft
 import Editor from "draft-js-plugins-editor";
 import "draft-js-mention-plugin/lib/plugin.css";
 import createMentionPlugin, { defaultSuggestionsFilter } from "draft-js-mention-plugin";
-import { UserProfile } from "../../../types/intrasocial_types";
+import { UserProfile, Permissible, IdentifiableObject, Linkable, ContextNaturalKey } from '../../../types/intrasocial_types';
 import { IntraSocialUtilities } from "../../../utilities/IntraSocialUtilities";
 import { Settings } from "../../../utilities/Settings";
 import { SecureImage } from '../SecureImage';
-import { userFullName } from "../../../utilities/Utilities";
+import { userFullName, contextAvatar, MentionData } from '../../../utilities/Utilities';
 import * as JSEMOJI from 'emoji-js';
 import "./MentionEditor.scss"
+import { translate } from "../../../localization/AutoIntlProvider";
 
 let jsemoji = new JSEMOJI();
 jsemoji.img_set = 'emojione';
@@ -40,20 +41,41 @@ export const emojiReplacements = {
 export class Mention {
     name: string
     key: string
-    username:string
+    subtitle:string
     avatar: string
     id: number
-    constructor(name: string, key: string, username:string, avatar: string, id: number) {
+    constructor(name: string, key: string, subtitle:string, avatar: string, id: number) {
         this.name = name
         this.key = key
-        this.username = username
+        this.subtitle = subtitle
         this.avatar = avatar
         this.id = id
     }
+    static fromContextObject(contextObject:Permissible & IdentifiableObject & Linkable, type:ContextNaturalKey){
+        const name = ContextNaturalKey.nameForContextObject(type, contextObject) || translate("Unknown")
+        return new Mention(name, type + ":" + contextObject.id + ":"+ name + ":",
+        ContextNaturalKey.descriptionForContextObject(type, contextObject),
+        contextAvatar(contextObject as any, true, type),
+        contextObject.id)
+    }
+    static fromMentionData = (data:MentionData) => {
+        const contextObject = data.getContextObject()
+        const type = data.contextNaturalKey
+        if(contextObject)
+        {
+            const name = ContextNaturalKey.nameForContextObject(type, contextObject) || data.contextObjectName || translate("Unknown")
+            return new Mention(name, type + ":" + contextObject.id + ":"+ name + ":",
+            ContextNaturalKey.descriptionForContextObject(type, contextObject),
+            contextAvatar(contextObject as any, true, type),
+            contextObject.id)
+        }
+        return new Mention(data.contextObjectName || "Unknown", data.originalString.splice(0, 1, ""), "Unknown", null, data.contextId)
+    }
     static fromUser(user:UserProfile)
     {
-        return new Mention(userFullName(user),
-        "auth.user:" + user.id,// user.username,
+        const name = userFullName(user)
+        return new Mention(name,
+        "auth.user:" + user.id + ":"+ name + ":",// user.username,
         user.username,
         IntraSocialUtilities.appendAuthorizationTokenToUrl(user.avatar || user.avatar_thumbnail),
         user.id)
@@ -86,7 +108,7 @@ const Entry = (props: EntryProps) => {
             <div className="mentionSuggestionsEntryContainerRight">
             <div className="mentionSuggestionsEntryText">{mention.name}</div>
 
-            <div className="mentionSuggestionsEntryTitle">{mention.username}</div>
+            <div className="mentionSuggestionsEntryTitle">{mention.subtitle}</div>
             </div>
         </div>
         </div>

@@ -716,7 +716,7 @@ export class NewsfeedComponent extends React.Component<Props, State> {
                         {
                             updateArray.push({index:currentIndex, object:null})
                         }
-                        else if(c.statusId == parentStatus.id)
+                        else if(parentStatus && c.statusId == parentStatus.id)
                         {
                             if(c.position > update.position)
                             {
@@ -756,7 +756,7 @@ export class NewsfeedComponent extends React.Component<Props, State> {
                     updateArray.push({index:parentBottomCommentLoaderIndex, object:clone})
                     console.log(`Adjusting parent bottom comment loader(${c.statusId}) position from ${c.position} to ${clone.position}`)
                 }
-                else if(update.position > c.position && c.position ==  parentStatus.comments - 1) // if delete below and there is no more
+                else if(parentStatus && update.position > c.position && c.position == parentStatus.comments - 1) // if delete below and there is no more
                 {
                     updateArray.push({index:parentBottomCommentLoaderIndex, object:null})
                     console.log(`Deleting parent bottom comment loader(${c.statusId})`)

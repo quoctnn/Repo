@@ -26,7 +26,7 @@ export class DetailsContent extends React.Component<Props, State> {
             <div className="details-content">
                 { this.props.community &&
                     <div className="text-truncate">
-                        <div className="details-field-name">{translate("common.community")}</div>
+                        <div className="details-field-name">{translate("common.core.community")}</div>
                         <div title={this.props.community.name} className="details-field-value"><Link to={this.props.community.uri}>{this.props.community.name}</Link></div>
                     </div>
                 }

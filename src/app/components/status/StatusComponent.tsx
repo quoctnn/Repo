@@ -148,12 +148,6 @@ export class StatusComponent extends React.Component<Props, State> {
             return {refresh: prevState.refresh + 1}
         })
     }
-    getMentions = () => {
-        const mentions = this.props.status.mentions
-        if(this.state.refresh > 0)
-            return ProfileManager.getProfiles(mentions)
-        return ProfileManager.getProfilesFetchRest(mentions, this.refresh)
-    }
     showCommentBox = () => {
         this.props.onActionPress(StatusActions.showCommentReply, {id:this.props.status.id})
     }
@@ -165,9 +159,8 @@ export class StatusComponent extends React.Component<Props, State> {
             return <div ref={this.element} className={itemClass}></div>
         }
         const contextObject =  isComment || !addLinkToContext ? null : status.context_object
-        const mentions = this.getMentions()
         const truncateLength = this.state.readMoreActive ? 0 : Settings.statusTruncationLength
-        const content = getTextContent(status.id.toString(), status.text, mentions, true, onActionPress, truncateLength, Settings.statusLinebreakLimit)
+        const content = getTextContent(status.id.toString(), status.text, true, truncateLength, Settings.statusLinebreakLimit)
         const {textContent, linkCards, hasMore} = content
         const cn = classnames("status-component", className, "lvl" + (status.level || 0) , "sid-" + status.id + "_p_" + (status.position || 0), {comment:isComment, highlight:status.highlightMode})
         const avatarSize = isComment ? 40 : 50

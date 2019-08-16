@@ -170,9 +170,6 @@ export default class StatusEditorComponent extends React.Component<Props, State>
     handleMentionSearch = (search:string, completion:(mentions:Mention[]) => void) =>
     {
         console.log("searching", search)
-        /*ProfileManager.searchMembersInContext(search, this.props.status.context_object_id, this.props.status.context_natural_key, (members) => {
-            completion(members.map(u => Mention.fromUser(u)))
-        })*/
         const taggableMembers = this.props.status.visibility
         const contextNaturalKey = this.props.status.context_natural_key
         const contextObjectId = this.props.status.context_object_id

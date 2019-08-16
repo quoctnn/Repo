@@ -1,16 +1,15 @@
 import * as React from "react";
-import { Message } from "../../types/intrasocial_types";
+import { Message, ContextNaturalKey } from "../../types/intrasocial_types";
 import classnames from 'classnames';
-import { Link } from 'react-router-dom';
-import { IS_ONLY_LINK_REGEX, URL_REGEX, uniqueId, userFullName, LINEBREAK_REGEX } from '../../utilities/Utilities';
-import { ProfileManager } from "../../managers/ProfileManager";
-import Routes from "../../utilities/Routes";
+import { IS_ONLY_LINK_REGEX, URL_REGEX, uniqueId, userFullName, LINEBREAK_REGEX, MENTION_REGEX, MentionData, truncate } from '../../utilities/Utilities';
 import ContentGallery from "../../components/general/ContentGallery";
 import Embedly from "../../components/general/embedly/Embedly";
 import { ConversationManager } from "../../managers/ConversationManager";
 import { FileUtilities } from "../../utilities/FileUtilities";
 import RadialProgress from "../../components/general/loading/RadialProgress";
 import { translate } from '../../localization/AutoIntlProvider';
+import IntraSocialMention from "../../components/general/IntraSocialMention";
+import { Settings } from "../../utilities/Settings";
 const processString = require('react-process-string');
 export class MessageContentParser{
     content:any = ""
@@ -54,8 +53,7 @@ export class MessageContentParser{
             }
             config.push(breaks)
         }
-        let mentions = this.message.mentions || []
-        let mentionSearch = mentions.map(m => {
+        /*let mentionSearch = mentions.map(m => {
             let user = ProfileManager.getProfileById(m)
             if(!user)
                 return null
@@ -67,7 +65,20 @@ export class MessageContentParser{
                     return <Link key={this.getKey(key)} to={Routes.profileUrl(user.slug_name) }>{userFullName(user)}</Link>;
                 }
             }
-        }).filter(o => o)
+        }).filter(o => o)*/
+        const mentionSearch = {
+            regex: MENTION_REGEX,
+            fn: (key, result:string[]) => {
+                const data = MentionData.fromRegex(result)
+                if(this.simpleMode)
+                {
+                    const name = data.getName()
+                    return <b key={this.getKey(key)}>{truncate(name, Settings.mentionTruncationLength)}</b>
+                }
+                return <IntraSocialMention key={this.getKey(key)} data={data} />
+            }
+        }
+        config.push(mentionSearch)
         config = config.concat(mentionSearch)
         let result = processString(config)(this.message.text)
         this.content = this.processElements(result)

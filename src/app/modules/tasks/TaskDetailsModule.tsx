@@ -77,7 +77,7 @@ class TaskDetailsModule extends React.Component<Props, State> {
                                         <DetailsContent community={community} description={task.description}>
                                                 { this.props.project &&
                                                     <div>
-                                                        <div className="details-field-name">{translate("common.project")}</div>
+                                                        <div className="details-field-name">{translate("common.project.project")}</div>
                                                         <div title={this.props.project.name} className="details-field-value text-truncate"><Link to={this.props.project.uri}>{this.props.project.name}</Link></div>
                                                     </div>
                                                 }

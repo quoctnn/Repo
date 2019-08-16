@@ -71,7 +71,7 @@ class TopNavigation extends React.Component<Props, State> {
                     { profile && !profile.is_anonymous &&
                         <>
                             <Link className={communityLinkClass} to={communityLink}>
-                                <i className="fa fa-globe" />{translate("common.community")}
+                                <i className="fa fa-globe" />{translate("common.core.community")}
                             </Link>
                             <Link className={dashboardClass} to={dashboardLink}>
                                 <i className="fa fa-tachometer-alt" />{translate("common.dashboard")}
