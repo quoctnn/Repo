@@ -324,6 +324,10 @@ var translations = {
     "other_communication_methods":"other communication methods",
     "iw_platforms_text":"Available for Windows, Mac, iOS and Android. Also available in web browser",
     "login_secondary_title":"Dynamic business efficiency",
+    "calendar.all_day":"All day",
+    "calendar.events":"Events",
+    "calendar.module.title":"Calendar",
+    "calendar.no_events":"No events",
   },
   no: {
     "search.placeholder": "Søk ...",
@@ -651,6 +655,10 @@ var translations = {
     "other_communication_methods":"andre kommunikasjonsmetoder",
     "iw_platforms_text":"Tilgjengelig for Windows, Mac, iOS og Android. Også tilgjengelig i nettleser",
     "login_secondary_title":"Dynamisk forretningseffektivitet",
+    "calendar.all_day":"Hele dagen",
+    "calendar.events":"Hendelser",
+    "calendar.module.title":"Kalender",
+    "calendar.no_events":"Ingen hendelser",
   },
   en: {
     "search.placeholder": "Search ...",
@@ -985,6 +993,10 @@ var translations = {
     "other_communication_methods":"other communication methods",
     "iw_platforms_text":"Available for Windows, Mac, iOS and Android. Also available in web browser",
     "login_secondary_title":"Dynamic business efficiency",
+    "calendar.all_day":"All day",
+    "calendar.events":"Events",
+    "calendar.module.title":"Calendar",
+    "calendar.no_events":"No events",
   }
 };
 

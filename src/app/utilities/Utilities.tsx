@@ -153,6 +153,7 @@ export enum DateFormat {
     day = "L",
     time = "LT",
     monthYear = "MMM YYYY",
+    serverDay = "YYYY-MM-DD",
     year = "YYYY"
 }
 export const stringToDateFormat = (string: string, format?: DateFormat) => {

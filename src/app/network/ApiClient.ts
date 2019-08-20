@@ -11,8 +11,9 @@ import { Status, UserProfile, UploadedFile, Community, Group, Conversation, Proj
          ProfileCertification,
          ProfileEducation,
          ProfilePosition,
-         CrashLogLevel} from '../types/intrasocial_types';
-import { nullOrUndefined } from '../utilities/Utilities';
+         CrashLogLevel,
+         CalendarItem} from '../types/intrasocial_types';
+import { nullOrUndefined, DateFormat } from '../utilities/Utilities';
 import moment = require("moment");
 import { Settings } from "../utilities/Settings";
 import { ConversationManager } from '../managers/ConversationManager';
@@ -938,6 +939,16 @@ export default class ApiClient
     static sendCrashReport(level:CrashLogLevel, message:string, stack:string, componentStack:string , callback:ApiClientCallback<any>){
         const url = Constants.apiRoute.createCrashReportUrl
         AjaxRequest.postJSON(url,  { level, message, stack, componentStack}, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
+    static getCalendarItems(start:Date, end:Date, callback:ApiClientCallback<(CalendarItem | Event | Task)[]>){
+        const startString = moment(start).format(DateFormat.serverDay)
+        const endString = moment(end).format(DateFormat.serverDay)
+        let url = Constants.apiRoute.calendarUrl + "?" + this.getQueryString({start:startString, end:endString})
+        AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
             callback(null, status, error)

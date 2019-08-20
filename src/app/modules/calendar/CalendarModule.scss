@@ -1,0 +1,132 @@
+@import "../../Config";
+.calendar-module{
+    padding: 8px;
+    padding-top: 0;
+    .title-text{
+        font-size: 1em;
+    }
+    .event-list{
+        .calendar-event-component{
+            text-decoration: none;
+            @include var(background-color, main-content-secondary-background);
+            margin: 8px;
+            padding: 4px;
+            border-radius: 6px;
+            .left{
+                justify-content: center;
+                flex: 0 0 25%;
+                width: 25%;
+                max-width: 100px;
+            }
+            .mark{
+                display: inline-block;
+                width: 8px;
+                height: 8px;
+                border-radius: 50%;
+                &.calendaritem{
+                    background: #04A451;
+                }
+                &.task{
+                    background: #4E13F5;
+                }
+                &.event{
+                    background: #FB0E7A;
+                }
+            }
+        }
+    }
+    .rbc-calendar
+    {
+        .rbc-row-bg{
+            display: none;
+        }
+        .calendar-toolbar
+        {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            .calendar-toolbar-label{
+                display: flex;
+                justify-content: center;
+            }
+        }
+        .rbc-month-view{
+            border:0;
+            .rbc-off-range-bg{
+                background: none;
+            }
+            .rbc-month-row{
+                overflow:initial;
+            }
+            .rbc-date-cell{
+                text-align: initial;
+                padding: initial;
+                .calendar-date-header{
+                    margin: 3px;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    cursor: pointer;
+                    position: relative;
+                    .event-indicator{
+                        position: absolute;
+                        width: 4px;
+                        height: 4px;
+                        background: #4284FF;
+                        border-radius: 50%;
+                        bottom: 3px;
+                    }
+                    .content{
+                        min-width: 30px;
+                        height: 30px;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        border-radius: 50%;
+
+                    }
+                    &.selected{
+                        .content{
+                            color:white;
+                            background: black;
+
+                        }
+                    }
+                }
+                &.rbc-now{
+                    .calendar-date-header{
+                        .content{
+                            color:red;
+                        }
+                    }
+                }
+                &.rbc-current{
+                    .calendar-date-header{
+                        .event-indicator{
+                            background:white;
+                        }
+                        .content{
+                            color:white;
+                            background: black;
+                        }
+                    }
+                }
+                &.rbc-now.rbc-current{
+                    .calendar-date-header{
+                        .event-indicator{
+                            background:white;
+                        }
+                        .content{
+                            color:white;
+                            background: red;
+                        }
+                    }
+                }
+            }
+
+        }
+        .rbc-header, .rbc-month-row{
+            border:0;
+        }
+    }
+}

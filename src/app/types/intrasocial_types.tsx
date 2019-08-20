@@ -5,6 +5,7 @@ import { translate } from "../localization/AutoIntlProvider";
 import { userFullName, groupCover, communityCover, userCover, projectCover, eventCover } from '../utilities/Utilities';
 import { CommunityManager } from '../managers/CommunityManager';
 import { ProjectManager } from '../managers/ProjectManager';
+import { Moment } from 'moment';
 export enum CrashLogLevel {
     info = "info",
     debug = "debug",
@@ -788,6 +789,23 @@ export type ContextGroup = {
     items: ContextItem[]
     type: ContextNaturalKey
 }
+export type CalendarItem = {
+
+    object_type:string
+    created_at:string
+    updated_at:string
+    hidden:boolean
+    hidden_reason:string
+    title:string
+    slug:string
+    description:string
+    all_day:boolean
+    start:string
+    end:string
+    timezone:string
+    user:number
+} & IdentifiableObject & Linkable
+
 export enum UploadedFileType {
     IMAGE = "image",
     IMAGE360 = "360photo",
@@ -1048,6 +1066,7 @@ export type Task = {
     serialization_date: string
     visibility?: number[]
     attributes?: TaskObjectAttribute[]
+    due_date:string
 } & Linkable & Permissible & IdentifiableObject
 
 export enum TaskPriority {
