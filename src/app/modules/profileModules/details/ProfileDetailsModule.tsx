@@ -7,7 +7,7 @@ import Module, { CommonModuleProps } from "../../Module";
 import { ReduxState } from "../../../redux";
 import { ContextManager } from "../../../managers/ContextManager";
 import { withRouter, RouteComponentProps } from "react-router";
-import { UserProfile, ContextNaturalKey, ProfilePosition } from "../../../types/intrasocial_types";
+import { UserProfile, ContextNaturalKey, ProfilePosition, ElasticSearchType } from "../../../types/intrasocial_types";
 import { userFullName, stringToDate, DateFormat } from '../../../utilities/Utilities';
 import ModuleContent from "../../ModuleContent";
 import ModuleHeader from "../../ModuleHeader";
@@ -18,6 +18,7 @@ import { AuthenticationManager } from '../../../managers/AuthenticationManager';
 import StackedAvatars from "../../../components/general/StackedAvatars";
 import { Link } from "react-router-dom";
 import { Moment } from "moment-timezone";
+import Routes from '../../../utilities/Routes';
 import moment = require("moment");
 
 type TimezoneInfoProps = {
@@ -137,7 +138,7 @@ class ProfileDetailsModule extends React.PureComponent<Props, State> {
                                 </div>
                             </div>
                             <div className="d-flex flex-column align-items-end">
-                                <Link to="#">{translate("common.see.all")}</Link>
+                                <Link to={{pathname:Routes.SEARCH, state:{modal:true}, search:"type=" + ElasticSearchType.USER}}>{translate("common.see.all")}</Link>
                                 <StackedAvatars userIds={connections} />
                             </div>
                         </div>
