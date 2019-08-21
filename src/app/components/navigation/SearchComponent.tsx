@@ -33,6 +33,7 @@ import PhotoSwipeComponent from "../general/gallery/PhotoSwipeComponent";
 import { IntraSocialUtilities } from "../../utilities/IntraSocialUtilities";
 import SimpleDialog from "../general/dialogs/SimpleDialog";
 import StickyBox from "../external/StickyBox";
+import initializeManagers from '../../managers/index';
 let timezone = moment.tz.guess()
 
 type BreadcrumbData = {community?:number, group?:number, event?:number, project?:number, task?:number, profile?:number}
@@ -185,6 +186,7 @@ export interface Props {
     onClose:() => void
     visible:boolean
     initialTerm?:string
+    initialType?:string
 }
 export interface State {
 
@@ -204,7 +206,7 @@ export interface State {
 }
 SearcQueryManager
 export class SearchComponent extends React.Component<Props, State> {
-    
+
     searchTextInput = React.createRef<SearchBox>()
     fromDatimepicker = React.createRef<DateTimePicker>()
     toDatimepicker = React.createRef<DateTimePicker>()
@@ -214,6 +216,10 @@ export class SearchComponent extends React.Component<Props, State> {
     serializedDateFormat = "YYYY-MM-DDTHH:mm"
     constructor(props:Props) {
         super(props)
+        var initialType = []
+        if (this.props.initialType && ElasticSearchType[this.props.initialType.toUpperCase()] !== undefined) {
+            initialType = [this.props.initialType as ElasticSearchType]
+        }
         this.state = {
             searchActive:false,
             activeSearchType:null,
@@ -221,7 +227,7 @@ export class SearchComponent extends React.Component<Props, State> {
             searchResult:null,
             searchHistory:[],
             lastLoggedHistory:null,
-            searchTypeFilters:[],
+            searchTypeFilters:initialType,
             requestId:0,
             hasMore:false,
             isLoading:false,
@@ -298,7 +304,7 @@ export class SearchComponent extends React.Component<Props, State> {
             const index = types.indexOf(type)
             if(index > -1)
                 types.splice(index, 1)
-            else 
+            else
                 types.push(type)
             return {searchTypeFilters:types, requestId:prevState.requestId + 1, isLoading:true, searchResult:null}
         },this.onSearchDataChanged)
@@ -381,7 +387,7 @@ export class SearchComponent extends React.Component<Props, State> {
             types,
             include_results:true,
             include_aggregations:true,
-            filters:this.getRealFilters(currentFilters),    
+            filters:this.getRealFilters(currentFilters),
             tags:data.tags,
             date_sort:sortOnDate,
             from_date:fromDate || undefined,
@@ -432,7 +438,7 @@ export class SearchComponent extends React.Component<Props, State> {
                 multiline={false}
                 useClearButtonWithText={true}
                 allowedSearchOptions={allowedSearchContextFilters}
-                
+
         />
     }
     setSearchQuery = (text:string) => () =>  {
@@ -457,7 +463,7 @@ export class SearchComponent extends React.Component<Props, State> {
     applyState = (editorState:EditorState) => {
         this.searchTextInput.current.applyState(editorState)
     }
-    
+
     deleteHistoryItem = (id:number) => (event:React.SyntheticEvent) => {
         event.preventDefault()
         event.stopPropagation()
@@ -473,7 +479,7 @@ export class SearchComponent extends React.Component<Props, State> {
                 }
                 return {searchHistory:history}
             })
-            
+
         })
     }
     renderHashtags = () => {
@@ -493,7 +499,7 @@ export class SearchComponent extends React.Component<Props, State> {
         return null
     }
     renderSearchHistory = () => {
-        
+
         const isEmptySearch = this.isEmptySearchQuery()
         if(!isEmptySearch)
             return null
@@ -501,7 +507,7 @@ export class SearchComponent extends React.Component<Props, State> {
         return <div className="search-history">
                 {history.map(h => {
                         return <div key={h.id} className="history-item" onClick={this.setSearchQuery(h.term)}>
-                        {h.term} 
+                        {h.term}
                         <Button size="xs" className="history-item-clear" onClick={this.deleteHistoryItem(h.id)}>
                             <i className="fa fa-times-circle"  />
                         </Button>
@@ -510,7 +516,7 @@ export class SearchComponent extends React.Component<Props, State> {
                 </div>
     }
     renderSearchTypeFiltersList = () => {
-        
+
         const isEmptySearch = this.isEmptySearchQuery()
         if(!isEmptySearch)
             return null
@@ -538,18 +544,18 @@ export class SearchComponent extends React.Component<Props, State> {
     renderSearchDateFilter = () => {
         return <div>
                     <div className="filter-header">{translate("search.filter.date.title")}</div>
-                    <DateTimePicker 
-                        ref={this.fromDatimepicker} 
-                        onChange={this.onFromTimeChanged} 
+                    <DateTimePicker
+                        ref={this.fromDatimepicker}
+                        onChange={this.onFromTimeChanged}
                         value={this.state.fromDate}
                         max={this.state.toDate}
                         format="YYYY-MM-DD HH:mm"
                         allowHoursPicker={true}
                         placeholder={translate("search.filter.date_start.title")}
                     />
-                    <DateTimePicker 
-                        ref={this.toDatimepicker} 
-                        onChange={this.onToTimeChanged} 
+                    <DateTimePicker
+                        ref={this.toDatimepicker}
+                        onChange={this.onToTimeChanged}
                         value={this.state.toDate}
                         max={moment().tz(timezone)}
                         min={this.state.fromDate}
@@ -559,7 +565,7 @@ export class SearchComponent extends React.Component<Props, State> {
                     />
                 </div>
     }
-    
+
     renderCommunityItem = (item:ElasticResultCommunity) => {
         const avatar = item.avatar || ContextNaturalKey.defaultAvatarForKey(ElasticSearchType.contextNaturalKeyForType(item.object_type))
         const left = <Avatar image={avatar} size={36} />
@@ -613,7 +619,7 @@ export class SearchComponent extends React.Component<Props, State> {
         window.app.navigateToRoute(url)
         this.props.onClose()
     }
-    
+
     renderTaskItem = (item:ElasticResultTask) => {
         const bc = breadcrumbs({community:item.community, project:item.project_id, task:item.parent_id    }, this.navigateToLocation)
         const left = <i className={ElasticSearchType.iconClassForKey(item.object_type)}></i>
@@ -691,7 +697,7 @@ export class SearchComponent extends React.Component<Props, State> {
         )
     }
     renderSearchResult = () => {
-        
+
         const isEmptySearch = this.isEmptySearchQuery()
         if(isEmptySearch)
             return null
@@ -701,7 +707,7 @@ export class SearchComponent extends React.Component<Props, State> {
         const aggregations = this.state.searchResult && this.state.searchResult.stats && this.state.searchResult.stats.aggregations || {}
         const hasActiveContextSearchType = !!this.state.activeSearchType
         const items = result.map(r => {
-            
+
             return <CursorListItem key={r.object_type + "_" + r.django_id } onSelect={() => {
                             const object = r as any
                             const slug = object.slug || ""
@@ -763,7 +769,7 @@ export class SearchComponent extends React.Component<Props, State> {
                         <div className="filter-header">{translate("search.filter.types.title")}</div>
                         {allowedSearchTypeFilters.map(tf => {
                             const checked = this.state.searchTypeFilters.contains(tf)
-                            const aggr = aggregations[tf] 
+                            const aggr = aggregations[tf]
                             const count = aggr && aggr.doc_count || -1
                             const filterName = ElasticSearchType.nameForKey(tf)
                             const text = count > -1 ? `${filterName}(${count})` : filterName
@@ -814,7 +820,7 @@ export default class FileResultItem extends React.Component<FileResultItemProps,
     }
     shouldComponentUpdate = (nextProps:FileResultItemProps, nextState:FileResultItemState) => {
         const ret =  nextProps.file != this.props.file ||
-                    nextState.visible != this.state.visible 
+                    nextState.visible != this.state.visible
         return ret
     }
     handleFileClick = (event:React.SyntheticEvent<any>) => {
@@ -844,11 +850,11 @@ export default class FileResultItem extends React.Component<FileResultItemProps,
             document.body.removeChild(element)
         }
     }
-    onModalClose = () => 
+    onModalClose = () =>
     {
         this.setState({visible:false})
     }
-    renderModal = () => 
+    renderModal = () =>
     {
         if(!this.state.visible)
             return null
@@ -877,7 +883,7 @@ export default class FileResultItem extends React.Component<FileResultItemProps,
         const hasThumbnail = !!item.thumbnail
         const cn = classnames("img-container", item.type, item.extension)
         const left = <div ref={this.imagaRef} className={cn}>
-                        {hasThumbnail && <SecureImage className="img-responsive sec-img" setBearer={true} setAsBackground={true} url={item.thumbnail}  /> 
+                        {hasThumbnail && <SecureImage className="img-responsive sec-img" setBearer={true} setAsBackground={true} url={item.thumbnail}  />
                         ||
                         <i className="fa file-icon"></i>
                         }
@@ -893,9 +899,9 @@ export default class FileResultItem extends React.Component<FileResultItemProps,
     }
     render()
     {
-        const {file} = this.props 
+        const {file} = this.props
         const cl = classnames("", file.type, file.extension)
-        return (<div onClick={this.handleFileClick} className={cl}> 
+        return (<div onClick={this.handleFileClick} className={cl}>
                     {this.renderContent()}
                     {this.renderModal()}
                 </div>)

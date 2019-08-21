@@ -11,6 +11,7 @@ import { UserProfile, ContextNaturalKey, ProfilePosition } from "../../../types/
 import { userFullName, stringToDate, DateFormat } from '../../../utilities/Utilities';
 import ModuleContent from "../../ModuleContent";
 import ModuleHeader from "../../ModuleHeader";
+import ModuleFooter from '../../ModuleFooter';
 import ApiClient from "../../../network/ApiClient";
 import { translate } from "../../../localization/AutoIntlProvider";
 import { AuthenticationManager } from '../../../managers/AuthenticationManager';
@@ -47,7 +48,7 @@ class TimezoneInfo extends React.PureComponent<TimezoneInfoProps, TimezoneInfoSt
             this.interval = null
         }
     }
-    render = () => {    
+    render = () => {
         return <div className="timezone-info">
                 {this.state.time.format("[GMT] Z [- " + translate("Now") + "] LT")}
                 </div>
@@ -145,7 +146,7 @@ class ProfileDetailsModule extends React.PureComponent<Props, State> {
         return null
     }
     renderCommonFriends = () => {
-        
+
         const {profile, authenticatedProfile} = this.props
         if(profile && authenticatedProfile && profile.id != authenticatedProfile.id)
             return <div className="medium-small-text">{translate("profile.friends.common.count").format(profile.mutual_friends.length)}</div>
@@ -160,11 +161,64 @@ class ProfileDetailsModule extends React.PureComponent<Props, State> {
                 {this.renderTimezoneInfo()}
                 </>
     }
-    render = () => 
+    renderFriendshipStatus = (relationship:string) => {
+        switch(relationship) {
+            case("friends"):
+                return (
+                    <div className='relationship'>
+                        {translate("common.relationship.friends")}
+                    </div>
+                );
+            case("pending-request"):
+                return (
+                    <div className='relationship'>
+                        {translate("common.relationship.pending")}
+                    </div>
+                );
+            case("pending-invitation"):
+                return (
+                    <div className='relationship'>
+                        {translate("common.relationship.invited")}
+                    </div>
+                );
+            default: return;
+        }
+    }
+    renderFriendshipButtons = (relationship:string) => {
+        switch(relationship) {
+            case("friends"):
+                return;
+            case("pending-invitation"):
+                return (
+                    <>
+                        <button className='btn btn-success'>
+                            {translate("invitation.accept")}
+                        </button>&nbsp;
+                        <button className='btn btn-danger'>
+                            {translate("invitation.dismiss")}
+                        </button>
+                    </>
+                );
+            case("pending-request"):
+                return (
+                    <button className='btn btn-danger'>
+                        {translate("common.relationship.cancel")}
+                    </button>
+                );
+            default:
+                return (
+                    <button className='btn btn-info'>
+                        {translate("common.relationship.send-request")}
+                    </button>
+                );
+        }
+    }
+    render = () =>
     {
         const {className, breakpoint, contextNaturalKey, pageSize, showLoadMore, showInModal, isModal, dispatch, staticContext, profile, authenticatedProfile, history, location, match,  ...rest} = this.props
         const title = userFullName(profile)
         const cn = classnames("profile-details-module", className)
+        const hasRelationship = profile && authenticatedProfile && profile.id != authenticatedProfile.id && profile.relationship
         return (<Module {...rest} className={cn}>
                     <ModuleHeader loading={false} headerTitle={title}>
                         <i className="fas fa-cog"></i>
@@ -174,6 +228,12 @@ class ProfileDetailsModule extends React.PureComponent<Props, State> {
                             {this.renderContent()}
                         </div>
                     </ModuleContent>
+                    {hasRelationship &&
+                        <ModuleFooter>
+                            {this.renderFriendshipStatus(profile.relationship[0])}
+                            {this.renderFriendshipButtons(profile.relationship[0])}
+                        </ModuleFooter>
+                    }
             </Module>)
     }
 }

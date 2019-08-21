@@ -38,24 +38,29 @@ const SectionComponent = (props:SectionComponentProps) => {
             </div>
 }
 type OwnProps = {
-
 }
 type ReduxStateProps = {
     apiEndpoint?:number,
     language:number,
 }
 type Props = RouteComponentProps<any> & ReduxStateProps & OwnProps
-class Signin extends React.Component<Props, {}> {
+class Signin extends React.Component<Props, {error?:string}> {
 
     emailInput: HTMLInputElement|null = null
     passwordInput: HTMLInputElement|null = null
     constructor(props:Props) {
         super(props);
+        this.state = {
+            error:null
+        }
     }
     loginCallback = (data:{token:string|null}, status:string, error:string) => {
         if(error || status == "error")
         {
-            ToastManager.showErrorToast(error || translate("Could not sign in"))
+            if (error !== "Bad Request")
+                ToastManager.showErrorToast(error || translate("Could not sign in"))
+            else
+                this.setState({error:"Invalid credentials"})
             return
         }
         if(data.token)
@@ -68,6 +73,7 @@ class Signin extends React.Component<Props, {}> {
     doSignin = (e) => {
 
         e.preventDefault()
+        this.setState({error:null})
         let endpoint = EndpointManager.currentEndpoint()
         if(endpoint.loginType == EndpointLoginType.API)
         {
@@ -99,6 +105,7 @@ class Signin extends React.Component<Props, {}> {
     render = () => {
         const endpoint = EndpointManager.currentEndpoint()
         const socialLinksActive = endpoint.loginType == EndpointLoginType.API && !Settings.isElectron
+        const errorMsg = this.state.error
         return(
             <div id="sign-in">
                 <div className="triangles-bg"></div>
@@ -133,6 +140,9 @@ class Signin extends React.Component<Props, {}> {
                                             <InputGroupAddon addonType="append"><i className="fas fa-lock"></i></InputGroupAddon>
                                         </InputGroup>
                                         <FormGroup>
+                                            {errorMsg &&
+                                                <div className='error'>{errorMsg}</div>
+                                            }
                                             <Button className="login-button" type="submit" color="info" onClick={this.doSignin}>{translate("Sign in")}</Button>
                                         </FormGroup>
                                     </Form>

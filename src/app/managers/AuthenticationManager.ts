@@ -23,7 +23,7 @@ export abstract class AuthenticationManager
         console.log("AuthenticationManager setup")
         NotificationCenter.addObserver('eventstream_' + EventStreamMessageType.CLIENT_STATUS_CHANGE, AuthenticationManager.processIncomingUserUpdate)
         NotificationCenter.addObserver('eventstream_' + EventStreamMessageType.COMMUNITY_MAIN, AuthenticationManager.processSwitchedMainCommunity)
-        NotificationCenter.addObserver('eventstream_' + EventStreamMessageType.ACTIVITY_NEW, AuthenticationManager.newActivityReceived)    
+        NotificationCenter.addObserver('eventstream_' + EventStreamMessageType.ACTIVITY_NEW, AuthenticationManager.newActivityReceived)
         NotificationCenter.addObserver('eventstream_' + EventStreamMessageType.CLIENT_UPDATE, AuthenticationManager.processClientUpdate)
     }
     private static processClientUpdate(...args:any[]) {
@@ -33,7 +33,7 @@ export abstract class AuthenticationManager
 
     static newActivityReceived = (...args:any[]) => {
         const activity = args[0] as RecentActivity;
-        if (activity) ToastManager.showInfoToast(activity.display_text);
+        if (activity) ToastManager.showInfoToast(activity.display_text, null, activity.uri);
     }
 
     static processIncomingUserUpdate = (...args:any[]) => {

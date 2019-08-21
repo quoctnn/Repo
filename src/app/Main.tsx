@@ -39,14 +39,16 @@ import FilesPage from "./components/pages/FilesPage";
 import DevToolPage from './components/pages/DevToolPage';
 import { SearchComponent } from "./components/navigation/SearchComponent";
 const WithSearch = () =>
-    withRouter(class Modal extends React.Component<RouteComponentProps<any>, { visible: boolean, term:string }> {
+    withRouter(class Modal extends React.Component<RouteComponentProps<any>, { visible: boolean, term:string, type:string }> {
         constructor(props: PathLoaderProps) {
             super(props)
             const dict = parseQueryString(props.location.search)
             const term = dict && dict["term"]
+            const type = dict && dict["type"]
             this.state = {
                 visible: true,
-                term
+                term,
+                type
             }
         }
         back = () => {
@@ -58,7 +60,7 @@ const WithSearch = () =>
             }, goBack)
         }
         render() {
-            return <SearchComponent initialTerm={this.state.term} onClose={this.back} visible={this.state.visible}/>
+            return <SearchComponent initialTerm={this.state.term} initialType={this.state.type} onClose={this.back} visible={this.state.visible}/>
         }
     })
 
