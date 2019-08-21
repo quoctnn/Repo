@@ -1,0 +1,33 @@
+
+@import "../../Config";
+.calendar-event-component{
+    text-decoration: none;
+    @include var(background-color, main-content-secondary-background);
+    margin: 8px;
+    padding: 4px;
+    border-radius: 6px;
+    .left{
+        justify-content: center;
+        flex: 0 0 25%;
+        width: 25%;
+        max-width: 100px;
+        .all-day{
+            text-align: center;
+        }
+    }
+    .mark{
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        &.calendaritem{
+            background: $calendarItemColor;
+        }
+        &.task{
+            background:$calendarTaskItemColor;
+        }
+        &.event{
+            background:$calendarEventItemColor;
+        }
+    }
+}

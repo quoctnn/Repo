@@ -352,7 +352,6 @@ export type TempStatus = {
     context_natural_key?: ContextNaturalKey
     context_object_id?: number
     parent: number,
-    mentions: number[]
     pending?: boolean
 }
 export enum ProjectSorting {

@@ -328,6 +328,10 @@ var translations = {
     "calendar.events":"Events",
     "calendar.module.title":"Calendar",
     "calendar.no_events":"No events",
+    "calendar.today":"Today",
+    "calendar.week":"Week",
+    "calendar.month":"Month",
+    "calendar.day":"Day",
   },
   no: {
     "search.placeholder": "Søk ...",
@@ -659,6 +663,10 @@ var translations = {
     "calendar.events":"Hendelser",
     "calendar.module.title":"Kalender",
     "calendar.no_events":"Ingen hendelser",
+    "calendar.today":"I dag",
+    "calendar.week":"Uke",
+    "calendar.month":"Måned",
+    "calendar.day":"Dag",
   },
   en: {
     "search.placeholder": "Search ...",
@@ -997,6 +1005,10 @@ var translations = {
     "calendar.events":"Events",
     "calendar.module.title":"Calendar",
     "calendar.no_events":"No events",
+    "calendar.today":"Today",
+    "calendar.week":"Week",
+    "calendar.month":"Month",
+    "calendar.day":"Day",
   }
 };
 
