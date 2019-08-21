@@ -15,10 +15,10 @@ import { setTemporaryConversationAction } from '../redux/tempCache';
 import { nullOrUndefined } from '../utilities/Utilities';
 import { WindowAppManager } from './WindowAppManager';
 export const ConversationManagerConversationRemovedEvent = "ConversationManagerConversationRemovedEvent"
-export abstract class ConversationManager 
+export abstract class ConversationManager
 {
-    static setup = () => 
-    { 
+    static setup = () =>
+    {
         NotificationCenter.addObserver("eventstream_" + EventStreamMessageType.CONVERSATION_NEW, ConversationManager.processIncomingConversation)
         NotificationCenter.addObserver("eventstream_" + EventStreamMessageType.CONVERSATION_UPDATE, ConversationManager.processIncomingConversation)
         NotificationCenter.addObserver("eventstream_" + EventStreamMessageType.CONVERSATION_MESSAGE, ConversationManager.processIncomingConversationMessage)
@@ -31,11 +31,11 @@ export abstract class ConversationManager
         ConversationManager.getStore().dispatch(removeConversationAction(conversationsId))
         NotificationCenter.push(ConversationManagerConversationRemovedEvent, [{conversation:conversationsId, temporary:false}])
     }
-    static getConversation = (conversationId:number|string):Conversation => 
+    static getConversation = (conversationId:number|string):Conversation =>
     {
         return ConversationManager.getStore().getState().conversationStore.byId[conversationId]
     }
-    static deleteConversation = (conversationId:number, completion:(success:boolean) => void) => 
+    static deleteConversation = (conversationId:number, completion:(success:boolean) => void) =>
     {
         ApiClient.deleteConversation(conversationId, (data, status, error) => {
             const success = nullOrUndefined(error)
@@ -47,7 +47,7 @@ export abstract class ConversationManager
             completion(success)
         })
     }
-    static archiveConversation = (conversationId:number, completion:(success:boolean) => void) => 
+    static archiveConversation = (conversationId:number, completion:(success:boolean) => void) =>
     {
         ApiClient.deleteConversation(conversationId, (data, status, error) => {
             const success = nullOrUndefined(error)
@@ -55,7 +55,7 @@ export abstract class ConversationManager
             completion(success)
         })
     }
-    static ensureConversationExists = (conversationId:number|string, completion:(conversation:Conversation) => void) => 
+    static ensureConversationExists = (conversationId:number|string, completion:(conversation:Conversation) => void) =>
     {
         if(!conversationId.isNumber())
         {
@@ -71,20 +71,20 @@ export abstract class ConversationManager
                 {
                     ConversationManager.storeConversations([data])
                 }
-                else 
+                else
                 {
                     console.log("error fetching conversation", error)
                 }
                 completion(data)
             })
         }
-        else 
+        else
         {
             completion(conversation)
         }
 
     }
-    private static processIncomingConversation = (...args:any[]) => 
+    private static processIncomingConversation = (...args:any[]) =>
     {
         let conversation = args[0] as Conversation
         ConversationManager.getStore().dispatch(addConversationsAction([conversation]))
@@ -92,20 +92,20 @@ export abstract class ConversationManager
     private static processIncomingConversationRemove = (...args:any[]) => {
         let data:{conversation_id:number} = args[0]
         ConversationManager.removeConversation(data.conversation_id)
-    } 
-    private static processIncomingConversationMessage = (...args:any[]) => 
+    }
+    private static processIncomingConversationMessage = (...args:any[]) =>
     {
         let store = ConversationManager.getStore()
         let message = args[0] as Message
         let me = AuthenticationManager.getAuthenticatedUser()
         store.dispatch(removeMessageFromQueueAction(message))
-        if (message.user != me.id) 
+        if (message.user != me.id)
         {
             ConversationManager.sendMessageNotification(message);
-        } 
-        ConversationManager.ensureConversationExists(message.conversation, () => { 
+        }
+        ConversationManager.ensureConversationExists(message.conversation, () => {
         })
-        
+
     }
     static createTemporaryConversation = () => {
 
@@ -138,24 +138,24 @@ export abstract class ConversationManager
             NotificationCenter.push(ConversationManagerConversationRemovedEvent, [{conversation:tempConversation.id, temporary:true}])
         }
     }
-    private static sendMessageNotification = (message: Message) =>  
+    private static sendMessageNotification = (message: Message) =>
     {
         let uri = Routes.conversationUrl(message.conversation)
-        if (document.hasFocus()) 
+        if (document.hasFocus())
         {
             // If tab is focused
             let user: UserProfile = ProfileManager.getProfileById(message.user)
             // Show the toast if the user is not viewing that conversation
-            if (user && window.location.pathname != uri) 
+            if (user && window.location.pathname != uri)
             {
-                ToastManager.showInfoToast(user.first_name + ': ' + message.text)
+                ToastManager.showInfoToast(user.first_name + ': ' + message.text, null, uri)
             }
-        } 
+        }
         else if ('Notification' in window && Notification.permission === 'granted')
         {
             // If window is not active and notifications are enabled
             let user: UserProfile = ProfileManager.getProfileById(message.user);
-            if (user) 
+            if (user)
             {
                 var options = {
                     body: user.first_name + ': ' + message.text,
@@ -170,7 +170,7 @@ export abstract class ConversationManager
             }
         }
     }
-    static leaveConversation = (conversationId:number, completion:(success:boolean) => void) => 
+    static leaveConversation = (conversationId:number, completion:(success:boolean) => void) =>
     {
         ApiClient.leaveConversation(conversationId, (data, status, error) => {
             const success = !error
@@ -182,13 +182,13 @@ export abstract class ConversationManager
             completion(success)
         })
     }
-    static markConversationAsRead = (conversationId:number, completion:() => void) => 
+    static markConversationAsRead = (conversationId:number, completion:() => void) =>
     {
         ApiClient.markConversationAsRead(conversationId, (data, status, error) => {
             completion()
         })
     }
-    static sendTypingInConversation = (conversation: number) => 
+    static sendTypingInConversation = (conversation: number) =>
     {
         WindowAppManager.sendOutgoingOnSocket(
           JSON.stringify({
@@ -197,7 +197,7 @@ export abstract class ConversationManager
           })
         );
     }
-    static sendMessage = (message:Message) => 
+    static sendMessage = (message:Message) =>
     {
         let store = ConversationManager.getStore()
         store.dispatch(addMessageToQueueAction(message))
@@ -216,7 +216,7 @@ export abstract class ConversationManager
         return ConversationManager.getStore().getState().messageQueue.messages.filter(m => m.conversation == conversationId && (onlyErrors ? (m.error || (m.tempFile && m.tempFile.error) ) : true ))
     }
     //queue
-    static processTempQueue = () => 
+    static processTempQueue = () =>
     {
         const messages = [...ConversationManager.getStore().getState().messageQueue.messages].reverse()
         const processNext = () => {
@@ -228,15 +228,15 @@ export abstract class ConversationManager
         }
         processNext()
     }
-    static removeQueuedMessage = (message:Message) => 
+    static removeQueuedMessage = (message:Message) =>
     {
         ConversationManager.getStore().dispatch(removeMessageFromQueueAction(message))
     }
-    static updateQueuedMessage = (message:Message) => 
+    static updateQueuedMessage = (message:Message) =>
     {
         ConversationManager.getStore().dispatch(updateMessageInQueueAction(message))
     }
-    static retryQueuedMessage = (message:Message) => 
+    static retryQueuedMessage = (message:Message) =>
     {
         let m = Object.assign({}, message)
         m.tempFile = Object.assign({}, m.tempFile)
@@ -245,8 +245,8 @@ export abstract class ConversationManager
         ConversationManager.getStore().dispatch(updateMessageInQueueAction(m))
         ConversationManager.createMessage(m)
     }
-    private static getStore = ():Store<ReduxState,any> => 
+    private static getStore = ():Store<ReduxState,any> =>
     {
-        return window.store 
+        return window.store
     }
 }
