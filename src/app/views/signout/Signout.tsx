@@ -25,23 +25,16 @@ class Signout extends React.Component<Props, {signedOut:boolean}> {
     }
     componentDidUpdate = () => {
         if (this.state.signedOut) {
-            this.timedRedirect()
+            this.props.history.push('/');
         }
     }
     componentDidMount = () => {
         if(this.props.signedIn)
         {
-            setTimeout(() => {
-                this.setState({signedOut:true}, AuthenticationManager.signOut)
-            }, 1000);
+            this.setState({signedOut:true}, AuthenticationManager.signOut)
         } else {
-            this.timedRedirect()
-        }
-    }
-    timedRedirect = () => {
-        setTimeout(() => {
             this.props.history.push('/');
-        }, 3000);
+        }
     }
     render = () => {
         const text = translate(this.props.signedIn ? "common.signing.out" : "common.signed.out" )

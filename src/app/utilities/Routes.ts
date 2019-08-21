@@ -31,10 +31,15 @@ export default abstract class Routes {
     private static STATUS = "/status/"
     private static ERROR_NOT_FOUND = "/error404/"
 
-    static searchUrl = (query:string) => {
+    static searchUrl = (query:string, type?:string) => {
+        if (!query && !type) return Routes.SEARCH
+        let uri = `${Routes.SEARCH}?`
+        if(type)
+            uri += `type=${encodeURIComponent( type )}`
+            if (query) uri += "&"
         if(query)
-            return `${Routes.SEARCH}?term=${encodeURIComponent( query )}`
-        return Routes.SEARCH
+            uri += `term=${encodeURIComponent( query )}`
+        return uri
     }
     static newsfeedUrl = (contextNaturalKey?: string, contextObjectId?:number|string, includeSubContext?:boolean|string) => {
         let ret = Routes.NEWSFEED
