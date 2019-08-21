@@ -2,6 +2,18 @@
 Task schedule
 -->
 
+v0.5.5 | XX.08.2019
+-----------------------------------------
+
+Added:
+======
+
+* Clickhandler on InfoToast
+* Check for backend connection before loading
+* Search for Groups and Projects from Sidebar
+
+
+
 v0.5.4 | 13.08.2019
 -----------------------------------------
 
