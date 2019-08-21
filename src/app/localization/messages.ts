@@ -144,6 +144,7 @@ var translations = {
     "common.activity": "Recent Activity",
     "common.see.all": "See all",
     "common.see.more": "See more",
+    "common.find.more": "Find more",
     "common.sorting.recent": "Recent",
     "common.sorting.mostUsed": "Most Used",
     "common.sorting.AtoZ": "A-Z",
@@ -328,6 +329,11 @@ var translations = {
     "calendar.events":"Events",
     "calendar.module.title":"Calendar",
     "calendar.no_events":"No events",
+    "common.relationship.friends": "You are friends",
+    "common.relationship.pending": "Request pending",
+    "common.relationship.invited": "Wants to be your friend",
+    "common.relationship.send-request": "Send friendrequest",
+    "common.relationship.cancel": "Cancel request"
   },
   no: {
     "search.placeholder": "Søk ...",
@@ -474,6 +480,7 @@ var translations = {
     "common.activity": "Nylig aktivitet",
     "common.see.all": "Se alt",
     "common.see.more": "Se mer",
+    "common.find.more": "Finn flere",
     "common.sorting.recent": "Nylig",
     "common.sorting.mostUsed": "Mest Besøkt",
     "common.sorting.AtoZ": "A-Z",
@@ -565,7 +572,6 @@ var translations = {
 		"task.in_project":"i prosjektet",
     "report.action.reported":"rapporterte",
     "common.context_key.singular.core.status":"en status",
-
     "report.tag.false_news": "Falske nyheter",
     "report.tag.harassment": "Trakassering",
     "report.tag.hate_speech": "Hatprat",
@@ -659,6 +665,11 @@ var translations = {
     "calendar.events":"Hendelser",
     "calendar.module.title":"Kalender",
     "calendar.no_events":"Ingen hendelser",
+    "common.relationship.friends": "Dere er venner",
+    "common.relationship.pending": "Forespørsel venter",
+    "common.relationship.invited": "Vil bli vennen din",
+    "common.relationship.send-request": "Send venneforespørsel",
+    "common.relationship.cancel": "Avbryt forespørsel"
   },
   en: {
     "search.placeholder": "Search ...",
@@ -812,6 +823,7 @@ var translations = {
     "common.activity": "Recent Activity",
     "common.see.all": "See all",
     "common.see.more": "See more",
+    "common.find.more": "Find more",
     "common.sorting.recent": "Recent",
     "common.sorting.mostUsed": "Most Used",
     "common.sorting.AtoZ": "A-Z",
@@ -997,6 +1009,11 @@ var translations = {
     "calendar.events":"Events",
     "calendar.module.title":"Calendar",
     "calendar.no_events":"No events",
+    "common.relationship.friends": "You are friends",
+    "common.relationship.pending": "Request pending",
+    "common.relationship.invited": "Wants to be your friend",
+    "common.relationship.send-request": "Send friendrequest",
+    "common.relationship.cancel": "Cancel request"
   }
 };
 
