@@ -119,6 +119,9 @@ $loginButtonColor:#063dee;
                     padding-left: 2em;
                     padding-right: 2em;
                 }
+                .error{
+                    @include var(color, danger-color);
+                }
             }
             .social-sign-in-panel{
                 max-width: 250px;
