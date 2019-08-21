@@ -375,7 +375,7 @@ class SideMenuNavigation extends React.Component<Props, State> {
         const borderHeight = this.state.open ? 1 : 0
         const transDur = SideMenuNavigation.animationDuration + "ms"
         const chapters = this.props.community && this.props.community.chapters
-        const anonUser = this.props.profile.is_anonymous
+        const anonUser = this.props.profile ? this.props.profile.is_anonymous : false
         const noProjects = chapters || anonUser
         return (
             <div ref={this.contentRef} onClick={openMenu} id="side-menu-navigation" className={cn} style={{ transitionDuration: transDur }}>

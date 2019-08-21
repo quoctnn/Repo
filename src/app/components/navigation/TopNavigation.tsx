@@ -95,7 +95,7 @@ class TopNavigation extends React.Component<Props, State> {
                     <div className="main-border-color-background mx-2" style={{ width: 1, height: "75%" }}></div>
                     <BreadcrumbNavigation />
                     {this.renderMenuLinks()}
-                    { !profile.is_anonymous &&
+                    { profile && !profile.is_anonymous &&
                         <>
                             <Button onClick={this.toggleNotificationPanel} color="link" className="badge-notification-container">
                                 <i className="fas fa-bell"></i>
