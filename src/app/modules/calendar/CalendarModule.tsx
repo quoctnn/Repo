@@ -1,6 +1,6 @@
 
 import * as React from 'react';
-import { withRouter, RouteComponentProps, Link } from 'react-router-dom';
+import { withRouter, RouteComponentProps } from 'react-router-dom';
 import classnames from "classnames"
 import "./CalendarModule.scss"
 import 'react-big-calendar/lib/sass/styles'
@@ -11,66 +11,85 @@ import { ReduxState } from '../../redux'
 import SimpleModule from '../SimpleModule'
 import { CommonModuleProps } from '../Module'
 import { CalendarMenuData } from './CalendarMenu'
-import { Calendar, momentLocalizer, ToolbarProps, View, NavigateAction } from 'react-big-calendar';
+import { Calendar, momentLocalizer, View, NavigateAction } from 'react-big-calendar';
 import * as moment from 'moment'
 import ApiClient from '../../network/ApiClient';
 import { CalendarItem, Task, Event } from '../../types/intrasocial_types';
 import { IntraSocialUtilities } from '../../utilities/IntraSocialUtilities';
+import { CalendarToolbar } from './CalendarToolbar';
+import { CalendarEventComponent } from './CalendarEventComponent';
 const localizer = momentLocalizer(moment)
-type CalendarEventComponent = {
-    event:CalendarEvent
-    date:Date
+const timezone = moment.tz.guess();
+export enum CalendarEventType{
+    CalendarItem = "CalendarItem",
+    Task = "Task",
+    Event = "Event",
 }
-type CalendarObject = {object_type:string}
-const getStartTime = (date:Date, start:Date) => {
-    const d = moment(date), s = moment(start)
-    return (d.isSame(start, "day") ? s : s.startOf('day')).format("HH:mm")
-}
-const getEndTime = (date:Date, end:Date) => {
-    const d = moment(date), e = moment(end)
-    return (d.isSame(e, "day") ? e : e.endOf('day')).format("HH:mm")
-}
-const CalendarEventComponent = (props:CalendarEventComponent) => {
-    //const iconClass = classnames(props.event.icon, "mr-1")
-    const type = props.event.resource && props.event.resource.object_type
-    const markClass = classnames("mark mr-1", type && type.toLowerCase() || "")
-    const url = props.event.uri || "#"
-    return <Link className="calendar-event-component d-flex" to={url}>
-                <div className="left d-flex">
-                    <div className="d-flex flex-column justify-content-center align-items-center">
-                        {
-                            props.event.allDay 
-                            && translate("calendar.all_day")
-                            || <>
-                                   {props.event.start && <div className="date-start">{getStartTime(props.date, props.event.start)}</div>} 
-                                   {props.event.end && <div className="date-end">{getEndTime(props.date, props.event.end)}</div>}
-                                </>
-                        }
-                    </div>
-                </div>
-                <div className="right d-flex flex-column justify-content-center">
-                    <div className="title">
-                        <div className={markClass}></div>
-                        {props.event.title}</div>
-                    <div className="description medium-small-text">{props.event.description}</div>
-                </div>
-            </Link>
-}
-class CustomToolbar extends React.Component<ToolbarProps, {}> {
-    render() {
-      return (
-        <div className='calendar-toolbar'>
-          <button className="btn btn-link" onClick={() => this.props.onNavigate("PREV")}>
-                <i className="fas fa-chevron-left"></i>
-            </button>
-            <div className="calendar-toolbar-label flex-grow-1">{this.props.label}</div>
-            <button className="btn btn-link" onClick={() => this.props.onNavigate("NEXT")}>
-                <i className="fas fa-chevron-right"></i>
-            </button>
-        </div>
-      );
+type CalendarObject = {object_type:CalendarEventType}
+export const createEvent = (data:(CalendarItem | Event | Task) & CalendarObject ):CalendarEvent => {
+    switch (data.object_type) {
+        case "Event":{
+            const event = data as Event
+            return {icon:"fas fa-calendar", 
+                    start:moment(event.start).tz(timezone).toDate(), 
+                    end:moment(event.end).tz(timezone).toDate(), 
+                    title:event.name, 
+                    description: IntraSocialUtilities.htmlToText(data.description), 
+                    resource:data,
+                    uri:event.uri,
+                    hexColor:"FB0E7A",
+                    }
+        }
+        case "Task":{
+            const task = data as Task
+            return {icon:"fas fa-tasks",
+                    start:moment(task.due_date).tz(timezone).startOf('day').toDate(), 
+                    end:moment(task.due_date).tz(timezone).startOf('day').toDate(), 
+                    allDay:true,  
+                    title:task.title, 
+                    description:IntraSocialUtilities.htmlToText(data.description), 
+                    resource:data,
+                    uri:task.uri,
+                    hexColor:"4E13F5",
+                }
+        }
+        case "CalendarItem":{
+            const item = data as CalendarItem
+            return {icon:"fas fa-calendar-day",
+                    allDay:item.all_day,
+                    start:moment(item.start).tz(timezone).toDate(),
+                    end:moment(item.end).tz(timezone).toDate(),
+                    title:item.title,
+                    description:item.description,
+                    resource:data,
+                    uri:item.uri,
+                    hexColor:"04A451",
+                    }
+        }
+        default:return null
     }
 }
+export const filterCalendarEvents = (date:Date, events:CalendarEvent[]) => {
+    if(!events || events.length == 0)
+        return events 
+    const day = moment(date).startOf('day')
+    const filtered =  events.filter(event => {
+            const s = event.start && moment(event.start)
+            const e = event.end && moment(event.end)
+            return (s && s.isSame(day, "day")) || 
+                    (e && e.isSame(day, "day") && day.diff(e, "seconds") >= 60) ||
+                    (s && e && day > s && day < e )
+    }).sort((a, b) => {
+        const allDay = -Number.MAX_VALUE
+        const a1 = a.allDay ? allDay : (a.start || a.end || new Date()).getTime()
+        const b1 = b.allDay ? allDay : (b.start || b.end || new Date()).getTime()
+        const val = a1 - b1
+        return val
+    })
+    return filtered
+}
+
+
 type DateHeaderProps = {
     date: Date;
     drilldownView:View
@@ -79,7 +98,7 @@ type DateHeaderProps = {
     onDrillDown:(e) => void
     events?:CalendarItem[]
 }
-type CalendarEvent = {
+export type CalendarEvent = {
     allDay?: boolean
     title: string
     start?: Date
@@ -88,6 +107,7 @@ type CalendarEvent = {
     description?:string
     icon:string
     uri:string
+    hexColor?:string
 }
 class DateHeader extends React.Component<DateHeaderProps, {}>{
     render() {
@@ -99,10 +119,12 @@ class DateHeader extends React.Component<DateHeaderProps, {}>{
                 </div>
     }
 }
+type DefaultProps = {
+}
 type OwnProps = {
     breakpoint: ResponsiveBreakpoint
     isMember?: boolean
-} & CommonModuleProps
+} & CommonModuleProps & DefaultProps
 type State = {
     isLoading: boolean
     menuData: CalendarMenuData
@@ -116,7 +138,7 @@ type ReduxDispatchProps = {
 type Props = OwnProps & RouteComponentProps<any> & ReduxStateProps & ReduxDispatchProps
 class CalendarModule extends React.Component<Props, State> {
     tempMenuData: CalendarMenuData = null
-    static defaultProps: CommonModuleProps = {
+    static defaultProps: CommonModuleProps & DefaultProps = {
         pageSize: 15,
     }
     constructor(props: Props) {
@@ -134,53 +156,12 @@ class CalendarModule extends React.Component<Props, State> {
             return {isLoading:true, events:[]}
         }, this.loadMonthData)
     }
-    createEvent = ( date:moment.Moment) =>  (data:(CalendarItem | Event | Task) & CalendarObject ):CalendarEvent => {
-//startDay = moment(event.start).startOf('day')
-        switch (data.object_type) {
-            case "Event":{
-                const event = data as Event
-                return {icon:"fas fa-calendar", 
-                        start:moment(event.start).toDate(), 
-                        end:moment(event.end).toDate(), 
-                        title:event.name, 
-                        description: IntraSocialUtilities.htmlToText(data.description), 
-                        resource:data,
-                        uri:event.uri
-                        }
-            }
-            case "Task":{
-                const task = data as Task
-                return {icon:"fas fa-tasks",
-                        start:moment(task.due_date).startOf('day').toDate(), 
-                        end:moment(task.due_date).startOf('day').toDate(), 
-                        allDay:true,  
-                        title:task.title, 
-                        description:IntraSocialUtilities.htmlToText(data.description), 
-                        resource:data,
-                        uri:task.uri
-                    }
-            }
-            case "CalendarItem":{
-                const item = data as CalendarItem
-                return {icon:"fas fa-calendar-day",
-                        allDay:item.all_day,
-                        start:moment(item.start).toDate(),
-                        end:moment(item.end).toDate(),
-                        title:item.title,
-                        description:item.description,
-                        resource:data,
-                        uri:item.uri
-                        }
-            }
-            default:return null
-        }
-    }
     loadMonthData = () => {
         const date = moment(this.state.date)
         const start = date.startOf('month').toDate()
         const end = date.endOf('month').toDate()
         ApiClient.getCalendarItems(start, end, (data, status, error) => {
-            const d = (data || []).map(this.createEvent(date))
+            const d = (data || []).map(createEvent)
             this.setState(() => {
                 return {isLoading:false, events:d}
             })
@@ -200,26 +181,7 @@ class CalendarModule extends React.Component<Props, State> {
     menuDataUpdated = (data: CalendarMenuData) => {
         this.tempMenuData = data
     }
-    fetchEvent = (date:Date) => {
-        if(this.state.isLoading)
-            return []
-        const day = moment(date).startOf('day')
-        let events = this.state.events
-        const filtered =  events.filter(event => {
-                const s = event.start && moment(event.start)
-                const e = event.end && moment(event.end)
-                return (s && s.isSame(day, "day")) || 
-                        (e && e.isSame(day, "day") && day.diff(e, "seconds") > 0) ||
-                        (s && e && day > s && day < e )
-        }).sort((a, b) => {
-            if(a.allDay)
-                return -Number.MAX_VALUE
-            const a1 = (a.start && a.start.getTime()) || (a.end && a.end.getTime()) || 0
-            const b1 = (b.start && b.start.getTime()) || (b.end && b.end.getTime()) || 0
-            return b1 - a1
-        })
-        return filtered
-    }
+    
     onCalendarNavigate = (newDate: Date, view: View, action: NavigateAction) => {
         console.log("cal navigated", newDate, view, action)
         if(view == "month" && (action == "NEXT" || action == "PREV"))
@@ -247,17 +209,17 @@ class CalendarModule extends React.Component<Props, State> {
     renderContent = () => {
 
         const components = {
-            toolbar: CustomToolbar,
+            toolbar: (props) => <CalendarToolbar {...props} />,
             month:{
                 dateHeader:(props:DateHeaderProps & any) => {
                     const date = props.date
-                    const events = this.fetchEvent(date)
+                    const events = this.state.isLoading ? [] : filterCalendarEvents(date, this.state.events)
                     return <DateHeader {...props} events={events} />
                 },
                 //event:DateEvent
             }
         }
-        const events = this.fetchEvent(this.state.date)
+        const events = this.state.isLoading ? [] : filterCalendarEvents(this.state.date, this.state.events)
         return <div>
                 <Calendar
                     date={this.state.date}
@@ -298,15 +260,14 @@ class CalendarModule extends React.Component<Props, State> {
         const menu = undefined //<CalendarMenu data={this.state.menuData} onUpdate={this.menuDataUpdated} />
         const renderModalContent = !showInModal || isModal ? undefined : this.renderModalContent
         return (<SimpleModule {...rest}
-            showHeader={!isModal}
+            showHeader={false}
             renderModalContent={renderModalContent}
             className={cn}
             headerClick={this.headerClick}
             breakpoint={breakpoint}
             isLoading={this.state.isLoading}
             onMenuToggle={this.onMenuToggle}
-            menu={menu}
-            headerTitle={translate("calendar.module.title")}>
+            menu={menu}>
             {this.renderContent()}
         </SimpleModule>)
     }

@@ -4,7 +4,6 @@ import { Avatar } from "../general/Avatar";
 import { userAvatar, userFullName, getTextContent } from '../../utilities/Utilities';
 
 import { translate } from "../../localization/AutoIntlProvider";
-import { ProfileManager } from "../../managers/ProfileManager";
 import ReactionStats from "./ReactionStats";
 import { StatusUtilities } from "../../utilities/StatusUtilities";
 import { AuthenticationManager } from "../../managers/AuthenticationManager";
