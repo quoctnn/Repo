@@ -217,7 +217,7 @@ export class SearchComponent extends React.Component<Props, State> {
     constructor(props:Props) {
         super(props)
         var initialType = []
-        if (ElasticSearchType[this.props.initialType.toUpperCase()] !== undefined) {
+        if (this.props.initialType && ElasticSearchType[this.props.initialType.toUpperCase()] !== undefined) {
             initialType = [this.props.initialType as ElasticSearchType]
         }
         this.state = {
