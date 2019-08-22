@@ -124,12 +124,12 @@ class UserMenu extends React.Component<Props, State> {
         selectableDropdownItems.push({id:"all", type:OverflowMenuItemType.option, title:translate("Sign out"), onPress:this.signOut})
         const cn = classnames("dropdown-menu-popover", "user-status-dropdown")
         return <Popover className={cn}
-                        delay={0} 
-                        trigger="legacy" 
-                        placement="bottom" 
-                        hideArrow={false} 
-                        isOpen={this.state.popoverVisible} 
-                        target={this.triggerRef} 
+                        delay={0}
+                        trigger="legacy"
+                        placement="bottom"
+                        hideArrow={false}
+                        isOpen={this.state.popoverVisible}
+                        target={this.triggerRef}
                         toggle={this.closePopoverPanel}
                         >
                     <PopoverBody className="pl-0 pr-0">
@@ -138,7 +138,6 @@ class UserMenu extends React.Component<Props, State> {
                 </Popover>
     }
     renderTrigger = () => {
-        
         const profile = this.props.profile
         if (!this.props.profile || this.props.profile.is_anonymous)
             return <Link className="btn btn-sm btn-outline-secondary" to={Routes.SIGNIN}>{translate("Sign in")}</Link>

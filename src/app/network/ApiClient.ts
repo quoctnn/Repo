@@ -768,6 +768,22 @@ export default class ApiClient
             callback(null, status, error)
         })
     }
+    static friendInvitationGetId = (userId:number, callback:ApiClientCallback<any>) => {
+        let url = Constants.apiRoute.friendInvitation + `?user_id=${userId}`
+        AjaxRequest.get(url, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
+    static friendInvitationSend = (userId:number, callback:ApiClientCallback<any>) => {
+        let url = Constants.apiRoute.friendInvitation
+        AjaxRequest.post(url, {to_user: userId }, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
     static friendInvitationAccept = (invitation:number, callback:ApiClientCallback<any>) => {
         let url = Constants.apiRoute.friendInvitationAccept(invitation)
         AjaxRequest.get(url, (data, status, request) => {
@@ -778,6 +794,31 @@ export default class ApiClient
     }
     static friendInvitationDelete(invitation:number, block:boolean, callback:ApiClientCallback<any>){
         let url = Constants.apiRoute.friendInvitationDelete(invitation) + "?" + this.getQueryString({block})
+        AjaxRequest.delete(url, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
+    static userBlockGetId = (userId:number, callback:ApiClientCallback<any>) => {
+        let url = Constants.apiRoute.blockUrl + `?user_id=${userId}`
+        AjaxRequest.get(url, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
+    static userBlock(userId:number, callback:ApiClientCallback<any>){
+        let url = Constants.apiRoute.blockUrl
+        const data = { to_user: userId }
+        AjaxRequest.postJSON(url, data, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
+    static userUnBlock(blocking:number, callback:ApiClientCallback<any>){
+        let url = Constants.apiRoute.blockDelete(blocking)
         AjaxRequest.delete(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {

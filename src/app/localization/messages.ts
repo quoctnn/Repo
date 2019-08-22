@@ -338,6 +338,8 @@ var translations = {
     "common.relationship.invited": "Wants to be your friend",
     "common.relationship.send-request": "Send friendrequest",
     "common.relationship.cancel": "Cancel request",
+    "common.relationship.block": "Block user",
+    "common.relationship.unblock": "Remove block",
     "calendar.agenda":"Agenda",
   },
   no: {
@@ -679,6 +681,8 @@ var translations = {
     "common.relationship.invited": "Vil bli vennen din",
     "common.relationship.send-request": "Send venneforespørsel",
     "common.relationship.cancel": "Avbryt forespørsel",
+    "common.relationship.block": "Blokkér bruker",
+    "common.relationship.unblock": "Fjern blokkering",
     "calendar.agenda":"Agenda",
   },
   en: {
@@ -1028,6 +1032,8 @@ var translations = {
     "common.relationship.invited": "Wants to be your friend",
     "common.relationship.send-request": "Send friendrequest",
     "common.relationship.cancel": "Cancel request",
+    "common.relationship.block": "Block user",
+    "common.relationship.unblock": "Remove block",
     "calendar.agenda":"Agenda",
     //
     "newsfeed.sorting.null":"All",
