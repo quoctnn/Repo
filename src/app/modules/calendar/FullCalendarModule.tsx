@@ -27,60 +27,61 @@ type AgendaDefaultProps = {
     length:number
 }
 type AgendaProps = AgendaDefaultProps & CalendarProps
-class AgendaComponent extends React.Component<AgendaProps, {}>{
-    static defaultProps:AgendaDefaultProps = {
-        length:30
+type K = React.FunctionComponent<AgendaProps> & {title?:any, range?:any, navigate?:any}
+const AgendaComponent:K
+= (props:AgendaProps) => {
+    let { length, date, localizer } = props
+    const start = moment(date)
+    let end = moment(date).add(length, "days")
+    const arr:Date[] = []
+    while(start.diff(end, "days") < 1){
+        arr.push(start.toDate());
+        start.add(1, "days")
     }
-    static title = (start:Date, { length = AgendaComponent.defaultProps.length, localizer }) => {
-        let end = moment(start).add(length, "days").toDate()
-        return localizer.format({ start, end }, 'agendaHeaderFormat')
-    }
-    static range = (start:Date, { length = AgendaComponent.defaultProps.length }) => {
-        let end = moment(start).add(length, "days").toDate()
-        return { start, end }
-    }
-      
-    static navigate = (date:Date, action:NavigateAction, { length = AgendaComponent.defaultProps.length }) => {
-        switch (action) {
-          case "PREV":
-            return moment(date).add(-length, "days").toDate()
-      
-          case "NEXT":
-            return moment(date).add(length, "days").toDate()
-      
-          default:
-            return date
-        }
-    }
-    render() {
-        let { length, date, localizer } = this.props
-        const start = moment(date)
-        let end = moment(date).add(length, "days")
-        const arr:Date[] = []
-        while(start.diff(end, "days") < 1){
-            arr.push(start.toDate());
-            start.add(1, "days")
-        }
-        const events = this.props.events as CalendarEvent[]
-        const data:AgendaListItem[] = arr.map(d => {
-            return {items:filterCalendarEvents(d, events), date:d}
-        }).filter(li => li.items.length > 0 )
-        const cn = classnames("agenda-component")
-        return <div className={cn}>
-                    {data.map(d => {
-                        return <div key={"agenda_" + d.date.getTime()} className="agenda-day">
-                                <div className="title">
-                                    {moment(d.date).format(DateFormat.day)}
-                                </div>
-                                {d.items.length > 0 && d.items.map((ce, i) => {
-                                    return <CalendarEventComponent key={ce.uri + "_" + i} event={ce} date={d.date}/>
-                                }) ||
-                                    <div className="">{translate("calendar.no_events")}</div>
-                                }
-                                
-                        </div>
-                    })}
-                </div>
+    const events = props.events as CalendarEvent[]
+    const data:AgendaListItem[] = arr.map(d => {
+        return {items:filterCalendarEvents(d, events), date:d}
+    }).filter(li => li.items.length > 0 )
+    const cn = classnames("agenda-component")
+    return <div className={cn}>
+                {data.map(d => {
+                    return <div key={"agenda_" + d.date.getTime()} className="agenda-day">
+                            <div className="title">
+                                {moment(d.date).format(DateFormat.day)}
+                            </div>
+                            {d.items.length > 0 && d.items.map((ce, i) => {
+                                return <CalendarEventComponent key={ce.uri + "_" + i} event={ce} date={d.date}/>
+                            }) ||
+                                <div className="">{translate("calendar.no_events")}</div>
+                            }
+                            
+                    </div>
+                })}
+            </div>
+}
+
+AgendaComponent.defaultProps = {
+    length:30,
+}
+AgendaComponent.title = (start:Date, { length = AgendaComponent.defaultProps.length, localizer }) => {
+    let end = moment(start).add(length, "days").toDate()
+    return localizer.format({ start, end }, 'agendaHeaderFormat')
+}
+AgendaComponent.range = (start:Date, { length = AgendaComponent.defaultProps.length }) => {
+    let end = moment(start).add(length, "days").toDate()
+    return { start, end }
+}
+  
+AgendaComponent.navigate = (date:Date, action:NavigateAction, { length = AgendaComponent.defaultProps.length }) => {
+    switch (action) {
+      case "PREV":
+        return moment(date).add(-length, "days").toDate()
+  
+      case "NEXT":
+        return moment(date).add(length, "days").toDate()
+  
+      default:
+        return date
     }
 }
 const CalendarItemComponent = (props:EventProps<CalendarEvent>) => {
@@ -192,7 +193,7 @@ class FullCalendarModule extends React.Component<Props, State> {
 
         }
         const events = this.state.events
-        const agenda:any = AgendaComponent
+        const agenda = AgendaComponent
         return <div>
                 <Calendar
                     date={this.state.date}
