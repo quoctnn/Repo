@@ -1,12 +1,14 @@
 import * as React from 'react';
-import { Popover, PopoverBody } from 'reactstrap';
+import { Popover, PopoverBody, Button } from 'reactstrap';
 import classnames = require('classnames');
 import { OverflowMenuItem, createDropdownItem } from './OverflowMenu';
+import "./DropDownMenu.scss"
 type Props = {
     items:(() => OverflowMenuItem[]) | OverflowMenuItem[]
     className?:string
     triggerClass:string
     triggerTitle?:string
+    triggerIcon?:string
     modifiers?:any
 }
 type DefaultProps = {
@@ -80,10 +82,13 @@ export class DropDownMenu extends React.Component<Props, State> {
     {
         const cn = classnames(this.props.triggerClass, {active:!this.state.popoverRemoved})
         return (<>
-                    <span onClick={this.onTriggerClick}>
-                        {this.props.triggerTitle}
-                        <i ref={this.triggerRef} onClick={this.onTriggerClick} className={cn}></i>
-                    </span>
+                    <div className="dropdown-menu-trigger" onClick={this.onTriggerClick}>
+                        <Button size="xs" className="text-truncate" color="link">
+                            {this.props.triggerIcon && <i className={this.props.triggerIcon + " trigger-icon"}></i>}
+                            {this.props.triggerTitle}
+                            <i ref={this.triggerRef} className={cn}></i>
+                        </Button>
+                    </div>
                     {this.renderPopover()}
                 </>)
     }

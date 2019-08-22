@@ -1029,6 +1029,16 @@ var translations = {
     "common.relationship.send-request": "Send friendrequest",
     "common.relationship.cancel": "Cancel request",
     "calendar.agenda":"Agenda",
+    //
+    "newsfeed.sorting.null":"All",
+    "newsfeed.sorting.important":"Important",
+    "newsfeed.sorting.reminder":"Reminder",
+    "newsfeed.sorting.attn":"Attention",
+    "newsfeed.sorting.pinned":"Pinned",
+    "newsfeed.sorting.follow":"Follow",
+    "newsfeed.sorting.link":"Link",
+    "conversation.filter.archived":"Archived",
+    "conversation.filter.null":"All",
   }
 };
 

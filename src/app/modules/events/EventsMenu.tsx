@@ -20,9 +20,9 @@ export namespace EventSorting {
     }
     export function icon(type: EventSorting) {
         switch(type){
-            case EventSorting.date: return <i className="fa fa-calendar"></i>
-            case EventSorting.popular: return  <i className="fa fa-burn"></i>
-            default: return <i className="fa fa-question"></i>
+            case EventSorting.date: return "fas fa-calendar"
+            case EventSorting.popular: return  "fas fa-burn"
+            default: return "fas fa-question"
         }
     }
 }

@@ -18,6 +18,8 @@ import { ContextManager } from '../../managers/ContextManager';
 import { EventSorting } from './EventsMenu';
 import { ButtonGroup, Button } from 'reactstrap';
 import { CommonModuleProps } from '../Module';
+import { DropDownMenu } from '../../components/general/DropDownMenu';
+import { OverflowMenuItem, OverflowMenuItemType } from '../../components/general/OverflowMenu';
 type OwnProps = {
     breakpoint:ResponsiveBreakpoint
 } & CommonModuleProps
@@ -115,13 +117,18 @@ class EventsModule extends React.Component<Props, State> {
     renderSorting = () => {
         if(this.state.menuVisible)
             return null
-        return (<ButtonGroup className="header-filter-group">
-                    {EventSorting.all.map(s =>
-                        <Button size="xs" active={this.state.menuData.sorting === s} key={s} onClick={this.toggleSorting(s)} color="light">
-                            <span title={EventSorting.translatedText(s)}>{EventSorting.icon(s)}</span>
-                        </Button>
-                    )}
-                </ButtonGroup>)
+        const ddi: OverflowMenuItem[] = EventSorting.all.map(s => {
+            return {
+                id:s,
+                type:OverflowMenuItemType.option,
+                onPress:this.toggleSorting(s),
+                title:EventSorting.translatedText(s),
+                iconClass:EventSorting.icon(s),
+            }
+        })
+
+        const title = EventSorting.translatedText(this.state.menuData.sorting)
+        return <DropDownMenu triggerIcon={EventSorting.icon(this.state.menuData.sorting)} triggerTitle={title} triggerClass="fas fa-caret-down mx-1" items={ddi}></DropDownMenu>
     }
     renderContent = () => {
         return <>

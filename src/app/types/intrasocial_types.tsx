@@ -378,9 +378,26 @@ export namespace ProjectSorting {
     }
     export function icon(type: ProjectSorting) {
         switch (type) {
-            case ProjectSorting.recent: return <i className="fa fa-user-clock"></i>
-            case ProjectSorting.mostUsed: return <i className="fa fa-burn"></i>
-            default: return <i className="fa fa-question"></i>
+            case ProjectSorting.recent: return "fas fa-user-clock"
+            case ProjectSorting.mostUsed: return "fas fa-burn"
+            default: return "fas fa-question"
+        }
+    }
+}
+export enum ConversationFilter {
+    archived = "archived",
+}
+export namespace ConversationFilter {
+    export const all = [
+        ConversationFilter.archived,
+    ]
+    export function translatedText(type: ConversationFilter) {
+        return translate("conversation.filter." + type)
+    }
+    export function icon(type: ConversationFilter) {
+        switch (type) {
+            case ConversationFilter.archived: return "fas fa-archive"
+            default: return "fas fa-globe-europe"
         }
     }
 }
@@ -405,9 +422,9 @@ export namespace GroupSorting {
     }
     export function icon(type: GroupSorting) {
         switch (type) {
-            case GroupSorting.recent: return <i className="fa fa-user-clock"></i>
-            case GroupSorting.mostUsed: return <i className="fa fa-burn"></i>
-            default: return <i className="fa fa-question"></i>
+            case GroupSorting.recent: return "fas fa-user-clock"
+            case GroupSorting.mostUsed: return "fas fa-burn"
+            default: return "fas fa-question"
         }
     }
 }
@@ -766,6 +783,9 @@ export enum ObjectAttributeType {
     link = "link",
 }
 export namespace ObjectAttributeType {
+    export function translatedText(type: ObjectAttributeType) {
+        return translate("newsfeed.sorting." + type)
+    }
     export function iconForType(type: ObjectAttributeType, active = false) {
         switch (type) {
             case ObjectAttributeType.important: return active ? "fas fa-star" : "far fa-star"
@@ -774,7 +794,7 @@ export namespace ObjectAttributeType {
             case ObjectAttributeType.pinned: return active ? "fas fa-thumbtack" : "fas fa-thumbtack"
             case ObjectAttributeType.follow: return active ? "far fa-bell-slash" : "far fa-bell"
             case ObjectAttributeType.link: return active ? "fas fa-link" : "fas fa-link"
-            default: return "fas fa-question"
+            default: return "fas fa-globe-europe"
         }
     }
 }
