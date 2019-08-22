@@ -17,7 +17,7 @@ import { Settings } from '../../utilities/Settings';
 import DashFillComponent from '../../components/general/DashFillComponent';
 import Routes from '../../utilities/Routes';
 import { availableLanguages } from '../../redux/language';
-import { nullOrUndefined } from '../../utilities/Utilities';
+import { nullOrUndefined, parseJSONObject } from '../../utilities/Utilities';
 import Logo from '../../components/general/images/Logo';
 
 type SectionComponentProps = {
@@ -54,13 +54,17 @@ class Signin extends React.Component<Props, {error?:string}> {
             error:null
         }
     }
-    loginCallback = (data:{token:string|null}, status:string, error:string) => {
+    loginCallback = (data:any, status:string, error:string) => {
         if(error || status == "error")
         {
-            if (error !== "Bad Request")
-                ToastManager.showErrorToast(error || translate("Could not sign in"))
-            else
-                this.setState({error:"Invalid credentials"})
+            if (data.responseText) {
+                const error_response = JSON.parse(data.responseText)
+                if (error_response.non_field_errors) {
+                    this.setState({error:error_response.non_field_errors})
+                } else if (error_response.detail) {
+                    this.setState({error:error_response.detail.error_description})
+                }
+            }
             return
         }
         if(data.token)
@@ -177,11 +181,19 @@ class Signin extends React.Component<Props, {error?:string}> {
                                                         </button>
                                             }}
                                         />
-                                        {/* Linkedin provider on login API is broken...
-                                            <LinkedIn
+                                        <LinkedIn
+                                            className="social-sign-on-button"
                                             clientId={Settings.LinkedInClientID}
                                             callback={this.doLinkedInSignin}
-                                            text='Sign in with LinkedIn' /> */}
+                                            text='Sign in with LinkedIn'
+                                            /* The LinkedIn module does not support the render property
+                                            render={renderProps => {
+                                                return <button  onClick={renderProps.onClick} disabled={!socialLinksActive}>
+                                                            <div className="social-icon"></div>
+                                                            {translate("sign_in_linkedin")}
+                                                        </button>
+                                            }}*/
+                                        />
                                     </div>
                                 </div>
                             </div>
