@@ -19,6 +19,8 @@ import { ContextManager } from '../../managers/ContextManager';
 import { ButtonGroup, Button } from 'reactstrap';
 import { CommonModuleProps } from '../Module';
 import SimpleGroupListItem from './SimpleGroupListItem';
+import { DropDownMenu } from '../../components/general/DropDownMenu';
+import { OverflowMenuItem, OverflowMenuItemType } from '../../components/general/OverflowMenu';
 export enum GroupsRenderMode {
     simple, normal
 }
@@ -137,13 +139,17 @@ class GroupsModule extends React.Component<Props, State> {
     renderSorting = () => {
         if(this.state.menuVisible)
             return null
-        return (<ButtonGroup className="header-filter-group">
-                    {GroupSorting.all.slice(0,2).map(s =>
-                        <Button size="xs" active={this.state.menuData.sorting === s} key={s} onClick={this.toggleSorting(s)} color="light">
-                            <span title={GroupSorting.translatedText(s)}>{GroupSorting.icon(s)}</span>
-                        </Button>
-                    )}
-                </ButtonGroup>)
+        const ddi: OverflowMenuItem[] = GroupSorting.all.map(s => {
+            return {
+                id:s,
+                type:OverflowMenuItemType.option,
+                onPress:this.toggleSorting(s),
+                title:GroupSorting.translatedText(s),
+                iconClass:GroupSorting.icon(s),
+            }
+        })
+        const title = GroupSorting.translatedText(this.state.menuData.sorting)
+        return <DropDownMenu triggerIcon={GroupSorting.icon(this.state.menuData.sorting)} triggerTitle={title} triggerClass="fas fa-caret-down mx-1" items={ddi}></DropDownMenu>
     }
     renderModalContent = () => {
         return <GroupsModule {...this.props} pageSize={50} style={{height:undefined, maxHeight:undefined}} showLoadMore={false} showInModal={false} isModal={true}/>

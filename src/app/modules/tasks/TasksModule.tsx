@@ -18,6 +18,8 @@ import { ContextManager } from '../../managers/ContextManager';
 import { ButtonGroup, Button } from 'reactstrap';
 import { AuthenticationManager } from '../../managers/AuthenticationManager';
 import { CommonModuleProps } from '../Module';
+import { DropDownMenu } from '../../components/general/DropDownMenu';
+import { OverflowMenuItem } from '../../components/general/OverflowMenu';
 
 type OwnProps = {
     breakpoint: ResponsiveBreakpoint

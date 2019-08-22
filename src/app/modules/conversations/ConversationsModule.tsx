@@ -3,7 +3,7 @@ import { withRouter, RouteComponentProps, Link } from "react-router-dom";
 import classnames from "classnames"
 import "./ConversationsModule.scss"
 import { ResponsiveBreakpoint } from '../../components/general/observers/ResponsiveComponent';
-import { ContextNaturalKey, Conversation, UserProfile } from '../../types/intrasocial_types';
+import { ContextNaturalKey, Conversation, UserProfile, ConversationFilter } from '../../types/intrasocial_types';
 import { connect, DispatchProp } from 'react-redux';
 import { ReduxState } from '../../redux';
 import SimpleModule from '../SimpleModule';
@@ -28,6 +28,8 @@ import ConfirmDialog from '../../components/general/dialogs/ConfirmDialog';
 import ButtonGroup from 'reactstrap/lib/ButtonGroup';
 import Button from 'reactstrap/lib/Button';
 import { CommonModuleProps } from '../Module';
+import { OverflowMenuItem, OverflowMenuItemType } from '../../components/general/OverflowMenu';
+import { DropDownMenu } from '../../components/general/DropDownMenu';
 type IsTypingStore = {[conversation:number]:{[user:number]:NodeJS.Timer}}
 type OwnProps = {
     breakpoint:ResponsiveBreakpoint
@@ -42,7 +44,7 @@ type State = {
     listRedrawContext?:string
     createConversationDialogVisible:boolean,
     conversationActionInProgress:{conversation:number, action:ConversationAction}
-    filterArchived:boolean
+    filter:ConversationFilter
 }
 type ReduxStateProps = {
     authenticatedUser:UserProfile
@@ -69,7 +71,7 @@ class ConversationsModule extends React.Component<Props, State> {
             isTyping:{},
             createConversationDialogVisible:false,
             conversationActionInProgress:{conversation:0, action:null},
-            filterArchived:false,
+            filter:null,
         }
         const observer = NotificationCenter.addObserver(ConversationManagerConversationRemovedEvent, this.processConversationRemoved)
         this.observers.push(observer)
@@ -100,7 +102,7 @@ class ConversationsModule extends React.Component<Props, State> {
             this.createTemporaryConversation()
     }
     componentDidUpdate = (prevProps:Props, prevState:State) => {
-        if(this.state.filterArchived != prevState.filterArchived)
+        if(this.state.filter != prevState.filter)
         {
             this.conversationsList.current.reload()
         }
@@ -172,7 +174,7 @@ class ConversationsModule extends React.Component<Props, State> {
         this.setState({isLoading})
     }
     fetchConversations = (offset:number, completion:(items:PaginationResult<Conversation>) => void ) => {
-        const archived = this.state.filterArchived
+        const archived = this.state.filter == ConversationFilter.archived
         ApiClient.getConversations( 30, offset, archived, (data, status, error) => {
             if(data && data.results)
             {
@@ -352,10 +354,10 @@ class ConversationsModule extends React.Component<Props, State> {
                 ConversationManager.createTemporaryConversation()
                 this.conversationsList.current && this.conversationsList.current.scrollToTop()
             }
-            if(this.state.filterArchived)
+            if(this.state.filter == ConversationFilter.archived)
             {
                 this.setState(() => {
-                    return {filterArchived:false}
+                    return {filter:null}
                 },onReady)
             }
             else {
@@ -364,24 +366,37 @@ class ConversationsModule extends React.Component<Props, State> {
         }
     }
     renderHeaderContent = () => {
-        return <div className="flex-shrink-0">
+        return <div className="flex-shrink-0 d-flex">
                     {this.renderFilters()}
-                    <Link title={translate("conversation.menu.create")} onClick={this.createTemporaryConversation} to={Routes.conversationUrl(tempConversationId)} className="btn btn-dark flex-shrink-0 btn-sm" >
+                    <Link title={translate("conversation.menu.create")} onClick={this.createTemporaryConversation} to={Routes.conversationUrl(tempConversationId)} className="btn btn-dark flex-shrink-0 btn-xs" >
                         <i className="fas fa-plus"></i>
                     </Link>
                 </div>
     }
-    toggleFilterArchived = () => {
+    applyFilter = (filter:ConversationFilter) => (e) => {
         this.setState((prevState:State ) => {
-            return {filterArchived:!prevState.filterArchived}
+            return {filter:filter}
         })
     }
     renderFilters = () => {
-        return (<ButtonGroup className="header-filter-group">
-                    <Button size="xs" active={!!this.state.filterArchived} onClick={this.toggleFilterArchived} color="light">
-                        <span title={translate("conversation.menu.archived")}><i className="fa fa-archive"></i></span>
-                    </Button>
-                </ButtonGroup>)
+        const ddi: OverflowMenuItem[] = ConversationFilter.all.map(s => {
+            return {
+                id:s,
+                type:OverflowMenuItemType.option,
+                onPress:this.applyFilter(s),
+                title:ConversationFilter.translatedText(s),
+                iconClass:ConversationFilter.icon(s),
+            }
+        })
+        ddi.unshift({
+            id:"all",
+            type:OverflowMenuItemType.option,
+            onPress:this.applyFilter(null),
+            title:ConversationFilter.translatedText(null),
+            iconClass:ConversationFilter.icon(null),
+        })
+        const title = ConversationFilter.translatedText(this.state.filter)
+        return <DropDownMenu triggerIcon={ConversationFilter.icon(this.state.filter)} triggerTitle={title} triggerClass="fas fa-caret-down mx-1" items={ddi}></DropDownMenu>
     }
     render()
     {

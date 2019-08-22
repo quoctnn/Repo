@@ -18,6 +18,8 @@ import SimpleModule from '../SimpleModule';
 import { ContextManager } from '../../managers/ContextManager';
 import { ButtonGroup, Button } from 'reactstrap';
 import { CommonModuleProps } from '../Module';
+import { OverflowMenuItem, OverflowMenuItemType } from '../../components/general/OverflowMenu';
+import { DropDownMenu } from '../../components/general/DropDownMenu';
 type OwnProps = {
     breakpoint:ResponsiveBreakpoint
 } & CommonModuleProps
@@ -113,13 +115,17 @@ class ProjectsModule extends React.Component<Props, State> {
     renderSorting = () => {
         if(this.state.menuVisible)
             return null
-        return (<ButtonGroup className="header-filter-group">
-                    {ProjectSorting.all.slice(1,3).map(s =>
-                        <Button size="xs" active={this.state.menuData.sorting === s} key={s} onClick={this.toggleSorting(s)} color="light">
-                            <span title={ProjectSorting.translatedText(s)}>{ProjectSorting.icon(s)}</span>
-                        </Button>
-                    )}
-                </ButtonGroup>)
+        const ddi: OverflowMenuItem[] = ProjectSorting.all.map(s => {
+            return {
+                id:s,
+                type:OverflowMenuItemType.option,
+                onPress:this.toggleSorting(s),
+                title:ProjectSorting.translatedText(s),
+                iconClass:ProjectSorting.icon(s),
+            }
+        })
+        const title = ProjectSorting.translatedText(this.state.menuData.sorting)
+        return <DropDownMenu triggerIcon={ProjectSorting.icon(this.state.menuData.sorting)} triggerTitle={title} triggerClass="fas fa-caret-down mx-1" items={ddi}></DropDownMenu>
     }
     renderContent = () => {
         return <>

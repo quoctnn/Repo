@@ -20,6 +20,8 @@ import { translate } from '../../localization/AutoIntlProvider';
 import { ReduxState } from '../../redux';
 import { ContextManager } from '../../managers/ContextManager';
 import { StatusComposerComponent } from '../../components/general/input/StatusComposerComponent';
+import { DropDownMenu } from '../../components/general/DropDownMenu';
+import { OverflowMenuItem, OverflowMenuItemType } from '../../components/general/OverflowMenu';
 
 type OwnProps = {
     className?:string
@@ -195,6 +197,28 @@ class NewsfeedModule extends React.Component<Props, State> {
     connectRef = (ref) => {
         this.newsfeedComponent = ref
     }
+    renderHeaderFilter = () => {
+        if(this.state.menuVisible)
+            return null
+        const ddi: OverflowMenuItem[] = this.availableFilters.map(s => {
+            return {
+                id:s,
+                type:OverflowMenuItemType.option,
+                onPress:this.filterButtonChanged(s),
+                title:ObjectAttributeType.translatedText(s),
+                iconClass:ObjectAttributeType.iconForType(s),
+            }
+        })
+        ddi.unshift({
+            id:"all",
+            type:OverflowMenuItemType.option,
+            onPress:this.filterButtonChanged(null),
+            title:ObjectAttributeType.translatedText(null),
+            iconClass:ObjectAttributeType.iconForType(null),
+        })
+        const title = ObjectAttributeType.translatedText(this.state.filter)
+        return <DropDownMenu triggerIcon={ObjectAttributeType.iconForType(this.state.filter)} triggerTitle={title} triggerClass="fas fa-caret-down mx-1" items={ddi}></DropDownMenu>
+    }
     render()
     {
         const {breakpoint, history, match, location, staticContext, className, contextNaturalKey, contextObjectId, contextObject, includeSubContext, ...rest} = this.props
@@ -202,7 +226,6 @@ class NewsfeedModule extends React.Component<Props, State> {
         const {contextTitle} = this.state
         const resolvedContextNaturalKey = this.state.contextNaturalKey || this.props.contextNaturalKey
         const resolvedContextObjectId =  this.state.contextObjectId || this.props.contextObjectId
-        const filter = this.state.filter
         const disableContextSearch = !!contextNaturalKey && !!contextObjectId
         const showComposer = !!this.props.contextNaturalKey && !!this.props.contextObjectId
         const composer = showComposer ? this.renderStatusComposer(resolvedContextNaturalKey, resolvedContextObjectId) : undefined
@@ -212,15 +235,7 @@ class NewsfeedModule extends React.Component<Props, State> {
         const title = composer || contextTitle || translate("Newsfeed")
         return (<Module {...rest} className={cn}>
                     <ModuleHeader headerTitle={title} loading={this.state.isLoading} className={headerClass} onClick={headerClick}>
-                        {!this.state.menuVisible &&
-                            <ButtonGroup className="header-filter-group">
-                                {this.availableFilters.map(f => {
-                                    return (<Button size="xs" key={f} active={filter == f} onClick={this.filterButtonChanged(f)} color="light">
-                                                <i className={ObjectAttributeType.iconForType(f)}></i>
-                                            </Button>)
-                                })}
-                            </ButtonGroup>
-                        }
+                        {this.renderHeaderFilter()}
                         <ModuleMenuTrigger onClick={this.menuItemClick} />
                     </ModuleHeader>
                     {breakpoint >= ResponsiveBreakpoint.standard && //do not render for small screens
