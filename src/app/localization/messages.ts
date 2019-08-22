@@ -337,7 +337,8 @@ var translations = {
     "common.relationship.pending": "Request pending",
     "common.relationship.invited": "Wants to be your friend",
     "common.relationship.send-request": "Send friendrequest",
-    "common.relationship.cancel": "Cancel request"
+    "common.relationship.cancel": "Cancel request",
+    "calendar.agenda":"Agenda",
   },
   no: {
     "search.placeholder": "Søk ...",
@@ -677,7 +678,8 @@ var translations = {
     "common.relationship.pending": "Forespørsel venter",
     "common.relationship.invited": "Vil bli vennen din",
     "common.relationship.send-request": "Send venneforespørsel",
-    "common.relationship.cancel": "Avbryt forespørsel"
+    "common.relationship.cancel": "Avbryt forespørsel",
+    "calendar.agenda":"Agenda",
   },
   en: {
     "search.placeholder": "Search ...",
@@ -1025,7 +1027,8 @@ var translations = {
     "common.relationship.pending": "Request pending",
     "common.relationship.invited": "Wants to be your friend",
     "common.relationship.send-request": "Send friendrequest",
-    "common.relationship.cancel": "Cancel request"
+    "common.relationship.cancel": "Cancel request",
+    "calendar.agenda":"Agenda",
   }
 };
 

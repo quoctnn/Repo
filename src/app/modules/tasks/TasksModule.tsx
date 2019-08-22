@@ -173,7 +173,7 @@ class TasksModule extends React.Component<Props, State> {
                 }
             case TaskActions.addStatus:
                 {
-                    const tempStatus = StatusUtilities.getStatusPreview(ContextNaturalKey.TASK, task.id, extra.message, extra.mentions, extra.files)
+                    const tempStatus = StatusUtilities.getStatusPreview(ContextNaturalKey.TASK, task.id, extra.message, extra.files)
                     ApiClient.createStatus(tempStatus, (newStatus, requestStatus, error) => {
                         const success = !!newStatus
                         if (success) {

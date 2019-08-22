@@ -512,7 +512,7 @@ export type ContextObject = {
     name: string
 } & Linkable
 export type Status = {
-    [key: string]: any
+    //[key: string]: any
     can_comment: boolean
     children: Status[]
     children_ids: number[]

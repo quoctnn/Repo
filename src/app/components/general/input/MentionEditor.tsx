@@ -71,11 +71,14 @@ export class Mention {
         }
         return new Mention(data.contextObjectName || "Unknown", data.originalString.splice(0, 1, ""), "Unknown", null, data.contextId)
     }
+    static getMentionString = (type:ContextNaturalKey, id:number, name?:string) => {
+        return `@${type}:${id}${!!name ? ":" + name +  ":": ""}`
+    }
     static fromUser(user:UserProfile)
     {
         const name = userFullName(user)
         return new Mention(name,
-        "auth.user:" + user.id + ":"+ name + ":",// user.username,
+        Mention.getMentionString(ContextNaturalKey.USER, user.id, name),
         user.username,
         IntraSocialUtilities.appendAuthorizationTokenToUrl(user.avatar || user.avatar_thumbnail),
         user.id)

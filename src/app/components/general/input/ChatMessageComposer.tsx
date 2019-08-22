@@ -80,16 +80,6 @@ const generateContentState = (content:string):ContentState =>
                 arr.push({index:match.index, length:MENTION_REGEX.lastIndex - match.index, mention: Mention.fromMentionData(data)})
                 indexes[key] = arr
             }
-            /*mentions.forEach(m => {
-                var re = new RegExp("@"+m.key.replace("+","\\+"), 'g')
-                var match:RegExpExecArray = null
-                while (match = re.exec(text)) {
-                    let key = block.getKey()
-                    let arr = indexes[key] || []
-                    arr.push({index:match.index, length:re.lastIndex - match.index, mention:m})
-                    indexes[key] = arr
-                }
-            })*/
         })
         Object.keys(indexes).forEach(k => {
             let arr = indexes[k].sort((a,b) => a.index - b.index)
@@ -135,7 +125,6 @@ type OwnProps = {
     onDidType:(unprocessedText:string) => void
     filesAdded?:(files:File[]) => void
     content:string
-    mentions:Mention[]
     mentionSearch:(search:string, completion:(mentions:Mention[]) => void) => void
     onHandleUploadClick?:(event) => void
     canSubmit?:boolean
@@ -206,8 +195,7 @@ export class ChatMessageComposer extends React.Component<Props,State> {
                 nextProps.content != this.props.content ||
                 nextProps.className != this.props.className ||
                 nextProps.forceUpdate != this.props.forceUpdate ||
-                nextProps.singleLine != this.props.singleLine ||
-                !(nextProps.mentions || []).isEqual(this.props.mentions || [])
+                nextProps.singleLine != this.props.singleLine 
         return update
     }
     componentDidUpdate = (prevProps:Props) => {

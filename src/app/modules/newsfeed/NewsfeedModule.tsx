@@ -151,7 +151,7 @@ class NewsfeedModule extends React.Component<Props, State> {
         this.blurStatusComposer()
         const instance = this.newsfeedComponent as NewsfeedComponent
         if(instance)
-            instance.createNewStatus(extra.message, extra.mentions, extra.files, completion )
+            instance.createNewStatus(extra.message, extra.files, completion )
     }
     blurStatusComposer = () => {
         this.setState({statusComposerFocus:false})

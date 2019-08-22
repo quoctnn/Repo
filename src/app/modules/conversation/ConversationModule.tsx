@@ -432,7 +432,6 @@ class ConversationModule extends React.Component<Props, State> {
                                 className="secondary-text main-content-secondary-background"
                                 mentionSearch={this.handleMentionSearch}
                                 content={""}
-                                mentions={[]}
                                 submitOnEnter={true}
                                 filesAdded={this.filesAdded}
                                 onSubmit={this.onChatMessageSubmit}

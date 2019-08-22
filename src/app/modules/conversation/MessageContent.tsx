@@ -53,19 +53,6 @@ export class MessageContentParser{
             }
             config.push(breaks)
         }
-        /*let mentionSearch = mentions.map(m => {
-            let user = ProfileManager.getProfileById(m)
-            if(!user)
-                return null
-            return {
-                regex:new RegExp("(@auth.user:" + user.id + ")|(" + "@" + user.username.replace("+","\\+") + ")", 'g'),
-                fn: (key, result) => {
-                    if(this.simpleMode)
-                        return <b key={this.getKey(key)}>{userFullName(user)}</b>
-                    return <Link key={this.getKey(key)} to={Routes.profileUrl(user.slug_name) }>{userFullName(user)}</Link>;
-                }
-            }
-        }).filter(o => o)*/
         const mentionSearch = {
             regex: MENTION_REGEX,
             fn: (key, result:string[]) => {

@@ -38,6 +38,7 @@
     }
     .calendar-event{
         .calendar-event-item{
+            display: flex;
             color: inherit;
         }
         &.calendaritem{

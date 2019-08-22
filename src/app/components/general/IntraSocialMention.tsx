@@ -27,6 +27,9 @@ class IntraSocialMention extends React.Component<Props, {}> {
             ContextManager.ensureObjectExists(data.contextNaturalKey, data.contextId)
         }
     }
+    componentDidUpdate = (prevProps:Props) => {
+        
+    }
     render = () => {
         const {data, object} = this.props
         const name = data.getName()
