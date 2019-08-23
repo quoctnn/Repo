@@ -138,7 +138,8 @@ class Signin extends React.Component<Props, {error?:string}> {
                                     <h2 className="title">{translate("Login")}</h2>
                                     <div className="sub-title mb-1">
                                         {translate("no_account_question")}{" "}
-                                        <Link className="s-link" to={Routes.SIGNUP}>{translate("Sign up")}</Link>
+                                        {/*<Link className="s-link" to={Routes.SIGNUP}>{translate("Sign up")}</Link>*/}
+                                        <a href="https://intra.work/accounts/oup/login/" target="_blank">{translate("Sign up")}</a>
                                     </div>
                                     <Form>
                                         <InputGroup className="form-group form-input">
@@ -187,19 +188,23 @@ class Signin extends React.Component<Props, {error?:string}> {
                                                         </button>
                                             }}
                                         />
-                                        <LinkedIn
+                                        <button className="social-sign-on-button" disabled={true}>
+                                            <div className="social-icon"></div>
+                                            {translate("sign_in_linkedin")}
+                                        </button>
+                                        {/* <LinkedIn
                                             className="social-sign-on-button"
                                             clientId={Settings.LinkedInClientID}
                                             callback={this.doLinkedInSignin}
                                             text='Sign in with LinkedIn'
-                                            /* The LinkedIn module does not support the render property
+                                            //The LinkedIn module does not support the render property
                                             render={renderProps => {
                                                 return <button  onClick={renderProps.onClick} disabled={!socialLinksActive}>
                                                             <div className="social-icon"></div>
                                                             {translate("sign_in_linkedin")}
                                                         </button>
-                                            }}*/
-                                        />
+                                            }}
+                                        /> */}
                                     </div>
                                 </div>
                             </div>
