@@ -21,7 +21,8 @@
     "forge": "./forge.config.js"
   },
   "dependencies": {
-    "electron-squirrel-startup": "^1.0.0"
+    "electron-squirrel-startup": "^1.0.0",
+    "electron-compile": "6.4.4"
   },
   "devDependencies": {
     "@electron-forge/cli": "6.0.0-beta.43",
@@ -29,6 +30,7 @@
     "@electron-forge/maker-rpm": "6.0.0-beta.43",
     "@electron-forge/maker-squirrel": "6.0.0-beta.43",
     "@electron-forge/maker-zip": "6.0.0-beta.43",
-    "electron": "6.0.0"
+    "electron": "6.0.0",
+    "electron-prebuilt-compile": "4.0.0"
   }
 }
