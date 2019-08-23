@@ -269,10 +269,28 @@ export default class ApiClient
     static readActivity(id:number, callback: (success, response) => void)
     {
         let url = Constants.apiRoute.recentActivityMarkReadUrl
-        AjaxRequest.post(url, {'serialization_ids':[id]}, (data, status, request) => {
+        AjaxRequest.post(url, {serialization_ids:[id]}, (data, status, request) => {
             callback(true, data)
         }, (request, status, error) => {
             callback(false, error)
+        })
+    }
+    static readAllActivities(callback: ApiClientCallback<any>)
+    {
+        let url = Constants.apiRoute.recentActivityMarkAllReadUrl
+        AjaxRequest.get(url, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
+    static readNotificationActions(callback: ApiClientCallback<any>)
+    {
+        let url = Constants.apiRoute.notificationsMarkActionsReadUrl
+        AjaxRequest.get(url, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
         })
     }
     static createStatus(status:Status, callback:ApiClientCallback<Status>)

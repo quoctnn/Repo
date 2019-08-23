@@ -1076,7 +1076,7 @@ export class NewsfeedComponent extends React.Component<Props, State> {
                 if(status.level > 1)
                 {
                     parent = this.findStatusByStatusId(status.parent)
-                    content = Mention.getMentionString(ContextNaturalKey.USER, status.owner.id, userFullName(status.owner)) + " "
+                    content = "@" + Mention.getMentionString(ContextNaturalKey.USER, status.owner.id, userFullName(status.owner)) + " "
                 }
                 this.insertCommentComposer(parent, content)
                 break;

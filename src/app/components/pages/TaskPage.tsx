@@ -4,13 +4,11 @@ import "./TaskPage.scss"
 import { Project, Community, Task } from "../../types/intrasocial_types";
 import LoadingSpinner from "../LoadingSpinner";
 import { ReduxState } from "../../redux";
-import PageHeader from "../PageHeader";
 import { DashboardWithData } from "../../DashboardWithData";
 import { ProjectManager } from "../../managers/ProjectManager";
 import { CommunityManager } from "../../managers/CommunityManager";
 import { Error404 } from "../../views/error/Error404";
 import { TaskManager } from "../../managers/TaskManager";
-import { communityAvatar, communityName, communityCover } from "../../utilities/Utilities";
 export interface OwnProps
 {
     match:any,
@@ -44,15 +42,6 @@ class TaskPage extends React.Component<Props, State>
     {
         return (<LoadingSpinner />)
     }
-    renderHeader(community:Community)
-    {
-        return (<PageHeader
-                    coverImage={communityCover(community)}
-                    primaryItemImage={communityAvatar(community, true)}
-                    primaryItemTitle={communityName(community)}
-                    />
-                )
-    }
     renderNotFound = () => {
         return <Error404 />
     }
@@ -64,7 +53,6 @@ class TaskPage extends React.Component<Props, State>
                 {!hasData && this.renderNotFound()}
                 {hasData &&
                     <div className="content">
-                        {this.renderHeader(community)}
                         <DashboardWithData category="task" />
                     </div>
                 }

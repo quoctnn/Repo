@@ -350,6 +350,7 @@ var translations = {
     "newsfeed.sorting.link":"Link",
     "conversation.filter.archived":"Archived",
     "conversation.filter.null":"All",
+    "notification.read_all":"Read all",
   },
   no: {
     "search.placeholder": "Søk ...",
@@ -702,6 +703,7 @@ var translations = {
     "newsfeed.sorting.link":"Link",
     "conversation.filter.archived":"Arkiverte",
     "conversation.filter.null":"Alle",
+    "notification.read_all":"Les alle",
   },
   en: {
     "search.placeholder": "Search ...",
@@ -1063,6 +1065,7 @@ var translations = {
     "newsfeed.sorting.link":"Link",
     "conversation.filter.archived":"Archived",
     "conversation.filter.null":"All",
+    "notification.read_all":"Read all",
   }
 };
 

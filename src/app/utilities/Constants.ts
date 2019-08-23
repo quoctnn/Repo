@@ -204,6 +204,7 @@ export default  {
         recentActivityUnreadUrl: '/api/v2/notification/unread-count/',
         recentActivityMarkReadUrl: '/api/v2/notification/update-as-read/',
         recentActivityMarkAllReadUrl: '/api/v2/notification/mark-all-as-read/',
+        notificationsMarkActionsReadUrl: '/api/v2/notification/mark-actions-as-read/',
 
         // Notification URLs
         notificationUrl: '/api/v2/notification/',

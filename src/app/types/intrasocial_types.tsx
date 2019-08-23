@@ -431,17 +431,16 @@ export namespace GroupSorting {
 //notifications
 export type NotificationObject = {
     type: NotificationGroupKey
+    created_at: string
 } & IdentifiableObject
 export type InvitationNotification = {
     context_object: any
     invited_by: UserProfile
-    created_at: string
     message?: string
 } & NotificationObject
 export type StatusNotification = {
     level: number
     created_by: number
-    created_at: string
     context_natural_key?: ContextNaturalKey
     context_object_id?: number
     context_object: ContextObject
@@ -454,14 +453,12 @@ export enum TaskNotificationAction {
 }
 export type ReportNotification = {
     context_natural_key: ContextNaturalKey
-    created_at: string
     creator: UserProfile
     tags: string[]
 } & Linkable & NotificationObject
 export type TaskNotification = {
     user: number
     created_by: number
-    created_at: string
     title: string
     action: TaskNotificationAction
     project: Project
@@ -477,7 +474,6 @@ export type ReminderNotification = {
 export type MembershipRequestNotification = {
     context_object: IdentifiableObject & Linkable & AvatarAndCover & { name: string }
     request_by: UserProfile
-    created_at: string
 } & NotificationObject
 export enum NotificationGroupKey {
     COMMUNITY_INVITATIONS = "community_invitations",

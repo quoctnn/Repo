@@ -4,12 +4,10 @@ import "./GroupPage.scss"
 import { Group, Community } from "../../types/intrasocial_types";
 import LoadingSpinner from "../LoadingSpinner";
 import { ReduxState } from "../../redux";
-import PageHeader from "../PageHeader";
 import { DashboardWithData } from "../../DashboardWithData";
 import { CommunityManager } from "../../managers/CommunityManager";
 import { Error404 } from "../../views/error/Error404";
 import { GroupManager } from "../../managers/GroupManager";
-import { communityAvatar, communityName, groupCover } from "../../utilities/Utilities";
 export interface OwnProps
 {
     match:any,
@@ -42,15 +40,6 @@ class GroupPage extends React.Component<Props, State>
     {
         return (<LoadingSpinner />)
     }
-    renderHeader(group:Group, community:Community)
-    {
-        return (<PageHeader
-                    coverImage={groupCover(group)}
-                    primaryItemImage={communityAvatar(community, true)}
-                    primaryItemTitle={communityName(community)}
-                    />
-                )
-    }
     renderNotFound = () => {
         return <Error404 />
     }
@@ -62,7 +51,6 @@ class GroupPage extends React.Component<Props, State>
                 {!hasData && this.renderNotFound()}
                 {hasData &&
                     <div className="content">
-                        {this.renderHeader(group, community)}
                         <DashboardWithData category="group" />
                     </div>
                 }

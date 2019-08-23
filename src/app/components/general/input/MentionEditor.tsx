@@ -72,7 +72,7 @@ export class Mention {
         return new Mention(data.contextObjectName || "Unknown", data.originalString.splice(0, 1, ""), "Unknown", null, data.contextId)
     }
     static getMentionString = (type:ContextNaturalKey, id:number, name?:string) => {
-        return `@${type}:${id}${!!name ? ":" + name +  ":": ""}`
+        return `${type}:${id}${!!name ? ":" + name +  ":": ""}`
     }
     static fromUser(user:UserProfile)
     {

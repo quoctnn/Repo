@@ -4,11 +4,9 @@ import "./ProfilePage.scss"
 import { UserProfile } from "../../types/intrasocial_types";
 import LoadingSpinner from "../LoadingSpinner";
 import { ReduxState } from "../../redux";
-import PageHeader from "../PageHeader";
 import { DashboardWithData } from "../../DashboardWithData";
 import { Error404 } from '../../views/error/Error404';
 import { ProfileManager } from "../../managers/ProfileManager";
-import { userCover, userAvatar, userFullName } from "../../utilities/Utilities";
 export interface OwnProps
 {
     match:any,
@@ -40,12 +38,6 @@ class ProfilePage extends React.Component<Props, State>
     {
         return (<LoadingSpinner />)
     }
-    renderHeader(profile:UserProfile)
-    {
-        return (
-                <PageHeader coverImage={userCover(profile)} primaryItemImage={userAvatar(profile, true)} primaryItemTitle={userFullName(profile)}  />
-            )
-    }
     renderNotFound = () => {
         return <Error404 />
     }
@@ -57,7 +49,6 @@ class ProfilePage extends React.Component<Props, State>
                 {!hasData && this.renderNotFound()}
                 {hasData &&
                     <div className="content">
-                        {this.renderHeader(profile)}
                         <DashboardWithData category="profile" />
                     </div>
                 }
