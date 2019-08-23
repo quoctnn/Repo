@@ -521,7 +521,7 @@ export default class ApiClient
             callback(null, status, error)
         })
     }
-    static apiSocialLogin(provider:string, accessToken:string|null, code:string|null, id_token:string|null, callback:ApiClientCallback<{token:string|null}>)
+    static apiSocialLogin(provider:string, accessToken:string|null, code:string|null, id_token:string|null, callback:ApiClientCallback<any>)
     {
         let urlparams = `provider=${provider}`
         if (accessToken) urlparams += `&access_token=${accessToken}`
@@ -530,15 +530,15 @@ export default class ApiClient
         AjaxRequest.post(Constants.apiRoute.socialLogin, urlparams, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(request, status, error)
         })
     }
-    static nativeLogin(email:string, password:string,callback:ApiClientCallback<{token:string|null}>)
+    static nativeLogin(email:string, password:string,callback:ApiClientCallback<any>)
     {
         AjaxRequest.post(Constants.apiRoute.nativeLogin,`username=${email}&password=${password}`, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(request, status, error)
         })
     }
     static getCommunities(is_member:boolean, ordering:ListOrdering, limit:number, offset:number,callback:ApiClientFeedPageCallback<Community>)
