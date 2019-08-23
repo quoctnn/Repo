@@ -17,7 +17,7 @@ export class IntraSocialUtilities
         document.execCommand('copy')
         textField.remove()
     }
-    static getStatusPreview(parent:Status, message:string, mentions?:number[], files?:UploadedFile[])
+    static getStatusPreview(parent:Status, message:string, files?:UploadedFile[])
     {
         let d = Date.now()
         const status = {} as Status
@@ -29,7 +29,6 @@ export class IntraSocialUtilities
         status.context_natural_key = parent.context_natural_key,
         status.context_object_id = parent.context_object_id,
         status.parent = parent.id,
-        status.mentions = mentions || []
         status.id = d
         status.uid = d
         status.owner = AuthenticationManager.getAuthenticatedUser()!

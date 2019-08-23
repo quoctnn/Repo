@@ -63,7 +63,7 @@ class PageMainNavigation extends React.Component<Props, {}> {
                 <div className="menu-row" >
                     <PageMainMenu className="d-flex justify-content-center align-items-end" style={{gridArea: "1 / 1 / span 1 / span 3"}}/>
                     <div className="center flex-grow-1 d-flex justify-content-around align-items-end" style={{gridArea: "1 / 4 / span 1 / span 6"}}>
-                        <a className="btn" onClick={this.navigateToCommunity} href="#">{translate("common.community")}</a>
+                        <a className="btn" onClick={this.navigateToCommunity} href="#">{translate("common.core.community")}</a>
                         <Link className="btn" to={Routes.ROOT}>{translate("common.dashboard")}</Link>
                         { !profile.is_anonymous &&
                             <Link to={Routes.conversationUrl(null)} className="btn">

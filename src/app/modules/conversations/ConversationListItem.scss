@@ -45,13 +45,18 @@
     {
        @include var(background-color, main-content-secondary-background);
     }
-    .action-button{
-        width: 18px;
-        height: 18px;
-        flex-shrink: 0;
-        display:none;
-        &.active{
-            display: block;
+    .dropdown-menu-trigger{
+        > button{
+            padding: 0;
+        }
+        .action-button{
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
+            display:none;
+            &.active{
+                display: block;
+            }
         }
     }
     &:hover{

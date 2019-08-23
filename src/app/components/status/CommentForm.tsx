@@ -19,7 +19,6 @@ export interface OwnProps
     canUpload:boolean
     files?:UploadedFile[]
     content?:string
-    mentions?:Mention[]
     mentionSearch:(search:string, completion:(mentions:Mention[]) => void) => void
     className?:string
     communityId:number
@@ -118,7 +117,6 @@ export class CommentForm extends React.Component<Props, State> {
                 ref={this.inputRef}
                 content={this.props.content}
                 mentionSearch={this.props.mentionSearch}
-                mentions={this.props.mentions}
                 onSubmit={this.handleSubmit}
                 onDidType={this.props.onDidType}
                 placeholder={placeholder}

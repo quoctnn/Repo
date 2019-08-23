@@ -3,13 +3,14 @@ import Embedly from '../components/general/embedly/Embedly';
 const processString = require('react-process-string');
 import Routes from './Routes';
 import * as React from 'react';
-import { UserProfile, StatusActions, Community, Project, Group, Event, Coordinate, SimpleUserProfile, ContextNaturalKey, AvatarAndCover } from '../types/intrasocial_types';
-import { Text } from '../components/general/Text';
+import { UserProfile, Community, Project, Group, Event, Coordinate, SimpleUserProfile, ContextNaturalKey, AvatarAndCover, Permissible, IdentifiableObject, Linkable } from '../types/intrasocial_types';
 import Constants from '../utilities/Constants';
 import { translate } from '../localization/AutoIntlProvider';
-import { IntraSocialLink } from '../components/general/IntraSocialLink';
 import * as moment from 'moment-timezone';
 import Link from '../components/general/Link';
+import { Link as ReactLink } from 'react-router-dom';
+import { ContextManager } from '../managers/ContextManager';
+import IntraSocialMention from '../components/general/IntraSocialMention';
 let timezone = moment.tz.guess()
 export const getDomainName = (url: string) => {
     var url_parts = url.split("/")
@@ -152,6 +153,7 @@ export enum DateFormat {
     day = "L",
     time = "LT",
     monthYear = "MMM YYYY",
+    serverDay = "YYYY-MM-DD",
     year = "YYYY"
 }
 export const stringToDateFormat = (string: string, format?: DateFormat) => {
@@ -173,13 +175,35 @@ export const SENTENCES_REGEX = /[^\.!\?]+[\.!\?]+|[^\.!\?]+$/g
 export const truncate = (text, maxChars) => {
     return text && text.length > (maxChars - 3) ? text.substring(0, maxChars - 3) + '...' : text;
 }
-export function getTextContent(prefixId: string,
-    text: string,
-    mentions: UserProfile[],
-    includeEmbedlies: boolean,
-    onLinkPress: (action: StatusActions, extra?: Object) => void,
-    truncateLength: number = 0,
-    linebreakLimit: number = 0) {
+export const MENTION_REGEX = new RegExp("@(" + ContextNaturalKey.all.map(s => s.replace(".", "\\.")).join("|") + "):(\\d+)(:([^.:]+):)?", 'g') 
+export class MentionData{
+    contextNaturalKey:ContextNaturalKey
+    contextId:number
+    contextObjectName?:string
+    private contextObject:Permissible & IdentifiableObject & Linkable = null 
+    originalString:string
+    private constructor(contextNaturalKey:ContextNaturalKey, contextId:number,contextObjectName:string, originalString:string)
+    {
+        this.contextNaturalKey = contextNaturalKey
+        this.contextId = contextId
+        this.contextObjectName = contextObjectName
+        this.originalString = originalString
+    }
+    static fromRegex = (regex:string[]) => {
+        return new MentionData(regex[1] as ContextNaturalKey, parseInt(regex[2]), regex[4], regex[0])
+    }
+    getName = () => {
+        const object = this.getContextObject()
+        const name = object && ContextNaturalKey.nameForContextObject(this.contextNaturalKey, object as any) || this.contextObjectName || "Unknown"
+        return name
+    }
+    getContextObject = () => {
+        if(this.contextObject)
+            return this.contextObject
+        return this.contextObject = ContextManager.getStoreObject(this.contextNaturalKey, this.contextId)
+    }
+}
+export function getTextContent(prefixId: string, text: string, includeEmbedlies: boolean, truncateLength: number = 0, linebreakLimit: number = 0) {
     var processed: any = null
     var config = []
     let embedlyArr: { [id: string]: JSX.Element } = {}
@@ -202,7 +226,7 @@ export function getTextContent(prefixId: string,
             regex: HASHTAG_REGEX_WITH_HIGHLIGHT,
             fn: (key, result) => {
                 const href = Routes.searchUrl(result[0])//result[1] == without #
-                return (<Text title={translate("search.for") + " " + result[0]} key={getKey("hashtag" + result[0])} href={href}>{result[0]}</Text>)
+                return (<ReactLink title={translate("search.for") + " " + result[0]} key={getKey("hashtag" + result[0])} to={{pathname:Routes.SEARCH, state:{modal:true}, search:"term=" + encodeURIComponent(result[0])}}>{result[0]}</ReactLink>)
             }
         }
         config.push(hashtags)
@@ -214,14 +238,14 @@ export function getTextContent(prefixId: string,
         }
     }
     config.push(breaks)
-    const mentionSearch = mentions.map(user => {
-        return {
-            regex:new RegExp("(@auth.user:" + user.id + ")|(" + "@" + user.username.replace("+","\\+") + ")", 'g'),
-            fn: (key, result) => {
-                return <IntraSocialLink key={getKey(key)} to={user} type={ContextNaturalKey.USER}>{userFullName(user)}</IntraSocialLink>
-            }
+    const mentionSearch = {
+        regex: MENTION_REGEX,
+        fn: (key, result:string[]) => {
+            const data = MentionData.fromRegex(result)
+            return <IntraSocialMention key={getKey(key)} data={data} />
         }
-    }).filter(o => o)
+    }
+    config.push(mentionSearch)
     config = config.concat(mentionSearch)
     processed = processString(config)(text)
     const embedKeys = Object.keys(embedlyArr)
@@ -365,7 +389,37 @@ export const filterArray = (array, text) => {
     });
     return filteredArray;
 }
-
+export const parseQueryString = (queryString:string) => {
+	var dictionary = {};
+	
+	// remove the '?' from the beginning of the
+	// if it exists
+	if (queryString.indexOf('?') === 0) {
+		queryString = queryString.substr(1);
+	}
+	
+	// Step 1: separate out each key/value pair
+	var parts = queryString.split('&amp;');
+	
+	for(var i = 0; i < parts.length; i++) {
+		var p = parts[i];
+		// Step 2: Split Key/Value pair
+		var keyValuePair = p.split('=');
+		
+		// Step 3: Add Key/Value pair to Dictionary object
+		var key = keyValuePair[0];
+		var value = keyValuePair[1];
+		
+		// decode URI encoded string
+		value = decodeURIComponent(value);
+		value = value.replace(/\+/g, ' ');
+		
+		dictionary[key] = value;
+	}
+	
+	// Step 4: Return Dictionary Object
+	return dictionary;
+}
 export function compareObjects(o1: object, o2: object) {
     for (var p in o1) {
         if (o1.hasOwnProperty(p)) {

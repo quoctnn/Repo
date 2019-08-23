@@ -11,8 +11,9 @@ import { Status, UserProfile, UploadedFile, Community, Group, Conversation, Proj
          ProfileCertification,
          ProfileEducation,
          ProfilePosition,
-         CrashLogLevel} from '../types/intrasocial_types';
-import { nullOrUndefined } from '../utilities/Utilities';
+         CrashLogLevel,
+         CalendarItem} from '../types/intrasocial_types';
+import { nullOrUndefined, DateFormat } from '../utilities/Utilities';
 import moment = require("moment");
 import { Settings } from "../utilities/Settings";
 import { ConversationManager } from '../managers/ConversationManager';
@@ -268,10 +269,28 @@ export default class ApiClient
     static readActivity(id:number, callback: (success, response) => void)
     {
         let url = Constants.apiRoute.recentActivityMarkReadUrl
-        AjaxRequest.post(url, {'serialization_ids':[id]}, (data, status, request) => {
+        AjaxRequest.post(url, {serialization_ids:[id]}, (data, status, request) => {
             callback(true, data)
         }, (request, status, error) => {
             callback(false, error)
+        })
+    }
+    static readAllActivities(callback: ApiClientCallback<any>)
+    {
+        let url = Constants.apiRoute.recentActivityMarkAllReadUrl
+        AjaxRequest.get(url, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
+    static readNotificationActions(callback: ApiClientCallback<any>)
+    {
+        let url = Constants.apiRoute.notificationsMarkActionsReadUrl
+        AjaxRequest.get(url, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
         })
     }
     static createStatus(status:Status, callback:ApiClientCallback<Status>)
@@ -520,7 +539,7 @@ export default class ApiClient
             callback(null, status, error)
         })
     }
-    static apiSocialLogin(provider:string, accessToken:string|null, code:string|null, id_token:string|null, callback:ApiClientCallback<{token:string|null}>)
+    static apiSocialLogin(provider:string, accessToken:string|null, code:string|null, id_token:string|null, callback:ApiClientCallback<any>)
     {
         let urlparams = `provider=${provider}`
         if (accessToken) urlparams += `&access_token=${accessToken}`
@@ -529,15 +548,15 @@ export default class ApiClient
         AjaxRequest.post(Constants.apiRoute.socialLogin, urlparams, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(request, status, error)
         })
     }
-    static nativeLogin(email:string, password:string,callback:ApiClientCallback<{token:string|null}>)
+    static nativeLogin(email:string, password:string,callback:ApiClientCallback<any>)
     {
         AjaxRequest.post(Constants.apiRoute.nativeLogin,`username=${email}&password=${password}`, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(request, status, error)
         })
     }
     static getCommunities(is_member:boolean, ordering:ListOrdering, limit:number, offset:number,callback:ApiClientFeedPageCallback<Community>)
@@ -767,6 +786,22 @@ export default class ApiClient
             callback(null, status, error)
         })
     }
+    static friendInvitationGetId = (userId:number, callback:ApiClientCallback<any>) => {
+        let url = Constants.apiRoute.friendInvitation + `?user_id=${userId}`
+        AjaxRequest.get(url, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
+    static friendInvitationSend = (userId:number, callback:ApiClientCallback<any>) => {
+        let url = Constants.apiRoute.friendInvitation
+        AjaxRequest.post(url, {to_user: userId }, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
     static friendInvitationAccept = (invitation:number, callback:ApiClientCallback<any>) => {
         let url = Constants.apiRoute.friendInvitationAccept(invitation)
         AjaxRequest.get(url, (data, status, request) => {
@@ -777,6 +812,31 @@ export default class ApiClient
     }
     static friendInvitationDelete(invitation:number, block:boolean, callback:ApiClientCallback<any>){
         let url = Constants.apiRoute.friendInvitationDelete(invitation) + "?" + this.getQueryString({block})
+        AjaxRequest.delete(url, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
+    static userBlockGetId = (userId:number, callback:ApiClientCallback<any>) => {
+        let url = Constants.apiRoute.blockUrl + `?user_id=${userId}`
+        AjaxRequest.get(url, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
+    static userBlock(userId:number, callback:ApiClientCallback<any>){
+        let url = Constants.apiRoute.blockUrl
+        const data = { to_user: userId }
+        AjaxRequest.postJSON(url, data, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
+    static userUnBlock(blocking:number, callback:ApiClientCallback<any>){
+        let url = Constants.apiRoute.blockDelete(blocking)
         AjaxRequest.delete(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
@@ -938,6 +998,16 @@ export default class ApiClient
     static sendCrashReport(level:CrashLogLevel, message:string, stack:string, componentStack:string , callback:ApiClientCallback<any>){
         const url = Constants.apiRoute.createCrashReportUrl
         AjaxRequest.postJSON(url,  { level, message, stack, componentStack}, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
+    static getCalendarItems(start:Date, end:Date, callback:ApiClientCallback<(CalendarItem | Event | Task)[]>){
+        const startString = moment(start).format(DateFormat.serverDay)
+        const endString = moment(end).format(DateFormat.serverDay)
+        let url = Constants.apiRoute.calendarUrl + "?" + this.getQueryString({start:startString, end:endString})
+        AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
             callback(null, status, error)

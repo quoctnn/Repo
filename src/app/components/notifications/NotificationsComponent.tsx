@@ -15,7 +15,16 @@ import { NotificationManager } from "../../managers/NotificationManager";
 type OwnProps = {
     onClose:() => void
 }
-type NotificationGroupObject = {key:string, values:NotificationObject[], iconClassName?:string }
+export type NotificationGroupAction = {
+    title:string
+    onPress?:() => void
+}
+type NotificationGroupObject = {
+    key:string
+    values:NotificationObject[]
+    iconClassName?:string
+    actions?:NotificationGroupAction[]
+}
 type State = {
     notifications:NotificationGroupObject[]
     open:{[key:string]:boolean}
@@ -131,12 +140,22 @@ class NotificationsComponent extends React.Component<Props, State> {
                     onClose={this.props.onClose}
                     toggleCollapse={this.toggleCollapseIndividualOpen(object.key)} 
                     title={object.key} 
-                    values={object.values} />
+                    values={object.values}
+                    actions={object.actions} />
     }
     renderNotificationsList = () => {
         if(this.state.notifications.length == 0)
             return null
         return this.state.notifications.map(o => this.renderNotificationGroup(o))
+    }
+    sortDateDescending = (a:NotificationObject, b:NotificationObject) => {
+        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    }
+    handleClearAllNotifications = () => {
+        console.log("handleClearAllNotifications")
+        ApiClient.readNotificationActions((data, status, error) => {
+            //this.reloadNotifications()
+        })
     }
     groupNotifications = (notifications:UnhandledNotifications):NotificationGroupObject[] => {
         const list:NotificationGroupObject[] = []
@@ -178,13 +197,23 @@ class NotificationsComponent extends React.Component<Props, State> {
             }
         })
         if(reminders.length > 0)
-            list.push({key:translate("notification.group.reminders"), values:reminders, iconClassName:"far fa-clock"})
+            list.push({key:translate("notification.group.reminders"), values:reminders.sort(this.sortDateDescending), iconClassName:"far fa-clock"})
         if(requestsAndInvitations.length > 0)
-            list.push({key:translate("notification.group.requests_invitations"), values:requestsAndInvitations, iconClassName:"fas fa-user-friends"})
+            list.push({key:translate("notification.group.requests_invitations"), values:requestsAndInvitations.sort(this.sortDateDescending), iconClassName:"fas fa-user-friends"})
         if(activity.length > 0)
-            list.push({key:translate("notification.group.activity"), values:activity, iconClassName:"far fa-bell"})
+        {
+            list.push({
+                key:translate("notification.group.activity"), 
+                values:activity.sort(this.sortDateDescending), 
+                iconClassName:"far fa-bell",
+                actions:[{
+                        title:translate("notification.read_all"),
+                        onPress:this.handleClearAllNotifications
+                    }]
+            })
+        }
         if(reports.length > 0)
-            list.push({key:translate("notification.group.reports"), values:reports, iconClassName:"far fa-flag"})
+            list.push({key:translate("notification.group.reports"), values:reports.sort(this.sortDateDescending), iconClassName:"far fa-flag"})
         return list 
     }
     render() {

@@ -5,10 +5,8 @@ import { Community } from "../../types/intrasocial_types";
 import { CommunityManager } from '../../managers/CommunityManager';
 import LoadingSpinner from "../LoadingSpinner";
 import { ReduxState } from "../../redux";
-import PageHeader from "../PageHeader";
 import { DashboardWithData } from "../../DashboardWithData";
 import { Error404 } from '../../views/error/Error404';
-import { communityAvatar, communityName, communityCover } from "../../utilities/Utilities";
 export interface OwnProps
 {
     match:any,
@@ -41,15 +39,6 @@ class CommunityPage extends React.Component<Props, State>
     {
         return (<LoadingSpinner />)
     }
-    renderHeader(community:Community)
-    {
-        return (<PageHeader
-                    coverImage={communityCover(community)}
-                    primaryItemImage={communityAvatar(community, true)}
-                    primaryItemTitle={communityName(community)}
-                    />
-                )
-    }
     renderNotFound = () => {
         return <Error404 />
     }
@@ -61,7 +50,6 @@ class CommunityPage extends React.Component<Props, State>
                 {!hasData && this.renderNotFound()}
                 {hasData &&
                     <div className="content">
-                        {this.renderHeader(community)}
                         <DashboardWithData category="community" />
                     </div>
                 }

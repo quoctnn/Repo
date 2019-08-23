@@ -4,7 +4,7 @@ import { AuthenticationManager } from '../managers/AuthenticationManager';
 import { URL_REGEX, URL_WWW_REGEX } from './IntraSocialUtilities';
 export class StatusUtilities 
 {
-    static getStatusPreview(contextNaturalKey:ContextNaturalKey, contextObjectId:number,  message:string, mentions?:number[], files?:UploadedFile[], ) 
+    static getStatusPreview(contextNaturalKey:ContextNaturalKey, contextObjectId:number,  message:string, files?:UploadedFile[], ) 
     {
         let d = Date.now()
         const status = {} as Status
@@ -13,8 +13,7 @@ export class StatusUtilities
         status.files_ids = (files || []).map(f => f.id),
         status.link = StatusUtilities.findPrimaryLink(message),
         status.context_natural_key = contextNaturalKey,
-        status.context_object_id = contextObjectId,
-        status.mentions = mentions || []
+        status.context_object_id = contextObjectId
         status.id = d
         status.uid = d
         status.owner = AuthenticationManager.getAuthenticatedUser()!
@@ -27,7 +26,7 @@ export class StatusUtilities
         status.temporary = true
         return status
     }
-    static getCommentPreview(parent:Status, message:string, mentions?:number[], files?:UploadedFile[]) 
+    static getCommentPreview(parent:Status, message:string, files?:UploadedFile[]) 
     {
         let d = Date.now()
         const status = {} as Status
@@ -39,7 +38,6 @@ export class StatusUtilities
         status.context_natural_key = parent.context_natural_key,
         status.context_object_id = parent.context_object_id,
         status.parent = parent.id,
-        status.mentions = mentions || []
         status.id = d
         status.uid = d
         status.owner = AuthenticationManager.getAuthenticatedUser()!

@@ -4,11 +4,9 @@ import "./EventPage.scss"
 import { Event, Community } from "../../types/intrasocial_types";
 import LoadingSpinner from "../LoadingSpinner";
 import { ReduxState } from "../../redux";
-import PageHeader from "../PageHeader";
 import { DashboardWithData } from "../../DashboardWithData";
 import { CommunityManager } from "../../managers/CommunityManager";
 import { Error404 } from "../../views/error/Error404";
-import { communityAvatar, communityName, eventCover } from "../../utilities/Utilities";
 import { EventManager } from "../../managers/EventManager";
 export interface OwnProps
 {
@@ -42,15 +40,6 @@ class EventPage extends React.Component<Props, State>
     {
         return (<LoadingSpinner />)
     }
-    renderHeader(event:Event, community:Community)
-    {
-        return (<PageHeader
-                    coverImage={eventCover(event)}
-                    primaryItemImage={communityAvatar(community, true)}
-                    primaryItemTitle={communityName(community)}
-                    />
-                )
-    }
     renderNotFound = () => {
         return <Error404 />
     }
@@ -62,7 +51,6 @@ class EventPage extends React.Component<Props, State>
                 {!hasData && this.renderNotFound()}
                 {hasData &&
                     <div className="content">
-                        {this.renderHeader(event, community)}
                         <DashboardWithData category="event" />
                     </div>
                 }

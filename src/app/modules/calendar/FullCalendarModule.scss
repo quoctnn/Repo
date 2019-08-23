@@ -1,0 +1,54 @@
+
+@import "../../Config";
+.full-calendar-module{
+    padding: 8px;
+    .rbc-calendar
+    {
+        .rbc-month-view{
+            .rbc-month-row{
+                min-height: 120px;
+            }
+        }
+        .rbc-time-view, .rbc-month-view{
+            @include var(border-color, border-color-default);
+            border-width: 1px;
+            border-style: solid;
+            .rbc-time-content > * + * > *, .rbc-time-header-content,.rbc-header + .rbc-header,.rbc-day-bg + .rbc-day-bg {
+                @include var(border-left-color, border-color-default);
+            }
+            .rbc-timeslot-group, .rbc-header{
+                @include var(border-bottom-color, border-color-default);
+            }
+            .rbc-day-slot .rbc-time-slot, .rbc-time-content,.rbc-month-row + .rbc-month-row {
+                @include var(border-top-color, border-color-default);
+            }
+            .rbc-off-range-bg{
+                @include var(background-color, main-content-secondary-background);
+            }
+            .rbc-today{
+                @include var(background-color, main-content-secondary-background);
+                @include var(color, primary-theme-color);
+            }
+            .rbc-now.rbc-current{
+                @include var(color, primary-theme-color);
+            }
+
+
+        }
+    }
+    .calendar-event{
+        .calendar-event-item{
+            display: flex;
+            color: inherit;
+        }
+        &.calendaritem{
+            background: $calendarItemColor;
+        }
+        &.task{
+            background:$calendarTaskItemColor;
+        }
+        &.event{
+            background:$calendarEventItemColor;
+        }
+    }
+}

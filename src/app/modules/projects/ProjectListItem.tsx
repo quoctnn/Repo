@@ -45,12 +45,12 @@ export default class ProjectListItem extends React.Component<Props, State> {
                         <div className="bottom d-flex align-items-center flex-row justify-content-around">
                             <div className="item">
                                 <div className="item-top">
-                                    <b>{project.tasks_assigned}&nbsp;</b>{translate("common.tasks")}</div>
+                                    <b>{project.tasks_assigned}&nbsp;</b>{translate("common.project.tasks")}</div>
                                 <div className="item-bottom">{translate("project.item.tasks.assigned")}</div>
                             </div>
                             <div className="item">
                                 <div className="item-top">
-                                    <b>{project.tasks_responsible}&nbsp;</b>{translate("common.tasks")}</div>
+                                    <b>{project.tasks_responsible}&nbsp;</b>{translate("common.project.tasks")}</div>
                                 <div className="item-bottom">{translate("project.item.tasks.responsible")}</div>
                             </div>
                         </div>

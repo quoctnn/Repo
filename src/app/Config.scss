@@ -2,6 +2,10 @@
 //let hasRootSupport = window.CSS && window.CSS.supports && window.CSS.supports('--a', 0)
 //root = document.querySelector(':root')
 //root.className = currentTheme
+
+$calendarItemColor:#04A451;
+$calendarTaskItemColor:#4E13F5;
+$calendarEventItemColor:#FB0E7A;
 @function str-replace($string, $search, $replace: '')
 {
     $index: str-index($string, $search);

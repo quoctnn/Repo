@@ -3,7 +3,7 @@ import * as React from "react";
 import MentionEditor from "../input/MentionEditor";
 import { EditorState, ContentState, getDefaultKeyBinding, KeyBindingUtil,  SelectionState, Modifier, DraftHandleValue} from "draft-js";
 import { Mention } from '../input/MentionEditor';
-import {nullOrUndefined, uniqueId } from '../../../utilities/Utilities';
+import { nullOrUndefined, uniqueId, MENTION_REGEX, MentionData } from '../../../utilities/Utilities';
 import "./ChatMessageComposer.scss"
 import classnames from 'classnames';
 import { NavigationUtilities } from '../../../utilities/NavigationUtilities';
@@ -62,26 +62,24 @@ const getBlocks = (contentState:ContentState) => {
     })
     return blocks
 }
-const generateContentState = (content:string, mentions:Mention[]):ContentState =>
+const generateContentState = (content:string):ContentState =>
 {
     var contentState = ContentState.createFromText(content || "")
     const selectionsToReplace:{mention:Mention, selectionState:any}[] = [];
     var indexes:{[block:string]:{index:number,length:number, mention:Mention}[]} = {}
-    if(mentions && mentions.length > 0)
+    if(content && content.length > 0)
     {
         const blockMap = contentState.getBlockMap()
         blockMap.forEach((block) => {
             let text = block.getText()
-            mentions.forEach(m => {
-                var re = new RegExp("@"+m.key.replace("+","\\+"), 'g')
-                var match:RegExpExecArray = null
-                while (match = re.exec(text)) {
-                    let key = block.getKey()
-                    let arr = indexes[key] || []
-                    arr.push({index:match.index, length:re.lastIndex - match.index, mention:m})
-                    indexes[key] = arr
-                }
-            })
+            var match:RegExpExecArray = null
+            while (match = MENTION_REGEX.exec(text)) {
+                let key = block.getKey()
+                let arr = indexes[key] || []
+                const data = MentionData.fromRegex(match)
+                arr.push({index:match.index, length:MENTION_REGEX.lastIndex - match.index, mention: Mention.fromMentionData(data)})
+                indexes[key] = arr
+            }
         })
         Object.keys(indexes).forEach(k => {
             let arr = indexes[k].sort((a,b) => a.index - b.index)
@@ -127,7 +125,6 @@ type OwnProps = {
     onDidType:(unprocessedText:string) => void
     filesAdded?:(files:File[]) => void
     content:string
-    mentions:Mention[]
     mentionSearch:(search:string, completion:(mentions:Mention[]) => void) => void
     onHandleUploadClick?:(event) => void
     canSubmit?:boolean
@@ -171,7 +168,7 @@ export class ChatMessageComposer extends React.Component<Props,State> {
         super(props)
         this.state = {
             plainText:this.props.content || "",
-            editorState:EditorState.createWithContent(generateContentState(this.props.content, this.props.mentions))
+            editorState:EditorState.createWithContent(generateContentState(this.props.content))
         }
     }
     componentDidMount = () => {
@@ -198,15 +195,14 @@ export class ChatMessageComposer extends React.Component<Props,State> {
                 nextProps.content != this.props.content ||
                 nextProps.className != this.props.className ||
                 nextProps.forceUpdate != this.props.forceUpdate ||
-                nextProps.singleLine != this.props.singleLine ||
-                !(nextProps.mentions || []).isEqual(this.props.mentions || [])
+                nextProps.singleLine != this.props.singleLine 
         return update
     }
     componentDidUpdate = (prevProps:Props) => {
         if(this.state.plainText == "" && this.props.forceUpdate != prevProps.forceUpdate && this.props.content && this.props.content.length > 0)
         {
             this.setState((prevState) => {
-                const editorState = EditorState.push(prevState.editorState, generateContentState(this.props.content, this.props.mentions), "change-block-data");
+                const editorState = EditorState.push(prevState.editorState, generateContentState(this.props.content), "change-block-data");
                 const text = editorState.getCurrentContent().getPlainText()
                 return {plainText:text, editorState: editorState}
             }, this.sendDidType)

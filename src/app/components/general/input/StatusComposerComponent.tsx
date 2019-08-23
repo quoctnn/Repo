@@ -28,7 +28,6 @@ type OwnProps =
     canPost?:() => boolean
     refresh?:string
     content?:string
-    mentions?:Mention[]
     onDidType?:(unprocessedText:string) => void
     taggableMembers?:number[] | (() => number[])
     onBlur?(e: React.SyntheticEvent<{}>): void
@@ -79,9 +78,6 @@ export class StatusComposerComponent extends React.Component<Props, State> {
     shouldComponentUpdate = (nextProps:Props, nextState:State) => {
         const ret = nextState.text != this.state.text ||
                 nextProps.content != this.props.content ||
-                !!nextProps.mentions && !this.props.mentions ||
-                !nextProps.mentions && !!this.props.mentions ||
-                nextProps.mentions && this.props.mentions && !nextProps.mentions.isEqual(this.props.mentions) ||
                 nextProps.className != this.props.className ||
                 nextProps.refresh != this.props.refresh ||
                 nextProps.showEmojiPicker != this.props.showEmojiPicker ||
@@ -261,7 +257,6 @@ export class StatusComposerComponent extends React.Component<Props, State> {
                 ref={this.formRef}
                 content={this.props.content}
                 mentionSearch={this.handleMentionSearch}
-                mentions={this.props.mentions}
                 onSubmit={this.handleSubmit}
                 onDidType={this.onDidType}
                 placeholder={placeholder}

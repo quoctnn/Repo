@@ -4,26 +4,28 @@ import Constants from "../utilities/Constants";
 import { translate } from "../localization/AutoIntlProvider";
 import { userFullName, groupCover, communityCover, userCover, projectCover, eventCover } from '../utilities/Utilities';
 import { CommunityManager } from '../managers/CommunityManager';
-export enum CrashLogLevel{
+import { ProjectManager } from '../managers/ProjectManager';
+import { Moment } from 'moment';
+export enum CrashLogLevel {
     info = "info",
     debug = "debug",
     warning = "warning",
     error = "error",
 }
-export enum ObjectHiddenReason{
+export enum ObjectHiddenReason {
     blocked = "blocked",
     deleted = "deleted",
     review = "review",
     unknown = "unknown",
 }
-export enum LanguageProficiency{
+export enum LanguageProficiency {
     ELEMENTARY = "ELEMENTARY",
     LIMITED_WORKING = "LIMITED_WORKING",
     PROFESSIONAL_WORKING = "PROFESSIONAL_WORKING",
     FULL_PROFESSIONAL = "FULL_PROFESSIONAL",
     NATIVE_OR_BILINGUAL = "NATIVE_OR_BILINGUAL",
 }
-export enum VolunteeringCause{
+export enum VolunteeringCause {
     animalRights = "animalRights",
     artsAndCulture = "artsAndCulture",
     children = "children",
@@ -40,83 +42,82 @@ export enum VolunteeringCause{
     socialServices = "socialServices",
 }
 export type ProfileLanguage = {
-    name:string 
-    hidden:boolean 
-    hidden_reason:ObjectHiddenReason
-    linkedin_id?:string
-    proficiency:LanguageProficiency
+    name: string
+    hidden: boolean
+    hidden_reason: ObjectHiddenReason
+    linkedin_id?: string
+    proficiency: LanguageProficiency
 
 } & IdentifiableObject
 export type ProfileCertification = {
-    name:string 
-    hidden:boolean 
-    hidden_reason:ObjectHiddenReason
-    linkedin_id?:string
-    start_date?:string
-    end_date?:string
-    authority?:string
-    license_number?:string
-    url?:string
-    company?:ProfileCompany
+    name: string
+    hidden: boolean
+    hidden_reason: ObjectHiddenReason
+    linkedin_id?: string
+    start_date?: string
+    end_date?: string
+    authority?: string
+    license_number?: string
+    url?: string
+    company?: ProfileCompany
 
 } & IdentifiableObject
 export type ProfileEducation = {
-    name:string 
-    hidden:boolean 
-    hidden_reason:ObjectHiddenReason
-    linkedin_id?:string
-    start_date?:string
-    end_date?:string
-    activities?:string
-    fields_of_study?:string
-    grade?:string
-    notes?:string
-    program?:string
-    rich_media_associations?:string
-    school?:ProfileCompany
+    name: string
+    hidden: boolean
+    hidden_reason: ObjectHiddenReason
+    linkedin_id?: string
+    start_date?: string
+    end_date?: string
+    activities?: string
+    fields_of_study?: string
+    grade?: string
+    notes?: string
+    program?: string
+    rich_media_associations?: string
+    school?: ProfileCompany
 
 } & IdentifiableObject
 export type ProfilePosition = {
-    name:string 
-    hidden:boolean 
-    hidden_reason:ObjectHiddenReason
-    linkedin_id?:string
+    name: string
+    hidden: boolean
+    hidden_reason: ObjectHiddenReason
+    linkedin_id?: string
 
-    title?:string
-    description?:string
-    location_name?:string
-    start_date?:string
-    end_date?:string
-    rich_media_associations?:string
-    company?:ProfileCompany
+    title?: string
+    description?: string
+    location_name?: string
+    start_date?: string
+    end_date?: string
+    rich_media_associations?: string
+    company?: ProfileCompany
 
 } & IdentifiableObject
 export type ProfileVolunteeringExperience = {
-    hidden:boolean 
-    hidden_reason:ObjectHiddenReason
-    linkedin_id?:string
-    role:string
-    cause:VolunteeringCause
-    description?:string
-    start_date?:string
-    end_date?:string
-    company?:ProfileCompany
+    hidden: boolean
+    hidden_reason: ObjectHiddenReason
+    linkedin_id?: string
+    role: string
+    cause: VolunteeringCause
+    description?: string
+    start_date?: string
+    end_date?: string
+    company?: ProfileCompany
 
 } & IdentifiableObject
 
 export type ProfileCompany = {
-    name:string 
-    hidden:boolean 
-    hidden_reason:ObjectHiddenReason
-    linkedin_id?:string
-    description?:string
-    url?:string
-    avatar_original?:string
+    name: string
+    hidden: boolean
+    hidden_reason: ObjectHiddenReason
+    linkedin_id?: string
+    description?: string
+    url?: string
+    avatar_original?: string
 } & IdentifiableObject
 
 
-export enum ContextNaturalKey
-{
+export enum ContextNaturalKey {
     GROUP = "group.group",
     COMMUNITY = "core.community",
     USER = "auth.user",
@@ -124,10 +125,9 @@ export enum ContextNaturalKey
     TASK = "project.task",
     EVENT = "event.event",
     NEWSFEED = "newsfeed",
-    CONVERSATION = "conversation",
+    CONVERSATION = "conversation.conversation",
 }
-export enum ContextSegmentKey
-{
+export enum ContextSegmentKey {
     GROUP = "group",
     COMMUNITY = "community",
     USER = "profile",
@@ -138,7 +138,7 @@ export enum ContextSegmentKey
 }
 export namespace ContextSegmentKey {
     export function keyForNaturalKey(key: ContextNaturalKey) {
-        switch(key){
+        switch (key) {
             case ContextNaturalKey.GROUP: return ContextSegmentKey.GROUP
             case ContextNaturalKey.COMMUNITY: return ContextSegmentKey.COMMUNITY
             case ContextNaturalKey.USER: return ContextSegmentKey.USER
@@ -146,110 +146,144 @@ export namespace ContextSegmentKey {
             case ContextNaturalKey.EVENT: return ContextSegmentKey.EVENT
             case ContextNaturalKey.TASK: return ContextSegmentKey.TASK
             case ContextNaturalKey.CONVERSATION: return ContextSegmentKey.CONVERSATION
-            default:return null
+            default: return null
         }
     }
-    export const parse = (value:string):ContextSegmentKey|null =>
-    {
-        switch (value)
-        {
-            case ContextSegmentKey.GROUP : return ContextSegmentKey.GROUP
-            case ContextSegmentKey.COMMUNITY : return ContextSegmentKey.COMMUNITY
-            case ContextSegmentKey.USER : return ContextSegmentKey.USER
-            case ContextSegmentKey.PROJECT : return ContextSegmentKey.PROJECT
-            case ContextSegmentKey.EVENT : return ContextSegmentKey.EVENT
-            case ContextSegmentKey.TASK : return ContextSegmentKey.TASK
-            case ContextSegmentKey.CONVERSATION : return ContextSegmentKey.CONVERSATION
-            default : return null
+    export const parse = (value: string): ContextSegmentKey | null => {
+        switch (value) {
+            case ContextSegmentKey.GROUP: return ContextSegmentKey.GROUP
+            case ContextSegmentKey.COMMUNITY: return ContextSegmentKey.COMMUNITY
+            case ContextSegmentKey.USER: return ContextSegmentKey.USER
+            case ContextSegmentKey.PROJECT: return ContextSegmentKey.PROJECT
+            case ContextSegmentKey.EVENT: return ContextSegmentKey.EVENT
+            case ContextSegmentKey.TASK: return ContextSegmentKey.TASK
+            case ContextSegmentKey.CONVERSATION: return ContextSegmentKey.CONVERSATION
+            default: return null
         }
     }
 }
 export namespace ContextNaturalKey {
+    export const all = [
+        ContextNaturalKey.GROUP,
+        ContextNaturalKey.COMMUNITY,
+        ContextNaturalKey.USER,
+        ContextNaturalKey.PROJECT,
+        ContextNaturalKey.EVENT,
+        ContextNaturalKey.TASK,
+        ContextNaturalKey.CONVERSATION
+    ]
     export function defaultAvatarForKey(key: ContextNaturalKey) {
-        switch(key){
+        switch (key) {
             case ContextNaturalKey.GROUP: return Constants.resolveUrl(Constants.defaultImg.groupAvatar)()
             case ContextNaturalKey.COMMUNITY: return Constants.resolveUrl(Constants.defaultImg.communityAvatar)()
             case ContextNaturalKey.USER: return Constants.resolveUrl(Constants.defaultImg.userAvatar)()
             case ContextNaturalKey.PROJECT: return Constants.resolveUrl(Constants.defaultImg.projectAvatar)()
             case ContextNaturalKey.EVENT: return Constants.resolveUrl(Constants.defaultImg.eventAvatar)()
-            default:return null
+            default: return null
         }
     }
     export function iconClassForKey(key: ContextNaturalKey) {
-        switch(key){
+        switch (key) {
             case ContextNaturalKey.GROUP: return "fas fa-users"
             case ContextNaturalKey.COMMUNITY: return "fas fa-globe"
             case ContextNaturalKey.USER: return "fas fa-user"
             case ContextNaturalKey.PROJECT: return "fas fa-clipboard-list"
             case ContextNaturalKey.EVENT: return "fas fa-calendar"
             case ContextNaturalKey.TASK: return "fas fa-tasks"
-            default:return null
+            default: return null
         }
     }
     export function elasticTypeForKey(key: ContextNaturalKey) {
-        switch(key){
+        switch (key) {
             case ContextNaturalKey.GROUP: return ElasticSearchType.GROUP
             case ContextNaturalKey.COMMUNITY: return ElasticSearchType.COMMUNITY
             case ContextNaturalKey.USER: return ElasticSearchType.USER
             case ContextNaturalKey.PROJECT: return ElasticSearchType.PROJECT
             case ContextNaturalKey.EVENT: return ElasticSearchType.EVENT
             case ContextNaturalKey.TASK: return ElasticSearchType.TASK
-            default:return null
+            default: return null
         }
     }
-    export function nameForContextObject(key: ContextNaturalKey, contextObject:any, communityName?:boolean) {
-        let obj;
-        switch(key){
+    export function descriptionForContextObject(key: ContextNaturalKey, contextObject: any) {
+        switch (key) {
+            case ContextNaturalKey.GROUP: return (contextObject as Group).description
+            case ContextNaturalKey.COMMUNITY: return (contextObject as Community).description
+            case ContextNaturalKey.USER: return (contextObject as UserProfile).username
+            case ContextNaturalKey.PROJECT: return (contextObject as Project).description
+            case ContextNaturalKey.EVENT: return (contextObject as Event).description
+            case ContextNaturalKey.TASK: return (contextObject as Task).description
+            case ContextNaturalKey.CONVERSATION: return (contextObject as Conversation).users.length + translate("common.members")
+            default: return null
+        }
+    }
+    export function nameForContextObject(key: ContextNaturalKey, contextObject: Permissible & IdentifiableObject & Linkable, includeAncestor?: boolean) {
+        switch (key) {
             case ContextNaturalKey.GROUP:
-                obj = contextObject as Group
-                if (communityName){
-                    const community = CommunityManager.getCommunityById(obj.community)
-                    if (community) {
-                        return obj.name + " - " + community.name
+                {
+                    const obj = contextObject as Group
+                    if (includeAncestor) {
+                        const community = CommunityManager.getCommunityById(obj.community)
+                        if (community) {
+                            return obj.name + " - " + community.name
+                        }
                     }
+                    return obj.name
                 }
-                return obj.name
+
             case ContextNaturalKey.COMMUNITY: return (contextObject as Community).name
             case ContextNaturalKey.USER: return userFullName((contextObject as UserProfile))
             case ContextNaturalKey.PROJECT:
-                obj = contextObject as Project
-                if (communityName){
-                    const community = CommunityManager.getCommunityById(obj.community)
-                    if (community) {
-                        return obj.name + " - " + community.name
+                {
+                    const obj = contextObject as Project
+                    if (includeAncestor) {
+                        const community = CommunityManager.getCommunityById(obj.community)
+                        if (community) {
+                            return obj.name + " - " + community.name
+                        }
                     }
+                    return obj.name
                 }
-                return obj.name
             case ContextNaturalKey.EVENT:
-                obj = contextObject as Event
-                if (communityName){
-                    const community = CommunityManager.getCommunityById(obj.community)
-                    if (community) {
-                        return obj.name + " - " + community.name
+                {
+                    const obj = contextObject as Event
+                    if (includeAncestor) {
+                        const community = CommunityManager.getCommunityById(obj.community)
+                        if (community) {
+                            return obj.name + " - " + community.name
+                        }
                     }
+                    return obj.name
                 }
-                return obj.name
             case ContextNaturalKey.TASK:
-                obj = contextObject as Task
-                if (communityName){
-                    const community = CommunityManager.getCommunityById(obj.community)
-                    if (community) {
-                        return obj.title + " - " + community.name
+                {
+                    const obj = contextObject as Task
+                    if (includeAncestor) {
+                        const project = ProjectManager.getProjectById(obj.project)
+                        if (project) {
+                            return obj.title + " - " + project.name
+                        }
                     }
+                    return obj.title
                 }
-                return obj.title
-            default:return null
+
+            case ContextNaturalKey.CONVERSATION:
+                {
+                    const obj = contextObject as Conversation
+                    return obj.title
+                }
+
+            default: return null
         }
     }
-    export function coverForContextObject(key: ContextNaturalKey, contextObject:any, thumbnail:boolean = false) {
-        switch(key){
+    export function coverForContextObject(key: ContextNaturalKey, contextObject: any, thumbnail: boolean = false) {
+        switch (key) {
             case ContextNaturalKey.GROUP: return groupCover(contextObject as Group, thumbnail)
             case ContextNaturalKey.COMMUNITY: return communityCover(contextObject as Community, thumbnail)
             case ContextNaturalKey.USER: return userCover(contextObject as UserProfile, thumbnail)
             case ContextNaturalKey.PROJECT: return projectCover(contextObject as Project, thumbnail)
             case ContextNaturalKey.EVENT: return eventCover(contextObject as Event, thumbnail)
             case ContextNaturalKey.TASK: return null
-            default:return null
+            default: return null
         }
     }
 }
@@ -257,11 +291,10 @@ export enum DraggableType {
     favorite = "favorite",
     group = "group.group"
 }
-export interface Verb
-{
-    id:number
-    infinitive:string
-    past_tense:string
+export interface Verb {
+    id: number
+    infinitive: string
+    past_tense: string
 }
 export type IdentifiableObject = {
     id: number
@@ -277,50 +310,49 @@ export interface SimpleNotification
 }
 */
 export type UnreadNotificationCounts = {
-    community_invitations:number
-    group_invitations:number
-    event_invitations:number
-    friendship_invitations:number
-    unread_conversations:number
-    status_notifications:number
-    status_reminders:number
-    status_attentions:number
-    task_notifications:number
-    task_reminders:number
-    task_attentions:number
-    reported_content:number
-    community_requests:number
-    group_requests:number
-    event_requests:number
-    total:number
+    community_invitations: number
+    group_invitations: number
+    event_invitations: number
+    friendship_invitations: number
+    unread_conversations: number
+    status_notifications: number
+    status_reminders: number
+    status_attentions: number
+    task_notifications: number
+    task_reminders: number
+    task_attentions: number
+    reported_content: number
+    community_requests: number
+    group_requests: number
+    event_requests: number
+    total: number
 }
 export type RecentActivity =
-{
-    id:number
-    created_at:string
-    updated_at:string
-    verb:Verb
-    is_seen: boolean
-    is_read: boolean
-    actor_count:number
-    display_text:string
-    extra:any
-    absolute_url:string
-    uri:string
-    actors:number[]
-    mentions:number[]
-    notifications:UnreadNotificationCounts
-}
+    {
+        id: number
+        created_at: string
+        updated_at: string
+        verb: Verb
+        is_seen: boolean
+        is_read: boolean
+        actor_count: number
+        display_text: string
+        extra: any
+        absolute_url: string
+        uri: string
+        actors: number[]
+        mentions: number[]
+        notifications: UnreadNotificationCounts
+    }
 export type TempStatus = {
-  text: string
-  privacy: string
-  files_ids: number[]
-  link: string|null
-  context_natural_key?: ContextNaturalKey
-  context_object_id?: number
-  parent:number,
-  mentions: number[]
-  pending?:boolean
+    text: string
+    privacy: string
+    files_ids: number[]
+    link: string | null
+    context_natural_key?: ContextNaturalKey
+    context_object_id?: number
+    parent: number,
+    pending?: boolean
 }
 export enum ProjectSorting {
     recentActivity = "recent_activity",
@@ -336,7 +368,7 @@ export namespace ProjectSorting {
         ProjectSorting.AtoZ,
     ]
     export function translatedText(type: ProjectSorting) {
-        switch(type){
+        switch (type) {
             case ProjectSorting.recentActivity: return translate("common.sorting.recentActivity")
             case ProjectSorting.recent: return translate("common.sorting.recent")
             case ProjectSorting.mostUsed: return translate("common.sorting.mostUsed")
@@ -345,10 +377,27 @@ export namespace ProjectSorting {
         }
     }
     export function icon(type: ProjectSorting) {
-        switch(type){
-            case ProjectSorting.recent: return <i className="fa fa-user-clock"></i>
-            case ProjectSorting.mostUsed: return <i className="fa fa-burn"></i>
-            default: return  <i className="fa fa-question"></i>
+        switch (type) {
+            case ProjectSorting.recent: return "fas fa-user-clock"
+            case ProjectSorting.mostUsed: return "fas fa-burn"
+            default: return "fas fa-question"
+        }
+    }
+}
+export enum ConversationFilter {
+    archived = "archived",
+}
+export namespace ConversationFilter {
+    export const all = [
+        ConversationFilter.archived,
+    ]
+    export function translatedText(type: ConversationFilter) {
+        return translate("conversation.filter." + type)
+    }
+    export function icon(type: ConversationFilter) {
+        switch (type) {
+            case ConversationFilter.archived: return "fas fa-archive"
+            default: return "fas fa-globe-europe"
         }
     }
 }
@@ -364,7 +413,7 @@ export namespace GroupSorting {
         GroupSorting.AtoZ
     ]
     export function translatedText(type: GroupSorting) {
-        switch(type){
+        switch (type) {
             case GroupSorting.recent: return translate("common.sorting.recent")
             case GroupSorting.mostUsed: return translate("common.sorting.mostUsed")
             case GroupSorting.AtoZ: return translate("common.sorting.AtoZ")
@@ -372,30 +421,29 @@ export namespace GroupSorting {
         }
     }
     export function icon(type: GroupSorting) {
-        switch(type){
-            case GroupSorting.recent: return <i className="fa fa-user-clock"></i>
-            case GroupSorting.mostUsed: return <i className="fa fa-burn"></i>
-            default: return  <i className="fa fa-question"></i>
+        switch (type) {
+            case GroupSorting.recent: return "fas fa-user-clock"
+            case GroupSorting.mostUsed: return "fas fa-burn"
+            default: return "fas fa-question"
         }
     }
 }
 //notifications
 export type NotificationObject = {
-    type:NotificationGroupKey
+    type: NotificationGroupKey
+    created_at: string
 } & IdentifiableObject
 export type InvitationNotification = {
     context_object: any
-    invited_by:UserProfile
-    created_at:string
-    message?:string
+    invited_by: UserProfile
+    message?: string
 } & NotificationObject
 export type StatusNotification = {
     level: number
-    created_by:number
-    created_at:string
+    created_by: number
     context_natural_key?: ContextNaturalKey
     context_object_id?: number
-    context_object:ContextObject
+    context_object: ContextObject
 } & Linkable & NotificationObject
 export enum TaskNotificationAction {
     UPDATED = "updated",
@@ -405,33 +453,29 @@ export enum TaskNotificationAction {
 }
 export type ReportNotification = {
     context_natural_key: ContextNaturalKey
-    created_at: string
     creator: UserProfile
-    tags:string[]
+    tags: string[]
 } & Linkable & NotificationObject
 export type TaskNotification = {
-    user:number
-    created_by:number
-    created_at:string
-    title:string
-    action:TaskNotificationAction
-    project:Project
+    user: number
+    created_by: number
+    title: string
+    action: TaskNotificationAction
+    project: Project
 } & Linkable & NotificationObject
 export type AttentionNotification = {
-    created_by:number
-    created_at:string
-    message?:string
+    created_by: number
+    created_at: string
+    message?: string
 } & Linkable & NotificationObject
 export type ReminderNotification = {
-    datetime:string
+    datetime: string
 } & AttentionNotification
 export type MembershipRequestNotification = {
-    context_object: IdentifiableObject & Linkable & AvatarAndCover & {name:string}
-    request_by:UserProfile
-    created_at:string
+    context_object: IdentifiableObject & Linkable & AvatarAndCover & { name: string }
+    request_by: UserProfile
 } & NotificationObject
-export enum NotificationGroupKey
-{
+export enum NotificationGroupKey {
     COMMUNITY_INVITATIONS = "community_invitations",
     GROUP_INVITATIONS = "group_invitations",
     EVENT_INVITATIONS = "event_invitations",
@@ -456,91 +500,89 @@ export enum NotificationGroupKey
 export type ConversationNotification = Conversation & NotificationObject
 export type UnhandledNotifications = {
     //invitations
-    community_invitations:InvitationNotification[]
-    group_invitations:InvitationNotification[]
-    event_invitations:InvitationNotification[]
-    friendship_invitations:InvitationNotification[]
+    community_invitations: InvitationNotification[]
+    group_invitations: InvitationNotification[]
+    event_invitations: InvitationNotification[]
+    friendship_invitations: InvitationNotification[]
 
-    unread_conversations:ConversationNotification[]
+    unread_conversations: ConversationNotification[]
 
-    status_notifications:StatusNotification[]
-    status_reminders:ReminderNotification[]
-    status_attentions:AttentionNotification[]
+    status_notifications: StatusNotification[]
+    status_reminders: ReminderNotification[]
+    status_attentions: AttentionNotification[]
 
-    task_notifications:TaskNotification[]
-    task_reminders:ReminderNotification[]
-    task_attentions:AttentionNotification[]
+    task_notifications: TaskNotification[]
+    task_reminders: ReminderNotification[]
+    task_attentions: AttentionNotification[]
 
-    reported_content:ReportNotification[]
+    reported_content: ReportNotification[]
     //requests
-    community_requests:MembershipRequestNotification[]
-    group_requests:MembershipRequestNotification[]
-    event_requests:MembershipRequestNotification[]
+    community_requests: MembershipRequestNotification[]
+    group_requests: MembershipRequestNotification[]
+    event_requests: MembershipRequestNotification[]
 }
 export type ContextObject = {
-     name:string
+    name: string
 } & Linkable
 export type Status = {
-    [key:string]: any
-    can_comment:boolean
-    children:Status[]
-    children_ids:number[]
-    comments:number
-    community?:ICommunity
-    context_object:ContextObject
-    created_at:string
-    edited_at:string
-    files:UploadedFile[]
-    id:number
-    uid:number
-    reactions:{ [id: string]: number[] }
-    reaction_count:number
-    owner:UserProfile
-    permission_set:number[]
-    poll:any
-    read:boolean
-    read_by:number[]
-    updated_at:string
-    serialization_date:string
-    extra?:string
-    highlights?:{[id:string]:[string]}
-    attributes:SimpleObjectAttribute[]
-    temporary:boolean
-    visibility?:number[]
-    level?:number
-    position:number
-    highlightMode?:boolean
+    //[key: string]: any
+    can_comment: boolean
+    children: Status[]
+    children_ids: number[]
+    comments: number
+    community?: ICommunity
+    context_object: ContextObject
+    created_at: string
+    edited_at: string
+    files: UploadedFile[]
+    id: number
+    uid: number
+    reactions: { [id: string]: number[] }
+    reaction_count: number
+    owner: UserProfile
+    permission_set: number[]
+    poll: any
+    read: boolean
+    read_by: number[]
+    updated_at: string
+    serialization_date: string
+    extra?: string
+    highlights?: { [id: string]: [string] }
+    attributes: SimpleObjectAttribute[]
+    temporary: boolean
+    visibility?: number[]
+    level?: number
+    position: number
+    highlightMode?: boolean
 } & TempStatus & Permissible
 
-export interface FileUpload
-{
-    file:File
-    progress:number
-    name:string
-    size:number
-    type:string
-    error:string|null
-    fileId?:number
+export interface FileUpload {
+    file: File
+    progress: number
+    name: string
+    size: number
+    type: string
+    error: string | null
+    fileId?: number
 }
 
-export class Message
-{
-    id!:number
-    pending?:boolean
-    uid!:string
-    user!:number
-    conversation!:number
-    text!:string
-    attachment:any
-    created_at!:string
-    updated_at!:string
-    read_by!:number[]
-    mentions!:number[]
-    files?:UploadedFile[]
-    tempFile?:FileUpload
-    error?:string
+export class Message {
+    id!: number
+    pending?: boolean
+    uid!: string
+    user!: number
+    conversation!: number
+    text!: string
+    attachment: any
+    created_at!: string
+    updated_at!: string
+    read_by!: number[]
+    mentions!: number[]
+    files?: UploadedFile[]
+    tempFile?: FileUpload
+    error?: string
 }
-export enum Permission{
+export enum Permission {
     none = 0,
     list = 10,
     read = 11,
@@ -560,97 +602,96 @@ export namespace Permission {
     }
 }
 export type GenericElasticResult = {
-    object_type:ElasticSearchType
-    django_id:number
-    created_at:string
-    uri:string
-    highlights:{[key:string]:string[]}
+    object_type: ElasticSearchType
+    django_id: number
+    created_at: string
+    uri: string
+    highlights: { [key: string]: string[] }
 }
 export type ElasticResultCreator = {
-    user_id:number
-    user_name:string
-    profile_uri:string
-    profile_avatar:string
+    user_id: number
+    user_name: string
+    profile_uri: string
+    profile_avatar: string
 }
 export type ElasticResultCommunity = {
-    avatar:string
-    cover:string
-    description:string
-    members:number[]
-    name:string
-    slug:string
+    avatar: string
+    cover: string
+    description: string
+    members: number[]
+    name: string
+    slug: string
 } & GenericElasticResult & ElasticResultCreator
 export type ElasticResultGroup = {
-    is_parent:boolean
-    parent_id:number
-    community:number 
-    slug:string
+    is_parent: boolean
+    parent_id: number
+    community: number
+    slug: string
 } & GenericElasticResult & ElasticResultCommunity
 export type ElasticResultProject = {
-    avatar:string
-    cover:string
-    community:number 
-    description:string
-    has_documents:boolean
-    members:number[]
-    name:string
-    slug:string
+    avatar: string
+    cover: string
+    community: number
+    description: string
+    has_documents: boolean
+    members: number[]
+    name: string
+    slug: string
 } & GenericElasticResult & ElasticResultCreator
 export type ElasticResultTask = {
-    community:number
-    project_id:number
-    responsible_id:number
-    responsible_name:string
-    title:string
-    description:string
-    has_documents:boolean
-    is_parent:boolean
-    parent_id:number
-    slug:string
+    community: number
+    project_id: number
+    responsible_id: number
+    responsible_name: string
+    title: string
+    description: string
+    has_documents: boolean
+    is_parent: boolean
+    parent_id: number
+    slug: string
 } & GenericElasticResult & ElasticResultCreator
 export type ElasticResultEvent = {
-    avatar:string
-    cover:string
-    community:number
-    name:string
-    description:string
-    members:number[]
-    is_parent:boolean
-    parent_id:number
-    slug:string
-    start_date:string
-    end_date:string
+    avatar: string
+    cover: string
+    community: number
+    name: string
+    description: string
+    members: number[]
+    is_parent: boolean
+    parent_id: number
+    slug: string
+    start_date: string
+    end_date: string
 } & GenericElasticResult & ElasticResultCreator
 export type ElasticResultFile = {
-    filename:string
-    file:string
-    type:UploadedFileType
-    extension:string
-    thumbnail:string
-    image_width:number
-    image_height:number
-    size:number
-    image?:string
-    context_natural_key:ContextNaturalKey
-    context_object_id:number
+    filename: string
+    file: string
+    type: UploadedFileType
+    extension: string
+    thumbnail: string
+    image_width: number
+    image_height: number
+    size: number
+    image?: string
+    context_natural_key: ContextNaturalKey
+    context_object_id: number
 } & GenericElasticResult & ElasticResultCreator
 export type ElasticResultStatus = {
-    has_documents:boolean
-    is_root_node:boolean
-    parent_id:number
-    text:string
-    context_natural_key:ContextNaturalKey
-    context_object_id:number
+    has_documents: boolean
+    is_root_node: boolean
+    parent_id: number
+    text: string
+    context_natural_key: ContextNaturalKey
+    context_object_id: number
 } & GenericElasticResult & ElasticResultCreator
 export type ElasticResultUser = {
-    avatar:string
-    biography:string
-    cover:string
-    slug:string
-    user_name:string
+    avatar: string
+    biography: string
+    cover: string
+    slug: string
+    user_name: string
 } & GenericElasticResult
-export enum ElasticSearchType
-{
+export enum ElasticSearchType {
     GROUP = "Group",
     COMMUNITY = "Community",
     USER = "User",
@@ -661,29 +702,29 @@ export enum ElasticSearchType
     UPLOADED_FILE = "UploadedFile"
 }
 export type ElasticSearchBucket = {
-    key:string
-    doc_count:number
+    key: string
+    doc_count: number
 }
 export type ElasticSearchBucketAggregation = {
-    buckets:ElasticSearchBucket[]
-    doc_count_error_upper_bound:number
-    sum_other_doc_count:number
+    buckets: ElasticSearchBucket[]
+    doc_count_error_upper_bound: number
+    sum_other_doc_count: number
 }
 export namespace ElasticSearchType {
 
     export function contextNaturalKeyForType(key: ElasticSearchType) {
-        switch(key){
+        switch (key) {
             case ElasticSearchType.GROUP: return ContextNaturalKey.GROUP
             case ElasticSearchType.COMMUNITY: return ContextNaturalKey.COMMUNITY
             case ElasticSearchType.USER: return ContextNaturalKey.USER
             case ElasticSearchType.PROJECT: return ContextNaturalKey.PROJECT
             case ElasticSearchType.EVENT: return ContextNaturalKey.EVENT
             case ElasticSearchType.TASK: return ContextNaturalKey.TASK
-            default:return null
+            default: return null
         }
     }
     export function iconClassForKey(key: ElasticSearchType) {
-        switch(key){
+        switch (key) {
             case ElasticSearchType.GROUP: return "fas fa-users"
             case ElasticSearchType.COMMUNITY: return "fas fa-globe"
             case ElasticSearchType.USER: return "fas fa-user"
@@ -692,7 +733,7 @@ export namespace ElasticSearchType {
             case ElasticSearchType.TASK: return "fas fa-tasks"
             case ElasticSearchType.UPLOADED_FILE: return "fas fa-file"
             case ElasticSearchType.STATUS: return "fas fa-rss"
-            default:return null
+            default: return null
         }
     }
     export function nameForKey(key: ElasticSearchType) {
@@ -702,21 +743,21 @@ export namespace ElasticSearchType {
 export type SimpleObjectAttribute = {
     attribute: ObjectAttributeType
     datetime: string
-    extra_data:string
-    id:number
+    extra_data: string
+    id: number
 }
 export type ObjectAttribute = {
-    created_at:string
-    created_by:number
-    user:number
+    created_at: string
+    created_by: number
+    user: number
 } & SimpleObjectAttribute
 export type StatusObjectAttribute = {
-    status:number
+    status: number
 } & ObjectAttribute
 export type TaskObjectAttribute = {
-    task:number
+    task: number
 } & ObjectAttribute
-export type ReportTag = { value: string, label: string}
+export type ReportTag = { value: string, label: string }
 export type ReportResult = {
     context_natural_key: ContextNaturalKey
     context_object_id: number
@@ -726,11 +767,10 @@ export type ReportResult = {
     id: number
     moderated_at: string
     moderator: number
-    tags:string[]
+    tags: string[]
 }
-export type SearchHistory = { id: number, term: string}
-export enum ObjectAttributeType
-{
+export type SearchHistory = { id: number, term: string }
+export enum ObjectAttributeType {
     important = "important",
     reminder = "reminder",
     attention = "attn",
@@ -739,30 +779,49 @@ export enum ObjectAttributeType
     link = "link",
 }
 export namespace ObjectAttributeType {
+    export function translatedText(type: ObjectAttributeType) {
+        return translate("newsfeed.sorting." + type)
+    }
     export function iconForType(type: ObjectAttributeType, active = false) {
-        switch(type){
-            case ObjectAttributeType.important: return active ? "fas fa-star" :  "far fa-star"
+        switch (type) {
+            case ObjectAttributeType.important: return active ? "fas fa-star" : "far fa-star"
             case ObjectAttributeType.reminder: return active ? "far fa-clock" : "far fa-clock"
             case ObjectAttributeType.attention: return active ? "fas fa-exclamation-triangle" : "fas fa-exclamation-triangle"
             case ObjectAttributeType.pinned: return active ? "fas fa-thumbtack" : "fas fa-thumbtack"
             case ObjectAttributeType.follow: return active ? "far fa-bell-slash" : "far fa-bell"
             case ObjectAttributeType.link: return active ? "fas fa-link" : "fas fa-link"
-            default:return "fas fa-question"
+            default: return "fas fa-globe-europe"
         }
     }
 }
 export type ContextItem = {
-    label:string
-    id:number
-    image?:string
-    type:ContextNaturalKey
+    label: string
+    id: number
+    image?: string
+    type: ContextNaturalKey
 }
 export type ContextGroup = {
-    items:ContextItem[]
-    type:ContextNaturalKey
+    items: ContextItem[]
+    type: ContextNaturalKey
 }
-export enum UploadedFileType
-{
+export type CalendarItem = {
+
+    object_type:string
+    created_at:string
+    updated_at:string
+    hidden:boolean
+    hidden_reason:string
+    title:string
+    slug:string
+    description:string
+    all_day:boolean
+    start:string
+    end:string
+    timezone:string
+    user:number
+} & IdentifiableObject & Linkable
+
+export enum UploadedFileType {
     IMAGE = "image",
     IMAGE360 = "360photo",
     DOCUMENT = "document",
@@ -770,141 +829,132 @@ export enum UploadedFileType
     AUDIO = "audio",
 }
 export namespace UploadedFileType {
-    export function parseFromMimeType(mimeType:string) {
+    export function parseFromMimeType(mimeType: string) {
         const mime = mimeType.toLowerCase()
-        if(mime.indexOf(UploadedFileType.IMAGE) > -1)
+        if (mime.indexOf(UploadedFileType.IMAGE) > -1)
             return UploadedFileType.IMAGE
-        if(mime.indexOf(UploadedFileType.VIDEO) > -1)
+        if (mime.indexOf(UploadedFileType.VIDEO) > -1)
             return UploadedFileType.VIDEO
-        if(mime.indexOf(UploadedFileType.AUDIO) > -1)
+        if (mime.indexOf(UploadedFileType.AUDIO) > -1)
             return UploadedFileType.AUDIO
         return UploadedFileType.DOCUMENT
     }
 }
 export type UploadedFile =
-{
-    user:number
-    filename:string
-    file:string
-    type:UploadedFileType
-    extension:string
-    image:string
-    image_width:number
-    image_height:number
-    thumbnail:string
-    size:number
-    created_at:string
-    //extensions
-    tempId?:number|string
-    custom?:boolean
-    uploadProgress?:number
-    uploading?:boolean
-    uploaded?:boolean
-    hasError?:boolean
-
-} & IdentifiableObject
-
-type FileIcon = {name:string, color:string}
-export const fileIcon = (file:UploadedFile) =>
-{
-    switch(file.type)
     {
+        user: number
+        filename: string
+        file: string
+        type: UploadedFileType
+        extension: string
+        image: string
+        image_width: number
+        image_height: number
+        thumbnail: string
+        size: number
+        created_at: string
+        //extensions
+        tempId?: number | string
+        custom?: boolean
+        uploadProgress?: number
+        uploading?: boolean
+        uploaded?: boolean
+        hasError?: boolean
+
+    } & IdentifiableObject
+
+type FileIcon = { name: string, color: string }
+export const fileIcon = (file: UploadedFile) => {
+    switch (file.type) {
         case UploadedFileType.AUDIO: return audioIcon(file.extension)
         case UploadedFileType.VIDEO: return videoIcon(file.extension)
         case UploadedFileType.DOCUMENT: return documentIcon(file.extension)
         case UploadedFileType.IMAGE: return imageIcon(file.extension)
-        default:return documentIcon(file.extension)
+        default: return documentIcon(file.extension)
     }
 }
-export const videoIcon = (extension:string):FileIcon =>
-{
-    switch(extension)
-    {
-        default: return {name:"file-video", color:"#A63636"}
+export const videoIcon = (extension: string): FileIcon => {
+    switch (extension) {
+        default: return { name: "file-video", color: "#A63636" }
     }
 }
-export const audioIcon = (extension:string):FileIcon =>
-{
-    switch(extension)
-    {
-        default: return {name:"file-audio", color:"#FFD00C"}
+export const audioIcon = (extension: string): FileIcon => {
+    switch (extension) {
+        default: return { name: "file-audio", color: "#FFD00C" }
     }
 }
-export const imageIcon = (extension:string):FileIcon =>
-{
-    switch(extension)
-    {
-        default: return {name:"file-image", color:"#029555"}
+export const imageIcon = (extension: string): FileIcon => {
+    switch (extension) {
+        default: return { name: "file-image", color: "#029555" }
     }
 }
-export const documentIcon = (extension:string):FileIcon => {
-    switch(extension)
-    {
+export const documentIcon = (extension: string): FileIcon => {
+    switch (extension) {
         case "pptx":
         case "ppt":
-        case "odp": return {name:"file-powerpoint", color:"#FF8D52"}
+        case "odp": return { name: "file-powerpoint", color: "#FF8D52" }
 
-        case "pdf": return {name:"file-pdf", color:"#FF5656"}
+        case "pdf": return { name: "file-pdf", color: "#FF5656" }
 
         case "doc":
         case "docx":
         case "txt":
         case "rtf":
-        case "odt": return {name:"file-word", color:"#547980"}
+        case "odt": return { name: "file-word", color: "#547980" }
 
         case "xlsx":
         case "xls":
-        case "ods": return {name:"file-excel", color:"#6abe67"}
+        case "ods": return { name: "file-excel", color: "#6abe67" }
 
-        default: return {name:"file-alt", color:"#4A87EC"}
+        default: return { name: "file-alt", color: "#4A87EC" }
     }
 }
 
 export type Permissible = {
-    permission:number
+    permission: number
 }
 export type Linkable = {
-    uri:string
+    uri: string
 }
 export type AvatarAndCover = {
 
-    avatar:string
-    avatar_thumbnail:string
+    avatar: string
+    avatar_thumbnail: string
     cover: string
     cover_cropped: string
     cover_thumbnail: string
 }
 export type Conversation =
-{
-    title:string
-    users:number[]
-    archived_by?: number[]
-    last_message:Message
-    read_by:any[]
-    absolute_url?:string
-    created_at:string
-    updated_at:string
-    unread_messages:number[]
-    temporary?:boolean
+    {
+        title: string
+        users: number[]
+        archived_by?: number[]
+        last_message: Message
+        read_by: any[]
+        absolute_url?: string
+        created_at: string
+        updated_at: string
+        unread_messages: number[]
+        temporary?: boolean
 
-} & Linkable & IdentifiableObject & Permissible
+    } & Linkable & IdentifiableObject & Permissible
 
 export type ICommunity = {
     cover_thumbnail: string
-    avatar_thumbnail:string
-    deactivated:boolean
-    name:string
-    slug_name:string
-    primary_color:string
-    secondary_color:string
-    chapters?:boolean
+    avatar_thumbnail: string
+    deactivated: boolean
+    name: string
+    slug_name: string
+    primary_color: string
+    secondary_color: string
+    chapters?: boolean
 } & Linkable & IdentifiableObject
 
 export type Community = {
     members: number[]
     relationship: any
     description: string
-    updated_at:string
+    updated_at: string
 } & ICommunity & AvatarAndCover & Permissible
 
 export type SimpleUserProfile = {
@@ -914,27 +964,27 @@ export type SimpleUserProfile = {
     last_name: string,
 } & IdentifiableObject
 export type ProfileConnections = {
-    count:number
-    ids:number[]
+    count: number
+    ids: number[]
 }
 export type UserProfile = {
-    email:string|null
-    locale:string|null
-    timezone:string|null
+    email: string | null
+    locale: string | null
+    timezone: string | null
     username: string
-    uuid:string|null
-    user_status:UserStatus
-    biography:string
-    slug_name:string
+    uuid: string | null
+    user_status: UserStatus
+    biography: string
+    slug_name: string
     relationship?: string[]
     mutual_friends?: number[]
-    last_seen?:number
-    is_anonymous:boolean
-    is_staff:boolean
-    is_superuser:boolean
-    connections?:number[]
-    active_community?:number
-    mutual_contacts:ProfileConnections
+    last_seen?: number
+    is_anonymous: boolean
+    is_staff: boolean
+    is_superuser: boolean
+    connections?: number[]
+    active_community?: number
+    mutual_contacts: ProfileConnections
 } & SimpleUserProfile & AvatarAndCover & Linkable & Permissible
 
 export type Group = {
@@ -952,15 +1002,15 @@ export type Group = {
 } & AvatarAndCover & Linkable & Permissible & IdentifiableObject
 
 export type Favorite = {
-    index:number
-    object_natural_key:ContextNaturalKey
-    image:string
-    object:ContextObject
-    object_id:number
+    index: number
+    object_natural_key: ContextNaturalKey
+    image: string
+    object: ContextObject
+    object_id: number
 } & IdentifiableObject
 export type Coordinate = {
-    lat:number
-    lon:number
+    lat: number
+    lon: number
 }
 export type Event = {
     name: string
@@ -978,11 +1028,11 @@ export type Event = {
     created_at: string
     group: Group
     updated_at: string
-    start:string
-    end:string
-    location:Coordinate
-    address:string
-    parent:Event
+    start: string
+    end: string
+    location: Coordinate
+    address: string
+    parent: Event
 
 } & AvatarAndCover & Linkable & Permissible & IdentifiableObject
 
@@ -1016,8 +1066,8 @@ export type TimeSpent = {
 export type Task = {
     id: number
     updated_at: string
-    project:number
-    title:string
+    project: number
+    title: string
     description: string
     last_change_by: number
     absolute_url: string
@@ -1031,9 +1081,10 @@ export type Task = {
     serialization_date: string
     visibility?: number[]
     attributes?: TaskObjectAttribute[]
+    due_date:string
 } & Linkable & Permissible & IdentifiableObject
 
-export enum TaskPriority{
+export enum TaskPriority {
     low = "low",
     medium = "medium",
     high = "high",
@@ -1045,15 +1096,15 @@ export namespace TaskPriority {
         TaskPriority.high,
     ]
     export function colorForPriority(type: TaskPriority) {
-        switch(type){
+        switch (type) {
             case TaskPriority.low: return "#61FA6B"
             case TaskPriority.medium: return "#FA9F61"
             case TaskPriority.high: return "#FA6161"
-            default:return null
+            default: return null
         }
     }
 }
-export enum TaskState{
+export enum TaskState {
     notStarted = "not-started",
     progress = "progress",
     toVerify = "to-verify",
@@ -1069,23 +1120,22 @@ export namespace TaskState {
         TaskState.notApplicable,
     ]
     export function colorForState(type: TaskState) {
-        switch(type){
+        switch (type) {
             case TaskState.progress: return "#F8CF88"
             case TaskState.toVerify: return "#FFFFB1"
             case TaskState.completed: return "#B9E4B4"
-            case TaskState.notApplicable : return "#ebccd1"
-            default:return null
+            case TaskState.notApplicable: return "#ebccd1"
+            default: return null
         }
     }
 }
-function strEnum<T extends string>(o: Array<T>): {[K in T]: K} {
+function strEnum<T extends string>(o: Array<T>): { [K in T]: K } {
     return o.reduce((res, key) => {
         res[key] = key;
         return res;
     }, Object.create(null));
 }
-export enum StatusReaction
-{
+export enum StatusReaction {
     LIKE = "like",
     HEART = "heart",
     SAD = "sad",
@@ -1096,79 +1146,68 @@ export enum StatusReaction
 export enum StatusReactionStyle {
     emoji, icon
 }
-export interface StatusReactionProps
-{
-    reaction:StatusReaction
-    onClick?:(event:any) => void
-    large:boolean
-    showBackground?:boolean
-    style?:React.CSSProperties
+export interface StatusReactionProps {
+    reaction: StatusReaction
+    onClick?: (event: any) => void
+    large: boolean
+    showBackground?: boolean
+    style?: React.CSSProperties
     innerRef?: any
-    selected:boolean
-    reactionStyle?:StatusReactionStyle
+    selected: boolean
+    reactionStyle?: StatusReactionStyle
 }
-export abstract class StatusReactionUtilities
-{
-    public static parseStatusReaction = (reaction:string):StatusReaction =>
-    {
-        switch (reaction)
-        {
-            case StatusReaction.JOY : return StatusReaction.JOY
-            case StatusReaction.HEART : return StatusReaction.HEART
-            case StatusReaction.SAD : return StatusReaction.SAD
-            case StatusReaction.DISLIKE : return StatusReaction.DISLIKE
-            case StatusReaction.COMPLETE : return StatusReaction.COMPLETE
-            default : return StatusReaction.LIKE
+export abstract class StatusReactionUtilities {
+    public static parseStatusReaction = (reaction: string): StatusReaction => {
+        switch (reaction) {
+            case StatusReaction.JOY: return StatusReaction.JOY
+            case StatusReaction.HEART: return StatusReaction.HEART
+            case StatusReaction.SAD: return StatusReaction.SAD
+            case StatusReaction.DISLIKE: return StatusReaction.DISLIKE
+            case StatusReaction.COMPLETE: return StatusReaction.COMPLETE
+            default: return StatusReaction.LIKE
         }
     }
-    public static reactionsList = ():StatusReaction[] =>
-    {
+    public static reactionsList = (): StatusReaction[] => {
         var arr = []
-        for(var n in StatusReaction) {
-            if (typeof StatusReaction[n] === 'string')
-            {
+        for (var n in StatusReaction) {
+            if (typeof StatusReaction[n] === 'string') {
                 arr.push(StatusReaction[n]);
             }
         }
         return arr.map(s => StatusReactionUtilities.parseStatusReaction(s))
     }
-    public static classNameForReactionContainer = (props:StatusReactionProps) =>
-    {
-        return "emoji-reaction-container" + (props.large ? " large": "")
+    public static classNameForReactionContainer = (props: StatusReactionProps) => {
+        return "emoji-reaction-container" + (props.large ? " large" : "")
     }
-    public static emojiForReaction = (props:StatusReactionProps) =>
-    {
+    public static emojiForReaction = (props: StatusReactionProps) => {
         const reactionStyle = props.reactionStyle || StatusReactionStyle.emoji
-        switch (props.reaction)
-        {
-            case StatusReaction.SAD : return    <span className={StatusReactionUtilities.classNameForReactionContainer(props)} onClick={props.onClick}>
-                                                    <Emoji symbol="😔" label={props.reaction} />
-                                                </span>
-            case StatusReaction.JOY : return    <span className={StatusReactionUtilities.classNameForReactionContainer(props)} onClick={props.onClick}>
-                                                    <Emoji symbol="😂" label={props.reaction} />
-                                                </span>
-            case StatusReaction.HEART : return  <span className={StatusReactionUtilities.classNameForReactionContainer(props)} onClick={props.onClick}>
-                                                    <Emoji symbol="❤️" label={props.reaction} />
-                                                </span>
-            case StatusReaction.DISLIKE : return  <span className={StatusReactionUtilities.classNameForReactionContainer(props)} onClick={props.onClick}>
-                                                    <Emoji symbol="👎" label={props.reaction} />
-                                                </span>
-            case StatusReaction.COMPLETE : return  <span className={StatusReactionUtilities.classNameForReactionContainer(props)} onClick={props.onClick}>
-                                                    <Emoji symbol="✔️" label={props.reaction} />
-                                                </span>
-            case StatusReaction.LIKE : return   <span className={StatusReactionUtilities.classNameForReactionContainer(props)} onClick={props.onClick}>
-                                                    {reactionStyle == StatusReactionStyle.emoji && <Emoji symbol="👍" label={props.reaction} />}
-                                                    {reactionStyle == StatusReactionStyle.icon && <i className="far fa-thumbs-up"></i>}
-                                                </span>
+        switch (props.reaction) {
+            case StatusReaction.SAD: return <span className={StatusReactionUtilities.classNameForReactionContainer(props)} onClick={props.onClick}>
+                <Emoji symbol="😔" label={props.reaction} />
+            </span>
+            case StatusReaction.JOY: return <span className={StatusReactionUtilities.classNameForReactionContainer(props)} onClick={props.onClick}>
+                <Emoji symbol="😂" label={props.reaction} />
+            </span>
+            case StatusReaction.HEART: return <span className={StatusReactionUtilities.classNameForReactionContainer(props)} onClick={props.onClick}>
+                <Emoji symbol="❤️" label={props.reaction} />
+            </span>
+            case StatusReaction.DISLIKE: return <span className={StatusReactionUtilities.classNameForReactionContainer(props)} onClick={props.onClick}>
+                <Emoji symbol="👎" label={props.reaction} />
+            </span>
+            case StatusReaction.COMPLETE: return <span className={StatusReactionUtilities.classNameForReactionContainer(props)} onClick={props.onClick}>
+                <Emoji symbol="✔️" label={props.reaction} />
+            </span>
+            case StatusReaction.LIKE: return <span className={StatusReactionUtilities.classNameForReactionContainer(props)} onClick={props.onClick}>
+                {reactionStyle == StatusReactionStyle.emoji && <Emoji symbol="👍" label={props.reaction} />}
+                {reactionStyle == StatusReactionStyle.icon && <i className="far fa-thumbs-up"></i>}
+            </span>
         }
     }
-    public static Component = (props:StatusReactionProps) =>
-    {
+    public static Component = (props: StatusReactionProps) => {
         return StatusReactionUtilities.emojiForReaction(props)
     }
 }
-export enum AvatarStatusColor
-{
+export enum AvatarStatusColor {
     GREEN = "#01d100",
     ORANGE = "orange",
     RED = "red",
@@ -1184,17 +1223,17 @@ export enum UserStatus {
     invisible = "invisible",
 }
 export type UserStatusItem = {
-    type:UserStatus
-    color:AvatarStatusColor
-    translation:() => string
+    type: UserStatus
+    color: AvatarStatusColor
+    translation: () => string
 }
-const UserStatusObjects:{[key:string]:UserStatusItem} = {
-    active:{type:UserStatus.active, color:AvatarStatusColor.GREEN, translation:() => UserStatus.getTranslation(UserStatus.active)},
-    away:{type:UserStatus.away, color:AvatarStatusColor.ORANGE, translation:() => UserStatus.getTranslation(UserStatus.away)},
-    unavailable:{type:UserStatus.unavailable, color:AvatarStatusColor.NONE, translation:() => UserStatus.getTranslation(UserStatus.unavailable)},
-    dnd:{type:UserStatus.dnd, color:AvatarStatusColor.RED, translation:() => UserStatus.getTranslation(UserStatus.dnd)},
-    vacation:{type:UserStatus.vacation, color:AvatarStatusColor.GRAY, translation:() => UserStatus.getTranslation(UserStatus.vacation)},
-    invisible:{type:UserStatus.invisible, color:AvatarStatusColor.NONE, translation:() => UserStatus.getTranslation(UserStatus.invisible)},
+const UserStatusObjects: { [key: string]: UserStatusItem } = {
+    active: { type: UserStatus.active, color: AvatarStatusColor.GREEN, translation: () => UserStatus.getTranslation(UserStatus.active) },
+    away: { type: UserStatus.away, color: AvatarStatusColor.ORANGE, translation: () => UserStatus.getTranslation(UserStatus.away) },
+    unavailable: { type: UserStatus.unavailable, color: AvatarStatusColor.NONE, translation: () => UserStatus.getTranslation(UserStatus.unavailable) },
+    dnd: { type: UserStatus.dnd, color: AvatarStatusColor.RED, translation: () => UserStatus.getTranslation(UserStatus.dnd) },
+    vacation: { type: UserStatus.vacation, color: AvatarStatusColor.GRAY, translation: () => UserStatus.getTranslation(UserStatus.vacation) },
+    invisible: { type: UserStatus.invisible, color: AvatarStatusColor.NONE, translation: () => UserStatus.getTranslation(UserStatus.invisible) },
 }
 export namespace UserStatus {
 
@@ -1204,79 +1243,78 @@ export namespace UserStatus {
     export function getTranslation(status: UserStatus) {
         return translate("user.status." + status)
     }
-    export function getSelectableStates(excludes?:UserStatus[]) {
+    export function getSelectableStates(excludes?: UserStatus[]) {
         let selectables = [UserStatus.active, UserStatus.dnd, UserStatus.vacation, UserStatus.invisible]
-        if(excludes)
+        if (excludes)
             selectables = selectables.filter(s => !excludes.contains(s))
         return selectables.map(s => UserStatusObjects[s])
     }
 }
 //DASHBOARD
 export type Module = {
-    id:number
-    name:string
-    type:string
-    disabled:boolean
-    properties:Object
+    id: number
+    name: string
+    type: string
+    disabled: boolean
+    properties: Object
 }
 export type GridColumn = {
-    id:number
-    module:Module
-    width:number
-    children:GridColumn[]
-    index:number
-    sticky?:boolean
-    tabbed_layout?:boolean
+    id: number
+    module: Module
+    width: number
+    children: GridColumn[]
+    index: number
+    sticky?: boolean
+    tabbed_layout?: boolean
 }
 export type GridColumns = {
-    id:number
-    columns:GridColumn[]
-    title:string
-    min_width:number
-    fill:boolean
+    id: number
+    columns: GridColumn[]
+    title: string
+    min_width: number
+    fill: boolean
 }
 export type Dashboard = {
-    id:number
-    grid_layouts:GridColumns[]
-    created_at:string
-    updated_at:string
-    hidden:boolean
-    hidden_reason:ObjectHiddenReason
-    position:number
-    title:string
-    slug:string
-    user:number
-    category:string
+    id: number
+    grid_layouts: GridColumns[]
+    created_at: string
+    updated_at: string
+    hidden: boolean
+    hidden_reason: ObjectHiddenReason
+    position: number
+    title: string
+    slug: string
+    user: number
+    category: string
 }
 //DASHBOARD END
 
 
 export type VersionInfo = {
-    major_version:number
-    minor_version:number
-    version_string:string
-    release_date:string
+    major_version: number
+    minor_version: number
+    version_string: string
+    release_date: string
 }
 
 export type Timesheet = {
-    id:number
-    created_at:string
-    updated_at:string
-    user:SimpleUserProfile
-    date:string
-    hours:number
-    minutes:number
-    description:string
-    project:number
-    task:number
+    id: number
+    created_at: string
+    updated_at: string
+    user: SimpleUserProfile
+    date: string
+    hours: number
+    minutes: number
+    description: string
+    project: number
+    task: number
     task_title: string
 } & Permissible & Linkable
-export interface EmbedMedia
-{
-    height:number
-    width:number
-    type:string
-    html:string
+export interface EmbedMedia {
+    height: number
+    width: number
+    type: string
+    html: string
 }
 export type EmbedImage = {
 
@@ -1286,26 +1324,24 @@ export type EmbedImage = {
     size: number,
     url: string
 }
-export interface EmbedCardItem
-{
-    key:string
-    url:string
-    provider_url:string
-    provider_display:string
-    original_url:string
-    description:string
-    title:string
-    favicon_url:string
-    images:EmbedImage[]
-    media:EmbedMedia
-    error_code:number
-    type:string
-    avatar:string
-    subtitle:string
-    internal?:boolean
+export interface EmbedCardItem {
+    key: string
+    url: string
+    provider_url: string
+    provider_display: string
+    original_url: string
+    description: string
+    title: string
+    favicon_url: string
+    images: EmbedImage[]
+    media: EmbedMedia
+    error_code: number
+    type: string
+    avatar: string
+    subtitle: string
+    internal?: boolean
 }
-export enum TaskActions
-{
+export enum TaskActions {
     /**Changes priority for Task: extra:{priority:TaskPriority} */
     setPriority,
     setState,
@@ -1315,8 +1351,7 @@ export enum TaskActions
     addStatus,
 
 }
-export enum StatusActions
-{
+export enum StatusActions {
     /**Navigates to the context of the current status (context_natural_key and context_object_id), i.e "group.group" or "core.community" ... and the the corresponding object id */
     context = 0,
     /**Navigates to the community of the current status: extra:{} */

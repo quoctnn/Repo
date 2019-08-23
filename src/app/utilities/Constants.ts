@@ -10,6 +10,13 @@ export default  {
         login:"/api/v1/auth/oup/login/",
         nativeLogin:"/api/v1/auth-oup/native-login/",
         socialLogin:"/api/v1/auth-oup/social-login/",
+
+        //calendar
+        calendarItemDetailUrl: (id:number) => {
+            return `/api/v2/calendar/${id}/`
+        },
+        calendarUrl:"/api/v2/calendar/",
+
         // Version
         versionUrl:"/api/v2/version/basic/",
         // Purchases
@@ -79,11 +86,24 @@ export default  {
         profilesUrl: '/api/v2/profile/',
         profilesV1Url: '/api/v1/profile/',
 
-
         myBusinessDataUrl:"/api/v2/profile/business-data/",
         myPersonalDataUrl:"/api/v2/profile/personal-data/",
+
         // Friends URLs
         friendsUrl: '/api/v2/friends/',
+        friendInvitation: '/api/v2/friend-invitation/',
+        friendInvitationDelete: (id:number) => {
+            return `/api/v2/friend-invitation/${id}/`
+        },
+        friendInvitationAccept: (id:number) => {
+            return `/api/v2/friend-invitation/${id}/accept/`
+        },
+
+        // Blocking URLs
+        blockUrl: '/api/v2/blocking/',
+        blockDelete: (id:number) => {
+            return `/api/v2/blocking/${id}/`
+        },
 
         // Group URLs
         groupUrl: (id:number|string) => {
@@ -184,6 +204,7 @@ export default  {
         recentActivityUnreadUrl: '/api/v2/notification/unread-count/',
         recentActivityMarkReadUrl: '/api/v2/notification/update-as-read/',
         recentActivityMarkAllReadUrl: '/api/v2/notification/mark-all-as-read/',
+        notificationsMarkActionsReadUrl: '/api/v2/notification/mark-actions-as-read/',
 
         // Notification URLs
         notificationUrl: '/api/v2/notification/',
@@ -201,13 +222,6 @@ export default  {
         convNotificationMarkReadUrl: '/api/v2/notification_conv/update-as-read/',
         convNotificationMarkAllReadUrl: '/api/v2/notification_conv/mark-all-as-read/',
 
-        //friend-invitation
-        friendInvitationDelete: (id:number) => {
-            return `/api/v2/friend-invitation/${id}/`
-        },
-        friendInvitationAccept: (id:number) => {
-            return `/api/v2/friend-invitation/${id}/accept/`
-        },
         //Status attributes
         statusAttributes:'/api/v2/status-attributes/',
         statusAttributesId: (id:number) => {

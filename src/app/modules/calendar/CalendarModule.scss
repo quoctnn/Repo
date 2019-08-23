@@ -1,0 +1,91 @@
+@import "../../Config";
+.calendar-module{
+    padding: 8px;
+    .title-text{
+        font-size: 1em;
+    }
+    .rbc-calendar
+    {
+        .rbc-row-bg{
+            display: none;
+        }
+        .rbc-month-view{
+            border:0;
+            .rbc-off-range-bg{
+                background: none;
+            }
+            .rbc-month-row{
+                overflow:initial;
+            }
+            .rbc-date-cell{
+                text-align: initial;
+                padding: initial;
+                .calendar-date-header{
+                    margin: 3px;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    cursor: pointer;
+                    position: relative;
+                    .event-indicator{
+                        position: absolute;
+                        width: 4px;
+                        height: 4px;
+                        background: #4284FF;
+                        border-radius: 50%;
+                        bottom: 3px;
+                    }
+                    .content{
+                        min-width: 30px;
+                        height: 30px;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        border-radius: 50%;
+
+                    }
+                    &.selected{
+                        .content{
+                            color:white;
+                            background: black;
+
+                        }
+                    }
+                }
+                &.rbc-now{
+                    .calendar-date-header{
+                        .content{
+                            @include var(color, primary-theme-color);
+                        }
+                    }
+                }
+                &.rbc-current{
+                    .calendar-date-header{
+                        .event-indicator{
+                            background:white;
+                        }
+                        .content{
+                            color:white;
+                            background: black;
+                        }
+                    }
+                }
+                &.rbc-now.rbc-current{
+                    .calendar-date-header{
+                        .event-indicator{
+                            background:white;
+                        }
+                        .content{
+                            color:white;
+                            @include var(background, primary-theme-color);
+                        }
+                    }
+                }
+            }
+
+        }
+        .rbc-header, .rbc-month-row{
+            border:0;
+        }
+    }
+}

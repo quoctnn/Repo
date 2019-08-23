@@ -4,12 +4,10 @@ import "./ProjectPage.scss"
 import { Project, Community } from "../../types/intrasocial_types";
 import LoadingSpinner from "../LoadingSpinner";
 import { ReduxState } from "../../redux";
-import PageHeader from "../PageHeader";
 import { DashboardWithData } from "../../DashboardWithData";
 import { ProjectManager } from "../../managers/ProjectManager";
 import { CommunityManager } from "../../managers/CommunityManager";
 import { Error404 } from "../../views/error/Error404";
-import { communityAvatar, communityName, communityCover, projectCover } from "../../utilities/Utilities";
 export interface OwnProps
 {
     match:any,
@@ -42,15 +40,6 @@ class ProjectPage extends React.Component<Props, State>
     {
         return (<LoadingSpinner />)
     }
-    renderHeader(project:Project, community:Community)
-    {
-        return (<PageHeader
-                    coverImage={projectCover(project)}
-                    primaryItemImage={communityAvatar(community, true)}
-                    primaryItemTitle={communityName(community)}
-                    />
-                )
-    }
     renderNotFound = () => {
         return <Error404 />
     }
@@ -62,7 +51,6 @@ class ProjectPage extends React.Component<Props, State>
                 {!hasData && this.renderNotFound()}
                 {hasData &&
                     <div className="content">
-                        {this.renderHeader(project, community)}
                         <DashboardWithData category="project" />
                     </div>
                 }

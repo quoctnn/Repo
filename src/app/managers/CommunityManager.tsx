@@ -38,8 +38,7 @@ export abstract class CommunityManager
                 CommunityManager.storeCommunities([community])
                 if(!hasCommunity)
                 {
-                    const buttons = [<Link key="1" to={Routes.communityUrl(community.slug_name)} className="btn btn-xs btn-primary">{translate("Visit")}</Link>]
-                    ToastManager.showInfoToast(translate("community.incoming.new").format(community.name), null, buttons)
+                    ToastManager.showInfoToast(translate("community.incoming.new").format(community.name), null, Routes.communityUrl(community.slug_name))
                 }
             }
         })

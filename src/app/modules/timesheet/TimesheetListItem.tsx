@@ -46,7 +46,7 @@ export default class TimesheetListItem extends React.Component<Props, State> {
                         <div className="d-flex flex-column details text-truncate">
                             <div title={name} className="user text-truncate">{name}</div>
                             { this.props.showTaskTitle &&
-                                <div title={timesheet.task_title} className="task-info text-truncate"><b>{translate("common.task") + ":"}</b> &nbsp;{timesheet.task_title}</div>
+                                <div title={timesheet.task_title} className="task-info text-truncate"><b>{translate("common.project.task") + ":"}</b> &nbsp;{timesheet.task_title}</div>
                                 ||
                                 <div title={timesheet.description} className="task-info text-truncate">{timesheet.description}</div>
                             }

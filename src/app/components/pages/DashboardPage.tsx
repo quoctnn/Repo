@@ -4,9 +4,7 @@ import "./DashboardPage.scss"
 import { Community } from "../../types/intrasocial_types";
 import LoadingSpinner from "../LoadingSpinner";
 import { ReduxState } from "../../redux";
-import PageHeader from "../PageHeader";
 import { DashboardWithData } from "../../DashboardWithData";
-import { communityAvatar, communityName, communityCover } from "../../utilities/Utilities";
 export interface OwnProps 
 {
     match:any,
@@ -40,20 +38,10 @@ class DashboardPage extends React.Component<Props, State>
             return (<LoadingSpinner />)
         }
     }
-    renderHeader(community:Community)
-    {
-        return (<PageHeader 
-                    coverImage={communityCover(community)} 
-                    primaryItemImage={communityAvatar(community, true)} 
-                    primaryItemTitle={communityName(community)}  
-                    />
-                )
-    }
     render() {
         return(
             <div id="dashboard-page" className="dashboard-container">
                 {this.renderLoading()}
-                {this.renderHeader(this.props.community)}
                 <DashboardWithData category="mainmenu" />
             </div>
         );

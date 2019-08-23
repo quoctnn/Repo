@@ -17,7 +17,7 @@ import { Settings } from '../../utilities/Settings';
 import DashFillComponent from '../../components/general/DashFillComponent';
 import Routes from '../../utilities/Routes';
 import { availableLanguages } from '../../redux/language';
-import { nullOrUndefined } from '../../utilities/Utilities';
+import { nullOrUndefined, parseJSONObject } from '../../utilities/Utilities';
 import Logo from '../../components/general/images/Logo';
 
 type SectionComponentProps = {
@@ -38,29 +38,44 @@ const SectionComponent = (props:SectionComponentProps) => {
             </div>
 }
 type OwnProps = {
-
 }
 type ReduxStateProps = {
     apiEndpoint?:number,
     language:number,
 }
 type Props = RouteComponentProps<any> & ReduxStateProps & OwnProps
-class Signin extends React.Component<Props, {}> {
+class Signin extends React.Component<Props, {error?:string}> {
 
     emailInput: HTMLInputElement|null = null
     passwordInput: HTMLInputElement|null = null
     constructor(props:Props) {
         super(props);
+        this.state = {
+            error:null
+        }
     }
-    loginCallback = (data:{token:string|null}, status:string, error:string) => {
+    loginCallback = (data:any, status:string, error:string) => {
         if(error || status == "error")
         {
-            ToastManager.showErrorToast(error || translate("Could not sign in"))
+            if (data.responseText) {
+                const error_response = JSON.parse(data.responseText)
+                if (error_response.non_field_errors) {
+                    // Invalid password on nativeLogin
+                    this.setState({error:error_response.non_field_errors})
+                } else if (error_response.detail) {
+                    // Email verification or GDPR consent not performed
+                    this.setState({error:error_response.detail.error_description})
+                } else {
+                    ToastManager.showErrorToast(error)
+                }
+            }
             return
         }
         if(data.token)
         {
             AuthenticationManager.signIn(data.token)
+        } else {
+            ToastManager.showErrorToast("No token in response")
         }
         const { from } = this.props.location.state || { from: { pathname: '/' } }
         this.props.history.push(from)
@@ -68,6 +83,7 @@ class Signin extends React.Component<Props, {}> {
     doSignin = (e) => {
 
         e.preventDefault()
+        this.setState({error:null})
         let endpoint = EndpointManager.currentEndpoint()
         if (allowedUsers.length == 0 || allowedUsers.contains(this.emailInput!.value)) {
             if(endpoint.loginType == EndpointLoginType.API)
@@ -104,7 +120,8 @@ class Signin extends React.Component<Props, {}> {
         const endpoint = EndpointManager.currentEndpoint()
         let endpointName = endpoint.endpoint.replace(/(^\w+:|)\/\//, '');
         endpointName = endpointName.replace(/(:\d+$)/, '');
-        const socialLinksActive = endpoint.loginType == EndpointLoginType.API
+        const socialLinksActive = endpoint.loginType == EndpointLoginType.API && !Settings.isElectron
+        const errorMsg = this.state.error
         return(
             <div id="sign-in">
                 <div className="triangles-bg"></div>
@@ -127,7 +144,8 @@ class Signin extends React.Component<Props, {}> {
                                     <h2 className="title">{translate("Login")}</h2>
                                     <div className="sub-title mb-1">
                                         {translate("no_account_question")}{" "}
-                                        <Link className="s-link" to={Routes.SIGNUP}>{translate("Sign up")}</Link>
+                                        {/*<Link className="s-link" to={Routes.SIGNUP}>{translate("Sign up")}</Link>*/}
+                                        <a href="https://intra.work/accounts/oup/login/" target="_blank">{translate("Sign up")}</a>
                                     </div>
                                     <Form>
                                         <InputGroup className="form-group form-input">
@@ -139,6 +157,9 @@ class Signin extends React.Component<Props, {}> {
                                             <InputGroupAddon addonType="append"><i className="fas fa-lock"></i></InputGroupAddon>
                                         </InputGroup>
                                         <FormGroup>
+                                            {errorMsg &&
+                                                <div className='error'>{errorMsg}</div>
+                                            }
                                             <Button className="login-button" type="submit" color="info" onClick={this.doSignin}>{translate("Sign in")}</Button>
                                         </FormGroup>
                                     </Form>
@@ -174,11 +195,23 @@ class Signin extends React.Component<Props, {}> {
                                                         </button>
                                             }}
                                         />
-                                        {/* Linkedin provider on login API is broken...
-                                            <LinkedIn
+                                        <button className="social-sign-on-button" disabled={true}>
+                                            <div className="social-icon"></div>
+                                            {translate("sign_in_linkedin")}
+                                        </button>
+                                        {/* <LinkedIn
+                                            className="social-sign-on-button"
                                             clientId={Settings.LinkedInClientID}
                                             callback={this.doLinkedInSignin}
-                                            text='Sign in with LinkedIn' /> */}
+                                            text='Sign in with LinkedIn'
+                                            //The LinkedIn module does not support the render property
+                                            render={renderProps => {
+                                                return <button  onClick={renderProps.onClick} disabled={!socialLinksActive}>
+                                                            <div className="social-icon"></div>
+                                                            {translate("sign_in_linkedin")}
+                                                        </button>
+                                            }}
+                                        /> */}
                                     </div>
                                 </div>
                                 }

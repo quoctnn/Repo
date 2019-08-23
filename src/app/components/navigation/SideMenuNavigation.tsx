@@ -7,7 +7,7 @@ import classnames from 'classnames';
 import Logo from "../general/images/Logo";
 import { translate } from "../../localization/AutoIntlProvider";
 import CollapseComponent from "../general/CollapseComponent";
-import { GroupSorting, Group, Project, ProjectSorting, ContextNaturalKey, Favorite, DraggableType, Community, UserProfile } from '../../types/intrasocial_types';
+import { GroupSorting, Group, Project, ProjectSorting, ContextNaturalKey, Favorite, DraggableType, Community, UserProfile, ElasticSearchType } from '../../types/intrasocial_types';
 import ApiClient from "../../network/ApiClient";
 import LogoSmall from "../general/images/LogoSmall";
 import { IntraSocialLink } from "../general/IntraSocialLink";
@@ -18,6 +18,7 @@ import Routes from '../../utilities/Routes';
 import { Link } from "react-router-dom";
 import { ContextManager } from "../../managers/ContextManager";
 import { AuthenticationManager } from '../../managers/AuthenticationManager';
+import { Settings } from '../../utilities/Settings';
 
 type ContextItemProps = {
     name?:string
@@ -374,7 +375,7 @@ class SideMenuNavigation extends React.Component<Props, State> {
         const borderHeight = this.state.open ? 1 : 0
         const transDur = SideMenuNavigation.animationDuration + "ms"
         const chapters = this.props.community && this.props.community.chapters
-        const anonUser = this.props.profile.is_anonymous
+        const anonUser = this.props.profile ? this.props.profile.is_anonymous : false
         const noProjects = chapters || anonUser
         return (
             <div ref={this.contentRef} onClick={openMenu} id="side-menu-navigation" className={cn} style={{ transitionDuration: transDur }}>
@@ -384,14 +385,16 @@ class SideMenuNavigation extends React.Component<Props, State> {
                         <Link to={{pathname:Routes.CHANGELOG, state:{modal:true}}} className="menu-button">
                             <i className="fas fa-info-circle"></i>
                         </Link>
-                        { anonUser || <>
+                        { Settings.isElectron ||
                             <Link to={Routes.DEVELOPER_TOOL.path} className="menu-button">
                                 <i className="fas fa-cog"></i>
                             </Link>
+                        }
+                        { anonUser ||
                             <Link to={Routes.FILES} className="menu-button">
                                 <i className="fas fa-cloud"></i>
                             </Link>
-                        </> }
+                        }
                         <div className="menu-button mode-switch" onClick={this.toggleMode} style={{ transitionDuration: transDur }}>
                             <i className={modeIconClass}></i>
                         </div>
@@ -410,11 +413,13 @@ class SideMenuNavigation extends React.Component<Props, State> {
                     }
                     <MenuBlock removeContentOnCollapsed={false} animationDuration={SideMenuNavigation.animationDuration} open={this.state.open} icon="fas fa-users" title={translate("Groups")}>
                         <ConnectedTopGroups onItemSelected={this.handleLinkItemSelected} mode={mode} />
+                        <Link style={{textAlign:"center", width:"100%"}} to={{pathname:Routes.SEARCH, state:{modal:true}, search:"type=" + ElasticSearchType.GROUP}} onClick={closeMenu}>{translate("common.find.more")}...</Link>
                     </MenuBlock>
                     { noProjects || <>
                         <div className="hbar main-border-color-background align-self-center" style={{ height: borderHeight, width: "90%" , transitionDuration: transDur}}></div>
                         <MenuBlock removeContentOnCollapsed={false} animationDuration={SideMenuNavigation.animationDuration} open={this.state.open} icon="fas fa-clipboard-list" title={translate("Projects")}>
                             <ConnectedTopProjects onItemSelected={this.handleLinkItemSelected} mode={mode} />
+                            <Link style={{textAlign:"center", width:"100%"}} to={{pathname:Routes.SEARCH, state:{modal:true}, search:"type=" + ElasticSearchType.PROJECT}} onClick={closeMenu}>{translate("common.find.more")}...</Link>
                         </MenuBlock>
                     </>}
                 </div>

@@ -1,7 +1,7 @@
 import * as React from "react";
 import "./TopNavigation.scss"
 import { ReduxState } from "../../redux";
-import { UserProfile, ElasticSearchType, ContextNaturalKey, SearchHistory } from '../../types/intrasocial_types';
+import { UserProfile} from '../../types/intrasocial_types';
 import { connect } from "react-redux";
 import { Link, withRouter, RouteComponentProps } from "react-router-dom";
 import { Button, Badge } from "reactstrap";
@@ -29,7 +29,6 @@ type ReduxStateProps = {
 }
 type State = {
     notificationsPanelVisible:boolean
-    searchPanelVisible:boolean
 }
 class TopNavigation extends React.Component<Props, State> {
     searchComponent = React.createRef<SearchComponent>()
@@ -37,7 +36,6 @@ class TopNavigation extends React.Component<Props, State> {
         super(props)
         this.state = {
             notificationsPanelVisible:false,
-            searchPanelVisible:false,
         }
     }
     navigateToCommunity = (event:React.SyntheticEvent<any>) => {
@@ -53,18 +51,10 @@ class TopNavigation extends React.Component<Props, State> {
             return {notificationsPanelVisible:!prevState.notificationsPanelVisible}
         })
     }
-    toggleSearchPanel = (e?:React.SyntheticEvent<any>) => {
-        this.setState((prevState:State) => {
-            return {searchPanelVisible:!prevState.searchPanelVisible}
-        })
-    }
     renderNotificationsPanel = () => {
         return <SimpleDialog className="notifications-modal" header={translate("Notifications")} visible={this.state.notificationsPanelVisible} didCancel={this.toggleNotificationPanel}>
                     <NotificationsComponent onClose={this.toggleNotificationPanel} />
                 </SimpleDialog>
-    }
-    renderSearchPanel = () => {
-        return <SearchComponent onClose={this.toggleSearchPanel} visible={this.state.searchPanelVisible}/>
     }
     renderMenuLinks = () => {
 
@@ -81,7 +71,7 @@ class TopNavigation extends React.Component<Props, State> {
                     { profile && !profile.is_anonymous &&
                         <>
                             <Link className={communityLinkClass} to={communityLink}>
-                                <i className="fa fa-globe" />{translate("common.community")}
+                                <i className="fa fa-globe" />{translate("common.core.community")}
                             </Link>
                             <Link className={dashboardClass} to={dashboardLink}>
                                 <i className="fa fa-tachometer-alt" />{translate("common.dashboard")}
@@ -105,22 +95,21 @@ class TopNavigation extends React.Component<Props, State> {
                     <div className="main-border-color-background mx-2" style={{ width: 1, height: "75%" }}></div>
                     <BreadcrumbNavigation />
                     {this.renderMenuLinks()}
-                    { !profile.is_anonymous &&
+                    { profile && !profile.is_anonymous &&
                         <>
                             <Button onClick={this.toggleNotificationPanel} color="link" className="badge-notification-container">
                                 <i className="fas fa-bell"></i>
                                 {this.props.unreadNotifications > 0 && <Badge pill={true} color="danger" className="badge-notification">{this.props.unreadNotifications}</Badge>}
                             </Button>
-                            <Button onClick={this.toggleSearchPanel} color="link" className="">
+                            <Link className="btn btn-link" to={{pathname:Routes.SEARCH, state:{modal:true}}}>
                                 <i className="fas fa-search"></i>
-                            </Button>
+                            </Link>
                         </>
                     }
                     <div className="main-border-color-background mx-2" style={{ width: 1, height: "75%" }}></div>
                     <UserMenu />
                 </div>
                 {this.renderNotificationsPanel()}
-                {this.renderSearchPanel()}
             </div>
         );
     }

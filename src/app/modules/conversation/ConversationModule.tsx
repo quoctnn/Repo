@@ -432,7 +432,6 @@ class ConversationModule extends React.Component<Props, State> {
                                 className="secondary-text main-content-secondary-background"
                                 mentionSearch={this.handleMentionSearch}
                                 content={""}
-                                mentions={[]}
                                 submitOnEnter={true}
                                 filesAdded={this.filesAdded}
                                 onSubmit={this.onChatMessageSubmit}
@@ -490,7 +489,7 @@ class ConversationModule extends React.Component<Props, State> {
         if(conversation)
         {
             const visible = this.state.conversationEditorDialogVisible
-            return <SimpleDialog header={translate("common.conversation")} showCloseButton={true} didCancel={this.toggleConversationEditorDialog} visible={visible}>
+            return <SimpleDialog header={translate("common.conversation.conversation")} showCloseButton={true} didCancel={this.toggleConversationEditorDialog} visible={visible}>
                         <ConversationEditor conversationId={this.props.conversation.id}/>
                     </SimpleDialog>
         }

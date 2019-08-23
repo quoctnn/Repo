@@ -34,7 +34,9 @@ export class NavigationUtilities {
     {
         ProfileManager.ensureProfilesExists([profile],() => {
            const p = ProfileManager.getProfileById(profile)
-           history.push(Routes.profileUrl(p.slug_name || p.id))
+            if (profile) {
+                history.push(Routes.profileUrl(p.slug_name || p.id))
+            }
         })
     }
     static navigateToUrl = (history: H.History, url:string) =>
@@ -44,16 +46,20 @@ export class NavigationUtilities {
     }
     static navigateToCommunity = (history: H.History, communityId:number) =>
     {
-         CommunityManager.ensureCommunityExists(communityId, (community) => {
-                history.push(Routes.communityUrl(community.slug_name, true))
-         })
+        CommunityManager.ensureCommunityExists(communityId, (community) => {
+            if (community) {
+                history.push(Routes.communityUrl(community.slug_name, true));
+            }
+        })
     }
     static navigateToGroup = (history: H.History, groupId:number) =>
     {
-         GroupManager.ensureGroupExists(groupId, (group) => {
+        GroupManager.ensureGroupExists(groupId, (group) => {
             CommunityManager.ensureCommunityExists(group.community, (community) => {
-                const groupUrl = Routes.groupUrl(community.slug_name, group.slug)
-                history.push(groupUrl)
+                if (community) {
+                    const groupUrl = Routes.groupUrl(community.slug_name, group.slug)
+                    history.push(groupUrl)
+                }
             })
          })
     }
@@ -63,8 +69,10 @@ export class NavigationUtilities {
         {
             ProjectManager.ensureProjectExists(task.project, (project) => {
                 CommunityManager.ensureCommunityExists(project.community, (community) => {
-                    const taskUrl = Routes.taskUrl(community.slug_name, project.slug, taskId)
-                    history.push(taskUrl)
+                    if (project && community) {
+                        const taskUrl = Routes.taskUrl(community.slug_name, project.slug, taskId)
+                        history.push(taskUrl)
+                    }
                 })
             })
         })
@@ -73,8 +81,10 @@ export class NavigationUtilities {
     {
          EventManager.ensureEventExists(eventId, (event) => {
             CommunityManager.ensureCommunityExists(event.community, (community) => {
-                const eventUrl = Routes.eventUrl(community.slug_name, event.slug)
-                history.push(eventUrl)
+                if (event && community) {
+                    const eventUrl = Routes.eventUrl(community.slug_name, event.slug)
+                    history.push(eventUrl)
+                }
             })
          })
     }
@@ -82,8 +92,10 @@ export class NavigationUtilities {
     {
          ProjectManager.ensureProjectExists(projectId, (project) => {
             CommunityManager.ensureCommunityExists(project.community, (community) => {
-                const projectUrl = Routes.projectUrl(community.slug_name, project.slug)
-                history.push(projectUrl)
+                if (project && community) {
+                    const projectUrl = Routes.projectUrl(community.slug_name, project.slug)
+                    history.push(projectUrl)
+                }
             })
          })
     }

@@ -39,7 +39,6 @@ type State = {
     files: UploadedFile[]
     uploading: boolean
     link: string
-    mentions: number[]
     showDropzone: boolean
 }
 type Props = OwnProps & DefaultProps
@@ -62,7 +61,6 @@ export default class StatusEditorComponent extends React.Component<Props, State>
             files: files,
             uploading: false,
             link: this.props.status.link,
-            mentions: this.props.status.mentions,
             showDropzone:files.length > 0,
         };
     }
@@ -126,7 +124,7 @@ export default class StatusEditorComponent extends React.Component<Props, State>
     }
     handleSubmit = () => {
         let content = this.getContent()
-        this.setState({text:content.text, mentions: content.mentions}, () => {
+        this.setState({text:content.text}, () => {
             if (!this.canPost()) {
                 return;
             }
@@ -140,7 +138,6 @@ export default class StatusEditorComponent extends React.Component<Props, State>
                 files_ids: this.state.files.map(f => f.id),
                 link: link,
                 parent: this.props.status.parent || null,
-                mentions: this.state.mentions
             };
             if(this.props.status.privacy)
             {
@@ -164,15 +161,11 @@ export default class StatusEditorComponent extends React.Component<Props, State>
             text: '',
             files: [],
             link: null,
-            mentions: []
         });
     }
     handleMentionSearch = (search:string, completion:(mentions:Mention[]) => void) =>
     {
         console.log("searching", search)
-        /*ProfileManager.searchMembersInContext(search, this.props.status.context_object_id, this.props.status.context_natural_key, (members) => {
-            completion(members.map(u => Mention.fromUser(u)))
-        })*/
         const taggableMembers = this.props.status.visibility
         const contextNaturalKey = this.props.status.context_natural_key
         const contextObjectId = this.props.status.context_object_id
@@ -267,7 +260,6 @@ export default class StatusEditorComponent extends React.Component<Props, State>
                 ref={this.formRef}
                 content={this.state.text}
                 mentionSearch={this.handleMentionSearch}
-                mentions={ProfileManager.getProfiles(this.props.status.mentions).map(m => Mention.fromUser(m))}
                 onSubmit={this.handleSubmit}
                 onDidType={this.onDidType}
                 placeholder={placeholder}

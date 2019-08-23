@@ -4,7 +4,6 @@ import { Avatar } from "../general/Avatar";
 import { userAvatar, userFullName, getTextContent } from '../../utilities/Utilities';
 
 import { translate } from "../../localization/AutoIntlProvider";
-import { ProfileManager } from "../../managers/ProfileManager";
 import ReactionStats from "./ReactionStats";
 import { StatusUtilities } from "../../utilities/StatusUtilities";
 import { AuthenticationManager } from "../../managers/AuthenticationManager";
@@ -148,12 +147,6 @@ export class StatusComponent extends React.Component<Props, State> {
             return {refresh: prevState.refresh + 1}
         })
     }
-    getMentions = () => {
-        const mentions = this.props.status.mentions
-        if(this.state.refresh > 0)
-            return ProfileManager.getProfiles(mentions)
-        return ProfileManager.getProfilesFetchRest(mentions, this.refresh)
-    }
     showCommentBox = () => {
         this.props.onActionPress(StatusActions.showCommentReply, {id:this.props.status.id})
     }
@@ -165,9 +158,8 @@ export class StatusComponent extends React.Component<Props, State> {
             return <div ref={this.element} className={itemClass}></div>
         }
         const contextObject =  isComment || !addLinkToContext ? null : status.context_object
-        const mentions = this.getMentions()
         const truncateLength = this.state.readMoreActive ? 0 : Settings.statusTruncationLength
-        const content = getTextContent(status.id.toString(), status.text, mentions, true, onActionPress, truncateLength, Settings.statusLinebreakLimit)
+        const content = getTextContent(status.id.toString(), status.text, true, truncateLength, Settings.statusLinebreakLimit)
         const {textContent, linkCards, hasMore} = content
         const cn = classnames("status-component", className, "lvl" + (status.level || 0) , "sid-" + status.id + "_p_" + (status.position || 0), {comment:isComment, highlight:status.highlightMode})
         const avatarSize = isComment ? 40 : 50
@@ -176,7 +168,7 @@ export class StatusComponent extends React.Component<Props, State> {
         const readBy = this.props.status.read_by || []
         //console.log("Render Status ", status.id)
         const large = files.length > 0 || linkCards.length > 0
-        const largeText = !isComment && content.length > 0 && content.length < Settings.StatusAdaptiveFontSizeLimit
+        const largeText = !isComment && !content.hasMore && content.length > 0 && content.length < Settings.StatusAdaptiveFontSizeLimit
         const statusContentClass = classnames("status-content-inner main-content-secondary-background", {large:large, "af":largeText})
         return(<div ref={this.props.innerRef} className={cn}>
                 <div className="d-flex">

@@ -84,7 +84,7 @@ class EventDetailsModule extends React.Component<Props, State> {
                                         { event.parent &&
                                             <div>
                                                 <span className="details-field-name">
-                                                    {translate("common.event")}:&nbsp;
+                                                    {translate("common.event.event")}:&nbsp;
                                                 </span>
                                                 <span className="details-field-value">
                                                     <Link to={event.parent.uri || "#"}>

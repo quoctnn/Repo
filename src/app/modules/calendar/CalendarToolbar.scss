@@ -1,0 +1,27 @@
+.calendar-toolbar
+{
+    &,.left, .right{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    &:not(.full)
+    {
+        .left{
+            width: 100%;
+        }
+    }
+    &.full{
+        justify-content: space-between;
+    }
+    .calendar-toolbar-label{
+        text-transform: capitalize;
+        display: flex;
+        justify-content: center;
+    }
+    .right{
+        .btn{
+            text-decoration: none;
+        }
+    }
+}

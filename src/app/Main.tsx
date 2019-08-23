@@ -19,7 +19,7 @@ import GroupPage from "./components/pages/GroupPage";
 import ProfilePage from "./components/pages/ProfilePage";
 import StatusPage from "./components/pages/StatusPage";
 import { PrivateRoute } from "./components/router/PrivateRoute";
-import { isAdmin } from "./utilities/Utilities";
+import { isAdmin, parseQueryString } from "./utilities/Utilities";
 import EventPage from "./components/pages/EventPage";
 import DashboardBuilderPage from "./components/pages/admin/DashboardBuilderPage";
 import { ContextManager } from "./managers/ContextManager";
@@ -37,7 +37,32 @@ import { DndProvider } from 'react-dnd'
 import HTML5Backend from 'react-dnd-html5-backend'
 import FilesPage from "./components/pages/FilesPage";
 import DevToolPage from './components/pages/DevToolPage';
-
+import { SearchComponent } from "./components/navigation/SearchComponent";
+const WithSearch = () =>
+    withRouter(class Modal extends React.Component<RouteComponentProps<any>, { visible: boolean, term:string, type:string }> {
+        constructor(props: PathLoaderProps) {
+            super(props)
+            const dict = parseQueryString(props.location.search)
+            const term = dict && dict["term"]
+            const type = dict && dict["type"]
+            this.state = {
+                visible: true,
+                term,
+                type
+            }
+        }
+        back = () => {
+            const goBack = () => {
+                setTimeout(this.props.history.goBack, 450)
+            }
+            this.setState(() => {
+                return { visible: false }
+            }, goBack)
+        }
+        render() {
+            return <SearchComponent initialTerm={this.state.term} initialType={this.state.type} onClose={this.back} visible={this.state.visible}/>
+        }
+    })
 
 const WithModal = (Component: any, title?: string) =>
     withRouter(class Modal extends React.Component<RouteComponentProps<any>, { visible: boolean }> {
@@ -143,6 +168,7 @@ const PathLoadedTaskPage = PathLoader(TaskPage, (path) => { return path })
 const PathLoadedConversationsPage = PathLoader(ConversationsPage, (path) => { return "/conversations/" }, (path) => path)
 const PathLoadedDashboardPage = PathLoader(DashboardPage, (path) => { return path })
 const ModalChangelog = WithModal(Changelog, "Changelog")
+const ModalSearchComponent = WithSearch()
 
 
 type Props = ReduxStateProps & ReduxDispatchProps & OwnProps & RouteComponentProps<any>
@@ -204,6 +230,7 @@ class Main extends React.Component<Props, State> {
                                 </Switch>
                                 <Switch location={location}>
                                     <Route path={Routes.CHANGELOG} component={ModalChangelog} />
+                                    <Route path={Routes.SEARCH} component={ModalSearchComponent} />
                                 </Switch>
                             </DndProvider>
                         }

@@ -1,22 +1,23 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-
+import EmojiPicker from 'emoji-picker-react';
 import { EditorState, DraftHandleValue, Modifier, SelectionState , } from 'draft-js';
 import Editor from "draft-js-plugins-editor";
 import "draft-js-mention-plugin/lib/plugin.css";
-import "draft-js-emoji-plugin/lib/plugin.css";
 import createMentionPlugin, { defaultSuggestionsFilter } from "draft-js-mention-plugin";
-import createEmojiPlugin from "draft-js-emoji-plugin";
-import emojiPositionSuggestions from "./emojiPositionSuggestion";
-import {defaultTheme} from 'draft-js-emoji-plugin'
-import { UserProfile } from "../../../types/intrasocial_types";
+import { UserProfile, Permissible, IdentifiableObject, Linkable, ContextNaturalKey } from '../../../types/intrasocial_types';
 import { IntraSocialUtilities } from "../../../utilities/IntraSocialUtilities";
 import { Settings } from "../../../utilities/Settings";
 import { SecureImage } from '../SecureImage';
-import { userFullName } from "../../../utilities/Utilities";
-require("./MentionEditor.scss");
+import { userFullName, contextAvatar, MentionData } from '../../../utilities/Utilities';
+import * as JSEMOJI from 'emoji-js';
+import "./MentionEditor.scss"
+import { translate } from "../../../localization/AutoIntlProvider";
 
-let theme = {...defaultTheme, emojiSelectPopover:"emojiSelectPopover " + defaultTheme.emojiSelectPopover}
+let jsemoji = new JSEMOJI();
+jsemoji.img_set = 'emojione';
+jsemoji.img_sets.emojione.path = 'https://cdn.jsdelivr.net/emojione/assets/3.0/png/32/';
+
 export const emojiReplacements = {
     ':-)': "😀", 
     ':)': "😀", 
@@ -40,20 +41,44 @@ export const emojiReplacements = {
 export class Mention {
     name: string
     key: string
-    username:string
+    subtitle:string
     avatar: string
     id: number
-    constructor(name: string, key: string, username:string, avatar: string, id: number) {
+    constructor(name: string, key: string, subtitle:string, avatar: string, id: number) {
         this.name = name
         this.key = key
-        this.username = username
+        this.subtitle = subtitle
         this.avatar = avatar
         this.id = id
     }
+    static fromContextObject(contextObject:Permissible & IdentifiableObject & Linkable, type:ContextNaturalKey){
+        const name = ContextNaturalKey.nameForContextObject(type, contextObject) || translate("Unknown")
+        return new Mention(name, type + ":" + contextObject.id + ":"+ name + ":",
+        ContextNaturalKey.descriptionForContextObject(type, contextObject),
+        contextAvatar(contextObject as any, true, type),
+        contextObject.id)
+    }
+    static fromMentionData = (data:MentionData) => {
+        const contextObject = data.getContextObject()
+        const type = data.contextNaturalKey
+        if(contextObject)
+        {
+            const name = ContextNaturalKey.nameForContextObject(type, contextObject) || data.contextObjectName || translate("Unknown")
+            return new Mention(name, type + ":" + contextObject.id + ":"+ name + ":",
+            ContextNaturalKey.descriptionForContextObject(type, contextObject),
+            contextAvatar(contextObject as any, true, type),
+            contextObject.id)
+        }
+        return new Mention(data.contextObjectName || "Unknown", data.originalString.splice(0, 1, ""), "Unknown", null, data.contextId)
+    }
+    static getMentionString = (type:ContextNaturalKey, id:number, name?:string) => {
+        return `${type}:${id}${!!name ? ":" + name +  ":": ""}`
+    }
     static fromUser(user:UserProfile)
     {
-        return new Mention(userFullName(user),
-        "auth.user:" + user.id,// user.username,
+        const name = userFullName(user)
+        return new Mention(name,
+        Mention.getMentionString(ContextNaturalKey.USER, user.id, name),
         user.username,
         IntraSocialUtilities.appendAuthorizationTokenToUrl(user.avatar || user.avatar_thumbnail),
         user.id)
@@ -86,7 +111,7 @@ const Entry = (props: EntryProps) => {
             <div className="mentionSuggestionsEntryContainerRight">
             <div className="mentionSuggestionsEntryText">{mention.name}</div>
 
-            <div className="mentionSuggestionsEntryTitle">{mention.username}</div>
+            <div className="mentionSuggestionsEntryTitle">{mention.subtitle}</div>
             </div>
         </div>
         </div>
@@ -147,11 +172,6 @@ export default class MentionEditor extends React.Component<Props, State> {
     rootElement: any;
     positioningElement: any;
     observer:MutationObserver
-    emojiPlugin = createEmojiPlugin({
-        positionSuggestions: emojiPositionSuggestions,
-        useNativeArt: true,
-        theme:theme
-    });
 
     private emojiButton = React.createRef<HTMLButtonElement>();
     private container = React.createRef<HTMLDivElement>();
@@ -182,7 +202,6 @@ export default class MentionEditor extends React.Component<Props, State> {
         this.rootElement = null;
         this.positioningElement = null;
         this.observer = null;
-        this.emojiPlugin = null;
         this.emojiButton = null;
         this.container = null;
         this.fileUploader = null;
@@ -220,9 +239,14 @@ export default class MentionEditor extends React.Component<Props, State> {
     {
         this.toggleEmojiPanel(e)
     }
+    onEmojiClick = (a, e, event) => {
+        console.log(a, e, event)
+        let emoji = jsemoji.replace_colons(`:${e.name}:`)
+        console.log(emoji)
+        this.insertText(emoji, this.props.editorState)
+    }
     addBackDrop = () => {
 
-        const { EmojiSelect } = this.emojiPlugin;
         if (!this.rootElement) {
             this.rootElement = document.createElement("div");
             this.rootElement.className = "emoji-backdrop";
@@ -243,7 +267,7 @@ export default class MentionEditor extends React.Component<Props, State> {
             let tranform = up ? "translate(0, calc(-100% - 55px))" : "none";
             ReactDOM.render(
                 <div className="emoji-picker-container" style={{ transform: tranform }}>
-                    <EmojiSelect isOpen={this.state.emojiSelectOpen} />
+                    <EmojiPicker onEmojiClick={this.onEmojiClick}/>
                 </div>,
                 this.positioningElement
             );
@@ -354,6 +378,26 @@ export default class MentionEditor extends React.Component<Props, State> {
             state,newselection
         )
         this.onChange(state)
+    }
+    insertText = (text:string, editorState: EditorState): EditorState => {
+        const contentState = Modifier.insertText(
+          editorState.getCurrentContent(),
+          editorState.getSelection(),
+          text
+        );
+
+        const newEditorState = EditorState.push(
+          editorState,
+          contentState,
+          'insert-characters',
+        );
+        
+        this.onChange(newEditorState)
+        return
+        return EditorState.forceSelection(
+          newEditorState,
+          contentState.getSelectionAfter(),
+        );
     }
     onHandleBeforeInput = (chars: string, editorState: EditorState):DraftHandleValue => {
 

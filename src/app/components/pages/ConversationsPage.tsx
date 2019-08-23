@@ -5,10 +5,8 @@ import { Community } from "../../types/intrasocial_types";
 import { CommunityManager } from "../../managers/CommunityManager";
 import LoadingSpinner from "../LoadingSpinner";
 import { ReduxState } from "../../redux";
-import PageHeader from "../PageHeader";
 import { DashboardWithData } from "../../DashboardWithData";
 import { Error404 } from '../../views/error/Error404';
-import { communityAvatar, communityName, communityCover } from "../../utilities/Utilities";
 export interface OwnProps 
 {
     updateKey?:string
@@ -36,24 +34,13 @@ class ConversationsPage extends React.Component<Props, State>
     {
         return (<LoadingSpinner />)
     }
-    renderHeader(community:Community)
-    {
-        return (<PageHeader 
-                    coverImage={communityCover(community)} 
-                    primaryItemImage={communityAvatar(community, true)} 
-                    primaryItemTitle={communityName(community)}  
-                    />
-                )
-    }
     renderNotFound = () => {
         return <Error404 />
     }
     render() {
-        const {community} = this.props
         return(
             <div id="conversations-page" className="dashboard-container">
                 <div className="content">
-                    {this.renderHeader(community)}
                     <DashboardWithData category="conversations" updateKey={this.props.updateKey} />
                 </div>
             </div>

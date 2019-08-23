@@ -37,6 +37,8 @@ import ProfileCertificationModule from "./modules/profileModules/certifications/
 import ProfileAboutModule from "./modules/profileModules/about/ProfileAboutModule";
 import ProfileVolunteeringModule from "./modules/profileModules/volunteering/ProfileVolunteeringModule";
 import StatusModule from "./modules/status/StatusModule";
+import CalendarModule from "./modules/calendar/CalendarModule";
+import FullCalendarModule from "./modules/calendar/FullCalendarModule";
 
 type DemoProps = {
     text?:string
@@ -87,7 +89,9 @@ export namespace DashboardComponents {
         "ProfileAboutModule":ProfileAboutModule,//
         "ProfileVolunteeringModule":ProfileVolunteeringModule,
         //
-        "StatusModule":StatusModule
+        "StatusModule":StatusModule,
+        "CalendarModule":CalendarModule,
+        "FullCalendarModule":FullCalendarModule
     }
     export function getComponent(type: string, props:any) {
         const comp = componentMap[type]

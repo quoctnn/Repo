@@ -5,6 +5,7 @@ import { translate } from '../../localization/AutoIntlProvider';
 import { userFullName, nullOrUndefined } from '../../utilities/Utilities';
 import classnames = require('classnames');
 import { Settings } from '../../utilities/Settings';
+import { ContextManager } from '../../managers/ContextManager';
 
 type Props = {
     to:Linkable
@@ -19,51 +20,11 @@ export const IntraSocialLink = (props:Props) => {
     let newTitle = renderTitle ? title : undefined
     if(renderTitle && !newTitle && !nullOrUndefined( type ))
     {
-        switch(type)
-        {
-            case ContextNaturalKey.COMMUNITY:
-            {
-                const obj = to as Community
-                newTitle = `${translate("common.community")} ${name || obj.name}`
-                break;
-            }
-            case ContextNaturalKey.GROUP:
-            {
-                const obj = to as Group
-                newTitle = `${translate("common.group")} ${name || obj.name}`
-                break;
-            }
-            case ContextNaturalKey.PROJECT:
-            {
-                const obj = to as Project
-                newTitle = `${translate("common.project")} ${name || obj.name}`
-                break;
-            }
-            case ContextNaturalKey.EVENT:
-            {
-                const obj = to as Event
-                newTitle = `${translate("common.event")} ${name || obj.name}`
-                break;
-            }
-            case ContextNaturalKey.USER:
-            {
-                const obj = to as UserProfile
-                newTitle = `${translate("common.profile")} ${name || userFullName(obj)}`
-                break;
-            }
-            case ContextNaturalKey.TASK:
-            {
-                const obj = to as Task
-                newTitle = `${translate("common.task")} ${name || obj.title}`
-                break;
-            }
-            default:{
-            }
-        }
+        newTitle = `${translate("common." + type)} ${name || ContextNaturalKey.nameForContextObject(type, to as any)}`
     }
     if(renderTitle && !newTitle)
         console.warn("IntraSocialLink:", "Title is missing for object", to)
-    if(!to.uri)
+    if(!to || !to.uri)
     {
         console.warn("IntraSocialLink:", "URL is missing for object", to)
         return <span className="text-danger" title={newTitle}>{"["}{props.children}{"]"}</span>

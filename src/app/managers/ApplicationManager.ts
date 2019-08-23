@@ -48,14 +48,6 @@ export abstract class ApplicationManager
     static setup = () =>
     {
         ApplicationManager.resetData(false)
-        ApplicationManager.fetchBackendInfo((result, message) => {
-            switch (result) {
-                case (0):
-                    break;
-                default:
-                    alert("There was an error while connecting to the backend server.\n" + message);
-            }
-        })
     }
     private static resetData = (resetCachedData:boolean) => {
 
@@ -84,25 +76,32 @@ export abstract class ApplicationManager
         ApplicationManager.resetData(resetCachedData)
         ApplicationManager.getStore().dispatch(setApplicationLoadedAction(false))
         const requests:RequestObject[] = []
-        requests.push({name:"Dashboards", action:ApplicationManager.fetchDashboards})
-        requests.push({name:"Communities", action:ApplicationManager.fetchCommunities})
-        requests.push({name:"Profile", action:ApplicationManager.fetchProfile})
-        requests.push({name:"Contacts", action:ApplicationManager.fetchContacts})
-        requests.push({name:"Favorites", action:ApplicationManager.fetchFavorites})
-        let requestsCompleted = 0
-        const requestCompleter = (request:RequestObject) => {
-            requestsCompleted += 1
-            const progress:LoadingProgress = {percent: requestsCompleted / requests.length, text:request.name}
-            NotificationCenter.push(ApplicationManagerLoadingProgressNotification,[progress])
-            if(requestsCompleted == requests.length)
-                ApplicationManager.setApplicationLoaded()
-        }
-
         const progress:LoadingProgress = {percent: 0, text:"Fetching data"}
-        NotificationCenter.push(ApplicationManagerLoadingProgressNotification,[progress])
-        //run requests
-        requests.forEach(r => {
-            r.action(() => {requestCompleter(r)})
+        ApplicationManager.fetchBackendInfo((result, message) => {
+            switch (result) {
+                case (0):
+                    requests.push({name:"Dashboards", action:ApplicationManager.fetchDashboards})
+                    requests.push({name:"Communities", action:ApplicationManager.fetchCommunities})
+                    requests.push({name:"Profile", action:ApplicationManager.fetchProfile})
+                    requests.push({name:"Contacts", action:ApplicationManager.fetchContacts})
+                    requests.push({name:"Favorites", action:ApplicationManager.fetchFavorites})
+                    let requestsCompleted = 0
+                    const requestCompleter = (request:RequestObject) => {
+                        requestsCompleted += 1
+                        const progress:LoadingProgress = {percent: requestsCompleted / requests.length, text:request.name}
+                        NotificationCenter.push(ApplicationManagerLoadingProgressNotification,[progress])
+                        if(requestsCompleted == requests.length)
+                            ApplicationManager.setApplicationLoaded()
+                    }
+                    NotificationCenter.push(ApplicationManagerLoadingProgressNotification,[progress])
+                    //run requests
+                    requests.forEach(r => {
+                        r.action(() => {requestCompleter(r)})
+                    })
+                    break;
+                default:
+                    alert("There was an error while connecting to the backend server.\n" + message);
+            }
         })
     }
     private static fetchBackendInfo = (completion:(result:number, message:string) => void) => {
@@ -120,9 +119,9 @@ export abstract class ApplicationManager
                     }
                 else {
                     console.info("Backend version:", versionInfo);
+                    completion(0, "")
                 }
             }
-            completion(0, "")
         })
     }
 
@@ -151,7 +150,7 @@ export abstract class ApplicationManager
         })
     }
     private static fetchContacts = (completion:() => void) => {
-        ApiClient.getProfiles(100, 0, (data, status, error) => {
+        ApiClient.getProfiles(10000, 0, (data, status, error) => {
             const profiles = (data && data.results) || []
             ProfileManager.storeProfiles(profiles, true)
             completion()
