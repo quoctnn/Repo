@@ -63,6 +63,8 @@ class Signin extends React.Component<Props, {error?:string}> {
                     this.setState({error:error_response.non_field_errors})
                 } else if (error_response.detail) {
                     this.setState({error:error_response.detail.error_description})
+                } else {
+                    ToastManager.showErrorToast(error)
                 }
             }
             return
@@ -70,6 +72,8 @@ class Signin extends React.Component<Props, {error?:string}> {
         if(data.token)
         {
             AuthenticationManager.signIn(data.token)
+        } else {
+            ToastManager.showErrorToast("No token in response")
         }
         const { from } = this.props.location.state || { from: { pathname: '/' } }
         this.props.history.push(from)
