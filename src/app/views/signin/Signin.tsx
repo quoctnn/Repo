@@ -60,8 +60,10 @@ class Signin extends React.Component<Props, {error?:string}> {
             if (data.responseText) {
                 const error_response = JSON.parse(data.responseText)
                 if (error_response.non_field_errors) {
+                    // Invalid password on nativeLogin
                     this.setState({error:error_response.non_field_errors})
                 } else if (error_response.detail) {
+                    // Email verification or GDPR consent not performed
                     this.setState({error:error_response.detail.error_description})
                 } else {
                     ToastManager.showErrorToast(error)
