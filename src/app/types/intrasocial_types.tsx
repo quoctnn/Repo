@@ -751,6 +751,8 @@ export type ElasticResultFile = {
     image?: string
     context_natural_key: ContextNaturalKey
     context_object_id: number
+    status_id:number
+    community:number
 } & GenericElasticResult & ElasticResultCreator
 export type ElasticResultStatus = {
     has_documents: boolean
