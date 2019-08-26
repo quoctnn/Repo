@@ -380,7 +380,7 @@ export default class MentionEditor extends React.Component<Props, State> {
         )
         this.onChange(state)
     }
-    insertText = (text:string, editorState: EditorState): EditorState => {
+    insertText = (text:string, editorState: EditorState) => {
         const contentState = Modifier.insertText(
           editorState.getCurrentContent(),
           editorState.getSelection(),
@@ -394,11 +394,6 @@ export default class MentionEditor extends React.Component<Props, State> {
         );
 
         this.onChange(newEditorState)
-        return
-        return EditorState.forceSelection(
-          newEditorState,
-          contentState.getSelectionAfter(),
-        );
     }
     onHandleBeforeInput = (chars: string, editorState: EditorState):DraftHandleValue => {
 

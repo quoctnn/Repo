@@ -164,19 +164,6 @@ export abstract class ProfileManager
             })
         })
     }
-    static getProfilesFetchRest = (profiles:number[], completion:() => void) =>
-    {
-        let state = ProfileManager.getStore().getState()
-        let ids = state.profileStore.allIds.map(id => id)
-        let requestIds = profiles.filter(id => ids.indexOf(id) == -1)
-        if(requestIds.length > 0)
-        {
-            const request:ProfileRequestObject = {profiles:requestIds, completion}
-            ProfileManager.requestObjects.push(request)
-            ProfileManager.scheduleRequestIfNeeded()
-        }
-        return ProfileManager.getProfiles(profiles)
-    }
     private static filterProfile = (query:string, profile:UserProfile) =>
     {
         let compareString = userFullName(profile)

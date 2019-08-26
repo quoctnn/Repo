@@ -33,10 +33,10 @@ import PhotoSwipeComponent from "../general/gallery/PhotoSwipeComponent";
 import { IntraSocialUtilities } from "../../utilities/IntraSocialUtilities";
 import SimpleDialog from "../general/dialogs/SimpleDialog";
 import StickyBox from "../external/StickyBox";
-import initializeManagers from '../../managers/index';
+import Routes from "../../utilities/Routes";
 let timezone = moment.tz.guess()
 
-type BreadcrumbData = {community?:number, group?:number, event?:number, project?:number, task?:number, profile?:number}
+type BreadcrumbData = {community?:number, group?:number, event?:number, project?:number, task?:number, profile?:number, status?:number}
 export enum SearchSortOptions {
     relevance = "relevance",
     date = "date"
@@ -108,7 +108,7 @@ const truncateWithBoundary = (value:string, n:number, useWordBoundary:boolean) =
         : subString) + "&hellip;";
 }
 const breadcrumbs = (data:BreadcrumbData, onNavigate:(uri:string) => (event:React.SyntheticEvent) => void) => {
-    const {community, group, event, project, task, profile} = data
+    const {community, group, event, project, task, profile, status} = data
     let breadcrumbs:LinkObject[] = []
     if(community)
     {
@@ -146,6 +146,10 @@ const breadcrumbs = (data:BreadcrumbData, onNavigate:(uri:string) => (event:Reac
         if(profileObject)
             breadcrumbs.push({uri:profileObject.uri, title:userFullName(profileObject)})
     }
+    if(status)
+    {
+        breadcrumbs.push({uri:Routes.statusUrl(status), title:translate("elasticsearch.type.name.Status")})
+    }
     breadcrumbs = breadcrumbs.filter(e => !nullOrUndefined(e))
     const arr:JSX.Element[] = []
     breadcrumbs.forEach((s,i) => {
@@ -155,8 +159,7 @@ const breadcrumbs = (data:BreadcrumbData, onNavigate:(uri:string) => (event:Reac
     })
     return arr
 }
-
-const breadcrumbsFromContext = (contextNaturalKey:ContextNaturalKey, contextObjectId:number, onNavigate:(uri:string) => (event:React.SyntheticEvent) => void, breadcrumbData?:BreadcrumbData) => {
+const getBreadcrumbDataFromContext = (contextNaturalKey:ContextNaturalKey, contextObjectId:number, onNavigate:(uri:string) => (event:React.SyntheticEvent) => void, breadcrumbData?:BreadcrumbData) => {
     const data:BreadcrumbData = breadcrumbData || {}
     switch (contextNaturalKey) {
         case ContextNaturalKey.COMMUNITY:
@@ -180,6 +183,10 @@ const breadcrumbsFromContext = (contextNaturalKey:ContextNaturalKey, contextObje
         default:
             break;
     }
+    return data
+}
+const breadcrumbsFromContext = (contextNaturalKey:ContextNaturalKey, contextObjectId:number, onNavigate:(uri:string) => (event:React.SyntheticEvent) => void, breadcrumbData?:BreadcrumbData) => {
+    const data:BreadcrumbData = getBreadcrumbDataFromContext(contextNaturalKey, contextObjectId, onNavigate)
     return breadcrumbs(data, onNavigate)
 }
 export interface Props {
@@ -663,7 +670,6 @@ export class SearchComponent extends React.Component<Props, State> {
         return <SearchResultItem className={item.object_type.toLowerCase()} header={user_name} description={description} footer={footer} left={left} right={right} />
     }
     renderFileItem = (item:ElasticResultFile) => {
-
         return <FileResultItem file={item} onNavigate={this.navigateToLocation} />
     }
     renderResultItem = (item:GenericElasticResult) => {
@@ -889,9 +895,14 @@ export default class FileResultItem extends React.Component<FileResultItemProps,
                         }
                     </div>
         const creatorLink = breadcrumbs({profile:item.user_id}, this.props.onNavigate)
-        const bc = breadcrumbsFromContext(item.context_natural_key, item.context_object_id, this.props.onNavigate)
+        const bcContext = getBreadcrumbDataFromContext(item.context_natural_key, item.context_object_id, this.props.onNavigate)
+        bcContext.community = item.community
+        bcContext.status = item.status_id
+        const bc = breadcrumbs(bcContext, this.props.onNavigate)
         const hasBreadcrumbs = bc.length > 0
-        const footer = <div className="text-bolder">{creatorLink}{hasBreadcrumbs ? " " + translate("in_context") + " ": ""}{bc}{" "}<TimeComponent date={item.created_at} /> </div>
+        const footer = <div className="text-bolder">
+                            {creatorLink}{hasBreadcrumbs ? " " + translate("in_context") + " ": ""}{bc}{" "}<TimeComponent date={item.created_at} />
+                            </div>
         const right = ElasticSearchType.nameForKey( item.object_type )
         const fn = getTextForField(item, "filename", 150)
         const filename = <span dangerouslySetInnerHTML={{__html: fn}}></span>

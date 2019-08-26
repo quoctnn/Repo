@@ -176,6 +176,7 @@ export class NewsfeedComponent extends React.Component<Props, State> {
         }
     }
     componentDidUpdate = (prevProps:Props, prevState:State) => {
+        const newContext = this.props.contextObject != prevProps.contextObject
         if(this.props.contextNaturalKey != prevProps.contextNaturalKey ||
             this.props.contextObjectId != prevProps.contextObjectId ||
             this.props.contextObject != prevProps.contextObject ||

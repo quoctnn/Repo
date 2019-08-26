@@ -624,7 +624,7 @@ var translations = {
     "elasticsearch.type.name.Project":"Prosjekt",
     "elasticsearch.type.name.Task":"Oppgave",
     "elasticsearch.type.name.Event":"Arrangement",
-    "elasticsearch.type.name.Status":"Post",
+    "elasticsearch.type.name.Status":"Innlegg",
     "elasticsearch.type.name.UploadedFile":"Fil",
     "results":"resultater",
     "Members":"Medlemmer",
