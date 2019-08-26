@@ -11,6 +11,9 @@
         }
         .rbc-month-view{
             border:0;
+            flex: unset;
+            flex-direction: unset;
+            display: unset;
             .rbc-off-range-bg{
                 background: none;
             }
