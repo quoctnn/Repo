@@ -1,21 +1,20 @@
 import * as React from 'react';
 import { connect } from 'react-redux'
-import { Community, ContextNaturalKey, UserProfile } from '../../../types/intrasocial_types';
+import { Community, ContextNaturalKey, UserProfile, ElasticSearchType } from '../../../types/intrasocial_types';
 import { ReduxState } from '../../../redux/index';
 import "./CommunitySelector.scss"
 import { translate } from '../../../localization/AutoIntlProvider';
 import { OverflowMenuItem, OverflowMenuItemType, createDropdownItem } from '../OverflowMenu';
 import { CommunityManager } from '../../../managers/CommunityManager';
 import ApiClient from '../../../network/ApiClient';
-import { ToastManager } from '../../../managers/ToastManager';
 import Routes from '../../../utilities/Routes';
-import { withRouter, RouteComponentProps } from 'react-router-dom';
-import { DropDownMenu } from '../DropDownMenu';
+import { withRouter, RouteComponentProps, Link } from 'react-router-dom';
 import { Avatar } from '../Avatar';
 import { communityAvatar, contextAvatar } from '../../../utilities/Utilities';
 import classnames = require('classnames');
 import { Popover, PopoverBody } from 'reactstrap';
 import { AuthenticationManager } from '../../../managers/AuthenticationManager';
+import { NavigationUtilities } from '../../../utilities/NavigationUtilities';
 
 type OwnProps = {
 }
@@ -65,24 +64,9 @@ class CommunitySelector extends React.Component<Props, State> {
             }
         }
     }
-    showAllCommunities = (event: React.SyntheticEvent<any>) => {
-        window.alert("Not implemented")
-    }
-    renderCommunitySelector = () =>
-    {
-        const selectableDropdownItems:OverflowMenuItem[] = this.state.communities.map((community, i) => {
-            return {
-                id:"community_" + community.id,
-                type:OverflowMenuItemType.option,
-                title: community.name,
-                onPress:this.setMainCommunity(community),
-                toggleMenu:false
-            }
-        })
-        selectableDropdownItems.push({id:"divider1", type:OverflowMenuItemType.divider})
-        selectableDropdownItems.push({id:"all", type:OverflowMenuItemType.option, title:translate("common.see.all"), onPress:this.showAllCommunities})
+    openCommunitySearch = () => {
         return (
-            <DropDownMenu triggerClass="fas fa-caret-down mx-1" items={selectableDropdownItems}></DropDownMenu>
+            <Link className="clickable dropdown-item" to={{pathname:Routes.SEARCH, state:{modal:true}, search:"type=" + ElasticSearchType.COMMUNITY}}>{translate("common.see.all")}</Link>
         )
     }
     onTriggerClick = (e:React.SyntheticEvent) => {
@@ -125,7 +109,7 @@ class CommunitySelector extends React.Component<Props, State> {
             }
         })
         selectableDropdownItems.push({id:"divider1", type:OverflowMenuItemType.divider})
-        selectableDropdownItems.push({id:"all", type:OverflowMenuItemType.option, title:translate("common.see.all"), onPress:this.showAllCommunities})
+        selectableDropdownItems.push({id:"all", type:OverflowMenuItemType.option, children:this.openCommunitySearch()})
         const cn = classnames("dropdown-menu-popover", "community-selector-dropdown")
         return <Popover className={cn}
                         delay={0}
