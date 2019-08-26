@@ -35,7 +35,7 @@ export default class CursorList extends React.Component<Props, State> {
     constructor(props:Props) {
         super(props);
 
-        this.state = { 
+        this.state = {
             cursor:this.getInitialCursor(props),
         }
     }
@@ -51,7 +51,7 @@ export default class CursorList extends React.Component<Props, State> {
     }
     handleItemClick = (item:JSX.Element, event:any) => {
         if(!item || item.type != cursorListItemComparer.type)
-            return 
+            return
         event.preventDefault()
         event.stopPropagation()
         const object = item as any as CursorListItem
@@ -92,7 +92,7 @@ export default class CursorList extends React.Component<Props, State> {
         {
             e.preventDefault()
             this.moveCursor(-1)
-            this.props.onClose(e)
+            if (this.props.onClose) this.props.onClose(e)
         }
         else if(e.key == "Tab")
         {
@@ -131,7 +131,7 @@ export default class CursorList extends React.Component<Props, State> {
         {
             this.props.onClose(e)
         }
-        else 
+        else
         {
             if(this.props.onMouseDown)
             {
@@ -144,11 +144,11 @@ export default class CursorList extends React.Component<Props, State> {
     }
     render = () => {
         const cursor = this.state.cursor
-        return (<div ref={this.component}  
-                    className="autocomplete-component" 
-                    style={this.props.style} 
-                    onTouchStart={this.onListMouseDown} 
-                    onMouseDown={this.onListMouseDown} 
+        return (<div ref={this.component}
+                    className="autocomplete-component"
+                    style={this.props.style}
+                    onTouchStart={this.onListMouseDown}
+                    onMouseDown={this.onListMouseDown}
                     onMouseLeave={this.onComponentMouseLeave}
                     >
                     {<div className="list">
@@ -165,4 +165,4 @@ export default class CursorList extends React.Component<Props, State> {
                     </div>}
                 </div>)
     }
-} 
+}
