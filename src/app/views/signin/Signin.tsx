@@ -15,7 +15,6 @@ import "./Signin.scss"
 import { translate } from '../../localization/AutoIntlProvider';
 import { Settings } from '../../utilities/Settings';
 import DashFillComponent from '../../components/general/DashFillComponent';
-import Routes from '../../utilities/Routes';
 import { availableLanguages } from '../../redux/language';
 import { nullOrUndefined } from '../../utilities/Utilities';
 import Logo from '../../components/general/images/Logo';
