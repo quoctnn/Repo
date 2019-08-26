@@ -2,7 +2,7 @@
 Task schedule
 -->
 
-v0.5.5 | XX.08.2019
+v0.5.5 | 26.08.2019
 -----------------------------------------
 
 Added:
@@ -16,9 +16,12 @@ Added:
 * Mention support for Community, Group, Event, Conversation, Project, Task
 * Adaptive font-size for main posts(large text when less that 85 chars)
 * GDPR consent dialog
+* Friendship info and buttons on profile page
+* 'See all' communities opens search box
 
 Changes:
 ======
+
 * Rebuilt login/signin screen and loading screen
 * Switched to a new emoji input panel
 * Made search accessible from url and linked hashtags in posts to search
