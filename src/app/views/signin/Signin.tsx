@@ -17,9 +17,19 @@ import { Settings } from '../../utilities/Settings';
 import DashFillComponent from '../../components/general/DashFillComponent';
 import Routes from '../../utilities/Routes';
 import { availableLanguages } from '../../redux/language';
-import { nullOrUndefined, parseJSONObject } from '../../utilities/Utilities';
+import { nullOrUndefined } from '../../utilities/Utilities';
 import Logo from '../../components/general/images/Logo';
-
+import { RequestErrorData, GDPRFormAnswers, GDPRData } from '../../types/intrasocial_types';
+import SimpleDialog from '../../components/general/dialogs/SimpleDialog';
+import GdprForm from './GdprForm';
+enum LoginProvider{
+    google = "google", facebook = "facebook", linkedIn = "linkedin", native = "native"
+}
+type LoginContinuationData = {
+    accessToken?:string
+    tokenId?:string
+    provider:LoginProvider
+}
 type SectionComponentProps = {
     title:string
     secondaryTitle?:string
@@ -44,31 +54,50 @@ type ReduxStateProps = {
     language:number,
 }
 type Props = RouteComponentProps<any> & ReduxStateProps & OwnProps
-class Signin extends React.Component<Props, {error?:string}> {
+type State = {
+    error:string
+    updateGdprContinuationKey:string
+    gdprUserResponse:GDPRFormAnswers
+    gdprData:GDPRData,
+}
+class Signin extends React.Component<Props, State> {
 
     emailInput: HTMLInputElement|null = null
     passwordInput: HTMLInputElement|null = null
+    loginContinuationData:LoginContinuationData
     constructor(props:Props) {
         super(props);
         this.state = {
-            error:null
+            error:null,
+            updateGdprContinuationKey:null,
+            gdprUserResponse:null,
+            gdprData:null
+
         }
     }
-    loginCallback = (data:any, status:string, error:string) => {
-        if(error || status == "error")
+    loginCallback = (data:any, status:string, error:string, errorData:RequestErrorData) => {
+        if(errorData)
         {
-            if (data.responseText) {
-                const error_response = JSON.parse(data.responseText)
-                if (error_response.non_field_errors) {
+            if (errorData.detail && errorData.detail.extra && errorData.detail.extra.gdprInfo) {
+                // Email verification or GDPR consent not performed
+                this.setState({gdprData:errorData.detail.extra})
+                return
+            }
+            else {
+                let error = (errorData.detail && errorData.detail.error_description) || errorData.data.non_field_errors 
+                if(!error && typeof errorData.data == "object")
+                {
+                    const keys = Object.keys(errorData.data)
+                    if(keys.length > 0)
+                        error = `[${keys[0]}]${errorData.data[keys[0]]}` 
+                }
+                if (error) {
                     // Invalid password on nativeLogin
-                    this.setState({error:error_response.non_field_errors})
-                } else if (error_response.detail) {
-                    // Email verification or GDPR consent not performed
-                    this.setState({error:error_response.detail.error_description})
-                } else {
-                    ToastManager.showErrorToast(error)
+                    this.setState({error})
+                    return
                 }
             }
+            ToastManager.showErrorToast(error)
             return
         }
         if(data.token)
@@ -84,33 +113,85 @@ class Signin extends React.Component<Props, {error?:string}> {
 
         e.preventDefault()
         this.setState({error:null})
-        let endpoint = EndpointManager.currentEndpoint()
-        if(endpoint.loginType == EndpointLoginType.API)
-        {
-           ApiClient.apiLogin(this.emailInput!.value, this.passwordInput!.value, this.loginCallback)
-        }
-        else if(endpoint.loginType == EndpointLoginType.NATIVE)
-        {
-            ApiClient.nativeLogin(this.emailInput!.value, this.passwordInput!.value, this.loginCallback)
+        this.loginContinuationData = {provider:LoginProvider.native}
+        this.continueSignin(this.loginContinuationData)
+    }
+    continueSignin = (data:LoginContinuationData ) => {
+        switch (data.provider) {
+            case LoginProvider.facebook:this.continueFacebookSignin(data);break;
+            case LoginProvider.google:this.continueGoogleSignin(data);break;
+            case LoginProvider.linkedIn:this.continueLinkedInSignin(data);break;
+            case LoginProvider.native:this.continueNativeSignin(data);break;
+            default: break;
         }
     }
     doFacebookSignin = (response) => {
         if(response.accessToken)
-            ApiClient.apiSocialLogin("facebook", response.accessToken, null, null, this.loginCallback)
+        {
+            this.loginContinuationData = {provider:LoginProvider.facebook, accessToken:response.accessToken }
+            this.continueSignin(this.loginContinuationData)
+        }
     }
     doGoogleSignin = (response) => {
         if(response.accessToken)
-            ApiClient.apiSocialLogin("google", response.accessToken, null, response.tokenId, this.loginCallback)
+        {
+            this.loginContinuationData = {provider:LoginProvider.google, accessToken:response.accessToken, tokenId:response.tokenId }
+            this.continueSignin(this.loginContinuationData)
+        }
     }
     doLinkedInSignin = (error, code, redirectUri) => {
         if (error) {
             console.error(error)
         }
         console.log(code)
-        ApiClient.apiSocialLogin("linkedin", null, code, null, this.loginCallback)
+        this.loginContinuationData = {provider:LoginProvider.linkedIn, accessToken:code}
+        this.continueSignin(this.loginContinuationData)
+    }
+    continueNativeSignin = (data:LoginContinuationData) => {
+
+        const continuationKey = this.state.updateGdprContinuationKey
+        const gdprUserResponse = this.state.gdprUserResponse
+        let endpoint = EndpointManager.currentEndpoint()
+        if(endpoint.loginType == EndpointLoginType.API)
+        {
+           ApiClient.apiLogin(this.emailInput!.value, this.passwordInput!.value, continuationKey, gdprUserResponse, this.loginCallback)
+        }
+        else if(endpoint.loginType == EndpointLoginType.NATIVE)
+        {
+            ApiClient.nativeLogin(this.emailInput!.value, this.passwordInput!.value, continuationKey, gdprUserResponse, this.loginCallback)
+        }
+    }
+    continueFacebookSignin = (data:LoginContinuationData) => {
+        ApiClient.apiSocialLogin(LoginProvider.facebook, data.accessToken, null, null, this.state.updateGdprContinuationKey, this.state.gdprUserResponse, this.loginCallback)
+    }
+    continueGoogleSignin = (data:LoginContinuationData) => {
+        ApiClient.apiSocialLogin(LoginProvider.google, data.accessToken, null, data.tokenId, this.state.updateGdprContinuationKey, this.state.gdprUserResponse, this.loginCallback)
+    }
+    continueLinkedInSignin = (data:LoginContinuationData) => {
+        ApiClient.apiSocialLogin(LoginProvider.linkedIn, null, data.accessToken, null, this.state.updateGdprContinuationKey, this.state.gdprUserResponse, this.loginCallback)
     }
     selectLocale = (index:number) => () => {
         window.app.setLanguage(index)
+    }
+    closeGdprInfoDialog = () => {
+        this.setState( () => {
+            return {gdprData:null}
+        })
+    }
+    handleGdprFormComplete = (form:GDPRFormAnswers) => {
+        console.log("form", form)
+        this.setState(() => {
+            return {gdprUserResponse:form, updateGdprContinuationKey:this.state.gdprData.updateGdprContinuationKey}
+        }, () => {
+            if(this.loginContinuationData)
+                this.continueSignin(this.loginContinuationData)
+        })
+    }
+    renderGdprInfoDialog = () => {
+        const visible = !!this.state.gdprData
+        return <SimpleDialog showCloseButton={false} didCancel={this.closeGdprInfoDialog} visible={visible}>
+                    <GdprForm data={this.state.gdprData && this.state.gdprData.gdprInfo} onCancel={this.closeGdprInfoDialog} onFormComplete={this.handleGdprFormComplete}  />
+                </SimpleDialog>
     }
     render = () => {
         const endpoint = EndpointManager.currentEndpoint()
@@ -221,6 +302,7 @@ class Signin extends React.Component<Props, {error?:string}> {
                         </div>
                     </div>
                 </div>
+                {this.renderGdprInfoDialog()}
             </div>
         );
     }

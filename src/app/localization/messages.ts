@@ -351,6 +351,7 @@ var translations = {
     "conversation.filter.archived":"Archived",
     "conversation.filter.null":"All",
     "notification.read_all":"Read all",
+    "Confirm":"Confirm",
   },
   no: {
     "search.placeholder": "Søk ...",
@@ -704,6 +705,7 @@ var translations = {
     "conversation.filter.archived":"Arkiverte",
     "conversation.filter.null":"Alle",
     "notification.read_all":"Les alle",
+    "Confirm":"Bekreft",
   },
   en: {
     "search.placeholder": "Search ...",
@@ -1066,6 +1068,8 @@ var translations = {
     "conversation.filter.archived":"Archived",
     "conversation.filter.null":"All",
     "notification.read_all":"Read all",
+    //
+    "Confirm":"Confirm",
   }
 };
 

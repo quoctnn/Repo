@@ -10,6 +10,7 @@ export default  {
         login:"/api/v1/auth/oup/login/",
         nativeLogin:"/api/v1/auth-oup/native-login/",
         socialLogin:"/api/v1/auth-oup/social-login/",
+        gdprForm:"/api/v1/auth-oup/gdpr-form/",
 
         //calendar
         calendarItemDetailUrl: (id:number) => {
