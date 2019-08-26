@@ -17,25 +17,26 @@ import { translate } from "../../../localization/AutoIntlProvider";
 let jsemoji = new JSEMOJI();
 jsemoji.img_set = 'emojione';
 jsemoji.img_sets.emojione.path = 'https://cdn.jsdelivr.net/emojione/assets/3.0/png/32/';
+jsemoji.replace_mode = 'unified';
 
 export const emojiReplacements = {
-    ':-)': "😀", 
-    ':)': "😀", 
-    ':]': "😀", 
-    ':-]': "😀", 
+    ':-)': "😀",
+    ':)': "😀",
+    ':]': "😀",
+    ':-]': "😀",
     ':D':"🤣",
     ':-D':"🤣",
     ':/':'😕',
     ':-/':'😕',
     ':(':'🙁',
     ':-(':'🙁',
-    ':[':'😡', 
+    ':[':'😡',
     ':-[':'😡',
     '</3':'💔',
     '<3':'❤️',
     ':-O':'😲',
     ':O':'😲',
-    ';)':'😉', 
+    ';)':'😉',
     ';-)':'😉'
 }
 export class Mention {
@@ -391,7 +392,7 @@ export default class MentionEditor extends React.Component<Props, State> {
           contentState,
           'insert-characters',
         );
-        
+
         this.onChange(newEditorState)
         return
         return EditorState.forceSelection(
@@ -420,17 +421,17 @@ export default class MentionEditor extends React.Component<Props, State> {
                     {
                         const text = replacement + " "
                         this.replaceText(i, charsInputPos, text, i + text.length, editorState)
-                        return "handled" 
+                        return "handled"
                     }
                 }
-                else 
+                else
                 {
                     word = char + word
                 }
                 i--
             }
         }
-        return "not-handled"    
+        return "not-handled"
     }
     render = () => {
         const { MentionSuggestions } = this.mentionPlugin;
@@ -452,7 +453,7 @@ export default class MentionEditor extends React.Component<Props, State> {
                             keyBindingFn={this.props.keyBindings}
                             handleBeforeInput={this.onHandleBeforeInput}
                             handleKeyCommand={this.props.handleKeyCommand}
-                            
+
                         />
                     </div>
                 </div>
@@ -467,15 +468,15 @@ export default class MentionEditor extends React.Component<Props, State> {
                         </button>
                     }
                     {(this.props.filesAdded || this.props.onHandleUploadClick) &&
-                        <button 
+                        <button
                             className="upload-button editor-button btn btn-default"
                             type="button" onClick={this.onFileuploadButtonClick} >
-                            {this.props.filesAdded && 
-                                <input ref={this.fileUploader} 
-                                        accept={Settings.allowedTypesFileUpload} 
-                                        multiple={true} 
-                                        className="form-control" 
-                                        type="file" 
+                            {this.props.filesAdded &&
+                                <input ref={this.fileUploader}
+                                        accept={Settings.allowedTypesFileUpload}
+                                        multiple={true}
+                                        className="form-control"
+                                        type="file"
                                         onChange={this.uploadFileChanged} /> }
                             <i className="fa fa-paperclip fa-lg"></i>
                         </button>}
