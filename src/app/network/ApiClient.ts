@@ -12,12 +12,14 @@ import { Status, UserProfile, UploadedFile, Community, Group, Conversation, Proj
          ProfileEducation,
          ProfilePosition,
          CrashLogLevel,
-         CalendarItem} from '../types/intrasocial_types';
+         CalendarItem,
+         GDPRInfo,
+         GDPRFormAnswers} from '../types/intrasocial_types';
 import { nullOrUndefined, DateFormat } from '../utilities/Utilities';
 import moment = require("moment");
 import { Settings } from "../utilities/Settings";
 import { ConversationManager } from '../managers/ConversationManager';
-import { ProfileLanguage, ProfileVolunteeringExperience } from '../types/intrasocial_types';
+import { ProfileLanguage, ProfileVolunteeringExperience, RequestErrorData } from '../types/intrasocial_types';
 export type PaginationResult<T> = {results:T[], count:number, previous?:string, next?:string, divider?:number}
 export type ElasticSuggestion = {text:string, offset:number, length:number, options:[]}
 export type ElasticExtensionResult = {stats:{suggestions:{[key:string]:ElasticSuggestion}, aggregations:{[key:string]:any}}}
@@ -25,6 +27,7 @@ export type StatusCommentsResult<T> = {results:T[], count:number, parent:T}
 export type ElasticResult<T> = PaginationResult<T> & ElasticExtensionResult
 export type ApiClientFeedPageCallback<T> = (data: PaginationResult<T>, status:string, error:string|null) => void;
 export type ApiClientCallback<T> = (data: T|null, status:string, error:string|null) => void;
+export type ApiLoginCallback<T> = (data: T|null, status:string, error:string|null, errorData?:RequestErrorData) => void;
 export type ApiStatusCommentsCallback<T> = (data: StatusCommentsResult<T>, status:string, error:string|null) => void;
 export type SearchArguments = {
     term?:string
@@ -531,32 +534,40 @@ export default class ApiClient
             callback(null, status, error)
         })
     }
-    static apiLogin(email:string, password:string, callback:ApiClientCallback<{token:string|null}>)
+    static getGDPRForm(preferredLanguage:string, callback:ApiClientCallback<GDPRInfo>)
     {
-        AjaxRequest.post(Constants.apiRoute.login,`username=${email}&password=${password}`, (data, status, request) => {
+        let url = Constants.apiRoute.gdprForm + "?" + this.getQueryString({preferred_language:preferredLanguage})
+        AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
             callback(null, status, error)
         })
     }
-    static apiSocialLogin(provider:string, accessToken:string|null, code:string|null, id_token:string|null, callback:ApiClientCallback<any>)
+    static apiLogin(email:string, password:string, update_gdpr_continuation_key:string, gdpr_user_response:GDPRFormAnswers,callback:ApiLoginCallback<{token:string}>)
     {
-        let urlparams = `provider=${provider}`
-        if (accessToken) urlparams += `&access_token=${accessToken}`
-        if (code) urlparams += `&code=${code}`
-        if (id_token) urlparams += `&id_token=${id_token}`
-        AjaxRequest.post(Constants.apiRoute.socialLogin, urlparams, (data, status, request) => {
+        const data = this.getQueryString({username:email,password,update_gdpr_continuation_key, gdpr_user_response:gdpr_user_response && JSON.stringify(gdpr_user_response)})
+        AjaxRequest.post(Constants.apiRoute.login,data, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(request, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
-    static nativeLogin(email:string, password:string,callback:ApiClientCallback<any>)
+    static apiSocialLogin(provider:string, accessToken:string, code:string, id_token:string, update_gdpr_continuation_key:string, gdpr_user_response:GDPRFormAnswers, callback:ApiLoginCallback<{token:string}>)
     {
-        AjaxRequest.post(Constants.apiRoute.nativeLogin,`username=${email}&password=${password}`, (data, status, request) => {
+        const data = this.getQueryString({provider,access_token:accessToken,code,id_token, update_gdpr_continuation_key, gdpr_user_response:gdpr_user_response && JSON.stringify(gdpr_user_response)})
+        AjaxRequest.post(Constants.apiRoute.socialLogin, data, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(request, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
+        })
+    }
+    static nativeLogin(email:string, password:string, update_gdpr_continuation_key:string, gdpr_user_response:GDPRFormAnswers, callback:ApiLoginCallback<{token:string}>)
+    {
+        const data = this.getQueryString({username:email,password,update_gdpr_continuation_key, gdpr_user_response:gdpr_user_response && JSON.stringify(gdpr_user_response)})
+        AjaxRequest.post(Constants.apiRoute.nativeLogin, data, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static getCommunities(is_member:boolean, ordering:ListOrdering, limit:number, offset:number,callback:ApiClientFeedPageCallback<Community>)

@@ -5,7 +5,83 @@ import { translate } from "../localization/AutoIntlProvider";
 import { userFullName, groupCover, communityCover, userCover, projectCover, eventCover } from '../utilities/Utilities';
 import { CommunityManager } from '../managers/CommunityManager';
 import { ProjectManager } from '../managers/ProjectManager';
-import { Moment } from 'moment';
+export type GDPRData = {
+    requiredActions:OUPRequiredAction[]
+    updateGdprContinuationKey:string
+    gdprInfo:GDPRInfo
+}
+export type GDPRInfo = {
+    consentSetId:string
+    languageIsoCode:string
+    terms:GDPRTerms
+    processingActivity:GDPRProcessingActivity
+}
+export type GDPRTerms = {
+    agreementText:string
+    checked:boolean
+    explanation:string
+    id:string
+    markNeedToFill:boolean
+    questionText:string
+    title:string
+}
+export type GDPRProcessingActivity = {
+    id:string
+    title:string
+    consents:GDPRProcessingActivityConsent[]
+}
+export type GDPRProcessingActivityConsent = {
+    id:string
+    order:number
+    mandatory:boolean
+    title:string
+    explanation:string
+    type:GDPRProcessingActivityType
+    question:string
+    choices:GDPRProcessingActivityConsentChoice[]
+}
+export type GDPRProcessingActivityConsentChoice = {
+    id:string
+    message:string
+}
+export enum GDPRProcessingActivityType{
+    singleChoice =  "single_choice",
+    multipleChoice = "multiple_choice"
+}
+export enum OUPRequiredAction{
+    verifyEmail = "VERIFY_EMAIL",
+    updateProfile = "UPDATE_PROFILE",
+    configureTOTP = "CONFIGURE_TOTP",
+    updatePassword = "UPDATE_PASSWORD",
+    gdprTermsAndCondition = "GDPR_TERMS_AND_CONDITIONS",
+}
+export type RequestErrorDetail = {
+    error:string 
+    error_description:string
+    extra:GDPRData
+}
+export type GDPRFormConsents = {
+    id:string
+    agreedChoiceIds:string[]
+}
+export type GDPRFormAnswers = {
+    consentSetId:string
+    processingActivityId:string
+    termId:string
+    termsAgreed:boolean
+    consents:GDPRFormConsents[]
+}
+export class RequestErrorData{
+    data:any
+    detail?:RequestErrorDetail
+    constructor(data:any) {
+        this.data = data
+        if(data.detail)
+        {
+            this.detail = JSON.parse(data.detail)
+        }
+    }
+}
 export enum CrashLogLevel {
     info = "info",
     debug = "debug",
