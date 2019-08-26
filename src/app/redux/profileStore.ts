@@ -34,7 +34,7 @@ const addProfiles = (state, action:AddProfilesAction) => {
     profiles.forEach(p => {
         let id = p.id
         let old = state[id]
-        if(action.force || !old || !old.last_seen || !p.last_seen || new Date(old.last_seen) < new Date(p.last_seen)) // update
+        if(action.force || !old || !old.last_seen || !p.last_seen || new Date(old.last_seen).getTime() < new Date(p.last_seen).getTime()) // update
         {
             newState[p.id] = p
         }
