@@ -376,7 +376,15 @@ export class SearchComponent extends React.Component<Props, State> {
                 currentFilters[st.getName()] = "*" + data.query + "*"
             })*/
         }
-        const q = hasActiveSearchType ? "" : data.query
+        let q = hasActiveSearchType ? "" : data.query
+        if(q && q.length > 0)
+        {
+            const lastChar = q[q.length -1]
+            if(lastChar !=  "*" && lastChar != "?")
+            {
+                q = q + "*"
+            }
+        }
         const searchForbidden = types.length == 0 || this.isSearchForbidden(data)
         if(searchForbidden)
         {
