@@ -103,18 +103,18 @@ export abstract class WindowAppManager
         NotificationCenter.push(eventStreamNotificationPrefix + data.type,[data.data])
     }
     static resolveLocalFileUrl = (file:string) => {
-        if (Settings.CDN) {
-            return url.format({
-                protocol: "https",
-                host:Settings.CDNHost,
-                pathname: path.join(Settings.CDNPath, window.appRoot, file),
-                slashes: true,
-            })
-        } else if (Settings.isElectron) {
+        if (Settings.isElectron) {
             return url.format({
                 pathname: path.join(window.appRoot, "app", file),
                 protocol: location.protocol,
                 host:location.host,
+                slashes: true,
+            })
+        } else if (Settings.CDN) {
+            return url.format({
+                protocol: "https",
+                host:Settings.CDNHost,
+                pathname: path.join(Settings.CDNPath, window.appRoot, file),
                 slashes: true,
             })
         }
