@@ -65,7 +65,6 @@ export abstract class WindowAppManager
             const f:() => void = null;
             f()
         } catch (e) {
-            debugger
             const event = new ErrorEvent("error", {error:e})
             window.dispatchEvent(event)
         }
