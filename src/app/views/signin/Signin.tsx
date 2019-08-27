@@ -3,8 +3,8 @@ import FacebookLogin from 'react-facebook-login/dist/facebook-login-render-props
 import GoogleLogin from 'react-google-login';
 import LinkedIn from 'linkedin-login-for-react';
 import ApiClient from '../../network/ApiClient'
-import { Button, Input , Form , FormGroup, InputGroupAddon, InputGroup} from 'reactstrap'
-import { withRouter, RouteComponentProps, Link} from 'react-router-dom'
+import { Button, Input , Form , FormGroup, InputGroupAddon, InputGroup, FormFeedback} from 'reactstrap'
+import { withRouter, RouteComponentProps} from 'react-router-dom'
 import { connect } from 'react-redux'
 import { AuthenticationManager } from '../../managers/AuthenticationManager'
 import { ToastManager } from '../../managers/ToastManager'
@@ -21,6 +21,7 @@ import Logo from '../../components/general/images/Logo';
 import { RequestErrorData, GDPRFormAnswers, GDPRData } from '../../types/intrasocial_types';
 import SimpleDialog from '../../components/general/dialogs/SimpleDialog';
 import GdprForm from './GdprForm';
+import classnames = require('classnames');
 enum LoginProvider{
     google = "google", facebook = "facebook", linkedIn = "linkedin", native = "native"
 }
@@ -58,6 +59,15 @@ type State = {
     updateGdprContinuationKey:string
     gdprUserResponse:GDPRFormAnswers
     gdprData:GDPRData,
+    formErrors:{[key:string]:string}
+}
+export const normalizeformErrors = (errors:{[key:string]:string[]}) => {
+    const dict = {}
+    const keys = Object.keys(errors)
+    keys.forEach(k => {
+        dict[k] = errors[k][0]
+    })
+    return dict
 }
 class Signin extends React.Component<Props, State> {
 
@@ -70,7 +80,8 @@ class Signin extends React.Component<Props, State> {
             error:null,
             updateGdprContinuationKey:null,
             gdprUserResponse:null,
-            gdprData:null
+            gdprData:null,
+            formErrors:{}
 
         }
     }
@@ -79,22 +90,26 @@ class Signin extends React.Component<Props, State> {
         {
             if (errorData.detail && errorData.detail.extra && errorData.detail.extra.gdprInfo) {
                 // Email verification or GDPR consent not performed
-                this.setState({gdprData:errorData.detail.extra})
+                this.setState(() => {
+                    return {gdprData:errorData.detail.extra, formErrors:{}, error:null}
+                })
                 return
             }
             else {
                 let error = (errorData.detail && errorData.detail.error_description) || errorData.data.non_field_errors
-                if(!error && typeof errorData.data == "object")
-                {
-                    const keys = Object.keys(errorData.data)
-                    if(keys.length > 0)
-                        error = `[${keys[0]}]${errorData.data[keys[0]]}`
-                }
                 if (error) {
                     // Invalid password on nativeLogin
-                    this.setState({error})
+                    this.setState(() => {
+                        return {error, formErrors:{}}
+                    })
                     return
                 }
+                else if(typeof errorData.data == "object") {
+                    this.setState(() => {
+                        return {formErrors:normalizeformErrors(errorData.data)}
+                    })
+                }
+
             }
             ToastManager.showErrorToast(error)
             return
@@ -198,6 +213,9 @@ class Signin extends React.Component<Props, State> {
         endpointName = endpointName.replace(/(:\d+$)/, '');
         const socialLinksActive = endpoint.loginType == EndpointLoginType.API && !Settings.isElectron
         const errorMsg = this.state.error
+        const usernameError = this.state.formErrors["username"]
+        const passwordError = this.state.formErrors["password"]
+        const submitButtonClasses = classnames("login-button form-control", {"is-invalid":!!errorMsg})
         return(
             <div id="sign-in">
                 <div className="triangles-bg"></div>
@@ -225,18 +243,18 @@ class Signin extends React.Component<Props, State> {
                                     </div>
                                     <Form>
                                         <InputGroup className="form-group form-input">
-                                            <Input type="text" autoComplete="username" name="email" innerRef={(input) => { this.emailInput = input }} placeholder={translate("Email")} />
+                                            <Input invalid={!!usernameError} type="text" autoComplete="username" name="email" innerRef={(input) => { this.emailInput = input }} defaultValue="leslie@intrahouse.com" placeholder={translate("Email")} />
+                                            {usernameError && <FormFeedback tooltip={true}>{usernameError}</FormFeedback>}
                                             <InputGroupAddon addonType="append"><i className="fas fa-user"></i></InputGroupAddon>
                                         </InputGroup>
                                         <InputGroup className="form-group form-input">
-                                            <Input autoComplete="current-password" name="password" innerRef={(input) => { this.passwordInput = input }} type="password" placeholder={translate("Password")} />
+                                            <Input invalid={!!passwordError} autoComplete="current-password" name="password" innerRef={(input) => { this.passwordInput = input }} type="password" placeholder={translate("Password")} />
                                             <InputGroupAddon addonType="append"><i className="fas fa-lock"></i></InputGroupAddon>
+                                            {passwordError && <FormFeedback tooltip={true}>{passwordError}</FormFeedback>}
                                         </InputGroup>
                                         <FormGroup>
-                                            {errorMsg &&
-                                                <div className='error'>{errorMsg}</div>
-                                            }
-                                            <Button className="login-button" type="submit" color="info" onClick={this.doSignin}>{translate("Sign in")}</Button>
+                                            <Button className={submitButtonClasses} type="submit" color="info" onClick={this.doSignin}>{translate("Sign in")}</Button>
+                                            {errorMsg && <FormFeedback tooltip={true}>{errorMsg}</FormFeedback>}
                                         </FormGroup>
                                     </Form>
                                 </div>

@@ -1,7 +1,7 @@
 {
   "name": "intraSocial",
   "productName": "intraSocial",
-  "version": "0.5.4",
+  "version": "0.5.5",
   "description": "intraSocial ALPHA - For testing purposes only",
   "main": "app/index.js",
   "scripts": {

@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import * as moment from 'moment'
 import { translate } from '../../localization/AutoIntlProvider';
 import "./CalendarEventComponent.scss"
+import { truncate } from '../../utilities/Utilities';
 
 const getStartTime = (date:Date, start:Date) => {
     const d = moment(date), s = moment(start)
@@ -38,9 +39,10 @@ export const CalendarEventComponent = (props:CalendarEventComponent) => {
                 </div>
                 <div className="right d-flex flex-column justify-content-center">
                     <div className="title">
-                        <div className={markClass}></div>
-                        {props.event.title}</div>
-                    <div className="description medium-small-text">{props.event.description}</div>
+                            <div className={markClass}></div>
+                            {truncate(props.event.title, 30)}
+                    </div>
+                    <div className="description medium-small-text">{truncate(props.event.description, 30)}</div>
                 </div>
             </Link>
 }
