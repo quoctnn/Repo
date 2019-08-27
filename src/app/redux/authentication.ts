@@ -5,6 +5,7 @@ import { nullOrUndefined } from '../utilities/Utilities';
 export enum AuthenticationActionTypes {
     SetSignedInToken = 'authentication.set_signed_in_token',
     SetSignedInProfile = 'authentication.set_signed_in_profile',
+    Reset = 'authentication.reset',
 }
 export interface AuthenticationData {
     token: string
@@ -17,7 +18,7 @@ export interface SetAuthenticationTokenAction{
 }
 export interface SetAuthenticationProfileAction{
     type:string
-    profile:UserProfile,
+    profile?:UserProfile,
 }
 const INITIAL_STATE:AuthenticationData = {
     token:null, 
@@ -32,13 +33,18 @@ export const setAuthenticationProfileAction = (profile:UserProfile):SetAuthentic
     type: AuthenticationActionTypes.SetSignedInProfile,
     profile,
 })
-const authentication = (state = INITIAL_STATE, action:SetAuthenticationTokenAction & SetAuthenticationProfileAction):AuthenticationData => {
+export const resetAuthenticationData = ():SetAuthenticationProfileAction => ({
+    type: AuthenticationActionTypes.Reset,
+}) 
+const authentication = (state = {...INITIAL_STATE}, action:SetAuthenticationTokenAction & SetAuthenticationProfileAction):AuthenticationData => {
     switch(action.type) 
     {
         case AuthenticationActionTypes.SetSignedInToken:
             return { ...state, token:action.token}
         case AuthenticationActionTypes.SetSignedInProfile:
             return { ...state, profile:action.profile, signedIn: !nullOrUndefined( action.profile) && !action.profile.is_anonymous}
+        case AuthenticationActionTypes.Reset:
+            return  {...INITIAL_STATE}
         default:
             return state;
     }

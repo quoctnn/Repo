@@ -25,6 +25,7 @@ import { FavoriteManager } from './FavoriteManager';
 import { Settings } from '../utilities/Settings';
 import { Redirect } from 'react-router';
 import { noop } from 'react-select/lib/utils';
+import { resetAuthenticationData } from '../redux/authentication';
 
 export type ApplicationData = {
     dashboards:{[key:string]:Dashboard}
@@ -176,6 +177,7 @@ export abstract class ApplicationManager
         dispatch(resetMessageQueueAction())
         dispatch(resetEndpointAction())
         dispatch(resetEmbedlyStoreAction())
+        dispatch(resetAuthenticationData())
         ApplicationManager.softReset()
     }
     static softReset = () => {
