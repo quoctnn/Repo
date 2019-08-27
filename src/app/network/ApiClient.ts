@@ -1006,9 +1006,9 @@ export default class ApiClient
             callback(null, status, error)
         })
     }
-    static sendCrashReport(level:CrashLogLevel, message:string, stack:string, componentStack:string , callback:ApiClientCallback<any>){
+    static sendCrashReport(level:CrashLogLevel, message:string, stack:string, componentStack:string, user_id:number, user_agent:string, endpoint:string, extra:string, callback:ApiClientCallback<any>){
         const url = Constants.apiRoute.createCrashReportUrl
-        AjaxRequest.postJSON(url,  { level, message, stack, componentStack}, (data, status, request) => {
+        AjaxRequest.postJSON(url,  { level, message, stack, componentStack, user_id, user_agent, endpoint, extra}, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
             callback(null, status, error)
