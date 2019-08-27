@@ -242,7 +242,7 @@ class ConversationsModule extends React.Component<Props, State> {
                 ConversationManager.archiveConversation(action.conversation, (success) => {
                     if(success)
                     {
-                        ToastManager.showInfoToast("conversation.archived")
+                        ToastManager.showInfoToast(translate("conversation.archived"))
                         this.conversationsList.current.removeItemById(action.conversation)
                         this.navigateToFirstConversation()
                     }

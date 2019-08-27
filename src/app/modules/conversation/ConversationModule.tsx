@@ -139,8 +139,16 @@ class ConversationModule extends React.Component<Props, State> {
         {
             let it = this.removeUserFromIsTypingData(message.user)
             this.setState((prevState:State) => {
-                const items = prevState.items
-                items.push(message)
+                const items = [...prevState.items]
+                const oldIndex = items.findIndex(e => e.id == message.id)
+                if(oldIndex > -1)
+                {
+                    items[oldIndex] = message
+                }
+                else 
+                {
+                    items.push(message)
+                }
                 return {isTyping:it, items }
             })
         }
@@ -288,7 +296,6 @@ class ConversationModule extends React.Component<Props, State> {
             return
         if(this.canPublishDidType)
         {
-            console.log("sendDidType")
             ConversationManager.sendTypingInConversation(conversation.id)
             this.canPublishDidType = false
             setTimeout(() => {
