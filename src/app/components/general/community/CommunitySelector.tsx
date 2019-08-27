@@ -157,7 +157,7 @@ const mapStateToProps = (state:ReduxState, ownProps:OwnProps) => {
     const allCommunities = state.communityStore.allIds.map(id => state.communityStore.byId[id])
     const topCommunities = allCommunities.sort(sortDescendingVisits).slice(0, 5)
     const topIds = topCommunities.map(tc => tc.id)
-    const recentCommunities = allCommunities.filter(c => !!c.last_visited).sort(sortDescendingVisited).slice(0, 5).filter(rc => !topIds.contains(rc.id))
+    const recentCommunities = allCommunities.filter(c => !!c.last_visited).sort(sortDescendingVisited).filter(rc => !topIds.contains(rc.id)).slice(0, 5)
     const profile = AuthenticationManager.getAuthenticatedUser()
     return {
         mainCommunity,
