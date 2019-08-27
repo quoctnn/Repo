@@ -14,18 +14,22 @@ import { communityAvatar, contextAvatar } from '../../../utilities/Utilities';
 import classnames = require('classnames');
 import { Popover, PopoverBody } from 'reactstrap';
 import { AuthenticationManager } from '../../../managers/AuthenticationManager';
-import { NavigationUtilities } from '../../../utilities/NavigationUtilities';
-
+const sortDescendingVisited = (a:Community, b:Community) => {
+    return new Date(b.last_visited).getTime() - new Date(a.last_visited).getTime()
+}
+const sortDescendingVisits = (a:Community, b:Community) => {
+    return b.visit_count - a.visit_count
+}
 type OwnProps = {
 }
 type ReduxStateProps = {
     mainCommunity:Community,
-    communities:number[],
+    topCommunities:Community[]
+    recentCommunities:Community[],
     profile:UserProfile
 }
 type Props = ReduxStateProps & OwnProps & RouteComponentProps<any>
 type State = {
-    communities:Community[]
     popoverRemoved:boolean
     popoverVisible:boolean
 }
@@ -34,17 +38,12 @@ class CommunitySelector extends React.Component<Props, State> {
     constructor(props:Props) {
         super(props);
         this.state = {
-            communities:[],
             popoverRemoved:true,
             popoverVisible:false,
         }
     }
     componentDidMount()
     {
-        var communities = this.props.communities.map((id, i) => {
-            return CommunityManager.getCommunity(id.toString())
-        })
-        this.setState({communities})
     }
     componentWillUnmount = () => {
     }
@@ -98,9 +97,9 @@ class CommunitySelector extends React.Component<Props, State> {
         const open = !this.state.popoverRemoved || this.state.popoverVisible
         if(!open)
             return null
-        const selectableDropdownItems:OverflowMenuItem[] = this.state.communities.map((community, i) => {
+        const selectableDropdownItems:OverflowMenuItem[] = this.props.topCommunities.map((community, i) => {
             return {
-                id:"community_" + community.id,
+                id:"community_top" + community.id,
                 type:OverflowMenuItemType.option,
                 title: community.name,
                 onPress:this.setMainCommunity(community),
@@ -108,6 +107,19 @@ class CommunitySelector extends React.Component<Props, State> {
                 children:<Avatar className="mr-1" size={24} image={contextAvatar(community, true, ContextNaturalKey.COMMUNITY)} />
             }
         })
+        const recentCommunities = this.props.recentCommunities.map((community, i) => {
+            return {
+                id:"community_recent" + community.id,
+                type:OverflowMenuItemType.option,
+                title: community.name,
+                onPress:this.setMainCommunity(community),
+                toggleMenu:false,
+                children:<Avatar className="mr-1" size={24} image={contextAvatar(community, true, ContextNaturalKey.COMMUNITY)} />
+            }
+        })
+        if(recentCommunities.length > 0)
+            selectableDropdownItems.push({id:"recent_header", title:translate("common.sorting.recent"), type:OverflowMenuItemType.header})
+        selectableDropdownItems.push(...recentCommunities)
         selectableDropdownItems.push({id:"divider1", type:OverflowMenuItemType.divider})
         selectableDropdownItems.push({id:"all", type:OverflowMenuItemType.option, children:this.openCommunitySearch()})
         const cn = classnames("dropdown-menu-popover", "community-selector-dropdown")
@@ -142,12 +154,15 @@ class CommunitySelector extends React.Component<Props, State> {
 
 const mapStateToProps = (state:ReduxState, ownProps:OwnProps) => {
     const mainCommunity = CommunityManager.getCommunityById(state.activeCommunity.activeCommunity)
-    const communities = state.communityStore.allIds
+    const allCommunities = state.communityStore.allIds.map(id => state.communityStore.byId[id])
+    const topCommunities = allCommunities.sort(sortDescendingVisits).slice(0, 5)
+    const topIds = topCommunities.map(tc => tc.id)
+    const recentCommunities = allCommunities.filter(c => !!c.last_visited).sort(sortDescendingVisited).slice(0, 5).filter(rc => !topIds.contains(rc.id))
     const profile = AuthenticationManager.getAuthenticatedUser()
-
     return {
         mainCommunity,
-        communities,
+        topCommunities,
+        recentCommunities,
         profile
     }
 }

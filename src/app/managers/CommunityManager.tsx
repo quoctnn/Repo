@@ -43,9 +43,9 @@ export abstract class CommunityManager
             }
         })
     }
-    static storeCommunities = (communities:Community[]) => {
+    static storeCommunities = (communities:Community[], force?:boolean) => {
         if(communities.length > 0)
-            CommunityManager.getStore().dispatch(addCommunitiesAction(communities))
+            CommunityManager.getStore().dispatch(addCommunitiesAction(communities, force))
     }
     static removeCommunity = (communityId:number) => {
         const activeCommunity = CommunityManager.getActiveCommunity()

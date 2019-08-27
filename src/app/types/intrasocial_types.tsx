@@ -1033,6 +1033,8 @@ export type Community = {
     relationship: any
     description: string
     updated_at: string
+    visit_count:number
+    last_visited:string
 } & ICommunity & AvatarAndCover & Permissible
 
 export type SimpleUserProfile = {

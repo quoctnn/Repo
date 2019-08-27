@@ -82,7 +82,8 @@ export abstract class ApplicationManager
             switch (result) {
                 case (0):
                     requests.push({name:"Dashboards", action:ApplicationManager.fetchDashboards})
-                    requests.push({name:"Communities", action:ApplicationManager.fetchCommunities})
+                    requests.push({name:"Communities", action:ApplicationManager.fetchMostUsedCommunities})
+                    requests.push({name:"Communities", action:ApplicationManager.fetchRecentCommunities})
                     requests.push({name:"Profile", action:ApplicationManager.fetchProfile})
                     requests.push({name:"Contacts", action:ApplicationManager.fetchContacts})
                     requests.push({name:"Favorites", action:ApplicationManager.fetchFavorites})
@@ -134,10 +135,18 @@ export abstract class ApplicationManager
             ToastManager.showErrorToast(error)
         })
     }
-    private static fetchCommunities = (completion:() => void) => {
-        ApiClient.getCommunities(true, ListOrdering.ALPHABETICALLY, 100, 0, (data, status, error) => {
+    private static fetchMostUsedCommunities = (completion:() => void) => {
+        ApiClient.getCommunities(true, ListOrdering.MOST_USED, 10, 0, (data, status, error) => {
             const communities = (data && data.results) || []
-            CommunityManager.storeCommunities(communities)
+            CommunityManager.storeCommunities(communities, true)
+            completion()
+            ToastManager.showErrorToast(error)
+        })
+    }
+    private static fetchRecentCommunities = (completion:() => void) => {
+        ApiClient.getCommunities(true, ListOrdering.RECENT, 10, 0, (data, status, error) => {
+            const communities = (data && data.results) || []
+            CommunityManager.storeCommunities(communities, true)
             completion()
             ToastManager.showErrorToast(error)
         })

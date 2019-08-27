@@ -8,6 +8,7 @@ export enum CommunityStoreActionTypes {
 export interface AddCommunitiesAction{
     type:string
     communities:Community[]
+    force?:boolean
 }
 export interface RemoveCommunityAction{
     type:string
@@ -16,9 +17,10 @@ export interface RemoveCommunityAction{
 export interface ResetCommunitiesAction{
     type:string
 }
-export const addCommunitiesAction = (communities: Community[]):AddCommunitiesAction => ({
+export const addCommunitiesAction = (communities: Community[], force?:boolean):AddCommunitiesAction => ({
     type: CommunityStoreActionTypes.AddCommunities,
-    communities
+    communities,
+    force
 })
 export const removeCommunityAction = (community:number):RemoveCommunityAction => ({
     type: CommunityStoreActionTypes.RemoveCommunity,
@@ -41,7 +43,7 @@ const addCommunities = (state, action:AddCommunitiesAction) => {
     communities.forEach(c => {
         let id = c.id
         let old = state[id]
-        if(!old || new Date(c.updated_at).getTime() > new Date(old.updated_at).getTime()) // update
+        if(action.force || !old || new Date(c.updated_at).getTime() > new Date(old.updated_at).getTime()) // update
         {
             newState[c.id] = c
         }
