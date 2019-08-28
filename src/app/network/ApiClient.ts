@@ -637,9 +637,9 @@ export default class ApiClient
             callback(null, status, error)
         })
     }
-    static getConversations(limit:number, offset:number, archived:boolean, callback:ApiClientFeedPageCallback<Conversation>)
+    static getConversations(limit:number, offset:number, archived:boolean, withUsers:number[], callback:ApiClientFeedPageCallback<Conversation>)
     {
-        let url = Constants.apiRoute.conversations + "?" + this.getQueryString({limit, offset, archived})
+        let url = Constants.apiRoute.conversations + "?" + this.getQueryString({limit, offset, archived, with_users:withUsers && withUsers.join(",")})
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {

@@ -195,7 +195,7 @@ class ConversationDetailsModule extends React.Component<Props, State> {
                     <div className="d-flex">
                         {ConversationUtilities.getAvatar(conversation, authenticatedUser.id, true)}
                         <InputGroup className="input-group-transparent">
-                            <Input innerRef={this.titleRef} placeholder={translate("common.title")} tabIndex={1} className="form-control-transparent primary-text title-text" value={title} onChange={this.onTitleChange} onBlur={this.onTitleBlur} /> 
+                            <Input disabled={conversation.temporary} innerRef={this.titleRef} placeholder={translate("common.title")} tabIndex={1} className="form-control-transparent primary-text title-text" value={title} onChange={this.onTitleChange} onBlur={this.onTitleBlur} /> 
                         </InputGroup>
                         {!conversation.temporary && <DropDownMenu items={this.getOptionMenuItems()} triggerClass="fas fa-cog action-button push-right" />}
                     </div>

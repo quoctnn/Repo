@@ -1014,6 +1014,7 @@ export type Conversation =
     updated_at: string
     unread_messages: number[]
     temporary?: boolean
+    temporary_id?:number
 
 } & Linkable & IdentifiableObject & Permissible
 

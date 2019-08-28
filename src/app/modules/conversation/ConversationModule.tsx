@@ -72,6 +72,7 @@ class ConversationModule extends React.Component<Props, State> {
     private messageList = React.createRef<ChatMessageList>();
     private canPublishDidType = true
     private observers:EventSubscription[] = []
+    private messageComposer = React.createRef<ChatMessageComposer>();
     constructor(props:Props) {
         super(props);
         this.state = {
@@ -93,7 +94,12 @@ class ConversationModule extends React.Component<Props, State> {
         const newConversation = this.props.conversation
         return (oldConversation && !newConversation) ||
                 (!oldConversation && newConversation) ||
-                (oldConversation && newConversation && oldConversation.id != newConversation.id)
+                (oldConversation && newConversation && 
+                    (oldConversation.id != newConversation.id || 
+                    (oldConversation.temporary && newConversation.temporary && 
+                        (!oldConversation.users.isEqual(newConversation.users) || 
+                         oldConversation.temporary_id != newConversation.temporary_id) ) ) )
+
     }
     componentDidMount = () => {
         const obs1 = NotificationCenter.addObserver("eventstream_" + EventStreamMessageType.CONVERSATION_TYPING, this.isTypingHandler)
@@ -127,6 +133,10 @@ class ConversationModule extends React.Component<Props, State> {
             this.setState((prevState:State) => {
                 return {conversationEditorDialogVisible:false, renderDropZone:false, showSpinner:false}
             })
+        }
+        if(this.props.location.pathname != prevProps.location.pathname && this.messageComposer && this.messageComposer.current)
+        {
+            this.messageComposer.current.clearEditorContent()
         }
     }
     incomingMessageHandler = (...args:any[]) =>
@@ -238,13 +248,42 @@ class ConversationModule extends React.Component<Props, State> {
         })
     }
     fetchMessages = (offset:number, completion:(items:PaginationResult<Message>) => void ) => {
-
-        if(!this.props.conversation || this.props.conversation.temporary)
+        const emptyData = {results:[], count:0, previous:null, next:null}
+        if(!this.props.conversation || this.props.conversation.temporary && this.props.conversation.temporary_id == -1)
         {
-            completion({results:[], count:0, previous:null, next:null})
+            completion(emptyData)
             return
         }
-        const conversationId = this.props.conversation.id
+        if(this.props.conversation.temporary && !this.props.conversation.temporary_id)//not set yet
+        {
+            const users = this.props.conversation.users.filter(i => i != this.props.authenticatedUser.id)
+            if(users.length > 0)
+            {
+                ApiClient.getConversations(1, 0, false, users, (data, status, error) => {
+                    if(this.props.conversation.temporary)
+                    {
+                        const temp = {...this.props.conversation}
+                        if(data && data.results && data.results.length > 0)
+                        {
+                            const conv = data.results[0]
+                            temp.temporary_id = conv.id
+                        }
+                        else {
+                            temp.temporary_id = -1 //prevent multiple fetches
+                        }
+                        ConversationManager.updateTemporaryConversation(temp)
+                    }
+                    completion(emptyData)
+                })
+                return
+            }
+            else {
+
+                completion(emptyData)
+                return
+            }
+        }
+        const conversationId = this.props.conversation.temporary && this.props.conversation.temporary_id || this.props.conversation.id
         ApiClient.getConversationMessages(conversationId, 30, offset, (data, status, error) => {
             completion(data)
             ToastManager.showErrorToast(error)
@@ -304,21 +343,33 @@ class ConversationModule extends React.Component<Props, State> {
         }
     }
     createConversationWithMessage = (tempConversation:Conversation, message:Message) => {
-        ApiClient.createConversation(tempConversation.title, tempConversation.users, (newConversation, status, error) => {
-            if(newConversation)
-            {
-                message.conversation = newConversation.id
-                ConversationManager.sendMessage(message)
+        const tempConversationId = tempConversation.temporary_id
+        if(tempConversationId && tempConversationId > -1) // add to old conversation
+        {
+            message.conversation = tempConversationId
+            ConversationManager.sendMessage(message)
+            setTimeout(() => {
                 ConversationManager.updateTemporaryConversation(null)
-                NavigationUtilities.navigateToConversation(this.props.history, newConversation.id)
-                ToastManager.showInfoToast(translate("conversation.created"))
-            }
-            if(error || status == "error")
-            {
-                ToastManager.showErrorToast(error || translate("Could not create conversation"))
-                return
-            }
-        } )
+                NavigationUtilities.navigateToConversation(this.props.history, tempConversationId)
+            },200)
+        }
+        else {
+            ApiClient.createConversation(tempConversation.title, tempConversation.users, (newConversation, status, error) => {
+                if(newConversation)
+                {
+                    message.conversation = newConversation.id
+                    ConversationManager.sendMessage(message)
+                    ConversationManager.updateTemporaryConversation(null)
+                    NavigationUtilities.navigateToConversation(this.props.history, newConversation.id)
+                    ToastManager.showInfoToast(translate("conversation.created"))
+                }
+                if(error || status == "error")
+                {
+                    ToastManager.showErrorToast(error || translate("Could not create conversation"))
+                    return
+                }
+            } )
+        }
     }
     onChatMessageSubmit = (text:string, mentions:number[]) => {
         let conversation = this.props.conversation
@@ -436,6 +487,7 @@ class ConversationModule extends React.Component<Props, State> {
                             {this.renderSomeoneIsTyping()}
                         </ChatMessageList>
                     <ChatMessageComposer
+                                ref={this.messageComposer}
                                 className="secondary-text main-content-secondary-background"
                                 mentionSearch={this.handleMentionSearch}
                                 content={""}
@@ -454,6 +506,7 @@ class ConversationModule extends React.Component<Props, State> {
     onMemberSelectChange = (value: ProfileFilterOption[], action: ActionMeta) => {
         const temp = {...this.props.conversation}
         temp.users = value.map(v => v.id)
+        temp.temporary_id = undefined
         ConversationManager.updateTemporaryConversation(temp)
     }
     renderMembersInput = () => {

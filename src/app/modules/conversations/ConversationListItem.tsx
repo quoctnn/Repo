@@ -106,15 +106,17 @@ class ConversationListItem extends React.Component<Props, State> {
                                 {hasUnsentMessages && <i className="fas fa-exclamation-triangle small-text text-danger mr-1"></i>}
                                 {title}
                                 </div>
-                                {conversation.last_message && <TimeComponent date={conversation.last_message.created_at} />}
+                                {conversation.temporary &&
+                                    <i onClick={this.onConversationAction(ConversationAction.delete, conversation.id)} className="fas fa-times action-button push-right"></i>
+                                    || conversation.last_message &&
+                                    <TimeComponent date={conversation.last_message.created_at} />
+                                }
                             </div>
                             <div className="subtitle-row d-flex">
                                 {conversation.last_message && <div className="text-truncate">
                                     <MessageContent message={conversation.last_message} simpleMode={true}/>
                                 </div>}
-                                {conversation.temporary &&
-                                    <i onClick={this.onConversationAction(ConversationAction.delete, conversation.id)} className="fas fa-times action-button push-right"></i>
-                                    || ddOptions.length > 0 &&
+                                {!conversation.temporary && ddOptions.length > 0 &&
                                     <DropDownMenu items={ddOptions} triggerClass="fas fa-cog action-button push-right" />
                                 }
                             </div>

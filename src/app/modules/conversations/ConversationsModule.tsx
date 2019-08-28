@@ -199,7 +199,7 @@ class ConversationsModule extends React.Component<Props, State> {
     }
     fetchConversations = (offset:number, completion:(items:PaginationResult<Conversation>) => void ) => {
         const archived = this.state.filter == ConversationFilter.archived
-        ApiClient.getConversations( 30, offset, archived, (data, status, error) => {
+        ApiClient.getConversations( 30, offset, archived, null, (data, status, error) => {
             if(data && data.results)
             {
                 ConversationManager.storeConversations(data.results)
