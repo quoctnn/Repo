@@ -263,6 +263,8 @@ export class SearchComponent extends React.Component<Props, State> {
     }
     componentDidMount = () => {
         this.loadSearchHistory()
+        if(this.searchTextInput && this.searchTextInput.current)
+            this.searchTextInput.current.focus()
         if(!nullOrUndefined(this.state.searchData.originalText))
         {
             this.setState((prevState:State) => ({
