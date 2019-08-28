@@ -341,6 +341,15 @@ export default class ApiClient
             callback(null, status, error)
         })
     }
+    static removeConversationUsers(conversation:number, users:number[], callback:ApiClientCallback<Conversation>)
+    {
+        let url = Constants.apiRoute.removeConversationUsers(conversation)
+        AjaxRequest.post(url, {remove:users}, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error)
+        })
+    }
     static leaveConversation(id:number, callback:ApiClientCallback<any>)
     {
         let url = Constants.apiRoute.leaveConversation(id)

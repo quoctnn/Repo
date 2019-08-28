@@ -445,3 +445,12 @@ export const normalizeIndex = (selectedIndex, max) => {
     }
     return index;
 }
+export const shallowCompare = (obj1:Object, obj2:Object) =>
+  Object.keys(obj1).length === Object.keys(obj2).length &&
+  Object.keys(obj1).every(key => 
+    obj2.hasOwnProperty(key) && obj1[key] === obj2[key]
+  )
+export const shallowCompareFields = (keys:string[], obj1:Object, obj2:Object) =>
+    keys.every(key => 
+        obj1.hasOwnProperty(key) && obj2.hasOwnProperty(key) && obj1[key] === obj2[key]
+  )

@@ -12,9 +12,14 @@
     .title-row
     {
         justify-content: space-between;
+        time{
+            font-size: 0.7rem;
+            @include var(color, secondary-text-color);
+        }
     }
     .subtitle-row{
         font-size: 0.8em;
+        justify-content: space-between;
         .file-icon::before{
             color:inherit !important;
         }

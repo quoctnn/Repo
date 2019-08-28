@@ -23,8 +23,6 @@ import { resetEmbedlyStoreAction } from '../components/general/embedly/redux';
 import { resetUnreadNotificationsAction } from '../redux/unreadNotifications';
 import { FavoriteManager } from './FavoriteManager';
 import { Settings } from '../utilities/Settings';
-import { Redirect } from 'react-router';
-import { noop } from 'react-select/lib/utils';
 import { resetAuthenticationData } from '../redux/authentication';
 
 export type ApplicationData = {

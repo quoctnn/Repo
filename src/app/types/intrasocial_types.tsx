@@ -1003,19 +1003,19 @@ export type AvatarAndCover = {
     cover_thumbnail: string
 }
 export type Conversation =
-    {
-        title: string
-        users: number[]
-        archived_by?: number[]
-        last_message: Message
-        read_by: any[]
-        absolute_url?: string
-        created_at: string
-        updated_at: string
-        unread_messages: number[]
-        temporary?: boolean
+{
+    title: string
+    users: number[]
+    archived_by?: number[]
+    last_message: Message
+    read_by: any[]
+    absolute_url?: string
+    created_at: string
+    updated_at: string
+    unread_messages: number[]
+    temporary?: boolean
 
-    } & Linkable & IdentifiableObject & Permissible
+} & Linkable & IdentifiableObject & Permissible
 
 export type ICommunity = {
     cover_thumbnail: string

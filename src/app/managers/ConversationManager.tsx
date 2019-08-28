@@ -107,7 +107,7 @@ export abstract class ConversationManager
         })
 
     }
-    static createTemporaryConversation = () => {
+    static createTemporaryConversation = (creator:number) => {
 
         let store = ConversationManager.getStore()
         const now = Date.now()
@@ -125,7 +125,8 @@ export abstract class ConversationManager
             read_by:[],
             uri:Routes.conversationUrl("new"),
             permission:Permission.post,
-            temporary:true
+            temporary:true,
+            
         }
         store.dispatch(setTemporaryConversationAction(conversation))
     }
@@ -179,6 +180,14 @@ export abstract class ConversationManager
             {
                 ConversationManager.removeConversation(conversationId)
             }
+            completion(success)
+        })
+    }
+    static removeUsersFromConversation = (conversationId:number, users:number[], completion:(success:boolean) => void) =>
+    {
+        ApiClient.removeConversationUsers(conversationId, users, (data, status, error) => {
+            const success = !error
+            ToastManager.showErrorToast(error, status, translate("Could not remove user(s) from conversation"))
             completion(success)
         })
     }

@@ -13,16 +13,21 @@ import { OverflowMenuItem, OverflowMenuItemType } from '../../components/general
 import { translate } from '../../localization/AutoIntlProvider';
 import { MessageContent } from '../conversation/MessageContent';
 import { ConversationManager } from '../../managers/ConversationManager';
+import { NotificationCenter } from '../../utilities/NotificationCenter';
+import { ConversationActionArchiveNotification, ConversationActionArgument } from './ConversationsModule';
+import { TimeComponent } from '../../components/general/TimeComponent';
 export enum ConversationAction{
     delete = "delete",
-    archive = "archive"
+    archive = "archive",
+    leave = "leave",
+    removeUsers = "remove.users"
 }
 type OwnProps = {
     conversation:Conversation
     children?: React.ReactNode
     className?:string
     isActive:boolean
-    onConversationAction?:(action:ConversationAction, conversationId:number) => void
+    onConversationAction?:(action:ConversationAction, argument:ConversationActionArgument) => void
 }
 type ReduxStateProps =
 {
@@ -51,7 +56,7 @@ class ConversationListItem extends React.Component<Props, State> {
     }
     onConversationAction = (action:ConversationAction, conversationId:number) => (e:React.SyntheticEvent) => {
         e.preventDefault()
-        this.props.onConversationAction && this.props.onConversationAction(action, conversationId)
+        this.props.onConversationAction && this.props.onConversationAction(action, {conversation:conversationId})
     }
     toggleDropDown = (e:React.SyntheticEvent) => {
         e.preventDefault()
@@ -71,9 +76,8 @@ class ConversationListItem extends React.Component<Props, State> {
         if(conversation.temporary)
             return items
         const isArchived = (conversation.archived_by || []).contains(this.props.authenticatedProfile.id)
-        //items.push({id:"2", type:OverflowMenuItemType.option, title:translate("conversation.menu.delete"), onPress:this.onConversationAction(ConversationAction.delete, conversationId), toggleMenu:false})
         if(!isArchived)
-            items.push({id:"3", type:OverflowMenuItemType.option, title:translate("conversation.menu.archive"), onPress:this.onConversationAction(ConversationAction.archive, conversation.id), toggleMenu:false})
+            items.push({id:"3", type:OverflowMenuItemType.option, title:translate("conversation.menu.archive"), onPress:() => NotificationCenter.push(ConversationActionArchiveNotification,[{conversation:conversation.id}]), toggleMenu:false})
         return items
     }
     render() {
@@ -94,7 +98,7 @@ class ConversationListItem extends React.Component<Props, State> {
                 <Link className="d-flex button-link" to={conversation.uri || "#"}>
                     <div className="conversation-item-body d-flex align-items-center">
                         <div>
-                            {ConversationUtilities.getAvatar(conversation, myId, this.props.children)}
+                            {ConversationUtilities.getAvatar(conversation, myId, true, this.props.children)}
                         </div>
                         <div className="d-flex flex-column text-truncate right-content">
                             <div className="title-row d-flex">
@@ -102,16 +106,17 @@ class ConversationListItem extends React.Component<Props, State> {
                                 {hasUnsentMessages && <i className="fas fa-exclamation-triangle small-text text-danger mr-1"></i>}
                                 {title}
                                 </div>
-                                {conversation.temporary &&
-                                <i onClick={this.onConversationAction(ConversationAction.delete, conversation.id)} className="fas fa-times action-button push-right"></i>
-                                || ddOptions.length > 0 &&
-                                <DropDownMenu items={ddOptions} triggerClass="fas fa-cog action-button push-right" />
-                                }
+                                {conversation.last_message && <TimeComponent date={conversation.last_message.created_at} />}
                             </div>
                             <div className="subtitle-row d-flex">
                                 {conversation.last_message && <div className="text-truncate">
                                     <MessageContent message={conversation.last_message} simpleMode={true}/>
                                 </div>}
+                                {conversation.temporary &&
+                                    <i onClick={this.onConversationAction(ConversationAction.delete, conversation.id)} className="fas fa-times action-button push-right"></i>
+                                    || ddOptions.length > 0 &&
+                                    <DropDownMenu items={ddOptions} triggerClass="fas fa-cog action-button push-right" />
+                                }
                             </div>
                         </div>
                     </div>

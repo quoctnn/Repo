@@ -1,5 +1,6 @@
 import { combineReducers } from 'redux'
 import { Conversation } from "../types/intrasocial_types";
+import { shallowCompareFields } from '../utilities/Utilities';
 export enum ConversationStoreActionTypes {
     AddConversations = 'conversationstore.add_conversations',
     RemoveConversation = 'conversationstore.remove_conversation',
@@ -35,13 +36,23 @@ export const resetConversationsAction = ():ResetConversationsAction => ({
     
     return []
 }
+const shouldUpdate = (oldConversation:Conversation, newConversation:Conversation) => {
+    if(!oldConversation)
+        return true
+    const fieldsUpdated = !shallowCompareFields(["users"], oldConversation, newConversation)
+    if(fieldsUpdated)
+    {
+        return true
+    }
+    return new Date(newConversation.updated_at).getTime() > new Date(oldConversation.updated_at).getTime()
+}
 const addConversations = (state, action:AddConversationsAction) => {
     let conversations = action.conversations
     let newState = {  ...state }
     conversations.forEach(c => {
         let id = c.id
         let old = state[id]
-        if(!old || new Date(c.updated_at).getTime() > new Date(old.updated_at).getTime()) // update
+        if(shouldUpdate(old, c)) // update
         {
             newState[c.id] = c
         }

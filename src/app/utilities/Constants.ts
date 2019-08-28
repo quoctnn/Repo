@@ -272,6 +272,9 @@ export default  {
         addConversationUsers: (id:number) => {
             return `/api/v2/conversation/${id}/add-users/`
         },
+        removeConversationUsers: (id:number) => {
+            return `/api/v2/conversation/${id}/kick/`
+        },
         conversations: '/api/v2/conversation/',
         composeMessageUrl: '/api/v1/conversation/compose/',
 

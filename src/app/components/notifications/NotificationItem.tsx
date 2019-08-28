@@ -217,7 +217,7 @@ const UnreadConversation = (props: UnreadConversationProps) => {
     const time = (props.conversation.last_message && props.conversation.last_message.created_at) || props.conversation.updated_at
     const title = ConversationUtilities.getConversationTitle(props.conversation)
     const link = props.conversation.uri
-    const avatar = ConversationUtilities.getAvatar(props.conversation, props.authenticatedUser.id)
+    const avatar = ConversationUtilities.getAvatar(props.conversation, props.authenticatedUser.id, true)
     const message = props.conversation.last_message && <div className="text-truncate"><MessageContent message={props.conversation.last_message} simpleMode={true} /></div> || ""
     return <InvitationComponent onClose={props.onClose} avatarLink={link} createdAt={time} title={title} link={link} avatar={avatar} message={message}>
         <Button onClick={markAsRead} color="secondary" size="xs">{translate("notification.action.mark.read")}</Button>

@@ -2,7 +2,7 @@ import * as React from 'react';
 import { SecureImage } from './SecureImage';
 import { AvatarStatusColor } from '../../types/intrasocial_types';
 import { UserStatusIndicator } from './UserStatusIndicator';
-require("./Avatar.scss");
+import "./Avatar.scss"
 
 type Props = {
     size?:number

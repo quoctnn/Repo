@@ -25,11 +25,17 @@ import Routes from '../../utilities/Routes';
 import { ConversationAction } from './ConversationListItem';
 import { NavigationUtilities } from '../../utilities/NavigationUtilities';
 import ConfirmDialog from '../../components/general/dialogs/ConfirmDialog';
-import ButtonGroup from 'reactstrap/lib/ButtonGroup';
-import Button from 'reactstrap/lib/Button';
 import { CommonModuleProps } from '../Module';
 import { OverflowMenuItem, OverflowMenuItemType } from '../../components/general/OverflowMenu';
 import { DropDownMenu } from '../../components/general/DropDownMenu';
+
+
+export const ConversationActionDeleteNotification = "ConversationActionDeleteNotification"
+export const ConversationActionArchiveNotification = "ConversationActionArchiveNotification"
+export const ConversationActionLeaveNotification = "ConversationActionLeaveNotification"
+export const ConversationActionRemoveUsersNotification = "ConversationActionRemoveUsersNotification"
+
+export type ConversationActionArgument = {conversation:number, users?:number[], temporary?:boolean}
 type IsTypingStore = {[conversation:number]:{[user:number]:NodeJS.Timer}}
 type OwnProps = {
     breakpoint:ResponsiveBreakpoint
@@ -43,7 +49,7 @@ type State = {
     isTyping:IsTypingStore
     listRedrawContext?:string
     createConversationDialogVisible:boolean,
-    conversationActionInProgress:{conversation:number, action:ConversationAction}
+    conversationActionInProgress:{argument:ConversationActionArgument, action:ConversationAction}
     filter:ConversationFilter
 }
 type ReduxStateProps = {
@@ -70,11 +76,17 @@ class ConversationsModule extends React.Component<Props, State> {
             isLoading:false,
             isTyping:{},
             createConversationDialogVisible:false,
-            conversationActionInProgress:{conversation:0, action:null},
+            conversationActionInProgress:{argument:{conversation:0}, action:null},
             filter:null,
         }
         const observer = NotificationCenter.addObserver(ConversationManagerConversationRemovedEvent, this.processConversationRemoved)
         this.observers.push(observer)
+        const observer1 = NotificationCenter.addObserver(ConversationActionArchiveNotification, this.processConversationActionArchive)
+        this.observers.push(observer1)
+        const observer2 = NotificationCenter.addObserver(ConversationActionLeaveNotification, this.processConversationActionLeave)
+        this.observers.push(observer2)
+        const observer3 = NotificationCenter.addObserver(ConversationActionRemoveUsersNotification, this.processConversationActionRemoveUsers)
+        this.observers.push(observer3)
 
     }
     componentWillUnmount = () => {
@@ -82,8 +94,20 @@ class ConversationsModule extends React.Component<Props, State> {
         this.observers = null
         this.conversationsList = null
     }
+    processConversationActionRemoveUsers = (...args:any[]) => {
+        let data:ConversationActionArgument = args[0]
+        this.onConversationAction(ConversationAction.removeUsers, data)
+    }
+    processConversationActionLeave = (...args:any[]) => {
+        let data:ConversationActionArgument = args[0]
+        this.onConversationAction(ConversationAction.leave, data)
+    }
+    processConversationActionArchive = (...args:any[]) => {
+        let data:ConversationActionArgument = args[0]
+        this.onConversationAction(ConversationAction.archive, data)
+    }
     processConversationRemoved = (...args:any[]) => {
-        let data:{conversation:number, temporary:boolean} = args[0]
+        let data:ConversationActionArgument = args[0]
         const isActive = this.props.routeConversationId == data.conversation.toString()
         this.conversationsList.current.removeItemById(data.conversation)
         if(isActive && !data.temporary)
@@ -196,12 +220,12 @@ class ConversationsModule extends React.Component<Props, State> {
     }
     resetAction = () => {
         this.setState(() => {
-            return {conversationActionInProgress:{conversation:0, action:null}}
+            return {conversationActionInProgress:{argument:{conversation:0}, action:null}}
         })
     }
-    setAction = (conversation:number, action:ConversationAction) => {
+    setAction = (argument:ConversationActionArgument, action:ConversationAction) => {
         this.setState(() => {
-            return {conversationActionInProgress:{conversation:conversation, action:action}}
+            return {conversationActionInProgress:{argument, action:action}}
         })
     }
     navigateToFirstConversation = () => {
@@ -215,17 +239,17 @@ class ConversationsModule extends React.Component<Props, State> {
     }
     onConfirmAction = (confirmed:boolean) => {
         const action = this.state.conversationActionInProgress
-        if(action.conversation == 0)
+        if(action.argument.conversation == 0)
             return
         if(action.action == ConversationAction.delete)
         {
             if(confirmed)
             {
-                ConversationManager.deleteConversation(action.conversation, (success) => {
+                ConversationManager.deleteConversation(action.argument.conversation, (success) => {
                     if(success)
                     {
                         ToastManager.showInfoToast("conversation.deleted")
-                        this.conversationsList.current.removeItemById(action.conversation)
+                        this.conversationsList.current.removeItemById(action.argument.conversation)
                         this.navigateToFirstConversation()
                     }
                     this.resetAction()
@@ -239,11 +263,11 @@ class ConversationsModule extends React.Component<Props, State> {
         {
             if(confirmed)
             {
-                ConversationManager.archiveConversation(action.conversation, (success) => {
+                ConversationManager.archiveConversation(action.argument.conversation, (success) => {
                     if(success)
                     {
                         ToastManager.showInfoToast(translate("conversation.archived"))
-                        this.conversationsList.current.removeItemById(action.conversation)
+                        this.conversationsList.current.removeItemById(action.argument.conversation)
                         this.navigateToFirstConversation()
                     }
                     this.resetAction()
@@ -253,27 +277,58 @@ class ConversationsModule extends React.Component<Props, State> {
                 this.resetAction()
             }
         }
-
+        else if(action.action == ConversationAction.leave)
+        {
+            if(confirmed)
+            {
+                ConversationManager.leaveConversation(action.argument.conversation, (success) => {
+                    if(success)
+                    {
+                        ToastManager.showInfoToast(translate("You left the conversation!"))
+                    }
+                    this.resetAction()
+                })
+            }
+            else {
+                this.resetAction()
+            }
+        }
+        else if(action.action == ConversationAction.removeUsers)
+        {
+            if(confirmed)
+            {
+                ConversationManager.removeUsersFromConversation(action.argument.conversation, action.argument.users, (success) => {
+                    if(success)
+                    {
+                        ToastManager.showInfoToast(translate("User(s) removed from conversation!"))
+                    }
+                    this.resetAction()
+                })
+            }
+            else {
+                this.resetAction()
+            }
+        }
     }
     renderConfirmDialog = () => {
         const action = this.state.conversationActionInProgress
-        const visible = action.action && action.conversation > 0
+        const visible = action.action && action.argument.conversation > 0
         const title = action.action ? translate(`conversation.prevent${action.action}.title`) : ""
         const message = action.action ? translate(`conversation.prevent${action.action}.description`) : ""
         const okButtonTitle = translate("common.yes")
         return <ConfirmDialog visible={visible} title={title} message={message} didComplete={this.onConfirmAction} okButtonTitle={okButtonTitle}/>
     }
-    onConversationAction = (action:ConversationAction, conversationId:number) => {
+    onConversationAction = (action:ConversationAction, argument:ConversationActionArgument) => {
 
         const currentAction = this.state.conversationActionInProgress
-        const currentActionInProgress = currentAction.conversation > 0
+        const currentActionInProgress = currentAction.argument.conversation > 0
         if(currentActionInProgress)
             return
         switch(action)
         {
             case ConversationAction.delete:
             {
-                const conversation = this.conversationsList.current.getItemById(conversationId)
+                const conversation = this.conversationsList.current.getItemById(argument.conversation)
                 if(conversation.temporary)
                 {
                     const firstConversation = this.conversationsList.current.getItemAtIndex(1)
@@ -282,13 +337,15 @@ class ConversationsModule extends React.Component<Props, State> {
                     NavigationUtilities.navigateToConversation(this.props.history, firstConversation && firstConversation.id)
                 }
                 else{
-                    this.setAction(conversationId, action)
+                    this.setAction(argument, action)
                 }
                 break;
             }
+            case ConversationAction.leave:
             case ConversationAction.archive:
+            case ConversationAction.removeUsers:
             {
-                this.setAction(conversationId, action)
+                this.setAction(argument, action)
                 break;
             }
         }
@@ -351,7 +408,7 @@ class ConversationsModule extends React.Component<Props, State> {
         {
             const onReady = () => {
 
-                ConversationManager.createTemporaryConversation()
+                ConversationManager.createTemporaryConversation(this.props.authenticatedUser.id)
                 this.conversationsList.current && this.conversationsList.current.scrollToTop()
             }
             if(this.state.filter == ConversationFilter.archived)

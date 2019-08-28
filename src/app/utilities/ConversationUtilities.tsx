@@ -1,6 +1,6 @@
 import * as React from "react";
 import { ProfileManager } from '../managers/ProfileManager';
-import { Conversation, Message, UserProfile } from '../types/intrasocial_types';
+import { Conversation, Message, UserProfile, UserStatus, UserStatusItem } from '../types/intrasocial_types';
 import { nullOrUndefined, userAvatar } from './Utilities';
 import { translate } from '../localization/AutoIntlProvider';
 import { AuthenticationManager } from '../managers/AuthenticationManager';
@@ -31,10 +31,13 @@ export class ConversationUtilities
             return "Unknown User"
         }).join(", ")
     }
-    static getAvatar = (conversation: Conversation, me:number, children?: React.ReactNode) => {
+    static getAvatar = (conversation: Conversation, me:number, showUserStatus:boolean, children?: React.ReactNode) => {
         let users = ProfileManager.getProfiles(conversation.users.filter(i => i != me).slice(0, ConversationUtilities.maxVisibleAvatars))
         const avatars = users.map(u => userAvatar( u )).filter(a => !nullOrUndefined(a))
-        return <Avatar images={avatars} size={ConversationUtilities.avatarSize} borderColor="white" borderWidth={2}>
+        let userStatusItem:UserStatusItem = undefined
+        if(showUserStatus && users.length == 1)
+            userStatusItem = UserStatus.getObject(users[0].user_status)
+        return <Avatar statusColor={userStatusItem && userStatusItem.color} images={avatars} size={ConversationUtilities.avatarSize} borderColor="white" borderWidth={2}>
                         {!!children && children
                             || conversation.unread_messages.length > 0 &&
                             <div className="notification-badge bg-success text-white text-truncate"><span>{conversation.unread_messages.length}</span></div>

@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Input, InputGroupAddon, Button } from 'reactstrap';
+import { Input, InputGroupAddon } from 'reactstrap';
 import InputGroup from "reactstrap/lib/InputGroup";
 import { ReduxState } from "../../redux";
 import { Conversation, UserProfile } from '../../types/intrasocial_types';
