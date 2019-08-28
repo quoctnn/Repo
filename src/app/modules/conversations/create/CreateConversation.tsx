@@ -6,12 +6,11 @@ import { UserProfile, Conversation } from '../../../types/intrasocial_types';
 import { translate } from '../../../localization/AutoIntlProvider';
 import ApiClient from '../../../network/ApiClient';
 import { ToastManager } from '../../../managers/ToastManager';
-import { Avatar } from '../../../components/general/Avatar';
+import Avatar from '../../../components/general/Avatar';
 import LoadingSpinner from '../../../components/LoadingSpinner';
 import SelectUsersDialog from '../../../components/general/dialogs/SelectUsersDialog';
 import { ProfileManager } from '../../../managers/ProfileManager';
 import { ConversationUtilities } from '../../../utilities/ConversationUtilities';
-import { AuthenticationManager } from '../../../managers/AuthenticationManager';
 import { userAvatar } from '../../../utilities/Utilities';
 type OwnProps = {
     onComplete:() => void

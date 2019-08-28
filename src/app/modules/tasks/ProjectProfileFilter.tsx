@@ -4,7 +4,7 @@ import { UserProfile } from '../../types/intrasocial_types';
 import { userFullName, userAvatar } from '../../utilities/Utilities';
 import { ProjectManager } from '../../managers/ProjectManager';
 import { ProfileManager } from '../../managers/ProfileManager';
-import { Avatar } from '../../components/general/Avatar';
+import Avatar from '../../components/general/Avatar';
 import { OptionProps } from 'react-select/lib/components/Option';
 import { SingleValueProps } from 'react-select/lib/components/SingleValue';
 import { AsyncSelectIW } from '../../components/general/input/AsyncSelectIW';

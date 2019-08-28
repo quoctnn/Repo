@@ -6,7 +6,7 @@ import { Conversation, UserProfile } from '../../types/intrasocial_types';
 import { connect } from "react-redux";
 import { ConversationUtilities } from "../../utilities/ConversationUtilities";
 import { translate } from "../../localization/AutoIntlProvider";
-import { Avatar } from "../../components/general/Avatar";
+import Avatar from "../../components/general/Avatar";
 import { ProfileManager } from '../../managers/ProfileManager';
 import { userAvatar, uniqueId, userFullName } from '../../utilities/Utilities';
 import { List, ListHeader, ListItem } from '../../components/general/List';

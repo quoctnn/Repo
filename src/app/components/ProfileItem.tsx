@@ -1,7 +1,7 @@
 import * as React from "react";
 import classNames from "classnames";
 import { userFullName, userAvatar } from '../utilities/Utilities';
-import { Avatar } from './general/Avatar';
+import Avatar from './general/Avatar';
 import { Link } from 'react-router-dom';
 import Routes from '../utilities/Routes';
 import { StatusReactionUtilities, UserProfile } from '../types/intrasocial_types';

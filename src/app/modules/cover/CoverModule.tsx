@@ -12,7 +12,7 @@ import { contextCover, contextAvatar } from '../../utilities/Utilities';
 import { CoverImage } from '../../components/general/CoverImage';
 import { FavoriteManager } from '../../managers/FavoriteManager';
 import { Button } from "reactstrap";
-import { Avatar } from "../../components/general/Avatar";
+import Avatar from "../../components/general/Avatar";
 
 type OwnProps =
 {

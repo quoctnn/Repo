@@ -7,7 +7,7 @@ import { translate } from '../../localization/AutoIntlProvider';
 import { Button, Badge } from "reactstrap";
 import { ListItem } from "../general/List";
 import { ProfileManager } from '../../managers/ProfileManager';
-import { Avatar } from "../general/Avatar";
+import Avatar from "../general/Avatar";
 import { userAvatar, userFullName, groupAvatar, communityAvatar, eventAvatar } from '../../utilities/Utilities';
 import { Link } from 'react-router-dom';
 import { TimeComponent } from "../general/TimeComponent";

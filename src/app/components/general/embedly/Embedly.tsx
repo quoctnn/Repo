@@ -7,7 +7,7 @@ import { embedlyRequestDataAction } from './redux';
 import "./Embedly.scss"
 import LoadingSpinner from "../../LoadingSpinner";
 import Constants from "../../../utilities/Constants";
-import { Avatar } from "../Avatar";
+import Avatar from "../Avatar";
 import { Settings } from "../../../utilities/Settings";
 import classnames from 'classnames';
 import { Card, CardImg, CardBody, CardTitle, CardSubtitle } from "reactstrap";

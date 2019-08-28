@@ -1,9 +1,9 @@
 import * as React from "react";
 import "./PageMainNavigation.scss"
-import { Avatar } from "./general/Avatar";
+import Avatar from "./general/Avatar";
 import { ReduxState } from "../redux";
 import { connect } from 'react-redux'
-import { UserProfile, UserStatus } from '../types/intrasocial_types';
+import { UserProfile } from '../types/intrasocial_types';
 import { userFullName, userAvatar } from "../utilities/Utilities";
 import UserStatusSelector from "./general/UserStatusSelector";
 import PageMainMenu from "./PageMainMenu";
@@ -43,7 +43,6 @@ class PageMainNavigation extends React.Component<Props, {}> {
         {
             return
         }
-        const currentStatus = UserStatus.getObject(profile.user_status)
         return(
             <div id="page-main-navigation" className="">
                 <div className="d-flex">
@@ -74,7 +73,7 @@ class PageMainNavigation extends React.Component<Props, {}> {
                     </div>
                     <div className="right" style={{gridArea: "1 / 10 / span 1 / span 3"}}>
                         <div className="profile-box d-flex align-items-center mr-1  flex-row-reverse">
-                            <Avatar className="" image={userAvatar(profile, true)} size={63} statusColor={currentStatus && currentStatus.color} >
+                            <Avatar className="" image={userAvatar(profile, true)} size={63} userStatus={profile.id} >
                             </Avatar>
                             <div className="text-truncate mr-2">
                                 <div className="profile-name text-truncate">{userFullName( profile ) }</div>

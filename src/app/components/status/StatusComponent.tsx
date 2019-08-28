@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Status, StatusActions, ObjectAttributeType, Permission, ContextNaturalKey } from '../../types/intrasocial_types';
-import { Avatar } from "../general/Avatar";
+import Avatar from "../general/Avatar";
 import { userAvatar, userFullName, getTextContent } from '../../utilities/Utilities';
 
 import { translate } from "../../localization/AutoIntlProvider";
