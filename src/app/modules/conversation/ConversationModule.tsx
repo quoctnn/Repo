@@ -13,7 +13,7 @@ import { ReduxState } from '../../redux';
 import SimpleModule from '../SimpleModule';
 import { ContextManager } from '../../managers/ContextManager';
 import { ChatMessageList } from './ChatMessageList';
-import { Avatar } from '../../components/general/Avatar';
+import Avatar from '../../components/general/Avatar';
 import { AuthenticationManager } from '../../managers/AuthenticationManager';
 import { ProfileManager } from '../../managers/ProfileManager';
 import { TypingIndicator } from '../../components/general/TypingIndicator';

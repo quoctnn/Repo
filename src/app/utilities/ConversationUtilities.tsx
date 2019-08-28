@@ -4,7 +4,7 @@ import { Conversation, Message, UserProfile, UserStatus, UserStatusItem } from '
 import { nullOrUndefined, userAvatar } from './Utilities';
 import { translate } from '../localization/AutoIntlProvider';
 import { AuthenticationManager } from '../managers/AuthenticationManager';
-import { Avatar } from "../components/general/Avatar";
+import Avatar from "../components/general/Avatar";
 
 export class ConversationUtilities 
 {
@@ -34,10 +34,10 @@ export class ConversationUtilities
     static getAvatar = (conversation: Conversation, me:number, showUserStatus:boolean, children?: React.ReactNode) => {
         let users = ProfileManager.getProfiles(conversation.users.filter(i => i != me).slice(0, ConversationUtilities.maxVisibleAvatars))
         const avatars = users.map(u => userAvatar( u )).filter(a => !nullOrUndefined(a))
-        let userStatusItem:UserStatusItem = undefined
+        let profile:UserProfile = undefined
         if(showUserStatus && users.length == 1)
-            userStatusItem = UserStatus.getObject(users[0].user_status)
-        return <Avatar statusColor={userStatusItem && userStatusItem.color} images={avatars} size={ConversationUtilities.avatarSize} borderColor="white" borderWidth={2}>
+            profile = users[0]
+        return <Avatar userStatus={profile && profile.id} images={avatars} size={ConversationUtilities.avatarSize} borderColor="white" borderWidth={2}>
                         {!!children && children
                             || conversation.unread_messages.length > 0 &&
                             <div className="notification-badge bg-success text-white text-truncate"><span>{conversation.unread_messages.length}</span></div>

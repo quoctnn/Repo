@@ -4,7 +4,7 @@ import "./SearchComponent.scss"
 import { ContextSearchData, SearchOption, SearcQueryManager, SearchEntityType } from "../general/input/contextsearch/extensions";
 import { ElasticSearchType, SearchHistory, ContextNaturalKey, GenericElasticResult, ElasticResultCommunity, ElasticResultStatus, ElasticResultEvent, ElasticResultTask, ElasticResultProject, ElasticResultUser, ElasticResultGroup, ElasticResultFile, Event, UploadedFile, UploadedFileType, ElasticSearchBucketAggregation } from '../../types/intrasocial_types';
 import ApiClient, { ElasticResult, SearchArguments } from "../../network/ApiClient";
-import { Avatar } from '../general/Avatar';
+import Avatar from '../general/Avatar';
 import { SearchBox } from "../general/input/contextsearch/SearchBox";
 import { EditorState } from "draft-js";
 import { nullOrUndefined, truncate, userFullName, stringToDateFormat } from '../../utilities/Utilities';

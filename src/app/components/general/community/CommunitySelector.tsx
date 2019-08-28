@@ -9,7 +9,7 @@ import { CommunityManager } from '../../../managers/CommunityManager';
 import ApiClient from '../../../network/ApiClient';
 import Routes from '../../../utilities/Routes';
 import { withRouter, RouteComponentProps, Link } from 'react-router-dom';
-import { Avatar } from '../Avatar';
+import Avatar from '../Avatar';
 import { communityAvatar, contextAvatar } from '../../../utilities/Utilities';
 import classnames = require('classnames');
 import { Popover, PopoverBody } from 'reactstrap';

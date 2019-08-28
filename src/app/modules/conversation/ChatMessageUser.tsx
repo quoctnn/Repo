@@ -1,6 +1,6 @@
 import * as React from "react";
 import { MessagePosition } from './ChatMessage';
-import { Avatar } from "../../components/general/Avatar";
+import Avatar from "../../components/general/Avatar";
 
 export interface Props {
     avatar:string,

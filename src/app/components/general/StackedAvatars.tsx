@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import "./StackedAvatars.scss"
 import { withRouter, RouteComponentProps, Link } from "react-router-dom";
 import { ReduxState } from '../../redux';
-import { Avatar } from './Avatar';
+import Avatar from './Avatar';
 import { UserProfile } from '../../types/intrasocial_types';
 import { ProfileManager } from '../../managers/ProfileManager';
 import { userAvatar } from '../../utilities/Utilities';

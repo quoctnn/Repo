@@ -3,7 +3,7 @@ import classnames from "classnames"
 import "./ActivityItem.scss"
 import { RecentActivity, UserProfile } from '../../types/intrasocial_types';
 import { Link } from 'react-router-dom';
-import { Avatar } from '../../components/general/Avatar';
+import Avatar from '../../components/general/Avatar';
 import { ProfileManager } from '../../managers/ProfileManager';
 import { userAvatar } from '../../utilities/Utilities';
 import ApiClient from '../../network/ApiClient';

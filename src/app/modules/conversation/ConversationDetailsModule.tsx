@@ -17,7 +17,7 @@ import { translate } from '../../localization/AutoIntlProvider';
 import { ProfileManager } from '../../managers/ProfileManager';
 import { ListItem, List, ListHeader } from '../../components/general/List';
 import { uniqueId, userFullName, userAvatar } from '../../utilities/Utilities';
-import { Avatar } from '../../components/general/Avatar';
+import Avatar from '../../components/general/Avatar';
 import SelectUsersDialog from '../../components/general/dialogs/SelectUsersDialog';
 import { InputGroup, Input } from 'reactstrap';
 import { DropDownMenu } from '../../components/general/DropDownMenu';
@@ -104,10 +104,9 @@ class ConversationDetailsModule extends React.Component<Props, State> {
     renderMember = (member:number) => {
         const conversation = this.props.conversation
         const profile = ProfileManager.getProfileById(member)
-        const userStatusItem = UserStatus.getObject(profile.user_status)
         return <ListItem key={profile.id || uniqueId()} className="d-flex align-items-center justify-content-between member-item">
                         <div className="d-flex align-items-center">
-                            <Avatar statusColor={userStatusItem.color} className="mr-2" size={40} image={userAvatar(profile, true)} />
+                            <Avatar userStatus={profile.id} className="mr-2" size={40} image={userAvatar(profile, true)} />
                             <div className="text-truncate">{userFullName(profile)}</div>
                         </div>
                         {!conversation.temporary && <DropDownMenu items={this.getMemberOptionMenuItems(profile)} triggerClass="fas fa-ellipsis-v action-button push-right" />}
