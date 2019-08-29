@@ -1,7 +1,7 @@
 
 import * as React from 'react';
-import {Editor, EditorState, ContentState, convertToRaw, CompositeDecorator, Modifier, SelectionState, DraftHandleValue} from 'draft-js'
-import { SearcQueryManager, searchDecorators, searchEntities, SearchEntityType, SearchOption, InsertEntity, ContextSearchData } from "./extensions";
+import {Editor, EditorState, convertToRaw, CompositeDecorator, DraftHandleValue} from 'draft-js'
+import { SearcQueryManager, searchDecorators, SearchOption, ContextSearchData } from "./extensions";
 import classnames from "classnames";
 import "./SearchBox.scss"
 import { translate } from '../../../../localization/AutoIntlProvider';
@@ -57,7 +57,7 @@ export class SearchBox extends React.Component<Props, State>{
         return this.state.editorState
     }
     applyState = (editorState:EditorState, forceOnChange = false) => {
-        this.setState({ editorState: editorState } ,() => {this.onChange(editorState, forceOnChange)})
+        this.setState(() => {return { editorState: editorState }} ,() => {this.onChange(editorState, forceOnChange)})
     }
     getFocusOffset = () => {
         return this.state.editorState.getSelection().getFocusOffset()
@@ -98,7 +98,9 @@ export class SearchBox extends React.Component<Props, State>{
         this.logState(editorState)
         const newText = es.getCurrentContent().getPlainText()
         const sendOnChange = forceOnChange || newText != this.state.text
-        this.setState({editorState:editorState, text:newText}, () => {
+        this.setState(() => {
+            return {editorState:editorState, text:newText}
+        }, () => {
             if(sendOnChange)
             {
                 this.props.onChange(this.state.editorState)

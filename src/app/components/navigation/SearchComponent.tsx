@@ -464,17 +464,15 @@ class SearchComponent extends React.Component<Props, State> {
     setSearchQuery = (text:string) => () =>  {
         let state = this.editorState()
         state = SearcQueryManager.clearState(state)
-        state = SearcQueryManager.appendText(text, true, state)
-        state = SearcQueryManager.appendText(" ", true, state)
+        state = SearcQueryManager.appendText(text + " ", true, state)
         this.applyState(state)
     }
     appendSearchQuery = (text:string) => () =>  {
         let state = this.editorState()
         const currentText = state.getCurrentContent().getPlainText()
         if(currentText.length > 0 && currentText[currentText.length - 1] != " ")
-            state = SearcQueryManager.appendText(" ", true, state)
-        state = SearcQueryManager.appendText(text, true, state)
-        state = SearcQueryManager.appendText(" ", true, state)
+            state = SearcQueryManager.appendText(" ", false, state)
+        state = SearcQueryManager.appendText(text + " ", true, state)
         this.applyState(state)
     }
     editorState = () => {

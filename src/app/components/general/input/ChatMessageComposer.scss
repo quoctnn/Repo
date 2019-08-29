@@ -81,7 +81,7 @@
             .public-DraftStyleDefault-block, *[data-block="true"] {
                 display: inline-block;
                 min-width: 1px;
-                white-space: nowrap;
+                white-space: pre;
             }
         }
         .public-DraftEditor-content {

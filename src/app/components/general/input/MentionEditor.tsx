@@ -387,12 +387,22 @@ export default class MentionEditor extends React.Component<Props, State> {
           text
         );
 
-        const newEditorState = EditorState.push(
+        let newEditorState = EditorState.push(
           editorState,
           contentState,
           'insert-characters',
         );
-
+        //force selection at end
+        newEditorState = EditorState.moveFocusToEnd(newEditorState)
+        /*const block = newEditorState.getCurrentContent().getLastBlock()
+        const length = block.getLength();
+        const blockSelection = SelectionState
+            .createEmpty(block.getKey())
+            .merge({
+            anchorOffset: length,
+            focusOffset: length,
+          }) as SelectionState
+        newEditorState = EditorState.forceSelection(newEditorState, blockSelection )*/
         this.onChange(newEditorState)
     }
     onHandleBeforeInput = (chars: string, editorState: EditorState):DraftHandleValue => {
