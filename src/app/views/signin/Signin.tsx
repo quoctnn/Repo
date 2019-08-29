@@ -213,6 +213,7 @@ class Signin extends React.Component<Props, State> {
         endpointName = endpointName.replace(/(:\d+$)/, '');
         const socialLinksActive = endpoint.loginType == EndpointLoginType.API && !Settings.isElectron
         const errorMsg = this.state.error
+        const scope = ["r_liteprofile", "r_emailaddress", "w_member_social"]
         const usernameError = this.state.formErrors["username"]
         const passwordError = this.state.formErrors["password"]
         const submitButtonClasses = classnames("login-button form-control", {"is-invalid":!!errorMsg})
@@ -243,7 +244,7 @@ class Signin extends React.Component<Props, State> {
                                     </div>
                                     <Form>
                                         <InputGroup className="form-group form-input">
-                                            <Input invalid={!!usernameError} type="text" autoComplete="username" name="email" innerRef={(input) => { this.emailInput = input }} defaultValue="leslie@intrahouse.com" placeholder={translate("Email")} />
+                                            <Input invalid={!!usernameError} type="text" autoComplete="username" name="email" innerRef={(input) => { this.emailInput = input }} placeholder={translate("Email")} />
                                             {usernameError && <FormFeedback tooltip={true}>{usernameError}</FormFeedback>}
                                             <InputGroupAddon addonType="append"><i className="fas fa-user"></i></InputGroupAddon>
                                         </InputGroup>
@@ -289,23 +290,20 @@ class Signin extends React.Component<Props, State> {
                                                         </button>
                                             }}
                                         />
-                                        <button className="social-sign-on-button" disabled={true}>
-                                            <div className="social-icon"></div>
-                                            {translate("sign_in_linkedin")}
-                                        </button>
-                                        {/* <LinkedIn
+                                        <LinkedIn
                                             className="social-sign-on-button"
                                             clientId={Settings.LinkedInClientID}
                                             callback={this.doLinkedInSignin}
                                             text='Sign in with LinkedIn'
-                                            //The LinkedIn module does not support the render property
+                                            scope={scope}
+                                            /* The LinkedIn module does not support the render property
                                             render={renderProps => {
                                                 return <button  onClick={renderProps.onClick} disabled={!socialLinksActive}>
                                                             <div className="social-icon"></div>
                                                             {translate("sign_in_linkedin")}
                                                         </button>
-                                            }}
-                                        /> */}
+                                            }*/
+                                        />
                                     </div>
                                 </div>
                                 }
