@@ -81,6 +81,22 @@ export class RequestErrorData{
             this.detail = JSON.parse(data.detail)
         }
     }
+    getErrorMessage = () => {
+
+        const error = (this.detail && this.detail.error_description) || this.data.non_field_errors
+        let errorMessage:string = undefined
+        if(error)
+        {
+            if(Array.isArray(error))
+                errorMessage = error[0]
+            else if(typeof error == "string")
+                errorMessage = error
+            else {
+                console.warn(`RequestErrorData:${error} is not a string`)
+            }
+        }
+        return errorMessage
+    }
 }
 export enum CrashLogLevel {
     info = "info",
@@ -790,7 +806,7 @@ export type ElasticSearchBucketAggregation = {
 }
 export namespace ElasticSearchType {
 
-    export function contextNaturalKeyForType(key: ElasticSearchType) {
+    export function contextNaturalKeyForType(key: ElasticSearchType):ContextNaturalKey {
         switch (key) {
             case ElasticSearchType.GROUP: return ContextNaturalKey.GROUP
             case ElasticSearchType.COMMUNITY: return ContextNaturalKey.COMMUNITY

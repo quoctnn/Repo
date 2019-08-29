@@ -6,7 +6,7 @@ import { Favorite, ContextNaturalKey } from '../types/intrasocial_types';
 import { addFavoritesAction, setFavoritesAction, removeFavoriteAction } from '../redux/favoriteStore';
 import ApiClient from '../network/ApiClient';
 import { ToastManager } from './ToastManager';
-import { translate } from '../localization/AutoIntlProvider';
+import { translate, lazyTranslate } from '../localization/AutoIntlProvider';
 export abstract class FavoriteManager 
 {
     static setup()
@@ -27,12 +27,12 @@ export abstract class FavoriteManager
 
     }
     static createFavorite = (objectNaturalKey: ContextNaturalKey, objectId: number) => {
-        ApiClient.createFavorite(objectNaturalKey,objectId, null, (data, status, error) => {
+        ApiClient.createFavorite(objectNaturalKey,objectId, null, (data, status, error, errorData) => {
             if(data)
             {
                 FavoriteManager.addFavoritesToStore([data])
             }
-            ToastManager.showErrorToast(error, status, translate("Could not add item to your favorites"))
+            ToastManager.showRequestErrorToast(errorData, lazyTranslate("network.error"))
         })
     }
     static removeFavorite = (id: number) => {

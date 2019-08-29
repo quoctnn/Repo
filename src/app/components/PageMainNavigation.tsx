@@ -73,7 +73,7 @@ class PageMainNavigation extends React.Component<Props, {}> {
                     </div>
                     <div className="right" style={{gridArea: "1 / 10 / span 1 / span 3"}}>
                         <div className="profile-box d-flex align-items-center mr-1  flex-row-reverse">
-                            <Avatar className="" image={userAvatar(profile, true)} size={63} userStatus={profile.id} >
+                            <Avatar image={userAvatar(profile, true)} size={63} userStatus={profile.id} >
                             </Avatar>
                             <div className="text-truncate mr-2">
                                 <div className="profile-name text-truncate">{userFullName( profile ) }</div>

@@ -18,6 +18,9 @@ type Props = {
     language: number,
 }
 var private_messages = null
+export const lazyTranslate = (key:string) => {
+    return () => translate(key)
+}
 export const translate = (key:string):string => {
     let messages = private_messages
     if(key in messages)

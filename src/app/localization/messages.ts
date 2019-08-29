@@ -362,6 +362,7 @@ var translations = {
     "common.rename":"Rename",
     "conversation.message.user":"Send message",
     "conversation.user.remove":"Remove from conversation",
+    "network.error":"Error",
   },
   no: {
     "search.placeholder": "Søk ...",
@@ -726,6 +727,7 @@ var translations = {
     "common.rename":"Endre navn",
     "conversation.message.user":"Send melding",
     "conversation.user.remove":"Fjern fra samtale",
+    "network.error":"Feil",
   },
   en: {
     "search.placeholder": "Search ...",
@@ -1099,6 +1101,7 @@ var translations = {
     "common.rename":"Rename",
     "conversation.message.user":"Send message",
     "conversation.user.remove":"Remove from conversation",
+    "network.error":"Error",
   }
 };
 

@@ -1,7 +1,7 @@
 import * as React from "react";
 import { connect, DispatchProp } from 'react-redux'
 import "./ContactsModule.scss"
-import { UserProfile, UserStatus } from '../../types/intrasocial_types';
+import { UserProfile } from '../../types/intrasocial_types';
 import { NotificationCenter } from "../../utilities/NotificationCenter";
 import { EventStreamMessageType } from "../../network/ChannelEventStream";
 import { EventSubscription } from "fbemitter";

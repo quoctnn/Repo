@@ -4,7 +4,7 @@ import { AvatarStatusColor, UserStatus } from '../../types/intrasocial_types';
 import { UserStatusIndicator } from './UserStatusIndicator';
 import "./Avatar.scss"
 import { ReduxState } from '../../redux';
-import { connect } from 'react-redux';
+import { connect, DispatchProp } from 'react-redux';
 import { ProfileManager } from '../../managers/ProfileManager';
 
 type OwnProps = {
@@ -19,9 +19,10 @@ type OwnProps = {
 type ReduxStateProps = {
     statusColor?:AvatarStatusColor,
 }
-type Props = ReduxStateProps & OwnProps
+type DefaultProps = ReduxStateProps & OwnProps 
+type Props = DefaultProps & DispatchProp
 class Avatar extends React.PureComponent<Props & React.HTMLAttributes<HTMLElement>, {}> {
-    static defaultProps:Props = {
+    static defaultProps:DefaultProps = {
         size:50,
         borderWidth:0,
         borderColor:"none",
@@ -36,7 +37,7 @@ class Avatar extends React.PureComponent<Props & React.HTMLAttributes<HTMLElemen
     }
     render()
     {
-        const {image, images, borderColor, borderWidth, size, children, className, statusColor, userStatus, innerRef ,...rest} = this.props
+        const {image, images, borderColor, borderWidth, size, children, className, statusColor, userStatus, innerRef, dispatch ,...rest} = this.props
         let imgs:string[] = []
         if(image)
             imgs.push(image)
@@ -72,4 +73,4 @@ const mapStateToProps = (state: ReduxState, ownProps: OwnProps): ReduxStateProps
     }
     return {}
 }
-export default connect<ReduxStateProps, null, OwnProps>(mapStateToProps, null)(Avatar)
+export default connect<ReduxStateProps, DispatchProp, OwnProps>(mapStateToProps, null)(Avatar)
