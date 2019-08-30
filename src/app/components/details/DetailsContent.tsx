@@ -2,8 +2,8 @@ import * as React from 'react';
 import { Community } from '../../types/intrasocial_types';
 import { translate } from '../../localization/AutoIntlProvider';
 import { Link } from 'react-router-dom';
-import { IntraSocialUtilities } from '../../utilities/IntraSocialUtilities';
 import "./DetailsContent.scss"
+import { MentionProcessorComponent } from '../MentionProcessorComponent';
 
 type OwnProps = {
     community?:Community
@@ -22,6 +22,7 @@ export class DetailsContent extends React.Component<Props, State> {
     }
     render()
     {
+        const description = this.props.description
         return (
             <div className="details-content">
                 { this.props.community &&
@@ -31,9 +32,9 @@ export class DetailsContent extends React.Component<Props, State> {
                     </div>
                 }
                 {this.props.children}
-                { this.props.description &&
-                    <div title={IntraSocialUtilities.htmlToText(this.props.description)} className="details-description">
-                        {IntraSocialUtilities.htmlToText(this.props.description)}
+                { description &&
+                    <div className="details-description">
+                        <MentionProcessorComponent text={description} processHtml={true} />
                     </div>
                 }
             </div>

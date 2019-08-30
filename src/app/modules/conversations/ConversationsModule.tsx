@@ -87,12 +87,18 @@ class ConversationsModule extends React.Component<Props, State> {
         this.observers.push(observer2)
         const observer3 = NotificationCenter.addObserver(ConversationActionRemoveUsersNotification, this.processConversationActionRemoveUsers)
         this.observers.push(observer3)
+        const observer4 = NotificationCenter.addObserver(ConversationActionDeleteNotification, this.processConversationActionDelete)
+        this.observers.push(observer4)
 
     }
     componentWillUnmount = () => {
         this.observers.forEach(o => o.remove())
         this.observers = null
         this.conversationsList = null
+    }
+    processConversationActionDelete = (...args:any[]) => {
+        let data:ConversationActionArgument = args[0]
+        this.onConversationAction(ConversationAction.delete, data)
     }
     processConversationActionRemoveUsers = (...args:any[]) => {
         let data:ConversationActionArgument = args[0]
@@ -335,11 +341,8 @@ class ConversationsModule extends React.Component<Props, State> {
                     ConversationManager.updateTemporaryConversation(null)
                     this.conversationsList.current.removeItemById(conversation.id)
                     NavigationUtilities.navigateToConversation(this.props.history, firstConversation && firstConversation.id)
+                    break;
                 }
-                else{
-                    this.setAction(argument, action)
-                }
-                break;
             }
             case ConversationAction.leave:
             case ConversationAction.archive:

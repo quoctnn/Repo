@@ -55,7 +55,6 @@ type State = {
     showSpinner:boolean
     isTyping:{[key:string]:NodeJS.Timer}
     renderDropZone:boolean
-    conversationEditorDialogVisible:boolean
 }
 type ReduxStateProps = {
     conversation: Conversation
@@ -86,7 +85,6 @@ class ConversationModule extends React.Component<Props, State> {
             showSpinner:false,
             isTyping:{},
             renderDropZone:false,
-            conversationEditorDialogVisible:false
         }
     }
     shouldReloadList = (prevProps:Props) => {
@@ -131,7 +129,7 @@ class ConversationModule extends React.Component<Props, State> {
         if(!this.props.conversation && !!prevProps.conversation) // if conversation removed
         {
             this.setState((prevState:State) => {
-                return {conversationEditorDialogVisible:false, renderDropZone:false, showSpinner:false}
+                return {renderDropZone:false, showSpinner:false}
             })
         }
         if(this.props.location.pathname != prevProps.location.pathname && this.messageComposer && this.messageComposer.current)
@@ -506,7 +504,8 @@ class ConversationModule extends React.Component<Props, State> {
     onMemberSelectChange = (value: ProfileFilterOption[], action: ActionMeta) => {
         const temp = {...this.props.conversation}
         temp.users = value.map(v => v.id)
-        temp.temporary_id = undefined
+        if(!temp.title)
+            temp.temporary_id = undefined
         ConversationManager.updateTemporaryConversation(temp)
     }
     renderMembersInput = () => {
@@ -535,26 +534,9 @@ class ConversationModule extends React.Component<Props, State> {
         const conversation = this.props.conversation
         if(conversation)
         {
-            return <div className="link text-truncate" onClick={this.toggleConversationEditorDialog}>{ConversationUtilities.getConversationTitle(conversation)}</div>
+            return <div className="text-truncate">{ConversationUtilities.getConversationTitle(conversation)}</div>
         }
         return null
-    }
-    toggleConversationEditorDialog = () => {
-        this.setState((prevState:State ) => {
-            return {conversationEditorDialogVisible:!prevState.conversationEditorDialogVisible}
-        })
-    }
-    renderConversationEditorDialog = () => {
-        const conversation = this.props.conversation
-        if(conversation)
-        {
-            const visible = this.state.conversationEditorDialogVisible
-            return <SimpleDialog header={translate("common.conversation.conversation")} showCloseButton={true} didCancel={this.toggleConversationEditorDialog} visible={visible}>
-                        <ConversationEditor conversationId={this.props.conversation.id}/>
-                    </SimpleDialog>
-        }
-        return null
-
     }
     render()
     {
@@ -569,7 +551,6 @@ class ConversationModule extends React.Component<Props, State> {
                     isLoading={this.state.isLoading}
                     headerTitle={title}>
                 {this.renderContent()}
-                {this.renderConversationEditorDialog()}
                 </SimpleModule>)
     }
 }

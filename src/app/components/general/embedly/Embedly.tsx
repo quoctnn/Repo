@@ -153,7 +153,12 @@ class Embedly extends React.Component<Props, State> {
         }
     }
     getUrl = () => {
-        return (this.props.data && this.props.data.provider_url && new URL(this.props.data.url, this.props.data.provider_url).href) || this.props.url
+        if(this.props.data && this.props.data.provider_url)
+        {
+            const u = this.props.data.internal ? this.props.data.url : this.props.data.original_url
+            return new URL(u, this.props.data.provider_url).href
+        }
+        return this.props.url
     }
     render = () => {
         if(!this.props.renderOnError && this.props.hasError)

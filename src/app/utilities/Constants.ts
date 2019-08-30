@@ -266,6 +266,9 @@ export default  {
         conversation: (id:number) => {
             return `/api/v2/conversation/${id}/`
         },
+        archiveConversation: (id:number) => {
+            return `/api/v2/conversation/${id}/archive/`
+        },
         leaveConversation: (id:number) => {
             return `/api/v2/conversation/${id}/leave/`
         },

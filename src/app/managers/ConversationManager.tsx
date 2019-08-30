@@ -49,7 +49,7 @@ export abstract class ConversationManager
     }
     static archiveConversation = (conversationId:number, completion:(success:boolean) => void) =>
     {
-        ApiClient.deleteConversation(conversationId, (data, status, error) => {
+        ApiClient.archiveConversation(conversationId, (data, status, error) => {
             const success = nullOrUndefined(error)
             ToastManager.showErrorToast(error)
             completion(success)
@@ -131,6 +131,8 @@ export abstract class ConversationManager
         store.dispatch(setTemporaryConversationAction(conversation))
     }
     static updateTemporaryConversation = (conversation:Conversation) => {
+        if(!!conversation)
+            conversation.updated_at = new Date().toUTCString()
         let store = ConversationManager.getStore()
         const tempConversation = store.getState().tempCache.conversation
         store.dispatch(setTemporaryConversationAction(conversation))

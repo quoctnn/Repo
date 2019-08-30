@@ -76,14 +76,17 @@ export class RequestErrorData{
     detail?:RequestErrorDetail
     constructor(data:any) {
         this.data = data
-        if(data.detail)
+        if(data && data.detail)
         {
-            this.detail = JSON.parse(data.detail)
+            try {
+                this.detail = JSON.parse(data.detail)
+            } catch (error) {
+            }
         }
     }
     getErrorMessage = () => {
 
-        const error = (this.detail && this.detail.error_description) || this.data.non_field_errors
+        const error = (this.detail && this.detail.error_description) || (this.data && this.data.non_field_errors)
         let errorMessage:string = undefined
         if(error)
         {
@@ -1031,6 +1034,8 @@ export type Conversation =
     unread_messages: number[]
     temporary?: boolean
     temporary_id?:number
+    private?:boolean 
+    admins?:number[]
 
 } & Linkable & IdentifiableObject & Permissible
 

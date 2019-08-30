@@ -3,17 +3,17 @@ import { withRouter, RouteComponentProps, Link } from "react-router-dom";
 import classnames from "classnames"
 import "./ConversationDetailsModule.scss"
 import { ResponsiveBreakpoint } from '../../components/general/observers/ResponsiveComponent';
-import { ContextNaturalKey, Conversation, UserProfile, UserStatus } from '../../types/intrasocial_types';
+import { ContextNaturalKey, Conversation, UserProfile } from '../../types/intrasocial_types';
 import { connect } from 'react-redux';
 import { ReduxState } from '../../redux';
 import SimpleModule from '../SimpleModule';
 import { ContextManager } from '../../managers/ContextManager';
 import { AuthenticationManager } from '../../managers/AuthenticationManager';
-import { tempConversationId, ConversationActionArchiveNotification, ConversationActionLeaveNotification, ConversationActionRemoveUsersNotification } from '../conversations/ConversationsModule';
+import { tempConversationId, ConversationActionArchiveNotification, ConversationActionLeaveNotification, ConversationActionRemoveUsersNotification, ConversationActionDeleteNotification } from '../conversations/ConversationsModule';
 import { ConversationUtilities } from '../../utilities/ConversationUtilities';
 import ApiClient from '../../network/ApiClient';
 import { ToastManager } from '../../managers/ToastManager';
-import { translate } from '../../localization/AutoIntlProvider';
+import { translate, lazyTranslate } from '../../localization/AutoIntlProvider';
 import { ProfileManager } from '../../managers/ProfileManager';
 import { ListItem, List, ListHeader } from '../../components/general/List';
 import { uniqueId, userFullName, userAvatar } from '../../utilities/Utilities';
@@ -23,6 +23,7 @@ import { InputGroup, Input } from 'reactstrap';
 import { DropDownMenu } from '../../components/general/DropDownMenu';
 import { OverflowMenuItem, OverflowMenuItemType } from '../../components/general/OverflowMenu';
 import { NotificationCenter } from '../../utilities/NotificationCenter';
+import { ConversationManager } from '../../managers/ConversationManager';
 type OwnProps = {
     className?:string
     breakpoint:ResponsiveBreakpoint
@@ -62,10 +63,13 @@ class ConversationDetailsModule extends React.Component<Props, State> {
     componentDidUpdate = (prevProps:Props, prevState:State) => {
         if(this.shouldUpdate(prevProps))
         {
-            this.setState(() => {
-                return {title:this.getTitle(this.props)}
-            })
+            this.updateTitle()
         }
+    }
+    updateTitle = () => {
+        this.setState(() => {
+            return {title:this.getTitle(this.props)}
+        })
     }
     getTitle = (props:Props) => {
         return (props.conversation && ConversationUtilities.getConversationTitle(props.conversation)) || ""
@@ -77,8 +81,31 @@ class ConversationDetailsModule extends React.Component<Props, State> {
         })
     }
     onTitleBlur = (event: React.FocusEvent<HTMLInputElement>) => {
+        const {conversation} = this.props
+        if(!conversation)
+            return
+        if(conversation.temporary)
+        {
+            const title = this.state.title
+            const temp = {...conversation}
+            if(!title || title == "")
+            {
+                temp.title = null 
+                temp.temporary_id = null
+                this.setState((prevState:State) => {
+                    return {title:ConversationUtilities.getConversationTitle(temp)}
+                })
+            }
+            else {
+
+                temp.title = title
+                temp.temporary_id = -1
+            }
+            ConversationManager.updateTemporaryConversation(temp)
+            return
+        }
         const oldTitle = this.getTitle(this.props)
-        const conversationId = this.props.conversation && this.props.conversation.id
+        const conversationId = conversation.id
         if(conversationId && this.state.title != oldTitle)
         {
             ApiClient.updateConversation(conversationId,{title:this.state.title}, (data, status, error) => {
@@ -92,11 +119,13 @@ class ConversationDetailsModule extends React.Component<Props, State> {
         const items:OverflowMenuItem[] = []
         if(conversation.temporary)
             return items
+        const authenticatedUserId = this.props.authenticatedUser.id
+        const admins = conversation.admins || []
         items.push({id:"1", type:OverflowMenuItemType.option, title:translate("common.page.profile"), onPress:() => window.app.navigateToRoute(profile.uri), toggleMenu:false})
-        if(profile.id != this.props.authenticatedUser.id)
+        if(profile.id != authenticatedUserId)
         {
             items.push({id:"2", type:OverflowMenuItemType.option, title:translate("conversation.message.user"), onPress:() => alert("not implemented")})
-            if(conversation.users.length > 2)
+            if(admins.contains(authenticatedUserId) && conversation.users.length > 2)
                 items.push({id:"3", type:OverflowMenuItemType.option, title:translate("conversation.user.remove"), onPress:() => NotificationCenter.push(ConversationActionRemoveUsersNotification,[{conversation:conversation.id, users:[profile.id]}]), toggleMenu:false})
         }
         return items
@@ -105,7 +134,7 @@ class ConversationDetailsModule extends React.Component<Props, State> {
         const conversation = this.props.conversation
         const profile = ProfileManager.getProfileById(member)
         return <ListItem key={profile.id || uniqueId()} className="d-flex align-items-center justify-content-between member-item">
-                        <div className="d-flex align-items-center">
+                        <div className="d-flex align-items-center text-truncate">
                             <Avatar userStatus={profile.id} className="mr-2" size={40} image={userAvatar(profile, true)} />
                             <div className="text-truncate">{userFullName(profile)}</div>
                         </div>
@@ -118,7 +147,8 @@ class ConversationDetailsModule extends React.Component<Props, State> {
         })
     }
     renderAddMembers = () => {
-        const canAddMembers = true
+        const conversation = this.props.conversation
+        const canAddMembers = conversation && !conversation.temporary && !conversation.private
         if(!canAddMembers)
             return
         return <ListItem hasAction={true} onClick={this.toggleAddMembersDialog} className="d-flex align-items-center">
@@ -133,8 +163,8 @@ class ConversationDetailsModule extends React.Component<Props, State> {
         this.setState((prevState:State) => {
             return {addMembersDialogVisible:false}
         }, () => {
-            ApiClient.addConversationUsers(conversationId, added, (conversation, status, error) => {
-                ToastManager.showErrorToast(error, status, translate("Could not add new members"))
+            ApiClient.addConversationUsers(conversationId, added, (conversation, status, error, errorData) => {
+                ToastManager.showRequestErrorToast(errorData, lazyTranslate("network.error"))
             })
         })
     }
@@ -164,6 +194,8 @@ class ConversationDetailsModule extends React.Component<Props, State> {
                     />
     }
     renderMembers = () => {
+        if(this.props.conversation.private)
+            return null
         return this.props.conversation.users.map(this.renderMember)
     }
     getOptionMenuItems = () => {
@@ -174,6 +206,7 @@ class ConversationDetailsModule extends React.Component<Props, State> {
         
         items.push({id:"1", type:OverflowMenuItemType.option, title:translate("common.rename"), onPress:() => this.titleRef && this.titleRef.current && this.titleRef.current.focus(), toggleMenu:false})
         const isArchived = (conversation.archived_by || []).contains(this.props.authenticatedUser.id)
+        items.push({id:"2", type:OverflowMenuItemType.option, title:translate("conversation.menu.delete"), onPress:() => NotificationCenter.push(ConversationActionDeleteNotification,[{conversation:conversation.id}]), toggleMenu:false})
         if(!isArchived)
             items.push({id:"3", type:OverflowMenuItemType.option, title:translate("conversation.menu.archive"), onPress:() => NotificationCenter.push(ConversationActionArchiveNotification,[{conversation:conversation.id}]), toggleMenu:false})
         
@@ -194,12 +227,12 @@ class ConversationDetailsModule extends React.Component<Props, State> {
                     <div className="d-flex">
                         {ConversationUtilities.getAvatar(conversation, authenticatedUser.id, true)}
                         <InputGroup className="input-group-transparent">
-                            <Input disabled={conversation.temporary} innerRef={this.titleRef} placeholder={translate("common.title")} tabIndex={1} className="form-control-transparent primary-text title-text" value={title} onChange={this.onTitleChange} onBlur={this.onTitleBlur} /> 
+                            <Input innerRef={this.titleRef} placeholder={translate("common.title")} tabIndex={1} className="text-truncate form-control-transparent primary-text title-text" value={title} onChange={this.onTitleChange} onBlur={this.onTitleBlur} /> 
                         </InputGroup>
                         {!conversation.temporary && <DropDownMenu items={this.getOptionMenuItems()} triggerClass="fas fa-cog action-button push-right" />}
                     </div>
-                    <ListHeader>{translate("conversation.members")}</ListHeader>
-                    {!conversation.temporary && this.renderAddMembers()}
+                    {!conversation.private && <ListHeader>{translate("conversation.members")}</ListHeader>}
+                    {this.renderAddMembers()}
                     {this.renderMembers()}
                 </List>
                 {this.renderAddmembersDialog()}

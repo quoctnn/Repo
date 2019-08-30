@@ -25,10 +25,9 @@ export type ElasticSuggestion = {text:string, offset:number, length:number, opti
 export type ElasticExtensionResult = {stats:{suggestions:{[key:string]:ElasticSuggestion}, aggregations:{[key:string]:any}}}
 export type StatusCommentsResult<T> = {results:T[], count:number, parent:T}
 export type ElasticResult<T> = PaginationResult<T> & ElasticExtensionResult
-export type ApiClientFeedPageCallback<T> = (data: PaginationResult<T>, status:string, error:string|null) => void;
-export type ApiClientCallback<T> = (data: T|null, status:string, error:string|null) => void;
-export type ApiClientCallbackWithError<T> = (data: T|null, status:string, error:string|null, errorData?:RequestErrorData) => void;
-export type ApiStatusCommentsCallback<T> = (data: StatusCommentsResult<T>, status:string, error:string|null) => void;
+export type ApiClientFeedPageCallback<T> = (data: PaginationResult<T>, status:string, error:string|null, errorData?:RequestErrorData) => void;
+export type ApiClientCallback<T> = (data: T|null, status:string, error:string|null, errorData?:RequestErrorData) => void;
+export type ApiStatusCommentsCallback<T> = (data: StatusCommentsResult<T>, status:string, error:string|null, errorData?:RequestErrorData) => void;
 export type SearchArguments = {
     term?:string
     types?:ElasticSearchType[]
@@ -85,7 +84,7 @@ export default class ApiClient
             }
             callback(location, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static getBackendVersionInfo(callback:ApiClientCallback<VersionInfo>){
@@ -93,7 +92,7 @@ export default class ApiClient
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static createTimesheet(task:number, description:string, date:moment.Moment,  hours:number, minutes:number, callback:ApiClientCallback<Timesheet>){
@@ -101,7 +100,7 @@ export default class ApiClient
         AjaxRequest.postJSON(url,  { task, date:date.format("YYYY-MM-DD"), description, hours, minutes}, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static getDashboards(callback:ApiClientFeedPageCallback<Dashboard>){
@@ -109,7 +108,7 @@ export default class ApiClient
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static reportObject(type:string, contextId:number, tags:string[], description:string , callback:ApiClientCallback<ReportResult>){
@@ -118,7 +117,7 @@ export default class ApiClient
         AjaxRequest.postJSON(endpoint,  { description, tags}, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static getReportTags(callback:ApiClientCallback<ReportTag[]>){
@@ -129,7 +128,7 @@ export default class ApiClient
             });
             callback(arr, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static getSearchHistory(callback:ApiClientFeedPageCallback<SearchHistory>){
@@ -137,7 +136,7 @@ export default class ApiClient
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static deleteSearchHistory(id:number, callback:ApiClientCallback<any>){
@@ -145,7 +144,7 @@ export default class ApiClient
         AjaxRequest.delete(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static createSearchHistory(term:string, callback:ApiClientFeedPageCallback<SearchHistory>){
@@ -153,7 +152,7 @@ export default class ApiClient
         AjaxRequest.postJSON(url, {term}, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static createStatusAttribute(status:number, attribute:ObjectAttributeType, user:number, callback:ApiClientCallback<StatusObjectAttribute>){
@@ -161,7 +160,7 @@ export default class ApiClient
         AjaxRequest.postJSON(endpoint, {status, attribute, user}, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static setStatusesRead(ids:number[], callback:ApiClientCallback<any>){
@@ -169,7 +168,7 @@ export default class ApiClient
         AjaxRequest.postJSON(url, {ids}, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static setMessagesRead(ids:number[], callback:ApiClientCallback<any>){
@@ -177,7 +176,7 @@ export default class ApiClient
         AjaxRequest.postJSON(url, {ids}, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static deleteStatusAttribute(id:number, callback:ApiClientCallback<any>){
@@ -185,7 +184,7 @@ export default class ApiClient
         AjaxRequest.delete(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static deleteTaskAttribute(id:number, callback:ApiClientCallback<any>){
@@ -193,7 +192,7 @@ export default class ApiClient
         AjaxRequest.delete(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static getEmbedCards(urls:string[], callback:ApiClientCallback<EmbedCardItem[]>){
@@ -201,7 +200,7 @@ export default class ApiClient
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static search2( limit:number, offset:number, params:SearchArguments, callback:ApiClientCallback<ElasticResult<any>>){
@@ -209,7 +208,7 @@ export default class ApiClient
         AjaxRequest.postJSON(url, params, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static statusComments(parent:number, position:number, children:number, includeParent:boolean, callback:ApiStatusCommentsCallback<Status>)
@@ -219,7 +218,7 @@ export default class ApiClient
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static statusSingle(id:number, callback:ApiStatusCommentsCallback<Status>)
@@ -228,7 +227,7 @@ export default class ApiClient
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static newsfeedV2(limit:number,offset:number,context_natural_key:ContextNaturalKey, context_object_id:number, parent:number, children:number,attribute:ObjectAttributeType, include_sub_context:boolean = true, after:number, callback:ApiClientFeedPageCallback<Status>)
@@ -237,7 +236,7 @@ export default class ApiClient
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static newsfeed(limit:number,offset:number, parent:number|null, children:number|null, callback:ApiClientFeedPageCallback<Status>)
@@ -246,7 +245,7 @@ export default class ApiClient
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static getNotifications(callback:ApiClientCallback<UnhandledNotifications>)
@@ -255,7 +254,7 @@ export default class ApiClient
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
 
     }
@@ -265,7 +264,7 @@ export default class ApiClient
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
 
     }
@@ -284,7 +283,7 @@ export default class ApiClient
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static readNotificationActions(callback: ApiClientCallback<any>)
@@ -293,7 +292,7 @@ export default class ApiClient
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static createStatus(status:Status, callback:ApiClientCallback<Status>)
@@ -302,7 +301,7 @@ export default class ApiClient
         AjaxRequest.post(url,status, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static deleteStatus(statusId:number, callback:ApiClientCallback<any>)
@@ -311,7 +310,17 @@ export default class ApiClient
         AjaxRequest.delete(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
+        })
+    }
+    
+    static archiveConversation(conversationId:number, callback:ApiClientCallback<any>)
+    {
+        let url = Constants.apiRoute.archiveConversation(conversationId)
+        AjaxRequest.get(url, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static deleteConversation(conversationId:number, callback:ApiClientCallback<any>)
@@ -320,7 +329,7 @@ export default class ApiClient
         AjaxRequest.delete(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static updateConversation(id:number, conversation:Partial<Conversation>, callback:ApiClientCallback<Conversation>)
@@ -329,7 +338,7 @@ export default class ApiClient
         AjaxRequest.patch(url, conversation, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static addConversationUsers(conversation:number, users:number[], callback:ApiClientCallback<Conversation>)
@@ -338,7 +347,7 @@ export default class ApiClient
         AjaxRequest.post(url, {users}, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static removeConversationUsers(conversation:number, users:number[], callback:ApiClientCallback<Conversation>)
@@ -347,7 +356,7 @@ export default class ApiClient
         AjaxRequest.post(url, {remove:users}, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static leaveConversation(id:number, callback:ApiClientCallback<any>)
@@ -356,7 +365,7 @@ export default class ApiClient
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static updateTask(id:number, task:Partial<Task>, callback:ApiClientCallback<Task>)
@@ -365,7 +374,7 @@ export default class ApiClient
         AjaxRequest.patch(url, task, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static updateStatus(status:Partial<Status>, callback:ApiClientCallback<Status>)
@@ -374,7 +383,7 @@ export default class ApiClient
         AjaxRequest.patchJSON(url, status, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static getStatus(id:number|string, callback:ApiClientCallback<Status>)
@@ -383,7 +392,7 @@ export default class ApiClient
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static getCommunity(communityId:string|number, callback:ApiClientCallback<Community>)
@@ -392,7 +401,7 @@ export default class ApiClient
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static setMainCommunity(communityId:string|number, callback:ApiClientCallback<Community>)
@@ -401,7 +410,7 @@ export default class ApiClient
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static getFiles(context_natural_key:ContextNaturalKey, context_object_id:number, limit:number, offset:number, callback:ApiClientFeedPageCallback<UploadedFile>){
@@ -409,7 +418,7 @@ export default class ApiClient
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static getCommunityFiles(communityId:string|number, limit:number, offset:number, callback:ApiClientFeedPageCallback<UploadedFile>)
@@ -418,7 +427,7 @@ export default class ApiClient
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static getProject(projectId:string|number, callback:ApiClientCallback<Project>)
@@ -427,7 +436,7 @@ export default class ApiClient
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static getTasks(limit:number,
@@ -458,7 +467,7 @@ export default class ApiClient
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static getTask(taskId:number, callback:ApiClientCallback<Task>)
@@ -467,7 +476,7 @@ export default class ApiClient
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static getEvent(eventId:string|number, callback:ApiClientCallback<Event>)
@@ -476,7 +485,7 @@ export default class ApiClient
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static getProfilesByIds(profiles:number[], callback:ApiClientFeedPageCallback<UserProfile>)
@@ -485,7 +494,7 @@ export default class ApiClient
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static getProfiles(limit:number, offset:number, callback:ApiClientFeedPageCallback<UserProfile>)
@@ -494,7 +503,7 @@ export default class ApiClient
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static reactToStatus(statusId:number,reaction:string, callback:ApiClientCallback<any>)
@@ -502,7 +511,7 @@ export default class ApiClient
         AjaxRequest.post(Constants.apiRoute.postReaction(statusId), {reaction}, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static createConversation(title:string, users:number[], callback:ApiClientCallback<Conversation>)
@@ -515,7 +524,7 @@ export default class ApiClient
         AjaxRequest.postJSON(Constants.apiRoute.conversations, d, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static getProfile(id:string|number, callback:ApiClientCallback<UserProfile>)
@@ -523,7 +532,7 @@ export default class ApiClient
         AjaxRequest.get(Constants.apiRoute.profileUrl(id), (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static getProfilesBySlug(slug:string, callback:ApiClientFeedPageCallback<UserProfile>)
@@ -532,7 +541,7 @@ export default class ApiClient
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static getMyProfile(callback:ApiClientCallback<UserProfile>)
@@ -540,7 +549,7 @@ export default class ApiClient
         AjaxRequest.get(Constants.apiRoute.myProfileUrl, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static getGDPRForm(preferredLanguage:string, callback:ApiClientCallback<GDPRInfo>)
@@ -549,10 +558,10 @@ export default class ApiClient
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
-    static apiLogin(email:string, password:string, update_gdpr_continuation_key:string, gdpr_user_response:GDPRFormAnswers,callback:ApiClientCallbackWithError<{token:string}>)
+    static apiLogin(email:string, password:string, update_gdpr_continuation_key:string, gdpr_user_response:GDPRFormAnswers,callback:ApiClientCallback<{token:string}>)
     {
         const data = this.getQueryString({username:email,password,update_gdpr_continuation_key, gdpr_user_response:gdpr_user_response && JSON.stringify(gdpr_user_response)})
         AjaxRequest.post(Constants.apiRoute.login,data, (data, status, request) => {
@@ -561,7 +570,7 @@ export default class ApiClient
             callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
-    static apiSocialLogin(provider:string, accessToken:string, code:string, id_token:string, update_gdpr_continuation_key:string, gdpr_user_response:GDPRFormAnswers, callback:ApiClientCallbackWithError<{token:string}>)
+    static apiSocialLogin(provider:string, accessToken:string, code:string, id_token:string, update_gdpr_continuation_key:string, gdpr_user_response:GDPRFormAnswers, callback:ApiClientCallback<{token:string}>)
     {
         const data = this.getQueryString({provider,access_token:accessToken,code,id_token, update_gdpr_continuation_key, gdpr_user_response:gdpr_user_response && JSON.stringify(gdpr_user_response)})
         AjaxRequest.post(Constants.apiRoute.socialLogin, data, (data, status, request) => {
@@ -570,7 +579,7 @@ export default class ApiClient
             callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
-    static nativeLogin(email:string, password:string, update_gdpr_continuation_key:string, gdpr_user_response:GDPRFormAnswers, callback:ApiClientCallbackWithError<{token:string}>)
+    static nativeLogin(email:string, password:string, update_gdpr_continuation_key:string, gdpr_user_response:GDPRFormAnswers, callback:ApiClientCallback<{token:string}>)
     {
         const data = this.getQueryString({username:email,password,update_gdpr_continuation_key, gdpr_user_response:gdpr_user_response && JSON.stringify(gdpr_user_response)})
         AjaxRequest.post(Constants.apiRoute.nativeLogin, data, (data, status, request) => {
@@ -585,7 +594,7 @@ export default class ApiClient
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static getGroups(community:number, parent:number, limit:number, offset:number, ordering:GroupSorting, callback:ApiClientFeedPageCallback<Group>)
@@ -595,7 +604,7 @@ export default class ApiClient
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
 
@@ -605,7 +614,7 @@ export default class ApiClient
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static getTimesheets(community:number, user:number, project:number, task:number, limit:number, offset:number,callback:ApiClientFeedPageCallback<Timesheet>)
@@ -614,7 +623,7 @@ export default class ApiClient
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static getEvents(community:number, parent:number, group:number, limit:number, offset:number, ordering:string, upcoming:boolean, callback:ApiClientFeedPageCallback<Event>)
@@ -625,7 +634,7 @@ export default class ApiClient
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static getProjects(community:number, group:number, limit:number, offset:number, ordering:ProjectSorting, responsible:boolean, assigned:boolean, callback:ApiClientFeedPageCallback<Project>)
@@ -634,7 +643,7 @@ export default class ApiClient
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static getConversations(limit:number, offset:number, archived:boolean, withUsers:number[], callback:ApiClientFeedPageCallback<Conversation>)
@@ -643,7 +652,7 @@ export default class ApiClient
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static getConversation(id:number,callback:ApiClientCallback<Conversation>)
@@ -652,7 +661,7 @@ export default class ApiClient
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static createMessage(message:Message, callback:ApiClientCallback<Message>)
@@ -680,10 +689,10 @@ export default class ApiClient
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
-    static createFavorite(object_natural_key:ContextNaturalKey, object_id:number, index:number, callback:ApiClientCallbackWithError<Favorite>)
+    static createFavorite(object_natural_key:ContextNaturalKey, object_id:number, index:number, callback:ApiClientCallback<Favorite>)
     {
         let url = Constants.apiRoute.favoritesUrl
         const data:Partial<Favorite> = {}
@@ -703,7 +712,7 @@ export default class ApiClient
         AjaxRequest.patchJSON(url, {object_natural_key, object_id, index}, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static deleteFavorite(id:number, callback:ApiClientCallback<any>){
@@ -711,7 +720,7 @@ export default class ApiClient
         AjaxRequest.delete(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     private static sendMessage(message:Message, callback:ApiClientCallback<Message>){
@@ -727,7 +736,7 @@ export default class ApiClient
             m.tempFile = Object.assign({}, m.tempFile)
             m.error = status
             ConversationManager.updateQueuedMessage(m)
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static updateFilename(fileId:number,filename:string, callback:ApiClientCallback<UploadedFile>)
@@ -735,7 +744,7 @@ export default class ApiClient
         AjaxRequest.post(Constants.apiRoute.fileUploadUpdateName(fileId), {filename}, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     private static uploadFile(message:Message, completion:(message:Message) => void){
@@ -776,7 +785,7 @@ export default class ApiClient
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static markConversationAsRead(conversationId:number, callback:ApiClientCallback<any>)
@@ -785,7 +794,7 @@ export default class ApiClient
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static markTaskAsRead(id:number, callback:ApiClientCallback<any>)
@@ -794,7 +803,7 @@ export default class ApiClient
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static getPage<T>(endpoint:string, limit:number, offset:number,callback:ApiClientFeedPageCallback<T>)
@@ -803,7 +812,7 @@ export default class ApiClient
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static friendInvitationGetId = (userId:number, callback:ApiClientCallback<any>) => {
@@ -811,7 +820,7 @@ export default class ApiClient
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static friendInvitationSend = (userId:number, callback:ApiClientCallback<any>) => {
@@ -819,7 +828,7 @@ export default class ApiClient
         AjaxRequest.post(url, {to_user: userId }, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static friendInvitationAccept = (invitation:number, callback:ApiClientCallback<any>) => {
@@ -827,7 +836,7 @@ export default class ApiClient
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static friendInvitationDelete(invitation:number, block:boolean, callback:ApiClientCallback<any>){
@@ -835,7 +844,7 @@ export default class ApiClient
         AjaxRequest.delete(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static userBlockGetId = (userId:number, callback:ApiClientCallback<any>) => {
@@ -843,7 +852,7 @@ export default class ApiClient
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static userBlock(userId:number, callback:ApiClientCallback<any>){
@@ -852,7 +861,7 @@ export default class ApiClient
         AjaxRequest.postJSON(url, data, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static userUnBlock(blocking:number, callback:ApiClientCallback<any>){
@@ -860,7 +869,7 @@ export default class ApiClient
         AjaxRequest.delete(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static groupInvitationAccept = (invitation:number, callback:ApiClientCallback<any>) => {
@@ -868,7 +877,7 @@ export default class ApiClient
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static groupInvitationDelete(invitation:number, callback:ApiClientCallback<any>){
@@ -876,7 +885,7 @@ export default class ApiClient
         AjaxRequest.delete(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static groupMembershipRequestAccept = (id:number, callback:ApiClientCallback<any>) => {
@@ -884,7 +893,7 @@ export default class ApiClient
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static groupMembershipRequestDelete(id:number, callback:ApiClientCallback<any>){
@@ -892,7 +901,7 @@ export default class ApiClient
         AjaxRequest.delete(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static communityInvitationAccept = (invitation:number, callback:ApiClientCallback<any>) => {
@@ -900,7 +909,7 @@ export default class ApiClient
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static communityInvitationDelete(invitation:number, callback:ApiClientCallback<any>){
@@ -908,7 +917,7 @@ export default class ApiClient
         AjaxRequest.delete(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static communityMembershipRequestAccept = (id:number, callback:ApiClientCallback<any>) => {
@@ -916,7 +925,7 @@ export default class ApiClient
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static communityMembershipRequestDelete(id:number, callback:ApiClientCallback<any>){
@@ -924,7 +933,7 @@ export default class ApiClient
         AjaxRequest.delete(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static eventInvitationGoing = (invitation:number, callback:ApiClientCallback<any>) => {
@@ -932,7 +941,7 @@ export default class ApiClient
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static eventInvitationNotGoing = (invitation:number, callback:ApiClientCallback<any>) => {
@@ -940,7 +949,7 @@ export default class ApiClient
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static eventInvitationDelete(invitation:number, callback:ApiClientCallback<any>){
@@ -948,7 +957,7 @@ export default class ApiClient
         AjaxRequest.delete(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static eventMembershipRequestAccept = (id:number, callback:ApiClientCallback<any>) => {
@@ -956,7 +965,7 @@ export default class ApiClient
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static eventMembershipRequestDelete(id:number, callback:ApiClientCallback<any>){
@@ -964,7 +973,7 @@ export default class ApiClient
         AjaxRequest.delete(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static getUnreadNotifications(callback:ApiClientCallback<UnreadNotificationCounts>){
@@ -972,7 +981,7 @@ export default class ApiClient
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static getLanguages(limit:number, offset:number, user:number, callback:ApiClientFeedPageCallback<ProfileLanguage>){
@@ -980,7 +989,7 @@ export default class ApiClient
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static getCertifications(limit:number, offset:number, user:number, callback:ApiClientFeedPageCallback<ProfileCertification>){
@@ -988,7 +997,7 @@ export default class ApiClient
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static getEducations(limit:number, offset:number, user:number, callback:ApiClientFeedPageCallback<ProfileEducation>){
@@ -996,7 +1005,7 @@ export default class ApiClient
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static getPositions(limit:number, offset:number, user:number, callback:ApiClientFeedPageCallback<ProfilePosition>){
@@ -1004,7 +1013,7 @@ export default class ApiClient
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static getVolunteering(limit:number, offset:number, user:number, callback:ApiClientFeedPageCallback<ProfileVolunteeringExperience>){
@@ -1012,7 +1021,7 @@ export default class ApiClient
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static sendCrashReport(level:CrashLogLevel, message:string, stack:string, componentStack:string, user_id:number, user_agent:string, endpoint:string, extra:string, callback:ApiClientCallback<any>){
@@ -1020,7 +1029,7 @@ export default class ApiClient
         AjaxRequest.postJSON(url,  { level, message, stack, componentStack, user_id, user_agent, endpoint, extra}, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
     static getCalendarItems(start:Date, end:Date, callback:ApiClientCallback<(CalendarItem | Event | Task)[]>){
@@ -1030,7 +1039,7 @@ export default class ApiClient
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
-            callback(null, status, error)
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
 
