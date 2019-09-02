@@ -57,7 +57,7 @@ export function userAvatar(user: UserProfile, thumbnail = false) {
     let val: string = null
     if (user)
         val = thumbnail ? user.avatar_thumbnail || user.avatar : user.avatar || user.avatar_thumbnail
-    return val || Constants.resolveUrl(Constants.defaultImg.user)()
+    return val || Constants.resolveUrl(Constants.defaultImg.userAvatar)()
 }
 export function communityAvatar(community: Community, thumbnail = false) {
     let val: string = null

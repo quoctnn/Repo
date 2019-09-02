@@ -1087,6 +1087,7 @@ export type UserProfile = {
     connections?: number[]
     active_community?: number
     mutual_contacts: ProfileConnections
+    unresolved_time?:string
 } & SimpleUserProfile & AvatarAndCover & Linkable & Permissible
 
 export type Group = {
@@ -1340,7 +1341,7 @@ const UserStatusObjects: { [key: string]: UserStatusItem } = {
 export namespace UserStatus {
 
     export function getObject(status: UserStatus) {
-        return UserStatusObjects[status]
+        return UserStatusObjects[status] || UserStatusObjects[UserStatus.invisible]
     }
     export function getTranslation(status: UserStatus) {
         return translate("user.status." + status)

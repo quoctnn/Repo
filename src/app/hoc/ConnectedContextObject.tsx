@@ -18,7 +18,10 @@ type State<T> = {
 }
 class GenericConnectedContextObject<T> extends React.Component<Props<T>,State<T>> {
     constructor(props:Props<T>) {
-      super(props);
+      super(props)
+      this.state = {
+          object:null
+      }
     }
     componentDidMount = () => {
         if(!this.props.object)

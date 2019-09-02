@@ -1,5 +1,4 @@
 import {  Store } from 'redux';
-import ApiClient from '../network/ApiClient';
 import { CommunityManager } from './CommunityManager';
 import { UserProfile, ContextNaturalKey } from '../types/intrasocial_types';
 import { AuthenticationManager } from './AuthenticationManager';
@@ -10,6 +9,7 @@ import { addProfilesAction } from '../redux/profileStore';
 import { userFullName } from '../utilities/Utilities';
 import { NotificationCenter } from '../utilities/NotificationCenter';
 import { EventStreamMessageType } from '../network/ChannelEventStream';
+import { ProfileResolver } from '../network/ProfileResolver';
 
 export type ProfileManagerSearchInContextProps = {
     search:string
@@ -17,10 +17,6 @@ export type ProfileManagerSearchInContextProps = {
     contextObjectId?:number
     contextNaturalKey?:ContextNaturalKey
     completion:(members:UserProfile[]) => void
-}
-type ProfileRequestObject = {
-    profiles:number[]
-    completion:() => void
 }
 export abstract class ProfileManager
 {
@@ -61,17 +57,20 @@ export abstract class ProfileManager
         let profile = ProfileManager.getProfile(id)
         if(!profile || forceUpdate)
         {
-            ApiClient.getProfile(id, (data, status, error) => {
-                if(data)
-                {
-                    ProfileManager.storeProfile(data)
-                }
-                else
-                {
-                    console.log("error fetching group", error)
-                }
-                completion(data)
-            })
+            if(id.isNumber())
+            {
+                ProfileResolver.resolveProfiles([parseInt(id)], (data) => {
+                    if(data)
+                    {
+                        ProfileManager.storeProfiles(data)
+                    }
+                    else
+                    {
+                        console.log("error fetching profile", profileId)
+                    }
+                    completion(data[0])
+                })
+            }
         }
         else
         {
@@ -86,19 +85,28 @@ export abstract class ProfileManager
         ids.push(state.authentication.profile!.id)
         let requestIds = []
         if (profiles) {
-            requestIds = profiles.filter(id => ids.indexOf(id) == -1)
+            requestIds = profiles.filter(id => {
+                const currentProfile = state.profileStore.byId[id]
+                if(currentProfile && currentProfile.unresolved_time)
+                {
+                    const diff = new Date().getTime() - new Date(currentProfile.unresolved_time).getTime()
+                    const minutes = Math.floor((diff/1000)/60)
+                    return minutes >= 2 
+                }
+                return ids.indexOf(id) == -1
+            })
         }
         if(requestIds.length > 0)
         {
-            ApiClient.getProfilesByIds(requestIds, (data, status, error) =>
+            ProfileResolver.resolveProfiles(requestIds, (data) =>
             {
-                if(data && data.results && data.results.length > 0)
+                if(data && data.length > 0)
                 {
-                    store.dispatch(addProfilesAction(data.results))
+                    store.dispatch(addProfilesAction(data))
                 }
                 else
                 {
-                    console.log("error fetching profiles", error)
+                    console.log("error fetching profiles", requestIds)
                 }
                 completion()
             })
@@ -139,30 +147,6 @@ export abstract class ProfileManager
             return s.profileStore.byId[p]
         }).filter(u => u != null)
         return userProfiles
-    }
-    private static requestObjects:ProfileRequestObject[] = []
-    private static requestDelay = 200
-    private static timeoutTimer:NodeJS.Timer = null
-    private static scheduleRequestIfNeeded = () => {
-
-        if(!ProfileManager.timeoutTimer)
-            ProfileManager.timeoutTimer = setTimeout(ProfileManager.processRequests, ProfileManager.requestDelay)
-    }
-    private static processRequests = () => {
-        const requests = ProfileManager.requestObjects
-        ProfileManager.requestObjects = []
-        ProfileManager.timeoutTimer = null
-        const result:number[] = []
-        const requestIds = requests.reduce((result,request) => result.concat(request.profiles), result).distinct()
-        ApiClient.getProfilesByIds(requestIds,(data) => {
-            if(data && data.results && data.results.length > 0)
-            {
-                ProfileManager.getStore().dispatch(addProfilesAction(data.results))
-            }
-            requests.forEach(r => {
-                r.completion()
-            })
-        })
     }
     private static filterProfile = (query:string, profile:UserProfile) =>
     {

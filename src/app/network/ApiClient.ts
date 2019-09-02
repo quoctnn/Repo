@@ -490,7 +490,7 @@ export default class ApiClient
     }
     static getProfilesByIds(profiles:number[], callback:ApiClientFeedPageCallback<UserProfile>)
     {
-        let url = Constants.apiRoute.profilesUrl + "?" + this.getQueryString({limit:profiles.length, id:encodeURIComponent(profiles.join(","))})
+        let url = Constants.apiRoute.profilesUrl + "?" + this.getQueryString({limit:profiles.length, id:profiles.join(",")})
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {

@@ -114,7 +114,7 @@ class ConversationDetailsModule extends React.Component<Props, State> {
             })
         }
     }
-    getMemberOptionMenuItems = (profile:UserProfile) => () => {
+    getMemberOptionMenuItems = (profile:UserProfile) => {
 
         const conversation = this.props.conversation
         const items:OverflowMenuItem[] = []
@@ -122,24 +122,35 @@ class ConversationDetailsModule extends React.Component<Props, State> {
             return items
         const authenticatedUserId = this.props.authenticatedUser.id
         const admins = conversation.admins || []
-        items.push({id:"1", type:OverflowMenuItemType.option, title:translate("common.page.profile"), onPress:() => window.app.navigateToRoute(profile.uri), toggleMenu:false})
+        const canVisit = !!profile.uri
+        if(canVisit)
+            items.push({id:"1", type:OverflowMenuItemType.option, title:translate("common.page.profile"), onPress:() => window.app.navigateToRoute(profile.uri), toggleMenu:false})
         if(profile.id != authenticatedUserId)
         {
-            items.push({id:"2", type:OverflowMenuItemType.option, title:translate("conversation.message.user"), onPress:() => alert("not implemented")})
+            if(canVisit)
+                items.push({id:"2", type:OverflowMenuItemType.option, title:translate("conversation.message.user"), onPress:() => alert("not implemented")})
             if(admins.contains(authenticatedUserId) && conversation.users.length > 2)
                 items.push({id:"3", type:OverflowMenuItemType.option, title:translate("conversation.user.remove"), onPress:() => NotificationCenter.push(ConversationActionRemoveUsersNotification,[{conversation:conversation.id, users:[profile.id]}]), toggleMenu:false})
         }
         return items
     }
-    renderMember = (member:number) => {
+    renderMemberOptionsMenu = (profile:UserProfile) => {
         const conversation = this.props.conversation
-        return <ConnectedContextObject contextNaturalKey={ContextNaturalKey.USER} objectId={member} render={(profile) => {
-                return <ListItem key={profile.id || uniqueId()} className="d-flex align-items-center justify-content-between member-item">
+        if(conversation.temporary)
+            return null
+        const options = this.getMemberOptionMenuItems(profile)
+        if(options.length == 0)
+            return null
+        return <DropDownMenu items={options} triggerClass="fas fa-ellipsis-v action-button push-right" />
+    }
+    renderMember = (member:number) => {
+        return <ConnectedContextObject key={member || uniqueId()} contextNaturalKey={ContextNaturalKey.USER} objectId={member} render={(profile) => {
+                return <ListItem  className="d-flex align-items-center justify-content-between member-item">
                 <div className="d-flex align-items-center text-truncate">
                     <Avatar userStatus={profile.id} className="mr-2" size={40} image={userAvatar(profile, true)} />
                     <div className="text-truncate">{userFullName(profile)}</div>
                 </div>
-                {!conversation.temporary && <DropDownMenu items={this.getMemberOptionMenuItems(profile)} triggerClass="fas fa-ellipsis-v action-button push-right" />}
+                {this.renderMemberOptionsMenu(profile)}
             </ListItem>
             }} /> 
     }
@@ -220,7 +231,7 @@ class ConversationDetailsModule extends React.Component<Props, State> {
     }
     renderContent = () => {
         const {conversation, authenticatedUser} = this.props
-        if(!conversation)
+        if(!conversation || !authenticatedUser)
             return null
         const title = this.state.title
         return (
