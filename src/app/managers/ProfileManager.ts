@@ -33,23 +33,19 @@ export abstract class ProfileManager
         const state = ProfileManager.getStore().getState()
         const isNumber = profileId.isNumber()
         const me = AuthenticationManager.getAuthenticatedUser()
-        if(me.slug_name == profileId)
-        {
-            return me
-        }
-        let keys = Object.keys(state.profileStore.byId)
-        let profiles = [me].concat(keys.map(k => state.profileStore.byId[parseInt(k)]))
-        var profile =  profiles.find(p => p.slug_name == profileId)
-        if(!profile && isNumber)
+        if(isNumber)//return by id
         {
             const id = parseInt(profileId)
-            if(me.id == id)
-            {
+            if(me && me.id == id)
                 return me
-            }
             return state.profileStore.byId[id]
         }
-        return profile
+        //return by slug
+        let keys = Object.keys(state.profileStore.byId)
+        let profiles = keys.map(k => state.profileStore.byId[parseInt(k)])
+        if(me)
+            profiles.unshift(me)
+        return profiles.find(p => p.slug_name == profileId)
     }
     static ensureProfileExists = (profileId:string|number, completion:(profile:UserProfile) => void, forceUpdate?: boolean) =>
     {

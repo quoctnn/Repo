@@ -33,8 +33,8 @@ const addProfiles = (state, action:AddProfilesAction) => {
     let newState = {  ...state }
     profiles.forEach(p => {
         let id = p.id
-        let old = state[id]
-        if(action.force || !old || !old.last_seen || !p.last_seen || new Date(old.last_seen).getTime() < new Date(p.last_seen).getTime()) // update
+        let old:UserProfile = state[id]
+        if(action.force || !old || old.unresolved_time || !old.last_seen || !p.last_seen || new Date(old.last_seen).getTime() < new Date(p.last_seen).getTime()) // update
         {
             newState[p.id] = p
         }
