@@ -68,7 +68,7 @@ class GroupDetailsModule extends React.Component<Props, State> {
     render()
     {
         const {breakpoint, history, match, location, staticContext, community, contextNaturalKey, ...rest} = this.props
-        return (<Module {...rest}>
+        return (<Module {...rest} className="community-details-module">
                     <ModuleHeader headerTitle={community && community.name || translate("detail.module.title")} loading={this.state.isLoading}>
                         <ModuleMenuTrigger onClick={this.menuItemClick} />
                     </ModuleHeader>
@@ -81,11 +81,11 @@ class GroupDetailsModule extends React.Component<Props, State> {
                             }
                         </ModuleContent>
                     }
-                    <ModuleFooter>
-                        { community && community.permission >= Permission.read &&
+                    { community && community.permission >= Permission.read &&
+                        <ModuleFooter className="mt-1">
                             <DetailsMembers members={community.members} />
-                        }
-                    </ModuleFooter>
+                        </ModuleFooter>
+                    }
                 </Module>)
     }
 }

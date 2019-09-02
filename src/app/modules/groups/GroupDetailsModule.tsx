@@ -87,11 +87,11 @@ class GroupDetailsModule extends React.Component<Props, State> {
                             }
                         </ModuleContent>
                     }
-                    <ModuleFooter>
-                        { group && group.permission >= Permission.read &&
+                    {group && group.permission >= Permission.read &&
+                        <ModuleFooter className="mt-1">
                             <DetailsMembers members={group.members} />
-                        }
-                    </ModuleFooter>
+                        </ModuleFooter>
+                    }
                 </Module>)
     }
 }

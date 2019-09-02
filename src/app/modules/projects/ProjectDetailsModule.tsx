@@ -11,13 +11,10 @@ import { translate } from '../../localization/AutoIntlProvider';
 import { Project, Community, ContextNaturalKey, Permission } from '../../types/intrasocial_types';
 import { connect } from 'react-redux';
 import { ReduxState } from '../../redux';
-import { CommunityManager } from '../../managers/CommunityManager';
 import LoadingSpinner from '../../components/LoadingSpinner';
-import { DetailsMembers } from '../../components/details/DetailsMembers';
+import { DetailsMembers, HorisontalLayoutPosition } from '../../components/details/DetailsMembers';
 import { DetailsContent } from '../../components/details/DetailsContent';
 import { ContextManager } from '../../managers/ContextManager';
-import classNames from 'classnames';
-import StackedAvatars from '../../components/general/StackedAvatars';
 type OwnProps = {
     breakpoint:ResponsiveBreakpoint
     contextNaturalKey: ContextNaturalKey
@@ -65,8 +62,8 @@ class ProjectDetailsModule extends React.Component<Props, State> {
     }
     render()
     {
-        const {breakpoint, history, match, location, staticContext, project, community, contextNaturalKey, ...rest} = this.props
-        return (<Module {...rest}>
+        const { breakpoint, history, match, location, staticContext, project, community, contextNaturalKey, ...rest} = this.props
+        return (<Module {...rest} className="project-details-module">
                     <ModuleHeader headerTitle={project && project.name || translate("detail.module.title")} loading={this.state.isLoading}>
                         <ModuleMenuTrigger onClick={this.menuItemClick} />
                     </ModuleHeader>
@@ -81,21 +78,16 @@ class ProjectDetailsModule extends React.Component<Props, State> {
                             }
                         </ModuleContent>
                     }
-                    <ModuleFooter>
                     { project && project.permission >= Permission.read &&
-                        <div className="details-module d-flex flex-row">
-                            <div className="details-members-left flex-grow-1">
-                            { project.managers &&
-                                <div>
-                                    {translate('project.managers')}
-                                    <StackedAvatars userIds={project.managers} />
-                                </div>
-                            }
+                        <ModuleFooter className="mt-1">
+                            <div className="d-flex flex-row justify-content-between">
+                                { project.managers &&
+                                    <DetailsMembers title={translate('project.managers')} position={HorisontalLayoutPosition.left} members={project.managers} showSeeAll={false} />
+                                }
+                                <DetailsMembers members={project.members} />
                             </div>
-                        <DetailsMembers members={project.members} />
-                    </div>
-                }
-                    </ModuleFooter>
+                        </ModuleFooter>
+                    }
                 </Module>)
     }
 }

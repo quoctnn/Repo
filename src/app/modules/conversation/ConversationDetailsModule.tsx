@@ -24,6 +24,7 @@ import { DropDownMenu } from '../../components/general/DropDownMenu';
 import { OverflowMenuItem, OverflowMenuItemType } from '../../components/general/OverflowMenu';
 import { NotificationCenter } from '../../utilities/NotificationCenter';
 import { ConversationManager } from '../../managers/ConversationManager';
+import ConnectedContextObject from '../../hoc/ConnectedContextObject';
 type OwnProps = {
     className?:string
     breakpoint:ResponsiveBreakpoint
@@ -132,14 +133,15 @@ class ConversationDetailsModule extends React.Component<Props, State> {
     }
     renderMember = (member:number) => {
         const conversation = this.props.conversation
-        const profile = ProfileManager.getProfileById(member)
-        return <ListItem key={profile.id || uniqueId()} className="d-flex align-items-center justify-content-between member-item">
-                        <div className="d-flex align-items-center text-truncate">
-                            <Avatar userStatus={profile.id} className="mr-2" size={40} image={userAvatar(profile, true)} />
-                            <div className="text-truncate">{userFullName(profile)}</div>
-                        </div>
-                        {!conversation.temporary && <DropDownMenu items={this.getMemberOptionMenuItems(profile)} triggerClass="fas fa-ellipsis-v action-button push-right" />}
-                    </ListItem>
+        return <ConnectedContextObject contextNaturalKey={ContextNaturalKey.USER} objectId={member} render={(profile) => {
+                return <ListItem key={profile.id || uniqueId()} className="d-flex align-items-center justify-content-between member-item">
+                <div className="d-flex align-items-center text-truncate">
+                    <Avatar userStatus={profile.id} className="mr-2" size={40} image={userAvatar(profile, true)} />
+                    <div className="text-truncate">{userFullName(profile)}</div>
+                </div>
+                {!conversation.temporary && <DropDownMenu items={this.getMemberOptionMenuItems(profile)} triggerClass="fas fa-ellipsis-v action-button push-right" />}
+            </ListItem>
+            }} /> 
     }
     toggleAddMembersDialog = () => {
         this.setState((prevState:State) => {
