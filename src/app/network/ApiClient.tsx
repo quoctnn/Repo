@@ -20,7 +20,7 @@ import { Status, UserProfile, UploadedFile, Community, Group, Conversation, Proj
     CalendarItem,
     GDPRInfo,
     GDPRFormAnswers,
-    UploadedFileResponse, ProfileLanguage, ProfileVolunteeringExperience, RequestErrorData, CropInfo, CropRect} from '../types/intrasocial_types';
+    UploadedFileResponse, ProfileLanguage, ProfileVolunteeringExperience, RequestErrorData, CropInfo, CropRect, ContextPhotoType} from '../types/intrasocial_types';
 export type PaginationResult<T> = {results:T[], count:number, previous?:string, next?:string, divider?:number}
 export type ElasticSuggestion = {text:string, offset:number, length:number, options:[]}
 export type ElasticExtensionResult = {stats:{suggestions:{[key:string]:ElasticSuggestion}, aggregations:{[key:string]:any}}}
@@ -413,13 +413,9 @@ export abstract class ApiClient
             callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
-    static setContextPhoto(contextNaturalKey:ContextNaturalKey, contextObjectId:number, file:File|string, crop:CropRect, callback:ApiClientCallback<CropInfo>)
+    static setContextPhoto(type:ContextPhotoType, contextNaturalKey:ContextNaturalKey, contextObjectId:number, file:File|string, crop:CropRect, callback:ApiClientCallback<CropInfo>)
     {
-        let url:string = null
-        switch (contextNaturalKey) {
-            case ContextNaturalKey.COMMUNITY:url = Constants.apiRoute.communityAvatarUrl(contextObjectId); break;
-            default:break;
-        }
+        const url = this.getContextPhotoUrl(type, contextNaturalKey, contextObjectId)
         if(!url)
         {
             callback(null, "500", "error", new RequestErrorData({detail:{error_description:"not supported"}}))
@@ -448,36 +444,23 @@ export abstract class ApiClient
             })
         }
     }
-    static setCommunityAvatar(communityId:number, file:File|string, crop:CropRect, callback:ApiClientCallback<CropInfo>)
-    {
-
-        let url = Constants.apiRoute.communityAvatarUrl(communityId)
-        if(file instanceof File)
-        {
-            // do upload
-            const formData = new FormData()
-            formData.append("image", file)
-            formData.append("top_left", crop.top_left[0].toString())
-            formData.append("top_left", crop.top_left[1].toString())
-            formData.append("bottom_right", crop.bottom_right[0].toString())
-            formData.append("bottom_right", crop.bottom_right[1].toString())
-            const uploader = new FileUploader<CropInfo>(formData, url,  () => {})
-            uploader.doUpload((info) => {
-                console.log(info)
-            })
+    private static getContextPhotoUrl = (type:ContextPhotoType, contextNaturalKey:ContextNaturalKey, contextObjectId:number) => {
+        let url:string = null
+        switch (contextNaturalKey + type) {
+            case ContextNaturalKey.COMMUNITY + ContextPhotoType.avatar:url = Constants.apiRoute.communityAvatarUrl(contextObjectId); break;
+            case ContextNaturalKey.COMMUNITY + ContextPhotoType.cover:url = Constants.apiRoute.communityCoverUrl(contextObjectId); break;
+            default:break;
         }
-        else 
-        {
-            AjaxRequest.postJSON(url, crop, (data, status, request) => {
-                callback(data, status, null)
-            }, (request, status, error) => {
-                callback(null, status, error, new RequestErrorData(request.responseJSON))
-            })
-        }
+        return url
     }
-    static getCommunityCover(communityId:number, callback:ApiClientCallback<CropInfo>)
+    static getContextPhoto(type:ContextPhotoType, contextNaturalKey:ContextNaturalKey, contextObjectId:number, callback:ApiClientCallback<CropInfo>)
     {
-        let url = Constants.apiRoute.communityCoverUrl(communityId)
+        const url = this.getContextPhotoUrl(type, contextNaturalKey, contextObjectId)
+        if(!url)
+        {
+            callback(null, "500", "error", new RequestErrorData({detail:{error_description:"not supported"}}))
+            return
+        }
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {

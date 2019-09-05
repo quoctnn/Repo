@@ -4,8 +4,8 @@ import "./FormController.scss"
 import { Button } from 'reactstrap';
 import { translate } from '../../localization/AutoIntlProvider';
 import classnames from 'classnames';
-import LoadingSpinner from '../LoadingSpinner';
-import { ContextNaturalKey } from '../../types/intrasocial_types';
+import { ContextNaturalKey, RequestErrorData } from '../../types/intrasocial_types';
+import CircularLoadingSpinner from '../general/CircularLoadingSpinner';
 export enum FormStatus{
     submitting, deactivated, normal
 }
@@ -20,6 +20,7 @@ export type FormComponentArgument = {
     placeholder?:string
     contextNaturalKey?:ContextNaturalKey
     contextObjectId?:number
+    error?:string
     onValueChanged?:(id:string, value?:any) => void
     onRequestNavigation?:(title?:string, toView?:React.ReactNode) => void
 }
@@ -43,6 +44,7 @@ type Props = {
     onFormSubmit:(data:{[key:string]:string}) => void
     status:FormStatus
     didCancel:() => void
+    formError:RequestErrorData
 }
 type State = {
     activePageIndex:number
@@ -107,13 +109,23 @@ export default class FormController extends React.Component<Props, State> {
         page[key] = ref
         this.pageData[pageKey] = page
     }
+    getError = (key:string) => {
+        if(this.props.formError && this.props.formError.data && typeof this.props.formError.data == "object")
+        {
+            return this.props.formError.data[key]
+        }
+        return null
+    }
     renderTextInput = (pageKey:string, args:FormComponentArgument) => {
+        args.error = this.getError(args.id)
         return <TextInput ref={this.setFormRef(pageKey, args.id)} key={args.id} {...args} onValueChanged={this.handleValueChanged(pageKey)} onRequestNavigation={this.handleRequestNavigation} />
     }
     renderTextAreaInput = (pageKey:string, args:FormComponentArgument) => {
+        args.error = this.getError(args.id)
         return <TextAreaInput ref={this.setFormRef(pageKey, args.id)} key={args.id} {...args} onValueChanged={this.handleValueChanged(pageKey)} onRequestNavigation={this.handleRequestNavigation} />
     }
     renderFileInput = (pageKey:string, args:FormComponentArgument) => {
+        args.error = this.getError(args.id)
         return <PhotoUploadPreview ref={this.setFormRef(pageKey, args.id)} key={args.id} {...args} onValueChanged={this.handleValueChanged(pageKey)} onRequestNavigation={this.handleRequestNavigation} />
     }
     renderComponent = (pageKey:string, data:FormComponentData) => {
@@ -145,7 +157,7 @@ export default class FormController extends React.Component<Props, State> {
             return <div className={cn} onClick={this.navigateToPage(i)} key={p.id}>
                         <div className="title">
                             <div>{p.title}</div>
-                            {hasError && <i className="error-icon fas fa-exclamation-triangle"></i>}
+                            {hasError && <i className="error-icon fas fa-exclamation-triangle text-danger"></i>}
                         </div>
                         {p.description && <div className="description secondary-text">{p.description}</div>}
                     </div>
@@ -176,7 +188,7 @@ export default class FormController extends React.Component<Props, State> {
     }
     render = () => {
         const canSubmit = this.props.status == FormStatus.normal && Object.keys(this.state.pageErrorData).length == 0
-        const submitTitle = this.props.status == FormStatus.submitting ? <LoadingSpinner /> : translate("Submit")
+        const submitTitle = this.props.status == FormStatus.submitting ? <CircularLoadingSpinner size={24} /> : translate("Submit")
         const showSecondaryView = !!this.state.secondaryView
         const mainContentCn = classnames("main-content", {"d-none":showSecondaryView})
         const title = showSecondaryView ? this.state.secondaryViewTitle : this.props.title
@@ -186,16 +198,18 @@ export default class FormController extends React.Component<Props, State> {
                     {title && <div className="form-title">{title}</div>}
                     </div>
                     <div className={mainContentCn}>
-                        <div className="form-controller-menu">
-                            {this.renderPageMenu()}
-                        </div>
-                        <div className="form-controller-page-container">
-                            {this.renderPages()}
-                            <div className="form-buttons">
-                                <Button disabled={!canSubmit} onClick={this.submitForm}>
-                                {submitTitle}
-                                </Button>
+                        <div className="d-flex">
+                            <div className="form-controller-menu">
+                                {this.renderPageMenu()}
                             </div>
+                            <div className="form-controller-page-container">
+                                {this.renderPages()}
+                            </div>
+                        </div>
+                        <div className="form-buttons">
+                            <Button disabled={!canSubmit} onClick={this.submitForm}>
+                            {submitTitle}
+                            </Button>
                         </div>
                     </div>
                     {!!this.state.secondaryView && 

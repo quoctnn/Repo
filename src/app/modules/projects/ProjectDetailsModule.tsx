@@ -15,10 +15,11 @@ import LoadingSpinner from '../../components/LoadingSpinner';
 import { DetailsMembers, HorisontalLayoutPosition } from '../../components/details/DetailsMembers';
 import { DetailsContent } from '../../components/details/DetailsContent';
 import { ContextManager } from '../../managers/ContextManager';
+import { CommonModuleProps } from '../Module';
+import classnames from 'classnames';
 type OwnProps = {
     breakpoint:ResponsiveBreakpoint
-    contextNaturalKey: ContextNaturalKey
-}
+} & CommonModuleProps
 type State = {
     menuVisible:boolean
     isLoading:boolean
@@ -62,8 +63,9 @@ class ProjectDetailsModule extends React.Component<Props, State> {
     }
     render()
     {
-        const { breakpoint, history, match, location, staticContext, project, community, contextNaturalKey, ...rest} = this.props
-        return (<Module {...rest} className="project-details-module">
+        const { breakpoint, history, match, location, staticContext, project, community, contextNaturalKey, className,  ...rest} = this.props
+        const cn = classnames("community-details-module", className)
+        return (<Module {...rest} className={cn}>
                     <ModuleHeader headerTitle={project && project.name || translate("detail.module.title")} loading={this.state.isLoading}>
                         <ModuleMenuTrigger onClick={this.menuItemClick} />
                     </ModuleHeader>

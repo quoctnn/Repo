@@ -146,7 +146,7 @@ class ConversationDetailsModule extends React.Component<Props, State> {
     renderMember = (member:number) => {
         return <ConnectedProfile key={member || uniqueId()} contextNaturalKey={ContextNaturalKey.USER} objectId={member} render={(profile) => {
                 return <ListItem  className="d-flex align-items-center justify-content-between member-item">
-                <div className="d-flex align-items-center text-truncate">
+                <div className="d-flex align-items-center mw0">
                     <Avatar userStatus={profile.id} className="mr-2" size={40} image={userAvatar(profile, true)} />
                     <div className="text-truncate">{userFullName(profile)}</div>
                 </div>

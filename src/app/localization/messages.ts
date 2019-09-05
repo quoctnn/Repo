@@ -363,6 +363,11 @@ var translations = {
     "conversation.message.user":"Send message",
     "conversation.user.remove":"Remove from conversation",
     "network.error":"Error",
+    "file.image.upload":"Upload image",
+    "Submit":"Submit",
+    "form.community.edit":"Edit community",
+    "Unknown":"Unknown",
+    "OK":"OK",
   },
   no: {
     "search.placeholder": "Søk ...",
@@ -728,6 +733,11 @@ var translations = {
     "conversation.message.user":"Send melding",
     "conversation.user.remove":"Fjern fra samtale",
     "network.error":"Feil",
+    "file.image.upload":"Last opp bilde",
+    "Submit":"Send",
+    "form.community.edit":"Rediger community",
+    "Unknown":"Ukjent",
+    "OK":"OK",
   },
   en: {
     "search.placeholder": "Search ...",
@@ -1102,6 +1112,12 @@ var translations = {
     "conversation.message.user":"Send message",
     "conversation.user.remove":"Remove from conversation",
     "network.error":"Error",
+    //
+    "file.image.upload":"Upload image",
+    "Submit":"Submit",
+    "form.community.edit":"Edit community",
+    "Unknown":"Unknown",
+    "OK":"OK",
   }
 };
 

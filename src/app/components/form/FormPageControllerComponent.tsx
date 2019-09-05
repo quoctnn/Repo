@@ -1,11 +1,11 @@
 import * as React from 'react';
-import { FormGroup, Input } from 'reactstrap';
+import { InputGroup, Input, FormFeedback } from 'reactstrap';
 import { FormComponentArgument, FormComponentBase } from './FormController';
 import Cropper, {Location, Area} from 'react-easy-crop'
 import Button from 'reactstrap/lib/Button';
 import { translate } from '../../localization/AutoIntlProvider';
 import { SecureImage } from '../general/SecureImage';
-import { ContextNaturalKey, CropRect, CropInfo } from '../../types/intrasocial_types';
+import { ContextNaturalKey, CropRect, CropInfo, ContextPhotoType } from '../../types/intrasocial_types';
 import {ApiClient} from '../../network/ApiClient';
 import LoadingSpinner from '../LoadingSpinner';
 import classnames = require('classnames');
@@ -13,7 +13,11 @@ import classnames = require('classnames');
 const cropRectToArea = (crop:CropRect) => {
     return {x:crop.top_left[0], y:crop.top_left[1], width:crop.bottom_right[0] - crop.top_left[0] , height:crop.bottom_right[1] - crop.top_left[1]}
 }
-
+const errorMessage = (error?:string) => {
+    if(!!error)
+        return <FormFeedback tooltip={false}><i className="error-icon fas fa-exclamation-triangle"></i>{" "}{error}</FormFeedback>
+    return null
+}
 const createImage = (url:string) =>
   new Promise<HTMLImageElement>((resolve, reject) => {
     const image = new Image()
@@ -58,7 +62,13 @@ export class TextInput extends React.Component<FormComponentArgument, FormCompon
         return this.state.value
     }
     isValid = () => {
-        return this.props.isRequired ? this.state.value.length > 0 : true
+        return this.props.isRequired ? this.state.value.trim().length > 0 : true
+    }
+    getError = () => {
+        if(this.props.error)
+            return this.props.error
+        if(!this.isValid())
+            return translate("input.error.length.required")
     }
     sendValueChanged = () => {
         this.props.onValueChanged && this.props.onValueChanged(this.props.id, this.state.value)
@@ -70,15 +80,17 @@ export class TextInput extends React.Component<FormComponentArgument, FormCompon
         }, this.sendValueChanged)
     }
     render = () => {
+        const error = this.getError()
         return <div key={this.props.id} className="form-text-input">
-                <FormGroup className="">
+                <InputGroup className="form-group form-input d-block">
                     <label htmlFor={this.props.id} className="col-form-label" >
                         {this.props.title}
                     </label>
                     <div className="">
-                        <Input id={this.props.id} value={this.state.value} type="text" onChange={this.handleInputChange} placeholder={this.props.placeholder}/>
+                        <Input invalid={!!error} id={this.props.id} value={this.state.value} type="text" onChange={this.handleInputChange} placeholder={this.props.placeholder}/>
+                        {errorMessage(error)}
                     </div>
-                </FormGroup>
+                </InputGroup>
             </div>
     }
 }
@@ -93,7 +105,13 @@ export class TextAreaInput extends React.Component<FormComponentArgument, FormCo
         return this.state.value
     }
     isValid = () => {
-        return this.props.isRequired ? this.state.value.length > 0 : true
+        return this.props.isRequired ? this.state.value.trim().length > 0 : true
+    }
+    getError = () => {
+        if(this.props.error)
+            return this.props.error
+        if(!this.isValid())
+            return translate("input.error.length.required")
     }
     sendValueChanged = () => {
         this.props.onValueChanged && this.props.onValueChanged(this.props.id, this.state.value)
@@ -105,15 +123,17 @@ export class TextAreaInput extends React.Component<FormComponentArgument, FormCo
         }, this.sendValueChanged)
     }
     render = () => {
+        const error = this.getError()
         return <div key={this.props.id} className="form-text-area-input">
-                <FormGroup className="">
+                <InputGroup className="form-group form-input d-block">
                     <label htmlFor={this.props.id} className="col-form-label" >
                         {this.props.title}
                     </label>
                     <div className="">
-                        <Input id={this.props.id} value={this.state.value} type="textarea" onChange={this.handleInputChange} placeholder={this.props.placeholder}/>
+                        <Input invalid={!!error} id={this.props.id} value={this.state.value} type="textarea" onChange={this.handleInputChange} placeholder={this.props.placeholder}/>
+                        {errorMessage(error)}
                     </div>
-                </FormGroup>
+                </InputGroup>
             </div>
     }
 }
@@ -152,12 +172,12 @@ export class PhotoUploadPreview extends React.Component<FormComponentArgument,{v
         const file = f || this.state.value || this.props.value
         const crop = this.state.crop
         const area:Area = crop && cropRectToArea(crop)
-        const mode = this.props.id == "avatar" ? FileCropperMode.avatar : FileCropperMode.cover
+        const mode = this.props.id == "avatar" ? ContextPhotoType.avatar : ContextPhotoType.cover
         this.props.onRequestNavigation(this.props.title , <FileCropper 
                                                 cancelCrop={this.handleCancelCrop} 
                                                 onCropCompleted={this.handleCropCompleted} 
                                                 file={file} 
-                                                mode={mode}
+                                                type={mode}
                                                 contextNaturalKey={this.props.contextNaturalKey} 
                                                 contextObjectId={this.props.contextObjectId}
                                                 initialCroppedAreaPixels={area}
@@ -186,7 +206,7 @@ export class PhotoUploadPreview extends React.Component<FormComponentArgument,{v
     render = () => {
         const cn = classnames("form-photo-upload-preview", this.props.id)
         return <div key={this.props.id} className={cn}>
-                <FormGroup className="">
+                <InputGroup className="form-group form-input d-block">
                     <label htmlFor={this.props.id} className="col-form-label" >
                         {this.props.title}
                     </label>
@@ -194,20 +214,17 @@ export class PhotoUploadPreview extends React.Component<FormComponentArgument,{v
                         <div className="image-preview-container" onClick={this.handleImagePreviewClick}>
                             {this.state.preview && <SecureImage url={this.state.preview} />}
                         </div>
-                        <Button onClick={this.triggerUpload} className="file-upload-button" outline={true} color="secondary">
+                        <Button onClick={this.triggerUpload} className="file-upload-button mt-1" outline={true} color="secondary">
                             {translate("file.image.upload")}
                             <Input innerRef={this.fileUploader}  className="d-none" id={this.props.id} type="file" onChange={this.handleInputChange} />
                         </Button>
                     </div>
-                </FormGroup>
+                </InputGroup>
             </div>
     }
 }
-export enum FileCropperMode{
-    cover, avatar
-}
 type FileCropperDefaultProps = {
-    mode:FileCropperMode
+    type:ContextPhotoType
 }
 type FileCropperProps = {
     file:File| string
@@ -221,7 +238,7 @@ type FileCropperState = {aspect:number, loading:boolean, zoom:number, crop:Locat
 export class FileCropper extends React.Component<FileCropperProps, FileCropperState>{
     private croppedAreaPixels:Area = null
     static defaultProps:FileCropperDefaultProps = {
-        mode:FileCropperMode.avatar
+        type:ContextPhotoType.avatar
     }
     constructor(props:FileCropperProps){
         super(props)
@@ -231,7 +248,7 @@ export class FileCropper extends React.Component<FileCropperProps, FileCropperSt
             zoom:1,
             initialCroppedAreaPixels:props.initialCroppedAreaPixels,
             loading:true,
-            aspect:props.mode == FileCropperMode.avatar ? 1 : 1300 / 275
+            aspect:props.type == ContextPhotoType.avatar ? 1 : 1300 / 275
         }
     }
     componentDidMount = () => {
@@ -253,13 +270,7 @@ export class FileCropper extends React.Component<FileCropperProps, FileCropperSt
         }
     }
     fetchServerData = (contextNaturalKey:ContextNaturalKey, contextObjectId:number) => {
-        switch (contextNaturalKey + this.props.mode) {
-            case ContextNaturalKey.COMMUNITY + FileCropperMode.avatar:ApiClient.getCommunityAvatar(contextObjectId, this.handleFetchedServerData);break;
-            case ContextNaturalKey.COMMUNITY + FileCropperMode.cover:ApiClient.getCommunityCover(contextObjectId, this.handleFetchedServerData);break;
-        
-            default:
-                break;
-        }
+        ApiClient.getContextPhoto(this.props.type, contextNaturalKey, contextObjectId,  this.handleFetchedServerData)
     }
     processInputFile = () => {
         const file = this.props.file

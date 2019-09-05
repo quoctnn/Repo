@@ -4,6 +4,7 @@
   flex-direction: column;
   .title-content{
     align-items: center;
+    margin-bottom: 10px;
     .form-title {
         font-size: 1.25rem;
         font-weight: 500;
@@ -27,12 +28,20 @@
   }
   .main-content {
     display: flex;
-
+    flex-direction: column;
+    .form-buttons {
+        margin-top: 10px;
+        display: flex;    
+        flex-direction: row-reverse;
+    }
     .form-controller-page-container {
       display: flex;
       flex-direction: column;
       flex-grow: 1;
       justify-content: space-between;
+      @include var(background-color, main-content-secondary-background);
+      padding: 0.75rem;
+      border-radius: 8px;
       .form-controller-page {
         display: none !important;
         flex-direction: column;
@@ -69,12 +78,10 @@
           display: flex !important;
         }
       }
-      .form-buttons {
-        align-self: flex-end;
-      }
     }
     .form-controller-menu {
       padding: 6px;
+      margin-right: 10px;
       .menu-button {
         cursor: pointer;
         display: flex;
@@ -93,7 +100,6 @@
             top: calc(50% - 0.5em);
             padding-left: 0.25rem;
             font-size: 0.7em;
-            color: orange;
           }
         }
         .description {

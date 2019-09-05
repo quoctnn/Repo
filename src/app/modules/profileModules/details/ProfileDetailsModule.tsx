@@ -21,8 +21,6 @@ import { Moment } from "moment-timezone";
 import Routes from '../../../utilities/Routes';
 import { OverflowMenuItem, OverflowMenuItemType, createDropdownItem } from '../../../components/general/OverflowMenu';
 import { PopoverBody, Popover } from 'reactstrap';
-import { profileStore } from '../../../redux/profileStore';
-import { ProfileManager } from '../../../managers/ProfileManager';
 import moment = require("moment");
 
 type TimezoneInfoProps = {

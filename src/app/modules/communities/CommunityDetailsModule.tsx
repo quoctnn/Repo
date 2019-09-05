@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { withRouter, RouteComponentProps, Link } from "react-router-dom";
-import Module from '../Module';
+import Module, { CommonModuleProps } from '../Module';
 import ModuleHeader from '../ModuleHeader';
 import ModuleContent from '../ModuleContent';
 import ModuleFooter from '../ModuleFooter';
@@ -8,7 +8,7 @@ import ModuleMenuTrigger from '../ModuleMenuTrigger';
 import "./CommunityDetailsModule.scss"
 import { ResponsiveBreakpoint } from '../../components/general/observers/ResponsiveComponent';
 import { translate, lazyTranslate } from '../../localization/AutoIntlProvider';
-import { Community, ContextNaturalKey, Permission, CropRect } from '../../types/intrasocial_types';
+import { Community, ContextNaturalKey, Permission, CropRect, ContextPhotoType, CropInfo, RequestErrorData } from '../../types/intrasocial_types';
 import { connect } from 'react-redux';
 import { ReduxState } from '../../redux';
 import CircularLoadingSpinner from '../../components/general/CircularLoadingSpinner';
@@ -19,17 +19,19 @@ import { ContextManager } from '../../managers/ContextManager';
 import { Button } from 'reactstrap';
 import SimpleDialog from '../../components/general/dialogs/SimpleDialog';
 import FormController, { FormPageData, FormComponentType, FormStatus } from '../../components/form/FormController';
-import {ApiClient} from '../../network/ApiClient';
-import { ToastManager } from '../../managers/ToastManager';
+import {ApiClient, ApiClientCallback} from '../../network/ApiClient';
+import classnames from 'classnames';
+import { uniqueId } from '../../utilities/Utilities';
 type OwnProps = {
     breakpoint:ResponsiveBreakpoint
-    contextNaturalKey: ContextNaturalKey
-}
+} & CommonModuleProps
 type State = {
     menuVisible:boolean
     isLoading:boolean
     editFormVisible:boolean
+    editFormReloadKey?:string
     editFormStatus:FormStatus
+    editFormError?:RequestErrorData
 }
 type ReduxStateProps = {
     community: Community
@@ -44,7 +46,9 @@ class GroupDetailsModule extends React.Component<Props, State> {
             isLoading:false,
             menuVisible:false,
             editFormVisible:false,
-            editFormStatus:FormStatus.normal
+            editFormStatus:FormStatus.normal,
+            editFormError:null,
+            editFormReloadKey:uniqueId()
         }
     }
     componentDidUpdate = (prevProps:Props) => {
@@ -76,11 +80,16 @@ class GroupDetailsModule extends React.Component<Props, State> {
     }
     toggleEditForm = () => {
         this.setState((prevState:State) => {
-            return {editFormVisible:!prevState.editFormVisible}
+            if(!prevState.editFormVisible)
+                return {editFormVisible:!prevState.editFormVisible, editFormReloadKey:uniqueId()}
+            return {editFormVisible:!prevState.editFormVisible, editFormError:null}
         })
     }
     renderEditButton = () => {
         return <Button onClick={this.toggleEditForm}>{translate("Edit")}</Button>
+    }
+    uploadContextPhoto = (type:ContextPhotoType, contextNaturalKey:ContextNaturalKey, contextObjectId:number, file:File|string, crop:CropRect, completion:ApiClientCallback<CropInfo>) => () => {
+        ApiClient.setContextPhoto(type,contextNaturalKey, contextObjectId, file, crop, completion)
     }
     handleEditCommunityFormSubmit = (communityData:Partial<Community>) => {
         console.log("formdata", communityData)
@@ -90,23 +99,56 @@ class GroupDetailsModule extends React.Component<Props, State> {
         delete communityData["avatar"]
         const coverData:{file:File|string, crop:CropRect} = communityData.cover as any
         delete communityData["cover"]
-        ApiClient.updateCommunity(this.props.community.id, communityData, (data, status, error, errorData) => {
-
-            if(avatarData)
+        const completed = () => {
+            if(errors.length > 0)
             {
-                ApiClient.setCommunityAvatar(community.id, avatarData.file, avatarData.crop, (avData, avStatus, avError) => {
-                    
+                this.setState(() => {
+                    return {editFormError:errors[0]}
                 })
+                this.setEditFormStatus(FormStatus.normal)
             }
-            ToastManager.showRequestErrorToast(errorData, lazyTranslate("network.error"))
-            this.setEditFormStatus(FormStatus.normal)
-        })
-        this.toggleEditForm()
+            else {
+                this.setEditFormStatus(FormStatus.normal)
+                this.toggleEditForm()
+            }
+        }
+        const errors:RequestErrorData[] = []
+        const pushError = (error?:RequestErrorData) => {
+            if(!!error)
+            {
+                errors.push(error)
+            }
+        }
+        const requests:(() => void)[] = []
+        let requestsCompleted = 0
+        const requestCompleter = (data, status, rerror, errorData) => {
+            requestsCompleted += 1
+            pushError(errorData)
+            if(requestsCompleted == requests.length)
+            {
+                completed()
+            }
+            else{
+                const request = requests[requestsCompleted]
+                request && request()
+            }
+        }
+        requests.push(() => ApiClient.updateCommunity(this.props.community.id, communityData, requestCompleter))
+        if(avatarData)
+            requests.push(this.uploadContextPhoto(ContextPhotoType.avatar,ContextNaturalKey.COMMUNITY, community.id, avatarData.file, avatarData.crop, requestCompleter))
+        if(coverData)
+            requests.push(this.uploadContextPhoto(ContextPhotoType.cover,ContextNaturalKey.COMMUNITY, community.id, coverData.file, coverData.crop, requestCompleter))
+        requests[0]() // start
     }
-    setEditFormStatus = (status:FormStatus) => {
+    setEditFormStatus = (status:FormStatus, resetError?:boolean) => {
         this.setState((prevState:State) => {
             if(prevState.editFormStatus != status)
+            {
+                if(resetError)
+                    return {editFormStatus:status, editFormError:null}
                 return {editFormStatus:status}
+                
+            }
         })
     }
     renderEditForm = () => {
@@ -114,7 +156,7 @@ class GroupDetailsModule extends React.Component<Props, State> {
         const visible = this.state.editFormVisible
         const pages:FormPageData[] = [
             {title:"Name", description:"name, description", id:"1", componentData:[
-                {type:FormComponentType.text, arguments:{title:"Name", id:"name", value:community.name, placeholder:"placeholder", contextNaturalKey:ContextNaturalKey.COMMUNITY, contextObjectId:community.id}},
+                {type:FormComponentType.text, arguments:{title:"Name", isRequired:true, id:"name", value:community.name, placeholder:"placeholder", contextNaturalKey:ContextNaturalKey.COMMUNITY, contextObjectId:community.id}},
                 {type:FormComponentType.textArea, arguments:{title:"comp title2", id:"description", value:community.description, isRequired:true}}
             ] },
             {title:"Images", description:"avatar, cover", id:"2", componentData:[
@@ -123,13 +165,13 @@ class GroupDetailsModule extends React.Component<Props, State> {
             ] },
         ]
         return <SimpleDialog didCancel={this.toggleEditForm} visible={visible}>
-                    <FormController didCancel={this.toggleEditForm} status={this.state.editFormStatus} onFormSubmit={this.handleEditCommunityFormSubmit} title={translate("form.community.edit")} pages={pages} />
+                    <FormController formError={this.state.editFormError} didCancel={this.toggleEditForm} status={this.state.editFormStatus} onFormSubmit={this.handleEditCommunityFormSubmit} title={translate("form.community.edit")} pages={pages} />
                 </SimpleDialog>
     }
-    render()
-    {
-        const {breakpoint, history, match, location, staticContext, community, contextNaturalKey, ...rest} = this.props
-        return (<Module {...rest} className="community-details-module">
+    render = () => {
+        const {breakpoint, history, match, location, staticContext, community, contextNaturalKey, className, ...rest} = this.props
+        const cn = classnames("community-details-module", className)
+        return (<Module {...rest} className={cn}>
                     <ModuleHeader headerTitle={community && community.name || translate("detail.module.title")} loading={this.state.isLoading}>
                         <ModuleMenuTrigger onClick={this.menuItemClick} />
                     </ModuleHeader>

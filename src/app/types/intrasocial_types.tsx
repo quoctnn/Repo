@@ -6,6 +6,10 @@ import { userFullName, groupCover, communityCover, userCover, projectCover, even
 import { CommunityManager } from '../managers/CommunityManager';
 import { ProjectManager } from '../managers/ProjectManager';
 export type UploadedFileResponse = {files:UploadedFile[]}
+
+export enum ContextPhotoType{
+    cover, avatar
+}
 export type CropRect = {
     top_left:number[]
     bottom_right:number[]
