@@ -9,7 +9,7 @@ import { ContextNaturalKey, TaskActions, Task, Permissible, IdentifiableObject, 
 import { ReduxState } from '../../redux';
 import { connect } from 'react-redux';
 import ListComponent from '../../components/general/ListComponent';
-import ApiClient, { PaginationResult } from '../../network/ApiClient';
+import {ApiClient,  PaginationResult } from '../../network/ApiClient';
 import { ToastManager } from '../../managers/ToastManager';
 import TaskListItem from './TaskListItem';
 import { StatusUtilities } from '../../utilities/StatusUtilities';

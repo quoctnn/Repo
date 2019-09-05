@@ -4,7 +4,7 @@ import { StatusUtilities } from '../../utilities/StatusUtilities';
 import { NavigationUtilities } from '../../utilities/NavigationUtilities';
 import { withRouter } from 'react-router';
 import * as Immutable from 'immutable';
-import ApiClient from '../../network/ApiClient';
+import {ApiClient} from '../../network/ApiClient';
 import { ReduxState } from '../../redux/index';
 import { UserProfile, Status, UploadedFile, ContextNaturalKey, StatusActions, ObjectAttributeType, Permission, Permissible } from '../../types/intrasocial_types';
 import { nullOrUndefined, uniqueId, userFullName } from '../../utilities/Utilities';

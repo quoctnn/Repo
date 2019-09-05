@@ -63,6 +63,12 @@ export default  {
         communityUrl: (id:number|string) => {
             return `/api/v2/community/${id}/`
         },
+        communityAvatarUrl: (id:number) => {
+            return `/api/v2/community/${id}/avatar/`
+        },
+        communityCoverUrl: (id:number) => {
+            return `/api/v2/community/${id}/cover/`
+        },
         setMainCommunityUrl: (id:number|string) => {
             return `/api/v2/community/${id}/set-as-main`
         },

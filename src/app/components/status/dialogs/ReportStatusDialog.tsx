@@ -4,7 +4,7 @@ import { translate } from '../../../localization/AutoIntlProvider';
 import { Status, ReportTag, ReportResult } from '../../../types/intrasocial_types';
 
 import "./ReportStatusDialog.scss"
-import ApiClient from '../../../network/ApiClient';
+import {ApiClient} from '../../../network/ApiClient';
 import { ToastManager } from '../../../managers/ToastManager';
 import Select from 'react-select';
 

@@ -5,6 +5,14 @@ import { translate } from "../localization/AutoIntlProvider";
 import { userFullName, groupCover, communityCover, userCover, projectCover, eventCover } from '../utilities/Utilities';
 import { CommunityManager } from '../managers/CommunityManager';
 import { ProjectManager } from '../managers/ProjectManager';
+export type UploadedFileResponse = {files:UploadedFile[]}
+export type CropRect = {
+    top_left:number[]
+    bottom_right:number[]
+}
+export type CropInfo = {
+    image:string
+} & CropRect
 export type GDPRData = {
     requiredActions:OUPRequiredAction[]
     updateGdprContinuationKey:string
@@ -210,8 +218,6 @@ export type ProfileCompany = {
     url?: string
     avatar_original?: string
 } & IdentifiableObject
-
-
 export enum ContextNaturalKey {
     GROUP = "group.group",
     COMMUNITY = "core.community",
@@ -221,41 +227,6 @@ export enum ContextNaturalKey {
     EVENT = "event.event",
     NEWSFEED = "newsfeed",
     CONVERSATION = "conversation.conversation",
-}
-export enum ContextSegmentKey {
-    GROUP = "group",
-    COMMUNITY = "community",
-    USER = "profile",
-    PROJECT = "project",
-    TASK = "task",
-    EVENT = "event",
-    CONVERSATION = "conversation"
-}
-export namespace ContextSegmentKey {
-    export function keyForNaturalKey(key: ContextNaturalKey) {
-        switch (key) {
-            case ContextNaturalKey.GROUP: return ContextSegmentKey.GROUP
-            case ContextNaturalKey.COMMUNITY: return ContextSegmentKey.COMMUNITY
-            case ContextNaturalKey.USER: return ContextSegmentKey.USER
-            case ContextNaturalKey.PROJECT: return ContextSegmentKey.PROJECT
-            case ContextNaturalKey.EVENT: return ContextSegmentKey.EVENT
-            case ContextNaturalKey.TASK: return ContextSegmentKey.TASK
-            case ContextNaturalKey.CONVERSATION: return ContextSegmentKey.CONVERSATION
-            default: return null
-        }
-    }
-    export const parse = (value: string): ContextSegmentKey | null => {
-        switch (value) {
-            case ContextSegmentKey.GROUP: return ContextSegmentKey.GROUP
-            case ContextSegmentKey.COMMUNITY: return ContextSegmentKey.COMMUNITY
-            case ContextSegmentKey.USER: return ContextSegmentKey.USER
-            case ContextSegmentKey.PROJECT: return ContextSegmentKey.PROJECT
-            case ContextSegmentKey.EVENT: return ContextSegmentKey.EVENT
-            case ContextSegmentKey.TASK: return ContextSegmentKey.TASK
-            case ContextSegmentKey.CONVERSATION: return ContextSegmentKey.CONVERSATION
-            default: return null
-        }
-    }
 }
 export namespace ContextNaturalKey {
     export const all = [
@@ -382,6 +353,42 @@ export namespace ContextNaturalKey {
         }
     }
 }
+export enum ContextSegmentKey {
+    GROUP = "group",
+    COMMUNITY = "community",
+    USER = "profile",
+    PROJECT = "project",
+    TASK = "task",
+    EVENT = "event",
+    CONVERSATION = "conversation"
+}
+export namespace ContextSegmentKey {
+    export function keyForNaturalKey(key: ContextNaturalKey) {
+        switch (key) {
+            case ContextNaturalKey.GROUP: return ContextSegmentKey.GROUP
+            case ContextNaturalKey.COMMUNITY: return ContextSegmentKey.COMMUNITY
+            case ContextNaturalKey.USER: return ContextSegmentKey.USER
+            case ContextNaturalKey.PROJECT: return ContextSegmentKey.PROJECT
+            case ContextNaturalKey.EVENT: return ContextSegmentKey.EVENT
+            case ContextNaturalKey.TASK: return ContextSegmentKey.TASK
+            case ContextNaturalKey.CONVERSATION: return ContextSegmentKey.CONVERSATION
+            default: return null
+        }
+    }
+    export const parse = (value: string): ContextSegmentKey | null => {
+        switch (value) {
+            case ContextSegmentKey.GROUP: return ContextSegmentKey.GROUP
+            case ContextSegmentKey.COMMUNITY: return ContextSegmentKey.COMMUNITY
+            case ContextSegmentKey.USER: return ContextSegmentKey.USER
+            case ContextSegmentKey.PROJECT: return ContextSegmentKey.PROJECT
+            case ContextSegmentKey.EVENT: return ContextSegmentKey.EVENT
+            case ContextSegmentKey.TASK: return ContextSegmentKey.TASK
+            case ContextSegmentKey.CONVERSATION: return ContextSegmentKey.CONVERSATION
+            default: return null
+        }
+    }
+}
+
 export enum DraggableType {
     favorite = "favorite",
     group = "group.group"

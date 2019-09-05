@@ -1,5 +1,5 @@
 import { FileUploader } from '../../network/ApiClient';
-import { UploadedFile, UploadedFileType } from '../../types/intrasocial_types';
+import { UploadedFile, UploadedFileType, UploadedFileResponse } from '../../types/intrasocial_types';
 export enum FileQueueStatus {
     Pending,
     Success,
@@ -17,7 +17,7 @@ export class FileQueueObject {
     public file: ExtendedFile;
     public status: FileQueueStatus = FileQueueStatus.Pending;
     public progress: number = 0;
-    public request: FileUploader;
+    public request: FileUploader<UploadedFileResponse>;
     public response: UploadedFile;
     public error: any;
 
@@ -106,14 +106,14 @@ export class FileUploaderService {
 
     private _upload = (queueObj: FileQueueObject) => {
 
-        queueObj.request = new FileUploader(queueObj.file, (progress) => {
+        queueObj.request = FileUploader.fromUploadedFile(queueObj.file, (progress) => {
             this._uploadProgress(queueObj, progress)
         })
         queueObj.request.doUpload((file, error) => {
-            if(error || !file)
+            if(error || !file || !file.files[0])
                 this._uploadFailed(queueObj, error);
             else 
-                this._uploadComplete(queueObj, file)
+                this._uploadComplete(queueObj, file.files[0])
         })
         return queueObj;
     }

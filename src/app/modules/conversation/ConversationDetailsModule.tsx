@@ -11,7 +11,7 @@ import { ContextManager } from '../../managers/ContextManager';
 import { AuthenticationManager } from '../../managers/AuthenticationManager';
 import { tempConversationId, ConversationActionArchiveNotification, ConversationActionLeaveNotification, ConversationActionRemoveUsersNotification, ConversationActionDeleteNotification } from '../conversations/ConversationsModule';
 import { ConversationUtilities } from '../../utilities/ConversationUtilities';
-import ApiClient from '../../network/ApiClient';
+import {ApiClient} from '../../network/ApiClient';
 import { ToastManager } from '../../managers/ToastManager';
 import { translate, lazyTranslate } from '../../localization/AutoIntlProvider';
 import { ProfileManager } from '../../managers/ProfileManager';
@@ -24,7 +24,7 @@ import { DropDownMenu } from '../../components/general/DropDownMenu';
 import { OverflowMenuItem, OverflowMenuItemType } from '../../components/general/OverflowMenu';
 import { NotificationCenter } from '../../utilities/NotificationCenter';
 import { ConversationManager } from '../../managers/ConversationManager';
-import ConnectedContextObject from '../../hoc/ConnectedContextObject';
+import {ConnectedProfile} from '../../hoc/ConnectedContextObject';
 type OwnProps = {
     className?:string
     breakpoint:ResponsiveBreakpoint
@@ -144,7 +144,7 @@ class ConversationDetailsModule extends React.Component<Props, State> {
         return <DropDownMenu items={options} triggerClass="fas fa-ellipsis-v action-button push-right" />
     }
     renderMember = (member:number) => {
-        return <ConnectedContextObject key={member || uniqueId()} contextNaturalKey={ContextNaturalKey.USER} objectId={member} render={(profile) => {
+        return <ConnectedProfile key={member || uniqueId()} contextNaturalKey={ContextNaturalKey.USER} objectId={member} render={(profile) => {
                 return <ListItem  className="d-flex align-items-center justify-content-between member-item">
                 <div className="d-flex align-items-center text-truncate">
                     <Avatar userStatus={profile.id} className="mr-2" size={40} image={userAvatar(profile, true)} />

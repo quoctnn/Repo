@@ -5,7 +5,7 @@ import { ObjectAttributeType, ElasticSearchType } from "../../types/intrasocial_
 import { SearcQueryManager, SearchEntityType, SearchOption, InsertEntity, ContextSearchData, SearchToken } from "../../components/general/input/contextsearch/extensions";
 import { ContextSearch } from "../../components/general/input/contextsearch/ContextSearch";
 import { AutocompleteSection, AutocompleteSectionItem } from "../../components/general/input/contextsearch/Autocomplete";
-import ApiClient, { ElasticResult, SearchArguments } from "../../network/ApiClient";
+import {ApiClient,  ElasticResult, SearchArguments } from "../../network/ApiClient";
 import { nullOrUndefined } from "../../utilities/Utilities";
 
 type Props =

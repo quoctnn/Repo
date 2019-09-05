@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import "./StatusModule.scss"
 import {Status, StatusActions } from '../../types/intrasocial_types';
 import { ReduxState } from "../../redux";
-import ApiClient from "../../network/ApiClient";
+import {ApiClient} from "../../network/ApiClient";
 import LoadingSpinner from "../../components/LoadingSpinner";
 import { withRouter, RouteComponentProps } from "react-router";
 import NewsfeedComponentRouted, { NewsfeedComponent } from '../newsfeed/NewsfeedComponent';

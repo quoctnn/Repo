@@ -11,7 +11,7 @@ import SimpleModule from '../SimpleModule';
 import { translate } from '../../localization/AutoIntlProvider';
 import ListComponent from '../../components/general/ListComponent';
 import TimesheetListItem from './TimesheetListItem';
-import ApiClient, { PaginationResult } from '../../network/ApiClient';
+import {ApiClient,  PaginationResult } from '../../network/ApiClient';
 import { ToastManager } from '../../managers/ToastManager';
 import { ContextManager } from '../../managers/ContextManager';
 import { CommonModuleProps } from '../Module';

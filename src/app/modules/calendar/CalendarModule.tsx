@@ -13,7 +13,7 @@ import { CommonModuleProps } from '../Module'
 import { CalendarMenuData } from './CalendarMenu'
 import { Calendar, momentLocalizer, View, NavigateAction } from 'react-big-calendar';
 import * as moment from 'moment'
-import ApiClient from '../../network/ApiClient';
+import {ApiClient} from '../../network/ApiClient';
 import { CalendarItem, Task, Event } from '../../types/intrasocial_types';
 import { IntraSocialUtilities } from '../../utilities/IntraSocialUtilities';
 import { CalendarToolbar } from './CalendarToolbar';

@@ -4,7 +4,7 @@ import { withRouter} from 'react-router-dom'
 import "./CreateConversation.scss"
 import { UserProfile, Conversation } from '../../../types/intrasocial_types';
 import { translate } from '../../../localization/AutoIntlProvider';
-import ApiClient from '../../../network/ApiClient';
+import {ApiClient} from '../../../network/ApiClient';
 import { ToastManager } from '../../../managers/ToastManager';
 import Avatar from '../../../components/general/Avatar';
 import LoadingSpinner from '../../../components/LoadingSpinner';

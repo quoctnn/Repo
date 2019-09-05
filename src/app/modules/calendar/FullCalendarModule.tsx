@@ -12,7 +12,7 @@ import { CommonModuleProps } from '../Module'
 import { CalendarMenuData } from './CalendarMenu'
 import { Calendar, momentLocalizer, View, NavigateAction, stringOrDate, EventProps, CalendarProps } from 'react-big-calendar';
 import * as moment from 'moment'
-import ApiClient from '../../network/ApiClient';
+import {ApiClient} from '../../network/ApiClient';
 import { createEvent, CalendarEvent, filterCalendarEvents } from './CalendarModule';
 import { CalendarToolbar } from './CalendarToolbar';
 import { DateFormat } from '../../utilities/Utilities';

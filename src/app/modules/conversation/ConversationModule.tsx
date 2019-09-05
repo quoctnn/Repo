@@ -6,7 +6,7 @@ import { ResponsiveBreakpoint } from '../../components/general/observers/Respons
 import { translate } from '../../localization/AutoIntlProvider';
 import CircularLoadingSpinner from '../../components/general/CircularLoadingSpinner';
 import { ContextNaturalKey, Conversation, Message, UserProfile } from '../../types/intrasocial_types';
-import ApiClient, { PaginationResult } from '../../network/ApiClient';
+import {ApiClient, PaginationResult } from '../../network/ApiClient';
 import { ToastManager } from '../../managers/ToastManager';
 import { connect } from 'react-redux';
 import { ReduxState } from '../../redux';
@@ -464,7 +464,7 @@ class ConversationModule extends React.Component<Props, State> {
         const {items, isLoading} = this.state
         let messages = this.props.queuedMessages.concat(items).sort(this.sortMessages)
         const conversationId = conversation && conversation.id
-        if(!conversationId)
+        if(!conversationId || !authenticatedUser)
         {
             return this.renderNoConversation()
         }

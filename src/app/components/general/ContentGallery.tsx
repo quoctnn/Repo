@@ -10,17 +10,13 @@ import { nullOrUndefined } from '../../utilities/Utilities';
 import classnames from 'classnames';
 import { SecureImage } from './SecureImage';
 import "./ContentGallery.scss"
-import {ReactInstance} from 'react-360-web';
-import { WindowAppManager } from '../../managers/WindowAppManager';
-import ResizeObserver from 'resize-observer-polyfill';
-import { Settings } from '../../utilities/Settings';
 export const convertToComponent = (file:UploadedFile,galleryMode?:boolean, onClick?:(file:UploadedFile, event) => void, innerRef?:(a:GalleryComponent<any>) => void):React.ReactElement<GalleryComponent<any>> => {
     const gm = nullOrUndefined( galleryMode ) ? false : galleryMode
     switch(file.type)
     {
-        case UploadedFileType.IMAGE360:
-            if(Settings.allowReact360)
-                return <Gallery360ImageComponent ref={innerRef} galleryMode={gm} file={file} onClick={onClick}/>
+        // case UploadedFileType.IMAGE360:
+        //     if(Settings.allowReact360)
+        //         return <Gallery360ImageComponent ref={innerRef} galleryMode={gm} file={file} onClick={onClick}/>
         case UploadedFileType.IMAGE: return <GalleryImageComponent galleryMode={gm} file={file} onClick={onClick}/>
         case UploadedFileType.DOCUMENT: return <GalleryDocumentComponent galleryMode={gm} file={file} onClick={onClick}/>
         case UploadedFileType.AUDIO:
@@ -48,78 +44,78 @@ export class GalleryComponent<T> extends React.Component<GalleryComponentProps, 
     didAppear = () => {
     }
 }
-export class Gallery360ImageComponent extends GalleryComponent<{ width:number, height:number }> {
-    private r360:ReactInstance = null
-    private container = React.createRef<HTMLDivElement>();
-    private observer = null;
-    private currentWidth = 0;
-    private currentHeight = 0;
-    private surfaceId:number = null
-    constructor(props:GalleryComponentProps) {
-        super(props)
+// export class Gallery360ImageComponent extends GalleryComponent<{ width:number, height:number }> {
+//     private r360:ReactInstance = null
+//     private container = React.createRef<HTMLDivElement>();
+//     private observer = null;
+//     private currentWidth = 0;
+//     private currentHeight = 0;
+//     private surfaceId:number = null
+//     constructor(props:GalleryComponentProps) {
+//         super(props)
 
-      this.state = { width:0, height:0 }
-    }
-    componentDidMount = () => {
-        this.initReact360()
-        this.observer = new ResizeObserver((entries, observer) => {
-            for (const entry of entries) {
-                const {width, height} = entry.contentRect;
-                if(width != this.currentWidth || height != this.currentHeight)
-                {
-                    this.currentHeight = height
-                    this.currentWidth = width
-                    this.r360.resize(width, height)
-                }
-            }
-        });
-        this.observer.observe(this.container.current);
-    }
-    componentWillUnmount() {
-        if (this.observer) {
-            this.observer.disconnect()
-            this.observer = null
-        }
-        if (this.r360) {
-            this.r360.detachRoot && this.r360.detachRoot(this.surfaceId)
-            this.r360.stop && this.r360.stop()
-            this.r360 = null
-        }
-        this.surfaceId = null
-        this.container = null
-        this.currentHeight = null
-        this.currentWidth = null
-    }
-    getBundleUrl = () => {
-        return WindowAppManager.resolveLocalFileUrl( "/react360/react360.bundle.js")
-    }
-    initReact360 = () => {
-        const image = getImageUrl(this.props.file, true)
-        this.r360 = new ReactInstance(this.getBundleUrl(), this.container.current, {
-            // Add custom options here
-            fullScreen: this.props.galleryMode,
-          });
+//       this.state = { width:0, height:0 }
+//     }
+//     componentDidMount = () => {
+//         this.initReact360()
+//         this.observer = new ResizeObserver((entries, observer) => {
+//             for (const entry of entries) {
+//                 const {width, height} = entry.contentRect;
+//                 if(width != this.currentWidth || height != this.currentHeight)
+//                 {
+//                     this.currentHeight = height
+//                     this.currentWidth = width
+//                     this.r360.resize(width, height)
+//                 }
+//             }
+//         });
+//         this.observer.observe(this.container.current);
+//     }
+//     componentWillUnmount() {
+//         if (this.observer) {
+//             this.observer.disconnect()
+//             this.observer = null
+//         }
+//         if (this.r360) {
+//             this.r360.detachRoot && this.r360.detachRoot(this.surfaceId)
+//             this.r360.stop && this.r360.stop()
+//             this.r360 = null
+//         }
+//         this.surfaceId = null
+//         this.container = null
+//         this.currentHeight = null
+//         this.currentWidth = null
+//     }
+//     getBundleUrl = () => {
+//         return WindowAppManager.resolveLocalFileUrl( "/react360/react360.bundle.js")
+//     }
+//     initReact360 = () => {
+//         const image = getImageUrl(this.props.file, true)
+//         this.r360 = new ReactInstance(this.getBundleUrl(), this.container.current, {
+//             // Add custom options here
+//             fullScreen: this.props.galleryMode,
+//           });
 
-          // Render your app content to the default cylinder surface
-          this.surfaceId = this.r360.renderToSurface(
-            this.r360.createRoot('demo360', { /* initial props */ }),
-            this.r360.getDefaultSurface()
-          );
+//           // Render your app content to the default cylinder surface
+//           this.surfaceId = this.r360.renderToSurface(
+//             this.r360.createRoot('demo360', { /* initial props */ }),
+//             this.r360.getDefaultSurface()
+//           );
 
-          // Load the initial environment
-          this.r360.compositor.setBackground(image);
-    }
-    onClick = (event:any) => {
-        if(this.props.onClick)
-            this.props.onClick(this.props.file, event)
-    }
-    render = () => {
-        const cn = classnames("gallery-item gallery-file-item gallery-image-item gallery-360-image hover-card drop-shadow", this.props.file.type, this.props.file.extension)
-        return <div ref={this.container} className={cn}>
-                    <div className="gallery-fullscreen" onClick={this.onClick}><i className="fas fa-expand"></i></div>
-                </div>
-    }
-}
+//           // Load the initial environment
+//           this.r360.compositor.setBackground(image);
+//     }
+//     onClick = (event:any) => {
+//         if(this.props.onClick)
+//             this.props.onClick(this.props.file, event)
+//     }
+//     render = () => {
+//         const cn = classnames("gallery-item gallery-file-item gallery-image-item gallery-360-image hover-card drop-shadow", this.props.file.type, this.props.file.extension)
+//         return <div ref={this.container} className={cn}>
+//                     <div className="gallery-fullscreen" onClick={this.onClick}><i className="fas fa-expand"></i></div>
+//                 </div>
+//     }
+// }
 export class GalleryImageComponent extends GalleryComponent<{}> {
     onClick = (event:any) => {
         if(this.props.onClick)

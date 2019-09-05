@@ -7,7 +7,7 @@ import { translate } from '../../localization/AutoIntlProvider';
 import { ContextNaturalKey, Event, Community, Group } from '../../types/intrasocial_types';
 import EventsMenu, { EventsMenuData } from './EventsMenu';
 import ListComponent from '../../components/general/ListComponent';
-import ApiClient, { PaginationResult } from '../../network/ApiClient';
+import {ApiClient,  PaginationResult } from '../../network/ApiClient';
 import { ToastManager } from '../../managers/ToastManager';
 import { connect } from 'react-redux';
 import { ReduxState } from '../../redux';

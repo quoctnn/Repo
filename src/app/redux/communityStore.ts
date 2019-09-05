@@ -1,5 +1,6 @@
 import { combineReducers } from 'redux'
 import { Community } from "../types/intrasocial_types";
+import { shallowCompareFields } from '../utilities/Utilities';
 export enum CommunityStoreActionTypes {
     AddCommunities = 'communitystore.add_community',
     RemoveCommunity = 'communitystore.remove_community',
@@ -37,13 +38,23 @@ export const resetCommunitiesAction = ():ResetCommunitiesAction => ({
     
     return []
 }
+const shouldUpdate = (oldCommunity:Community, newCommunity:Community) => {
+    if(!oldCommunity)
+        return true
+    const fieldsUpdated = !shallowCompareFields(["avatar", "cover"], oldCommunity, newCommunity)
+    if(fieldsUpdated)
+    {
+        return true
+    }
+    return new Date(newCommunity.updated_at).getTime() > new Date(oldCommunity.updated_at).getTime()
+}
 const addCommunities = (state, action:AddCommunitiesAction) => {
     let communities = action.communities
     let newState = {  ...state }
     communities.forEach(c => {
         let id = c.id
         let old = state[id]
-        if(action.force || !old || new Date(c.updated_at).getTime() > new Date(old.updated_at).getTime()) // update
+        if(shouldUpdate(old, c)) // update
         {
             newState[c.id] = c
         }

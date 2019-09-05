@@ -10,7 +10,7 @@ import { translate } from "../../../localization/AutoIntlProvider";
 import { RouteComponentProps, withRouter } from "react-router";
 import { ContextNaturalKey, UserProfile, ProfileCertification } from "../../../types/intrasocial_types";
 import { ContextManager } from "../../../managers/ContextManager";
-import ApiClient from '../../../network/ApiClient';
+import {ApiClient} from '../../../network/ApiClient';
 import { stringToDateFormat, DateFormat, stringToDate } from '../../../utilities/Utilities';
 import * as moment from 'moment-timezone';
 import CVListItem from '../CVListItem';

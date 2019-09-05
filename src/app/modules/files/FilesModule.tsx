@@ -10,7 +10,7 @@ import LoadingSpinner from '../../components/LoadingSpinner';
 import SimpleModule from '../SimpleModule';
 import { translate } from '../../localization/AutoIntlProvider';
 import ListComponent from '../../components/general/ListComponent';
-import ApiClient, { PaginationResult } from '../../network/ApiClient';
+import {ApiClient,  PaginationResult } from '../../network/ApiClient';
 import { ToastManager } from '../../managers/ToastManager';
 import FileListItem from './FileListItem';
 import { ContextManager } from '../../managers/ContextManager';

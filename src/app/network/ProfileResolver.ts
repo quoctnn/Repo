@@ -1,5 +1,5 @@
 import { UserProfile, UserStatus } from '../types/intrasocial_types';
-import ApiClient from './ApiClient';
+import {ApiClient} from './ApiClient';
 import { translate } from '../localization/AutoIntlProvider';
 
 export type ProfileRequestObject = {

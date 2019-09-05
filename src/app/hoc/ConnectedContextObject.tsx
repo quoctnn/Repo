@@ -39,9 +39,9 @@ class GenericConnectedContextObject<T> extends React.Component<Props<T>,State<T>
         return this.props.render(this.state.object)
     }
 }
-const mapStateToProps = (state: ReduxState, ownProps: OwnProps<UserProfile>): ReduxStateProps<UserProfile> => {
+const mapStateToPropsUserProfile = (state: ReduxState, ownProps: OwnProps<UserProfile>): ReduxStateProps<UserProfile> => {
     return {
-        object: ContextManager.getStoreObject(ownProps.contextNaturalKey, ownProps.objectId) as any as UserProfile
+        object: ContextManager.getStoreObject(ownProps.contextNaturalKey, ownProps.objectId) as UserProfile
     }
 }
-export default connect(mapStateToProps)(GenericConnectedContextObject as new(props: OwnProps<UserProfile>) => GenericConnectedContextObject<UserProfile>)
+export const ConnectedProfile = connect(mapStateToPropsUserProfile)(GenericConnectedContextObject as new(props: OwnProps<UserProfile>) => GenericConnectedContextObject<UserProfile>)

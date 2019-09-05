@@ -2,7 +2,7 @@ import * as React from 'react'
 import FacebookLogin from 'react-facebook-login/dist/facebook-login-render-props'
 import GoogleLogin from 'react-google-login';
 import LinkedIn from 'linkedin-login-for-react';
-import ApiClient from '../../network/ApiClient'
+import {ApiClient} from '../../network/ApiClient'
 import { Button, Input , Form , FormGroup, InputGroupAddon, InputGroup, FormFeedback} from 'reactstrap'
 import { withRouter, RouteComponentProps} from 'react-router-dom'
 import { connect } from 'react-redux'

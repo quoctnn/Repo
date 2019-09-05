@@ -8,7 +8,7 @@ import { Settings } from "../../../utilities/Settings";
 import "./StatusComposerComponent.scss"
 import FilesUpload from "../../status/FilesUpload";
 import { translate } from "../../../localization/AutoIntlProvider";
-import ApiClient from "../../../network/ApiClient";
+import {ApiClient} from "../../../network/ApiClient";
 import { ToastManager } from "../../../managers/ToastManager";
 
 type OwnProps =

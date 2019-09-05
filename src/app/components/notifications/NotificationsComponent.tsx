@@ -1,7 +1,7 @@
 import * as React from "react";
 import classnames = require("classnames");
 import "./NotificationsComponent.scss"
-import ApiClient from '../../network/ApiClient';
+import {ApiClient} from '../../network/ApiClient';
 import { ToastManager } from '../../managers/ToastManager';
 import { translate } from "../../localization/AutoIntlProvider";
 import { UnhandledNotifications, NotificationGroupKey, UserProfile, NotificationObject } from '../../types/intrasocial_types';

@@ -8,7 +8,7 @@ import CircularLoadingSpinner from '../../components/general/CircularLoadingSpin
 import { ContextNaturalKey, Group, Community, GroupSorting } from '../../types/intrasocial_types';
 import GroupsMenu, { GroupsMenuData } from './GroupsMenu';
 import ListComponent from '../../components/general/ListComponent';
-import ApiClient, { PaginationResult } from '../../network/ApiClient';
+import {ApiClient,  PaginationResult } from '../../network/ApiClient';
 import { ToastManager } from '../../managers/ToastManager';
 import { connect } from 'react-redux';
 import { ReduxState } from '../../redux';

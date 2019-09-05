@@ -10,7 +10,7 @@ import { translate } from "../../../localization/AutoIntlProvider";
 import { RouteComponentProps, withRouter } from "react-router";
 import { ContextNaturalKey, UserProfile, ProfileEducation } from "../../../types/intrasocial_types";
 import { ContextManager } from "../../../managers/ContextManager";
-import ApiClient from '../../../network/ApiClient';
+import {ApiClient} from '../../../network/ApiClient';
 import { stringToDateFormat, DateFormat } from '../../../utilities/Utilities';
 import CVListItem from "../CVListItem";
 

@@ -7,8 +7,8 @@ import ModuleFooter from '../ModuleFooter';
 import ModuleMenuTrigger from '../ModuleMenuTrigger';
 import "./CommunityDetailsModule.scss"
 import { ResponsiveBreakpoint } from '../../components/general/observers/ResponsiveComponent';
-import { translate } from '../../localization/AutoIntlProvider';
-import { Community, ContextNaturalKey, Permission } from '../../types/intrasocial_types';
+import { translate, lazyTranslate } from '../../localization/AutoIntlProvider';
+import { Community, ContextNaturalKey, Permission, CropRect } from '../../types/intrasocial_types';
 import { connect } from 'react-redux';
 import { ReduxState } from '../../redux';
 import CircularLoadingSpinner from '../../components/general/CircularLoadingSpinner';
@@ -16,6 +16,11 @@ import LoadingSpinner from '../../components/LoadingSpinner';
 import { DetailsContent } from '../../components/details/DetailsContent';
 import { DetailsMembers } from '../../components/details/DetailsMembers';
 import { ContextManager } from '../../managers/ContextManager';
+import { Button } from 'reactstrap';
+import SimpleDialog from '../../components/general/dialogs/SimpleDialog';
+import FormController, { FormPageData, FormComponentType, FormStatus } from '../../components/form/FormController';
+import {ApiClient} from '../../network/ApiClient';
+import { ToastManager } from '../../managers/ToastManager';
 type OwnProps = {
     breakpoint:ResponsiveBreakpoint
     contextNaturalKey: ContextNaturalKey
@@ -23,6 +28,8 @@ type OwnProps = {
 type State = {
     menuVisible:boolean
     isLoading:boolean
+    editFormVisible:boolean
+    editFormStatus:FormStatus
 }
 type ReduxStateProps = {
     community: Community
@@ -35,7 +42,9 @@ class GroupDetailsModule extends React.Component<Props, State> {
         super(props);
         this.state = {
             isLoading:false,
-            menuVisible:false
+            menuVisible:false,
+            editFormVisible:false,
+            editFormStatus:FormStatus.normal
         }
     }
     componentDidUpdate = (prevProps:Props) => {
@@ -65,6 +74,58 @@ class GroupDetailsModule extends React.Component<Props, State> {
             return (<CircularLoadingSpinner borderWidth={3} size={20} key="loading"/>)
         }
     }
+    toggleEditForm = () => {
+        this.setState((prevState:State) => {
+            return {editFormVisible:!prevState.editFormVisible}
+        })
+    }
+    renderEditButton = () => {
+        return <Button onClick={this.toggleEditForm}>{translate("Edit")}</Button>
+    }
+    handleEditCommunityFormSubmit = (communityData:Partial<Community>) => {
+        console.log("formdata", communityData)
+        const community = this.props.community
+        this.setEditFormStatus(FormStatus.submitting)
+        const avatarData:{file:File|string, crop:CropRect} = communityData.avatar as any
+        delete communityData["avatar"]
+        const coverData:{file:File|string, crop:CropRect} = communityData.cover as any
+        delete communityData["cover"]
+        ApiClient.updateCommunity(this.props.community.id, communityData, (data, status, error, errorData) => {
+
+            if(avatarData)
+            {
+                ApiClient.setCommunityAvatar(community.id, avatarData.file, avatarData.crop, (avData, avStatus, avError) => {
+                    
+                })
+            }
+            ToastManager.showRequestErrorToast(errorData, lazyTranslate("network.error"))
+            this.setEditFormStatus(FormStatus.normal)
+        })
+        this.toggleEditForm()
+    }
+    setEditFormStatus = (status:FormStatus) => {
+        this.setState((prevState:State) => {
+            if(prevState.editFormStatus != status)
+                return {editFormStatus:status}
+        })
+    }
+    renderEditForm = () => {
+        const community = this.props.community
+        const visible = this.state.editFormVisible
+        const pages:FormPageData[] = [
+            {title:"Name", description:"name, description", id:"1", componentData:[
+                {type:FormComponentType.text, arguments:{title:"Name", id:"name", value:community.name, placeholder:"placeholder", contextNaturalKey:ContextNaturalKey.COMMUNITY, contextObjectId:community.id}},
+                {type:FormComponentType.textArea, arguments:{title:"comp title2", id:"description", value:community.description, isRequired:true}}
+            ] },
+            {title:"Images", description:"avatar, cover", id:"2", componentData:[
+                {type:FormComponentType.file, arguments:{title:"Avatar", id:"avatar", value:community.avatar, contextNaturalKey:ContextNaturalKey.COMMUNITY, contextObjectId:community.id}},
+                {type:FormComponentType.file, arguments:{title:"Cover", id:"cover", value:community.cover_cropped, contextNaturalKey:ContextNaturalKey.COMMUNITY, contextObjectId:community.id}}
+            ] },
+        ]
+        return <SimpleDialog didCancel={this.toggleEditForm} visible={visible}>
+                    <FormController didCancel={this.toggleEditForm} status={this.state.editFormStatus} onFormSubmit={this.handleEditCommunityFormSubmit} title={translate("form.community.edit")} pages={pages} />
+                </SimpleDialog>
+    }
     render()
     {
         const {breakpoint, history, match, location, staticContext, community, contextNaturalKey, ...rest} = this.props
@@ -79,6 +140,8 @@ class GroupDetailsModule extends React.Component<Props, State> {
                             ||
                             <LoadingSpinner key="loading"/>
                             }
+                            {this.renderEditButton()}
+                            {this.renderEditForm()}
                         </ModuleContent>
                     }
                     { community && community.permission >= Permission.read &&

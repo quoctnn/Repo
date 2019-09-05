@@ -6,7 +6,7 @@ import { RecentActivity, UnreadNotificationCounts, UnhandledNotifications } from
 import { setUnreadConversationsAction, setUnreadNotificationsAction } from '../redux/unreadNotifications';
 import { ApplicationManagerApplicationLoadedNotification } from './ApplicationManager';
 import { AuthenticationManager } from './AuthenticationManager';
-import ApiClient from '../network/ApiClient';
+import {ApiClient} from '../network/ApiClient';
 export abstract class NotificationManager
 {
     static setup = () =>

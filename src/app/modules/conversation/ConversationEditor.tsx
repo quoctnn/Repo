@@ -11,7 +11,7 @@ import { ProfileManager } from '../../managers/ProfileManager';
 import { userAvatar, uniqueId, userFullName } from '../../utilities/Utilities';
 import { List, ListHeader, ListItem } from '../../components/general/List';
 import { AuthenticationManager } from "../../managers/AuthenticationManager";
-import ApiClient from "../../network/ApiClient";
+import {ApiClient} from "../../network/ApiClient";
 import SelectUsersDialog from "../../components/general/dialogs/SelectUsersDialog";
 import { ToastManager } from '../../managers/ToastManager';
 import { ConversationManager } from '../../managers/ConversationManager';

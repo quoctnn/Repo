@@ -1,7 +1,7 @@
 import * as React from "react";
 import classnames = require("classnames");
 import { NotificationGroupKey, InvitationNotification, Community, Group, UserProfile, Event, Conversation, StatusNotification, AttentionNotification, ReminderNotification, TaskNotification, TaskNotificationAction, ReportResult, ReportNotification, MembershipRequestNotification, NotificationObject, ConversationNotification } from '../../types/intrasocial_types';
-import ApiClient from '../../network/ApiClient';
+import {ApiClient} from '../../network/ApiClient';
 import { ToastManager } from '../../managers/ToastManager';
 import { translate } from '../../localization/AutoIntlProvider';
 import { Button, Badge } from "reactstrap";

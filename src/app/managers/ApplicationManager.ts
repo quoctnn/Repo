@@ -3,7 +3,7 @@ import { ReduxState } from '../redux/index';
 import { setApplicationLoadedAction } from '../redux/application';
 import { AuthenticationManager } from './AuthenticationManager';
 import { Dashboard } from '../types/intrasocial_types';
-import ApiClient, { ListOrdering } from '../network/ApiClient';
+import {ApiClient,  ListOrdering } from '../network/ApiClient';
 import { ToastManager } from './ToastManager';
 import { CommunityManager } from './CommunityManager';
 import { NotificationCenter } from '../utilities/NotificationCenter';

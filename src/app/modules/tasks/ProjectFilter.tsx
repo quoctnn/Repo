@@ -1,6 +1,6 @@
 import * as React from 'react';
 import classnames from "classnames"
-import ApiClient, { SearchArguments } from '../../network/ApiClient';
+import {ApiClient, SearchArguments } from '../../network/ApiClient';
 import { ElasticSearchType, ContextNaturalKey } from '../../types/intrasocial_types';
 import { ContextValue } from '../../components/general/input/ContextFilter';
 import { AsyncSelectIW } from '../../components/general/input/AsyncSelectIW';

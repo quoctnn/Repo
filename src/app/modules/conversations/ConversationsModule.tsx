@@ -9,7 +9,7 @@ import { ReduxState } from '../../redux';
 import SimpleModule from '../SimpleModule';
 import { translate } from '../../localization/AutoIntlProvider';
 import ListComponent from '../../components/general/ListComponent';
-import ApiClient, { PaginationResult } from '../../network/ApiClient';
+import {ApiClient, PaginationResult } from '../../network/ApiClient';
 import { ToastManager } from '../../managers/ToastManager';
 import ConversationListItem from './ConversationListItem';
 import { TypingIndicator } from '../../components/general/TypingIndicator';

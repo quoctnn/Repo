@@ -1,5 +1,5 @@
 import {  Store } from 'redux';
-import ApiClient from '../network/ApiClient';
+import {ApiClient} from '../network/ApiClient';
 import { Conversation, Message, UserProfile, Permission } from '../types/intrasocial_types';
 import { EventStreamMessageType } from '../network/ChannelEventStream';
 import { ReduxState } from '../redux';

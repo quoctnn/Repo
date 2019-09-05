@@ -6,7 +6,7 @@ import "./CommunitySelector.scss"
 import { translate } from '../../../localization/AutoIntlProvider';
 import { OverflowMenuItem, OverflowMenuItemType, createDropdownItem } from '../OverflowMenu';
 import { CommunityManager } from '../../../managers/CommunityManager';
-import ApiClient from '../../../network/ApiClient';
+import {ApiClient} from '../../../network/ApiClient';
 import Routes from '../../../utilities/Routes';
 import { withRouter, RouteComponentProps, Link } from 'react-router-dom';
 import Avatar from '../Avatar';

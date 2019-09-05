@@ -1,25 +1,26 @@
 import Constants from "../utilities/Constants";
 import {AjaxRequest} from "./AjaxRequest";
 import { EndpointManager } from '../managers/EndpointManager';
-var $ = require("jquery")
-import { Status, UserProfile, UploadedFile, Community, Group, Conversation, Project, Message, Event, Task,
-         ElasticSearchType, ObjectAttributeType, StatusObjectAttribute, EmbedCardItem, ReportTag,
-         ContextNaturalKey, ReportResult, Dashboard, Timesheet, Coordinate, RecentActivity,
-         UnhandledNotifications, UnreadNotificationCounts, GroupSorting, ProjectSorting, Favorite,
-         VersionInfo,
-         SearchHistory,
-         ProfileCertification,
-         ProfileEducation,
-         ProfilePosition,
-         CrashLogLevel,
-         CalendarItem,
-         GDPRInfo,
-         GDPRFormAnswers} from '../types/intrasocial_types';
+
 import { nullOrUndefined, DateFormat } from '../utilities/Utilities';
 import moment = require("moment");
 import { Settings } from "../utilities/Settings";
 import { ConversationManager } from '../managers/ConversationManager';
-import { ProfileLanguage, ProfileVolunteeringExperience, RequestErrorData } from '../types/intrasocial_types';
+const $ = require("jquery")
+import { Status, UserProfile, UploadedFile, Community, Group, Conversation, Project, Message, Event, Task,
+    ElasticSearchType, ObjectAttributeType, StatusObjectAttribute, EmbedCardItem, ReportTag,
+    ContextNaturalKey, ReportResult, Dashboard, Timesheet, Coordinate, RecentActivity,
+    UnhandledNotifications, UnreadNotificationCounts, GroupSorting, ProjectSorting, Favorite,
+    VersionInfo,
+    SearchHistory,
+    ProfileCertification,
+    ProfileEducation,
+    ProfilePosition,
+    CrashLogLevel,
+    CalendarItem,
+    GDPRInfo,
+    GDPRFormAnswers,
+    UploadedFileResponse, ProfileLanguage, ProfileVolunteeringExperience, RequestErrorData, CropInfo, CropRect} from '../types/intrasocial_types';
 export type PaginationResult<T> = {results:T[], count:number, previous?:string, next?:string, divider?:number}
 export type ElasticSuggestion = {text:string, offset:number, length:number, options:[]}
 export type ElasticExtensionResult = {stats:{suggestions:{[key:string]:ElasticSuggestion}, aggregations:{[key:string]:any}}}
@@ -42,14 +43,13 @@ export type SearchArguments = {
     from_date?:string
     to_date?:string
 }
-
 export enum ListOrdering {
     ALPHABETICALLY = "alphabetically",
     RECENT = "recent",
     MOST_USED = "most_used",
     RECENT_ACTIVIY = "recent_activity"
 }
-export default class ApiClient
+export abstract class ApiClient
 {
     static getQueryString(params:any)
     {
@@ -404,6 +404,95 @@ export default class ApiClient
             callback(null, status, error, new RequestErrorData(request.responseJSON))
         })
     }
+    static getCommunityAvatar(communityId:number, callback:ApiClientCallback<CropInfo>)
+    {
+        let url = Constants.apiRoute.communityAvatarUrl(communityId)
+        AjaxRequest.get(url, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
+        })
+    }
+    static setContextPhoto(contextNaturalKey:ContextNaturalKey, contextObjectId:number, file:File|string, crop:CropRect, callback:ApiClientCallback<CropInfo>)
+    {
+        let url:string = null
+        switch (contextNaturalKey) {
+            case ContextNaturalKey.COMMUNITY:url = Constants.apiRoute.communityAvatarUrl(contextObjectId); break;
+            default:break;
+        }
+        if(!url)
+        {
+            callback(null, "500", "error", new RequestErrorData({detail:{error_description:"not supported"}}))
+            return
+        }
+        if(file instanceof File)
+        {
+            // do upload
+            const formData = new FormData()
+            formData.append("image", file)
+            formData.append("top_left", crop.top_left[0].toString())
+            formData.append("top_left", crop.top_left[1].toString())
+            formData.append("bottom_right", crop.bottom_right[0].toString())
+            formData.append("bottom_right", crop.bottom_right[1].toString())
+            const uploader = new FileUploader<CropInfo>(formData, url,  () => {})
+            uploader.doUpload((info) => {
+                console.log(info)
+            })
+        }
+        else 
+        {
+            AjaxRequest.postJSON(url, crop, (data, status, request) => {
+                callback(data, status, null)
+            }, (request, status, error) => {
+                callback(null, status, error, new RequestErrorData(request.responseJSON))
+            })
+        }
+    }
+    static setCommunityAvatar(communityId:number, file:File|string, crop:CropRect, callback:ApiClientCallback<CropInfo>)
+    {
+
+        let url = Constants.apiRoute.communityAvatarUrl(communityId)
+        if(file instanceof File)
+        {
+            // do upload
+            const formData = new FormData()
+            formData.append("image", file)
+            formData.append("top_left", crop.top_left[0].toString())
+            formData.append("top_left", crop.top_left[1].toString())
+            formData.append("bottom_right", crop.bottom_right[0].toString())
+            formData.append("bottom_right", crop.bottom_right[1].toString())
+            const uploader = new FileUploader<CropInfo>(formData, url,  () => {})
+            uploader.doUpload((info) => {
+                console.log(info)
+            })
+        }
+        else 
+        {
+            AjaxRequest.postJSON(url, crop, (data, status, request) => {
+                callback(data, status, null)
+            }, (request, status, error) => {
+                callback(null, status, error, new RequestErrorData(request.responseJSON))
+            })
+        }
+    }
+    static getCommunityCover(communityId:number, callback:ApiClientCallback<CropInfo>)
+    {
+        let url = Constants.apiRoute.communityCoverUrl(communityId)
+        AjaxRequest.get(url, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
+        })
+    }
+    static updateCommunity(communityId:string|number, data:Partial<Community>, callback:ApiClientCallback<Community>)
+    {
+        let url = Constants.apiRoute.communityUrl(communityId)
+        AjaxRequest.patchJSON(url, data, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, error, new RequestErrorData(request.responseJSON))
+        })
+    }
     static setMainCommunity(communityId:string|number, callback:ApiClientCallback<Community>)
     {
         let url = Constants.apiRoute.setMainCommunityUrl(communityId)
@@ -749,13 +838,14 @@ export default class ApiClient
     }
     private static uploadFile(message:Message, completion:(message:Message) => void){
         let file = message.tempFile.file
-        let uploader = new FileUploader(file, (progress) => {
+        let uploader = FileUploader.fromUploadedFile(file, (progress) => {
             let m = Object.assign({}, message)
             m.tempFile = Object.assign({}, m.tempFile)
             m.tempFile.progress = progress
             ConversationManager.updateQueuedMessage(m)
         })
-        uploader.doUpload((file:UploadedFile) => {
+        uploader.doUpload((response) => {
+            const file = response && response.files && response.files[0]
             let m = Object.assign({}, message)
             if(file)
             {
@@ -1044,23 +1134,28 @@ export default class ApiClient
     }
 
 }
-export class FileUploader
+export class FileUploader<T>
 {
-    file:Blob
+    formData:FormData
     progress:(percent:number) => void
     request:any = null
-    constructor(file:Blob, progress:(percent:number) => void)
+    endpoint:string
+    static fromUploadedFile(file:Blob, progress:(percent:number) => void)
     {
-        this.file = file
+        const data = new FormData()
+        data.append("file", file)
+        return new FileUploader<UploadedFileResponse>(data, Constants.apiRoute.fileUploadUrl, progress)
+    }
+    constructor(formData:FormData, endpoint:string, progress:(percent:number) => void)
+    {
+        this.formData = formData
         this.progress = progress
+        this.endpoint = endpoint
         this.doUpload = this.doUpload.bind(this)
         this.progressHandling = this.progressHandling.bind(this)
     }
-    doUpload = (completion:(file:UploadedFile, error?:any) => void) => {
-        let url = EndpointManager.applyEndpointDomain(Constants.apiRoute.fileUploadUrl)
-        const data = new FormData();
-        data.append("file", this.file)
-        //data.append("error", "true")
+    doUpload = (completion:(data:T, error?:any) => void) => {
+        let url = EndpointManager.applyEndpointDomain(this.endpoint)
         this.request = $.ajax({
             type: "POST",
             url: url,
@@ -1071,14 +1166,14 @@ export class FileUploader
                 }
                 return myXhr;
             },
-            success: function (data:{files:UploadedFile[]}) {
-                completion(data.files[0])
+            success: function (data:T) {
+                completion(data)
             },
             error: function (error) {
                 completion(null, error)
             },
             async: true,
-            data: data,
+            data: this.formData,
             cache: false,
             contentType: false,
             processData: false,

@@ -230,7 +230,7 @@ class Main extends React.Component<Props, State> {
                                 </Switch>
                                 <Switch location={location}>
                                     <Route path={Routes.CHANGELOG} component={ModalChangelog} />
-                                    <Route path={Routes.SEARCH} component={ModalSearchComponent} />
+                                    <PrivateRoute path={Routes.SEARCH} component={ModalSearchComponent} />
                                 </Switch>
                             </DndProvider>
                         }

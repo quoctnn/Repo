@@ -1,7 +1,7 @@
 import * as React from "react";
 import {  Store } from 'redux';
 import { Community } from '../types/intrasocial_types';
-import ApiClient from '../network/ApiClient';
+import {ApiClient} from '../network/ApiClient';
 import { ReduxState } from '../redux';
 import { addCommunitiesAction, removeCommunityAction } from '../redux/communityStore';
 import { setActiveCommunityAction } from '../redux/activeCommunity';
@@ -9,8 +9,6 @@ import { NotificationCenter } from '../utilities/NotificationCenter';
 import { EventStreamMessageType } from '../network/ChannelEventStream';
 import { ToastManager } from './ToastManager';
 import { translate } from '../localization/AutoIntlProvider';
-import { Button } from "reactstrap";
-import { Link } from "react-router-dom";
 import Routes from "../utilities/Routes";
 export abstract class CommunityManager
 {

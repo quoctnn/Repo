@@ -1,4 +1,4 @@
-import ApiClient from '../network/ApiClient';
+import {ApiClient} from '../network/ApiClient';
 import { translate } from '../localization/AutoIntlProvider';
 type RouteEntry = {
     path:string

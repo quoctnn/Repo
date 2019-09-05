@@ -8,7 +8,7 @@ import { Message, UserProfile } from '../../types/intrasocial_types';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import classnames from 'classnames';
 import { ReadObserver } from '../../library/ReadObserver';
-import ApiClient from '../../network/ApiClient';
+import {ApiClient} from '../../network/ApiClient';
 export interface Props {
     messages:Message[],
     current_user:UserProfile,
@@ -109,7 +109,7 @@ export class ChatMessageList extends React.Component<Props & React.HTMLAttribute
         }
     }
     render = () => {
-        const {messages,current_user,chatDidScrollToTop,loading, children,conversation,className, ...rest} = this.props
+        const {messages, current_user, chatDidScrollToTop, loading, children, conversation, className, ...rest} = this.props
         let components = [];
         let lastUserId = null, lastDay = null;
         let messageTimeDist = 5;

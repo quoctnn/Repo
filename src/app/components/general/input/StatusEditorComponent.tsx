@@ -8,7 +8,7 @@ import { Mention } from './MentionEditor';
 import classnames = require('classnames');
 import FilesUpload from '../../status/FilesUpload';
 import { translate } from '../../../localization/AutoIntlProvider';
-import ApiClient from '../../../network/ApiClient';
+import {ApiClient} from '../../../network/ApiClient';
 import { ToastManager } from '../../../managers/ToastManager';
 import { uniqueId } from '../../../utilities/Utilities';
 import { NavigationUtilities } from '../../../utilities/NavigationUtilities';

@@ -1,7 +1,7 @@
 import { combineReducers } from 'redux';
 import { EmbedCardItem } from '../../../types/intrasocial_types';
 import { LinkCardType } from './Embedly';
-import ApiClient from '../../../network/ApiClient';
+import {ApiClient} from '../../../network/ApiClient';
 import { PersistConfig, persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 export enum EmbedlyStoreActionTypes {

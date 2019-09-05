@@ -6,7 +6,7 @@ import { RecentActivity } from '../../types/intrasocial_types';
 import SimpleModule from '../SimpleModule';
 import { translate } from '../../localization/AutoIntlProvider';
 import ListComponent from '../../components/general/ListComponent';
-import ApiClient, { PaginationResult } from '../../network/ApiClient';
+import {ApiClient,  PaginationResult } from '../../network/ApiClient';
 import { ToastManager } from '../../managers/ToastManager';
 import ActivityItem  from './ActivityItem';
 import { NotificationCenter } from '../../utilities/NotificationCenter';

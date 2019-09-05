@@ -4,7 +4,7 @@ import { NotificationCenter } from '../utilities/NotificationCenter';
 import { EventStreamMessageType } from '../network/ChannelEventStream';
 import { Favorite, ContextNaturalKey } from '../types/intrasocial_types';
 import { addFavoritesAction, setFavoritesAction, removeFavoriteAction } from '../redux/favoriteStore';
-import ApiClient from '../network/ApiClient';
+import {ApiClient} from '../network/ApiClient';
 import { ToastManager } from './ToastManager';
 import { translate, lazyTranslate } from '../localization/AutoIntlProvider';
 export abstract class FavoriteManager 

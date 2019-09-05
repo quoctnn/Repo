@@ -1,6 +1,6 @@
 import {  Store } from 'redux';
 import { Group } from '../types/intrasocial_types';
-import ApiClient from '../network/ApiClient';
+import {ApiClient} from '../network/ApiClient';
 import { ReduxState } from '../redux';
 import { addGroupsAction } from '../redux/groupStore';
 export abstract class GroupManager

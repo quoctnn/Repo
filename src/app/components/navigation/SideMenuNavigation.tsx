@@ -8,7 +8,7 @@ import Logo from "../general/images/Logo";
 import { translate } from "../../localization/AutoIntlProvider";
 import CollapseComponent from "../general/CollapseComponent";
 import { GroupSorting, Group, Project, ProjectSorting, ContextNaturalKey, Favorite, DraggableType, Community, UserProfile, ElasticSearchType } from '../../types/intrasocial_types';
-import ApiClient from "../../network/ApiClient";
+import {ApiClient} from "../../network/ApiClient";
 import LogoSmall from "../general/images/LogoSmall";
 import { IntraSocialLink } from "../general/IntraSocialLink";
 import { SecureImage } from "../general/SecureImage";

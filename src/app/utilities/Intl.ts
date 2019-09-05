@@ -33,7 +33,6 @@ declare global {
         isEqual(arr:T[])
         contains(element): boolean
         cloneArray(): T[];
-        toDictionary(indexKey: keyof T):{ [key: string]: T }
         toggleElement(element):void
     }
     interface Number

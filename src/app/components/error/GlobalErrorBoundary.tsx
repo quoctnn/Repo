@@ -1,6 +1,6 @@
 import * as React from "react";
 import SimpleDialog from "../general/dialogs/SimpleDialog";
-import ApiClient from "../../network/ApiClient";
+import {ApiClient} from "../../network/ApiClient";
 import { CrashLogLevel } from "../../types/intrasocial_types";
 import { AuthenticationManager } from "../../managers/AuthenticationManager";
 import { EndpointManager } from '../../managers/EndpointManager';
