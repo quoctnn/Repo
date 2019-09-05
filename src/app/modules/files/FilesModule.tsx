@@ -41,7 +41,7 @@ type ReduxStateProps = {
 type ReduxDispatchProps = {
 }
 type Props = OwnProps & RouteComponentProps<any> & ReduxStateProps & ReduxDispatchProps
-class FilesModule extends React.Component<Props, State> {  
+class FilesModule extends React.Component<Props, State> {
     filesList = React.createRef<ListComponent<UploadedFile>>()
     private calculatedPageSize = 15
     private defaultPageSize = 15
@@ -116,16 +116,16 @@ class FilesModule extends React.Component<Props, State> {
         const isListMode = this.isListMode()
         const targetWidth = isListMode ? 100000 : 200
         const updateKey = this.state.menuData.viewMode.toString()
-        return <ResizeObserverColumnsComponent className="d-flex flex-column" updateKey={updateKey} targetColumnWidth={targetWidth} 
+        return <ResizeObserverColumnsComponent className="d-flex flex-column" updateKey={updateKey} targetColumnWidth={targetWidth}
                 render={(state) => {
                     const cn = classnames("files-module-list grid")
                     this.calculatedPageSize = this.getCalculatedPageSize(state.colums, state.height, isListMode ? 76 : 76 /*200*/)
-                    return <ListComponent<UploadedFile> 
-                            ref={this.filesList} 
-                            onLoadingStateChanged={this.feedLoadingStateChanged} 
-                            fetchData={this.fetchFiles} 
+                    return <ListComponent<UploadedFile>
+                            ref={this.filesList}
+                            onLoadingStateChanged={this.feedLoadingStateChanged}
+                            fetchData={this.fetchFiles}
                             loadMoreOnScroll={!showLoadMore}
-                            renderItem={this.renderFile} 
+                            renderItem={this.renderFile}
                             reloadContext={updateKey}
                             className={cn + " grid-size-" + state.colums} />
             }}></ResizeObserverColumnsComponent>
@@ -154,12 +154,12 @@ class FilesModule extends React.Component<Props, State> {
         const cn = classnames("files-module", className)
         const headerContent = this.renderHeaderContent()
         const renderModalContent = !showInModal || isModal ? undefined : this.renderModalContent
-        return (<SimpleModule {...rest} 
+        return (<SimpleModule {...rest}
                     showHeader={!isModal}
-                    className={cn} 
-                    headerClick={this.headerClick} 
-                    breakpoint={breakpoint} 
-                    isLoading={this.state.isLoading} 
+                    className={cn}
+                    headerClick={this.headerClick}
+                    breakpoint={breakpoint}
+                    isLoading={this.state.isLoading}
                     renderModalContent={renderModalContent}
                     headerContent={headerContent}
                     headerTitle={translate("files.module.title")}>
@@ -179,4 +179,5 @@ const mapDispatchToProps = (dispatch:ReduxState, ownProps: OwnProps):ReduxDispat
     return {
     }
 }
+//@ts-ignore
 export default withRouter(connect<ReduxStateProps, ReduxDispatchProps, OwnProps>(mapStateToProps, mapDispatchToProps)(FilesModule))

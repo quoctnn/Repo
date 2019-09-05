@@ -505,8 +505,9 @@ const mapStateToProps = (state:ReduxState, ownProps: OwnProps & RouteComponentPr
         routeConversationId: conversationId
     }
 }
-const mergeProps = (stateProps, dispatchProps, ownProps) => 
-{ 
+const mergeProps = (stateProps, dispatchProps, ownProps) =>
+{
     return {...ownProps, ...stateProps}
 }
+//@ts-ignore
 export default withRouter(connect(mapStateToProps, undefined)(ConversationsModule))

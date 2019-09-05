@@ -362,4 +362,5 @@ const mapStateToProps = (state:ReduxState, ownProps: OwnProps & RouteComponentPr
         authenticatedProfile:AuthenticationManager.getAuthenticatedUser()
     }
 }
+//@ts-ignore
 export default withRouter(connect(mapStateToProps, null)(ProfileDetailsModule))
