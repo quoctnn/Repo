@@ -54,7 +54,7 @@ const AgendaComponent:K
                             }) ||
                                 <div className="">{translate("calendar.no_events")}</div>
                             }
-                            
+
                     </div>
                 })}
             </div>
@@ -71,15 +71,15 @@ AgendaComponent.range = (start:Date, { length = AgendaComponent.defaultProps.len
     let end = moment(start).add(length, "days").toDate()
     return { start, end }
 }
-  
+
 AgendaComponent.navigate = (date:Date, action:NavigateAction, { length = AgendaComponent.defaultProps.length }) => {
     switch (action) {
       case "PREV":
         return moment(date).add(-length, "days").toDate()
-  
+
       case "NEXT":
         return moment(date).add(length, "days").toDate()
-  
+
       default:
         return date
     }
@@ -128,7 +128,7 @@ class FullCalendarModule extends React.Component<Props, State> {
             return {isLoading:true, events:[]}
         }, this.loadMonthData)
     }
-    
+
     loadMonthData = () => {
         const date = moment(this.state.date)
         const start = date.startOf('month').toDate()
@@ -248,4 +248,5 @@ const mapDispatchToProps = (dispatch: ReduxState, ownProps: OwnProps): ReduxDisp
     return {
     }
 }
+//@ts-ignore
 export default withRouter(connect<ReduxStateProps, ReduxDispatchProps, OwnProps>(mapStateToProps, mapDispatchToProps)(FullCalendarModule))

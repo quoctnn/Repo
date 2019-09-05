@@ -6,7 +6,7 @@ var config = require('./webpack.base.config.js');
 var localDomain;
 
 try {
-  
+
   //localDomain = '192.168.15.24';
   localDomain = require('ip').address();
   //localDomain = require('./local.domain');
@@ -56,20 +56,6 @@ config.module.rules.unshift(
       'ts-loader'
     ],
     exclude: /node_modules/
-    },
-    {
-      test:/\.js$/,
-      include: [
-          path.resolve(__dirname, "../node_modules/react-360-web")
-      ],use: [
-        {
-          loader: 'babel-loader',
-          options: {
-            presets: []
-          }
-        },
-        //'ts-loader'
-      ]
     },
   {
     test: /\.(s*)css$/,

@@ -18,20 +18,6 @@ if (process.argv.includes('--debug')) {
 config.module.rules.unshift(
   { test: /\.tsx?$/, loader: 'ts-loader' },
   {
-    test:/\.js$/,
-    include: [
-        path.resolve(__dirname, "../node_modules/react-360-web")
-    ],
-    use: [
-      {
-        loader: 'babel-loader?cacheDirectory',
-        options: {
-          presets: []
-        }
-      }
-    ]
-  },
-  {
     test: /\.(s*)css$/,
     use: [
       {
