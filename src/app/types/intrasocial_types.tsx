@@ -237,7 +237,7 @@ export class RequestErrorData{
                 console.warn(`RequestErrorData:${error} is not a string`)
             }
         }
-        return errorMessage
+        return errorMessage || this.error
     }
 }
 export enum CrashLogLevel {
