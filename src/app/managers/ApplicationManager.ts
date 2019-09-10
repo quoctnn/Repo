@@ -130,7 +130,7 @@ export abstract class ApplicationManager
             const dashboards = (data && data.results) || []
             ApplicationManager.setAllDashboards(dashboards)
             completion()
-            ToastManager.showErrorToast(error)
+            ToastManager.showRequestErrorToast(error)
         })
     }
     private static fetchMostUsedCommunities = (completion:() => void) => {
@@ -138,7 +138,7 @@ export abstract class ApplicationManager
             const communities = (data && data.results) || []
             CommunityManager.storeCommunities(communities, true)
             completion()
-            ToastManager.showErrorToast(error)
+            ToastManager.showRequestErrorToast(error)
         })
     }
     private static fetchRecentCommunities = (completion:() => void) => {
@@ -146,7 +146,7 @@ export abstract class ApplicationManager
             const communities = (data && data.results) || []
             CommunityManager.storeCommunities(communities, true)
             completion()
-            ToastManager.showErrorToast(error)
+            ToastManager.showRequestErrorToast(error)
         })
     }
     private static fetchProfile = (completion:() => void) => {
@@ -154,7 +154,7 @@ export abstract class ApplicationManager
             const profile = data
             AuthenticationManager.setAuthenticatedUser(profile)
             completion()
-            ToastManager.showErrorToast(error)
+            ToastManager.showRequestErrorToast(error)
         })
     }
     private static fetchContacts = (completion:() => void) => {
@@ -162,7 +162,7 @@ export abstract class ApplicationManager
             const profiles = (data && data.results) || []
             ProfileManager.storeProfiles(profiles, true)
             completion()
-            ToastManager.showErrorToast(error)
+            ToastManager.showRequestErrorToast(error)
         })
     }
     private static fetchFavorites = (completion:() => void) => {
@@ -170,7 +170,7 @@ export abstract class ApplicationManager
             const favorites = (data && data.results) || []
             FavoriteManager.setFavoritesToStore(favorites)
             completion()
-            //ToastManager.showErrorToast(error)
+            //ToastManager.showRequestErrorToast(error)
         })
     }
     private static setApplicationLoaded = () => {

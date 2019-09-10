@@ -11,6 +11,7 @@ import { ElasticSearchType } from '../../../../types/intrasocial_types';
 import { EditorState } from 'draft-js';
 import { translate } from '../../../../localization/AutoIntlProvider';
 import { allowedSearchOptions } from '../../../../modules/newsfeed/NewsfeedMenu';
+import Popper from 'popper.js';
 
 type Props = {
     placeholder?:string
@@ -140,10 +141,11 @@ export class ContextSearch extends React.Component<Props, State>{
     }
     renderAutoComplete = () => {
         const sections = this.props.sections
-        const modifiers = {
+        const modifiers:Popper.Modifiers = {
             computeStyle: {
               fn: this.onComputeStyle
-            }
+            },
+            flip: { behavior: ['bottom', 'top', 'bottom'] }
           }
         return (<Popover
                     modifiers={modifiers}

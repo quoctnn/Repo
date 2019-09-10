@@ -1,14 +1,13 @@
 import * as React from 'react';
-import { withRouter, RouteComponentProps, Link } from "react-router-dom";
+import { withRouter, RouteComponentProps } from "react-router-dom";
 import Module, { CommonModuleProps } from '../Module';
 import ModuleHeader from '../ModuleHeader';
 import ModuleContent from '../ModuleContent';
 import ModuleFooter from '../ModuleFooter';
-import ModuleMenuTrigger from '../ModuleMenuTrigger';
 import "./CommunityDetailsModule.scss"
 import { ResponsiveBreakpoint } from '../../components/general/observers/ResponsiveComponent';
-import { translate, lazyTranslate } from '../../localization/AutoIntlProvider';
-import { Community, ContextNaturalKey, Permission, CropRect, ContextPhotoType, CropInfo, RequestErrorData } from '../../types/intrasocial_types';
+import { translate } from '../../localization/AutoIntlProvider';
+import { Community, ContextNaturalKey, Permission, CropRect, ContextPhotoType, CropInfo, RequestErrorData, ContextPrivacy, CommunityCategory, CommunityConfigurationData, CommunityCreatePermission } from '../../types/intrasocial_types';
 import { connect } from 'react-redux';
 import { ReduxState } from '../../redux';
 import CircularLoadingSpinner from '../../components/general/CircularLoadingSpinner';
@@ -16,12 +15,19 @@ import LoadingSpinner from '../../components/LoadingSpinner';
 import { DetailsContent } from '../../components/details/DetailsContent';
 import { DetailsMembers } from '../../components/details/DetailsMembers';
 import { ContextManager } from '../../managers/ContextManager';
-import { Button } from 'reactstrap';
-import SimpleDialog from '../../components/general/dialogs/SimpleDialog';
-import FormController, { FormPageData, FormComponentType, FormStatus } from '../../components/form/FormController';
+import FormController, { FormPageData, FormStatus } from '../../components/form/FormController';
 import {ApiClient, ApiClientCallback} from '../../network/ApiClient';
 import classnames from 'classnames';
-import { uniqueId } from '../../utilities/Utilities';
+import { uniqueId, removeEmptyEntriesFromObject } from '../../utilities/Utilities';
+import { TextInputData } from '../../components/form/components/TextInput';
+import { TextAreaInputData } from '../../components/form/components/TextAreaInput';
+import { ContextPhotoInputData } from '../../components/form/components/ContextPhotoInput';
+import { RichRadioGroupInputData, InputOption } from '../../components/form/components/RichRadioGroupInput';
+import { DropDownMenu } from '../../components/general/DropDownMenu';
+import { OverflowMenuItem, OverflowMenuItemType } from '../../components/general/OverflowMenu';
+import { SelectInputData } from '../../components/form/components/SelectInput';
+import { ColorInputData } from '../../components/form/components/ColorInput';
+import { BooleanInputData } from '../../components/form/components/BooleanInput';
 type OwnProps = {
     breakpoint:ResponsiveBreakpoint
 } & CommonModuleProps
@@ -32,6 +38,7 @@ type State = {
     editFormReloadKey?:string
     editFormStatus:FormStatus
     editFormError?:RequestErrorData
+    communityConfiguration?:CommunityConfigurationData
 }
 type ReduxStateProps = {
     community: Community
@@ -48,7 +55,8 @@ class GroupDetailsModule extends React.Component<Props, State> {
             editFormVisible:false,
             editFormStatus:FormStatus.normal,
             editFormError:null,
-            editFormReloadKey:uniqueId()
+            editFormReloadKey:uniqueId(),
+            communityConfiguration:null
         }
     }
     componentDidUpdate = (prevProps:Props) => {
@@ -70,35 +78,55 @@ class GroupDetailsModule extends React.Component<Props, State> {
         }
         this.setState(newState)
     }
-    feedLoadingStateChanged = (isLoading:boolean) => {
-        this.setState({isLoading})
-    }
     renderLoading = () => {
         if (this.state.isLoading) {
             return (<CircularLoadingSpinner borderWidth={3} size={20} key="loading"/>)
         }
     }
-    toggleEditForm = () => {
-        this.setState((prevState:State) => {
-            if(!prevState.editFormVisible)
-                return {editFormVisible:!prevState.editFormVisible, editFormReloadKey:uniqueId()}
-            return {editFormVisible:!prevState.editFormVisible, editFormError:null}
+    loadConfigurationDataAndShowForm = () => {
+        const community = this.props.community
+        ApiClient.getCommunityConfiguration(community.id, (data, status, errorData) => {
+            this.setState(() => {
+                return {isLoading:false, communityConfiguration:data, editFormVisible:true, editFormReloadKey:uniqueId()}
+            })
         })
     }
-    renderEditButton = () => {
-        return <Button onClick={this.toggleEditForm}>{translate("Edit")}</Button>
+    toggleEditForm = () => {
+        const isFormVisible = this.state.editFormVisible
+        if(isFormVisible) //close
+        {
+            this.setState(() => {
+                return {editFormVisible:!isFormVisible, editFormError:null, communityConfiguration:null}
+            })
+        }
+        else {
+            this.setState((prevState:State) => {
+                return {isLoading:true}
+            }, this.loadConfigurationDataAndShowForm )
+        }
+        
     }
     uploadContextPhoto = (type:ContextPhotoType, contextNaturalKey:ContextNaturalKey, contextObjectId:number, file:File|string, crop:CropRect, completion:ApiClientCallback<CropInfo>) => () => {
         ApiClient.setContextPhoto(type,contextNaturalKey, contextObjectId, file, crop, completion)
     }
     handleEditCommunityFormSubmit = (communityData:Partial<Community>) => {
         console.log("formdata", communityData)
+        //const hasDataToSave = Object.keys(communityData).length > 0
         const community = this.props.community
         this.setEditFormStatus(FormStatus.submitting)
-        const avatarData:{file:File|string, crop:CropRect} = communityData.avatar as any
-        delete communityData["avatar"]
-        const coverData:{file:File|string, crop:CropRect} = communityData.cover as any
-        delete communityData["cover"]
+        const {
+            name, 
+            description, 
+            privacy,
+            category,
+            //
+            avatar, 
+            cover,
+            //
+            ...communityConfigurationData} = communityData
+        const communityUpdateData = removeEmptyEntriesFromObject({name, description, privacy, category})
+        const avatarData:{file:File|string, crop:CropRect} = avatar as any
+        const coverData:{file:File|string, crop:CropRect} = cover as any
         const completed = () => {
             if(errors.length > 0)
             {
@@ -121,7 +149,7 @@ class GroupDetailsModule extends React.Component<Props, State> {
         }
         const requests:(() => void)[] = []
         let requestsCompleted = 0
-        const requestCompleter = (data, status, rerror, errorData) => {
+        const requestCompleter = (data, status, errorData) => {
             requestsCompleted += 1
             pushError(errorData)
             if(requestsCompleted == requests.length)
@@ -133,12 +161,19 @@ class GroupDetailsModule extends React.Component<Props, State> {
                 request && request()
             }
         }
-        requests.push(() => ApiClient.updateCommunity(this.props.community.id, communityData, requestCompleter))
+        if(Object.keys(communityUpdateData).length > 0)
+            requests.push(() => ApiClient.updateCommunity(this.props.community.id, communityUpdateData, requestCompleter))
         if(avatarData)
             requests.push(this.uploadContextPhoto(ContextPhotoType.avatar,ContextNaturalKey.COMMUNITY, community.id, avatarData.file, avatarData.crop, requestCompleter))
         if(coverData)
             requests.push(this.uploadContextPhoto(ContextPhotoType.cover,ContextNaturalKey.COMMUNITY, community.id, coverData.file, coverData.crop, requestCompleter))
-        requests[0]() // start
+        if(Object.keys(communityConfigurationData).length > 0)
+            requests.push(() => ApiClient.updateCommunityConfiguration(this.props.community.id, communityConfigurationData, requestCompleter))
+        if(requests.length > 0)
+            requests[0]() // start
+        else {
+            completed()
+        }
     }
     setEditFormStatus = (status:FormStatus, resetError?:boolean) => {
         this.setState((prevState:State) => {
@@ -147,42 +182,95 @@ class GroupDetailsModule extends React.Component<Props, State> {
                 if(resetError)
                     return {editFormStatus:status, editFormError:null}
                 return {editFormStatus:status}
-                
             }
         })
     }
     renderEditForm = () => {
         const community = this.props.community
         const visible = this.state.editFormVisible
-        const pages:FormPageData[] = [
-            {title:"Name", description:"name, description", id:"1", componentData:[
-                {type:FormComponentType.text, arguments:{title:"Name", isRequired:true, id:"name", value:community.name, placeholder:"placeholder", contextNaturalKey:ContextNaturalKey.COMMUNITY, contextObjectId:community.id}},
-                {type:FormComponentType.textArea, arguments:{title:"comp title2", id:"description", value:community.description, isRequired:true}}
-            ] },
-            {title:"Images", description:"avatar, cover", id:"2", componentData:[
-                {type:FormComponentType.file, arguments:{title:"Avatar", id:"avatar", value:community.avatar, contextNaturalKey:ContextNaturalKey.COMMUNITY, contextObjectId:community.id}},
-                {type:FormComponentType.file, arguments:{title:"Cover", id:"cover", value:community.cover_cropped, contextNaturalKey:ContextNaturalKey.COMMUNITY, contextObjectId:community.id}}
-            ] },
-        ]
-        return <SimpleDialog didCancel={this.toggleEditForm} visible={visible}>
-                    <FormController formError={this.state.editFormError} didCancel={this.toggleEditForm} status={this.state.editFormStatus} onFormSubmit={this.handleEditCommunityFormSubmit} title={translate("form.community.edit")} pages={pages} />
-                </SimpleDialog>
+        const configurationData = this.state.communityConfiguration
+        const hasConfigurationData = !!configurationData
+        const privacyOptions:InputOption[] = ContextPrivacy.all.map(p => {
+            return {
+                label:ContextPrivacy.titleForKey(p), 
+                value:p, 
+                description:ContextPrivacy.descriptionForKey(p),
+                icon:ContextPrivacy.iconClassForKey(p),
+            }
+        })
+        const categoryOptions:InputOption[] = CommunityCategory.all.map(p => {
+            return {
+                label:CommunityCategory.translationForKey(p), 
+                value:p, 
+            }
+        })
+        const communityCreateOptions:InputOption[] = CommunityCreatePermission.all.map(p => {
+            return {
+                label:CommunityCreatePermission.translationForKey(p), 
+                value:p.toString(), 
+            }
+        })
+        const pages:FormPageData[] = []
+        if(visible){
+            const primary = {title:translate("community.settings.page.title.primary"), description:translate("community.settings.page.description.primary"), id:"1", componentData:[
+                new TextInputData(community.name, translate("common.name"), "name", translate("community.placeholder.name"), true),
+                new TextAreaInputData(community.description, translate("common.description"), "description", null),
+                new RichRadioGroupInputData(community.privacy, translate("common.privacy"), "privacy", privacyOptions, true),
+                new SelectInputData(community.category,  translate("common.category"), "category", categoryOptions, null, null, true)
+            ]}
+            pages.push(primary)
+            const appearance = {title:translate("community.settings.page.title.appearance"), description:translate("community.settings.page.description.appearance"), id:"2", componentData:[
+                new ContextPhotoInputData(community.avatar, translate("common.avatar"), "avatar", ContextNaturalKey.COMMUNITY, community.id),
+                new ContextPhotoInputData(community.cover, translate("common.cover"), "cover", ContextNaturalKey.COMMUNITY, community.id ),
+            ]}
+            if(hasConfigurationData)
+            {
+                appearance.componentData.push(new ColorInputData(configurationData.primary_color, translate("community.settings.title.primarycolor"), "primary_color", true))
+                appearance.componentData.push(new ColorInputData(configurationData.secondary_color, translate("community.settings.title.secondarycolor"), "secondary_color", true))
+            }
+            pages.push(appearance)
+            if(hasConfigurationData)
+            {
+                pages.push({title:translate("community.settings.page.title.wall"), description:translate("community.settings.page.description.wall"), id:"3", componentData:[
+                    new BooleanInputData(configurationData.members_publication, translate("community.config.title.members_publication"), "members_publication", translate("community.config.description.members_publication")),
+                    new BooleanInputData(configurationData.members_comments, translate("community.config.title.members_comments"), "members_comments", translate("community.config.description.members_comments")),
+                    new BooleanInputData(configurationData.members_wall_notifications, translate("community.config.title.members_wall_notifications"), "members_wall_notifications", translate("community.config.description.members_wall_notifications")),
+                    new BooleanInputData(configurationData.public_member_list, translate("community.config.title.public_member_list"), "public_member_list", translate("community.config.description.public_member_list")),
+                    new BooleanInputData(configurationData.publish_files, translate("community.config.title.publish_files"), "publish_files", translate("community.config.description.publish_files")),
+                ]})
+                pages.push({title:translate("community.settings.page.title.other"), description:translate("community.settings.page.description.other"), id:"4", componentData:[
+                    new SelectInputData(configurationData.members_group_creation.toString(), translate("community.config.title.members_group_creation"), "members_group_creation", communityCreateOptions, null, translate("community.config.description.members_group_creation")),
+                    new SelectInputData(configurationData.subgroups.toString(), translate("community.config.title.subgroups"), "subgroups", communityCreateOptions, null, translate("community.config.description.subgroups")),
+                    new SelectInputData(configurationData.members_event_creation.toString(), translate("community.config.title.members_event_creation"), "members_event_creation", communityCreateOptions, null, translate("community.config.description.members_event_creation")),
+                    new SelectInputData(configurationData.members_group_creation.toString(), translate("community.config.title.members_project_creation"), "members_project_creation", communityCreateOptions, null, translate("community.config.description.members_project_creation")),
+                    new BooleanInputData(configurationData.allow_anonymous_users, translate("community.config.title.allow_anonymous_users"), "allow_anonymous_users", translate("community.config.description.allow_anonymous_users")),
+                ]})
+            }
+        }
+        return <FormController key={this.state.editFormReloadKey} visible={visible} formError={this.state.editFormError} didCancel={this.toggleEditForm} status={this.state.editFormStatus} onFormSubmit={this.handleEditCommunityFormSubmit} title={translate("form.community.edit")} pages={pages} />
+        
+    }
+    getCommunityOptions = () => {
+        const options: OverflowMenuItem[] = []
+        //options.push({id:"divider1", type:OverflowMenuItemType.divider})
+        options.push({id:"1", type:OverflowMenuItemType.option, title:translate("Edit"), onPress:this.toggleEditForm, iconClass:"fas fa-pen"})
+        return options
     }
     render = () => {
         const {breakpoint, history, match, location, staticContext, community, contextNaturalKey, className, ...rest} = this.props
         const cn = classnames("community-details-module", className)
+        const communityOptions = this.getCommunityOptions()
         return (<Module {...rest} className={cn}>
                     <ModuleHeader headerTitle={community && community.name || translate("detail.module.title")} loading={this.state.isLoading}>
-                        <ModuleMenuTrigger onClick={this.menuItemClick} />
+                        <DropDownMenu className="community-option-dropdown" triggerClass="fas fa-cog mx-1" items={communityOptions}></DropDownMenu>
                     </ModuleHeader>
-                    {breakpoint >= ResponsiveBreakpoint.standard && //do not render for small screens
+                    {true && //breakpoint >= ResponsiveBreakpoint.standard && //do not render for small screens
                         <ModuleContent>
                             { community && community.permission >= Permission.read &&
                                 <DetailsContent description={community.description}/>
                             ||
                             <LoadingSpinner key="loading"/>
                             }
-                            {this.renderEditButton()}
                             {this.renderEditForm()}
                         </ModuleContent>
                     }

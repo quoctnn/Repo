@@ -5,7 +5,7 @@ import { ReduxState } from "../../redux";
 import { Conversation, UserProfile } from '../../types/intrasocial_types';
 import { connect } from "react-redux";
 import { ConversationUtilities } from "../../utilities/ConversationUtilities";
-import { translate } from "../../localization/AutoIntlProvider";
+import { translate, lazyTranslate } from "../../localization/AutoIntlProvider";
 import Avatar from "../../components/general/Avatar";
 import { ProfileManager } from '../../managers/ProfileManager';
 import { userAvatar, uniqueId, userFullName } from '../../utilities/Utilities';
@@ -63,7 +63,7 @@ class ConversationEditor extends React.Component<Props, State> {
         if(this.state.title != oldTitle)
         {
             ApiClient.updateConversation(this.props.conversationId,{title:this.state.title}, (data, status, error) => {
-                ToastManager.showErrorToast(error, status, translate("Could not update conversation"))
+                ToastManager.showRequestErrorToast(error, lazyTranslate("Could not update conversation"))
             })
         }
     }
@@ -105,7 +105,7 @@ class ConversationEditor extends React.Component<Props, State> {
             return {addMembersDialogVisible:false}
         }, () => {
             ApiClient.addConversationUsers(conversationId, added, (conversation, status, error) => {
-                ToastManager.showErrorToast(error, status, translate("Could not add new members"))
+                ToastManager.showRequestErrorToast(error, lazyTranslate("Could not add new members"))
             })
         })
     }

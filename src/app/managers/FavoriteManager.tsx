@@ -27,7 +27,7 @@ export abstract class FavoriteManager
 
     }
     static createFavorite = (objectNaturalKey: ContextNaturalKey, objectId: number) => {
-        ApiClient.createFavorite(objectNaturalKey,objectId, null, (data, status, error, errorData) => {
+        ApiClient.createFavorite(objectNaturalKey,objectId, null, (data, status, errorData) => {
             if(data)
             {
                 FavoriteManager.addFavoritesToStore([data])
@@ -41,7 +41,7 @@ export abstract class FavoriteManager
             {
                 FavoriteManager.removeFavoriteFromStore(id)
             }
-            ToastManager.showErrorToast(error, status, translate("Could not remove item to your favorites"))
+            ToastManager.showRequestErrorToast(error, lazyTranslate("Could not remove item to your favorites"))
         })
     }
     static removeFavoriteFromStore = (id:number) => {

@@ -280,7 +280,7 @@ export class NewsfeedComponent extends React.Component<Props, State> {
                 this.insertOrUpdateComment(comment)
             }
             this.setState({ isLoading: false })//TODO: do this in this.updateItems or here?
-            ToastManager.showErrorToast(error)
+            ToastManager.showRequestErrorToast(error)
         })
     }
     private fetchUpdates = () => {
@@ -301,7 +301,7 @@ export class NewsfeedComponent extends React.Component<Props, State> {
                         isLoading:false,
                     });
                 }
-                ToastManager.showErrorToast(error)
+                ToastManager.showRequestErrorToast(error)
             })
         }
     }
@@ -467,7 +467,7 @@ export class NewsfeedComponent extends React.Component<Props, State> {
                     hasLoaded:true
                 });
             }
-            ToastManager.showErrorToast(error)
+            ToastManager.showRequestErrorToast(error)
         })
     }
     handleRefresh = () =>
@@ -529,7 +529,7 @@ export class NewsfeedComponent extends React.Component<Props, State> {
                 }
                 this.updateStatusItem(clone)
             }
-            ToastManager.showErrorToast(error)
+            ToastManager.showRequestErrorToast(error)
         })
     }
     handleCreateAttribute(status:Status, type:ObjectAttributeType, user?:number, completion?:(success:boolean) => void )
@@ -545,7 +545,7 @@ export class NewsfeedComponent extends React.Component<Props, State> {
                 attrs.push(data)
                 this.updateStatusItem(clone)
             }
-            ToastManager.showErrorToast(error)
+            ToastManager.showRequestErrorToast(error)
             completion && completion(!!data)
         })
     }
@@ -571,7 +571,7 @@ export class NewsfeedComponent extends React.Component<Props, State> {
                 console.log("error sending reaction:", error)
                 this.updateStatusItem(status) // setting old status
             }
-            ToastManager.showErrorToast(error)
+            ToastManager.showRequestErrorToast(error)
         })
     }
     handleLoadMore = () =>
@@ -787,7 +787,7 @@ export class NewsfeedComponent extends React.Component<Props, State> {
             {
                 this.postDeleteStatus({status_id:status.id, parent_id:status.parent, type:EventStreamMessageType.STATUS_DELETED})
             }
-            ToastManager.showErrorToast(error)
+            ToastManager.showRequestErrorToast(error)
             this.setStashUpdates(false)
         })
     }
@@ -803,7 +803,7 @@ export class NewsfeedComponent extends React.Component<Props, State> {
             {
                 completion(data && !error)
             }
-            ToastManager.showErrorToast(error)
+            ToastManager.showRequestErrorToast(error)
         })
     }
     createNewStatus = (message:string, files?:UploadedFile[], completion?:(success:boolean) => void) => {
@@ -830,7 +830,7 @@ export class NewsfeedComponent extends React.Component<Props, State> {
                 }
             }
             completion && completion(success)
-            ToastManager.showErrorToast(error)
+            ToastManager.showRequestErrorToast(error)
             this.setStashUpdates(false)
         })
     }
@@ -927,7 +927,7 @@ export class NewsfeedComponent extends React.Component<Props, State> {
                 }
                 if(completion)
                     completion(success)
-                ToastManager.showErrorToast(error)
+                ToastManager.showRequestErrorToast(error)
                 this.setStashUpdates(false)
             })
         }
@@ -1389,7 +1389,7 @@ export class NewsfeedComponent extends React.Component<Props, State> {
                 const comments = this.applyContextToStatuses(data.results, parent.context_natural_key, parent.context_object_id)
                 this.didLoadMoreComments(loader, comments)
             }
-            ToastManager.showErrorToast(error)
+            ToastManager.showRequestErrorToast(error)
         })
     }
     loadMoreComments = (loader:StatusCommentLoader) => (e:any) =>

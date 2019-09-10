@@ -13,6 +13,7 @@ import { ApplicationManager } from './ApplicationManager';
 import { CommunityManager } from './CommunityManager';
 import { Settings } from '../utilities/Settings';
 import { setLanguageAction, availableLanguages } from '../redux/language';
+import { RequestErrorData } from '../types/intrasocial_types';
 
 const url = require('url');
 const path = require("path")
@@ -114,7 +115,7 @@ export abstract class WindowAppManager
     static sendInboundOnSocket = (data:{type:string, data:any}) => {
         if(!data || !data.type)
         {
-            ToastManager.showErrorToast(translate("common.data.error"))
+            ToastManager.showRequestErrorToast( new RequestErrorData( translate("common.data.error"), "error"))
             return
         }
         NotificationCenter.push(eventStreamNotificationPrefix + data.type,[data.data])

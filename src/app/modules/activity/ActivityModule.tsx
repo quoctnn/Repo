@@ -73,7 +73,7 @@ class ActivityModule extends React.Component<Props, State> {
     fetchActivity = (offset:number, completion:(items:PaginationResult<RecentActivity>) => (void)) => {
         ApiClient.getRecentActivity(this.props.pageSize, offset, (data, status, error) => {
             completion(data)
-            ToastManager.showErrorToast(error)
+            ToastManager.showRequestErrorToast(error)
         })
     }
     renderActivity = (activity:RecentActivity) =>  {

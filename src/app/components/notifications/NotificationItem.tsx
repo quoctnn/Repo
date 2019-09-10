@@ -3,7 +3,7 @@ import classnames = require("classnames");
 import { NotificationGroupKey, InvitationNotification, Community, Group, UserProfile, Event, Conversation, StatusNotification, AttentionNotification, ReminderNotification, TaskNotification, TaskNotificationAction, ReportResult, ReportNotification, MembershipRequestNotification, NotificationObject, ConversationNotification } from '../../types/intrasocial_types';
 import {ApiClient} from '../../network/ApiClient';
 import { ToastManager } from '../../managers/ToastManager';
-import { translate } from '../../localization/AutoIntlProvider';
+import { translate, lazyTranslate } from '../../localization/AutoIntlProvider';
 import { Button, Badge } from "reactstrap";
 import { ListItem } from "../general/List";
 import { ProfileManager } from '../../managers/ProfileManager';
@@ -60,7 +60,7 @@ const CommunityInvitation = (props: InvitationProps) => {
             if (!error) {
                 sendCompleted()
             }
-            ToastManager.showErrorToast(error, status, translate("invitation.error.respond"))
+            ToastManager.showRequestErrorToast(error, lazyTranslate("invitation.error.respond"))
         })
     }
     const dismiss = () => {
@@ -68,7 +68,7 @@ const CommunityInvitation = (props: InvitationProps) => {
             if (!error) {
                 sendCompleted()
             }
-            ToastManager.showErrorToast(error, status, translate("invitation.error.respond"))
+            ToastManager.showRequestErrorToast(error, lazyTranslate("invitation.error.respond"))
         })
     }
     const sendCompleted = () => {
@@ -92,7 +92,7 @@ const GroupInvitation = (props: InvitationProps) => {
             if (!error) {
                 sendCompleted()
             }
-            ToastManager.showErrorToast(error, status, translate("invitation.error.respond"))
+            ToastManager.showRequestErrorToast(error, lazyTranslate("invitation.error.respond"))
         })
     }
     const dismiss = () => {
@@ -100,7 +100,7 @@ const GroupInvitation = (props: InvitationProps) => {
             if (!error) {
                 sendCompleted()
             }
-            ToastManager.showErrorToast(error, status, translate("invitation.error.respond"))
+            ToastManager.showRequestErrorToast(error, lazyTranslate("invitation.error.respond"))
         })
     }
     const sendCompleted = () => {
@@ -124,7 +124,7 @@ const FriendshipInvitation = (props: InvitationProps) => {
             if (!error) {
                 sendCompleted()
             }
-            ToastManager.showErrorToast(error, status, translate("invitation.error.respond"))
+            ToastManager.showRequestErrorToast(error, lazyTranslate("invitation.error.respond"))
         })
     }
     const dismiss = () => {
@@ -132,7 +132,7 @@ const FriendshipInvitation = (props: InvitationProps) => {
             if (!error) {
                 sendCompleted()
             }
-            ToastManager.showErrorToast(error, status, translate("invitation.error.respond"))
+            ToastManager.showRequestErrorToast(error, lazyTranslate("invitation.error.respond"))
         })
     }
     const block = () => {
@@ -140,7 +140,7 @@ const FriendshipInvitation = (props: InvitationProps) => {
             if (!error) {
                 sendCompleted()
             }
-            ToastManager.showErrorToast(error, status, translate("invitation.error.respond"))
+            ToastManager.showRequestErrorToast(error, lazyTranslate("invitation.error.respond"))
         })
     }
     const sendCompleted = () => {
@@ -163,7 +163,7 @@ const EventInvitation = (props: InvitationProps) => {
             if (!error) {
                 sendCompleted()
             }
-            ToastManager.showErrorToast(error, status, translate("invitation.error.respond"))
+            ToastManager.showRequestErrorToast(error, lazyTranslate("invitation.error.respond"))
         })
     }
     const notGoing = () => {
@@ -171,7 +171,7 @@ const EventInvitation = (props: InvitationProps) => {
             if (!error) {
                 sendCompleted()
             }
-            ToastManager.showErrorToast(error, status, translate("invitation.error.respond"))
+            ToastManager.showRequestErrorToast(error, lazyTranslate("invitation.error.respond"))
         })
     }
     const dismiss = () => {
@@ -179,7 +179,7 @@ const EventInvitation = (props: InvitationProps) => {
             if (!error) {
                 sendCompleted()
             }
-            ToastManager.showErrorToast(error, status, translate("invitation.error.respond"))
+            ToastManager.showRequestErrorToast(error, lazyTranslate("invitation.error.respond"))
         })
     }
     const sendCompleted = () => {
@@ -208,7 +208,7 @@ const UnreadConversation = (props: UnreadConversationProps) => {
             if (!error) {
                 sendCompleted()
             }
-            ToastManager.showErrorToast(error, status, translate("invitation.error.respond"))
+            ToastManager.showRequestErrorToast(error, lazyTranslate("invitation.error.respond"))
         })
     }
     const sendCompleted = () => {
@@ -232,7 +232,7 @@ const StatusNotificationComponent = (props: StatusNotificationProps) => {
             if (!error) {
                 sendCompleted()
             }
-            ToastManager.showErrorToast(error, status, translate("notification.error.respond"))
+            ToastManager.showRequestErrorToast(error, lazyTranslate("notification.error.respond"))
         })
     }
     const sendCompleted = () => {
@@ -273,7 +273,7 @@ const AttentionComponent = (props: AttentionProps) => {
                 if (!error) {
                     sendCompleted()
                 }
-                ToastManager.showErrorToast(error, status, translate("notification.error.respond"))
+                ToastManager.showRequestErrorToast(error, lazyTranslate("notification.error.respond"))
             })
         }
     }
@@ -310,7 +310,7 @@ const ReminderComponent = (props: ReminderProps) => {
                 if (!error) {
                     sendCompleted()
                 }
-                ToastManager.showErrorToast(error, status, translate("notification.error.respond"))
+                ToastManager.showRequestErrorToast(error, lazyTranslate("notification.error.respond"))
             })
         }
     }
@@ -339,7 +339,7 @@ const TaskNotificationComponent = (props: TaskNotificationProps) => {
             if (!error) {
                 sendCompleted()
             }
-            ToastManager.showErrorToast(error, status, translate("notification.error.respond"))
+            ToastManager.showRequestErrorToast(error, lazyTranslate("notification.error.respond"))
         })
     }
     const sendCompleted = () => {
@@ -409,7 +409,7 @@ const MembershipRequestComponent = (props: MembershipRequestProps) => {
                 if (!error) {
                     sendCompleted()
                 }
-                ToastManager.showErrorToast(error, status, translate("notification.error.respond"))
+                ToastManager.showRequestErrorToast(error, lazyTranslate("notification.error.respond"))
             })
         }
     }
@@ -419,7 +419,7 @@ const MembershipRequestComponent = (props: MembershipRequestProps) => {
                 if (!error) {
                     sendCompleted()
                 }
-                ToastManager.showErrorToast(error, status, translate("notification.error.respond"))
+                ToastManager.showRequestErrorToast(error, lazyTranslate("notification.error.respond"))
             })
         }
     }

@@ -3,7 +3,7 @@ import { withRouter, RouteComponentProps } from "react-router-dom";
 import classnames from "classnames"
 import "./ConversationModule.scss"
 import { ResponsiveBreakpoint } from '../../components/general/observers/ResponsiveComponent';
-import { translate } from '../../localization/AutoIntlProvider';
+import { translate, lazyTranslate } from '../../localization/AutoIntlProvider';
 import CircularLoadingSpinner from '../../components/general/CircularLoadingSpinner';
 import { ContextNaturalKey, Conversation, Message, UserProfile } from '../../types/intrasocial_types';
 import {ApiClient, PaginationResult } from '../../network/ApiClient';
@@ -284,7 +284,7 @@ class ConversationModule extends React.Component<Props, State> {
         const conversationId = this.props.conversation.temporary && this.props.conversation.temporary_id || this.props.conversation.id
         ApiClient.getConversationMessages(conversationId, 30, offset, (data, status, error) => {
             completion(data)
-            ToastManager.showErrorToast(error)
+            ToastManager.showRequestErrorToast(error)
         })
     }
     handleLoadMore = () =>
@@ -363,7 +363,7 @@ class ConversationModule extends React.Component<Props, State> {
                 }
                 if(error || status == "error")
                 {
-                    ToastManager.showErrorToast(error || translate("Could not create conversation"))
+                    ToastManager.showRequestErrorToast(error, lazyTranslate("Could not create conversation"))
                     return
                 }
             } )

@@ -109,7 +109,7 @@ class GroupsModule extends React.Component<Props, State> {
         const groupId = this.props.group && this.props.group.id
         ApiClient.getGroups(communityId, groupId, this.props.pageSize, offset, ordering, (data, status, error) => {
             completion(data)
-            ToastManager.showErrorToast(error)
+            ToastManager.showRequestErrorToast(error)
         })
     }
     renderGroup = (group:Group) =>  {

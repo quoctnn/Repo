@@ -1,6 +1,7 @@
 @import "./Config";
 .scrollbar, .vertical-scroll, .DraftEditor-editorContainer
 {
+    -webkit-overflow-scrolling: touch;
     &::-webkit-scrollbar {
          width: 5px;
          height: 5px;
@@ -57,17 +58,24 @@ ul,li{ list-style-type: none; padding: 0;}
     }
 }
 .modal-title {
-    display: block;
+    display: flex;
     width: 100%;
+    align-items: center;
+    .modal-close{
+        margin-left: auto;
+    }
 }
 .modal-header, .modal-footer{
     @include var(border-color, border-color-default);
-}.modal-title {
-    margin: 0 auto;
 }
 .modal-content {
     @include var(background, main-content-background);
     @include var(color, primary-text-color);
+}
+.modal-dialog-scrollable{
+    .modal-body{
+        -webkit-overflow-scrolling: touch;
+    }
 }
 .close {
     opacity: 1 !important;
@@ -178,6 +186,11 @@ button{@include var(color, primary-text-color);}
 }
 .main-content-secondary-background{
     @include var(background-color, main-content-secondary-background);
+}
+.btn-light{
+    @include var(background-color, main-content-background);
+    @include var(color, primary-text-color);
+    border-width: 0;
 }
 .highlight-text {
 

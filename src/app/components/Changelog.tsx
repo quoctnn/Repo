@@ -4,6 +4,7 @@ import { ToastManager } from '../managers/ToastManager';
 import * as rst2html from 'rst2html'
 import "./Changelog.scss"
 import { WindowAppManager } from '../managers/WindowAppManager';
+import { RequestErrorData } from "../types/intrasocial_types";
 
 type Props = 
 {
@@ -35,7 +36,7 @@ export class Changelog extends React.Component<Props, State>
                 })
             }            
         }, (request, status, error) => {
-            ToastManager.showErrorToast(error, status)
+            ToastManager.showRequestErrorToast(new RequestErrorData(error, null))
         })
     }
     render() {

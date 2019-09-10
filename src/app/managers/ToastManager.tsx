@@ -15,7 +15,7 @@ export abstract class ToastManager
             toast.info(infoBox, opts || {hideProgressBar: true});
         }
     }
-    static showErrorToast = (message:string, preferredMessage?:string, description?:string, buttons?:JSX.Element[], opts?:ToastOptions) =>
+    private static showErrorToast = (message:string, preferredMessage?:string, description?:string, buttons?:JSX.Element[], opts?:ToastOptions) =>
     {
         if(message)
             toast.error(<ErrorToast message={preferredMessage || message} description={description} buttons={buttons} />,opts || {hideProgressBar: true});

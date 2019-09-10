@@ -69,7 +69,7 @@ class ProjectDetailsModule extends React.Component<Props, State> {
                     <ModuleHeader headerTitle={project && project.name || translate("detail.module.title")} loading={this.state.isLoading}>
                         <ModuleMenuTrigger onClick={this.menuItemClick} />
                     </ModuleHeader>
-                    {breakpoint >= ResponsiveBreakpoint.standard && //do not render for small screens
+                    {true && //breakpoint >= ResponsiveBreakpoint.standard && //do not render for small screens
                         <ModuleContent>
                             { project && project.permission >= Permission.read &&
                                 <div className="project-details-content">

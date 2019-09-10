@@ -70,7 +70,7 @@ class CommunitiesModule extends React.Component<Props, State> {
         const isMember = this.props.isMember || true
         ApiClient.getCommunities(isMember, ListOrdering.MOST_USED, this.props.pageSize, offset, (data, status, error) => {
             completion(data)
-            ToastManager.showErrorToast(error)
+            ToastManager.showRequestErrorToast(error)
         })
     }
     renderCommunity = (community: Community) => {

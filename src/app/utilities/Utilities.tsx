@@ -29,7 +29,14 @@ export const parseJSONObject = (param: string) => {
     }
     return null
 }
-
+export const removeEmptyEntriesFromObject = <T extends {}>(object:T):T => {
+    const newObject = Object.keys(object).reduce((acc, key) => {
+        const _acc = acc;
+        if (object[key] !== undefined) _acc[key] = object[key];
+        return _acc;
+      }, {} as T)
+    return newObject
+}
 export function userFullName(user: SimpleUserProfile | UserProfile, fallback?: string) {
     if (!user) {
         if (fallback !== undefined)

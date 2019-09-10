@@ -110,7 +110,7 @@ class ConversationDetailsModule extends React.Component<Props, State> {
         if(conversationId && this.state.title != oldTitle)
         {
             ApiClient.updateConversation(conversationId,{title:this.state.title}, (data, status, error) => {
-                ToastManager.showErrorToast(error, status, translate("Could not update conversation"))
+                ToastManager.showRequestErrorToast(error, lazyTranslate("Could not update conversation"))
             })
         }
     }
@@ -176,7 +176,7 @@ class ConversationDetailsModule extends React.Component<Props, State> {
         this.setState((prevState:State) => {
             return {addMembersDialogVisible:false}
         }, () => {
-            ApiClient.addConversationUsers(conversationId, added, (conversation, status, error, errorData) => {
+            ApiClient.addConversationUsers(conversationId, added, (conversation, status, errorData) => {
                 ToastManager.showRequestErrorToast(errorData, lazyTranslate("network.error"))
             })
         })

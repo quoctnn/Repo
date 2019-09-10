@@ -3,7 +3,7 @@ import { Button,Form, FormGroup } from 'reactstrap';
 import { withRouter} from 'react-router-dom'
 import "./CreateConversation.scss"
 import { UserProfile, Conversation } from '../../../types/intrasocial_types';
-import { translate } from '../../../localization/AutoIntlProvider';
+import { translate, lazyTranslate } from '../../../localization/AutoIntlProvider';
 import {ApiClient} from '../../../network/ApiClient';
 import { ToastManager } from '../../../managers/ToastManager';
 import Avatar from '../../../components/general/Avatar';
@@ -75,7 +75,7 @@ class CreateConversation extends React.Component<Props, State> {
                     }
                     if(error || status == "error")
                     {
-                        ToastManager.showErrorToast(error || translate("Could not create conversation"))
+                        ToastManager.showRequestErrorToast(error, lazyTranslate("Could not create conversation"))
                         return
                     }
                 })

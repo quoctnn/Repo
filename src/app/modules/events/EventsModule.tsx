@@ -91,7 +91,7 @@ class EventsModule extends React.Component<Props, State> {
         const groupId = this.props.group ? this.props.group.id : null
         ApiClient.getEvents(communityId, eventId, groupId, this.props.pageSize, offset, ordering, upcoming, (data, status, error) => {
             completion(data)
-            ToastManager.showErrorToast(error)
+            ToastManager.showRequestErrorToast(error)
         })
     }
     renderEvent = (event:Event) =>  {

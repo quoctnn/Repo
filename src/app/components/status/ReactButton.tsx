@@ -3,6 +3,7 @@ import classNames from "classnames";
 import {  Popover, PopoverBody } from 'reactstrap';
 import { StatusActions, StatusReaction, StatusReactionUtilities, StatusReactionStyle } from '../../types/intrasocial_types';
 import HoverLongPressTrigger from '../HoverLongPressTrigger';
+import Popper from 'popper.js';
 require("./ReactButton.scss");
 
 
@@ -97,7 +98,17 @@ export default class ReactButton extends React.Component<Props, State>
         {
             return null
         }
-        return <Popover placement="top" hideArrow={false} isOpen={open} target={this.ref.current} container={this.popoverContainerRef.current} toggle={this.hideReactionsView}>
+        const modifiers:Popper.Modifiers = {
+            flip: { behavior: ['bottom', 'top', 'bottom'] }
+          }
+        return <Popover 
+            placement="top" 
+            hideArrow={false} 
+            isOpen={open} 
+            modifiers={modifiers}
+            target={this.ref.current} 
+            container={this.popoverContainerRef.current} 
+            toggle={this.hideReactionsView}>
                     <PopoverBody>
                         <HoverLongPressTrigger leaveTimeout={200} className="trigger reactions-panel"
                             onHover={this.onPopoverHover} 

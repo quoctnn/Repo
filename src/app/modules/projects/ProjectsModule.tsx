@@ -91,7 +91,7 @@ class ProjectsModule extends React.Component<Props, State> {
         const groupId = this.props.group && this.props.group.id
         ApiClient.getProjects(communityId, groupId, this.props.pageSize, offset, md.sorting, md.responsible, md.assigned, (data, status, error) => {
             completion(data)
-            ToastManager.showErrorToast(error)
+            ToastManager.showRequestErrorToast(error)
         })
     }
     renderProject = (project:Project) =>  {

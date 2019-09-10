@@ -23,6 +23,11 @@ export const lazyTranslate = (key:string) => {
 }
 export const translate = (key:string):string => {
     let messages = private_messages
+    if(!messages)
+    {
+        console.warn("Translations not yet initialized")
+        return key
+    }
     if(key in messages)
         return messages[key]
     console.error("'" + key + "'" + " is missing from translations")

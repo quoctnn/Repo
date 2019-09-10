@@ -211,7 +211,7 @@ class ConversationsModule extends React.Component<Props, State> {
                 ConversationManager.storeConversations(data.results)
             }
             completion(data)
-            ToastManager.showErrorToast(error)
+            ToastManager.showRequestErrorToast(error)
         })
     }
     renderSomeoneIsTyping = (conversationId:number) => {

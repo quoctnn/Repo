@@ -39,7 +39,7 @@ export default class ReportStatusDialog extends React.Component<Props, State> {
             {
                 this.setState({availableTags:tags})
             }
-            ToastManager.showErrorToast(error)
+            ToastManager.showRequestErrorToast(error)
         })
     }
     submit = (e:any) => {
@@ -53,7 +53,7 @@ export default class ReportStatusDialog extends React.Component<Props, State> {
             {
                 this.setState({ result: data });
             }
-            ToastManager.showErrorToast(error, "Your report could not be sent. Please try again later.")
+            ToastManager.showRequestErrorToast(error, () => "Your report could not be sent. Please try again later.")
         })
     }
     handleSelectChange = (value:ReportTag[]) => {

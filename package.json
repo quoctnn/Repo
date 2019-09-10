@@ -33,6 +33,7 @@
   },
   "homepage": "https://github.com/intrahouse/intrasocial-client#readme",
   "dependencies": {
+    "@types/react-color": "^3.0.1",
     "bootstrap": "^4.3.1",
     "draft-js": "^0.11.0",
     "draft-js-mention-plugin": "^3.1.5",
@@ -52,6 +53,7 @@
     "popper.js": "^1.15.0",
     "react": "^16.9.0",
     "react-big-calendar": "^0.22.0",
+    "react-color": "^2.17.3",
     "react-dnd": "^9.3.4",
     "react-dnd-html5-backend": "^9.3.4",
     "react-dom": "^16.9.0",

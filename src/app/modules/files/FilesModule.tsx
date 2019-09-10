@@ -8,7 +8,7 @@ import { connect } from 'react-redux';
 import { ReduxState } from '../../redux';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import SimpleModule from '../SimpleModule';
-import { translate } from '../../localization/AutoIntlProvider';
+import { translate, lazyTranslate } from '../../localization/AutoIntlProvider';
 import ListComponent from '../../components/general/ListComponent';
 import {ApiClient,  PaginationResult } from '../../network/ApiClient';
 import { ToastManager } from '../../managers/ToastManager';
@@ -81,7 +81,7 @@ class FilesModule extends React.Component<Props, State> {
         const pageSize = this.props.pageSize || this.calculatedPageSize
         ApiClient.getFiles(this.props.contextNaturalKey, contextId, pageSize, offset, (data, status, error) => {
             completion(data)
-            ToastManager.showErrorToast(error)
+            ToastManager.showRequestErrorToast(error)
         })
     }
     handleRenameFile = (file: UploadedFile, name: string) => {
@@ -92,7 +92,7 @@ class FilesModule extends React.Component<Props, State> {
             {
                 this.filesList.current.updateItem(data)
             }
-            ToastManager.showErrorToast(error, status, translate("Could not update filename"))
+            ToastManager.showRequestErrorToast(error, lazyTranslate("Could not update filename"))
         })
     }
     renderFile = (file:UploadedFile) =>  {

@@ -54,7 +54,7 @@ const addCommunities = (state, action:AddCommunitiesAction) => {
     communities.forEach(c => {
         let id = c.id
         let old = state[id]
-        if(shouldUpdate(old, c)) // update
+        if(action.force || shouldUpdate(old, c)) // update
         {
             newState[c.id] = c
         }

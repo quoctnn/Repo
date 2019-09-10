@@ -10,7 +10,7 @@ import { NotificationCenter } from '../utilities/NotificationCenter';
 import Routes from '../utilities/Routes';
 import { ProfileManager } from './ProfileManager';
 import { ToastManager } from './ToastManager';
-import { translate } from '../localization/AutoIntlProvider';
+import { translate, lazyTranslate } from '../localization/AutoIntlProvider';
 import { setTemporaryConversationAction } from '../redux/tempCache';
 import { nullOrUndefined } from '../utilities/Utilities';
 import { WindowAppManager } from './WindowAppManager';
@@ -43,7 +43,7 @@ export abstract class ConversationManager
             {
                 ConversationManager.removeConversation(conversationId)
             }
-            ToastManager.showErrorToast(error)
+            ToastManager.showRequestErrorToast(error)
             completion(success)
         })
     }
@@ -51,7 +51,7 @@ export abstract class ConversationManager
     {
         ApiClient.archiveConversation(conversationId, (data, status, error) => {
             const success = nullOrUndefined(error)
-            ToastManager.showErrorToast(error)
+            ToastManager.showRequestErrorToast(error)
             completion(success)
         })
     }
@@ -177,7 +177,7 @@ export abstract class ConversationManager
     {
         ApiClient.leaveConversation(conversationId, (data, status, error) => {
             const success = !error
-            ToastManager.showErrorToast(error, status, translate("Could not leave conversation"))
+            ToastManager.showRequestErrorToast(error, lazyTranslate("Could not leave conversation"))
             if(success)
             {
                 ConversationManager.removeConversation(conversationId)
@@ -189,7 +189,7 @@ export abstract class ConversationManager
     {
         ApiClient.removeConversationUsers(conversationId, users, (data, status, error) => {
             const success = !error
-            ToastManager.showErrorToast(error, status, translate("Could not remove user(s) from conversation"))
+            ToastManager.showRequestErrorToast(error, lazyTranslate("Could not remove user(s) from conversation"))
             completion(success)
         })
     }

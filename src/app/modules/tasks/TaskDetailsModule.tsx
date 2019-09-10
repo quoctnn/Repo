@@ -69,7 +69,7 @@ class TaskDetailsModule extends React.Component<Props, State> {
                         <ModuleHeader className="task-detail" headerTitle={task && task.title || translate("detail.module.title")} loading={this.state.isLoading}>
                             <ModuleMenuTrigger onClick={this.menuItemClick} />
                         </ModuleHeader>
-                        {breakpoint >= ResponsiveBreakpoint.standard && //do not render for small screens
+                        {true && //breakpoint >= ResponsiveBreakpoint.standard && //do not render for small screens
                             <>
                                 <ModuleContent>
                                 { task && task.permission >= Permission.read &&

@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import EmojiPicker from 'emoji-picker-react';
-import { EditorState, DraftHandleValue, Modifier, SelectionState , } from 'draft-js';
+import { EditorState, DraftHandleValue, Modifier, SelectionState, getDefaultKeyBinding , } from 'draft-js';
 import Editor from "draft-js-plugins-editor";
 import "draft-js-mention-plugin/lib/plugin.css";
 import createMentionPlugin, { defaultSuggestionsFilter } from "draft-js-mention-plugin";
@@ -438,6 +438,17 @@ export default class MentionEditor extends React.Component<Props, State> {
         }
         return "not-handled"
     }
+    handlekeyBindingFn = (e: React.KeyboardEvent<any> ) => {
+        if(this.props.keyBindings)
+        {
+            const val = this.props.keyBindings(e)
+            if(val == "handled")
+                return val
+        }
+        if(this.mentionPlugin && this.mentionPlugin.keyBindingFn)
+            return this.mentionPlugin.keyBindingFn(e)
+        return getDefaultKeyBinding(e)
+    }
     render = () => {
         const { MentionSuggestions } = this.mentionPlugin;
         const plugins = [this.mentionPlugin];
@@ -455,7 +466,7 @@ export default class MentionEditor extends React.Component<Props, State> {
                             onBlur={this.props.onBlur}
                             onFocus={this.props.onFocus}
                             placeholder={this.props.placeholder}
-                            keyBindingFn={this.props.keyBindings}
+                            keyBindingFn={this.handlekeyBindingFn}
                             handleBeforeInput={this.onHandleBeforeInput}
                             handleKeyCommand={this.props.handleKeyCommand}
 

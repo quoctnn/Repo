@@ -33,7 +33,7 @@ export abstract class CommunityManager
             if(community)
             {
                 const hasCommunity = !!CommunityManager.getCommunityById(communityId)
-                CommunityManager.storeCommunities([community])
+                CommunityManager.storeCommunities([community], true)
                 if(!hasCommunity)
                 {
                     ToastManager.showInfoToast(translate("community.incoming.new").format(community.name), null, Routes.communityUrl(community.slug_name))

@@ -45,6 +45,40 @@
       .form-controller-page {
         display: none !important;
         flex-direction: column;
+        word-break: break-word;
+        .form-input{
+          .description{
+            font-size: 0.7rem;
+          }
+          .form-field-required-text{
+            font-size: 0.6em;
+            display: inline-flex;
+            padding-left: 8px;
+          }
+        }
+        .form-rich-radio-input{
+            .form-rich-radio-input-option{
+                user-select: none;
+                cursor: pointer;
+                @include var(background-color, main-content-background);
+                &.selected{
+                    background-color:#448fd16c;
+                }
+                align-items: center;
+                padding: 8px;
+                border-radius: 8px;
+                margin-bottom: 8px;
+                .name{
+                    font-size: 1rem;
+                }
+                .description{
+                    font-size: 0.7rem;
+                }
+                .option-status{
+                    width: 1.8rem;
+                }
+            }
+        }
         .form-photo-upload-preview{
             &.avatar{
                 .image-preview-container{
@@ -82,6 +116,14 @@
     .form-controller-menu {
       padding: 6px;
       margin-right: 10px;
+      max-width: 150px;
+      display: flex;
+      max-width: initial;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      .menu-button{
+        margin: 6px;
+      }
       .menu-button {
         cursor: pointer;
         display: flex;
@@ -110,6 +152,23 @@
           @include var(color, primary-theme-color);
         }
       }
+    }
+  }
+
+}
+.form-controller-modal{
+  @media (min-width: 576px)
+  {
+    max-width: 800px;
+    margin: 1.75rem auto;
+    .form-controller-menu{
+      max-width:300px !important;
+      display: block !important;
+      overflow-y: initial;
+
+    }
+    .main-content-inner{
+      flex-direction: row !important;
     }
   }
 

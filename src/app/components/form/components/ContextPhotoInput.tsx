@@ -1,22 +1,18 @@
+
 import * as React from 'react';
-import { InputGroup, Input, FormFeedback } from 'reactstrap';
-import { FormComponentArgument, FormComponentBase } from './FormController';
 import Cropper, {Location, Area} from 'react-easy-crop'
 import Button from 'reactstrap/lib/Button';
-import { translate } from '../../localization/AutoIntlProvider';
-import { SecureImage } from '../general/SecureImage';
-import { ContextNaturalKey, CropRect, CropInfo, ContextPhotoType } from '../../types/intrasocial_types';
-import {ApiClient} from '../../network/ApiClient';
-import LoadingSpinner from '../LoadingSpinner';
-import classnames = require('classnames');
-
+import { SecureImage } from '../../general/SecureImage';
+import { ContextNaturalKey, CropRect, CropInfo, ContextPhotoType } from '../../../types/intrasocial_types';
+import {ApiClient} from '../../../network/ApiClient';
+import LoadingSpinner from '../../LoadingSpinner';
+import { FormComponentBase, FormComponentRequiredMessage } from '../FormController';
+import { FormComponentData, FormComponentBaseProps } from '../definitions';
+import { translate } from '../../../localization/AutoIntlProvider';
+import { InputGroup, Input } from 'reactstrap';
+import classnames from 'classnames';
 const cropRectToArea = (crop:CropRect) => {
     return {x:crop.top_left[0], y:crop.top_left[1], width:crop.bottom_right[0] - crop.top_left[0] , height:crop.bottom_right[1] - crop.top_left[1]}
-}
-const errorMessage = (error?:string) => {
-    if(!!error)
-        return <FormFeedback tooltip={false}><i className="error-icon fas fa-exclamation-triangle"></i>{" "}{error}</FormFeedback>
-    return null
 }
 const createImage = (url:string) =>
   new Promise<HTMLImageElement>((resolve, reject) => {
@@ -48,98 +44,28 @@ export async function getCroppedImg(imageSrc:string, pixelCrop:Area):Promise<str
     // As Base64 string 
     return canvas.toDataURL('image/jpeg')
 }
-type FormComponentBasePropsState = {
-    value?:string
-}
-export class TextInput extends React.Component<FormComponentArgument, FormComponentBasePropsState> implements FormComponentBase{
-    constructor(props:FormComponentArgument){
-        super(props)
-        this.state = {
-            value:this.props.value || ""
-        }
-    }
-    getValue = () => {
-        return this.state.value
-    }
-    isValid = () => {
-        return this.props.isRequired ? this.state.value.trim().length > 0 : true
-    }
-    getError = () => {
-        if(this.props.error)
-            return this.props.error
-        if(!this.isValid())
-            return translate("input.error.length.required")
-    }
-    sendValueChanged = () => {
-        this.props.onValueChanged && this.props.onValueChanged(this.props.id, this.state.value)
-    }
-    handleInputChange = (e:React.ChangeEvent<HTMLInputElement>) => {
-        const value = e.target.value
-        this.setState(() => {
-            return {value}
-        }, this.sendValueChanged)
-    }
-    render = () => {
-        const error = this.getError()
-        return <div key={this.props.id} className="form-text-input">
-                <InputGroup className="form-group form-input d-block">
-                    <label htmlFor={this.props.id} className="col-form-label" >
-                        {this.props.title}
-                    </label>
-                    <div className="">
-                        <Input invalid={!!error} id={this.props.id} value={this.state.value} type="text" onChange={this.handleInputChange} placeholder={this.props.placeholder}/>
-                        {errorMessage(error)}
-                    </div>
-                </InputGroup>
-            </div>
+export class ContextPhotoInputData extends FormComponentData implements ContextPhotoInputProps{
+    value:string
+    contextNaturalKey?:ContextNaturalKey
+    contextObjectId?:number
+    constructor(value:string, title:string, id:string, contextNaturalKey?:ContextNaturalKey, contextObjectId?:number, isRequired?:boolean){
+        super(title, id, isRequired)
+        this.value = value
+        this.contextNaturalKey = contextNaturalKey
+        this.contextObjectId = contextObjectId
     }
 }
-export class TextAreaInput extends React.Component<FormComponentArgument, FormComponentBasePropsState> implements FormComponentBase{
-    constructor(props:FormComponentArgument){
-        super(props)
-        this.state = {
-            value:this.props.value || ""
-        }
-    }
-    getValue = () => {
-        return this.state.value
-    }
-    isValid = () => {
-        return this.props.isRequired ? this.state.value.trim().length > 0 : true
-    }
-    getError = () => {
-        if(this.props.error)
-            return this.props.error
-        if(!this.isValid())
-            return translate("input.error.length.required")
-    }
-    sendValueChanged = () => {
-        this.props.onValueChanged && this.props.onValueChanged(this.props.id, this.state.value)
-    }
-    handleInputChange = (e:React.ChangeEvent<HTMLInputElement>) => {
-        const value = e.target.value
-        this.setState(() => {
-            return {value}
-        }, this.sendValueChanged)
-    }
-    render = () => {
-        const error = this.getError()
-        return <div key={this.props.id} className="form-text-area-input">
-                <InputGroup className="form-group form-input d-block">
-                    <label htmlFor={this.props.id} className="col-form-label" >
-                        {this.props.title}
-                    </label>
-                    <div className="">
-                        <Input invalid={!!error} id={this.props.id} value={this.state.value} type="textarea" onChange={this.handleInputChange} placeholder={this.props.placeholder}/>
-                        {errorMessage(error)}
-                    </div>
-                </InputGroup>
-            </div>
-    }
+export type ContextPhotoInputProps = {
+    value:string
+    contextNaturalKey?:ContextNaturalKey
+    contextObjectId?:number
+} & FormComponentBaseProps
+export type ContextPhotoInputState = {
+    value:File, crop:CropRect, preview:string
 }
-export class PhotoUploadPreview extends React.Component<FormComponentArgument,{value:File, crop:CropRect, preview:string}> implements FormComponentBase{
+export class ContextPhotoInput extends React.Component<ContextPhotoInputProps,ContextPhotoInputState> implements FormComponentBase{
     private fileUploader = React.createRef<HTMLInputElement>();
-    constructor(props:FormComponentArgument){
+    constructor(props:ContextPhotoInputProps){
         super(props)
         this.state = {
             value:null,
@@ -209,6 +135,7 @@ export class PhotoUploadPreview extends React.Component<FormComponentArgument,{v
                 <InputGroup className="form-group form-input d-block">
                     <label htmlFor={this.props.id} className="col-form-label" >
                         {this.props.title}
+                        <FormComponentRequiredMessage required={this.props.isRequired} />
                     </label>
                     <div className="">
                         <div className="image-preview-container" onClick={this.handleImagePreviewClick}>
@@ -300,7 +227,6 @@ export class FileCropper extends React.Component<FileCropperProps, FileCropperSt
         this.setState({ crop })
     }
     onCropComplete = (croppedArea: Area, croppedAreaPixels: Area) => {
-        console.log(croppedArea, croppedAreaPixels)
         this.croppedAreaPixels = croppedAreaPixels
     }
     onZoomChange = (zoom:number) => {
