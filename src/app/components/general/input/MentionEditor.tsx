@@ -9,7 +9,7 @@ import { UserProfile, Permissible, IdentifiableObject, Linkable, ContextNaturalK
 import { IntraSocialUtilities } from "../../../utilities/IntraSocialUtilities";
 import { Settings } from "../../../utilities/Settings";
 import { SecureImage } from '../SecureImage';
-import { userFullName, contextAvatar, MentionData } from '../../../utilities/Utilities';
+import { userFullName, contextAvatar, MentionData, nullOrUndefined } from '../../../utilities/Utilities';
 import * as JSEMOJI from 'emoji-js';
 import "./MentionEditor.scss"
 import { translate } from "../../../localization/AutoIntlProvider";
@@ -442,7 +442,7 @@ export default class MentionEditor extends React.Component<Props, State> {
         if(this.props.keyBindings)
         {
             const val = this.props.keyBindings(e)
-            if(val == "handled")
+            if(!nullOrUndefined(val))
                 return val
         }
         if(this.mentionPlugin && this.mentionPlugin.keyBindingFn)
