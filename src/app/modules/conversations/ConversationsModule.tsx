@@ -152,6 +152,10 @@ class ConversationsModule extends React.Component<Props, State> {
     processIncomingConversation = (...args:any[]) =>
     {
         let conversation = args[0] as Conversation
+        const viewModeIsArchived = this.state.filter == ConversationFilter.archived
+        const isArchived = (conversation.archived_by || []).contains(this.props.authenticatedUser.id)
+        if(!viewModeIsArchived && isArchived || viewModeIsArchived && !isArchived) // ignore update
+            return
         this.conversationsList.current.safeUnshift(conversation)
         this.setState((prevState:State) => {
             return {listRedrawContext:uniqueId()}

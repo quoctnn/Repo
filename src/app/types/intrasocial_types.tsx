@@ -133,7 +133,7 @@ export namespace CommunityCategory {
 export type UploadedFileResponse = {files:UploadedFile[]}
 
 export enum ContextPhotoType{
-    cover, avatar
+    cover = "cover", avatar = "avatar"
 }
 export type CropRect = {
     top_left:number[]
@@ -222,6 +222,22 @@ export class RequestErrorData{
             } catch (error) {
             }
         }
+    }
+    renameErrorField = (oldKey:string, newKey?:string) => {
+        if(this.data && typeof this.data == "object")
+        {
+            if (this.data.hasOwnProperty(oldKey)) {
+                this.data[newKey] = this.data[oldKey]
+                delete this.data[oldKey]
+            }
+        }
+    }
+    getErrorMessageForField = (key:string) => {
+        if(this.data && typeof this.data == "object")
+        {
+            return this.data[key]
+        }
+        return null
     }
     getErrorMessage = () => {
 

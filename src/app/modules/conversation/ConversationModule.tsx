@@ -380,6 +380,7 @@ class ConversationModule extends React.Component<Props, State> {
             ConversationManager.sendMessage(message)
     }
     filesAdded = (files:File[]) => {
+        //files added, store them and present them
         let conversation = this.props.conversation
         if(!conversation)
             return

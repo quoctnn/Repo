@@ -19,7 +19,7 @@ type State = {
     formVisible:boolean
     formReloadKey?:string
     formStatus:FormStatus
-    formError?:RequestErrorData
+    formErrors?:RequestErrorData[]
     communityConfiguration?:CommunityConfigurationData
 }
 type Props = OwnProps & RouteComponentProps<any>
@@ -29,7 +29,7 @@ class CommunityCreateComponent extends React.Component<Props, State> {
         this.state = {
             formVisible:true,
             formStatus:FormStatus.normal,
-            formError:null,
+            formErrors:null,
             formReloadKey:uniqueId(),
             communityConfiguration:null
         }
@@ -67,7 +67,7 @@ class CommunityCreateComponent extends React.Component<Props, State> {
             if(errors.length > 0)
             {
                 this.setState(() => {
-                    return {formError:errors[0]}
+                    return {formErrors:errors}
                 })
                 this.setFormStatus(FormStatus.normal)
             }
@@ -133,7 +133,7 @@ class CommunityCreateComponent extends React.Component<Props, State> {
             if(prevState.formStatus != status)
             {
                 if(resetError)
-                    return {formStatus:status, formError:null}
+                    return {formStatus:status, formErrors:null}
                 return {formStatus:status}
             }
         })
@@ -189,7 +189,7 @@ class CommunityCreateComponent extends React.Component<Props, State> {
                 new BooleanInputData(false, translate("community.config.title.allow_anonymous_users"), "allow_anonymous_users", translate("community.config.description.allow_anonymous_users")),
             ]})
         }
-        return <FormController key={this.state.formReloadKey} visible={visible} formError={this.state.formError} didCancel={this.back} status={this.state.formStatus} onFormSubmit={this.handleCreateCommunityFormSubmit} title={translate("community.create")} pages={pages} />
+        return <FormController key={this.state.formReloadKey} visible={visible} formErrors={this.state.formErrors} didCancel={this.back} status={this.state.formStatus} onFormSubmit={this.handleCreateCommunityFormSubmit} title={translate("community.create")} pages={pages} />
         
     }
 }

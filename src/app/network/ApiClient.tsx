@@ -431,14 +431,21 @@ export abstract class ApiClient
             formData.append("bottom_right", crop.bottom_right[0].toString())
             formData.append("bottom_right", crop.bottom_right[1].toString())
             const uploader = new FileUploader<CropInfo>(formData, url,  () => {})
-            uploader.doUpload(callback)
+            uploader.doUpload((data, status, error) => {
+                if(error)
+                    error.renameErrorField("image", type.toString())
+                callback(data, status, error)
+            })
         }
         else 
         {
             AjaxRequest.postJSON(url, crop, (data, status, request) => {
                 callback(data, status, null)
             }, (request, status, error) => {
-                callback(null, status, new RequestErrorData(request.responseJSON, error))
+                const e = new RequestErrorData(request.responseJSON, error)
+                if(e)
+                    e.renameErrorField("image", type.toString())
+                callback(null, status, e)
             })
         }
     }

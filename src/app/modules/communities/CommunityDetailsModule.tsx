@@ -37,7 +37,7 @@ type State = {
     editFormVisible:boolean
     editFormReloadKey?:string
     editFormStatus:FormStatus
-    editFormError?:RequestErrorData
+    editFormErrors?:RequestErrorData[]
     communityConfiguration?:CommunityConfigurationData
 }
 type ReduxStateProps = {
@@ -54,7 +54,7 @@ class GroupDetailsModule extends React.Component<Props, State> {
             menuVisible:false,
             editFormVisible:false,
             editFormStatus:FormStatus.normal,
-            editFormError:null,
+            editFormErrors:null,
             editFormReloadKey:uniqueId(),
             communityConfiguration:null
         }
@@ -96,7 +96,7 @@ class GroupDetailsModule extends React.Component<Props, State> {
         if(isFormVisible) //close
         {
             this.setState(() => {
-                return {editFormVisible:!isFormVisible, editFormError:null, communityConfiguration:null}
+                return {editFormVisible:!isFormVisible, editFormErrors:null, communityConfiguration:null}
             })
         }
         else {
@@ -131,7 +131,7 @@ class GroupDetailsModule extends React.Component<Props, State> {
             if(errors.length > 0)
             {
                 this.setState(() => {
-                    return {editFormError:errors[0]}
+                    return {editFormErrors:errors}
                 })
                 this.setEditFormStatus(FormStatus.normal)
             }
@@ -180,7 +180,7 @@ class GroupDetailsModule extends React.Component<Props, State> {
             if(prevState.editFormStatus != status)
             {
                 if(resetError)
-                    return {editFormStatus:status, editFormError:null}
+                    return {editFormStatus:status, editFormErrors:null}
                 return {editFormStatus:status}
             }
         })
@@ -247,7 +247,7 @@ class GroupDetailsModule extends React.Component<Props, State> {
                 ]})
             }
         }
-        return <FormController key={this.state.editFormReloadKey} visible={visible} formError={this.state.editFormError} didCancel={this.toggleEditForm} status={this.state.editFormStatus} onFormSubmit={this.handleEditCommunityFormSubmit} title={translate("form.community.edit")} pages={pages} />
+        return <FormController key={this.state.editFormReloadKey} visible={visible} formErrors={this.state.editFormErrors} didCancel={this.toggleEditForm} status={this.state.editFormStatus} onFormSubmit={this.handleEditCommunityFormSubmit} title={translate("form.community.edit")} pages={pages} />
         
     }
     getCommunityOptions = () => {

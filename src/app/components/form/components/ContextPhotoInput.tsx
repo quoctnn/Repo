@@ -6,7 +6,7 @@ import { SecureImage } from '../../general/SecureImage';
 import { ContextNaturalKey, CropRect, CropInfo, ContextPhotoType } from '../../../types/intrasocial_types';
 import {ApiClient} from '../../../network/ApiClient';
 import LoadingSpinner from '../../LoadingSpinner';
-import { FormComponentBase, FormComponentRequiredMessage } from '../FormController';
+import { FormComponentBase, FormComponentRequiredMessage, FormComponentErrorMessage } from '../FormController';
 import { FormComponentData, FormComponentBaseProps } from '../definitions';
 import { translate } from '../../../localization/AutoIntlProvider';
 import { InputGroup, Input } from 'reactstrap';
@@ -129,14 +129,20 @@ export class ContextPhotoInput extends React.Component<ContextPhotoInputProps,Co
         else 
             this.navigateToCropper()
     }
+    getError = () => {
+        return this.props.error  
+    }
     render = () => {
         const cn = classnames("form-photo-upload-preview", this.props.id)
+        const error = this.getError()
+        const errorCn = classnames({"d-block":!!error})
         return <div key={this.props.id} className={cn}>
                 <InputGroup className="form-group form-input d-block">
                     <label htmlFor={this.props.id} className="col-form-label" >
                         {this.props.title}
                         <FormComponentRequiredMessage required={this.props.isRequired} />
                     </label>
+                    <FormComponentErrorMessage error={error} className={errorCn}/>
                     <div className="">
                         <div className="image-preview-container" onClick={this.handleImagePreviewClick}>
                             {this.state.preview && <SecureImage url={this.state.preview} />}

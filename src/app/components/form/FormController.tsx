@@ -61,7 +61,7 @@ type Props = {
     onFormSubmit:(data:{[key:string]:string}) => void
     status:FormStatus
     didCancel:() => void
-    formError:RequestErrorData
+    formErrors:RequestErrorData[]
     visible:boolean
 }
 type State = {
@@ -89,7 +89,7 @@ export default class FormController extends React.Component<Props, State> {
         this.updateFormErrors()
     }
     componentDidUpdate = (prevProps:Props) => {
-        if(prevProps.formError != this.props.formError)
+        if(prevProps.formErrors != this.props.formErrors)
         {
             this.updateFormErrors()
         }
@@ -98,8 +98,9 @@ export default class FormController extends React.Component<Props, State> {
         const error = {}
         const pKeys = Object.keys(this.pageData)
         pKeys.forEach(pk => {
-            const cKeys = Object.keys(this.pageData[pk])
-            const isValid = cKeys.every(ck => this.pageData[pk][ck].isValid())
+            const page = this.pageData[pk]
+            const cKeys = Object.keys(page)
+            const isValid = cKeys.every(ck => page[ck].isValid())
             if(!isValid)
             {
                 error[pk] = true
@@ -133,13 +134,21 @@ export default class FormController extends React.Component<Props, State> {
     }
     setFormRef = (pageKey:string, key:string) => (ref:any) => {
         const page = this.pageData[pageKey] || {}
-        page[key] = ref
+        if(nullOrUndefined(ref))
+        {
+            delete page[key]
+        }
+        else {
+            page[key] = ref
+        }
         this.pageData[pageKey] = page
     }
     getError = (key:string):string => {
-        if(this.props.formError && this.props.formError.data && typeof this.props.formError.data == "object")
+        if(this.props.formErrors)
         {
-            return this.props.formError.data[key]
+           const error = this.props.formErrors.find(fec => !!fec.getErrorMessageForField(key))
+           if(error)
+                return error.getErrorMessageForField(key)
         }
         return null
     }
