@@ -126,5 +126,4 @@ const mapDispatchToProps = (dispatch: ReduxState, ownProps: OwnProps): ReduxDisp
     return {
     }
 }
-//@ts-ignore
 export default withRouter(connect<ReduxStateProps, ReduxDispatchProps, OwnProps>(mapStateToProps, mapDispatchToProps)(CommunitiesModule))

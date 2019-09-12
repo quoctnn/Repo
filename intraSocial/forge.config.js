@@ -2,7 +2,8 @@ path = require('path');
 
 module.exports = {
     packagerConfig: {
-        icon: path.resolve(__dirname, 'app/assets/icons/png/512x512.png')
+        icon: path.resolve(__dirname, 'app/assets/icons/png/512x512.png'),
+        electronVersion: "6.0.8"
     },
     makers: [
         {
