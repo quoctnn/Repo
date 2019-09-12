@@ -58,5 +58,4 @@ const mapStateToProps = (state:ReduxState, ownProps: OwnProps & RouteComponentPr
         profile:resolved as any as UserProfile
     }
 }
-//@ts-ignore
 export default withRouter(connect(mapStateToProps, null)(ProfileAboutModule))
