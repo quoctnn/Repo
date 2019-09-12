@@ -1,17 +1,14 @@
 import * as React from "react";
-import { Message, ContextNaturalKey, FileUpload, UploadedFile, UploadedFileType } from "../../types/intrasocial_types";
+import { Message, FileUpload, UploadedFile, UploadedFileType } from "../../types/intrasocial_types";
 import classnames from 'classnames';
-import { IS_ONLY_LINK_REGEX, URL_REGEX, uniqueId, userFullName, LINEBREAK_REGEX, MENTION_REGEX, MentionData, truncate } from '../../utilities/Utilities';
+import { IS_ONLY_LINK_REGEX, URL_REGEX, uniqueId, LINEBREAK_REGEX, MENTION_REGEX, MentionData, truncate } from '../../utilities/Utilities';
 import ContentGallery from "../../components/general/ContentGallery";
 import Embedly from "../../components/general/embedly/Embedly";
 import { ConversationManager } from "../../managers/ConversationManager";
-import { FileUtilities } from "../../utilities/FileUtilities";
-import RadialProgress from "../../components/general/loading/RadialProgress";
-import { translate } from '../../localization/AutoIntlProvider';
 import IntraSocialMention from "../../components/general/IntraSocialMention";
 import { Settings } from "../../utilities/Settings";
-import FileListItem from '../files/FileListItem';
 import * as Mime from 'mime-types';
+import { translate } from "../../localization/AutoIntlProvider";
 const processString = require('react-process-string');
 export class MessageContentParser{
     content:any = ""
@@ -167,18 +164,6 @@ export class MessageContent extends React.Component<Props,State> {
                     </div>
                 </div>)
     }
-    /*private renderRemoveFailedContent = (message:Message) => {
-        return (<div className="d-flex align-items-center">
-                    <div className="d-flex flex-column mw0 mr-2">
-                        <div className="title text-truncate">{message.tempFile.name}</div>
-                        <div className="status text-truncate">{translate("Sending failed")}</div>
-                    </div>
-                    <div className="d-flex flex-shrink-0">
-                        <button className="btn link-text" onClick={() => ConversationManager.retryQueuedMessage(message)}>{translate("Retry")}</button>
-                        <button className="btn link-text" onClick={() => ConversationManager.removeQueuedMessage(message)}>{translate("Remove")}</button>
-                    </div>
-                </div>)
-    }*/
     private renderIllegalContent = (message:Message) => {
         return (<div className="d-flex align-items-center">
                     <div className="d-flex flex-column mw0 mr-2">
@@ -195,11 +180,15 @@ export class MessageContent extends React.Component<Props,State> {
         const files = message.files || []
         if(simpleMode)
         {
-            if(files.length > 0)
+            if(files.length == 1)
             {
                 const file = message.files[0]
                 const cn = classnames(file.type, file.extension)
                 return <div className={cn}><i className="fa file-icon mr-1"></i>{translate("file.type."+ file.type)}</div>
+            }
+            else if(files.length > 1){
+                const cn = classnames(UploadedFileType.DOCUMENT)
+                return <div className={cn}><i className="fa file-icon mr-1"></i>{`${files.length} ${translate("common.files")}`}</div>
             }
             return processedContent.content
         }

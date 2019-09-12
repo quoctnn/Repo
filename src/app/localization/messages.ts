@@ -465,6 +465,7 @@ var translations = {
     "conversation.module.drop.to.send.title":"Drop files here",
     "sending failed":"Sending failed",
     "common.upload.error":"Upload failed",
+    "common.files":"files",
     
   },
   no: {
@@ -933,6 +934,7 @@ var translations = {
     "conversation.module.drop.to.send.title":"Dropp filer her",
     "sending failed":"Sending feilet",
     "common.upload.error":"opplasting feilet",
+    "common.files":"filer",
   },
   en: {
     "search.placeholder": "Search ...",
@@ -1410,6 +1412,7 @@ var translations = {
     "conversation.module.drop.to.send.title":"Drop files here",
     "sending failed":"Sending failed",
     "common.upload.error":"Upload failed",
+    "common.files":"files",
   }
 };
 

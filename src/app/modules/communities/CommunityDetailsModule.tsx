@@ -43,7 +43,6 @@ type State = {
 }
 type ReduxStateProps = {
     community: Community
-    authenticatedUser: UserProfile
 }
 type ReduxDispatchProps = {
 }
@@ -254,7 +253,7 @@ class GroupDetailsModule extends React.Component<Props, State> {
     }
     getCommunityOptions = () => {
         const options: OverflowMenuItem[] = []
-        if(this.props.authenticatedUser.permission >= Permission.admin)
+        if(this.props.community.permission >= Permission.admin)
             options.push({id:"1", type:OverflowMenuItemType.option, title:translate("Edit"), onPress:this.toggleEditForm, iconClass:"fas fa-pen"})
         return options
     }
@@ -289,7 +288,6 @@ const mapStateToProps = (state:ReduxState, ownProps: OwnProps & RouteComponentPr
     const community = ContextManager.getContextObject(ownProps.location.pathname, ContextNaturalKey.COMMUNITY) as Community
     return {
         community,
-        authenticatedUser: AuthenticationManager.getAuthenticatedUser(),
     }
 }
 const mapDispatchToProps = (dispatch:ReduxState, ownProps: OwnProps):ReduxDispatchProps => {
