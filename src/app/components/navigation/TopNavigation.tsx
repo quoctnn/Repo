@@ -62,20 +62,23 @@ class TopNavigation extends React.Component<Props, State> {
         const communityLink = community && Routes.communityUrl(community.slug_name) || "#"
         const dashboardLink = Routes.ROOT
         const conversationsLink = Routes.conversationUrl(null)
-        const communityLinkClass = classnames("btn nav-link", {active:path.startsWith(communityLink)})
-        const dashboardClass = classnames("btn nav-link", {active:path == dashboardLink})
-        const conversationsLinkClass = classnames("btn nav-link", {active:path.startsWith(conversationsLink)})
-        return <div className="flex-grow-1 d-flex justify-content-center">
+        const communityLinkClass = classnames("btn nav-link d-flex align-items-center mw0", {active:path.startsWith(communityLink)})
+        const dashboardClass = classnames("btn nav-link d-flex align-items-center mw0", {active:path == dashboardLink})
+        const conversationsLinkClass = classnames("btn nav-link d-flex align-items-center mw0", {active:path.startsWith(conversationsLink)})
+        return <div className="flex-grow-1 d-flex justify-content-center mw0">
                     { profile && !profile.is_anonymous &&
                         <>
                             <Link className={communityLinkClass} to={communityLink}>
-                                <i className="fa fa-globe" />{translate("common.core.community")}
+                                <i className="fa fa-globe" />
+                                <div className="text-truncate">{translate("common.core.community")}</div>
                             </Link>
                             <Link className={dashboardClass} to={dashboardLink}>
-                                <i className="fa fa-tachometer-alt" />{translate("common.dashboard")}
+                                <i className="fa fa-tachometer-alt" />
+                                <div className="text-truncate">{translate("common.dashboard")}</div>
                             </Link>
                             <Link to={conversationsLink} className={conversationsLinkClass}>
-                                <i className="fa fa-comment" />{translate("common.messages")}
+                                <i className="fa fa-comment" />
+                                <div className="text-truncate">{translate("common.messages")}</div>
                                 {this.props.unreadConversations > 0 && <Badge pill={true} color="danger" className="ml-1 badge-notification">{this.props.unreadConversations}</Badge>}
                             </Link>
                         </>

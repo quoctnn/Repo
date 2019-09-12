@@ -32,6 +32,12 @@
     .message-list-container{
         .gallery-container{
             max-width: 100%;
+            
+        }
+        .swiper-container{
+            .swiper-wrapper{
+                position: initial;
+            }
         }
         .day-line
         {
@@ -211,6 +217,97 @@
             justify-content: center;
             align-items: center;
             z-index: 20000;
+        }
+    }
+    .dropzone-container{
+        border:0;
+        margin:0;
+        padding:8px;
+        padding-bottom: 0;
+        .file-list-item{
+            width: 110px;
+            flex-shrink: 0;
+            position: relative;
+            padding: 0;
+            .content-container{
+                margin-left: 4px;
+                margin-right: 4px;
+            }
+            .file-content{
+                flex-direction: column;
+                box-shadow: none;
+                @include var(background-color, main-content-background);
+                .img-container{
+                    width: auto;
+                    margin: 0;
+                }
+                .file-details{    
+                    flex-wrap: wrap;
+                    justify-content: flex-end;
+                    .file-size{
+                        width:100%;
+                    }
+                    .file-error, .file-progress{
+                        position: absolute;
+                        left:5px;
+                        right:5px;
+                        top:5px;
+                        white-space: normal;
+                        word-break: break-all;
+                    }
+                    .file-ext{
+                        position: absolute;
+                        top:34px;
+                        right:5px;
+                    }
+                }
+            }
+        }
+    }
+    .file-list{
+        display: flex;
+        margin: 8px;
+        margin-bottom: 0;
+        border-radius: 8px;
+        overflow-x: auto;
+        user-select: none;
+        flex-shrink: 0;
+
+        .file-preview{
+            padding: 8px;
+            margin-left: 12px;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between; 
+            position: relative;
+            width: 80px;
+            height: 100px;
+            overflow: hidden;
+            border-radius: 8px;
+            &:first-child{
+                margin-left:0;
+            }
+            .img-responsive{
+                background-size: cover;
+                background-repeat: no-repeat;
+                background-position: 50%;
+                width: 100%;
+                height: 100%;
+                position: absolute;
+                top: 0;
+                bottom: 0;
+                left: 0;
+                right: 0;
+            }
+            i.clear{
+                position: absolute;
+                top:5px;
+                right: 5px;
+                border-radius: 50%;
+                background: #9e9e9e9c;
+                color: white;
+            }
         }
     }
 }

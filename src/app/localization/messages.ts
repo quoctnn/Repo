@@ -462,6 +462,9 @@ var translations = {
     "input.error.select.option.required":"Please select an option",
     "form.field.required.text":"* required",
     "community.placeholder.name":"",
+    "conversation.module.drop.to.send.title":"Drop files here",
+    "sending failed":"Sending failed",
+    "common.upload.error":"Upload failed",
     
   },
   no: {
@@ -927,6 +930,9 @@ var translations = {
     "input.error.select.option.required":"Vennligst velg et alternativ",
     "form.field.required.text":"* påkrevd",
     "community.placeholder.name":"",
+    "conversation.module.drop.to.send.title":"Dropp filer her",
+    "sending failed":"Sending feilet",
+    "common.upload.error":"opplasting feilet",
   },
   en: {
     "search.placeholder": "Search ...",
@@ -1396,12 +1402,14 @@ var translations = {
     "common.cover":"Cover",
     "community.settings.title.primarycolor":"Primary color",
     "community.settings.title.secondarycolor":"Secondary color",
-    //
     "Superuser":"Superuser",
     "community.create":"Create community",
     "input.error.select.option.required":"Please select an option",
     "form.field.required.text":"* required",
     "community.placeholder.name":"",
+    "conversation.module.drop.to.send.title":"Drop files here",
+    "sending failed":"Sending failed",
+    "common.upload.error":"Upload failed",
   }
 };
 

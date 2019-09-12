@@ -6,7 +6,7 @@ import { nullOrUndefined, DateFormat } from '../utilities/Utilities';
 import moment = require("moment");
 import { Settings } from "../utilities/Settings";
 import { ConversationManager } from '../managers/ConversationManager';
-import { CommunityConfigurationData } from '../types/intrasocial_types';
+import { CommunityConfigurationData, FileUpload } from '../types/intrasocial_types';
 const $ = require("jquery")
 import { Status, UserProfile, UploadedFile, Community, Group, Conversation, Project, Message, Event, Task,
     ElasticSearchType, ObjectAttributeType, StatusObjectAttribute, EmbedCardItem, ReportTag,
@@ -770,21 +770,7 @@ export abstract class ApiClient
     }
     static createMessage(message:Message, callback:ApiClientCallback<Message>)
     {
-        if(message.tempFile && message.tempFile.file && message.tempFile.file instanceof File)
-        {
-            this.uploadFile(message, (m:Message) => {
-                if(m.tempFile && m.tempFile.error)
-                {
-                    callback(null, "Error", new RequestErrorData("Error uploading file", "error") )
-                }
-                else {
-                    this.sendMessage(m, callback)
-                }
-            })
-        }
-        else {
-            this.sendMessage(message, callback)
-        }
+        this.sendMessage(message, callback)
 
     }
     static getFavorites(callback:ApiClientFeedPageCallback<Favorite>)
@@ -829,15 +815,11 @@ export abstract class ApiClient
     }
     private static sendMessage(message:Message, callback:ApiClientCallback<Message>){
         var data = { conversation: message.conversation, text: message.text, uid: message.uid, mentions:message.mentions, files:(message.files || []).map(f => f.id) }
-        if(message.tempFile && message.tempFile.fileId)
-        {
-            data.files.push(message.tempFile.fileId)
-        }
         AjaxRequest.postJSON(Constants.apiRoute.conversationMessagesUrl, data, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
             let m = Object.assign({}, message)
-            m.tempFile = Object.assign({}, m.tempFile)
+            m.tempFiles = (m.tempFiles || []).map(f => Object.assign({}, f))
             m.error = status
             ConversationManager.updateQueuedMessage(m)
             callback(null, status, new RequestErrorData(request.responseJSON, error))
@@ -851,37 +833,13 @@ export abstract class ApiClient
             callback(null, status, new RequestErrorData(request.responseJSON, error))
         })
     }
-    private static uploadFile(message:Message, completion:(message:Message) => void){
-        let file = message.tempFile.file
+    private static uploadFile(file:File, id:string,  update:(tempFileId:string, progress:number ) => void, completion:(tempFileId:string, file?:UploadedFile) => void){
         let uploader = FileUploader.fromUploadedFile(file, (progress) => {
-            let m = Object.assign({}, message)
-            m.tempFile = Object.assign({}, m.tempFile)
-            m.tempFile.progress = progress
-            ConversationManager.updateQueuedMessage(m)
+            update(id, progress)
         })
         uploader.doUpload((response) => {
             const file = response && response.files && response.files[0]
-            let m = Object.assign({}, message)
-            if(file)
-            {
-                m.tempFile = null
-                if(m.files)
-                {
-                    m.files.push(file)
-                }
-                else
-                {
-                    m.files = [file]
-                }
-            }
-            else
-            {
-                m.tempFile = Object.assign({}, m.tempFile)
-                m.tempFile.progress = 0
-                m.tempFile.error = "error"
-            }
-            ConversationManager.updateQueuedMessage(m)
-            completion(m)
+            completion(id, file)
         })
     }
     static getConversationMessages(conversation:number, limit:number, offset:number,callback:ApiClientFeedPageCallback<Message>)

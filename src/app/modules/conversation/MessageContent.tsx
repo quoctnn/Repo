@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Message, ContextNaturalKey } from "../../types/intrasocial_types";
+import { Message, ContextNaturalKey, FileUpload, UploadedFile, UploadedFileType } from "../../types/intrasocial_types";
 import classnames from 'classnames';
 import { IS_ONLY_LINK_REGEX, URL_REGEX, uniqueId, userFullName, LINEBREAK_REGEX, MENTION_REGEX, MentionData, truncate } from '../../utilities/Utilities';
 import ContentGallery from "../../components/general/ContentGallery";
@@ -10,6 +10,8 @@ import RadialProgress from "../../components/general/loading/RadialProgress";
 import { translate } from '../../localization/AutoIntlProvider';
 import IntraSocialMention from "../../components/general/IntraSocialMention";
 import { Settings } from "../../utilities/Settings";
+import FileListItem from '../files/FileListItem';
+import * as Mime from 'mime-types';
 const processString = require('react-process-string');
 export class MessageContentParser{
     content:any = ""
@@ -122,39 +124,50 @@ export class MessageContent extends React.Component<Props,State> {
             })
         }
     }
-    private renderTempFile = () => {
-        const message = this.props.message
-        if(message.tempFile.file instanceof File)
-        {
-            if(message.tempFile.error)
-            {
-                return this.wrapInMessage(this.renderRetryUploadingContent(message))
-            }
-            else 
-            {
-                return this.wrapInMessage(this.renderUploadingContent(message))
-            }
-        }
-        else 
-        {
-            if(message.tempFile.fileId)
-            {
-                return this.wrapInMessage(this.renderTryingToCreateContent(message))
-            }
-            else 
-            {
-                return this.wrapInMessage(this.renderRemoveFailedContent(message))
-            }
+    convertFile = (queueObj:FileUpload):UploadedFile => {
+        const file = queueObj.file
+        const type = file.type
+        const extension =  Mime.extension(type)
+        const fileType = UploadedFileType.parseFromMimeType(type)
+        return {
+            id:new Date().getTime(),
+            user: -1,
+            filename: file.name,
+            file: null,
+            type: fileType,
+            extension: extension,
+            image: null,
+            image_width: 0,
+            image_height: 0,
+            thumbnail:type.startsWith("image/") &&  URL.createObjectURL(file),
+            size: file.size,
+            created_at: new Date().toUTCString(),
+            //ext  
+            tempId:queueObj.id,
+            custom: true,
+            uploadProgress:queueObj.progress,
+            uploading:queueObj.progress > 0,
+            uploaded:false,
+            hasError:!!queueObj.error
         }
     }
     private wrapInMessage = (content:any, className?:string, key?:string, error?:string) => {
         const cn = classnames("message", className)
         return <div key={key || uniqueId()} className={cn}>
                     {content}
-                    {error && <div className="small-text text-danger"><i className="fas fa-exclamation-triangle">&nbsp;{translate("sending failed")}</i></div>}
+                    {error && this.renderErrorMessage()}
                 </div>
     }
-    private renderRemoveFailedContent = (message:Message) => {
+    renderErrorMessage = () => {
+        return (<div className="d-flex flex-column">
+                   <div className="small-text text-danger"><i className="fas fa-exclamation-triangle">&nbsp;{translate("sending failed")}</i></div>
+                    <div className="d-flex flex-shrink-0">
+                        <button className="btn link-text" onClick={() => ConversationManager.retryQueuedMessage(this.props.message)}>{translate("Retry")}</button>
+                        <button className="btn link-text" onClick={() => ConversationManager.removeQueuedMessage(this.props.message)}>{translate("Remove")}</button>
+                    </div>
+                </div>)
+    }
+    /*private renderRemoveFailedContent = (message:Message) => {
         return (<div className="d-flex align-items-center">
                     <div className="d-flex flex-column mw0 mr-2">
                         <div className="title text-truncate">{message.tempFile.name}</div>
@@ -165,38 +178,7 @@ export class MessageContent extends React.Component<Props,State> {
                         <button className="btn link-text" onClick={() => ConversationManager.removeQueuedMessage(message)}>{translate("Remove")}</button>
                     </div>
                 </div>)
-    }
-    private renderUploadingContent = (message:Message) => {
-        return (<div className="d-flex align-items-center">
-                    <div className="d-flex flex-shrink-0">
-                        <RadialProgress percent={message.tempFile.progress} size={40} strokeWidth={5} />
-                    </div>
-                    <div className="d-flex flex-column mw0 ml-2">
-                        <div className="title text-truncate">{message.tempFile.name}</div>
-                        <div className="status text-truncate">{ FileUtilities.humanFileSize( message.tempFile.size ) + " " + translate("Sending...")}</div>
-                    </div>
-                </div>)
-    }
-    private renderRetryUploadingContent = (message:Message) => {
-        return (<div className="d-flex align-items-center">
-                    <div className="d-flex flex-column mw0 mr-2">
-                        <div className="title text-truncate">{message.tempFile.name}</div>
-                        <div className="status text-truncate">{ FileUtilities.humanFileSize( message.tempFile.size ) + " " + translate("Sending failed")}</div>
-                    </div>
-                    <div className="d-flex flex-shrink-0">
-                        <button className="btn link-text" onClick={() => ConversationManager.retryQueuedMessage(message)}>{translate("Retry")}</button>
-                        <button className="btn link-text" onClick={() => ConversationManager.removeQueuedMessage(message)}>{translate("Remove")}</button>
-                    </div>
-                </div>)
-    }
-    private renderTryingToCreateContent = (message:Message) => {
-        return (<div className="d-flex align-items-center">
-                    <div className="d-flex flex-column mw0 mr-2">
-                        <div className="title text-truncate">{message.tempFile.name}</div>
-                        <div className="status text-truncate">{translate("File uploaded. Creating message") }</div>   
-                    </div>
-                </div>)
-    }
+    }*/
     private renderIllegalContent = (message:Message) => {
         return (<div className="d-flex align-items-center">
                     <div className="d-flex flex-column mw0 mr-2">
@@ -221,10 +203,6 @@ export class MessageContent extends React.Component<Props,State> {
             }
             return processedContent.content
         }
-        if(!message.error && message.tempFile && message.tempFile.file)
-        {
-            return this.renderTempFile()
-        }
         const urls = processedContent.urls
         const hasContent = processedContent.content.length > 0
         const hasFiles = files.length > 0
@@ -232,7 +210,7 @@ export class MessageContent extends React.Component<Props,State> {
         const showError = message.error && !hasContent && !hasFiles && !hasLinks
         return  <>
                     {hasContent && this.wrapInMessage(processedContent.content, null, null, message.error )}
-                    {hasFiles && this.wrapInMessage(<ContentGallery files={files} setWidth={true}/>,null, null, message.error)}
+                    {hasFiles && this.wrapInMessage(<ContentGallery files={files} setWidth={true}/>, null, null, message.error)}
                     {hasLinks && urls.map(u => this.wrapInMessage(<Embedly renderOnError={false} verticalCard={true} url={u} />, "embed", null, message.error))}
                     {showError && this.wrapInMessage(this.renderIllegalContent(message), null, null, message.error)}
                 </>

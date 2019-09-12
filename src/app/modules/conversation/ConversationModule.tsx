@@ -5,7 +5,7 @@ import "./ConversationModule.scss"
 import { ResponsiveBreakpoint } from '../../components/general/observers/ResponsiveComponent';
 import { translate, lazyTranslate } from '../../localization/AutoIntlProvider';
 import CircularLoadingSpinner from '../../components/general/CircularLoadingSpinner';
-import { ContextNaturalKey, Conversation, Message, UserProfile } from '../../types/intrasocial_types';
+import { ContextNaturalKey, Conversation, Message, UserProfile, UploadedFileType, UploadedFile } from '../../types/intrasocial_types';
 import {ApiClient, PaginationResult } from '../../network/ApiClient';
 import { ToastManager } from '../../managers/ToastManager';
 import { connect } from 'react-redux';
@@ -29,10 +29,72 @@ import Select from 'react-select';
 import { ProfileOptionComponent, ProfileSingleValueComponent, createProfileFilterOption, ProfileFilterOption } from '../tasks/ProjectProfileFilter';
 import { ActionMeta } from 'react-select/lib/types';
 import { NavigationUtilities } from '../../utilities/NavigationUtilities';
-import SimpleDialog from '../../components/general/dialogs/SimpleDialog';
-import ConversationEditor from './ConversationEditor';
 import { tempConversationId } from '../conversations/ConversationsModule';
-import { userAvatar } from '../../utilities/Utilities';
+import { userAvatar, uniqueId } from '../../utilities/Utilities';
+import { FileUtilities } from '../../utilities/FileUtilities';
+import { SecureImage } from '../../components/general/SecureImage';
+import * as Mime from 'mime-types';
+import FilesUpload from '../../components/status/FilesUpload';
+
+type FilePreviewProps = {
+    file:File
+    onRemove:(file:File) => void
+}
+export class FilePreview extends React.Component<FilePreviewProps, {preview?:string, isLoading:boolean}> {
+    constructor(props:FilePreviewProps) {
+        super(props);
+        const isImage = this.isImage()
+        this.state = {
+            isLoading:isImage ? true : false
+        }
+    }
+    isImage = () => {
+        return this.props.file.type.startsWith("image/")
+    }
+    componentDidMount = () => {
+        if(this.isImage())
+        {
+            FileUtilities.blobToDataURL(this.props.file, (fileString) => {
+                if(fileString)
+                {
+                    this.setState(() => {
+                        return {preview:fileString, isLoading:false}
+                    })
+                }
+            })
+        }
+    }
+    renderLoading = () => {
+        return <CircularLoadingSpinner borderWidth={3} size={20} key="loading"/>
+    }
+    renderPreview = () => {
+        if(this.state.preview)
+        {
+            return  <>
+                    <SecureImage setAsBackground={true} className="img-responsive" url={this.state.preview} />
+                    </>
+        }
+        const file = this.props.file
+        const extension =  Mime.extension(file.type)
+        const type = UploadedFileType.parseFromMimeType(file.type)
+        return  <>
+                <div className={classnames("file-icon-container", type, extension)}><i className="fa file-icon"></i></div>
+                <div className="title text-truncate">{this.props.file.name}</div>
+                <div className="size text-truncate small-text">{FileUtilities.humanFileSize(this.props.file.size)}</div>
+                </>
+    }
+    removeFile = () => {
+        this.props.onRemove(this.props.file)
+    }
+    render = () => {
+        const isLoading = this.state.isLoading
+        return <div className={classnames("file-preview main-content-secondary-background", {loading:isLoading})}>
+                    {isLoading && this.renderLoading()}
+                    {!isLoading && this.renderPreview()}
+                    <i onClick={this.removeFile} className="clear far fa-times-circle"></i>
+                </div>
+    }
+}
 
 const reducer = (accumulator, currentValue) => accumulator + currentValue;
 const uidToNumber = (uid) => uid.split("_").map(n => parseInt(n)).reduce(reducer)
@@ -55,6 +117,9 @@ type State = {
     showSpinner:boolean
     isTyping:{[key:string]:NodeJS.Timer}
     renderDropZone:boolean
+    showDropzone: boolean
+    files:UploadedFile[]
+    uploading:boolean
 }
 type ReduxStateProps = {
     conversation: Conversation
@@ -72,6 +137,8 @@ class ConversationModule extends React.Component<Props, State> {
     private canPublishDidType = true
     private observers:EventSubscription[] = []
     private messageComposer = React.createRef<ChatMessageComposer>();
+    private uploadRef = React.createRef<any>();
+    private protectKey = uniqueId()
     constructor(props:Props) {
         super(props);
         this.state = {
@@ -85,6 +152,9 @@ class ConversationModule extends React.Component<Props, State> {
             showSpinner:false,
             isTyping:{},
             renderDropZone:false,
+            showDropzone:false,
+            files:[],
+            uploading:false
         }
     }
     shouldReloadList = (prevProps:Props) => {
@@ -116,6 +186,10 @@ class ConversationModule extends React.Component<Props, State> {
         this.dragCount = null;
         this.messageList = null;
         this.canPublishDidType = null;
+        this.uploadRef = null
+        this.messageComposer = null
+        NavigationUtilities.protectNavigation(this.protectKey, false);
+        this.protectKey = null;
     }
     componentDidUpdate = (prevProps:Props, prevState:State) => {
         if(this.shouldReloadList(prevProps))
@@ -135,7 +209,11 @@ class ConversationModule extends React.Component<Props, State> {
         if(this.props.location.pathname != prevProps.location.pathname && this.messageComposer && this.messageComposer.current)
         {
             this.messageComposer.current.clearEditorContent()
+            this.setState((prevState:State) => {
+                return {files:[], uploading:false, showDropzone:false}
+            })
         }
+        NavigationUtilities.protectNavigation(this.protectKey, this.state.files.length > 0)
     }
     incomingMessageHandler = (...args:any[]) =>
     {
@@ -369,26 +447,29 @@ class ConversationModule extends React.Component<Props, State> {
             } )
         }
     }
+    clearFiles = () => {
+        this.setState(() => {
+            return {files:[], uploading:false, showDropzone:false}
+        })
+    }
     onChatMessageSubmit = (text:string, mentions:number[]) => {
         let conversation = this.props.conversation
         if(!conversation)
             return
-        const message = ConversationUtilities.getChatMessagePreview(this.props.authenticatedUser.id, text, null, mentions, conversation)
+        const files = this.state.files
+        this.clearFiles()
+        const message = ConversationUtilities.getChatMessagePreview(this.props.authenticatedUser.id, text, files, mentions, conversation)
         if(conversation.temporary)
             this.createConversationWithMessage(conversation, message)
         else
             ConversationManager.sendMessage(message)
     }
     filesAdded = (files:File[]) => {
-        //files added, store them and present them
-        let conversation = this.props.conversation
-        if(!conversation)
-            return
-        files.forEach(f => {
-
-            const message = ConversationUtilities.getChatMessagePreview(this.props.authenticatedUser.id, "", f, [], conversation)
-            ConversationManager.sendMessage(message)
-        })
+        if(this.uploadRef && this.uploadRef.current)
+        {
+            this.uploadRef.current.onDrop(files)
+            this.uploadRef.current.scrollToTop()
+        }
     }
     onDragOver = (event:React.DragEvent<HTMLDivElement>) => {
         event.preventDefault()
@@ -459,6 +540,59 @@ class ConversationModule extends React.Component<Props, State> {
     sortMessages = (a:Message, b:Message):number => {
         return b.id - a.id
     }
+
+    handleFileUploaded = (file:UploadedFile) => {
+        let files = this.state.files.map(f => f)
+        files.push(file)
+        this.setState({files: files})
+    }
+    handleFileQueueComplete = () => {
+        this.setState({uploading: false});
+    }
+    handleFileAdded = () => {
+        this.setState({uploading: true, showDropzone:true});
+    }
+    handleFileError = () => {
+        // TODO: ¿Should we display an error message (multi-lang) to the user?
+        this.setState({uploading: true});
+    }
+    handleFileRemoved = (file:UploadedFile) => {
+        if (typeof file !== 'undefined' && file != null) {
+            let files = this.removeFileFromList(file, this.state.files)
+            this.setState({files: files, showDropzone:files.length > 0});
+        }
+    }
+    removeFileFromList = (file:UploadedFile, fileList:UploadedFile[]) => {
+        let list = fileList.map(f => f)
+        let index = list.findIndex((item) => {
+            return item.id == file.id;
+        });
+        if(index >= 0)
+        {
+            list.splice(index, 1)
+        }
+        return list
+    }
+    handleRename = (file: UploadedFile, name: string) => {
+        if(!name || name.length == 0)
+            return
+        ApiClient.updateFilename(file.id, name, (data, status, error) => {
+            if(!!data && !error)
+            {
+                this.setState((prevState:State) => {
+                    const files = prevState.files.map(f => f)
+                    const index = files.findIndex(f => f.id == data.id)
+                    if(index > -1)
+                    {
+                        files[index] = data
+                        return {files}
+                    }
+                    return
+                })
+            }
+            ToastManager.showRequestErrorToast(error, lazyTranslate("Could not update filename"))
+        })
+    }
     renderContent = () => {
 
         const { conversation, authenticatedUser } = this.props
@@ -470,7 +604,25 @@ class ConversationModule extends React.Component<Props, State> {
             return this.renderNoConversation()
         }
         const cl = classnames("list list-component-list vertical-scroll droptarget")
-        const canSubmit = !this.props.conversation.temporary || this.props.conversation.users.length > 0
+        const canSubmit = !this.state.uploading && (!this.props.conversation.temporary || this.props.conversation.users.length > 0)
+        const minimumTextLength = this.state.files.length > 0 ? 0 : 1
+        const showDz = this.state.showDropzone || this.state.uploading
+        const fileUploadClass = classnames({"d-none":!showDz})
+        const uploadModule = <FilesUpload
+        className={fileUploadClass}
+        ref={this.uploadRef}
+        files={this.state.files}
+        onFileAdded={this.handleFileAdded}
+        onFileRename={this.handleRename}
+        onFileQueueComplete={this.handleFileQueueComplete}
+        onFileError={this.handleFileError}
+        onFileRemoved={this.handleFileRemoved}
+        onFileUploaded={this.handleFileUploaded}
+        communityId={-1}
+        showDropzoneTarget={false}
+        showListHeader={false}
+        horizontalLayout={true}
+        />
         return <div className="list-component message-list-container">
                         <ChatMessageList ref={this.messageList}
                             onDragOver={this.onDragOver}
@@ -485,7 +637,9 @@ class ConversationModule extends React.Component<Props, State> {
                             current_user={authenticatedUser} >
                             {this.renderSomeoneIsTyping()}
                         </ChatMessageList>
+                        
                     <ChatMessageComposer
+                                //onHandleUploadClick={this.handleUploadClick}
                                 ref={this.messageComposer}
                                 className="secondary-text main-content-secondary-background"
                                 mentionSearch={this.handleMentionSearch}
@@ -495,6 +649,8 @@ class ConversationModule extends React.Component<Props, State> {
                                 onSubmit={this.onChatMessageSubmit}
                                 onDidType={this.onDidType}
                                 canSubmit={canSubmit}
+                                minimumTextLength={minimumTextLength}
+                                topChildren={uploadModule}
                             />
                     {this.state.renderDropZone &&
                         <div className="drop-zone">

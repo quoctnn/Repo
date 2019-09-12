@@ -109,11 +109,12 @@ export class FileUploaderService {
         queueObj.request = FileUploader.fromUploadedFile(queueObj.file, (progress) => {
             this._uploadProgress(queueObj, progress)
         })
-        queueObj.request.doUpload((file, error) => {
-            if(error || !file || !file.files[0])
+        queueObj.request.doUpload((fileResponse, status, error) => {
+            const file = fileResponse && fileResponse.files && fileResponse.files[0]
+            if(error || !file)
                 this._uploadFailed(queueObj, error);
             else 
-                this._uploadComplete(queueObj, file.files[0])
+                this._uploadComplete(queueObj, file)
         })
         return queueObj;
     }

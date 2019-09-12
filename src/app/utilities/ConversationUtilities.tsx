@@ -1,7 +1,7 @@
 import * as React from "react";
 import { ProfileManager } from '../managers/ProfileManager';
-import { Conversation, Message, UserProfile, UserStatus, UserStatusItem } from '../types/intrasocial_types';
-import { nullOrUndefined, userAvatar } from './Utilities';
+import { Conversation, Message, UserProfile, UserStatus, UserStatusItem, FileUpload, UploadedFile } from '../types/intrasocial_types';
+import { nullOrUndefined, userAvatar, uniqueId } from './Utilities';
 import { translate } from '../localization/AutoIntlProvider';
 import { AuthenticationManager } from '../managers/AuthenticationManager';
 import Avatar from "../components/general/Avatar";
@@ -44,13 +44,13 @@ export class ConversationUtilities
                         }
                 </Avatar>
     }
-    static getChatMessagePreview(userId:number,text:string,file:File, mentions:number[], conversation:Conversation):Message {
+    static getChatMessagePreview(userId:number,text:string,files:UploadedFile[], mentions:number[], conversation:Conversation):Message {
 
         let uid = `${conversation.id}_${userId}_${Date.now()}`
         const now = Date.now()
         const ds = new Date().toUTCString()
-        const tempFile = nullOrUndefined(file) ? null: {file:file, progress:0, name:file.name, size:file.size, type:file.type, error:null}
-        const message = {
+        //const tempFiles:FileUpload[] = allFiles.map(file => { return {file:file, progress:0, name:file.name, size:file.size, type:file.type, error:null, id:uniqueId()}})
+        const message:Message = {
             id: now,
             uid:uid,
             pending:true,
@@ -62,7 +62,8 @@ export class ConversationUtilities
             updated_at:ds,
             read_by:[],
             mentions:mentions,
-            tempFile
+            files  
+            //tempFiles
         }
         return message
     }

@@ -842,6 +842,7 @@ export interface FileUpload {
     type: string
     error: string | null
     fileId?: number
+    id:string
 }
 
 export class Message {
@@ -857,7 +858,7 @@ export class Message {
     read_by!: number[]
     mentions!: number[]
     files?: UploadedFile[]
-    tempFile?: FileUpload
+    tempFiles?: FileUpload[]
     error?: string
 }
 export enum Permission {
