@@ -15,7 +15,6 @@ import UserMenu from "../UserMenu";
 import classnames = require("classnames");
 import CommunitySelector from "../general/community/CommunitySelector";
 import BreadcrumbNavigation from "./BreadcrumbNavigation";
-import { SearchComponent } from "./SearchComponent";
 import Logo from "../general/images/Logo";
 
 type OwnProps = {
@@ -31,7 +30,6 @@ type State = {
     notificationsPanelVisible:boolean
 }
 class TopNavigation extends React.Component<Props, State> {
-    searchComponent = React.createRef<SearchComponent>()
     constructor(props:Props) {
         super(props)
         this.state = {

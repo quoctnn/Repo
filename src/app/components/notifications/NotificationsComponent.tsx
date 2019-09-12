@@ -1,9 +1,9 @@
 import * as React from "react";
 import classnames = require("classnames");
 import "./NotificationsComponent.scss"
-import ApiClient from '../../network/ApiClient';
+import {ApiClient} from '../../network/ApiClient';
 import { ToastManager } from '../../managers/ToastManager';
-import { translate } from "../../localization/AutoIntlProvider";
+import { translate, lazyTranslate } from "../../localization/AutoIntlProvider";
 import { UnhandledNotifications, NotificationGroupKey, UserProfile, NotificationObject } from '../../types/intrasocial_types';
 import NotificationGroup from "./NotificationGroup";
 import { AuthenticationManager } from "../../managers/AuthenticationManager";
@@ -73,7 +73,7 @@ class NotificationsComponent extends React.Component<Props, State> {
                     return {notifications:list}
                 })
             }
-            ToastManager.showErrorToast(error, status, translate("notification.error.fetching"))
+            ToastManager.showRequestErrorToast(error, lazyTranslate("notification.error.fetching"))
         })
     }
     toggleCollapseSingleOpen = (key:string) => () => {

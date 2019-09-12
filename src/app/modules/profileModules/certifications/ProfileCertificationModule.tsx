@@ -10,7 +10,7 @@ import { translate } from "../../../localization/AutoIntlProvider";
 import { RouteComponentProps, withRouter } from "react-router";
 import { ContextNaturalKey, UserProfile, ProfileCertification } from "../../../types/intrasocial_types";
 import { ContextManager } from "../../../managers/ContextManager";
-import ApiClient from '../../../network/ApiClient';
+import {ApiClient} from '../../../network/ApiClient';
 import { stringToDateFormat, DateFormat, stringToDate } from '../../../utilities/Utilities';
 import * as moment from 'moment-timezone';
 import CVListItem from '../CVListItem';
@@ -89,18 +89,18 @@ class ProfileCertificationModule extends React.PureComponent<Props, State> {
     shouldModuleRender = () => {
         return this.state.certifications && this.state.certifications.length > 0
     }
-    render = () => 
+    render = () =>
     {
         const shouldRender = this.shouldModuleRender()
         if(!shouldRender)
             return null
         const {className, breakpoint, contextNaturalKey, pageSize, showLoadMore, showInModal, isModal, dispatch, staticContext, profile, history, location, match, ...rest} = this.props
         const cn = classnames("profile-certification-module", className)
-        return <SimpleModule {...rest} 
+        return <SimpleModule {...rest}
                 showHeader={!isModal}
-                className={cn} 
-                breakpoint={breakpoint} 
-                isLoading={false} 
+                className={cn}
+                breakpoint={breakpoint}
+                isLoading={false}
                 headerTitle={translate("profile.module.certification.title")}>
                 <div className="content">
                     {this.renderContent()}

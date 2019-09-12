@@ -2,9 +2,9 @@ import * as React from "react";
 import classnames from 'classnames';
 import "./SearchComponent.scss"
 import { ContextSearchData, SearchOption, SearcQueryManager, SearchEntityType } from "../general/input/contextsearch/extensions";
-import { ElasticSearchType, SearchHistory, ContextNaturalKey, GenericElasticResult, ElasticResultCommunity, ElasticResultStatus, ElasticResultEvent, ElasticResultTask, ElasticResultProject, ElasticResultUser, ElasticResultGroup, ElasticResultFile, Event, UploadedFile, UploadedFileType, ElasticSearchBucketAggregation } from '../../types/intrasocial_types';
-import ApiClient, { ElasticResult, SearchArguments } from "../../network/ApiClient";
-import { Avatar } from '../general/Avatar';
+import { ElasticSearchType, SearchHistory, ContextNaturalKey, GenericElasticResult, ElasticResultCommunity, ElasticResultStatus, ElasticResultEvent, ElasticResultTask, ElasticResultProject, ElasticResultUser, ElasticResultGroup, ElasticResultFile, Event, UploadedFile, UploadedFileType, ElasticSearchBucketAggregation, Favorite } from '../../types/intrasocial_types';
+import {ApiClient, ElasticResult, SearchArguments } from "../../network/ApiClient";
+import Avatar from '../general/Avatar';
 import { SearchBox } from "../general/input/contextsearch/SearchBox";
 import { EditorState } from "draft-js";
 import { nullOrUndefined, truncate, userFullName, stringToDateFormat } from '../../utilities/Utilities';
@@ -28,12 +28,13 @@ import { DropDownMenu } from "../general/DropDownMenu";
 import { DateTimePicker } from "../general/input/DateTimePicker";
 import { Moment } from "moment";
 import * as moment from "moment-timezone";
-import { SecureImage } from "../general/SecureImage";
-import PhotoSwipeComponent from "../general/gallery/PhotoSwipeComponent";
-import { IntraSocialUtilities } from "../../utilities/IntraSocialUtilities";
 import SimpleDialog from "../general/dialogs/SimpleDialog";
 import StickyBox from "../external/StickyBox";
 import Routes from "../../utilities/Routes";
+import FileResultItem from './FileResultItem';
+import { ReduxState } from "../../redux";
+import { connect } from 'react-redux';
+import { FavoriteManager } from "../../managers/FavoriteManager";
 let timezone = moment.tz.guess()
 
 type BreadcrumbData = {community?:number, group?:number, event?:number, project?:number, task?:number, profile?:number, status?:number}
@@ -59,7 +60,7 @@ const allowedSearchTypeFilters:ElasticSearchType[] = [
     ElasticSearchType.STATUS,
     ElasticSearchType.UPLOADED_FILE,
 ]
-const SearchResultItem = (props: {className?:string, left?:React.ReactNode, header?:React.ReactNode, description?:React.ReactNode, footer?:React.ReactNode, right?:React.ReactNode} ) => {
+export const SearchResultItem = (props: {className?:string, left?:React.ReactNode, header?:React.ReactNode, description?:React.ReactNode, footer?:React.ReactNode, right?:React.ReactNode} ) => {
     const {className,left, header, description,footer, right, ...rest} = props
     const cn = classnames("result-item border-1", className)
     return (<div className={cn} {...rest}>
@@ -72,7 +73,7 @@ const SearchResultItem = (props: {className?:string, left?:React.ReactNode, head
                 {right && <div className="right">{right}</div>}
             </div>)
 }
-const getTextForField = (object:GenericElasticResult, field:string, maxTextLength:number) => {
+export const getTextForField = (object:GenericElasticResult, field:string, maxTextLength:number) => {
     var origFieldVal = object[field] || ""
     if (object.highlights)
     {
@@ -107,7 +108,7 @@ const truncateWithBoundary = (value:string, n:number, useWordBoundary:boolean) =
         ? subString.substr(0, subString.lastIndexOf(' '))
         : subString) + "&hellip;";
 }
-const breadcrumbs = (data:BreadcrumbData, onNavigate:(uri:string) => (event:React.SyntheticEvent) => void) => {
+export const breadcrumbs = (data:BreadcrumbData, onNavigate:(uri:string) => (event:React.SyntheticEvent) => void) => {
     const {community, group, event, project, task, profile, status} = data
     let breadcrumbs:LinkObject[] = []
     if(community)
@@ -159,7 +160,7 @@ const breadcrumbs = (data:BreadcrumbData, onNavigate:(uri:string) => (event:Reac
     })
     return arr
 }
-const getBreadcrumbDataFromContext = (contextNaturalKey:ContextNaturalKey, contextObjectId:number, onNavigate:(uri:string) => (event:React.SyntheticEvent) => void, breadcrumbData?:BreadcrumbData) => {
+export const getBreadcrumbDataFromContext = (contextNaturalKey:ContextNaturalKey, contextObjectId:number, onNavigate:(uri:string) => (event:React.SyntheticEvent) => void, breadcrumbData?:BreadcrumbData) => {
     const data:BreadcrumbData = breadcrumbData || {}
     switch (contextNaturalKey) {
         case ContextNaturalKey.COMMUNITY:
@@ -189,14 +190,17 @@ const breadcrumbsFromContext = (contextNaturalKey:ContextNaturalKey, contextObje
     const data:BreadcrumbData = getBreadcrumbDataFromContext(contextNaturalKey, contextObjectId, onNavigate)
     return breadcrumbs(data, onNavigate)
 }
-export interface Props {
+type OwnProps = {
     onClose:() => void
     visible:boolean
     initialTerm?:string
     initialType?:string
 }
-export interface State {
-
+type ReduxStateProps = {
+    favorites:Favorite[]
+}
+type Props = OwnProps & ReduxStateProps
+type State = {
     searchActive:boolean
     activeSearchType:ElasticSearchType
     searchData:ContextSearchData
@@ -211,8 +215,7 @@ export interface State {
     fromDate:Moment
     toDate:Moment
 }
-SearcQueryManager
-export class SearchComponent extends React.Component<Props, State> {
+class SearchComponent extends React.Component<Props, State> {
 
     searchTextInput = React.createRef<SearchBox>()
     fromDatimepicker = React.createRef<DateTimePicker>()
@@ -263,6 +266,8 @@ export class SearchComponent extends React.Component<Props, State> {
     }
     componentDidMount = () => {
         this.loadSearchHistory()
+        if(this.searchTextInput && this.searchTextInput.current)
+            this.searchTextInput.current.focus()
         if(!nullOrUndefined(this.state.searchData.originalText))
         {
             this.setState((prevState:State) => ({
@@ -376,7 +381,15 @@ export class SearchComponent extends React.Component<Props, State> {
                 currentFilters[st.getName()] = "*" + data.query + "*"
             })*/
         }
-        const q = hasActiveSearchType ? "" : data.query
+        let q = hasActiveSearchType ? "" : data.query
+        if(q && q.length > 0)
+        {
+            const lastChar = q[q.length -1]
+            if(lastChar !=  "*" && lastChar != "?")
+            {
+                q = q + "*"
+            }
+        }
         const searchForbidden = types.length == 0 || this.isSearchForbidden(data)
         if(searchForbidden)
         {
@@ -451,17 +464,15 @@ export class SearchComponent extends React.Component<Props, State> {
     setSearchQuery = (text:string) => () =>  {
         let state = this.editorState()
         state = SearcQueryManager.clearState(state)
-        state = SearcQueryManager.appendText(text, true, state)
-        state = SearcQueryManager.appendText(" ", true, state)
+        state = SearcQueryManager.appendText(text + " ", true, state)
         this.applyState(state)
     }
     appendSearchQuery = (text:string) => () =>  {
         let state = this.editorState()
         const currentText = state.getCurrentContent().getPlainText()
         if(currentText.length > 0 && currentText[currentText.length - 1] != " ")
-            state = SearcQueryManager.appendText(" ", true, state)
-        state = SearcQueryManager.appendText(text, true, state)
-        state = SearcQueryManager.appendText(" ", true, state)
+            state = SearcQueryManager.appendText(" ", false, state)
+        state = SearcQueryManager.appendText(text + " ", true, state)
         this.applyState(state)
     }
     editorState = () => {
@@ -572,9 +583,29 @@ export class SearchComponent extends React.Component<Props, State> {
                     />
                 </div>
     }
-
+    getFavorite = (id:number, contextNaturalKey:ContextNaturalKey) => {
+        return this.props.favorites.find(o => o.object_id == id && o.object_natural_key == contextNaturalKey)
+    }
+    renderIsFavorite = (id:number, contextNaturalKey:ContextNaturalKey) => {
+        const isFavorite = !!this.getFavorite(id, contextNaturalKey)
+        const cn = classnames("favorite-button p-0 pr-1", {active:isFavorite})
+        const icon = isFavorite ? "fas fa-star" : "far fa-star"
+        return <Button size="sm" onClick={this.toggleFavorite(id, contextNaturalKey)} color="link" className={cn}>
+                    <i className={icon}></i>
+                </Button>
+    }
+    toggleFavorite = (id:number, contextNaturalKey:ContextNaturalKey) => (event:React.SyntheticEvent) => {
+        event.preventDefault()
+        event.stopPropagation()
+        const favorite = this.getFavorite(id, contextNaturalKey)
+        if(favorite)
+            FavoriteManager.removeFavorite(favorite.id)
+        else
+            FavoriteManager.createFavorite(contextNaturalKey, id)
+    }
     renderCommunityItem = (item:ElasticResultCommunity) => {
-        const avatar = item.avatar || ContextNaturalKey.defaultAvatarForKey(ElasticSearchType.contextNaturalKeyForType(item.object_type))
+        const contextNaturalKey = ContextNaturalKey.COMMUNITY
+        const avatar = item.avatar || ContextNaturalKey.defaultAvatarForKey(contextNaturalKey)
         const left = <Avatar image={avatar} size={36} />
         const members = item.members || []
         const footer = <div className="text-bolder">{`${members.length} ${members.length > 1 ? translate("Members") : translate("Member")}`}</div>
@@ -582,11 +613,13 @@ export class SearchComponent extends React.Component<Props, State> {
         const description = <span dangerouslySetInnerHTML={{__html: d}}></span>
         const right = ElasticSearchType.nameForKey( item.object_type )
         const n = getTextForField(item, "name", 150)
-        const name = <span dangerouslySetInnerHTML={{__html: n}}></span>
+        const name = <span className="d-flex align-items-center">{this.renderIsFavorite(item.django_id, contextNaturalKey)}{n}</span>
         return <SearchResultItem className={item.object_type.toLowerCase()} header={name} description={description} footer={footer} left={left} right={right} />
     }
     renderGroupItem = (item:ElasticResultGroup) => {
-        const avatar = item.avatar || ContextNaturalKey.defaultAvatarForKey(ElasticSearchType.contextNaturalKeyForType(item.object_type))
+
+        const contextNaturalKey = ContextNaturalKey.GROUP
+        const avatar = item.avatar || ContextNaturalKey.defaultAvatarForKey(contextNaturalKey)
         const left = <Avatar image={avatar} size={36} />
         const members = item.members || []
         const bc = breadcrumbs({community:item.community, group:item.parent_id}, this.navigateToLocation)
@@ -595,21 +628,23 @@ export class SearchComponent extends React.Component<Props, State> {
         const description = <span dangerouslySetInnerHTML={{__html: d}}></span>
         const right = ElasticSearchType.nameForKey( item.object_type )
         const n = getTextForField(item, "name", 150)
-        const name = <span dangerouslySetInnerHTML={{__html: n}}></span>
+        const name = <span className="d-flex align-items-center">{this.renderIsFavorite(item.django_id, contextNaturalKey)}{n}</span>
         return <SearchResultItem className={item.object_type.toLowerCase()} header={name} description={description} footer={footer} left={left} right={right} />
     }
     renderUserItem = (item:ElasticResultUser) => {
-        const avatar = item.avatar || ContextNaturalKey.defaultAvatarForKey(ElasticSearchType.contextNaturalKeyForType(item.object_type))
+        const contextNaturalKey = ContextNaturalKey.USER
+        const avatar = item.avatar || ContextNaturalKey.defaultAvatarForKey(contextNaturalKey)
         const left = <Avatar image={avatar} size={36} style={{borderRadius:"6px"}} />
         const d = getTextForField(item, "biography", 300)
         const description = <span dangerouslySetInnerHTML={{__html: d}}></span>
         const right = ElasticSearchType.nameForKey( item.object_type )
         const n = getTextForField(item, "user_name", 150)
-        const name = <span dangerouslySetInnerHTML={{__html: n}}></span>
+        const name = <span className="d-flex align-items-center">{this.renderIsFavorite(item.django_id, contextNaturalKey)}{n}</span>
         return <SearchResultItem className={item.object_type.toLowerCase()} header={name} description={description} left={left} right={right} />
     }
     renderProjectItem = (item:ElasticResultProject) => {
-        const avatar = item.avatar || ContextNaturalKey.defaultAvatarForKey(ElasticSearchType.contextNaturalKeyForType(item.object_type))
+        const contextNaturalKey = ContextNaturalKey.PROJECT
+        const avatar = item.avatar || ContextNaturalKey.defaultAvatarForKey(contextNaturalKey)
         const left = <Avatar image={avatar} size={36} />
         const members = item.members || []
         const bc = breadcrumbs({community:item.community}, this.navigateToLocation)
@@ -618,7 +653,7 @@ export class SearchComponent extends React.Component<Props, State> {
         const description = <span dangerouslySetInnerHTML={{__html: d}}></span>
         const right = ElasticSearchType.nameForKey( item.object_type )
         const n = getTextForField(item, "name", 150)
-        const name = <span dangerouslySetInnerHTML={{__html: n}}></span>
+        const name = <span className="d-flex align-items-center">{this.renderIsFavorite(item.django_id, contextNaturalKey)}{n}</span>
         return <SearchResultItem className={item.object_type.toLowerCase()} header={name} description={description} footer={footer} left={left} right={right} />
     }
     navigateToLocation = (url:string) => (e:React.SyntheticEvent) => {
@@ -628,6 +663,7 @@ export class SearchComponent extends React.Component<Props, State> {
     }
 
     renderTaskItem = (item:ElasticResultTask) => {
+        const contextNaturalKey = ContextNaturalKey.TASK
         const bc = breadcrumbs({community:item.community, project:item.project_id, task:item.parent_id    }, this.navigateToLocation)
         const left = <i className={ElasticSearchType.iconClassForKey(item.object_type)}></i>
         const footer = <div className="text-bolder">{bc}</div>
@@ -635,11 +671,12 @@ export class SearchComponent extends React.Component<Props, State> {
         const description = <span dangerouslySetInnerHTML={{__html: d}}></span>
         const right = ElasticSearchType.nameForKey( item.object_type )
         const t = getTextForField(item, "title", 150)
-        const title = <span dangerouslySetInnerHTML={{__html: t}}></span>
+        const title = <span className="d-flex align-items-center">{this.renderIsFavorite(item.django_id, contextNaturalKey)}{t}</span>
         return <SearchResultItem className={item.object_type.toLowerCase()} header={title} description={description} footer={footer} left={left} right={right} />
     }
     renderEventItem = (item:ElasticResultEvent) => {
-        const avatar = item.avatar || ContextNaturalKey.defaultAvatarForKey(ElasticSearchType.contextNaturalKeyForType(item.object_type))
+        const contextNaturalKey = ContextNaturalKey.PROJECT
+        const avatar = item.avatar || ContextNaturalKey.defaultAvatarForKey(contextNaturalKey)
         const left = <Avatar image={avatar} size={36} />
         const members = item.members || []
         const bc = breadcrumbs({community:item.community, event:item.parent_id}, this.navigateToLocation)
@@ -654,11 +691,11 @@ export class SearchComponent extends React.Component<Props, State> {
         const description = <span dangerouslySetInnerHTML={{__html: d}}></span>
         const right = ElasticSearchType.nameForKey( item.object_type )
         const n = getTextForField(item, "name", 150)
-        const name = <span dangerouslySetInnerHTML={{__html: n}}></span>
+        const name = <span className="d-flex align-items-center">{this.renderIsFavorite(item.django_id, contextNaturalKey)}{n}</span>
         return <SearchResultItem className={item.object_type.toLowerCase()} header={name} description={description} footer={footer} left={left} right={right} />
     }
     renderStatusItem = (item:ElasticResultStatus) => {
-        const avatar = item.profile_avatar || ContextNaturalKey.defaultAvatarForKey(ElasticSearchType.contextNaturalKeyForType(ElasticSearchType.USER))
+        const avatar = item.profile_avatar || ContextNaturalKey.defaultAvatarForKey(ContextNaturalKey.USER)
         const left = <Avatar image={avatar} size={36} />
         const bc = breadcrumbsFromContext(item.context_natural_key, item.context_object_id, this.navigateToLocation)
         const footer = <div className="text-bolder">{bc}{" "}<TimeComponent date={item.created_at} /> </div>
@@ -666,7 +703,7 @@ export class SearchComponent extends React.Component<Props, State> {
         const description = <span dangerouslySetInnerHTML={{__html: text}}></span>
         const right = ElasticSearchType.nameForKey( item.object_type )
         const un = getTextForField(item, "user_name", 150)
-        const user_name = <span dangerouslySetInnerHTML={{__html: un}}></span>
+        const user_name = <span className="d-flex align-items-center">{un}</span>
         return <SearchResultItem className={item.object_type.toLowerCase()} header={user_name} description={description} footer={footer} left={left} right={right} />
     }
     renderFileItem = (item:ElasticResultFile) => {
@@ -806,115 +843,11 @@ export class SearchComponent extends React.Component<Props, State> {
                 </SimpleDialog>)
     }
 }
-type FileResultItemProps = {
-    file:ElasticResultFile
-    onNavigate:(uri:string) => (event:React.SyntheticEvent) => void
-}
-type FileResultItemState = {
-    visible:boolean
-}
-export default class FileResultItem extends React.Component<FileResultItemProps, FileResultItemState> {
-    imagaRef = React.createRef<HTMLDivElement>()
-    constructor(props:FileResultItemProps) {
-        super(props);
-        this.state = {
-            visible:false
-        }
-    }
-    componentWillUnmount = () => {
-        this.imagaRef = null
-    }
-    shouldComponentUpdate = (nextProps:FileResultItemProps, nextState:FileResultItemState) => {
-        const ret =  nextProps.file != this.props.file ||
-                    nextState.visible != this.state.visible
-        return ret
-    }
-    handleFileClick = (event:React.SyntheticEvent<any>) => {
-        event.preventDefault()
-        //event.stopPropagation()
-        const file = this.props.file
-        if(file.type != UploadedFileType.IMAGE && file.type != UploadedFileType.IMAGE360)
-        {
-            this.downloadCurrent()
-        }
-        else {
-            this.setState({visible:true})
-        }
-    }
-    downloadCurrent = () => {
-        const file = this.props.file
-        if(file.file && file.filename){
-            const url = IntraSocialUtilities.appendAuthorizationTokenToUrl(file.file)
-            var element = document.createElement("a")
-            element.setAttribute("href", url)
-            element.setAttribute("download", file.filename)
-            element.setAttribute("target", "_blank")
-            element.setAttribute("crossOrigin", "anonymous")
-            element.style.display = "none"
-            document.body.appendChild(element)
-            element.click()
-            document.body.removeChild(element)
-        }
-    }
-    onModalClose = () =>
-    {
-        this.setState({visible:false})
-    }
-    renderModal = () =>
-    {
-        if(!this.state.visible)
-            return null
-        const options:PhotoSwipe.Options = {index:0, getThumbBoundsFn:(index) => {
-            const child = this.imagaRef && this.imagaRef.current
-            if(child)
-            {
-                const rect = child.getBoundingClientRect()
-                var pageYScroll = window.pageYOffset || document.documentElement.scrollTop
-                return {x:rect.left, y:rect.top + pageYScroll, w:rect.width}
-            }
-            return null
-        }}
-        return <PhotoSwipeComponent items={[this.props.file as any as UploadedFile]} options={options} visible={this.state.visible} onClose={this.onModalClose}/>
-    }
-    renderName = () => {
-        return <div className="text-truncate">{this.props.file.filename}</div>
-    }
-    preventDefault = (e:React.SyntheticEvent) => {
-        event.preventDefault()
-        event.stopPropagation()
-    }
-    renderContent = () => {
+const mapStateToProps = (state: ReduxState, ownProps: OwnProps): ReduxStateProps => {
 
-        const item = this.props.file
-        const hasThumbnail = !!item.thumbnail
-        const cn = classnames("img-container", item.type, item.extension)
-        const left = <div ref={this.imagaRef} className={cn}>
-                        {hasThumbnail && <SecureImage className="img-responsive sec-img" setBearer={true} setAsBackground={true} url={item.thumbnail}  />
-                        ||
-                        <i className="fa file-icon"></i>
-                        }
-                    </div>
-        const creatorLink = breadcrumbs({profile:item.user_id}, this.props.onNavigate)
-        const bcContext = getBreadcrumbDataFromContext(item.context_natural_key, item.context_object_id, this.props.onNavigate)
-        bcContext.community = item.community
-        bcContext.status = item.status_id
-        const bc = breadcrumbs(bcContext, this.props.onNavigate)
-        const hasBreadcrumbs = bc.length > 0
-        const footer = <div className="text-bolder">
-                            {creatorLink}{hasBreadcrumbs ? " " + translate("in_context") + " ": ""}{bc}{" "}<TimeComponent date={item.created_at} />
-                            </div>
-        const right = ElasticSearchType.nameForKey( item.object_type )
-        const fn = getTextForField(item, "filename", 150)
-        const filename = <span dangerouslySetInnerHTML={{__html: fn}}></span>
-        return <SearchResultItem className={item.object_type.toLowerCase()} header={filename} footer={footer} left={left} right={right} />
-    }
-    render()
-    {
-        const {file} = this.props
-        const cl = classnames("", file.type, file.extension)
-        return (<div onClick={this.handleFileClick} className={cl}>
-                    {this.renderContent()}
-                    {this.renderModal()}
-                </div>)
+    const favorites = state.favoriteStore.allIds.map(id => state.favoriteStore.byId[id])
+    return {
+        favorites
     }
 }
+export default connect<ReduxStateProps, {}, OwnProps>(mapStateToProps, null)(SearchComponent)

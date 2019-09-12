@@ -2,7 +2,7 @@ import * as React from 'react'
 import FacebookLogin from 'react-facebook-login/dist/facebook-login-render-props'
 import GoogleLogin from 'react-google-login';
 import LinkedIn from 'linkedin-login-for-react';
-import ApiClient from '../../network/ApiClient'
+import {ApiClient} from '../../network/ApiClient'
 import { Button, Input , Form , FormGroup, InputGroupAddon, InputGroup, FormFeedback} from 'reactstrap'
 import { withRouter, RouteComponentProps} from 'react-router-dom'
 import { connect } from 'react-redux'
@@ -85,7 +85,7 @@ class Signin extends React.Component<Props, State> {
 
         }
     }
-    loginCallback = (data:any, status:string, error:string, errorData:RequestErrorData) => {
+    loginCallback = (data:any, status:string, errorData:RequestErrorData) => {
         if(errorData)
         {
             if (errorData.detail && errorData.detail.extra && errorData.detail.extra.gdprInfo) {
@@ -111,14 +111,14 @@ class Signin extends React.Component<Props, State> {
                 }
 
             }
-            ToastManager.showErrorToast(error)
+            ToastManager.showRequestErrorToast(errorData)
             return
         }
         if(data.token)
         {
             AuthenticationManager.signIn(data.token)
         } else {
-            ToastManager.showErrorToast("No token in response")
+            ToastManager.showRequestErrorToast(new RequestErrorData("No token in response", "Error"))
         }
         const { from } = this.props.location.state || { from: { pathname: '/' } }
         this.props.history.push(from)

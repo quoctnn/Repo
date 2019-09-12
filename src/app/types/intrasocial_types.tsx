@@ -5,6 +5,143 @@ import { translate } from "../localization/AutoIntlProvider";
 import { userFullName, groupCover, communityCover, userCover, projectCover, eventCover } from '../utilities/Utilities';
 import { CommunityManager } from '../managers/CommunityManager';
 import { ProjectManager } from '../managers/ProjectManager';
+export type CommunityConfigurationData = {
+    id:number
+    members_publication:boolean
+    members_comments: boolean
+    members_wall_notifications:boolean
+    public_member_list:boolean
+    public_creator:boolean
+    publish_files:boolean
+    use_chapters:boolean
+    members_group_creation:CommunityCreatePermission
+    subgroups:CommunityCreatePermission
+    members_event_creation:CommunityCreatePermission
+    members_project_creation:CommunityCreatePermission
+    allow_anonymous_users:boolean
+    primary_color:string
+    secondary_color:string
+    community:number
+}
+export enum CommunityCreatePermission{
+    createDenied = 0,
+    createLimited = 20,
+    createAllowed = 21,
+}export namespace CommunityCreatePermission {
+    export const all = [
+        CommunityCreatePermission.createDenied,
+        CommunityCreatePermission.createLimited,
+        CommunityCreatePermission.createAllowed,
+    ]
+    export function translationForKey(key: CommunityCreatePermission) {
+        return translate(`community.create_permission.${key}`)
+    }
+}
+export enum CommunityCategory{
+    aerospace = "aerospace",
+    biotech = "biotech",
+    cargo_freight = "cargo_freight",
+    cause = "cause",
+    chemical = "chemical",
+    college = "college",
+    company = "company",
+    community_org = "community_org",
+    community_ser = "community_ser",
+    computer = "computer",
+    consulting = "consulting",
+    educationResearch = "education-research",
+    elementary = "elementary",
+    energy = "energy",
+    entrepreneur = "entrepreneur",
+    government = "government",
+    health = "health",
+    high_school = "high_school",
+    industrial = "industrial",
+    insurance = "insurance",
+    institution = "institution",
+    internet = "internet",
+    labor = "labor",
+    media = "media",
+    middle_school = "middle_school",
+    mining = "mining",
+    vehicle = "vehicle",
+    ngo = "ngo",
+    non = "non",
+    political_org = "political_org",
+    political_par = "political_par",
+    preschool = "preschool",
+    religious = "religious",
+    retail = "retail",
+    school = "school",
+    science = "science",
+    serviceProfessionals = "service-professionals",
+    startup = "startup",
+    telecom = "telecom",
+    tobacco = "tobacco",
+    travel = "travel",
+    other = "other",
+}
+export namespace CommunityCategory {
+    export const all = [
+    CommunityCategory.aerospace,
+    CommunityCategory.biotech,
+    CommunityCategory.cargo_freight,
+    CommunityCategory.cause,
+    CommunityCategory.chemical,
+    CommunityCategory.college,
+    CommunityCategory.company,
+    CommunityCategory.community_org,
+    CommunityCategory.community_ser,
+    CommunityCategory.computer,
+    CommunityCategory.consulting,
+    CommunityCategory.educationResearch,
+    CommunityCategory.elementary,
+    CommunityCategory.energy,
+    CommunityCategory.entrepreneur,
+    CommunityCategory.government,
+    CommunityCategory.health,
+    CommunityCategory.high_school,
+    CommunityCategory.industrial,
+    CommunityCategory.insurance,
+    CommunityCategory.institution,
+    CommunityCategory.internet,
+    CommunityCategory.labor,
+    CommunityCategory.media,
+    CommunityCategory.middle_school,
+    CommunityCategory.mining,
+    CommunityCategory.vehicle,
+    CommunityCategory.ngo,
+    CommunityCategory.non,
+    CommunityCategory.political_org,
+    CommunityCategory.political_par,
+    CommunityCategory.preschool,
+    CommunityCategory.religious,
+    CommunityCategory.retail,
+    CommunityCategory.school,
+    CommunityCategory.science,
+    CommunityCategory.serviceProfessionals,
+    CommunityCategory.startup,
+    CommunityCategory.telecom,
+    CommunityCategory.tobacco,
+    CommunityCategory.travel,
+    CommunityCategory.other,
+    ]
+    export function translationForKey(key: CommunityCategory) {
+        return translate(`community.category.${key}`)
+    }
+}
+export type UploadedFileResponse = {files:UploadedFile[]}
+
+export enum ContextPhotoType{
+    cover = "cover", avatar = "avatar"
+}
+export type CropRect = {
+    top_left:number[]
+    bottom_right:number[]
+}
+export type CropInfo = {
+    image:string
+} & CropRect
 export type GDPRData = {
     requiredActions:OUPRequiredAction[]
     updateGdprContinuationKey:string
@@ -74,12 +211,49 @@ export type GDPRFormAnswers = {
 export class RequestErrorData{
     data:any
     detail?:RequestErrorDetail
-    constructor(data:any) {
+    error:string
+    constructor(data:any, error:string) {
         this.data = data
-        if(data.detail)
+        this.error = error
+        if(data && data.detail)
         {
-            this.detail = JSON.parse(data.detail)
+            try {
+                this.detail = JSON.parse(data.detail)
+            } catch (error) {
+            }
         }
+    }
+    renameErrorField = (oldKey:string, newKey?:string) => {
+        if(this.data && typeof this.data == "object")
+        {
+            if (this.data.hasOwnProperty(oldKey)) {
+                this.data[newKey] = this.data[oldKey]
+                delete this.data[oldKey]
+            }
+        }
+    }
+    getErrorMessageForField = (key:string) => {
+        if(this.data && typeof this.data == "object")
+        {
+            return this.data[key]
+        }
+        return null
+    }
+    getErrorMessage = () => {
+
+        const error = (this.detail && this.detail.error_description) || (this.data && (this.data.non_field_errors || this.data))
+        let errorMessage:string = undefined
+        if(error)
+        {
+            if(Array.isArray(error))
+                errorMessage = error[0]
+            else if(typeof error == "string")
+                errorMessage = error
+            else {
+                console.warn(`RequestErrorData:${error} is not a string`)
+            }
+        }
+        return errorMessage || this.error
     }
 }
 export enum CrashLogLevel {
@@ -191,8 +365,35 @@ export type ProfileCompany = {
     url?: string
     avatar_original?: string
 } & IdentifiableObject
-
-
+export enum ContextPrivacy{
+    publicOpenMembership = "public-open-membership",
+    publicClosedMembership = "public-closed-membership",
+    privateListed = "private-listed",
+    privateUnlisted = "private-unlisted",
+}
+export namespace ContextPrivacy {
+    export const all = [
+        ContextPrivacy.publicOpenMembership,
+        ContextPrivacy.publicClosedMembership,
+        ContextPrivacy.privateListed,
+        ContextPrivacy.privateUnlisted,
+    ]
+    export function iconClassForKey(key: ContextPrivacy) {
+        switch (key) {
+            case ContextPrivacy.publicOpenMembership: return "fas fa-globe-europe"
+            case ContextPrivacy.publicClosedMembership: return "fas fa-globe-europe"
+            case ContextPrivacy.privateListed: return "fas fa-lock-open"
+            case ContextPrivacy.privateUnlisted: return "fas fa-lock"
+            default: return null
+        }
+    }
+    export function titleForKey(key: ContextPrivacy) {
+        return translate(`context.privacy.title.${key}`)
+    }
+    export function descriptionForKey(key: ContextPrivacy) {
+        return translate(`context.privacy.description.${key}`)
+    }
+}
 export enum ContextNaturalKey {
     GROUP = "group.group",
     COMMUNITY = "core.community",
@@ -202,41 +403,6 @@ export enum ContextNaturalKey {
     EVENT = "event.event",
     NEWSFEED = "newsfeed",
     CONVERSATION = "conversation.conversation",
-}
-export enum ContextSegmentKey {
-    GROUP = "group",
-    COMMUNITY = "community",
-    USER = "profile",
-    PROJECT = "project",
-    TASK = "task",
-    EVENT = "event",
-    CONVERSATION = "conversation"
-}
-export namespace ContextSegmentKey {
-    export function keyForNaturalKey(key: ContextNaturalKey) {
-        switch (key) {
-            case ContextNaturalKey.GROUP: return ContextSegmentKey.GROUP
-            case ContextNaturalKey.COMMUNITY: return ContextSegmentKey.COMMUNITY
-            case ContextNaturalKey.USER: return ContextSegmentKey.USER
-            case ContextNaturalKey.PROJECT: return ContextSegmentKey.PROJECT
-            case ContextNaturalKey.EVENT: return ContextSegmentKey.EVENT
-            case ContextNaturalKey.TASK: return ContextSegmentKey.TASK
-            case ContextNaturalKey.CONVERSATION: return ContextSegmentKey.CONVERSATION
-            default: return null
-        }
-    }
-    export const parse = (value: string): ContextSegmentKey | null => {
-        switch (value) {
-            case ContextSegmentKey.GROUP: return ContextSegmentKey.GROUP
-            case ContextSegmentKey.COMMUNITY: return ContextSegmentKey.COMMUNITY
-            case ContextSegmentKey.USER: return ContextSegmentKey.USER
-            case ContextSegmentKey.PROJECT: return ContextSegmentKey.PROJECT
-            case ContextSegmentKey.EVENT: return ContextSegmentKey.EVENT
-            case ContextSegmentKey.TASK: return ContextSegmentKey.TASK
-            case ContextSegmentKey.CONVERSATION: return ContextSegmentKey.CONVERSATION
-            default: return null
-        }
-    }
 }
 export namespace ContextNaturalKey {
     export const all = [
@@ -363,6 +529,42 @@ export namespace ContextNaturalKey {
         }
     }
 }
+export enum ContextSegmentKey {
+    GROUP = "group",
+    COMMUNITY = "community",
+    USER = "profile",
+    PROJECT = "project",
+    TASK = "task",
+    EVENT = "event",
+    CONVERSATION = "conversation"
+}
+export namespace ContextSegmentKey {
+    export function keyForNaturalKey(key: ContextNaturalKey) {
+        switch (key) {
+            case ContextNaturalKey.GROUP: return ContextSegmentKey.GROUP
+            case ContextNaturalKey.COMMUNITY: return ContextSegmentKey.COMMUNITY
+            case ContextNaturalKey.USER: return ContextSegmentKey.USER
+            case ContextNaturalKey.PROJECT: return ContextSegmentKey.PROJECT
+            case ContextNaturalKey.EVENT: return ContextSegmentKey.EVENT
+            case ContextNaturalKey.TASK: return ContextSegmentKey.TASK
+            case ContextNaturalKey.CONVERSATION: return ContextSegmentKey.CONVERSATION
+            default: return null
+        }
+    }
+    export const parse = (value: string): ContextSegmentKey | null => {
+        switch (value) {
+            case ContextSegmentKey.GROUP: return ContextSegmentKey.GROUP
+            case ContextSegmentKey.COMMUNITY: return ContextSegmentKey.COMMUNITY
+            case ContextSegmentKey.USER: return ContextSegmentKey.USER
+            case ContextSegmentKey.PROJECT: return ContextSegmentKey.PROJECT
+            case ContextSegmentKey.EVENT: return ContextSegmentKey.EVENT
+            case ContextSegmentKey.TASK: return ContextSegmentKey.TASK
+            case ContextSegmentKey.CONVERSATION: return ContextSegmentKey.CONVERSATION
+            default: return null
+        }
+    }
+}
+
 export enum DraggableType {
     favorite = "favorite",
     group = "group.group"
@@ -790,7 +992,7 @@ export type ElasticSearchBucketAggregation = {
 }
 export namespace ElasticSearchType {
 
-    export function contextNaturalKeyForType(key: ElasticSearchType) {
+    export function contextNaturalKeyForType(key: ElasticSearchType):ContextNaturalKey {
         switch (key) {
             case ElasticSearchType.GROUP: return ContextNaturalKey.GROUP
             case ElasticSearchType.COMMUNITY: return ContextNaturalKey.COMMUNITY
@@ -1003,19 +1205,22 @@ export type AvatarAndCover = {
     cover_thumbnail: string
 }
 export type Conversation =
-    {
-        title: string
-        users: number[]
-        archived_by?: number[]
-        last_message: Message
-        read_by: any[]
-        absolute_url?: string
-        created_at: string
-        updated_at: string
-        unread_messages: number[]
-        temporary?: boolean
+{
+    title: string
+    users: number[]
+    archived_by?: number[]
+    last_message: Message
+    read_by: any[]
+    absolute_url?: string
+    created_at: string
+    updated_at: string
+    unread_messages: number[]
+    temporary?: boolean
+    temporary_id?:number
+    private?:boolean 
+    admins?:number[]
 
-    } & Linkable & IdentifiableObject & Permissible
+} & Linkable & IdentifiableObject & Permissible
 
 export type ICommunity = {
     cover_thumbnail: string
@@ -1033,6 +1238,10 @@ export type Community = {
     relationship: any
     description: string
     updated_at: string
+    visit_count:number
+    last_visited:string
+    privacy: ContextPrivacy
+    category:CommunityCategory
 } & ICommunity & AvatarAndCover & Permissible
 
 export type SimpleUserProfile = {
@@ -1063,6 +1272,7 @@ export type UserProfile = {
     connections?: number[]
     active_community?: number
     mutual_contacts: ProfileConnections
+    unresolved_time?:string
 } & SimpleUserProfile & AvatarAndCover & Linkable & Permissible
 
 export type Group = {
@@ -1071,7 +1281,7 @@ export type Group = {
     community: number
     description: string
     creator: UserProfile
-    privacy: string
+    privacy: ContextPrivacy
     members: number[]
     members_count: number
     created_at: string
@@ -1096,7 +1306,7 @@ export type Event = {
     community: number
     description: string
     creator: UserProfile
-    privacy: string
+    privacy: ContextPrivacy
     attending: number[]
     attending_count: number
     not_attending: number[]
@@ -1120,7 +1330,7 @@ export type Project = {
     community: number
     description: string
     creator: UserProfile
-    privacy: string
+    privacy: ContextPrivacy
     tasks: number
     tags: string[]
     managers: number[]
@@ -1316,7 +1526,7 @@ const UserStatusObjects: { [key: string]: UserStatusItem } = {
 export namespace UserStatus {
 
     export function getObject(status: UserStatus) {
-        return UserStatusObjects[status]
+        return UserStatusObjects[status] || UserStatusObjects[UserStatus.invisible]
     }
     export function getTranslation(status: UserStatus) {
         return translate("user.status." + status)

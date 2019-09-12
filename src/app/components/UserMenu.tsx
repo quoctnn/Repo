@@ -14,8 +14,9 @@ import { UserStatusIndicator } from './general/UserStatusIndicator';
 import { translate } from '../localization/AutoIntlProvider';
 import Routes from '../utilities/Routes';
 import { Popover, PopoverBody } from 'reactstrap';
-import { Avatar } from './general/Avatar';
+import Avatar from './general/Avatar';
 import { userAvatar } from '../utilities/Utilities';
+import Popper from 'popper.js';
 
 export const sendUserStatus = (status: UserStatus) => {
     WindowAppManager.sendOutgoingOnSocket(
@@ -123,8 +124,12 @@ class UserMenu extends React.Component<Props, State> {
         selectableDropdownItems.push({id:"profile", type:OverflowMenuItemType.option, title:translate("common.page.profile"), onPress:this.navigateToProfile})
         selectableDropdownItems.push({id:"all", type:OverflowMenuItemType.option, title:translate("Sign out"), onPress:this.signOut})
         const cn = classnames("dropdown-menu-popover", "user-status-dropdown")
+        const modifiers:Popper.Modifiers = {
+            flip: { behavior: ['bottom', 'top', 'bottom'] }
+          }
         return <Popover className={cn}
                         delay={0}
+                        modifiers={modifiers}
                         trigger="legacy"
                         placement="bottom"
                         hideArrow={false}
@@ -141,9 +146,8 @@ class UserMenu extends React.Component<Props, State> {
         const profile = this.props.profile
         if (!this.props.profile || this.props.profile.is_anonymous)
             return <Link className="btn btn-sm btn-outline-secondary" to={Routes.SIGNIN}>{translate("Sign in")}</Link>
-        const currentStatus = UserStatus.getObject(profile.user_status)
         return <div ref={(ref) => this.triggerRef = ref} className="trigger d-flex align-items-center">
-                    <Avatar onClick={this.onTriggerClick} image={userAvatar(this.props.profile, true)} size={40} statusColor={currentStatus && currentStatus.color} >
+                    <Avatar onClick={this.onTriggerClick} image={userAvatar(this.props.profile, true)} size={40} userStatus={profile.id}>
                     </Avatar>
                 </div>
     }

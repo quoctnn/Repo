@@ -7,11 +7,15 @@
     .search-box:last-child{
         margin-bottom:1rem;
     }
+    .modal-close{
+        align-self: baseline;
+    }
 }
 .search-modal .modal-body{
     padding-top: 0;
 }
 .search-component{
+    flex-grow: 1;
     .search-box, .search-box .form-control{
         @include var(background-color, main-content-secondary-background);
     }

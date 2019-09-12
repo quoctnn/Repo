@@ -3,7 +3,7 @@ import { ReduxState } from '../redux/index';
 import { setApplicationLoadedAction } from '../redux/application';
 import { AuthenticationManager } from './AuthenticationManager';
 import { Dashboard } from '../types/intrasocial_types';
-import ApiClient, { ListOrdering } from '../network/ApiClient';
+import {ApiClient,  ListOrdering } from '../network/ApiClient';
 import { ToastManager } from './ToastManager';
 import { CommunityManager } from './CommunityManager';
 import { NotificationCenter } from '../utilities/NotificationCenter';
@@ -23,8 +23,6 @@ import { resetEmbedlyStoreAction } from '../components/general/embedly/redux';
 import { resetUnreadNotificationsAction } from '../redux/unreadNotifications';
 import { FavoriteManager } from './FavoriteManager';
 import { Settings } from '../utilities/Settings';
-import { Redirect } from 'react-router';
-import { noop } from 'react-select/lib/utils';
 import { resetAuthenticationData } from '../redux/authentication';
 
 export type ApplicationData = {
@@ -82,7 +80,8 @@ export abstract class ApplicationManager
             switch (result) {
                 case (0):
                     requests.push({name:"Dashboards", action:ApplicationManager.fetchDashboards})
-                    requests.push({name:"Communities", action:ApplicationManager.fetchCommunities})
+                    requests.push({name:"Communities", action:ApplicationManager.fetchMostUsedCommunities})
+                    requests.push({name:"Communities", action:ApplicationManager.fetchRecentCommunities})
                     requests.push({name:"Profile", action:ApplicationManager.fetchProfile})
                     requests.push({name:"Contacts", action:ApplicationManager.fetchContacts})
                     requests.push({name:"Favorites", action:ApplicationManager.fetchFavorites})
@@ -131,15 +130,23 @@ export abstract class ApplicationManager
             const dashboards = (data && data.results) || []
             ApplicationManager.setAllDashboards(dashboards)
             completion()
-            ToastManager.showErrorToast(error)
+            ToastManager.showRequestErrorToast(error)
         })
     }
-    private static fetchCommunities = (completion:() => void) => {
-        ApiClient.getCommunities(true, ListOrdering.ALPHABETICALLY, 100, 0, (data, status, error) => {
+    private static fetchMostUsedCommunities = (completion:() => void) => {
+        ApiClient.getCommunities(true, ListOrdering.MOST_USED, 10, 0, (data, status, error) => {
             const communities = (data && data.results) || []
-            CommunityManager.storeCommunities(communities)
+            CommunityManager.storeCommunities(communities, true)
             completion()
-            ToastManager.showErrorToast(error)
+            ToastManager.showRequestErrorToast(error)
+        })
+    }
+    private static fetchRecentCommunities = (completion:() => void) => {
+        ApiClient.getCommunities(true, ListOrdering.RECENT, 10, 0, (data, status, error) => {
+            const communities = (data && data.results) || []
+            CommunityManager.storeCommunities(communities, true)
+            completion()
+            ToastManager.showRequestErrorToast(error)
         })
     }
     private static fetchProfile = (completion:() => void) => {
@@ -147,7 +154,7 @@ export abstract class ApplicationManager
             const profile = data
             AuthenticationManager.setAuthenticatedUser(profile)
             completion()
-            ToastManager.showErrorToast(error)
+            ToastManager.showRequestErrorToast(error)
         })
     }
     private static fetchContacts = (completion:() => void) => {
@@ -155,7 +162,7 @@ export abstract class ApplicationManager
             const profiles = (data && data.results) || []
             ProfileManager.storeProfiles(profiles, true)
             completion()
-            ToastManager.showErrorToast(error)
+            ToastManager.showRequestErrorToast(error)
         })
     }
     private static fetchFavorites = (completion:() => void) => {
@@ -163,7 +170,7 @@ export abstract class ApplicationManager
             const favorites = (data && data.results) || []
             FavoriteManager.setFavoritesToStore(favorites)
             completion()
-            //ToastManager.showErrorToast(error)
+            //ToastManager.showRequestErrorToast(error)
         })
     }
     private static setApplicationLoaded = () => {

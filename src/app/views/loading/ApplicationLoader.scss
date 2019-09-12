@@ -3,7 +3,7 @@
 $bgcolorstop1: rgba(46, 103, 217, 0.8);
 $bgcolorstop2: rgba(114, 213, 114, 0.8);
 
-#application-loader{    
+#application-loader{
     position: fixed;
     top: 0;
     bottom: 0;
@@ -17,7 +17,7 @@ $bgcolorstop2: rgba(114, 213, 114, 0.8);
         right:0;
     }
     .triangles-bg{
-        background-image: url("../../assets/triangles-grey.png");
+        background-image: url("../../assets/triangles-grey.jpg");
         background-size: cover;
     }
     .gradient-bg{

@@ -1,6 +1,6 @@
 import {  Store } from 'redux';
 import { Project } from '../types/intrasocial_types';
-import ApiClient from '../network/ApiClient';
+import {ApiClient} from '../network/ApiClient';
 import { ReduxState } from '../redux';
 import { addProjectsAction } from '../redux/projectStore';
 export abstract class ProjectManager

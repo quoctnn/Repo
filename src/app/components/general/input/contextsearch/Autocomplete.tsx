@@ -1,7 +1,7 @@
 import * as React from 'react';
 import classNames from "classnames";
 import { nullOrUndefined } from '../../../../utilities/Utilities';
-import { Avatar } from '../../Avatar';
+import Avatar from '../../Avatar';
 export class AutocompleteSection 
 {
     type:string

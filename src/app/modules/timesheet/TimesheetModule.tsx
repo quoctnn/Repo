@@ -11,7 +11,7 @@ import SimpleModule from '../SimpleModule';
 import { translate } from '../../localization/AutoIntlProvider';
 import ListComponent from '../../components/general/ListComponent';
 import TimesheetListItem from './TimesheetListItem';
-import ApiClient, { PaginationResult } from '../../network/ApiClient';
+import {ApiClient,  PaginationResult } from '../../network/ApiClient';
 import { ToastManager } from '../../managers/ToastManager';
 import { ContextManager } from '../../managers/ContextManager';
 import { CommonModuleProps } from '../Module';
@@ -71,7 +71,7 @@ class TimesheetModule extends React.Component<Props, State> {
         const communityId = this.props.contextNaturalKey == ContextNaturalKey.COMMUNITY ? contextId : undefined
         ApiClient.getTimesheets(communityId, userId, projectId, taskId, this.props.pageSize, offset, (data, status, error) => {
             completion(data)
-            ToastManager.showErrorToast(error)
+            ToastManager.showRequestErrorToast(error)
         })
     }
     renderTimesheet = (timesheet:Timesheet) =>  {

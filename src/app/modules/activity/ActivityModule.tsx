@@ -6,7 +6,7 @@ import { RecentActivity } from '../../types/intrasocial_types';
 import SimpleModule from '../SimpleModule';
 import { translate } from '../../localization/AutoIntlProvider';
 import ListComponent from '../../components/general/ListComponent';
-import ApiClient, { PaginationResult } from '../../network/ApiClient';
+import {ApiClient,  PaginationResult } from '../../network/ApiClient';
 import { ToastManager } from '../../managers/ToastManager';
 import ActivityItem  from './ActivityItem';
 import { NotificationCenter } from '../../utilities/NotificationCenter';
@@ -73,7 +73,7 @@ class ActivityModule extends React.Component<Props, State> {
     fetchActivity = (offset:number, completion:(items:PaginationResult<RecentActivity>) => (void)) => {
         ApiClient.getRecentActivity(this.props.pageSize, offset, (data, status, error) => {
             completion(data)
-            ToastManager.showErrorToast(error)
+            ToastManager.showRequestErrorToast(error)
         })
     }
     renderActivity = (activity:RecentActivity) =>  {

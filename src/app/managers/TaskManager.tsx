@@ -1,6 +1,6 @@
 import {  Store } from 'redux';
 import { Task } from '../types/intrasocial_types';
-import ApiClient from '../network/ApiClient';
+import {ApiClient} from '../network/ApiClient';
 import { ReduxState } from '../redux';
 import { addTasksAction } from '../redux/taskStore';
 export abstract class TaskManager

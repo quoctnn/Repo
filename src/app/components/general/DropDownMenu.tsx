@@ -3,6 +3,7 @@ import { Popover, PopoverBody, Button } from 'reactstrap';
 import classnames = require('classnames');
 import { OverflowMenuItem, createDropdownItem } from './OverflowMenu';
 import "./DropDownMenu.scss"
+import Popper from 'popper.js';
 type Props = {
     items:(() => OverflowMenuItem[]) | OverflowMenuItem[]
     className?:string
@@ -63,6 +64,7 @@ export class DropDownMenu extends React.Component<Props, State> {
             return null
         const items =  Array.isArray(this.props.items) ? this.props.items : this.props.items()
         const cn = classnames("dropdown-menu-popover", this.props.className)
+        const modifiers:Popper.Modifiers = Object.assign({flip: { behavior: ['bottom', 'top', 'bottom'] } }, this.props.modifiers || {})
         return <Popover className={cn}
                         delay={0} 
                         trigger="legacy" 
@@ -71,7 +73,7 @@ export class DropDownMenu extends React.Component<Props, State> {
                         isOpen={this.state.popoverVisible} 
                         target={this.triggerRef.current} 
                         toggle={this.closePopoverPanel}
-                        modifiers={this.props.modifiers}
+                        modifiers={modifiers}
                         >
                     <PopoverBody className="pl-0 pr-0">
                         {items.map(i => createDropdownItem(i, this.closePopoverPanel))}

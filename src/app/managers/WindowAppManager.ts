@@ -3,7 +3,7 @@ import { ReduxState } from '../redux';
 import { resetProjectsAction } from '../redux/projectStore';
 import { resetEventsAction } from '../redux/eventStore';
 import ReconnectingWebSocket from "reconnecting-websocket";
-import { eventStreamNotificationPrefix } from '../network/ChannelEventStream';
+import { eventStreamNotificationPrefix, EventStreamMessageType } from '../network/ChannelEventStream';
 import { NotificationCenter } from '../utilities/NotificationCenter';
 import { ToastManager } from './ToastManager';
 import { translate } from '../localization/AutoIntlProvider';
@@ -12,7 +12,8 @@ import { resetMessageQueueAction } from '../redux/messageQueue';
 import { ApplicationManager } from './ApplicationManager';
 import { CommunityManager } from './CommunityManager';
 import { Settings } from '../utilities/Settings';
-import { setLanguageAction } from '../redux/language';
+import { setLanguageAction, availableLanguages } from '../redux/language';
+import { RequestErrorData } from '../types/intrasocial_types';
 
 const url = require('url');
 const path = require("path")
@@ -32,6 +33,8 @@ export type AppWindowObject = {
     setTheme:(index:number) => void
     navigateToRoute:(route:string, modal?:boolean) => void
     setLanguage:(index:number) => void
+    language:string
+    createError:() => void
 }
 export abstract class WindowAppManager
 {
@@ -51,15 +54,30 @@ export abstract class WindowAppManager
             setTheme:WindowAppManager.setTheme,
             resetMessageQueue:WindowAppManager.resetMessageQueue,
             navigateToRoute:WindowAppManager.navigateToRoute,
-            setLanguage:WindowAppManager.setLanguage
+            setLanguage:WindowAppManager.setLanguage,
+            language:WindowAppManager.language,
+            createError:WindowAppManager.createError
+            
         }
         //
+    }
+    static createError = () => {
+        try {
+            const f:() => void = null;
+            f()
+        } catch (e) {
+            const event = new ErrorEvent("error", {error:e})
+            window.dispatchEvent(event)
+        }
     }
     static setTheme = (index:number) => {
         ThemeManager.setTheme(index)
     }
     static setLanguage = (index:number) => {
         WindowAppManager.getStore().dispatch(setLanguageAction(index))
+    }
+    static get language(): string {
+        return availableLanguages[WindowAppManager.getStore().getState().language.language]
     }
     static sendMessageElectron = (channel:string, msg:any) => {
         if (window.isElectron) {
@@ -97,7 +115,7 @@ export abstract class WindowAppManager
     static sendInboundOnSocket = (data:{type:string, data:any}) => {
         if(!data || !data.type)
         {
-            ToastManager.showErrorToast(translate("common.data.error"))
+            ToastManager.showRequestErrorToast( new RequestErrorData( translate("common.data.error"), "error"))
             return
         }
         NotificationCenter.push(eventStreamNotificationPrefix + data.type,[data.data])

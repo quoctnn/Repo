@@ -7,8 +7,8 @@ import { ProfileManager } from '../../../managers/ProfileManager';
 import { Mention } from './MentionEditor';
 import classnames = require('classnames');
 import FilesUpload from '../../status/FilesUpload';
-import { translate } from '../../../localization/AutoIntlProvider';
-import ApiClient from '../../../network/ApiClient';
+import { translate, lazyTranslate } from '../../../localization/AutoIntlProvider';
+import {ApiClient} from '../../../network/ApiClient';
 import { ToastManager } from '../../../managers/ToastManager';
 import { uniqueId } from '../../../utilities/Utilities';
 import { NavigationUtilities } from '../../../utilities/NavigationUtilities';
@@ -245,7 +245,7 @@ export default class StatusEditorComponent extends React.Component<Props, State>
                     return
                 })
             }
-            ToastManager.showErrorToast(error, status, translate("Could not update filename"))
+            ToastManager.showRequestErrorToast(error, lazyTranslate("Could not update filename"))
         })
     }
     renderTextArea(canSubmit:boolean) {

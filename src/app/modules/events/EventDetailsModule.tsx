@@ -14,7 +14,6 @@ import { ReduxState } from '../../redux';
 import CircularLoadingSpinner from '../../components/general/CircularLoadingSpinner';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import { DetailsContent } from '../../components/details/DetailsContent';
-import { DetailsMembers } from '../../components/details/DetailsMembers';
 import { stringToDateFormat, DateFormat } from '../../utilities/Utilities';
 import { ContextManager } from '../../managers/ContextManager';
 const shortMonth:string[] = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
@@ -76,7 +75,7 @@ class EventDetailsModule extends React.Component<Props, State> {
                     <ModuleHeader className="event-detail" headerTitle={event && event.name || translate("detail.module.title")} loading={this.state.isLoading}>
                         <ModuleMenuTrigger onClick={this.menuItemClick} />
                     </ModuleHeader>
-                    {breakpoint >= ResponsiveBreakpoint.standard && //do not render for small screens
+                    {true && //breakpoint >= ResponsiveBreakpoint.standard && //do not render for small screens
                         <ModuleContent>
                             { event && event.permission >= Permission.read &&
                                 <div className="event-details-content">
@@ -100,29 +99,27 @@ class EventDetailsModule extends React.Component<Props, State> {
                             }
                         </ModuleContent>
                     }
-                    <ModuleFooter>
-                        { event && event.permission >= Permission.read &&
-                            <DetailsMembers>
-                                { startDate &&
-                                <div className="event-footer">
-                                    <div className="event-date-big">
-                                            <span>
-                                                {shortMonth[startDate.getMonth()].toUpperCase()}<br/>
-                                                {startDate.getDate()}
-                                            </span>
-                                    </div>
-                                    <div className="event-start-end text-truncate">
-                                        <div className="details-field-value">
-                                            {stringToDateFormat(event.start, DateFormat.date)}
-                                            &nbsp;-<br/>
-                                            {stringToDateFormat(event.end, DateFormat.date)}
-                                        </div>
+                    { event && event.permission >= Permission.read &&
+                        <ModuleFooter>
+                            { startDate &&
+                            <div className="event-footer">
+                                <div className="event-date-big">
+                                        <span>
+                                            {shortMonth[startDate.getMonth()].toUpperCase()}<br/>
+                                            {startDate.getDate()}
+                                        </span>
+                                </div>
+                                <div className="event-start-end text-truncate">
+                                    <div className="details-field-value">
+                                        {stringToDateFormat(event.start, DateFormat.date)}
+                                        &nbsp;-<br/>
+                                        {stringToDateFormat(event.end, DateFormat.date)}
                                     </div>
                                 </div>
-                                }
-                            </DetailsMembers>
-                        }
-                    </ModuleFooter>
+                            </div>
+                            }
+                        </ModuleFooter>
+                    }
                 </Module>)
     }
 }

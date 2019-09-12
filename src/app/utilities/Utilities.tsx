@@ -11,6 +11,7 @@ import Link from '../components/general/Link';
 import { Link as ReactLink } from 'react-router-dom';
 import { ContextManager } from '../managers/ContextManager';
 import IntraSocialMention from '../components/general/IntraSocialMention';
+var HtmlToReactParser = require('html-to-react').Parser
 let timezone = moment.tz.guess()
 export const getDomainName = (url: string) => {
     var url_parts = url.split("/")
@@ -28,7 +29,14 @@ export const parseJSONObject = (param: string) => {
     }
     return null
 }
-
+export const removeEmptyEntriesFromObject = <T extends {}>(object:T):T => {
+    const newObject = Object.keys(object).reduce((acc, key) => {
+        const _acc = acc;
+        if (object[key] !== undefined) _acc[key] = object[key];
+        return _acc;
+      }, {} as T)
+    return newObject
+}
 export function userFullName(user: SimpleUserProfile | UserProfile, fallback?: string) {
     if (!user) {
         if (fallback !== undefined)
@@ -56,7 +64,7 @@ export function userAvatar(user: UserProfile, thumbnail = false) {
     let val: string = null
     if (user)
         val = thumbnail ? user.avatar_thumbnail || user.avatar : user.avatar || user.avatar_thumbnail
-    return val || Constants.resolveUrl(Constants.defaultImg.user)()
+    return val || Constants.resolveUrl(Constants.defaultImg.userAvatar)()
 }
 export function communityAvatar(community: Community, thumbnail = false) {
     let val: string = null
@@ -203,17 +211,53 @@ export class MentionData{
         return this.contextObject = ContextManager.getStoreObject(this.contextNaturalKey, this.contextId)
     }
 }
+export const getTextContent2 = (prefixId: string, text: string, includeEmbedlies: boolean, truncateLength: number = 0, linebreakLimit: number = 0) => {
+    var htmlToReactParser = new HtmlToReactParser()
+    var reactElements:JSX.Element[] = htmlToReactParser.parse(text);
+    let result:JSX.Element[] = []
+    reactElements.forEach(e => {
+        if(e.props && e.props.children)
+        {
+            const content:React.ReactNode = e.props.children
+            if(Array.isArray(content))
+            {
+                console.log("not implemented")
+            }
+            else if (typeof content == "string")
+            {
+                const data = getTextContent(prefixId, content, includeEmbedlies, 0, 0)
+                if(data.modified)
+                {
+                    const {children, ...rest} = e.props
+                    const el = React.cloneElement(e, rest, data.textContent)
+                    result.push(el)
+                }
+                else {
+                    result.push(e)
+                }
+            }
+        }
+        else if (typeof e == "string")
+        {
+            const data = getTextContent(prefixId, e, includeEmbedlies, 0, 0)
+            result.push(...data.textContent)
+        }
+    })
+    return result
+}
 export function getTextContent(prefixId: string, text: string, includeEmbedlies: boolean, truncateLength: number = 0, linebreakLimit: number = 0) {
     var processed: any = null
     var config = []
     let embedlyArr: { [id: string]: JSX.Element } = {}
     let seed = 0
+    let modified = false
     const getKey = (key: string) => {
         return `${prefixId}_${key}_${seed++}`
     }
     const embedlies = {
         regex: URL_REGEX,
         fn: (key, result) => {
+            modified = true
             if (includeEmbedlies) {
                 embedlyArr[result[0]] = <Embedly renderOnError={false} key={getKey("embedly_" + result[0])} url={result[0]} />
             }
@@ -225,6 +269,7 @@ export function getTextContent(prefixId: string, text: string, includeEmbedlies:
         const hashtags = {
             regex: HASHTAG_REGEX_WITH_HIGHLIGHT,
             fn: (key, result) => {
+                modified = true
                 const href = Routes.searchUrl(result[0])//result[1] == without #
                 return (<ReactLink title={translate("search.for") + " " + result[0]} key={getKey("hashtag" + result[0])} to={{pathname:Routes.SEARCH, state:{modal:true}, search:"term=" + encodeURIComponent(result[0])}}>{result[0]}</ReactLink>)
             }
@@ -234,6 +279,7 @@ export function getTextContent(prefixId: string, text: string, includeEmbedlies:
     const breaks = {
         regex: LINEBREAK_REGEX,
         fn: (key, result) => {
+            modified = true
             return (<br key={uniqueId()} />)
         }
     }
@@ -241,6 +287,7 @@ export function getTextContent(prefixId: string, text: string, includeEmbedlies:
     const mentionSearch = {
         regex: MENTION_REGEX,
         fn: (key, result:string[]) => {
+            modified = true
             const data = MentionData.fromRegex(result)
             return <IntraSocialMention key={getKey(key)} data={data} />
         }
@@ -258,7 +305,7 @@ export function getTextContent(prefixId: string, text: string, includeEmbedlies:
         hasMore = truncatedResult.rest.length > 0
         length = truncatedResult.length
     }
-    const ret: { textContent: JSX.Element[], linkCards: JSX.Element[], hasMore: boolean, length:number } = { textContent: flatten, linkCards: [], hasMore, length }
+    const ret: { textContent: JSX.Element[], linkCards: JSX.Element[], hasMore: boolean, length:number, modified:boolean } = { textContent: flatten, linkCards: [], hasMore, length, modified }
     if (includeEmbedlies && embedKeys.length > 0) {
         ret.linkCards = embedKeys.map(k => embedlyArr[k])
     }
@@ -445,3 +492,12 @@ export const normalizeIndex = (selectedIndex, max) => {
     }
     return index;
 }
+export const shallowCompare = (obj1:Object, obj2:Object) =>
+  Object.keys(obj1).length === Object.keys(obj2).length &&
+  Object.keys(obj1).every(key => 
+    obj2.hasOwnProperty(key) && obj1[key] === obj2[key]
+  )
+export const shallowCompareFields = (keys:string[], obj1:Object, obj2:Object) =>
+    keys.every(key => 
+        obj1.hasOwnProperty(key) && obj2.hasOwnProperty(key) && obj1[key] === obj2[key]
+  )

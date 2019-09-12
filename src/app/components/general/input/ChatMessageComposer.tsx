@@ -195,7 +195,7 @@ export class ChatMessageComposer extends React.Component<Props,State> {
                 nextProps.content != this.props.content ||
                 nextProps.className != this.props.className ||
                 nextProps.forceUpdate != this.props.forceUpdate ||
-                nextProps.singleLine != this.props.singleLine 
+                nextProps.singleLine != this.props.singleLine
         return update
     }
     componentDidUpdate = (prevProps:Props) => {
@@ -209,7 +209,11 @@ export class ChatMessageComposer extends React.Component<Props,State> {
         }
     }
     clearEditorContent = () => {
-
+        const editorState = EditorState.push(this.state.editorState, ContentState.createFromText(''), "change-block-data");
+        this.setState(() => {
+            return { editorState, plainText:"" }
+        })
+        this.focusEnd()
     }
     getContent = () => {
         return this.getProcessedText()

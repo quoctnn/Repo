@@ -1,5 +1,5 @@
 import {  Store } from 'redux';
-import ApiClient from '../network/ApiClient';
+import {ApiClient} from '../network/ApiClient';
 import { Conversation, Message, UserProfile, Permission } from '../types/intrasocial_types';
 import { EventStreamMessageType } from '../network/ChannelEventStream';
 import { ReduxState } from '../redux';
@@ -10,7 +10,7 @@ import { NotificationCenter } from '../utilities/NotificationCenter';
 import Routes from '../utilities/Routes';
 import { ProfileManager } from './ProfileManager';
 import { ToastManager } from './ToastManager';
-import { translate } from '../localization/AutoIntlProvider';
+import { translate, lazyTranslate } from '../localization/AutoIntlProvider';
 import { setTemporaryConversationAction } from '../redux/tempCache';
 import { nullOrUndefined } from '../utilities/Utilities';
 import { WindowAppManager } from './WindowAppManager';
@@ -43,15 +43,15 @@ export abstract class ConversationManager
             {
                 ConversationManager.removeConversation(conversationId)
             }
-            ToastManager.showErrorToast(error)
+            ToastManager.showRequestErrorToast(error)
             completion(success)
         })
     }
     static archiveConversation = (conversationId:number, completion:(success:boolean) => void) =>
     {
-        ApiClient.deleteConversation(conversationId, (data, status, error) => {
+        ApiClient.archiveConversation(conversationId, (data, status, error) => {
             const success = nullOrUndefined(error)
-            ToastManager.showErrorToast(error)
+            ToastManager.showRequestErrorToast(error)
             completion(success)
         })
     }
@@ -107,7 +107,7 @@ export abstract class ConversationManager
         })
 
     }
-    static createTemporaryConversation = () => {
+    static createTemporaryConversation = (creator:number) => {
 
         let store = ConversationManager.getStore()
         const now = Date.now()
@@ -125,11 +125,14 @@ export abstract class ConversationManager
             read_by:[],
             uri:Routes.conversationUrl("new"),
             permission:Permission.post,
-            temporary:true
+            temporary:true,
+            
         }
         store.dispatch(setTemporaryConversationAction(conversation))
     }
     static updateTemporaryConversation = (conversation:Conversation) => {
+        if(!!conversation)
+            conversation.updated_at = new Date().toUTCString()
         let store = ConversationManager.getStore()
         const tempConversation = store.getState().tempCache.conversation
         store.dispatch(setTemporaryConversationAction(conversation))
@@ -174,11 +177,19 @@ export abstract class ConversationManager
     {
         ApiClient.leaveConversation(conversationId, (data, status, error) => {
             const success = !error
-            ToastManager.showErrorToast(error, status, translate("Could not leave conversation"))
+            ToastManager.showRequestErrorToast(error, lazyTranslate("Could not leave conversation"))
             if(success)
             {
                 ConversationManager.removeConversation(conversationId)
             }
+            completion(success)
+        })
+    }
+    static removeUsersFromConversation = (conversationId:number, users:number[], completion:(success:boolean) => void) =>
+    {
+        ApiClient.removeConversationUsers(conversationId, users, (data, status, error) => {
+            const success = !error
+            ToastManager.showRequestErrorToast(error, lazyTranslate("Could not remove user(s) from conversation"))
             completion(success)
         })
     }

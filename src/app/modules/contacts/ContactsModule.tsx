@@ -1,11 +1,11 @@
 import * as React from "react";
 import { connect, DispatchProp } from 'react-redux'
 import "./ContactsModule.scss"
-import { UserProfile, UserStatus } from '../../types/intrasocial_types';
+import { UserProfile } from '../../types/intrasocial_types';
 import { NotificationCenter } from "../../utilities/NotificationCenter";
 import { EventStreamMessageType } from "../../network/ChannelEventStream";
 import { EventSubscription } from "fbemitter";
-import { Avatar } from "../../components/general/Avatar";
+import Avatar from "../../components/general/Avatar";
 import { Link } from "react-router-dom";
 import Routes from "../../utilities/Routes";
 import { ReduxState } from "../../redux";
@@ -86,11 +86,10 @@ class ContactsModule extends React.PureComponent<Props, State> {
         completion({results:contacts, count:contacts.length})
     }
     renderContact = (contact:UserProfile) => {
-        const userStatus = UserStatus.getObject(contact.user_status)
         return <div className="avatar-profile main-content-secondary-background" key={"contact_" + contact.id}>
                     <Link className="d-flex flex-column" to={Routes.profileUrl(contact.slug_name)}>
                         <div className="d-flex header">
-                            <Avatar size={34} image={contact.avatar} borderColor="white" borderWidth={2} statusColor={userStatus && userStatus.color}>
+                            <Avatar size={34} image={contact.avatar} borderColor="white" borderWidth={2} userStatus={contact.id} >
                             {this.state.isTyping[contact.id] && <div className="typing-indicator-container"><TypingIndicator /></div>}
                             </Avatar>
                         </div>

@@ -10,7 +10,7 @@ import { translate } from "../../../localization/AutoIntlProvider";
 import { RouteComponentProps, withRouter } from "react-router";
 import { ContextNaturalKey, UserProfile, ProfileEducation } from "../../../types/intrasocial_types";
 import { ContextManager } from "../../../managers/ContextManager";
-import ApiClient from '../../../network/ApiClient';
+import {ApiClient} from '../../../network/ApiClient';
 import { stringToDateFormat, DateFormat } from '../../../utilities/Utilities';
 import CVListItem from "../CVListItem";
 
@@ -83,18 +83,18 @@ class ProfileEducationModule extends React.PureComponent<Props, State> {
     shouldModuleRender = () => {
         return this.state.educations && this.state.educations.length > 0
     }
-    render = () => 
+    render = () =>
     {
         const shouldRender = this.shouldModuleRender()
         if(!shouldRender)
             return null
         const {className, breakpoint, contextNaturalKey, pageSize, showLoadMore, showInModal, isModal, dispatch, staticContext, profile, history, location, match, ...rest} = this.props
         const cn = classnames("profile-education-module", className)
-        return <SimpleModule {...rest} 
+        return <SimpleModule {...rest}
                 showHeader={!isModal}
-                className={cn} 
-                breakpoint={breakpoint} 
-                isLoading={false} 
+                className={cn}
+                breakpoint={breakpoint}
+                isLoading={false}
                 headerTitle={translate("profile.module.education.title")}>
                 <div className="content">
                     {this.renderContent()}

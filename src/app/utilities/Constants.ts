@@ -63,6 +63,15 @@ export default  {
         communityUrl: (id:number|string) => {
             return `/api/v2/community/${id}/`
         },
+        communityConfigurationUrl: (id:number|string) => {
+            return `/api/v2/community/${id}/configuration/`
+        },
+        communityAvatarUrl: (id:number) => {
+            return `/api/v2/community/${id}/avatar/`
+        },
+        communityCoverUrl: (id:number) => {
+            return `/api/v2/community/${id}/cover/`
+        },
         setMainCommunityUrl: (id:number|string) => {
             return `/api/v2/community/${id}/set-as-main`
         },
@@ -266,11 +275,17 @@ export default  {
         conversation: (id:number) => {
             return `/api/v2/conversation/${id}/`
         },
+        archiveConversation: (id:number) => {
+            return `/api/v2/conversation/${id}/archive/`
+        },
         leaveConversation: (id:number) => {
             return `/api/v2/conversation/${id}/leave/`
         },
         addConversationUsers: (id:number) => {
             return `/api/v2/conversation/${id}/add-users/`
+        },
+        removeConversationUsers: (id:number) => {
+            return `/api/v2/conversation/${id}/kick/`
         },
         conversations: '/api/v2/conversation/',
         composeMessageUrl: '/api/v1/conversation/compose/',

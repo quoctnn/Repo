@@ -5,7 +5,7 @@ import { Community, ContextNaturalKey } from '../../types/intrasocial_types';
 import { communityCover } from '../../utilities/Utilities';
 import { SecureImage } from '../../components/general/SecureImage';
 import { IntraSocialLink } from '../../components/general/IntraSocialLink';
-import ApiClient from '../../network/ApiClient';
+import {ApiClient} from '../../network/ApiClient';
 import { Button } from 'reactstrap';
 import { translate } from '../../localization/AutoIntlProvider';
 import { ToastManager } from '../../managers/ToastManager';

@@ -8,7 +8,7 @@ import CircularLoadingSpinner from '../../components/general/CircularLoadingSpin
 import { ContextNaturalKey, Community } from '../../types/intrasocial_types';
 import CommunitiesMenu, { CommunitiesMenuData } from './CommunitiesMenu';
 import ListComponent from '../../components/general/ListComponent';
-import ApiClient, { PaginationResult, ListOrdering } from '../../network/ApiClient';
+import {ApiClient,  PaginationResult, ListOrdering } from '../../network/ApiClient';
 import { ToastManager } from '../../managers/ToastManager';
 import { connect } from 'react-redux';
 import { ReduxState } from '../../redux';
@@ -70,7 +70,7 @@ class CommunitiesModule extends React.Component<Props, State> {
         const isMember = this.props.isMember || true
         ApiClient.getCommunities(isMember, ListOrdering.MOST_USED, this.props.pageSize, offset, (data, status, error) => {
             completion(data)
-            ToastManager.showErrorToast(error)
+            ToastManager.showRequestErrorToast(error)
         })
     }
     renderCommunity = (community: Community) => {

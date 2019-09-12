@@ -13,7 +13,7 @@ import { CommonModuleProps } from '../Module'
 import { CalendarMenuData } from './CalendarMenu'
 import { Calendar, momentLocalizer, View, NavigateAction } from 'react-big-calendar';
 import * as moment from 'moment'
-import ApiClient from '../../network/ApiClient';
+import {ApiClient} from '../../network/ApiClient';
 import { CalendarItem, Task, Event } from '../../types/intrasocial_types';
 import { IntraSocialUtilities } from '../../utilities/IntraSocialUtilities';
 import { CalendarToolbar } from './CalendarToolbar';
@@ -30,11 +30,11 @@ export const createEvent = (data:(CalendarItem | Event | Task) & CalendarObject 
     switch (data.object_type) {
         case "Event":{
             const event = data as Event
-            return {icon:"fas fa-calendar", 
-                    start:moment(event.start).tz(timezone).toDate(), 
-                    end:moment(event.end).tz(timezone).toDate(), 
-                    title:event.name, 
-                    description: IntraSocialUtilities.htmlToText(data.description), 
+            return {icon:"fas fa-calendar",
+                    start:moment(event.start).tz(timezone).toDate(),
+                    end:moment(event.end).tz(timezone).toDate(),
+                    title:event.name,
+                    description: IntraSocialUtilities.htmlToText(data.description),
                     resource:data,
                     uri:event.uri,
                     hexColor:"FB0E7A",
@@ -43,11 +43,11 @@ export const createEvent = (data:(CalendarItem | Event | Task) & CalendarObject 
         case "Task":{
             const task = data as Task
             return {icon:"fas fa-tasks",
-                    start:moment(task.due_date).tz(timezone).startOf('day').toDate(), 
-                    end:moment(task.due_date).tz(timezone).startOf('day').toDate(), 
-                    allDay:true,  
-                    title:task.title, 
-                    description:IntraSocialUtilities.htmlToText(data.description), 
+                    start:moment(task.due_date).tz(timezone).startOf('day').toDate(),
+                    end:moment(task.due_date).tz(timezone).startOf('day').toDate(),
+                    allDay:true,
+                    title:task.title,
+                    description:IntraSocialUtilities.htmlToText(data.description),
                     resource:data,
                     uri:task.uri,
                     hexColor:"4E13F5",
@@ -71,12 +71,12 @@ export const createEvent = (data:(CalendarItem | Event | Task) & CalendarObject 
 }
 export const filterCalendarEvents = (date:Date, events:CalendarEvent[]) => {
     if(!events || events.length == 0)
-        return events 
+        return events
     const day = moment(date).startOf('day')
     const filtered =  events.filter(event => {
             const s = event.start && moment(event.start)
             const e = event.end && moment(event.end)
-            return (s && s.isSame(day, "day")) || 
+            return (s && s.isSame(day, "day")) ||
                     (e && e.isSame(day, "day") && day.diff(e, "seconds") >= 60) ||
                     (s && e && day > s && day < e )
     }).sort((a, b) => {
@@ -181,7 +181,7 @@ class CalendarModule extends React.Component<Props, State> {
     menuDataUpdated = (data: CalendarMenuData) => {
         this.tempMenuData = data
     }
-    
+
     onCalendarNavigate = (newDate: Date, view: View, action: NavigateAction) => {
         console.log("cal navigated", newDate, view, action)
         if(view == "month" && (action == "NEXT" || action == "PREV"))

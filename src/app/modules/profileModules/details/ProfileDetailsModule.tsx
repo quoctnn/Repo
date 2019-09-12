@@ -12,7 +12,7 @@ import { userFullName, stringToDate, DateFormat } from '../../../utilities/Utili
 import ModuleContent from "../../ModuleContent";
 import ModuleHeader from "../../ModuleHeader";
 import ModuleFooter from '../../ModuleFooter';
-import ApiClient from "../../../network/ApiClient";
+import {ApiClient} from "../../../network/ApiClient";
 import { translate } from "../../../localization/AutoIntlProvider";
 import { AuthenticationManager } from '../../../managers/AuthenticationManager';
 import StackedAvatars from "../../../components/general/StackedAvatars";
@@ -21,8 +21,6 @@ import { Moment } from "moment-timezone";
 import Routes from '../../../utilities/Routes';
 import { OverflowMenuItem, OverflowMenuItemType, createDropdownItem } from '../../../components/general/OverflowMenu';
 import { PopoverBody, Popover } from 'reactstrap';
-import { profileStore } from '../../../redux/profileStore';
-import { ProfileManager } from '../../../managers/ProfileManager';
 import moment = require("moment");
 
 type TimezoneInfoProps = {

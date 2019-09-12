@@ -8,9 +8,9 @@ import { connect } from 'react-redux';
 import { ReduxState } from '../../redux';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import SimpleModule from '../SimpleModule';
-import { translate } from '../../localization/AutoIntlProvider';
+import { translate, lazyTranslate } from '../../localization/AutoIntlProvider';
 import ListComponent from '../../components/general/ListComponent';
-import ApiClient, { PaginationResult } from '../../network/ApiClient';
+import {ApiClient,  PaginationResult } from '../../network/ApiClient';
 import { ToastManager } from '../../managers/ToastManager';
 import FileListItem from './FileListItem';
 import { ContextManager } from '../../managers/ContextManager';
@@ -41,7 +41,7 @@ type ReduxStateProps = {
 type ReduxDispatchProps = {
 }
 type Props = OwnProps & RouteComponentProps<any> & ReduxStateProps & ReduxDispatchProps
-class FilesModule extends React.Component<Props, State> {  
+class FilesModule extends React.Component<Props, State> {
     filesList = React.createRef<ListComponent<UploadedFile>>()
     private calculatedPageSize = 15
     private defaultPageSize = 15
@@ -81,7 +81,7 @@ class FilesModule extends React.Component<Props, State> {
         const pageSize = this.props.pageSize || this.calculatedPageSize
         ApiClient.getFiles(this.props.contextNaturalKey, contextId, pageSize, offset, (data, status, error) => {
             completion(data)
-            ToastManager.showErrorToast(error)
+            ToastManager.showRequestErrorToast(error)
         })
     }
     handleRenameFile = (file: UploadedFile, name: string) => {
@@ -92,7 +92,7 @@ class FilesModule extends React.Component<Props, State> {
             {
                 this.filesList.current.updateItem(data)
             }
-            ToastManager.showErrorToast(error, status, translate("Could not update filename"))
+            ToastManager.showRequestErrorToast(error, lazyTranslate("Could not update filename"))
         })
     }
     renderFile = (file:UploadedFile) =>  {
@@ -116,16 +116,16 @@ class FilesModule extends React.Component<Props, State> {
         const isListMode = this.isListMode()
         const targetWidth = isListMode ? 100000 : 200
         const updateKey = this.state.menuData.viewMode.toString()
-        return <ResizeObserverColumnsComponent className="d-flex flex-column" updateKey={updateKey} targetColumnWidth={targetWidth} 
+        return <ResizeObserverColumnsComponent className="d-flex flex-column" updateKey={updateKey} targetColumnWidth={targetWidth}
                 render={(state) => {
                     const cn = classnames("files-module-list grid")
                     this.calculatedPageSize = this.getCalculatedPageSize(state.colums, state.height, isListMode ? 76 : 76 /*200*/)
-                    return <ListComponent<UploadedFile> 
-                            ref={this.filesList} 
-                            onLoadingStateChanged={this.feedLoadingStateChanged} 
-                            fetchData={this.fetchFiles} 
+                    return <ListComponent<UploadedFile>
+                            ref={this.filesList}
+                            onLoadingStateChanged={this.feedLoadingStateChanged}
+                            fetchData={this.fetchFiles}
                             loadMoreOnScroll={!showLoadMore}
-                            renderItem={this.renderFile} 
+                            renderItem={this.renderFile}
                             reloadContext={updateKey}
                             className={cn + " grid-size-" + state.colums} />
             }}></ResizeObserverColumnsComponent>
@@ -154,12 +154,12 @@ class FilesModule extends React.Component<Props, State> {
         const cn = classnames("files-module", className)
         const headerContent = this.renderHeaderContent()
         const renderModalContent = !showInModal || isModal ? undefined : this.renderModalContent
-        return (<SimpleModule {...rest} 
+        return (<SimpleModule {...rest}
                     showHeader={!isModal}
-                    className={cn} 
-                    headerClick={this.headerClick} 
-                    breakpoint={breakpoint} 
-                    isLoading={this.state.isLoading} 
+                    className={cn}
+                    headerClick={this.headerClick}
+                    breakpoint={breakpoint}
+                    isLoading={this.state.isLoading}
                     renderModalContent={renderModalContent}
                     headerContent={headerContent}
                     headerTitle={translate("files.module.title")}>

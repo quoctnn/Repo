@@ -7,6 +7,7 @@ import { Popover, PopoverBody, Input, InputGroup, Button, InputGroupAddon, Butto
 import { uniqueId } from '../../../utilities/Utilities';
 import * as Slider from 'react-input-slider';
 import "./DateTimePicker.scss"
+import Popper from 'popper.js';
 type OwnProps = {
     onChange?: (value:moment.Moment, name:string) => void,
     value?:moment.Moment,
@@ -341,6 +342,9 @@ class MomentInput extends React.Component<MomentInputProps, MomentInputState> {
         let inputValue = value ? value.format(format) : (date ? date.format(format): "");
         const hasInputValue = inputValue && inputValue.length > 0
         const id = "momentinput_" + this._id
+        const modifiers:Popper.Modifiers = {
+            flip: { behavior: ['bottom', 'top', 'bottom'] }
+          }
         return (
             <div style={style} className={className} ref={node => this.node = node}>
                 <InputGroup id={id} className={inputClassName} >
@@ -359,7 +363,14 @@ class MomentInput extends React.Component<MomentInputProps, MomentInputState> {
                     </InputGroupAddon>
                 </InputGroup>
                 {isOpen &&
-                    <Popover className="date-time-picker" trigger="legacy" placement="bottom" isOpen={isOpen} target={id} toggle={this.toggleIsOpen}>
+                    <Popover 
+                    modifiers={modifiers}
+                    className="date-time-picker" 
+                    trigger="legacy" 
+                    placement="bottom" 
+                    isOpen={isOpen} 
+                    target={id} 
+                    toggle={this.toggleIsOpen}>
                         <PopoverBody>
                             {options &&
                                 <ButtonGroup className="options d-flex">

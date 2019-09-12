@@ -10,7 +10,7 @@ import { translate } from "../../../localization/AutoIntlProvider";
 import { RouteComponentProps, withRouter } from "react-router";
 import { ContextNaturalKey, UserProfile, ProfileLanguage } from "../../../types/intrasocial_types";
 import { ContextManager } from "../../../managers/ContextManager";
-import ApiClient from '../../../network/ApiClient';
+import {ApiClient} from '../../../network/ApiClient';
 
 type OwnProps = {
     breakpoint:ResponsiveBreakpoint
@@ -73,18 +73,18 @@ class ProfileLanguageModule extends React.PureComponent<Props, State> {
     shouldModuleRender = () => {
         return this.state.languages && this.state.languages.length > 0
     }
-    render = () => 
+    render = () =>
     {
         const shouldRender = this.shouldModuleRender()
         if(!shouldRender)
             return null
         const {className, breakpoint, contextNaturalKey, pageSize, showLoadMore, showInModal, isModal, dispatch, staticContext, profile, history, location, match, ...rest} = this.props
         const cn = classnames("profile-language-module", className)
-        return <SimpleModule {...rest} 
+        return <SimpleModule {...rest}
                 showHeader={!isModal}
-                className={cn} 
-                breakpoint={breakpoint} 
-                isLoading={false} 
+                className={cn}
+                breakpoint={breakpoint}
+                isLoading={false}
                 headerTitle={translate("profile.module.language.title")}>
                 <div className="content container">
                         {this.renderContent()}

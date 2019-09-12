@@ -9,7 +9,7 @@ import { ContextNaturalKey, TaskActions, Task, Permissible, IdentifiableObject, 
 import { ReduxState } from '../../redux';
 import { connect } from 'react-redux';
 import ListComponent from '../../components/general/ListComponent';
-import ApiClient, { PaginationResult } from '../../network/ApiClient';
+import {ApiClient,  PaginationResult } from '../../network/ApiClient';
 import { ToastManager } from '../../managers/ToastManager';
 import TaskListItem from './TaskListItem';
 import { StatusUtilities } from '../../utilities/StatusUtilities';
@@ -132,7 +132,7 @@ class TasksModule extends React.Component<Props, State> {
                                 ToastManager.showInfoToast(translate("task.state.changed"), `${translate("task.priority." + task.priority)} > ${translate("task.priority." + data.priority)}`)
                             }
                             completion && completion(success)
-                            ToastManager.showErrorToast(error)
+                            ToastManager.showRequestErrorToast(error)
                         })
                     }
                     else {
@@ -150,7 +150,7 @@ class TasksModule extends React.Component<Props, State> {
                                 ToastManager.showInfoToast(translate("task.state.changed"), `${translate("task.state." + task.state)} > ${translate("task.state." + data.state)}`)
                             }
                             completion && completion(success)
-                            ToastManager.showErrorToast(error)
+                            ToastManager.showRequestErrorToast(error)
                         })
                     }
                     else {
@@ -169,7 +169,7 @@ class TasksModule extends React.Component<Props, State> {
                             ToastManager.showInfoToast(translate("task.timesheet.added"), task.title)
                         }
                         completion && completion(success)
-                        ToastManager.showErrorToast(error)
+                        ToastManager.showRequestErrorToast(error)
                     })
                     break;
                 }
@@ -182,7 +182,7 @@ class TasksModule extends React.Component<Props, State> {
                             ToastManager.showInfoToast(translate("task.status.added"), task.title)
                         }
                         completion && completion(success)
-                        ToastManager.showErrorToast(error)
+                        ToastManager.showRequestErrorToast(error)
                     })
                     break;
                 }
@@ -207,7 +207,7 @@ class TasksModule extends React.Component<Props, State> {
         const notAssigned = data.notAssigned
         ApiClient.getTasks(this.props.pageSize, offset, project, state, priority, tags, assignedTo, responsible, creator, notAssigned, category, term, (data, status, error) => {
             completion(data)
-            ToastManager.showErrorToast(error)
+            ToastManager.showRequestErrorToast(error)
         })
     }
     renderTask = (task: Task) => {

@@ -9,7 +9,7 @@ import { ReduxState } from '../../redux';
 import { nullOrUndefined, coordinateIsValid } from '../../utilities/Utilities';
 import { Feature, Layer } from 'react-mapbox-gl';
 import MapboxMapComponent, { mapLayout, mapImages } from '../../components/general/map/MapboxMapComponent';
-import ApiClient from '../../network/ApiClient';
+import {ApiClient} from '../../network/ApiClient';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import SimpleModule from '../SimpleModule';
 import { translate } from '../../localization/AutoIntlProvider';

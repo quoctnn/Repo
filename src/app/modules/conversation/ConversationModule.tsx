@@ -3,17 +3,17 @@ import { withRouter, RouteComponentProps } from "react-router-dom";
 import classnames from "classnames"
 import "./ConversationModule.scss"
 import { ResponsiveBreakpoint } from '../../components/general/observers/ResponsiveComponent';
-import { translate } from '../../localization/AutoIntlProvider';
+import { translate, lazyTranslate } from '../../localization/AutoIntlProvider';
 import CircularLoadingSpinner from '../../components/general/CircularLoadingSpinner';
 import { ContextNaturalKey, Conversation, Message, UserProfile } from '../../types/intrasocial_types';
-import ApiClient, { PaginationResult } from '../../network/ApiClient';
+import {ApiClient, PaginationResult } from '../../network/ApiClient';
 import { ToastManager } from '../../managers/ToastManager';
 import { connect } from 'react-redux';
 import { ReduxState } from '../../redux';
 import SimpleModule from '../SimpleModule';
 import { ContextManager } from '../../managers/ContextManager';
 import { ChatMessageList } from './ChatMessageList';
-import { Avatar } from '../../components/general/Avatar';
+import Avatar from '../../components/general/Avatar';
 import { AuthenticationManager } from '../../managers/AuthenticationManager';
 import { ProfileManager } from '../../managers/ProfileManager';
 import { TypingIndicator } from '../../components/general/TypingIndicator';
@@ -55,7 +55,6 @@ type State = {
     showSpinner:boolean
     isTyping:{[key:string]:NodeJS.Timer}
     renderDropZone:boolean
-    conversationEditorDialogVisible:boolean
 }
 type ReduxStateProps = {
     conversation: Conversation
@@ -72,6 +71,7 @@ class ConversationModule extends React.Component<Props, State> {
     private messageList = React.createRef<ChatMessageList>();
     private canPublishDidType = true
     private observers:EventSubscription[] = []
+    private messageComposer = React.createRef<ChatMessageComposer>();
     constructor(props:Props) {
         super(props);
         this.state = {
@@ -85,7 +85,6 @@ class ConversationModule extends React.Component<Props, State> {
             showSpinner:false,
             isTyping:{},
             renderDropZone:false,
-            conversationEditorDialogVisible:false
         }
     }
     shouldReloadList = (prevProps:Props) => {
@@ -93,7 +92,12 @@ class ConversationModule extends React.Component<Props, State> {
         const newConversation = this.props.conversation
         return (oldConversation && !newConversation) ||
                 (!oldConversation && newConversation) ||
-                (oldConversation && newConversation && oldConversation.id != newConversation.id)
+                (oldConversation && newConversation && 
+                    (oldConversation.id != newConversation.id || 
+                    (oldConversation.temporary && newConversation.temporary && 
+                        (!oldConversation.users.isEqual(newConversation.users) || 
+                         oldConversation.temporary_id != newConversation.temporary_id) ) ) )
+
     }
     componentDidMount = () => {
         const obs1 = NotificationCenter.addObserver("eventstream_" + EventStreamMessageType.CONVERSATION_TYPING, this.isTypingHandler)
@@ -125,8 +129,12 @@ class ConversationModule extends React.Component<Props, State> {
         if(!this.props.conversation && !!prevProps.conversation) // if conversation removed
         {
             this.setState((prevState:State) => {
-                return {conversationEditorDialogVisible:false, renderDropZone:false, showSpinner:false}
+                return {renderDropZone:false, showSpinner:false}
             })
+        }
+        if(this.props.location.pathname != prevProps.location.pathname && this.messageComposer && this.messageComposer.current)
+        {
+            this.messageComposer.current.clearEditorContent()
         }
     }
     incomingMessageHandler = (...args:any[]) =>
@@ -139,8 +147,16 @@ class ConversationModule extends React.Component<Props, State> {
         {
             let it = this.removeUserFromIsTypingData(message.user)
             this.setState((prevState:State) => {
-                const items = prevState.items
-                items.push(message)
+                const items = [...prevState.items]
+                const oldIndex = items.findIndex(e => e.id == message.id)
+                if(oldIndex > -1)
+                {
+                    items[oldIndex] = message
+                }
+                else 
+                {
+                    items.push(message)
+                }
                 return {isTyping:it, items }
             })
         }
@@ -230,16 +246,45 @@ class ConversationModule extends React.Component<Props, State> {
         })
     }
     fetchMessages = (offset:number, completion:(items:PaginationResult<Message>) => void ) => {
-
-        if(!this.props.conversation || this.props.conversation.temporary)
+        const emptyData = {results:[], count:0, previous:null, next:null}
+        if(!this.props.conversation || this.props.conversation.temporary && this.props.conversation.temporary_id == -1)
         {
-            completion({results:[], count:0, previous:null, next:null})
+            completion(emptyData)
             return
         }
-        const conversationId = this.props.conversation.id
+        if(this.props.conversation.temporary && !this.props.conversation.temporary_id)//not set yet
+        {
+            const users = this.props.conversation.users.filter(i => i != this.props.authenticatedUser.id)
+            if(users.length > 0)
+            {
+                ApiClient.getConversations(1, 0, false, users, (data, status, error) => {
+                    if(this.props.conversation.temporary)
+                    {
+                        const temp = {...this.props.conversation}
+                        if(data && data.results && data.results.length > 0)
+                        {
+                            const conv = data.results[0]
+                            temp.temporary_id = conv.id
+                        }
+                        else {
+                            temp.temporary_id = -1 //prevent multiple fetches
+                        }
+                        ConversationManager.updateTemporaryConversation(temp)
+                    }
+                    completion(emptyData)
+                })
+                return
+            }
+            else {
+
+                completion(emptyData)
+                return
+            }
+        }
+        const conversationId = this.props.conversation.temporary && this.props.conversation.temporary_id || this.props.conversation.id
         ApiClient.getConversationMessages(conversationId, 30, offset, (data, status, error) => {
             completion(data)
-            ToastManager.showErrorToast(error)
+            ToastManager.showRequestErrorToast(error)
         })
     }
     handleLoadMore = () =>
@@ -288,7 +333,6 @@ class ConversationModule extends React.Component<Props, State> {
             return
         if(this.canPublishDidType)
         {
-            console.log("sendDidType")
             ConversationManager.sendTypingInConversation(conversation.id)
             this.canPublishDidType = false
             setTimeout(() => {
@@ -297,21 +341,33 @@ class ConversationModule extends React.Component<Props, State> {
         }
     }
     createConversationWithMessage = (tempConversation:Conversation, message:Message) => {
-        ApiClient.createConversation(tempConversation.title, tempConversation.users, (newConversation, status, error) => {
-            if(newConversation)
-            {
-                message.conversation = newConversation.id
-                ConversationManager.sendMessage(message)
+        const tempConversationId = tempConversation.temporary_id
+        if(tempConversationId && tempConversationId > -1) // add to old conversation
+        {
+            message.conversation = tempConversationId
+            ConversationManager.sendMessage(message)
+            setTimeout(() => {
                 ConversationManager.updateTemporaryConversation(null)
-                NavigationUtilities.navigateToConversation(this.props.history, newConversation.id)
-                ToastManager.showInfoToast(translate("conversation.created"))
-            }
-            if(error || status == "error")
-            {
-                ToastManager.showErrorToast(error || translate("Could not create conversation"))
-                return
-            }
-        } )
+                NavigationUtilities.navigateToConversation(this.props.history, tempConversationId)
+            },200)
+        }
+        else {
+            ApiClient.createConversation(tempConversation.title, tempConversation.users, (newConversation, status, error) => {
+                if(newConversation)
+                {
+                    message.conversation = newConversation.id
+                    ConversationManager.sendMessage(message)
+                    ConversationManager.updateTemporaryConversation(null)
+                    NavigationUtilities.navigateToConversation(this.props.history, newConversation.id)
+                    ToastManager.showInfoToast(translate("conversation.created"))
+                }
+                if(error || status == "error")
+                {
+                    ToastManager.showRequestErrorToast(error, lazyTranslate("Could not create conversation"))
+                    return
+                }
+            } )
+        }
     }
     onChatMessageSubmit = (text:string, mentions:number[]) => {
         let conversation = this.props.conversation
@@ -324,6 +380,7 @@ class ConversationModule extends React.Component<Props, State> {
             ConversationManager.sendMessage(message)
     }
     filesAdded = (files:File[]) => {
+        //files added, store them and present them
         let conversation = this.props.conversation
         if(!conversation)
             return
@@ -408,7 +465,7 @@ class ConversationModule extends React.Component<Props, State> {
         const {items, isLoading} = this.state
         let messages = this.props.queuedMessages.concat(items).sort(this.sortMessages)
         const conversationId = conversation && conversation.id
-        if(!conversationId)
+        if(!conversationId || !authenticatedUser)
         {
             return this.renderNoConversation()
         }
@@ -429,6 +486,7 @@ class ConversationModule extends React.Component<Props, State> {
                             {this.renderSomeoneIsTyping()}
                         </ChatMessageList>
                     <ChatMessageComposer
+                                ref={this.messageComposer}
                                 className="secondary-text main-content-secondary-background"
                                 mentionSearch={this.handleMentionSearch}
                                 content={""}
@@ -447,6 +505,8 @@ class ConversationModule extends React.Component<Props, State> {
     onMemberSelectChange = (value: ProfileFilterOption[], action: ActionMeta) => {
         const temp = {...this.props.conversation}
         temp.users = value.map(v => v.id)
+        if(!temp.title)
+            temp.temporary_id = undefined
         ConversationManager.updateTemporaryConversation(temp)
     }
     renderMembersInput = () => {
@@ -475,26 +535,9 @@ class ConversationModule extends React.Component<Props, State> {
         const conversation = this.props.conversation
         if(conversation)
         {
-            return <div className="link text-truncate" onClick={this.toggleConversationEditorDialog}>{ConversationUtilities.getConversationTitle(conversation)}</div>
+            return <div className="text-truncate">{ConversationUtilities.getConversationTitle(conversation)}</div>
         }
         return null
-    }
-    toggleConversationEditorDialog = () => {
-        this.setState((prevState:State ) => {
-            return {conversationEditorDialogVisible:!prevState.conversationEditorDialogVisible}
-        })
-    }
-    renderConversationEditorDialog = () => {
-        const conversation = this.props.conversation
-        if(conversation)
-        {
-            const visible = this.state.conversationEditorDialogVisible
-            return <SimpleDialog header={translate("common.conversation.conversation")} showCloseButton={true} didCancel={this.toggleConversationEditorDialog} visible={visible}>
-                        <ConversationEditor conversationId={this.props.conversation.id}/>
-                    </SimpleDialog>
-        }
-        return null
-
     }
     render()
     {
@@ -509,7 +552,6 @@ class ConversationModule extends React.Component<Props, State> {
                     isLoading={this.state.isLoading}
                     headerTitle={title}>
                 {this.renderContent()}
-                {this.renderConversationEditorDialog()}
                 </SimpleModule>)
     }
 }

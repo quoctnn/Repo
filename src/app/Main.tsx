@@ -37,7 +37,8 @@ import { DndProvider } from 'react-dnd'
 import HTML5Backend from 'react-dnd-html5-backend'
 import FilesPage from "./components/pages/FilesPage";
 import DevToolPage from './components/pages/DevToolPage';
-import { SearchComponent } from "./components/navigation/SearchComponent";
+import SearchComponent from "./components/navigation/SearchComponent";
+import CommunityCreateComponent from './modules/communities/CommunityCreateComponent';
 const WithSearch = () =>
     withRouter(class Modal extends React.Component<RouteComponentProps<any>, { visible: boolean, term:string, type:string }> {
         constructor(props: PathLoaderProps) {
@@ -230,7 +231,8 @@ class Main extends React.Component<Props, State> {
                                 </Switch>
                                 <Switch location={location}>
                                     <Route path={Routes.CHANGELOG} component={ModalChangelog} />
-                                    <Route path={Routes.SEARCH} component={ModalSearchComponent} />
+                                    <PrivateRoute path={Routes.SEARCH} component={ModalSearchComponent} />
+                                    <PrivateRoute path={Routes.COMMUNITY_CREATE} component={CommunityCreateComponent} />
                                 </Switch>
                             </DndProvider>
                         }

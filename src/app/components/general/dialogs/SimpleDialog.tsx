@@ -1,5 +1,5 @@
 import * as React from "react";
-import {ModalBody, Modal, ModalHeader, ModalFooter } from 'reactstrap';
+import {ModalBody, Modal, ModalHeader, ModalFooter, Button } from 'reactstrap';
 import classnames = require("classnames");
 import { translate } from "../../../localization/AutoIntlProvider";
 
@@ -11,7 +11,7 @@ type DefaultProps = {
     fade:boolean
 }
 type Props = {
-    header?:React.ReactNode
+    header?:React.ReactNode | JSX.Element
     children:React.ReactNode
     footer?:React.ReactNode
     visible:boolean
@@ -38,22 +38,22 @@ export default class SimpleDialog extends React.Component<Props, State> {
     renderCloseButton = () => {
         if(!this.props.showCloseButton)
             return null
-        return <button type="button" className="close" onClick={this.props.didCancel}>
-                <span aria-hidden="true">&times;</span>
+        return <Button color="light" className="modal-close" onClick={this.props.didCancel}>
                 <span className="sr-only">{translate("common.close")}</span>
-            </button>
+                <i aria-hidden="true" className="fas fa-times"></i>
+            </Button>
     }
     render() 
     {
         const cn = classnames(this.props.className, {"modal-dialog-scrollable":this.props.scrollable})
-        const headerToggle = this.props.showCloseButton ? this.props.didCancel : undefined
         return(
             <div>
                 <Modal fade={this.props.fade} centered={this.props.centered} toggle={this.props.didCancel} zIndex={this.props.zIndex} isOpen={this.props.visible} className={cn}>
                     {
                         this.props.header && 
-                        <ModalHeader toggle={headerToggle}>
+                        <ModalHeader>
                             {this.props.header}
+                            {this.renderCloseButton()}
                         </ModalHeader>
                     }
                     <ModalBody className="vertical-scroll" onScroll={this.props.onScroll}>

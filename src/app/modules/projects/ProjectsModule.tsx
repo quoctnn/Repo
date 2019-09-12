@@ -6,7 +6,7 @@ import { ResponsiveBreakpoint } from '../../components/general/observers/Respons
 import { translate } from '../../localization/AutoIntlProvider';
 import { ContextNaturalKey, Community, Project, ProjectSorting, Group } from '../../types/intrasocial_types';
 import ListComponent from '../../components/general/ListComponent';
-import ApiClient, { PaginationResult } from '../../network/ApiClient';
+import {ApiClient,  PaginationResult } from '../../network/ApiClient';
 import { ToastManager } from '../../managers/ToastManager';
 import { connect } from 'react-redux';
 import { ReduxState } from '../../redux';
@@ -91,7 +91,7 @@ class ProjectsModule extends React.Component<Props, State> {
         const groupId = this.props.group && this.props.group.id
         ApiClient.getProjects(communityId, groupId, this.props.pageSize, offset, md.sorting, md.responsible, md.assigned, (data, status, error) => {
             completion(data)
-            ToastManager.showErrorToast(error)
+            ToastManager.showRequestErrorToast(error)
         })
     }
     renderProject = (project:Project) =>  {

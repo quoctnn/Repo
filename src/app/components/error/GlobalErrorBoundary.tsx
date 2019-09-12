@@ -1,7 +1,9 @@
 import * as React from "react";
 import SimpleDialog from "../general/dialogs/SimpleDialog";
-import ApiClient from "../../network/ApiClient";
+import {ApiClient} from "../../network/ApiClient";
 import { CrashLogLevel } from "../../types/intrasocial_types";
+import { AuthenticationManager } from "../../managers/AuthenticationManager";
+import { EndpointManager } from '../../managers/EndpointManager';
 type State = {
     error:Error
     errorInfo:any
@@ -38,7 +40,15 @@ export default class GlobalErrorBoundary extends React.Component<Props, State> {
     sendError = (error:Error, errorInfo?:any) => {
         if(!error)
             return
-        ApiClient.sendCrashReport(CrashLogLevel.error, error.message, error.stack, errorInfo && errorInfo.componentStack, () => {
+        const userAgent = navigator.userAgent
+        const user = AuthenticationManager.getAuthenticatedUser()
+        const userId = user && user.id || -1
+        const endpoint = EndpointManager.currentEndpoint().endpoint
+        const extraDict = {
+            language:window.app.language
+        }
+        const extra = JSON.stringify(extraDict)
+        ApiClient.sendCrashReport(CrashLogLevel.error, error.message, error.stack, errorInfo && errorInfo.componentStack, userId, userAgent, endpoint,extra,  () => {
 
         })
     }

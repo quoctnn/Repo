@@ -13,6 +13,7 @@ import * as websocketInfo from "../../../../docs/Websocket messages.json"
 import { ThemeManager } from "../../managers/ThemeManager";
 import { ApplicationManager } from '../../managers/ApplicationManager';
 import { WindowAppManager } from '../../managers/WindowAppManager';
+import Popper from "popper.js";
 
 type ReduxStateProps = {
     language: number;
@@ -133,7 +134,10 @@ class DevTool extends React.PureComponent<Props, State> {
         {
             return null
         }
-        return <Popover className="dev-tool-infoBox-container" trigger="legacy" placement="top" hideArrow={false} isOpen={!!data} target={target} toggle={this.hideInfoBox}>
+        const modifiers:Popper.Modifiers = {
+            flip: { behavior: ['bottom', 'top', 'bottom'] }
+          }
+        return <Popover modifiers={modifiers} className="dev-tool-infoBox-container" trigger="legacy" placement="top" hideArrow={false} isOpen={!!data} target={target} toggle={this.hideInfoBox}>
                     <PopoverBody className="dev-tool-infoBox">
                         {data}
                     </PopoverBody>

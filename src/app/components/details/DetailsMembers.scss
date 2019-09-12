@@ -1,4 +1,8 @@
-.module-footer .details-members{
+.details-members{
     margin: 0 10px;
     text-align: right;
+    .avatar-stacked{
+        margin-left: 0;
+        margin-right: 0;
+    }
 }

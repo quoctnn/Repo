@@ -1,0 +1,36 @@
+@import "../../Config";
+.conversation-details-module{
+    height: min-content;
+    .conversation-editor{
+        padding: 0.5rem 0.7rem;
+    }
+    .avatar .user-status-indicator {
+        bottom: -2px;
+        right: -2px;
+    }
+    .member-item{
+        &.active, &:hover
+        {
+            @include var(background-color, main-content-secondary-background);
+        }
+        .dropdown-menu-trigger{
+            > button{
+                padding: 0;
+            }
+            .action-button{
+                width: 18px;
+                height: 18px;
+                flex-shrink: 0;
+                display:none;
+                &.active{
+                    display: block;
+                }
+            }
+        }
+        &:hover{
+            .action-button{
+                display: block;
+            }
+        }
+    }
+}

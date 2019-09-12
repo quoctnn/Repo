@@ -1,0 +1,23 @@
+.form-color-input{
+    .color-input-container{
+        padding: 5px;
+        background: #fff;
+        border-radius: 1px;
+        box-shadow: 0 0 0 1px rgba(0,0,0,.1);
+        display: inline-block;
+        cursor: pointer;
+        .color-input{
+            width: 36px;
+            height: 14px;
+            border-radius: 2px;
+        }
+    }
+    .form-control{
+        border-width: 0;
+    }
+}
+.dropdown-color-input{
+    .popover{
+        z-index: 2000;
+    }
+}

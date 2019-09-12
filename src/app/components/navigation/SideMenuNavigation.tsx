@@ -8,7 +8,7 @@ import Logo from "../general/images/Logo";
 import { translate } from "../../localization/AutoIntlProvider";
 import CollapseComponent from "../general/CollapseComponent";
 import { GroupSorting, Group, Project, ProjectSorting, ContextNaturalKey, Favorite, DraggableType, Community, UserProfile, ElasticSearchType } from '../../types/intrasocial_types';
-import ApiClient from "../../network/ApiClient";
+import {ApiClient} from "../../network/ApiClient";
 import LogoSmall from "../general/images/LogoSmall";
 import { IntraSocialLink } from "../general/IntraSocialLink";
 import { SecureImage } from "../general/SecureImage";
@@ -377,6 +377,7 @@ class SideMenuNavigation extends React.Component<Props, State> {
         const chapters = this.props.community && this.props.community.chapters
         const anonUser = this.props.profile ? this.props.profile.is_anonymous : false
         const noProjects = chapters || anonUser
+        const isSuperUser = this.props.profile && this.props.profile.is_superuser
         return (
             <div ref={this.contentRef} onClick={openMenu} id="side-menu-navigation" className={cn} style={{ transitionDuration: transDur }}>
                 {this.renderHeader()}
@@ -422,6 +423,11 @@ class SideMenuNavigation extends React.Component<Props, State> {
                             <Link style={{textAlign:"center", width:"100%"}} to={{pathname:Routes.SEARCH, state:{modal:true}, search:"type=" + ElasticSearchType.PROJECT}} onClick={closeMenu}>{translate("common.find.more")}...</Link>
                         </MenuBlock>
                     </>}
+                    {isSuperUser && 
+                        <MenuBlock removeContentOnCollapsed={false} animationDuration={SideMenuNavigation.animationDuration} open={this.state.open} icon="fas fa-user-shield" title={translate("Superuser")}>
+                            <Link to={{pathname:Routes.COMMUNITY_CREATE, state:{modal:true}}} onClick={closeMenu}>{translate("community.create")}</Link>
+                        </MenuBlock>
+                    }
                 </div>
                     <div className="spacer flex-grow-1 flex-shrink-1"></div>
                     <div className="footer menu-bottom d-flex">

@@ -1,7 +1,7 @@
 import * as React from "react";
 import {  Store } from 'redux';
 import { Community } from '../types/intrasocial_types';
-import ApiClient from '../network/ApiClient';
+import {ApiClient} from '../network/ApiClient';
 import { ReduxState } from '../redux';
 import { addCommunitiesAction, removeCommunityAction } from '../redux/communityStore';
 import { setActiveCommunityAction } from '../redux/activeCommunity';
@@ -9,8 +9,6 @@ import { NotificationCenter } from '../utilities/NotificationCenter';
 import { EventStreamMessageType } from '../network/ChannelEventStream';
 import { ToastManager } from './ToastManager';
 import { translate } from '../localization/AutoIntlProvider';
-import { Button } from "reactstrap";
-import { Link } from "react-router-dom";
 import Routes from "../utilities/Routes";
 export abstract class CommunityManager
 {
@@ -35,7 +33,7 @@ export abstract class CommunityManager
             if(community)
             {
                 const hasCommunity = !!CommunityManager.getCommunityById(communityId)
-                CommunityManager.storeCommunities([community])
+                CommunityManager.storeCommunities([community], true)
                 if(!hasCommunity)
                 {
                     ToastManager.showInfoToast(translate("community.incoming.new").format(community.name), null, Routes.communityUrl(community.slug_name))
@@ -43,9 +41,9 @@ export abstract class CommunityManager
             }
         })
     }
-    static storeCommunities = (communities:Community[]) => {
+    static storeCommunities = (communities:Community[], force?:boolean) => {
         if(communities.length > 0)
-            CommunityManager.getStore().dispatch(addCommunitiesAction(communities))
+            CommunityManager.getStore().dispatch(addCommunitiesAction(communities, force))
     }
     static removeCommunity = (communityId:number) => {
         const activeCommunity = CommunityManager.getActiveCommunity()

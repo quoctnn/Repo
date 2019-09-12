@@ -4,7 +4,7 @@ import { translate } from '../../../localization/AutoIntlProvider';
 import { Status, ReportTag, ReportResult } from '../../../types/intrasocial_types';
 
 import "./ReportStatusDialog.scss"
-import ApiClient from '../../../network/ApiClient';
+import {ApiClient} from '../../../network/ApiClient';
 import { ToastManager } from '../../../managers/ToastManager';
 import Select from 'react-select';
 
@@ -39,7 +39,7 @@ export default class ReportStatusDialog extends React.Component<Props, State> {
             {
                 this.setState({availableTags:tags})
             }
-            ToastManager.showErrorToast(error)
+            ToastManager.showRequestErrorToast(error)
         })
     }
     submit = (e:any) => {
@@ -53,7 +53,7 @@ export default class ReportStatusDialog extends React.Component<Props, State> {
             {
                 this.setState({ result: data });
             }
-            ToastManager.showErrorToast(error, "Your report could not be sent. Please try again later.")
+            ToastManager.showRequestErrorToast(error, () => "Your report could not be sent. Please try again later.")
         })
     }
     handleSelectChange = (value:ReportTag[]) => {

@@ -14,7 +14,7 @@ import { ReduxState } from '../../redux';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import { DetailsContent } from '../../components/details/DetailsContent';
 import { ContextManager } from '../../managers/ContextManager';
-import { DetailsMembers } from '../../components/details/DetailsMembers';
+import { DetailsMembers, HorisontalLayoutPosition } from '../../components/details/DetailsMembers';
 import StackedAvatars from '../../components/general/StackedAvatars';
 type OwnProps = {
     breakpoint:ResponsiveBreakpoint
@@ -69,7 +69,7 @@ class TaskDetailsModule extends React.Component<Props, State> {
                         <ModuleHeader className="task-detail" headerTitle={task && task.title || translate("detail.module.title")} loading={this.state.isLoading}>
                             <ModuleMenuTrigger onClick={this.menuItemClick} />
                         </ModuleHeader>
-                        {breakpoint >= ResponsiveBreakpoint.standard && //do not render for small screens
+                        {true && //breakpoint >= ResponsiveBreakpoint.standard && //do not render for small screens
                             <>
                                 <ModuleContent>
                                 { task && task.permission >= Permission.read &&
@@ -87,23 +87,13 @@ class TaskDetailsModule extends React.Component<Props, State> {
                                     <LoadingSpinner key="loading"/>
                                 }
                                 </ModuleContent>
-                                <ModuleFooter>
-                                    <div className="details-module d-flex flex-row">
+                                <ModuleFooter className="mt-1">
+                                    <div className="d-flex flex-row justify-content-between">
                                         { task.responsible &&
-                                            <div className="details-members-left" style={{flexGrow: 1}}>
-                                                <div>
-                                                    {translate('task.responsible')}
-                                                    <StackedAvatars userIds={[task.responsible.id]} />
-                                                </div>
-                                            </div>
+                                            <DetailsMembers title={translate('task.responsible')} members={[task.responsible.id]} position={HorisontalLayoutPosition.left} showSeeAll={false}/>
                                         }
                                         { task.assigned_to && task.assigned_to.length > 0 &&
-                                            <div className="details-members">
-                                                <div>
-                                                    {translate('task.assigned_to')}
-                                                    <StackedAvatars userIds={task.assigned_to.map((user) => {return user.id})} />
-                                                </div>
-                                            </div>
+                                            <DetailsMembers title={translate('task.assigned_to')} members={task.assigned_to.map((user) => {return user.id})} position={HorisontalLayoutPosition.right} showSeeAll={false}/>
                                         }
                                     </div>
                                 </ModuleFooter>

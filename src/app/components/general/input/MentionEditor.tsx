@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import EmojiPicker from 'emoji-picker-react';
-import { EditorState, DraftHandleValue, Modifier, SelectionState , } from 'draft-js';
+import { EditorState, DraftHandleValue, Modifier, SelectionState, getDefaultKeyBinding , } from 'draft-js';
 import Editor from "draft-js-plugins-editor";
 import "draft-js-mention-plugin/lib/plugin.css";
 import createMentionPlugin, { defaultSuggestionsFilter } from "draft-js-mention-plugin";
@@ -9,7 +9,7 @@ import { UserProfile, Permissible, IdentifiableObject, Linkable, ContextNaturalK
 import { IntraSocialUtilities } from "../../../utilities/IntraSocialUtilities";
 import { Settings } from "../../../utilities/Settings";
 import { SecureImage } from '../SecureImage';
-import { userFullName, contextAvatar, MentionData } from '../../../utilities/Utilities';
+import { userFullName, contextAvatar, MentionData, nullOrUndefined } from '../../../utilities/Utilities';
 import * as JSEMOJI from 'emoji-js';
 import "./MentionEditor.scss"
 import { translate } from "../../../localization/AutoIntlProvider";
@@ -387,12 +387,22 @@ export default class MentionEditor extends React.Component<Props, State> {
           text
         );
 
-        const newEditorState = EditorState.push(
+        let newEditorState = EditorState.push(
           editorState,
           contentState,
           'insert-characters',
         );
-
+        //force selection at end
+        newEditorState = EditorState.moveFocusToEnd(newEditorState)
+        /*const block = newEditorState.getCurrentContent().getLastBlock()
+        const length = block.getLength();
+        const blockSelection = SelectionState
+            .createEmpty(block.getKey())
+            .merge({
+            anchorOffset: length,
+            focusOffset: length,
+          }) as SelectionState
+        newEditorState = EditorState.forceSelection(newEditorState, blockSelection )*/
         this.onChange(newEditorState)
     }
     onHandleBeforeInput = (chars: string, editorState: EditorState):DraftHandleValue => {
@@ -428,6 +438,17 @@ export default class MentionEditor extends React.Component<Props, State> {
         }
         return "not-handled"
     }
+    handlekeyBindingFn = (e: React.KeyboardEvent<any> ) => {
+        if(this.props.keyBindings)
+        {
+            const val = this.props.keyBindings(e)
+            if(!nullOrUndefined(val))
+                return val
+        }
+        if(this.mentionPlugin && this.mentionPlugin.keyBindingFn)
+            return this.mentionPlugin.keyBindingFn(e)
+        return getDefaultKeyBinding(e)
+    }
     render = () => {
         const { MentionSuggestions } = this.mentionPlugin;
         const plugins = [this.mentionPlugin];
@@ -445,7 +466,7 @@ export default class MentionEditor extends React.Component<Props, State> {
                             onBlur={this.props.onBlur}
                             onFocus={this.props.onFocus}
                             placeholder={this.props.placeholder}
-                            keyBindingFn={this.props.keyBindings}
+                            keyBindingFn={this.handlekeyBindingFn}
                             handleBeforeInput={this.onHandleBeforeInput}
                             handleKeyCommand={this.props.handleKeyCommand}
 

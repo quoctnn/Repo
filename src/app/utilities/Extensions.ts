@@ -82,15 +82,6 @@ Array.prototype.toggleElement = function<T>(element:T){
     else 
         this.push(element)
 }
-Array.prototype.toDictionary = function<T>(indexKey: keyof T) 
-{
-    const object: { [key: string]: T } = {}
-    for (let i = 0; i < self.length; i++) {
-            const key = self[i][indexKey]
-            object[key] = self[i]
-    }
-    return object
-}
 Number.prototype.mod = function(n) {
   return ((this%n)+n)%n;
 };

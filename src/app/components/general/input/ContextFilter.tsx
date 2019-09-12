@@ -2,7 +2,7 @@ import * as React from 'react';
 import AsyncSelect from 'react-select/lib/Async'
 import classnames from "classnames"
 import { ContextItem, ElasticSearchType, ContextNaturalKey } from '../../../types/intrasocial_types';
-import ApiClient from '../../../network/ApiClient';
+import {ApiClient} from '../../../network/ApiClient';
 import { SearchArguments } from '../../../network/ApiClient';
 require("./ContextFilter.scss");
 

@@ -10,7 +10,10 @@ export type CommonModuleProps = {
     showInModal?:boolean
     isModal?:boolean
     moduleRef?:React.LegacyRef<HTMLDivElement>
-} & React.HTMLAttributes<HTMLElement>
+    className?: string
+    style?: React.CSSProperties;
+
+} //& React.HTMLAttributes<HTMLElement>
 export default class Module extends React.Component<CommonModuleProps , {}> {
     render() {
         const {children, className,moduleRef, pageSize, contextNaturalKey, showLoadMore, showInModal,isModal, ...rest} = this.props

@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Avatar } from '../../components/general/Avatar';
+import Avatar from '../../components/general/Avatar';
 import classnames = require("classnames");
 
 type Props = {
