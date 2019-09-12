@@ -5,7 +5,7 @@ var BundleTracker = require('webpack-bundle-tracker');
 var config = require('./webpack.base.config.js');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const OptimizeCSSAssetsPlugin = require("optimize-css-assets-webpack-plugin");
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
 const GoogleFontsPlugin = require('@beyonk/google-fonts-webpack-plugin');
 var path = require('path');
 
@@ -82,17 +82,8 @@ module.exports = merge(config, {
   devtool: 'cheap-module-source-map',
   optimization: {
     minimizer: [
-      new UglifyJsPlugin({
-        uglifyOptions: {
-          compressor: {
-            warnings: false
-          },
-          output: {
-            comments: false
-          }
-        }
-      }),
-        new OptimizeCSSAssetsPlugin({})
+      new TerserPlugin(),
+      new OptimizeCSSAssetsPlugin({})
     ]
   }
 });
