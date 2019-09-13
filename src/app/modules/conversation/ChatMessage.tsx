@@ -12,8 +12,8 @@ type Props = {
     direction:MessagePosition,
     innerRef?: (element:HTMLElement) => void
 }
-export class ChatMessage extends React.Component<Props, {}> {
-    shouldComponentUpdate = (nextProps:Props, nextState) => {
+export class ChatMessage extends React.PureComponent<Props, {}> {
+    /*shouldComponentUpdate = (nextProps:Props, nextState) => {
         if(nextProps.data.error != this.props.data.error || nextProps.innerRef != this.props.innerRef)
         {
             return true
@@ -26,7 +26,7 @@ export class ChatMessage extends React.Component<Props, {}> {
         if(!n && !o)
             return false
         return n.progress != o.progress || n.error != o.error 
-    }
+    }*/
     render() {
         const message = this.props.data
         const cl = classnames("chat-message", this.props.direction + (message.pending ? " temp" : ""), {"temp":message.pending})

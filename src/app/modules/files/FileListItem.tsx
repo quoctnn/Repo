@@ -2,7 +2,6 @@ import * as React from 'react'
 import classnames from "classnames"
 import "./FileListItem.scss"
 import { UploadedFile, UploadedFileType } from '../../types/intrasocial_types';
-import { Link } from 'react-router-dom';
 import { FileUtilities } from '../../utilities/FileUtilities';
 import { SecureImage } from '../../components/general/SecureImage';
 import PhotoSwipeComponent from '../../components/general/gallery/PhotoSwipeComponent';
@@ -198,16 +197,16 @@ export default class FileListItem extends React.Component<Props, State> {
                             <OverflowMenu refresh={"str"} fetchItems={this.fetchMenuItems} maxVisible={0} buttonIconClass="fas fa-ellipsis-v" />
                         }
                     </div>
-                    <div className="d-flex text-muted text-truncate align-items-center">
-                        <div className="text-truncate medium-small-text">{fileSize}</div>
+                    <div className="d-flex text-muted text-truncate align-items-center file-details">
+                        <div className="text-truncate medium-small-text file-size">{fileSize}</div>
                         <div className="flex-grow-1 d-flex">
                         {(file.uploading || file.uploadProgress > 0) && 
-                            <Progress value={file.uploadProgress} className="ml-1 mr-1 flex-grow-1" >
+                            <Progress value={file.uploadProgress} className="ml-1 mr-1 flex-grow-1 file-progress" >
                             {file.uploadProgress + "%"}
                             </Progress>
                         }
                         {file.hasError && 
-                            <Badge className="ml-1 mr-1" color="danger">{translate("common.upload.error")}</Badge>
+                            <Badge className="ml-1 mr-1 file-error" color="danger">{translate("common.upload.error")}</Badge>
                         }
                         </div>
                         {!!onRetryUpload &&
@@ -220,10 +219,11 @@ export default class FileListItem extends React.Component<Props, State> {
                                 <i className="fas fa-trash-alt"></i>
                             </Button>
                         }
-                        {file.type == UploadedFileType.IMAGE360 &&
-                            <Badge className="badge-theme ml-1 mr-1">360</Badge>
+                        <div className="file-ext ml-1 mr-1">{file.type == UploadedFileType.IMAGE360 &&
+                            <Badge className="badge-theme mr-1">360</Badge>
                         }
-                        <Badge className="badge-theme ml-1 mr-1">{file.extension}</Badge>
+                        <Badge className="badge-theme">{file.extension}</Badge>
+                        </div>
                     </div>
                 </div>
     }

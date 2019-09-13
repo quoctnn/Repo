@@ -7,7 +7,7 @@ import ModuleFooter from '../ModuleFooter';
 import "./CommunityDetailsModule.scss"
 import { ResponsiveBreakpoint } from '../../components/general/observers/ResponsiveComponent';
 import { translate } from '../../localization/AutoIntlProvider';
-import { Community, ContextNaturalKey, Permission, CropRect, ContextPhotoType, CropInfo, RequestErrorData, ContextPrivacy, CommunityCategory, CommunityConfigurationData, CommunityCreatePermission } from '../../types/intrasocial_types';
+import { Community, ContextNaturalKey, Permission, CropRect, ContextPhotoType, CropInfo, RequestErrorData, ContextPrivacy, CommunityCategory, CommunityConfigurationData, CommunityCreatePermission, UserProfile } from '../../types/intrasocial_types';
 import { connect } from 'react-redux';
 import { ReduxState } from '../../redux';
 import CircularLoadingSpinner from '../../components/general/CircularLoadingSpinner';
@@ -28,6 +28,7 @@ import { OverflowMenuItem, OverflowMenuItemType } from '../../components/general
 import { SelectInputData } from '../../components/form/components/SelectInput';
 import { ColorInputData } from '../../components/form/components/ColorInput';
 import { BooleanInputData } from '../../components/form/components/BooleanInput';
+import { AuthenticationManager } from '../../managers/AuthenticationManager';
 type OwnProps = {
     breakpoint:ResponsiveBreakpoint
 } & CommonModuleProps
@@ -252,8 +253,8 @@ class GroupDetailsModule extends React.Component<Props, State> {
     }
     getCommunityOptions = () => {
         const options: OverflowMenuItem[] = []
-        //options.push({id:"divider1", type:OverflowMenuItemType.divider})
-        options.push({id:"1", type:OverflowMenuItemType.option, title:translate("Edit"), onPress:this.toggleEditForm, iconClass:"fas fa-pen"})
+        if(this.props.community.permission >= Permission.admin)
+            options.push({id:"1", type:OverflowMenuItemType.option, title:translate("Edit"), onPress:this.toggleEditForm, iconClass:"fas fa-pen"})
         return options
     }
     render = () => {
@@ -262,7 +263,7 @@ class GroupDetailsModule extends React.Component<Props, State> {
         const communityOptions = this.getCommunityOptions()
         return (<Module {...rest} className={cn}>
                     <ModuleHeader headerTitle={community && community.name || translate("detail.module.title")} loading={this.state.isLoading}>
-                        <DropDownMenu className="community-option-dropdown" triggerClass="fas fa-cog mx-1" items={communityOptions}></DropDownMenu>
+                       {communityOptions.length > 0 && <DropDownMenu className="community-option-dropdown" triggerClass="fas fa-cog mx-1" items={communityOptions}></DropDownMenu>} 
                     </ModuleHeader>
                     {true && //breakpoint >= ResponsiveBreakpoint.standard && //do not render for small screens
                         <ModuleContent>

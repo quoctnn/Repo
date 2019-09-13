@@ -149,8 +149,7 @@ class ConversationsModule extends React.Component<Props, State> {
             this.navigateToFirstConversation()
         }
     }
-    processIncomingConversation = (...args:any[]) =>
-    {
+    processIncomingConversation = (...args:any[]) => {
         let conversation = args[0] as Conversation
         const viewModeIsArchived = this.state.filter == ConversationFilter.archived
         const isArchived = (conversation.archived_by || []).contains(this.props.authenticatedUser.id)

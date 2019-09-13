@@ -165,7 +165,7 @@ class ConversationDetailsModule extends React.Component<Props, State> {
         if(!canAddMembers)
             return
         return <ListItem hasAction={true} onClick={this.toggleAddMembersDialog} className="d-flex align-items-center">
-                    <div className="mr-2 d-flex align-items-center justify-content-center main-content-secondary-background" style={{width:40, height:40, borderRadius:"50%", background:"white", color:"black"}}>
+                    <div className="mr-2 d-flex align-items-center justify-content-center main-content-secondary-background flex-shrink-0" style={{width:40, height:40, borderRadius:"50%", background:"white", color:"black"}}>
                         <i style={{height:20}} className="fas fa-plus"></i>
                     </div>
                     <div className="text-truncate">{translate("conversation.add.members")}</div>

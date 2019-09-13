@@ -224,7 +224,7 @@ export abstract class ConversationManager
         })
     }
     static getQueuedMessages = (conversationId:number, onlyErrors:boolean = false) => {
-        return ConversationManager.getStore().getState().messageQueue.messages.filter(m => m.conversation == conversationId && (onlyErrors ? (m.error || (m.tempFile && m.tempFile.error) ) : true ))
+        return ConversationManager.getStore().getState().messageQueue.messages.filter(m => m.conversation == conversationId && (onlyErrors ? (m.error || ((m.tempFiles || []).some(f =>  f.error))) : true ))
     }
     //queue
     static processTempQueue = () =>
@@ -250,9 +250,11 @@ export abstract class ConversationManager
     static retryQueuedMessage = (message:Message) =>
     {
         let m = Object.assign({}, message)
-        m.tempFile = Object.assign({}, m.tempFile)
-        m.tempFile.progress = 0
-        m.tempFile.error = null
+        m.tempFiles = (m.tempFiles || []).map(f => Object.assign({}, f))
+        m.tempFiles.forEach(f => {
+            f.error = null
+            f.progress = 0
+        })
         ConversationManager.getStore().dispatch(updateMessageInQueueAction(m))
         ConversationManager.createMessage(m)
     }

@@ -32,6 +32,12 @@
     .message-list-container{
         .gallery-container{
             max-width: 100%;
+            
+        }
+        .swiper-container{
+            .swiper-wrapper{
+                position: initial;
+            }
         }
         .day-line
         {
@@ -211,6 +217,51 @@
             justify-content: center;
             align-items: center;
             z-index: 20000;
+        }
+    }
+    .dropzone-container{
+        border:0;
+        margin:0;
+        padding:8px;
+        padding-bottom: 0;
+        .file-list-item{
+            width: 110px;
+            flex-shrink: 0;
+            position: relative;
+            padding: 0;
+            .content-container{
+                margin-left: 4px;
+                margin-right: 4px;
+            }
+            .file-content{
+                flex-direction: column;
+                box-shadow: none;
+                @include var(background-color, main-content-background);
+                .img-container{
+                    width: auto;
+                    margin: 0;
+                }
+                .file-details{    
+                    flex-wrap: wrap;
+                    justify-content: flex-end;
+                    .file-size{
+                        width:100%;
+                    }
+                    .file-error, .file-progress{
+                        position: absolute;
+                        left:5px;
+                        right:5px;
+                        top:5px;
+                        white-space: normal;
+                        word-break: break-all;
+                    }
+                    .file-ext{
+                        position: absolute;
+                        top:34px;
+                        right:5px;
+                    }
+                }
+            }
         }
     }
 }
