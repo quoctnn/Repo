@@ -193,7 +193,7 @@ export enum OUPRequiredAction{
     gdprTermsAndCondition = "GDPR_TERMS_AND_CONDITIONS",
 }
 export type RequestErrorDetail = {
-    error:string 
+    error:string
     error_description:string
     extra:GDPRData
 }
@@ -707,6 +707,30 @@ export namespace GroupSorting {
     }
 }
 //notifications
+export enum ActivitySorting {
+    recent = "recent",
+    onlyUnseen = "only_unseen",
+}
+export namespace ActivitySorting {
+    export const all = [
+        ActivitySorting.recent,
+        ActivitySorting.onlyUnseen,
+    ]
+    export function translatedText(type: ActivitySorting) {
+        switch (type) {
+            case ActivitySorting.recent: return translate("common.sorting.recent")
+            case ActivitySorting.onlyUnseen: return translate("common.sorting.unSeen")
+            default: return "N/A"
+        }
+    }
+    export function icon(type: ActivitySorting) {
+        switch (type) {
+            case ActivitySorting.recent: return "fas fa-user-clock"
+            case ActivitySorting.onlyUnseen: return "fas fa-eye-slash"
+            default: return ""
+        }
+    }
+}
 export type NotificationObject = {
     type: NotificationGroupKey
     created_at: string
@@ -1217,7 +1241,7 @@ export type Conversation =
     unread_messages: number[]
     temporary?: boolean
     temporary_id?:number
-    private?:boolean 
+    private?:boolean
     admins?:number[]
 
 } & Linkable & IdentifiableObject & Permissible

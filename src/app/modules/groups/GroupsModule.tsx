@@ -16,7 +16,6 @@ import GroupListItem from './GroupListItem';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import SimpleModule from '../SimpleModule';
 import { ContextManager } from '../../managers/ContextManager';
-import { ButtonGroup, Button } from 'reactstrap';
 import { CommonModuleProps } from '../Module';
 import SimpleGroupListItem from './SimpleGroupListItem';
 import { DropDownMenu } from '../../components/general/DropDownMenu';

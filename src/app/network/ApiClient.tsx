@@ -258,9 +258,12 @@ export abstract class ApiClient
         })
 
     }
-    static getRecentActivity(limit:number, offset:number, callback:ApiClientFeedPageCallback<RecentActivity>)
+    static getRecentActivity(limit:number, offset:number, onlyUnseen, callback:ApiClientFeedPageCallback<RecentActivity>)
     {
         let url = Constants.apiRoute.recentActivityUrl + "?" + this.getQueryString({limit, offset})
+        if (onlyUnseen) {
+            url += '&only_unseen=true'
+        }
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
@@ -313,7 +316,7 @@ export abstract class ApiClient
             callback(null, status, new RequestErrorData(request.responseJSON, error))
         })
     }
-    
+
     static archiveConversation(conversationId:number, callback:ApiClientCallback<any>)
     {
         let url = Constants.apiRoute.archiveConversation(conversationId)
@@ -437,7 +440,7 @@ export abstract class ApiClient
                 callback(data, status, error)
             })
         }
-        else 
+        else
         {
             AjaxRequest.postJSON(url, crop, (data, status, request) => {
                 callback(data, status, null)
