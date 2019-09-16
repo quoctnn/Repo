@@ -75,6 +75,13 @@ See the Apache Version 2.0 License for specific language governing permissions
 and limitations under the License.
 ***************************************************************************** */
 
+/*!
+ * mime-types
+ * Copyright(c) 2014 Jonathan Ong
+ * Copyright(c) 2015 Douglas Christopher Wilson
+ * MIT Licensed
+ */
+
 /*! jQuery v3.4.1 | (c) JS Foundation and other contributors | jquery.org/license */
 
 /*!
@@ -155,13 +162,6 @@ and limitations under the License.
  *
  * Copyright © 2012-2016 Faisal Salman <fyzlman@gmail.com>
  * Dual licensed under GPLv2 or MIT
- */
-
-/*!
- * mime-types
- * Copyright(c) 2014 Jonathan Ong
- * Copyright(c) 2015 Douglas Christopher Wilson
- * MIT Licensed
  */
 
 /*!

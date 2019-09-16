@@ -120,7 +120,10 @@ const template = [
         type: 'separator'
       },
       {
-        role: 'togglefullscreen', label: i18n.__('Toggle fullscreen')
+        label: i18n.__('Developer Tools'),
+        click(menuItem, browserWindow, event) {
+          browserWindow.webContents.openDevTools();
+        }
       }
     ]
   },
