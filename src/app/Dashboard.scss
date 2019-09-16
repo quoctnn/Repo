@@ -21,16 +21,19 @@
     }
 }
 body.has-side-menu {
-    @media (min-width: 640px){
+    .dashboard-container
+    {
+        margin-left: $sideMenuInactiveWidth;
+    }
+    &.side-menu-locked{
         .dashboard-container
         {
-            margin-left: $sideMenuInactiveWidth;
+            margin-left: $sideMenuActiveWidth;
         }
-        &.side-menu-locked{
-            .dashboard-container
-            {
-                margin-left: $sideMenuActiveWidth;
-            }
+    }
+    @media (max-width: 640px){
+        .dashboard-container{
+            margin-left:0;
         }
     }
 }

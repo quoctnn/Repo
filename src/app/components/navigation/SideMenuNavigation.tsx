@@ -283,7 +283,7 @@ type Props = OwnProps & ReduxStateProps
 type State = {
     open: boolean
     mode: MenuViewMode
-    closeMenuOnNavigation:boolean
+    closeMenuOnNavigation?:boolean
 }
 export const SideMenuNavigationToggleMenuNotification = "SideMenuNavigationToggleMenuNotification"
 export const SideMenuNavigationVisibilityChangeNotification = "SideMenuNavigationVisibilityChangeNotification"
@@ -347,7 +347,9 @@ class SideMenuNavigation extends React.Component<Props, State> {
     }
     toggleMenu = () => {
         this.setState((prevState: State) => {
-            return { open: !prevState.open }
+            if(prevState.open)
+                return { open: false, closeMenuOnNavigation:true}
+            return { open: true }
         })
     }
     sendChange = () => {
