@@ -35,9 +35,11 @@ import { FileUtilities } from '../../utilities/FileUtilities';
 import { SecureImage } from '../../components/general/SecureImage';
 import * as Mime from 'mime-types';
 import FilesUpload from '../../components/status/FilesUpload';
-import { ResponsiveNotifierDidUpdateNotification } from '../../components/general/observers/ResponsiveNotifier';
 import { CommonModuleProps } from '../Module';
-import { ModuleResizeExpandNotification, ModuleResizeResetNotification } from '../../DashboardWithData';
+import { Button } from 'reactstrap';
+import Routes from '../../utilities/Routes';
+import SimpleDialog from '../../components/general/dialogs/SimpleDialog';
+import ConversationDetailsModule from './ConversationDetailsModule';
 
 type FilePreviewProps = {
     file:File
@@ -81,9 +83,9 @@ export class FilePreview extends React.Component<FilePreviewProps, {preview?:str
         const extension =  Mime.extension(file.type)
         const type = UploadedFileType.parseFromMimeType(file.type)
         return  <>
-                <div className={classnames("file-icon-container", type, extension)}><i className="fa file-icon"></i></div>
-                <div className="title text-truncate">{this.props.file.name}</div>
-                <div className="size text-truncate small-text">{FileUtilities.humanFileSize(this.props.file.size)}</div>
+                    <div className={classnames("file-icon-container", type, extension)}><i className="fa file-icon"></i></div>
+                    <div className="title text-truncate">{this.props.file.name}</div>
+                    <div className="size text-truncate small-text">{FileUtilities.humanFileSize(this.props.file.size)}</div>
                 </>
     }
     removeFile = () => {
@@ -107,6 +109,7 @@ const messageToTimestamp = (message:Message) => new Date(message.updated_at).get
 type OwnProps = {
     className?:string
     breakpoint:ResponsiveBreakpoint
+    singleMode?:boolean
 } & CommonModuleProps
 type State = {
     items:Message[]
@@ -122,6 +125,7 @@ type State = {
     showDropzone: boolean
     files:UploadedFile[]
     uploading:boolean
+    showEditDialog:boolean
 }
 type ReduxStateProps = {
     conversation: Conversation
@@ -141,7 +145,6 @@ class ConversationModule extends React.Component<Props, State> {
     private messageComposer = React.createRef<ChatMessageComposer>();
     private uploadRef = React.createRef<any>();
     private protectKey = uniqueId()
-    private isModuleMaximized = false
     constructor(props:Props) {
         super(props);
         this.state = {
@@ -157,7 +160,8 @@ class ConversationModule extends React.Component<Props, State> {
             renderDropZone:false,
             showDropzone:false,
             files:[],
-            uploading:false
+            uploading:false,
+            showEditDialog:false
         }
     }
     shouldReloadList = (prevProps:Props) => {
@@ -177,32 +181,10 @@ class ConversationModule extends React.Component<Props, State> {
         this.observers.push(obs1)
         const obs2 = NotificationCenter.addObserver("eventstream_" + EventStreamMessageType.CONVERSATION_MESSAGE, this.incomingMessageHandler)
         this.observers.push(obs2)
-        this.observers.push(NotificationCenter.addObserver(ResponsiveNotifierDidUpdateNotification, this.processResponsiveNotifierDidUpdateNotification))
         if(this.props.conversation)
         {
             this.reload()
         }
-        this.sendModuleResizeRequest(window.app.breakpoint)
-    }
-    sendModuleResizeRequest = (breakpoint:ResponsiveBreakpoint) => {
-
-        if(!this.props.conversation)
-            return
-        if(breakpoint >= ResponsiveBreakpoint.big && this.isModuleMaximized)
-        {
-            this.isModuleMaximized = false
-            NotificationCenter.push(ModuleResizeResetNotification, [{id:this.props.__module_id, dashboard:this.props.__dashboard_id}])
-        }
-        else if(breakpoint < ResponsiveBreakpoint.big && !this.isModuleMaximized) 
-        {
-            this.isModuleMaximized = true
-            NotificationCenter.push(ModuleResizeExpandNotification, [{id:this.props.__module_id, dashboard:this.props.__dashboard_id}])
-        }
-        console.log("processResponsiveNotifierDidUpdateNotification", breakpoint, this.isModuleMaximized)
-    }
-    processResponsiveNotifierDidUpdateNotification = (...args:any[]) => {
-        const data:{old:ResponsiveBreakpoint, new:ResponsiveBreakpoint} = args[0]
-        this.sendModuleResizeRequest(data.new)
     }
     componentWillUnmount = () =>
     {
@@ -712,13 +694,43 @@ class ConversationModule extends React.Component<Props, State> {
             placeholder={translate("conversation.create.members.placeholder")}
         /></div>
     }
+    navigateToConversations = () => {
+        window.app.navigateToRoute(Routes.conversationUrl(null))
+    }
+    renderBackButton = () => {
+        if(this.props.singleMode)
+            return <Button color="light" onClick={this.navigateToConversations} className="back-button mr-2">
+                        <i className="fas fa-arrow-left"></i>
+                    </Button>
+        return null
+    }
+    toggleEditDialog = () => {
+        this.setState((prevState:State) => {
+            return {showEditDialog:!prevState.showEditDialog}
+        })
+    }
+    renderEditButton = () => {
+        if(this.props.singleMode)
+            return <Button color="light" onClick={this.toggleEditDialog} className="edit-button mr-2">
+                        <i className="fas fa-edit"></i>
+                    </Button>
+        return null
+    }
     renderConversationEditorTitle = () => {
         const conversation = this.props.conversation
         if(conversation)
         {
-            return <div className="text-truncate">{ConversationUtilities.getConversationTitle(conversation)}</div>
+            return <div className="mw0 d-flex w-100">
+                {this.renderBackButton()}
+                <div className="title text-truncate flex-grow-1">{ConversationUtilities.getConversationTitle(conversation)}</div>
+            </div>
         }
         return null
+    }
+    renderEditDialog = () => {
+        return <SimpleDialog didCancel={this.toggleEditDialog} visible={this.state.showEditDialog} header={translate("Update conversation")}>
+            <ConversationDetailsModule breakpoint={this.props.breakpoint} />
+        </SimpleDialog>
     }
     render()
     {
@@ -731,8 +743,10 @@ class ConversationModule extends React.Component<Props, State> {
                     headerClick={this.headerClick}
                     breakpoint={breakpoint}
                     isLoading={this.state.isLoading}
+                    headerContent={this.renderEditButton()}
                     headerTitle={title}>
                 {this.renderContent()}
+                {this.renderEditDialog()}
                 </SimpleModule>)
     }
 }

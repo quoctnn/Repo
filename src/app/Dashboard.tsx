@@ -40,6 +40,7 @@ import StatusModule from "./modules/status/StatusModule";
 import CalendarModule from "./modules/calendar/CalendarModule";
 import FullCalendarModule from "./modules/calendar/FullCalendarModule";
 import ConversationDetailsModule from "./modules/conversation/ConversationDetailsModule";
+import ConversationContainerModule from "./modules/conversation/ConversationContainerModule";
 
 type DemoProps = {
     text?:string
@@ -78,6 +79,7 @@ export namespace DashboardComponents {
         "FilesModule":FilesModule,
         "ConversationsModule":ConversationsModule,
         "ConversationModule":ConversationModule,
+        "ConversationContainerModule":ConversationContainerModule,
         "RecentActivityModule":ActivityModule,
         "CoverModule":CoverModule,
         "ContactsModule":ContactsModule,

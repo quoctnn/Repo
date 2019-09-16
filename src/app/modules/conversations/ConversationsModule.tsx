@@ -39,11 +39,11 @@ export type ConversationActionArgument = {conversation:number, users?:number[], 
 type IsTypingStore = {[conversation:number]:{[user:number]:NodeJS.Timer}}
 type OwnProps = {
     breakpoint:ResponsiveBreakpoint
-} & CommonModuleProps & DispatchProp
+} & CommonModuleProps
 type DefaultProps = {
     activeConversation:number
     preventShowTypingInChatId:number,
-}
+} & DispatchProp
 type State = {
     isLoading:boolean
     isTyping:IsTypingStore
@@ -68,7 +68,8 @@ class ConversationsModule extends React.Component<Props, State> {
     private observers:EventSubscription[] = []
     static defaultProps:DefaultProps = {
         activeConversation:-1,
-        preventShowTypingInChatId:-1
+        preventShowTypingInChatId:-1,
+        dispatch:null
     }
     constructor(props:Props) {
         super(props);
@@ -509,9 +510,5 @@ const mapStateToProps = (state:ReduxState, ownProps: OwnProps & RouteComponentPr
         tempConversation,
         routeConversationId: conversationId
     }
-}
-const mergeProps = (stateProps, dispatchProps, ownProps) =>
-{
-    return {...ownProps, ...stateProps}
 }
 export default withRouter(connect(mapStateToProps, undefined)(ConversationsModule))

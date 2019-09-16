@@ -216,7 +216,7 @@ export class ChatMessageComposer extends React.Component<Props,State> {
         this.setState(() => {
             return { editorState, plainText:"" }
         })
-        this.focusEnd()
+        //this.focusEnd()
     }
     getContent = () => {
         return this.getProcessedText()
@@ -232,7 +232,7 @@ export class ChatMessageComposer extends React.Component<Props,State> {
             const editorState = EditorState.push(this.state.editorState, ContentState.createFromText(''), "remove-range");
             this.setState({plainText: '', editorState})
             NavigationUtilities.protectNavigation(this.protectKey, false);
-            this.focusEnd()
+            //this.focusEnd()
         }
         return false
     }

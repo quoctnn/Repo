@@ -468,6 +468,7 @@ var translations = {
     "sending failed":"Sending failed",
     "common.upload.error":"Upload failed",
     "common.files":"files",
+    "Update conversation":"Update conversation",
 
   },
   no: {
@@ -939,6 +940,7 @@ var translations = {
     "sending failed":"Sending feilet",
     "common.upload.error":"opplasting feilet",
     "common.files":"filer",
+    "Update conversation":"Oppdater samtale",
   },
   en: {
     "search.placeholder": "Search ...",
@@ -1419,6 +1421,7 @@ var translations = {
     "sending failed":"Sending failed",
     "common.upload.error":"Upload failed",
     "common.files":"files",
+    "Update conversation":"Update conversation",
   }
 };
 
