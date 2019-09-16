@@ -18,6 +18,7 @@ type OwnProps = {
     id?:string
     fill:boolean
     updateKey?:string
+    dashboardId:number
 }
 type DefaultProps = {
 
@@ -44,7 +45,8 @@ export class Grid extends React.PureComponent<Props, State> {
         this.state = {items:[], rects:{}}
     }
     componentDidUpdate = (prevProps:Props) => {
-        if((this.props.fill && !this.bodyClassAdded || !this.props.fill && this.bodyClassAdded))
+        console.log("dash-fill", this.props.fill, this.bodyClassAdded)
+        if((this.props.fill && !this.bodyClassAdded) || (!this.props.fill && this.bodyClassAdded))
         {
             if(this.bodyClassAdded)
             {
@@ -191,6 +193,8 @@ export class Grid extends React.PureComponent<Props, State> {
         props.key = key
         props.moduleRef = this.connectRef(key)
         props.className = ccn
+        props.__module_id = module.id
+        props.__dashboard_id = this.props.dashboardId
         props.breakpoint = this.props.breakpoint
         return DashboardComponents.getComponent(module.type, props)
     }
@@ -200,11 +204,12 @@ export class Grid extends React.PureComponent<Props, State> {
         return  <div className={cn}>
                     {columns.map(c => {
                         const key = "col_" + c.id + "_" + level
+                        const ccn = c.width == 0 ? colCN + " d-none" : colCN
                         if(tabbed && c.module)
-                            return <TabPanel className={colCN} key={key} xs={c.width}>{this.renderModule(c.module)}</TabPanel>
+                            return <TabPanel className={ccn} key={key} xs={c.width}>{this.renderModule(c.module)}</TabPanel>
                         else if(c.module)
-                            return <Col className={colCN} key={key} xs={c.width}>{this.renderModule(c.module)}</Col>
-                        else return  <Col className={colCN} key={key} xs={c.width}>{this.renderColumns(c, c.children, level + 1)}</Col>
+                            return <Col className={ccn} key={key} xs={c.width}>{this.renderModule(c.module)}</Col>
+                        else return  <Col className={ccn} key={key} xs={c.width}>{this.renderColumns(c, c.children, level + 1)}</Col>
                     })}
                 </div>
     }

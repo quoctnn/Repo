@@ -30,6 +30,7 @@ import { activateCrosstabAuthenticationSync } from "./redux/crosstabAuthenticati
 import { ThemeManager } from "./managers/ThemeManager";
 import { NavigationUtilities } from "./utilities/NavigationUtilities";
 import GlobalErrorBoundary from "./components/error/GlobalErrorBoundary";
+import ResponsiveNotifier from "./components/general/observers/ResponsiveNotifier";
 
 
 const store = createStore(appReducer, applyMiddleware(...middleWares));
@@ -57,6 +58,7 @@ export const App = (props: any) => {
     <Provider store={store}>
         <GlobalErrorBoundary>
             <ChannelEventStream />
+            <ResponsiveNotifier />
             <PersistGate loading={null} persistor={persistor}>
                 <AutoIntlProvider>
                         <Router getUserConfirmation={NavigationUtilities.getProtectedNavigationConfirmation}>

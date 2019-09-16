@@ -116,6 +116,7 @@ type State = {
 }
 type Props = OwnProps & RouteComponentProps<any>
 
+
 class DashboardComponent extends React.Component<Props, State> {
     constructor(props:Props)
     {
@@ -160,8 +161,8 @@ class DashboardComponent extends React.Component<Props, State> {
     {
         const grid = this.findGridLayout(this.props.breakpoint, true)
         const modulesCount = this.countModules( grid.columns || [])
-        const fill = (modulesCount == 1 || this.props.breakpoint > ResponsiveBreakpoint.standard) && grid.fill
-        return (<Grid updateKey={this.props.updateKey} fill={fill} grid={grid} breakpoint={this.props.breakpoint} enableAnimation={true} />)
+        const fill = (modulesCount == 1 || this.props.breakpoint >= ResponsiveBreakpoint.mini) && grid.fill
+        return (<Grid dashboardId={this.props.dashboard.id} updateKey={this.props.updateKey} fill={fill} grid={grid} breakpoint={this.props.breakpoint} enableAnimation={true} />)
     }
     findGridLayout = (breakpoint: number, useDefaultAsFallback:boolean) => {
 

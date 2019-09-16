@@ -16,6 +16,10 @@ import classnames = require("classnames");
 import CommunitySelector from "../general/community/CommunitySelector";
 import BreadcrumbNavigation from "./BreadcrumbNavigation";
 import Logo from "../general/images/Logo";
+import { EventSubscription } from "fbemitter";
+import { AnimatedIconStack } from "../general/AnimatedIconStack";
+import { NotificationCenter } from "../../utilities/NotificationCenter";
+import { SideMenuNavigationVisibilityChangeNotification } from "./SideMenuNavigation";
 
 type OwnProps = {
 }
@@ -25,16 +29,35 @@ type ReduxStateProps = {
     profile: UserProfile
     unreadNotifications: number
     unreadConversations:number
+
 }
 type State = {
     notificationsPanelVisible:boolean
+    sideMenuOpen:boolean
 }
 class TopNavigation extends React.Component<Props, State> {
+    observers:EventSubscription[] = []
     constructor(props:Props) {
         super(props)
         this.state = {
             notificationsPanelVisible:false,
+            sideMenuOpen:false
         }
+        const observer1 = NotificationCenter.addObserver(SideMenuNavigationVisibilityChangeNotification, this.processMenuVisibilityChangeNotification)
+        this.observers.push(observer1)
+    }
+    processMenuVisibilityChangeNotification = (...args:any[]) => {
+        const open = args[0].open
+        if(this.state.sideMenuOpen != open)
+        {
+            this.setState(() => {
+                return {sideMenuOpen:open}
+            })
+        }
+    }
+    componentWillUnmount() {
+        this.observers.forEach(o => o.remove())
+        this.observers = null
     }
     navigateToCommunity = (event:React.SyntheticEvent<any>) => {
         event.preventDefault()
@@ -92,6 +115,7 @@ class TopNavigation extends React.Component<Props, State> {
         return (
             <div id="top-navigation">
                 <div className="top-navigation-content d-flex main-content-background align-items-center px-2 drop-shadow">
+                    <AnimatedIconStack size={2} active={this.state.sideMenuOpen} onClick={window.app.toggleMenu} className="menu-toggle d-none mr-2" iconA="fas fa-bars" />
                     <CommunitySelector />
                     <div className="main-border-color-background mx-2" style={{ width: 1, height: "75%" }}></div>
                     <BreadcrumbNavigation />

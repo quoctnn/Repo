@@ -19,6 +19,8 @@ import { Link } from "react-router-dom";
 import { ContextManager } from "../../managers/ContextManager";
 import { AuthenticationManager } from '../../managers/AuthenticationManager';
 import { Settings } from '../../utilities/Settings';
+import { NotificationCenter } from "../../utilities/NotificationCenter";
+import { EventSubscription } from "fbemitter";
 
 type ContextItemProps = {
     name?:string
@@ -283,11 +285,14 @@ type State = {
     mode: MenuViewMode
     closeMenuOnNavigation:boolean
 }
+export const SideMenuNavigationToggleMenuNotification = "SideMenuNavigationToggleMenuNotification"
+export const SideMenuNavigationVisibilityChangeNotification = "SideMenuNavigationVisibilityChangeNotification"
 class SideMenuNavigation extends React.Component<Props, State> {
     static bodyClass = "has-side-menu"
     static sideMenuLockedClass = "side-menu-locked"
     static animationDuration = 300
     private contentRef = React.createRef<HTMLDivElement>()
+    private observers:EventSubscription[] = []
     constructor(props: Props) {
         super(props)
         this.state = {
@@ -297,10 +302,18 @@ class SideMenuNavigation extends React.Component<Props, State> {
         }
         document.body.classList.add(SideMenuNavigation.bodyClass)
     }
+    processToggleMenuNotification = (...args:any[]) => {
+        this.toggleMenu()
+    }
+    componentDidMount = () => {
+        const observer1 = NotificationCenter.addObserver(SideMenuNavigationToggleMenuNotification, this.processToggleMenuNotification)
+        this.observers.push(observer1)
+    }
     outsideTrigger = (e:MouseEvent) => {
         if(this.isDialogVisible())
             return
-        if(!this.contentRef.current.contains(e.target as any))
+        const el = e.target as HTMLElement
+        if(el && !this.contentRef.current.contains(el) && !el.closest(".menu-toggle"))
             this.toggleMenu()
     }
     componentDidUpdate = (prevProps:Props, prevState:State) => {
@@ -320,16 +333,25 @@ class SideMenuNavigation extends React.Component<Props, State> {
             else
                 document.body.classList.add(SideMenuNavigation.sideMenuLockedClass)
         }
+        if(prevState.open != this.state.open)
+        {
+            this.sendChange()
+        }
     }
     componentWillUnmount = () => {
         document.body.classList.remove(SideMenuNavigation.bodyClass)
         document.body.classList.remove(SideMenuNavigation.sideMenuLockedClass)
         document.removeEventListener('mousedown', this.outsideTrigger);
+        this.observers.forEach(o => o.remove())
+        this.observers = null
     }
     toggleMenu = () => {
         this.setState((prevState: State) => {
             return { open: !prevState.open }
         })
+    }
+    sendChange = () => {
+        NotificationCenter.push(SideMenuNavigationVisibilityChangeNotification,[{open:this.state.open}])
     }
     closeOnNavigation = () => {
         this.setState((prevState: State) => {
@@ -369,7 +391,7 @@ class SideMenuNavigation extends React.Component<Props, State> {
         const openMenu = !this.state.open ? this.toggleMenu : undefined
         const closeMenu = this.state.open ? this.closeOnNavigation : undefined
         const mode = this.state.mode
-        const cn = classnames("main-content-background drop-shadow", mode,  { active: this.state.open })
+        const cn = classnames("main-content-background drop-shadow", mode,  { active: this.state.open})
         const modeIcon = mode == MenuViewMode.list ? "fas fa-th-large" : "fas fa-th-list"
         const modeIconClass = classnames("anim-icon-button", modeIcon)
         const borderHeight = this.state.open ? 1 : 0
@@ -387,12 +409,12 @@ class SideMenuNavigation extends React.Component<Props, State> {
                             <i className="fas fa-info-circle"></i>
                         </Link>
                         { Settings.isElectron ||
-                            <Link to={Routes.DEVELOPER_TOOL.path} className="menu-button">
+                            <Link onClick={this.toggleMenu} to={Routes.DEVELOPER_TOOL.path} className="menu-button">
                                 <i className="fas fa-cog"></i>
                             </Link>
                         }
                         { anonUser ||
-                            <Link to={Routes.FILES} className="menu-button">
+                            <Link onClick={this.toggleMenu} to={Routes.FILES} className="menu-button">
                                 <i className="fas fa-cloud"></i>
                             </Link>
                         }

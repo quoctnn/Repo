@@ -12,6 +12,8 @@ export type CommonModuleProps = {
     moduleRef?:React.LegacyRef<HTMLDivElement>
     className?: string
     style?: React.CSSProperties;
+    __module_id?:number
+    __dashboard_id?:number
 
 } //& React.HTMLAttributes<HTMLElement>
 export default class Module extends React.Component<CommonModuleProps , {}> {

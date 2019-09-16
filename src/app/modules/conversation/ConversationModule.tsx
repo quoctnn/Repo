@@ -35,6 +35,9 @@ import { FileUtilities } from '../../utilities/FileUtilities';
 import { SecureImage } from '../../components/general/SecureImage';
 import * as Mime from 'mime-types';
 import FilesUpload from '../../components/status/FilesUpload';
+import { ResponsiveNotifierDidUpdateNotification } from '../../components/general/observers/ResponsiveNotifier';
+import { CommonModuleProps } from '../Module';
+import { ModuleResizeExpandNotification, ModuleResizeResetNotification } from '../../DashboardWithData';
 
 type FilePreviewProps = {
     file:File
@@ -104,8 +107,7 @@ const messageToTimestamp = (message:Message) => new Date(message.updated_at).get
 type OwnProps = {
     className?:string
     breakpoint:ResponsiveBreakpoint
-    contextNaturalKey?:ContextNaturalKey
-}
+} & CommonModuleProps
 type State = {
     items:Message[]
     isLoading: boolean
@@ -139,6 +141,7 @@ class ConversationModule extends React.Component<Props, State> {
     private messageComposer = React.createRef<ChatMessageComposer>();
     private uploadRef = React.createRef<any>();
     private protectKey = uniqueId()
+    private isModuleMaximized = false
     constructor(props:Props) {
         super(props);
         this.state = {
@@ -174,10 +177,32 @@ class ConversationModule extends React.Component<Props, State> {
         this.observers.push(obs1)
         const obs2 = NotificationCenter.addObserver("eventstream_" + EventStreamMessageType.CONVERSATION_MESSAGE, this.incomingMessageHandler)
         this.observers.push(obs2)
+        this.observers.push(NotificationCenter.addObserver(ResponsiveNotifierDidUpdateNotification, this.processResponsiveNotifierDidUpdateNotification))
         if(this.props.conversation)
         {
             this.reload()
         }
+        this.sendModuleResizeRequest(window.app.breakpoint)
+    }
+    sendModuleResizeRequest = (breakpoint:ResponsiveBreakpoint) => {
+
+        if(!this.props.conversation)
+            return
+        if(breakpoint >= ResponsiveBreakpoint.big && this.isModuleMaximized)
+        {
+            this.isModuleMaximized = false
+            NotificationCenter.push(ModuleResizeResetNotification, [{id:this.props.__module_id, dashboard:this.props.__dashboard_id}])
+        }
+        else if(breakpoint < ResponsiveBreakpoint.big && !this.isModuleMaximized) 
+        {
+            this.isModuleMaximized = true
+            NotificationCenter.push(ModuleResizeExpandNotification, [{id:this.props.__module_id, dashboard:this.props.__dashboard_id}])
+        }
+        console.log("processResponsiveNotifierDidUpdateNotification", breakpoint, this.isModuleMaximized)
+    }
+    processResponsiveNotifierDidUpdateNotification = (...args:any[]) => {
+        const data:{old:ResponsiveBreakpoint, new:ResponsiveBreakpoint} = args[0]
+        this.sendModuleResizeRequest(data.new)
     }
     componentWillUnmount = () =>
     {
@@ -716,7 +741,8 @@ const mapStateToProps = (state:ReduxState, ownProps: OwnProps & RouteComponentPr
     const conversation = ContextManager.getContextObject(ownProps.location.pathname, ContextNaturalKey.CONVERSATION) as Conversation || state.tempCache.conversation
     const authenticatedUser = AuthenticationManager.getAuthenticatedUser()
     const queuedMessages = (!!conversation && ConversationManager.getQueuedMessages(conversation.id)) || []
-    const createNewConversation = ownProps.match.params.conversationId == tempConversationId
+    const conversationId:string = ownProps.match.params.conversationId
+    const createNewConversation = conversationId == tempConversationId
     return {
         conversation,
         authenticatedUser,

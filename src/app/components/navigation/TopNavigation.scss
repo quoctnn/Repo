@@ -27,6 +27,11 @@
             margin-right: 6px;
         }
     }
+    @media (max-width: 640px){
+        .menu-toggle{
+            display: block !important;
+        }
+    }
 }
 .search-modal{
     margin-left: auto;

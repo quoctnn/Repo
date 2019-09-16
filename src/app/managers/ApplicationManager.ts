@@ -2,7 +2,7 @@ import {  Store } from 'redux';
 import { ReduxState } from '../redux/index';
 import { setApplicationLoadedAction } from '../redux/application';
 import { AuthenticationManager } from './AuthenticationManager';
-import { Dashboard } from '../types/intrasocial_types';
+import { Dashboard, GridColumn } from '../types/intrasocial_types';
 import {ApiClient,  ListOrdering } from '../network/ApiClient';
 import { ToastManager } from './ToastManager';
 import { CommunityManager } from './CommunityManager';
@@ -41,6 +41,14 @@ export type LoadingProgress = {
 }
 export const ApplicationManagerLoadingProgressNotification = "ApplicationManagerLoadingProgressNotification"
 export const ApplicationManagerApplicationLoadedNotification = "ApplicationManagerApplicationLoadedNotification"
+const cloneColumn = (columns:GridColumn[]) => {
+    return columns.map(f => {
+        const c = {...f}
+        c.children = cloneColumn(f.children)
+        c.module = f.module && {...f.module}
+        return c
+    })
+}
 export abstract class ApplicationManager
 {
     private static applicationData:ApplicationData = null
@@ -58,8 +66,14 @@ export abstract class ApplicationManager
     }
     static getDashboards = (category:string) => {
         const all = ApplicationManager.applicationData.dashboards[category]
-        all.grid_layouts = all.grid_layouts.sort((a, b) => b.min_width - a.min_width)
-        return all
+        const clone = {...all}
+        clone.grid_layouts = clone.grid_layouts.sort((a, b) => b.min_width - a.min_width)
+        clone.grid_layouts = clone.grid_layouts.map(gl => {
+            const c = {...gl}
+            c.columns = cloneColumn(c.columns)
+            return c
+        })
+        return clone
     }
     static setDashboard = (dashboard:Dashboard) => {
         ApplicationManager.applicationData.dashboards[dashboard.category] = dashboard

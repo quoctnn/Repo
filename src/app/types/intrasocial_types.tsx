@@ -1546,6 +1546,7 @@ export type Module = {
     type: string
     disabled: boolean
     properties: Object
+    parent?:GridColumn
 }
 export type GridColumn = {
     id: number
@@ -1555,6 +1556,7 @@ export type GridColumn = {
     index: number
     sticky?: boolean
     tabbed_layout?: boolean
+    parent?:GridColumn
 }
 export type GridColumns = {
     id: number

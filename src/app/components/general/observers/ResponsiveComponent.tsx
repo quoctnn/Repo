@@ -5,7 +5,7 @@ export enum ResponsiveBreakpoint {
     micro = 60,
     mini = 200,
     standard = 400,
-    big = 600,
+    big = 640,
 }
 export namespace ResponsiveBreakpoint {
     const all = [

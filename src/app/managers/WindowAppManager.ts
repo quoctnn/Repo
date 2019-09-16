@@ -3,7 +3,7 @@ import { ReduxState } from '../redux';
 import { resetProjectsAction } from '../redux/projectStore';
 import { resetEventsAction } from '../redux/eventStore';
 import ReconnectingWebSocket from "reconnecting-websocket";
-import { eventStreamNotificationPrefix, EventStreamMessageType } from '../network/ChannelEventStream';
+import { eventStreamNotificationPrefix } from '../network/ChannelEventStream';
 import { NotificationCenter } from '../utilities/NotificationCenter';
 import { ToastManager } from './ToastManager';
 import { translate } from '../localization/AutoIntlProvider';
@@ -14,6 +14,8 @@ import { CommunityManager } from './CommunityManager';
 import { Settings } from '../utilities/Settings';
 import { setLanguageAction, availableLanguages } from '../redux/language';
 import { RequestErrorData } from '../types/intrasocial_types';
+import { SideMenuNavigationToggleMenuNotification } from '../components/navigation/SideMenuNavigation';
+import { ResponsiveBreakpoint } from '../components/general/observers/ResponsiveComponent';
 
 const url = require('url');
 const path = require("path")
@@ -35,6 +37,8 @@ export type AppWindowObject = {
     setLanguage:(index:number) => void
     language:string
     createError:() => void
+    toggleMenu:() => void
+    breakpoint:ResponsiveBreakpoint
 }
 export abstract class WindowAppManager
 {
@@ -56,10 +60,14 @@ export abstract class WindowAppManager
             navigateToRoute:WindowAppManager.navigateToRoute,
             setLanguage:WindowAppManager.setLanguage,
             language:WindowAppManager.language,
-            createError:WindowAppManager.createError
-            
+            createError:WindowAppManager.createError,
+            toggleMenu:WindowAppManager.toggleMenu,
+            breakpoint:ResponsiveBreakpoint.micro
         }
         //
+    }
+    static toggleMenu = () => {
+        NotificationCenter.push(SideMenuNavigationToggleMenuNotification,[])
     }
     static createError = () => {
         try {

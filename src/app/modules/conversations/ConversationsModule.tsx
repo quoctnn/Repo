@@ -144,7 +144,8 @@ class ConversationsModule extends React.Component<Props, State> {
         {
             this.conversationsList.current.safeUnshift(this.props.tempConversation)
         }
-        if(!this.props.routeConversationId)
+        const bp = window.app.breakpoint
+        if(bp >= ResponsiveBreakpoint.big && !this.props.routeConversationId)
         {
             this.navigateToFirstConversation()
         }
@@ -377,7 +378,8 @@ class ConversationsModule extends React.Component<Props, State> {
         return items.filter(i => !i.temporary).length
     }
     onDidLoadData = (offset:number) => {
-        if(offset == 0 && this.props.activeConversation == null)
+        const bp = window.app.breakpoint
+        if(bp >= ResponsiveBreakpoint.big && offset == 0 && this.props.activeConversation == null)
         {
             this.navigateToFirstConversation()
         }
