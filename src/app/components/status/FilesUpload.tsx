@@ -3,7 +3,7 @@ import { Settings } from '../../utilities/Settings';
 import { UploadedFile, UploadedFileType, UserProfile } from '../../types/intrasocial_types';
 import Dropzone from 'react-dropzone';
 import * as Mime from "mime-types"
-import "./FilesUpload.scss" 
+import "./FilesUpload.scss"
 import FileListItem from '../../modules/files/FileListItem';
 import ListComponent, { ListComponentHeader } from '../general/ListComponent';
 import { FileUploaderService, FileQueueObject, ExtendedFile } from './FileUploadService';
@@ -43,7 +43,7 @@ type ReduxStateProps = {
 }
 type Props = DefaultProps & OwnProps & ReduxStateProps
 
-class FilesUpload extends React.Component<Props, State> { 
+class FilesUpload extends React.Component<Props, State> {
     filesList = React.createRef<ListComponent<FileListItemType>>()
     listComponent = React.createRef<HTMLDivElement>()
     private fileUploaderService:FileUploaderService = null
@@ -169,7 +169,7 @@ class FilesUpload extends React.Component<Props, State> {
             thumbnail: queueObj.file.preview,
             size: queueObj.file.size,
             created_at: new Date().toUTCString(),
-            //ext  
+            //ext
             tempId:queueObj.file.tempId,
             custom: true,
             uploadProgress:queueObj.progress,
@@ -182,7 +182,7 @@ class FilesUpload extends React.Component<Props, State> {
         const incomingFiles = this.props.files || []
         return <div ref={this.listComponent} className="list list-component-list vertical-scroll">
                     {this.state.files.map(f => this.renderFile(this.convertFile(f)))}
-                    {this.props.showListHeader && incomingFiles.length > 0 && 
+                    {this.props.showListHeader && incomingFiles.length > 0 &&
                         <ListComponentHeader title={translate("files.uploaded")} />
                     }
                     {incomingFiles.map(f => this.renderFile(f))}
@@ -196,9 +196,11 @@ class FilesUpload extends React.Component<Props, State> {
             freeMode: true,
             shouldSwiperUpdate:true,
           }
+        const files = incomingFiles.map(f => this.renderFile(f)).concat(
+            this.state.files.map(f => this.renderFile(this.convertFile(f)))
+        )
         return  (<Swiper {...params}>
-                    {this.state.files.map(f => this.renderFile(this.convertFile(f)))}
-                    {incomingFiles.map(f => this.renderFile(f))}
+                    { files }
                 </Swiper>)
     }
     render = () => {

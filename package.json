@@ -64,7 +64,7 @@
     "react-easy-crop": "^1.15.0",
     "react-facebook-login": "^4.1.1",
     "react-google-login": "^5.0.5",
-    "react-id-swiper": "^1.6.8",
+    "react-id-swiper": "^2.3.2",
     "react-intl": "^2.4.0",
     "react-mapbox-gl": "^4.6.0",
     "react-measure": "^2.3.0",
@@ -81,7 +81,8 @@
     "redux": "^4.0.4",
     "redux-persist": "^5.10.0",
     "resize-observer-polyfill": "^1.5.1",
-    "rst2html": "^1.0.4"
+    "rst2html": "^1.0.4",
+    "swiper": "^5.0.1"
   },
   "devDependencies": {
     "@beyonk/google-fonts-webpack-plugin": "^1.2.3",
