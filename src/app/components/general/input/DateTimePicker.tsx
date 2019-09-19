@@ -5,7 +5,7 @@ import * as moment from 'moment-timezone';
 import { translate } from '../../../localization/AutoIntlProvider';
 import { Popover, PopoverBody, Input, InputGroup, Button, InputGroupAddon, ButtonGroup } from 'reactstrap';
 import { uniqueId } from '../../../utilities/Utilities';
-import * as Slider from 'react-input-slider';
+import Slider from 'react-input-slider';
 import "./DateTimePicker.scss"
 import Popper from 'popper.js';
 type OwnProps = {
@@ -477,8 +477,9 @@ const YearPicker = ({defaults, add, onActiveTab, onClick, isDisabled, translatio
     </div>
 )
 type TimePickerProps = {selected:moment.Moment, onSetTime:(key:string) => void, translations:any, minuteSteps?:number, isAM:boolean}
-const TimePicker = ({selected, onSetTime, translations, minuteSteps, isAM}:TimePickerProps) => (
-    <div className="r-time tab-m is-active" style={{paddingBottom:"10px"}}>
+const TimePicker = ({selected, onSetTime, translations, minuteSteps, isAM}:TimePickerProps) => 
+    {
+        return <div className="r-time tab-m is-active" style={{paddingBottom:"10px"}}>
         <div className="showtime">
             <span className="time">{selected.format(isAM ? "hh" :"HH")}</span>
             <span className="separater">:</span>
@@ -511,4 +512,5 @@ const TimePicker = ({selected, onSetTime, translations, minuteSteps, isAM}:TimeP
             />
         </div>
     </div>
-)
+    }
+    

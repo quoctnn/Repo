@@ -187,6 +187,13 @@ export default  {
 
         // Event URLs
         upcomingEventsUrl: '/api/v2/event/upcoming/',
+
+        eventAvatarUrl: (id:number) => {
+            return `/api/v2/event/${id}/avatar/`
+        },
+        eventCoverUrl: (id:number) => {
+            return `/api/v2/event/${id}/cover/`
+        },
         eventsUrl: '/api/v2/event/',
         eventDetailUrl: (id:number|string) => {
             return `/api/v2/event/${id}/`

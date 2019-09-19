@@ -200,7 +200,7 @@ export class MessageContent extends React.Component<Props,State> {
         return  <>
                     {hasContent && this.wrapInMessage(processedContent.content, null, null, message.error )}
                     {hasFiles && this.wrapInMessage(<ContentGallery files={files} setWidth={true}/>, null, null, message.error)}
-                    {hasLinks && urls.map(u => this.wrapInMessage(<Embedly renderOnError={false} verticalCard={true} url={u} />, "embed", null, message.error))}
+                    {hasLinks && urls.map(u => this.wrapInMessage(<Embedly renderOnError={true} verticalCard={true} url={u} />, "embed", null, message.error))}
                     {showError && this.wrapInMessage(this.renderIllegalContent(message), null, null, message.error)}
                 </>
     }

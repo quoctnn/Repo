@@ -239,6 +239,19 @@ export class RequestErrorData{
         }
         return null
     }
+    getErrorMessagesForFields = (keys:string[]) => {
+        if(this.data && typeof this.data == "object")
+        {
+            const obj:{[key:string]:string} = {}
+            keys.forEach(k => {
+                const s = this.data[k]
+                if(s)
+                    obj[k] = s
+            })
+            return obj
+        }
+        return null
+    }
     getErrorMessage = () => {
 
         const error = (this.detail && this.detail.error_description) || (this.data && (this.data.non_field_errors || this.data))
@@ -1321,9 +1334,19 @@ export type Favorite = {
     object: ContextObject
     object_id: number
 } & IdentifiableObject
-export type Coordinate = {
+export class Coordinate {
     lat: number
-    lon: number
+    long: number
+    static equals(a: Coordinate, b: Coordinate): boolean {
+        if((!a && b) || (a && !b))
+            return false
+        return (!a && !b) || ( a.lat == b.lat && a.long == b.long)
+    }
+    static isValid(coordinate: Coordinate): boolean {
+        if(!coordinate)
+            return false
+        return coordinate.lat > 0 && coordinate.long > 0
+    }
 }
 export type Event = {
     name: string

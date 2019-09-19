@@ -5,19 +5,15 @@ import { translate } from '../../localization/AutoIntlProvider';
 import classnames from 'classnames';
 import { ContextNaturalKey, RequestErrorData } from '../../types/intrasocial_types';
 import CircularLoadingSpinner from '../general/CircularLoadingSpinner';
-import { TextInput, TextInputData } from './components/TextInput';
-import { TextAreaInputData, TextAreaInput } from './components/TextAreaInput';
-import { FormComponentData } from './definitions';
-import { ContextPhotoInput, ContextPhotoInputData } from './components/ContextPhotoInput';
-import { RichRadioGroupInputData, RichRadioGroupInput } from './components/RichRadioGroupInput';
-import { SelectInput, SelectInputData } from './components/SelectInput';
-import { ColorInputData, ColorInput } from './components/ColorInput';
 import SimpleDialog from '../general/dialogs/SimpleDialog';
-import { BooleanInputData, BooleanInput } from './components/BooleanInput';
 import { nullOrUndefined } from '../../utilities/Utilities';
-export const FormComponentErrorMessage = (props:{error?:string , className?:string}) => {
-    if(!!props.error)
-        return <FormFeedback className={props.className} tooltip={false}><i className="error-icon fas fa-exclamation-triangle"></i>{" "}{props.error}</FormFeedback>
+import { FormPage } from './FormPage';
+
+
+export const FormComponentErrorMessage = (props:{errors?:{[key:string]:string}, errorKey:string, className?:string}) => {
+    const error = props.errors && props.errors[props.errorKey]
+    if(!!error)
+        return <FormFeedback className={props.className} tooltip={false}><i className="error-icon fas fa-exclamation-triangle"></i>{" "}{error}</FormFeedback>
     return null
 }
 export const FormComponentRequiredMessage = (props:{required:boolean, className?:string}) => {
@@ -42,27 +38,26 @@ export type FormComponentArgument = {
     contextNaturalKey?:ContextNaturalKey
     contextObjectId?:number
     error?:string
-    onValueChanged?:(id:string, value?:any) => void
+    onValueChanged?:(id:string, value:any, isRequired:boolean) => void
     onRequestNavigation?:(title?:string, toView?:React.ReactNode) => void
-}
-export type FormPageData = {
-    title:string
-    description?:string
-    id:string
-    componentData:FormComponentData[]
 }
 export interface FormComponentBase{
     isValid:() => boolean
     getValue:() => any
 }
+type FormContent = {
+    menuItems:React.ReactNode[],
+    pages:React.ReactNode[],
+}
 type Props = {
-    pages:FormPageData[]
     title?:string
     onFormSubmit:(data:{[key:string]:string}) => void
+    onValueChanged?:(id:string, value?:any) => void
     status:FormStatus
     didCancel:() => void
     formErrors:RequestErrorData[]
     visible:boolean
+    render:(form:FormController) => FormContent
 }
 type State = {
     activePageIndex:number
@@ -74,6 +69,7 @@ type State = {
 type ComponentData = FormComponentBase & React.Component<FormComponentArgument>
 export default class FormController extends React.Component<Props, State> {
     pageData:{[key:string]:{[key:string]:ComponentData}} = {}
+    content:FormContent = {pages:[], menuItems:[]}
     constructor(props:Props){
         super(props)
         this.state = {
@@ -108,19 +104,23 @@ export default class FormController extends React.Component<Props, State> {
         })
         return error
     }
+    findPageIndex = (pageId:string) => {
+        const pages = this.content.pages as FormPage[]
+        return pages.findIndex(p => p.props.pageId == pageId)
+    }
     updateFormErrors = (completion?:() => void) => {
         const formErrorData = this.getFormErrorData()
         this.setState(() => {
             return {pageErrorData:formErrorData}
         },completion)
     }
-    handleValueChanged = (pageKey:string) =>  (id:string, value:string) => {
-        const comp = this.pageData[pageKey][id]
-        if(comp.props.isRequired)
+    handleValueChanged = (pageKey:string) =>  (id:string, value:any, isRequired:boolean) => {
+        if(isRequired)
         {
             console.log("handleValueChanged", id, value)
             this.updateFormErrors()
         }
+        this.props.onValueChanged && this.props.onValueChanged(id, value)
     }
     navigateToMainContent = () => {
         this.setState(() => {
@@ -132,98 +132,46 @@ export default class FormController extends React.Component<Props, State> {
             return {secondaryView:toView, secondaryViewTitle:title}
         })
     }
-    setFormRef = (pageKey:string, key:string) => (ref:any) => {
+    setFormRef = (pageKey:string) => (ref:ComponentData) => {
         const page = this.pageData[pageKey] || {}
-        if(nullOrUndefined(ref))
+        if(!nullOrUndefined(ref))
         {
-            delete page[key]
-        }
-        else {
-            page[key] = ref
+            page[ref.props.id] = ref
         }
         this.pageData[pageKey] = page
     }
-    getError = (key:string):string => {
+    getErrors = (keys:string[]):{[key:string]:string} => {
         if(this.props.formErrors)
         {
-           const error = this.props.formErrors.find(fec => !!fec.getErrorMessageForField(key))
-           if(error)
-                return error.getErrorMessageForField(key)
+            let errors:{[key:string]:string} = {}
+            this.props.formErrors.forEach(fec => 
+                {
+                    const e = fec.getErrorMessagesForFields(keys)
+                    if(e)
+                    {
+                        errors = Object.assign(errors, e)
+                    }
+                })
+            return errors
         }
         return null
-    }
-    renderTextInput = (pageKey:string, args:TextInputData) => {
-        args.error = this.getError(args.id)
-        args.hasSubmitted = this.state.hasSubmitted
-        return <TextInput ref={this.setFormRef(pageKey, args.id)} key={args.id} {...args} onValueChanged={this.handleValueChanged(pageKey)} onRequestNavigation={this.handleRequestNavigation} />
-    }
-    renderTextAreaInput = (pageKey:string, args:TextAreaInputData) => {
-        args.error = this.getError(args.id)
-        args.hasSubmitted = this.state.hasSubmitted
-        return <TextAreaInput ref={this.setFormRef(pageKey, args.id)} key={args.id} {...args} onValueChanged={this.handleValueChanged(pageKey)} onRequestNavigation={this.handleRequestNavigation} />
-    }
-    renderContextPhotoInput = (pageKey:string, args:ContextPhotoInputData) => {
-        args.error = this.getError(args.id)
-        return <ContextPhotoInput ref={this.setFormRef(pageKey, args.id)} key={args.id} {...args} onValueChanged={this.handleValueChanged(pageKey)} onRequestNavigation={this.handleRequestNavigation} />
-    }
-    renderRichRadioInput = (pageKey:string, args:RichRadioGroupInputData) => {
-        args.error = this.getError(args.id)
-        args.hasSubmitted = this.state.hasSubmitted
-        return <RichRadioGroupInput ref={this.setFormRef(pageKey, args.id)} key={args.id} {...args} onValueChanged={this.handleValueChanged(pageKey)} onRequestNavigation={this.handleRequestNavigation} />
-    }
-    renderSelectInput = (pageKey:string, args:SelectInputData) => {
-        args.error = this.getError(args.id)
-        args.hasSubmitted = this.state.hasSubmitted
-        return <SelectInput ref={this.setFormRef(pageKey, args.id)} key={args.id} {...args} onValueChanged={this.handleValueChanged(pageKey)} onRequestNavigation={this.handleRequestNavigation} />
-    }
-    renderColorInput = (pageKey:string, args:ColorInputData) => {
-        args.error = this.getError(args.id)
-        args.hasSubmitted = this.state.hasSubmitted
-        return <ColorInput ref={this.setFormRef(pageKey, args.id)} key={args.id} {...args} onValueChanged={this.handleValueChanged(pageKey)} onRequestNavigation={this.handleRequestNavigation} />
-    } 
-    renderBooleanInput = (pageKey:string, args:BooleanInputData) => {
-        args.error = this.getError(args.id)
-        args.hasSubmitted = this.state.hasSubmitted
-        return <BooleanInput ref={this.setFormRef(pageKey, args.id)} key={args.id} {...args} onValueChanged={this.handleValueChanged(pageKey)} onRequestNavigation={this.handleRequestNavigation} />
-    }
-    renderComponent = (pageKey:string, data:FormComponentData) => {
-        switch (true) {
-            case data instanceof TextInputData:return this.renderTextInput(pageKey, data as TextInputData)
-            case data instanceof TextAreaInputData:return this.renderTextAreaInput(pageKey, data as TextAreaInputData)
-            case data instanceof ContextPhotoInputData:return this.renderContextPhotoInput(pageKey, data as ContextPhotoInputData)
-            case data instanceof RichRadioGroupInputData:return this.renderRichRadioInput(pageKey, data as RichRadioGroupInputData)
-            case data instanceof SelectInputData:return this.renderSelectInput(pageKey, data as SelectInputData)
-            case data instanceof ColorInputData:return this.renderColorInput(pageKey, data as ColorInputData)
-            case data instanceof BooleanInputData:return this.renderBooleanInput(pageKey, data as BooleanInputData)
-            default:return <div>DEFAULT</div>
-        }
-    }
-    renderPage = (page:FormPageData, index:number) => {
-        const cn = classnames("form-controller-page d-flex flex-column", {active:index == this.state.activePageIndex})
-        return <div key={page.id} className={cn}>
-            {page.componentData.map(cd => this.renderComponent(page.id, cd))}
-        </div>
-    }
-    renderPages = () => {
-        return this.props.pages.map(this.renderPage)
     }
     navigateToPage = (index:number) => () => {
         this.setState(() => {
             return {activePageIndex:index}
         })
     }
-    renderPageMenu = () => {
-        return this.props.pages.map((p, i) => {
-            const hasError = !!this.state.pageErrorData[p.id]
-            const cn = classnames("menu-button", {error:hasError, active:this.state.activePageIndex == i})
-            return <div className={cn} onClick={this.navigateToPage(i)} key={p.id}>
-                        <div className="title">
-                            <div className="text-truncate">{p.title}</div>
-                            {hasError && <i className="error-icon fas fa-exclamation-triangle text-danger "></i>}
-                        </div>
-                        {p.description && <div className="description secondary-text text-truncate">{p.description}</div>}
-                    </div>
-        })
+    navigateToPageId = (pageId:string) => {
+        const i = this.findPageIndex(pageId)
+        if(i > -1)
+        {
+            this.setState(() => {
+                return {activePageIndex:i}
+            })
+        }
+    }
+    hasPageErrorData = (pageId:string) => {
+        return !!this.state.pageErrorData[pageId]
     }
     getFormData = (groupByPage:boolean = false) => {
         const object = {}
@@ -252,6 +200,9 @@ export default class FormController extends React.Component<Props, State> {
     }
     hasFormError = () => {
         return this.state.pageErrorData && Object.keys(this.state.pageErrorData).length > 0
+    }
+    hasSubmitted = () => {
+        return this.state.hasSubmitted
     }
     trySubmitForm = () => {
 
@@ -287,17 +238,19 @@ export default class FormController extends React.Component<Props, State> {
                                                     {submitTitle}
                                                     </Button>
                                                 </div>
-        const genericError = this.getError("detail")
+        const genericError = this.getErrors(["detail"])
+        this.content = this.props.render(this)
+        const {menuItems, pages} = this.content
         return <SimpleDialog className="form-controller-modal" didCancel={this.props.didCancel} visible={this.props.visible} header={header} footer={footer}>
                     <div className="form-controller">
-                        {genericError && <FormComponentErrorMessage className="d-block" error={genericError} />}
+                        {genericError && <FormComponentErrorMessage className="d-block" errors={genericError} errorKey="detail" />}
                         <div className={mainContentCn}>
                             <div className="d-flex flex-column main-content-inner">
                                 <div className="form-controller-menu">
-                                    {this.renderPageMenu()}
+                                    {menuItems}
                                 </div>
                                 <div className="form-controller-page-container">
-                                    {this.renderPages()}
+                                    {pages}
                                 </div>
                             </div>
                         </div>

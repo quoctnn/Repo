@@ -4,18 +4,21 @@ import Module from '../Module';
 import ModuleHeader from '../ModuleHeader';
 import ModuleContent from '../ModuleContent';
 import ModuleFooter from '../ModuleFooter';
-import ModuleMenuTrigger from '../ModuleMenuTrigger';
 import "./EventDetailsModule.scss"
 import { ResponsiveBreakpoint } from '../../components/general/observers/ResponsiveComponent';
 import { translate } from '../../localization/AutoIntlProvider';
-import { Event, Community, ContextNaturalKey, Permission } from '../../types/intrasocial_types';
+import { Event, Community, ContextNaturalKey, Permission, RequestErrorData, ContextPrivacy, CropRect, ContextPhotoType, CropInfo } from '../../types/intrasocial_types';
 import { connect } from 'react-redux';
 import { ReduxState } from '../../redux';
 import CircularLoadingSpinner from '../../components/general/CircularLoadingSpinner';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import { DetailsContent } from '../../components/details/DetailsContent';
-import { stringToDateFormat, DateFormat } from '../../utilities/Utilities';
+import { stringToDateFormat, DateFormat, uniqueId } from '../../utilities/Utilities';
 import { ContextManager } from '../../managers/ContextManager';
+import { OverflowMenuItem, OverflowMenuItemType } from '../../components/general/OverflowMenu';
+import FormController, { FormStatus } from '../../components/form/FormController';
+import { DropDownMenu } from '../../components/general/DropDownMenu';
+import EventCreateComponent from './EventCreateComponent';
 const shortMonth:string[] = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 type OwnProps = {
     breakpoint:ResponsiveBreakpoint
@@ -24,6 +27,8 @@ type OwnProps = {
 type State = {
     menuVisible:boolean
     isLoading:boolean
+    editFormVisible:boolean
+    editFormReloadKey:string
 }
 type ReduxStateProps = {
     community: Community
@@ -33,11 +38,14 @@ type ReduxDispatchProps = {
 }
 type Props = OwnProps & RouteComponentProps<any> & ReduxStateProps & ReduxDispatchProps
 class EventDetailsModule extends React.Component<Props, State> {
+    formController:FormController = null
     constructor(props:Props) {
         super(props);
         this.state = {
             isLoading:false,
-            menuVisible:false
+            menuVisible:false,
+            editFormVisible:false,
+            editFormReloadKey:uniqueId(),
         }
     }
     componentDidUpdate = (prevProps:Props) => {
@@ -67,13 +75,40 @@ class EventDetailsModule extends React.Component<Props, State> {
             return (<CircularLoadingSpinner borderWidth={3} size={20} key="loading"/>)
         }
     }
+    toggleEditForm = () => {
+        const isFormVisible = this.state.editFormVisible
+        if(isFormVisible)
+        {
+            this.setState(() => {
+                return {editFormVisible:false}
+            })
+        }
+        else {
+            this.setState(() => {
+                return {editFormVisible:true, editFormReloadKey:uniqueId()}
+            })
+        }
+        
+    }
+    getEventOptions = () => {
+        const options: OverflowMenuItem[] = []
+        if(this.props.community.permission >= Permission.admin)
+            options.push({id:"1", type:OverflowMenuItemType.option, title:translate("Edit"), onPress:this.toggleEditForm, iconClass:"fas fa-pen"})
+        return options
+    }
+    renderEditForm = () => {
+        const visible = this.state.editFormVisible
+        const event = this.props.event
+        return <EventCreateComponent key={this.state.editFormReloadKey} event={event} visible={visible} onComplete={this.toggleEditForm} />
+    }
     render()
     {
         const {breakpoint, history, match, location, staticContext, event, community, contextNaturalKey, ...rest} = this.props
         const startDate = event ? new Date(event.start) : null
+        const eventOptions = this.getEventOptions()
         return (<Module {...rest}>
                     <ModuleHeader className="event-detail" headerTitle={event && event.name || translate("detail.module.title")} loading={this.state.isLoading}>
-                        <ModuleMenuTrigger onClick={this.menuItemClick} />
+                        {eventOptions.length > 0 && <DropDownMenu className="community-option-dropdown" triggerClass="fas fa-cog mx-1" items={eventOptions}></DropDownMenu>} 
                     </ModuleHeader>
                     {true && //breakpoint >= ResponsiveBreakpoint.standard && //do not render for small screens
                         <ModuleContent>
@@ -97,6 +132,7 @@ class EventDetailsModule extends React.Component<Props, State> {
                                 ||
                                 <LoadingSpinner key="loading"/>
                             }
+                            {this.renderEditForm()}
                         </ModuleContent>
                     }
                     { event && event.permission >= Permission.read &&

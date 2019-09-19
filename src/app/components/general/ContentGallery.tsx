@@ -350,7 +350,7 @@ export default class ContentGallery extends React.Component<Props, State> {
             },
             style:{height:this.props.height}
           }
-        return  (<Swiper ref={(node) => {if(node) this.swiper = node.swiper}  } {...params}>
+        return  (<Swiper  ref={(node) => {if(node) this.swiper = node.swiper}  } {...params}>
                     {items}
                 </Swiper>)
     }

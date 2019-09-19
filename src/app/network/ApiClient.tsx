@@ -6,7 +6,7 @@ import { nullOrUndefined, DateFormat } from '../utilities/Utilities';
 import moment = require("moment");
 import { Settings } from "../utilities/Settings";
 import { ConversationManager } from '../managers/ConversationManager';
-import { CommunityConfigurationData, FileUpload } from '../types/intrasocial_types';
+import { CommunityConfigurationData } from '../types/intrasocial_types';
 const $ = require("jquery")
 import { Status, UserProfile, UploadedFile, Community, Group, Conversation, Project, Message, Event, Task,
     ElasticSearchType, ObjectAttributeType, StatusObjectAttribute, EmbedCardItem, ReportTag,
@@ -43,6 +43,16 @@ export type SearchArguments = {
     from_date?:string
     to_date?:string
 }
+export type MapBoxFeature = {
+    center:[number, number]
+    place_name:string
+    type:string
+    bbox:[number, number, number, number]
+    place_type:string[]
+    properties:{[key:string]:any}
+    text:string
+    id:string
+}
 export enum ListOrdering {
     ALPHABETICALLY = "alphabetically",
     RECENT = "recent",
@@ -73,16 +83,26 @@ export abstract class ApiClient
         })
         return arr.join('&');
     }
-    static forwardGeocode(address:string, callback:ApiClientCallback<Coordinate>){
+    static forwardGeocode(address:string, callback:ApiClientCallback<MapBoxFeature[]>){
         const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(address)}.json?types=address&access_token=${Settings.mapboxAccessToken}`
-        AjaxRequest.get(url, (data:{features:[{center:number[]}]}, status, request) => {
-            let location:Coordinate = null
-            const feature = data && data.features && data.features[0]
-            if(feature && feature.center && feature.center.length == 2)
-            {
-                location = {lat:feature.center[1], lon:feature.center[0]}
-            }
-            callback(location, status, null)
+        AjaxRequest.get(url, (data:{features:MapBoxFeature[]}, status, request) => {
+            callback(data && data.features || [], status, null)
+        }, (request, status, error) => {
+            callback(null, status, new RequestErrorData(request.responseJSON, error))
+        })
+    }
+    static reverseGeocode(location:Coordinate, callback:ApiClientCallback<MapBoxFeature[]>){
+        const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(location.long + "," + location.lat)}.json?types=address&access_token=${Settings.mapboxAccessToken}`
+        AjaxRequest.get(url, (data:{features:MapBoxFeature[]}, status, request) => {
+            callback(data && data.features || [], status, null)
+        }, (request, status, error) => {
+            callback(null, status, new RequestErrorData(request.responseJSON, error))
+        })
+    }
+    static placeAutocomple(query:string, callback:ApiClientCallback<MapBoxFeature[]>){
+        const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?access_token=${Settings.mapboxAccessToken}&autocomplete=true`
+        AjaxRequest.get(url, (data:{features:MapBoxFeature[]}, status, request) => {
+            callback(data && data.features || [], status, null)
         }, (request, status, error) => {
             callback(null, status, new RequestErrorData(request.responseJSON, error))
         })
@@ -421,7 +441,7 @@ export abstract class ApiClient
         const url = this.getContextPhotoUrl(type, contextNaturalKey, contextObjectId)
         if(!url)
         {
-            callback(null, "500", new RequestErrorData({detail:{error_description:"not supported"}}, "error"))
+            callback(null, "500", new RequestErrorData({detail:`api endpoint not set for ${contextNaturalKey} and type ${type}`}, "error"))
             return
         }
         if(file instanceof File)
@@ -457,6 +477,8 @@ export abstract class ApiClient
         switch (contextNaturalKey + type) {
             case ContextNaturalKey.COMMUNITY + ContextPhotoType.avatar:url = Constants.apiRoute.communityAvatarUrl(contextObjectId); break;
             case ContextNaturalKey.COMMUNITY + ContextPhotoType.cover:url = Constants.apiRoute.communityCoverUrl(contextObjectId); break;
+            case ContextNaturalKey.EVENT + ContextPhotoType.avatar:url = Constants.apiRoute.eventAvatarUrl(contextObjectId); break;
+            case ContextNaturalKey.EVENT + ContextPhotoType.cover:url = Constants.apiRoute.eventCoverUrl(contextObjectId); break;
             default:break;
         }
         return url
@@ -466,7 +488,7 @@ export abstract class ApiClient
         const url = this.getContextPhotoUrl(type, contextNaturalKey, contextObjectId)
         if(!url)
         {
-            callback(null, "500", new RequestErrorData({detail:{error_description:"not supported"}}, "error"))
+            callback(null, "500", new RequestErrorData({detail:`api endpoint not set for ${contextNaturalKey} and type ${type}`}, "error"))
             return
         }
         AjaxRequest.get(url, (data, status, request) => {
@@ -590,6 +612,24 @@ export abstract class ApiClient
     {
         let url = Constants.apiRoute.eventDetailUrl(eventId)
         AjaxRequest.get(url, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, new RequestErrorData(request.responseJSON, error))
+        })
+    }
+    static updateEvent(eventId:string|number, data:Partial<Event>, callback:ApiClientCallback<Event>)
+    {
+        let url = Constants.apiRoute.eventDetailUrl(eventId)
+        AjaxRequest.patchJSON(url, data, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, new RequestErrorData(request.responseJSON, error))
+        })
+    }
+    static createEvent(data:Partial<Event>, callback:ApiClientCallback<Event>)
+    {
+        let url = Constants.apiRoute.eventsUrl
+        AjaxRequest.postJSON(url, data, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
             callback(null, status, new RequestErrorData(request.responseJSON, error))

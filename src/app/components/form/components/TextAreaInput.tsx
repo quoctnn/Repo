@@ -2,17 +2,9 @@ import * as React from 'react';
 import { FormComponentBase, FormComponentErrorMessage, FormComponentRequiredMessage } from '../FormController';
 import { InputGroup, Input } from 'reactstrap';
 import { translate } from '../../../localization/AutoIntlProvider';
-import { FormComponentData, FormComponentBaseProps } from '../definitions';
+import { FormComponentBaseProps } from '../definitions';
+import classnames from 'classnames';
 
-export class TextAreaInputData extends FormComponentData implements TextAreaInputProps{
-    value:string
-    placeholder?:string
-    constructor(value:string, title:string, id:string, placeholder?:string, isRequired?:boolean){
-        super(title, id, isRequired)
-        this.value = value
-        this.placeholder = placeholder
-    }
-}
 export type TextAreaInputProps = {
     value:string
     placeholder?:string
@@ -37,14 +29,22 @@ export class TextAreaInput extends React.Component<TextAreaInputProps, TextAreaI
         const performValidation = this.props.hasSubmitted || this.state.valueSet
         return performValidation && this.props.isRequired ? this.state.value.trim().length > 0 : true
     }
-    getError = () => {
-        if(this.props.error)
-            return this.props.error
+    getErrors = () => {
+        const performValidation = (this.props.hasSubmitted || this.state.valueSet) && this.props.isRequired
+        if(!performValidation)
+            return null
+        let e = this.props.errors && this.props.errors([this.props.id]) || {}
+        if(Object.keys(e).length > 0)
+            return e
         if(!this.isValid())
-            return translate("input.error.length.required")
+        {
+            e[this.props.id] = translate("input.error.length.required")
+        }
+        return e
     }
     sendValueChanged = () => {
-        this.props.onValueChanged && this.props.onValueChanged(this.props.id, this.state.value)
+        const val = this.props.value == this.state.value ? null : this.state.value
+        this.props.onValueChanged && this.props.onValueChanged(this.props.id, val, this.props.isRequired)
     }
     handleInputChange = (e:React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value
@@ -53,7 +53,9 @@ export class TextAreaInput extends React.Component<TextAreaInputProps, TextAreaI
         }, this.sendValueChanged)
     }
     render = () => {
-        const error = this.getError()
+        const errors = this.getErrors()
+        const hasError = errors && Object.keys( errors ).length > 0
+        const cn = classnames({"d-block":hasError})
         return <div key={this.props.id} className="form-text-area-input">
                 <InputGroup className="form-group form-input d-block">
                     <label htmlFor={this.props.id} className="col-form-label" >
@@ -61,8 +63,8 @@ export class TextAreaInput extends React.Component<TextAreaInputProps, TextAreaI
                         <FormComponentRequiredMessage required={this.props.isRequired} />
                     </label>
                     <div className="">
-                        <Input invalid={!!error} id={this.props.id} value={this.state.value} type="textarea" onChange={this.handleInputChange} placeholder={this.props.placeholder}/>
-                        <FormComponentErrorMessage error={error} />
+                        <Input invalid={hasError}  id={this.props.id} value={this.state.value} type="textarea" onChange={this.handleInputChange} placeholder={this.props.placeholder}/>
+                        <FormComponentErrorMessage className={cn} errors={errors} errorKey={this.props.id}/>
                     </div>
                 </InputGroup>
             </div>

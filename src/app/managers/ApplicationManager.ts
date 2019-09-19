@@ -42,7 +42,7 @@ export type LoadingProgress = {
 export const ApplicationManagerLoadingProgressNotification = "ApplicationManagerLoadingProgressNotification"
 export const ApplicationManagerApplicationLoadedNotification = "ApplicationManagerApplicationLoadedNotification"
 const cloneColumn = (columns:GridColumn[]) => {
-    return columns.map(f => {
+    return columns && columns.map(f => {
         const c = {...f}
         c.children = cloneColumn(f.children)
         c.module = f.module && {...f.module}
