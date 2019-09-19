@@ -27,7 +27,7 @@ import { Mention } from '../../components/general/input/MentionEditor';
 import { ConversationUtilities } from '../../utilities/ConversationUtilities';
 import Select from 'react-select';
 import { ProfileOptionComponent, ProfileSingleValueComponent, createProfileFilterOption, ProfileFilterOption } from '../tasks/ProjectProfileFilter';
-import { ActionMeta } from 'react-select/lib/types';
+import { ActionMeta } from 'react-select/src/types';
 import { NavigationUtilities } from '../../utilities/NavigationUtilities';
 import { tempConversationId } from '../conversations/ConversationsModule';
 import { userAvatar, uniqueId } from '../../utilities/Utilities';
@@ -169,10 +169,10 @@ class ConversationModule extends React.Component<Props, State> {
         const newConversation = this.props.conversation
         return (oldConversation && !newConversation) ||
                 (!oldConversation && newConversation) ||
-                (oldConversation && newConversation && 
-                    (oldConversation.id != newConversation.id || 
-                    (oldConversation.temporary && newConversation.temporary && 
-                        (!oldConversation.users.isEqual(newConversation.users) || 
+                (oldConversation && newConversation &&
+                    (oldConversation.id != newConversation.id ||
+                    (oldConversation.temporary && newConversation.temporary &&
+                        (!oldConversation.users.isEqual(newConversation.users) ||
                          oldConversation.temporary_id != newConversation.temporary_id) ) ) )
 
     }
@@ -238,7 +238,7 @@ class ConversationModule extends React.Component<Props, State> {
                 {
                     items[oldIndex] = message
                 }
-                else 
+                else
                 {
                     items.push(message)
                 }
@@ -644,7 +644,7 @@ class ConversationModule extends React.Component<Props, State> {
                             current_user={authenticatedUser} >
                             {this.renderSomeoneIsTyping()}
                         </ChatMessageList>
-                        
+
                     <ChatMessageComposer
                                 //onHandleUploadClick={this.handleUploadClick}
                                 ref={this.messageComposer}

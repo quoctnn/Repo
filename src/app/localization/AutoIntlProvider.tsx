@@ -1,18 +1,14 @@
 import * as React from "react";
-import {IntlProvider, addLocaleData} from "react-intl";
+import {IntlProvider} from "react-intl";
 import messages from "./messages";
 import { connect } from 'react-redux'
 
-import * as en from 'react-intl/locale-data/en';
-import * as es from 'react-intl/locale-data/es';
-import * as nb from 'react-intl/locale-data/nb';
 import "moment/locale/en-gb";
 import "moment/locale/es";
 import "moment/locale/nb";
 import * as moment from 'moment-timezone';
 import { availableLanguages } from "../../app/redux/language";
 import { ReduxState } from "../../app/redux";
-addLocaleData([...en, ...es, ...nb]);
 
 type Props = {
     language: number,
@@ -60,5 +56,5 @@ const mapStateToProps = (state:ReduxState) => {
         language:state.language.language,
     };
 }
-  
+
 export default connect<Props>(mapStateToProps, null)(AutoIntlProvider);

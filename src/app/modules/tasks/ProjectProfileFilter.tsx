@@ -5,9 +5,9 @@ import { userFullName, userAvatar } from '../../utilities/Utilities';
 import { ProjectManager } from '../../managers/ProjectManager';
 import { ProfileManager } from '../../managers/ProfileManager';
 import Avatar from '../../components/general/Avatar';
-import { OptionProps } from 'react-select/lib/components/Option';
-import { SingleValueProps } from 'react-select/lib/components/SingleValue';
 import { AsyncSelectIW } from '../../components/general/input/AsyncSelectIW';
+import { SingleValueProps } from 'react-select/src/components/SingleValue';
+import { OptionProps } from 'react-select/src/components/Option';
 
 export type ProfileFilterOption = { value: string, label: string, id:number, icon:string}
 export const createProfileFilterOption = (profile:UserProfile):ProfileFilterOption => {

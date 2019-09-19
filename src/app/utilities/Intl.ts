@@ -5,7 +5,7 @@ import { Store } from "redux";
 import { ReduxState } from "../redux";
 declare global {
     interface DocumentTouch {}
-    interface Window { 
+    interface Window {
         app: AppWindowObject
         CSS:CSS
         store:Store<ReduxState,any>
@@ -81,7 +81,7 @@ export default class Intl {
     {
         return Intl.getCurrentLocale().slice(0, 2);
     }
-    static translate(intl:ReactIntl.InjectedIntl, key:string)
+    static translate(intl:any, key:string)
     {
         return intl.formatMessage({id:key, defaultMessage:key})
     }

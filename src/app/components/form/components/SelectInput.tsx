@@ -5,8 +5,8 @@ import { InputGroup } from 'reactstrap';
 import { translate } from '../../../localization/AutoIntlProvider';
 import { FormComponentBaseProps } from '../definitions';
 import { InputOption } from './RichRadioGroupInput';
-import { ActionMeta } from 'react-select/lib/types';
 import classnames from 'classnames';
+import { ActionMeta } from 'react-select/src/types';
 
 export type SelectInputProps = {
     value:string
@@ -69,12 +69,12 @@ export class SelectInput extends React.Component<SelectInputProps, SelectInputSt
                     </label>
                     <FormComponentErrorMessage className={cn} errors={errors} errorKey={this.props.id} />
                     <div className="">
-                        <Select 
+                        <Select
                         styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
                         isMulti={false}
                         name={this.props.id}
                         value={selectedOption}
-                        menuPortalTarget={document.body} 
+                        menuPortalTarget={document.body}
                         menuPosition="fixed"
                         onChange={this.handleInputChange}
                         placeholder={this.props.placeholder}

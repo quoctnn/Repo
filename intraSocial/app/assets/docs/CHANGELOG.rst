@@ -2,6 +2,17 @@
 Task schedule
 -->
 
++++++++++++++++++++++++++++++++++++++++++++++++++
+Leslie: Legg dette til på neste changelog versjon
+
+Added:
+======
+* Sorting options for 'Recent Activities'
+
++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+
 v0.5.5 | 26.08.2019
 -----------------------------------------
 
