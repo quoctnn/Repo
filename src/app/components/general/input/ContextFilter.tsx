@@ -1,5 +1,5 @@
 import * as React from 'react';
-import AsyncSelect from 'react-select/lib/Async'
+import AsyncSelect from 'react-select/async'
 import classnames from "classnames"
 import { ContextItem, ElasticSearchType, ContextNaturalKey } from '../../../types/intrasocial_types';
 import {ApiClient} from '../../../network/ApiClient';
@@ -35,7 +35,7 @@ export class ContextFilter extends React.PureComponent<Props & React.HTMLAttribu
         super(props)
         this.state = { selectedValue:props.value}
     }
-    
+
     groupResultItems = (items:ContextValue[]) => {
         const groups:{[key:string]:OptionType} = {}
         items.forEach(i => {
@@ -66,19 +66,19 @@ export class ContextFilter extends React.PureComponent<Props & React.HTMLAttribu
     onChange = (value:ContextValue) => {
         this.setState({ selectedValue: value }, () => this.props.onValueChange(this.state.selectedValue));
     }
-    render() 
+    render()
     {
         const {className} = this.props
         const { selectedValue} = this.state;
         const cn = classnames("context-filter", className)
         return(<div className={cn}>
-                <AsyncSelect 
+                <AsyncSelect
                     styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
                     isClearable={true}
                     value={selectedValue}
-                    menuPortalTarget={document.body} 
-                    cacheOptions={true} 
-                    defaultOptions={true} 
+                    menuPortalTarget={document.body}
+                    cacheOptions={true}
+                    defaultOptions={true}
                     onChange={this.onChange}
                     loadOptions={this.searchOptions} />
                 </div>
