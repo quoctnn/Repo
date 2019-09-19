@@ -1,5 +1,5 @@
 import { combineReducers } from "redux";
-import { persistReducer, PersistConfig } from "redux-persist";
+import { persistReducer } from "redux-persist";
 import storage from 'redux-persist/lib/storage';
 import language from './language';
 import { theme } from "./theme";
@@ -20,12 +20,12 @@ import messageQueue, { MessageQueue } from "./messageQueue";
 import tempCache, { TempCache } from './tempCache';
 import { unreadNotifications, UnreadNotifications } from './unreadNotifications';
 import { favoriteStore } from './favoriteStore';
-const rootPersistConfig:PersistConfig = {
+const rootPersistConfig = {
     key: 'root',
     storage: storage,
-    blacklist: [    
+    blacklist: [
                     'authentication',
-                    "application", 
+                    "application",
                     "tempCache",
                     "embedlyStore",
                 ],
