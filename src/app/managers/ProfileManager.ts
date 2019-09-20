@@ -53,20 +53,18 @@ export abstract class ProfileManager
         let profile = ProfileManager.getProfile(id)
         if(!profile || forceUpdate)
         {
-            if(id.isNumber())
-            {
-                ProfileResolver.resolveProfiles([parseInt(id)], (data) => {
-                    if(data)
-                    {
-                        ProfileManager.storeProfiles(data)
-                    }
-                    else
-                    {
-                        console.log("error fetching profile", profileId)
-                    }
-                    completion(data[0])
-                })
-            }
+            ProfileResolver.resolveProfiles([id], (data) => {
+                const profile = data && data[0]
+                if(profile)
+                {
+                    ProfileManager.storeProfiles([profile])
+                }
+                else
+                {
+                    console.log("error fetching profile", profileId)
+                }
+                completion(profile)
+            })
         }
         else
         {

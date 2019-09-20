@@ -34,10 +34,6 @@ class ProfilePage extends React.Component<Props, State>
         if (this.props.profile)
             ProfileManager.ensureProfileExists(this.props.profile.id, () => {}, true)
     }
-    renderLoading = () =>
-    {
-        return (<LoadingSpinner />)
-    }
     renderNotFound = () => {
         return <Error404 />
     }

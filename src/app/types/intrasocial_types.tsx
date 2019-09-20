@@ -5,6 +5,21 @@ import { translate } from "../localization/AutoIntlProvider";
 import { userFullName, groupCover, communityCover, userCover, projectCover, eventCover } from '../utilities/Utilities';
 import { CommunityManager } from '../managers/CommunityManager';
 import { ProjectManager } from '../managers/ProjectManager';
+export enum AppLanguage{
+    english = "en",
+    norwegian = "nb",
+    spanish = "es",
+}
+export namespace AppLanguage {
+    export const all = [
+        AppLanguage.english,
+        AppLanguage.norwegian,
+        AppLanguage.spanish,
+    ]
+    export function translationForKey(key: AppLanguage) {
+        return translate(`language.${key}`)
+    }
+}
 export type CommunityConfigurationData = {
     id:number
     members_publication:boolean
@@ -27,7 +42,8 @@ export enum CommunityCreatePermission{
     createDenied = 0,
     createLimited = 20,
     createAllowed = 21,
-}export namespace CommunityCreatePermission {
+}
+export namespace CommunityCreatePermission {
     export const all = [
         CommunityCreatePermission.createDenied,
         CommunityCreatePermission.createLimited,
@@ -1295,7 +1311,7 @@ export type ProfileConnections = {
 }
 export type UserProfile = {
     email: string | null
-    locale: string | null
+    locale: AppLanguage
     timezone: string | null
     username: string
     uuid: string | null

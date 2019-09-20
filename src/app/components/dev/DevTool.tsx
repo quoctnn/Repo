@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 import { Form, Popover, PopoverBody } from "reactstrap";
 import "./DevTool.scss"
 import { translate } from "../../localization/AutoIntlProvider";
-import { availableLanguages, setLanguageAction } from "../../redux/language";
+import { setLanguageAction } from "../../redux/language";
 import { availableThemes } from "../../redux/theme";
 import { ReduxState } from "../../redux";
 import { availableEndpoints, setEndpointAction } from "../../redux/endpoint";
@@ -14,15 +14,16 @@ import { ThemeManager } from "../../managers/ThemeManager";
 import { ApplicationManager } from '../../managers/ApplicationManager';
 import { WindowAppManager } from '../../managers/WindowAppManager';
 import Popper from "popper.js";
+import { AppLanguage } from '../../types/intrasocial_types';
 
 type ReduxStateProps = {
-    language: number;
+    language: AppLanguage;
     theme: number;
     apiEndpoint?: number;
     accessToken?: string;
 }
 type ReduxDispatchProps = {
-    setLanguage?: (index: number) => void;
+    setLanguage?: (language: AppLanguage) => void;
     setApiEndpoint?: (index: number) => void;
     setAccessTokenOverride: (accessToken: string) => void;
     enablePushNotifications: () => void;
@@ -101,21 +102,21 @@ class DevTool extends React.PureComponent<Props, State> {
             aria-haspopup="true"
             aria-expanded="false"
             >
-            {availableLanguages[this.props.language]}
+            {AppLanguage.translationForKey( this.props.language )}
             </button>
 
             <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
-            {availableLanguages.map((lang, index) => {
+            {AppLanguage.all.map((lang) => {
                 return (
                 <a
-                    key={index}
+                    key={lang}
                     onClick={() => {
-                    this.props.setLanguage(index);
+                    this.props.setLanguage(lang);
                     }}
                     className="dropdown-item"
                     href="#"
                 >
-                    {lang}
+                    {AppLanguage.translationForKey(lang)}
                 </a>
                 );
             })}
@@ -337,7 +338,7 @@ class DevTool extends React.PureComponent<Props, State> {
                 </div>
                 <div className="form-group row">
                     <label htmlFor="lang" className="col-sm-4 col-form-label">
-                    {translate("Language")}
+                    {translate("common.language")}
                     </label>
                     <div className="col-sm-8" id="lang">
                     {this.renderLanguageSelector()}
@@ -421,8 +422,8 @@ const mapStateToProps = (state: ReduxState) => {
 };
 const mapDispatchToProps = dispatch => {
     return {
-        setLanguage:(index:number) => {
-            dispatch(setLanguageAction(index));
+        setLanguage:(language:AppLanguage) => {
+            dispatch(setLanguageAction(language));
         },
         setApiEndpoint: (index:number) => {
             

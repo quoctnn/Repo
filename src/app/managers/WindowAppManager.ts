@@ -12,8 +12,8 @@ import { resetMessageQueueAction } from '../redux/messageQueue';
 import { ApplicationManager } from './ApplicationManager';
 import { CommunityManager } from './CommunityManager';
 import { Settings } from '../utilities/Settings';
-import { setLanguageAction, availableLanguages } from '../redux/language';
-import { RequestErrorData } from '../types/intrasocial_types';
+import { setLanguageAction } from '../redux/language';
+import { RequestErrorData, AppLanguage } from '../types/intrasocial_types';
 import { SideMenuNavigationToggleMenuNotification } from '../components/navigation/SideMenuNavigation';
 import { ResponsiveBreakpoint } from '../components/general/observers/ResponsiveComponent';
 
@@ -34,7 +34,7 @@ export type AppWindowObject = {
     sendMessageElectron:(channel:string, msg:any) => void
     setTheme:(index:number) => void
     navigateToRoute:(route:string, modal?:boolean) => void
-    setLanguage:(index:number) => void
+    setLanguage:(language:AppLanguage) => void
     language:string
     createError:() => void
     toggleMenu:() => void
@@ -81,11 +81,11 @@ export abstract class WindowAppManager
     static setTheme = (index:number) => {
         ThemeManager.setTheme(index)
     }
-    static setLanguage = (index:number) => {
-        WindowAppManager.getStore().dispatch(setLanguageAction(index))
+    static setLanguage = (language:AppLanguage) => {
+        WindowAppManager.getStore().dispatch(setLanguageAction(language))
     }
     static get language(): string {
-        return availableLanguages[WindowAppManager.getStore().getState().language.language]
+        return WindowAppManager.getStore().getState().language.language
     }
     static sendMessageElectron = (channel:string, msg:any) => {
         if (window.isElectron) {

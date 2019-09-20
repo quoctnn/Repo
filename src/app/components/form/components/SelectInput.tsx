@@ -7,11 +7,14 @@ import { FormComponentBaseProps } from '../definitions';
 import { InputOption } from './RichRadioGroupInput';
 import classnames from 'classnames';
 import { ActionMeta } from 'react-select/src/types';
-
+export type InputOptionGroup = {
+    label:string 
+    options:InputOption[]
+}
 export type SelectInputProps = {
     value:string
     placeholder?:string
-    options:InputOption[]
+    options:(InputOption | InputOptionGroup)[]
     description?:string
 } & FormComponentBaseProps
 export type SelectInputState = {
@@ -32,15 +35,39 @@ export class SelectInput extends React.Component<SelectInputProps, SelectInputSt
     }
     isValid = () => {
         const performValidation = this.props.hasSubmitted || this.state.valueSet
-        return performValidation && this.props.isRequired ? this.state.value.trim().length > 0 : true
+        if(performValidation)
+        {
+            const selectedOption = this.state.value && this.findOption(this.state.value)
+            return !!selectedOption
+        }
+        return true
+    }
+    findOption = (value:string) => {
+        const opts = this.props.options as any[]
+        opts.find(o => o.value == value)
+        for (let index = 0; index < opts.length; index++) {
+            const opt = opts[index]
+            if(opt.value)
+            {
+                if(opt.value == value)
+                    return opt
+            }
+            else if(opt.options)
+            {
+                const found = opt.options.find(o => o.value == value)
+                if(found)
+                    return found
+            }
+        }
+        return null
     }
     getErrors = () => {
-        const performValidation = (this.props.hasSubmitted || this.state.valueSet) && this.props.isRequired
-        if(!performValidation)
-            return null
         let e = this.props.errors && this.props.errors([this.props.id]) || {}
         if(Object.keys(e).length > 0)
             return e
+        const performValidation = (this.props.hasSubmitted || this.state.valueSet) && this.props.isRequired
+        if(!performValidation)
+                return null
         if(!this.isValid())
         {
             e[this.props.id] = translate("input.error.select.option.required")
@@ -58,7 +85,7 @@ export class SelectInput extends React.Component<SelectInputProps, SelectInputSt
     }
     render = () => {
         const errors = this.getErrors()
-        const selectedOption = this.state.value && this.props.options.find(o => o.value == this.state.value)
+        const selectedOption = this.state.value && this.findOption(this.state.value)
         const hasError = errors && Object.keys( errors ).length > 0
         const cn = classnames({"d-block":hasError})
         return <div key={this.props.id} className="form-select-input">
@@ -79,7 +106,7 @@ export class SelectInput extends React.Component<SelectInputProps, SelectInputSt
                         onChange={this.handleInputChange}
                         placeholder={this.props.placeholder}
                         closeMenuOnSelect={true}
-                        isSearchable={false}
+                        isSearchable={true}
                         options={this.props.options} />
                         {this.props.description && <div className="description">{this.props.description}</div>}
                     </div>

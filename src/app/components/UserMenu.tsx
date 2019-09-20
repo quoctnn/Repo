@@ -2,7 +2,7 @@ import * as React from 'react';
 import { connect } from 'react-redux'
 import { Link, withRouter, RouteComponentProps } from 'react-router-dom';
 import classnames = require('classnames');
-import { UserStatus, UserProfile, UserStatusItem } from '../types/intrasocial_types';
+import { UserStatus, UserProfile, UserStatusItem, AppLanguage } from '../types/intrasocial_types';
 import { WindowAppManager } from '../managers/WindowAppManager';
 import { EventStreamMessageType } from '../network/ChannelEventStream';
 import { EventStreamManager, EventStreamManagerConnectionChangedEvent } from '../managers/EventStreamManager';
@@ -31,7 +31,7 @@ export interface OwnProps {
 }
 interface ReduxStateProps {
     profile: UserProfile,
-    language: number
+    language: AppLanguage
 }
 interface ReduxDispatchProps {
 }

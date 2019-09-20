@@ -93,6 +93,12 @@ export default  {
         profileUrl: (id:string|number) => {
             return `/api/v2/profile/${id}/`
         },
+        profileAvatarUrl: (id:string|number) => {
+            return `/api/v2/profile/${id}/avatar/`
+        },
+        profileCoverUrl: (id:string|number) => {
+            return `/api/v2/profile/${id}/cover/`
+        },
         profilesUrl: '/api/v2/profile/',
         profilesV1Url: '/api/v1/profile/',
 

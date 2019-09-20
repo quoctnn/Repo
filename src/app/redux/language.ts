@@ -1,17 +1,21 @@
+import { AppLanguage } from '../types/intrasocial_types';
 export enum LanguageActionTypes {
     SetLanguage = 'language.set_language',
 }
-export const availableLanguages = ['en', 'es', 'nb'];
 const INITIAL_STATE = {
-  language: 0
+  language: AppLanguage.english
 }
 export interface SetLanguageAction{
     type:string
-    language:number
+    language:AppLanguage
 }
-export const setLanguageAction = (index: number):SetLanguageAction => ({
+export const setLanguageAction = (language: AppLanguage):SetLanguageAction => ({
     type: LanguageActionTypes.SetLanguage,
-    language: index
+    language
+})
+export const resetLanguageAction = ():SetLanguageAction => ({
+  type: LanguageActionTypes.SetLanguage,
+  language: AppLanguage.english
 })
 const language = (state = INITIAL_STATE, action:SetLanguageAction) => {
   switch (action.type) {

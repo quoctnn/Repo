@@ -24,6 +24,7 @@ import { resetUnreadNotificationsAction } from '../redux/unreadNotifications';
 import { FavoriteManager } from './FavoriteManager';
 import { Settings } from '../utilities/Settings';
 import { resetAuthenticationData } from '../redux/authentication';
+import { resetLanguageAction } from '../redux/language';
 
 export type ApplicationData = {
     dashboards:{[key:string]:Dashboard}
@@ -199,6 +200,7 @@ export abstract class ApplicationManager
         dispatch(resetEndpointAction())
         dispatch(resetEmbedlyStoreAction())
         dispatch(resetAuthenticationData())
+        dispatch(resetLanguageAction())
         ApplicationManager.softReset()
     }
     static softReset = () => {

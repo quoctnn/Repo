@@ -6,7 +6,7 @@ import { theme } from "./theme";
 import endpoint from './endpoint';
 import authentication, { AuthenticationData } from "./authentication";
 import { embedlyStore } from "../components/general/embedly/redux";
-import { EmbedCardItem, Community, UserProfile, Group, Project, Event, Task, Conversation, Favorite } from '../types/intrasocial_types';
+import { EmbedCardItem, Community, UserProfile, Group, Project, Event, Task, Conversation, Favorite, AppLanguage } from '../types/intrasocial_types';
 import { communityStore } from "./communityStore";
 import { profileStore } from './profileStore';
 import {groupStore} from './groupStore';
@@ -38,7 +38,7 @@ const rootReducer = combineReducers({
 export default persistReducer(rootPersistConfig, rootReducer)
 export interface ReduxState
 {
-    language:{language:number}
+    language:{language:AppLanguage}
     theme:{theme:number}
     endpoint: {endpoint: number}
     authentication: AuthenticationData;

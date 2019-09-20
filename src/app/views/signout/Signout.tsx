@@ -6,13 +6,14 @@ import { ReduxState } from '../../redux'
 import "./Signout.scss"
 import { translate } from '../../localization/AutoIntlProvider';
 import Routes from '../../utilities/Routes';
+import { AppLanguage } from '../../types/intrasocial_types';
 
 type OwnProps = {
 
 }
 type ReduxStateProps = {
     apiEndpoint?:number,
-    language:number,
+    language:AppLanguage,
     signedIn:boolean
 }
 type Props = RouteComponentProps<any> & ReduxStateProps & OwnProps

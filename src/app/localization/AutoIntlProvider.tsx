@@ -7,11 +7,11 @@ import "moment/locale/en-gb";
 import "moment/locale/es";
 import "moment/locale/nb";
 import * as moment from 'moment-timezone';
-import { availableLanguages } from "../../app/redux/language";
 import { ReduxState } from "../../app/redux";
+import { AppLanguage } from "../types/intrasocial_types";
 
 type Props = {
-    language: number,
+    language: AppLanguage,
 }
 var private_messages = null
 export const lazyTranslate = (key:string) => {
@@ -30,22 +30,21 @@ export const translate = (key:string):string => {
     return key
 }
 class AutoIntlProvider extends React.Component<Props, {}> {
-    componentWillMount()
-    {
-        let lang = availableLanguages[this.props.language]
+    componentDidMount = () => {
+        const lang = this.props.language
         private_messages = messages[lang]
         moment.locale(lang)
     }
-    componentWillUpdate(nextProps:Props, nextState)
-    {
-        let lang = availableLanguages[nextProps.language]
+    componentWillUpdate = (nextProps:Props, nextState) => {
+        const lang = nextProps.language
         private_messages = messages[lang]
         moment.locale(lang)
     }
     render() {
-        let lang = availableLanguages[this.props.language]
+        const lang = this.props.language
+        const m = messages[lang]
         return(
-            <IntlProvider locale={lang} messages={messages[lang]}>
+            <IntlProvider locale={lang} messages={m}>
                 {this.props.children}
             </IntlProvider>
         );

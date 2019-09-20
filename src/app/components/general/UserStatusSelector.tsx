@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { connect } from 'react-redux'
-import { UserStatus, UserProfile, UserStatusItem } from '../../types/intrasocial_types';
+import { UserStatus, UserProfile, UserStatusItem, AppLanguage } from '../../types/intrasocial_types';
 import { EventStreamMessageType } from '../../network/ChannelEventStream';
 import { NotificationCenter } from '../../utilities/NotificationCenter';
 import { ReduxState } from '../../redux/index';
@@ -29,7 +29,7 @@ export interface OwnProps {
 }
 interface ReduxStateProps {
     profile: UserProfile | null,
-    language: number,
+    language: AppLanguage,
     count: number
 }
 interface ReduxDispatchProps {

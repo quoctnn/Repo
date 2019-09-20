@@ -15,10 +15,9 @@ import "./Signin.scss"
 import { translate } from '../../localization/AutoIntlProvider';
 import { Settings } from '../../utilities/Settings';
 import DashFillComponent from '../../components/general/DashFillComponent';
-import { availableLanguages } from '../../redux/language';
 import { nullOrUndefined } from '../../utilities/Utilities';
 import Logo from '../../components/general/images/Logo';
-import { RequestErrorData, GDPRFormAnswers, GDPRData } from '../../types/intrasocial_types';
+import { RequestErrorData, GDPRFormAnswers, GDPRData, AppLanguage } from '../../types/intrasocial_types';
 import SimpleDialog from '../../components/general/dialogs/SimpleDialog';
 import GdprForm from './GdprForm';
 import classnames = require('classnames');
@@ -51,7 +50,7 @@ type OwnProps = {
 }
 type ReduxStateProps = {
     apiEndpoint?:number,
-    language:number,
+    language:AppLanguage,
 }
 type Props = RouteComponentProps<any> & ReduxStateProps & OwnProps
 type State = {
@@ -184,8 +183,8 @@ class Signin extends React.Component<Props, State> {
     continueLinkedInSignin = (data:LoginContinuationData) => {
         ApiClient.apiSocialLogin(LoginProvider.linkedIn, null, data.accessToken, null, this.state.updateGdprContinuationKey, this.state.gdprUserResponse, this.loginCallback)
     }
-    selectLocale = (index:number) => () => {
-        window.app.setLanguage(index)
+    selectLocale = (language:AppLanguage) => () => {
+        window.app.setLanguage(language)
     }
     closeGdprInfoDialog = () => {
         this.setState( () => {
@@ -318,8 +317,8 @@ class Signin extends React.Component<Props, State> {
                             </div>
                         </div>
                         <div className="footer">
-                            <div onClick={this.selectLocale(availableLanguages.indexOf("nb"))} className="locale-selector locale_nb"></div>
-                            <div onClick={this.selectLocale(availableLanguages.indexOf("es"))} className="locale-selector locale_es ml-1"></div>
+                            <div onClick={this.selectLocale(AppLanguage.norwegian)} className="locale-selector locale_nb"></div>
+                            <div onClick={this.selectLocale(AppLanguage.spanish)} className="locale-selector locale_es ml-1"></div>
                             <div className="ml-3">{translate("iw_made_in")}</div>
                         </div>
                     </div>

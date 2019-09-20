@@ -8,7 +8,7 @@ import { ReduxState } from "../../../redux";
 import { ContextManager } from "../../../managers/ContextManager";
 import { withRouter, RouteComponentProps } from "react-router";
 import { UserProfile, ContextNaturalKey, ProfilePosition, ElasticSearchType } from "../../../types/intrasocial_types";
-import { userFullName, stringToDate, DateFormat } from '../../../utilities/Utilities';
+import { userFullName, stringToDate, DateFormat, uniqueId } from '../../../utilities/Utilities';
 import ModuleContent from "../../ModuleContent";
 import ModuleHeader from "../../ModuleHeader";
 import ModuleFooter from '../../ModuleFooter';
@@ -19,9 +19,10 @@ import StackedAvatars from "../../../components/general/StackedAvatars";
 import { Link } from "react-router-dom";
 import { Moment } from "moment-timezone";
 import Routes from '../../../utilities/Routes';
-import { OverflowMenuItem, OverflowMenuItemType, createDropdownItem } from '../../../components/general/OverflowMenu';
-import { PopoverBody, Popover } from 'reactstrap';
+import { OverflowMenuItem, OverflowMenuItemType } from '../../../components/general/OverflowMenu';
+import ProfileUpdateComponent from "../../../components/general/contextCreation/ProfileUpdateComponent"
 import moment = require("moment");
+import { DropDownMenu } from "../../../components/general/DropDownMenu";
 
 type TimezoneInfoProps = {
     timezone:string
@@ -71,20 +72,19 @@ type State = {
     latestJob:ProfilePosition
     isLoading:boolean
     hasLoaded:boolean
-    popoverRemoved:boolean
-    popoverVisible:boolean
+    editFormVisible:boolean
+    editFormReloadKey?:string
 }
 type Props = ReduxStateProps & ReduxDispatchProps & OwnProps & RouteComponentProps<any>
 class ProfileDetailsModule extends React.PureComponent<Props, State> {
-    private triggerRef:HTMLElement = null
     constructor(props:Props) {
         super(props)
         this.state = {
             latestJob:null,
             isLoading:false,
             hasLoaded:false,
-            popoverRemoved:true,
-            popoverVisible:false
+            editFormVisible:false,
+            editFormReloadKey:uniqueId(),
         }
     }
     componentDidMount = () => {
@@ -152,35 +152,6 @@ class ProfileDetailsModule extends React.PureComponent<Props, State> {
             }
         })
     }
-    onTriggerClick = (e:React.SyntheticEvent) => {
-        e.preventDefault()
-        if(!this.state.popoverRemoved)
-        {
-            this.closePopoverPanel()
-        }
-        else {
-            this.setState( (prevState) => {
-                return {popoverRemoved:false, popoverVisible:true}
-            })
-        }
-    }
-    closePopoverPanel = () => {
-        const completion = () => {
-            setTimeout(() => {
-                this.setState( (prevState) => {
-                    return {popoverVisible:false, popoverRemoved:true}
-                })
-            }, 300)
-        }
-        this.setState( (prevState) => {
-            return {popoverVisible:false}
-        },completion)
-    }
-    renderTrigger = () => {
-        return <div ref={(ref) => this.triggerRef = ref} className="trigger d-flex align-items-center">
-                    <i onClick={this.onTriggerClick} className="fas fa-cog"></i>
-                </div>
-    }
     renderTimezoneInfo = () => {
         if(this.props.profile && this.props.profile.timezone)
             return <TimezoneInfo timezone={this.props.profile.timezone} />
@@ -204,11 +175,11 @@ class ProfileDetailsModule extends React.PureComponent<Props, State> {
             if(connections.length > 0)
             {
                 return  <div className="d-flex justify-content-between align-items-center">
-                             <div className="d-flex flex-column">
-                                <div className="">
+                             <div className="d-flex flex-column mw0">
+                                <div className="text-truncate">
                                     {translate("Connections")}
                                 </div>
-                                <div className="">
+                                <div className="text-truncate">
                                     {`${numberOfConnections} ${translate("People")}`}
                                 </div>
                             </div>
@@ -237,42 +208,54 @@ class ProfileDetailsModule extends React.PureComponent<Props, State> {
                 {this.renderTimezoneInfo()}
                 </>
     }
-    renderDropdown = () => {
-        const open = !this.state.popoverRemoved || this.state.popoverVisible
-        if(!open)
-            return null
-        let profileDropdownItems: OverflowMenuItem[] = [];
+    renderEditForm = () => {
+        const visible = this.state.editFormVisible
         const profile = this.props.profile
-        if (this.props.authenticatedProfile.id !== profile.id) {
+        return <ProfileUpdateComponent key={this.state.editFormReloadKey} profile={profile} visible={visible} onComplete={this.toggleEditForm} />
+    }
+    toggleEditForm = () => {
+        const isFormVisible = this.state.editFormVisible
+        if(isFormVisible)
+        {
+            this.setState(() => {
+                return {editFormVisible:false}
+            })
+        }
+        else {
+            this.setState(() => {
+                return {editFormVisible:true, editFormReloadKey:uniqueId()}
+            })
+        }
+    }
+    getProfileOptions = () => {
+        const options: OverflowMenuItem[] = []
+        const profile = this.props.profile
+        if(!profile)
+            return options
+        if (this.props.authenticatedProfile.id == profile.id) {
+            options.push({id:"1", type:OverflowMenuItemType.option, title:translate("Edit"), onPress:this.toggleEditForm, iconClass:"fas fa-pen"})
+        }
+        else{
             // TODO: Check if user is already blocked and have unblock instead
             if (profile.relationship && profile.relationship.contains("blocked")) {
-                profileDropdownItems.push({
+                options.push({
                     id: "unblock",
                     type: OverflowMenuItemType.option,
                     title: translate("common.relationship.unblock"),
-                    onPress: this.unBlockUser(this.props.profile),
+                    onPress: this.unBlockUser(profile),
                     toggleMenu: false
                 })
             } else {
-                profileDropdownItems.push({
+                options.push({
                     id: "block",
                     type: OverflowMenuItemType.option,
                     title: translate("common.relationship.block"),
-                    onPress: this.blockUser(this.props.profile),
+                    onPress: this.blockUser(profile),
                     toggleMenu: false
                 })
             }
         }
-        const cn = classnames("dropdown-menu-popover", "profile-detail-dropdown")
-        return (
-                <Popover className={cn} delay={0} trigger="legacy" placement="bottom"
-                         hideArrow={false} isOpen={this.state.popoverVisible}
-                         target={this.triggerRef} toggle={this.closePopoverPanel}>
-                    <PopoverBody className="pl-0 pr-0">
-                        {profileDropdownItems.map(i => createDropdownItem(i, this.closePopoverPanel))}
-                    </PopoverBody>
-                </Popover>
-        )
+        return options
     }
     renderFriendshipStatus = (relationship:string) => {
         switch(relationship) {
@@ -334,15 +317,16 @@ class ProfileDetailsModule extends React.PureComponent<Props, State> {
         const title = userFullName(profile)
         const cn = classnames("profile-details-module", className)
         const hasRelationship = profile && authenticatedProfile && profile.id != authenticatedProfile.id && profile.relationship
+        const profileOptions = this.getProfileOptions()
         return (<Module {...rest} className={cn}>
                     <ModuleHeader loading={false} headerTitle={title}>
-                        {this.renderTrigger()}
-                        {this.renderDropdown()}
+                    {profileOptions.length > 0 && <DropDownMenu className="profile-option-dropdown" triggerClass="fas fa-cog mx-1" items={profileOptions}></DropDownMenu>}
                     </ModuleHeader>
                     <ModuleContent>
                         <div className="content">
                             {this.renderContent()}
                         </div>
+                        {this.renderEditForm()}
                     </ModuleContent>
                     {hasRelationship &&
                         <ModuleFooter>

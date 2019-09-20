@@ -88,7 +88,6 @@ class EventDetailsModule extends React.Component<Props, State> {
                 return {editFormVisible:true, editFormReloadKey:uniqueId()}
             })
         }
-        
     }
     getEventOptions = () => {
         const options: OverflowMenuItem[] = []

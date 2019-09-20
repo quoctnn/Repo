@@ -482,6 +482,8 @@ export abstract class ApiClient
             case ContextNaturalKey.EVENT + ContextPhotoType.cover:url = Constants.apiRoute.eventCoverUrl(contextObjectId); break;
             case ContextNaturalKey.GROUP + ContextPhotoType.avatar:url = Constants.apiRoute.groupAvatarUrl(contextObjectId); break;
             case ContextNaturalKey.GROUP + ContextPhotoType.cover:url = Constants.apiRoute.groupCoverUrl(contextObjectId); break;
+            case ContextNaturalKey.USER + ContextPhotoType.avatar:url = Constants.apiRoute.profileAvatarUrl(contextObjectId); break;
+            case ContextNaturalKey.USER + ContextPhotoType.cover:url = Constants.apiRoute.profileCoverUrl(contextObjectId); break;
             default:break;
         }
         return url
@@ -638,7 +640,7 @@ export abstract class ApiClient
             callback(null, status, new RequestErrorData(request.responseJSON, error))
         })
     }
-    static getProfilesByIds(profiles:number[], callback:ApiClientFeedPageCallback<UserProfile>)
+    static getProfilesByIds(profiles:(number|string)[], callback:ApiClientFeedPageCallback<UserProfile>)
     {
         let url = Constants.apiRoute.profilesUrl + "?" + this.getQueryString({limit:profiles.length, id:profiles.join(",")})
         AjaxRequest.get(url, (data, status, request) => {
@@ -680,6 +682,14 @@ export abstract class ApiClient
     static getProfile(id:string|number, callback:ApiClientCallback<UserProfile>)
     {
         AjaxRequest.get(Constants.apiRoute.profileUrl(id), (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, new RequestErrorData(request.responseJSON, error))
+        })
+    }
+    static updateProfile(profileData:Partial<UserProfile>, callback:ApiClientCallback<UserProfile>)
+    {
+        AjaxRequest.putJSON(Constants.apiRoute.myProfileUrl, profileData, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
             callback(null, status, new RequestErrorData(request.responseJSON, error))
