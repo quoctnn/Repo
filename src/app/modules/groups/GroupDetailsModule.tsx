@@ -11,12 +11,15 @@ import { translate } from '../../localization/AutoIntlProvider';
 import { Group, Community, ContextNaturalKey, Permission } from '../../types/intrasocial_types';
 import { connect } from 'react-redux';
 import { ReduxState } from '../../redux';
-import { CommunityManager } from '../../managers/CommunityManager';
 import CircularLoadingSpinner from '../../components/general/CircularLoadingSpinner';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import { DetailsContent } from '../../components/details/DetailsContent';
 import { DetailsMembers } from '../../components/details/DetailsMembers';
 import { ContextManager } from '../../managers/ContextManager';
+import GroupCreateComponent from '../../components/general/contextCreation/GroupCreateComponent';
+import { uniqueId } from '../../utilities/Utilities';
+import { OverflowMenuItemType, OverflowMenuItem } from '../../components/general/OverflowMenu';
+import { DropDownMenu } from '../../components/general/DropDownMenu';
 type OwnProps = {
     breakpoint:ResponsiveBreakpoint
     contextNaturalKey: ContextNaturalKey
@@ -24,6 +27,8 @@ type OwnProps = {
 type State = {
     menuVisible:boolean
     isLoading:boolean
+    editFormVisible:boolean
+    editFormReloadKey:string
 }
 type ReduxStateProps = {
     community: Community
@@ -37,7 +42,9 @@ class GroupDetailsModule extends React.Component<Props, State> {
         super(props);
         this.state = {
             isLoading:false,
-            menuVisible:false
+            menuVisible:false,
+            editFormVisible:false,
+            editFormReloadKey:uniqueId(),
         }
     }
     componentDidUpdate = (prevProps:Props) => {
@@ -67,12 +74,39 @@ class GroupDetailsModule extends React.Component<Props, State> {
             return (<CircularLoadingSpinner borderWidth={3} size={20} key="loading"/>)
         }
     }
+    toggleEditForm = () => {
+        const isFormVisible = this.state.editFormVisible
+        if(isFormVisible)
+        {
+            this.setState(() => {
+                return {editFormVisible:false}
+            })
+        }
+        else {
+            this.setState(() => {
+                return {editFormVisible:true, editFormReloadKey:uniqueId()}
+            })
+        }
+        
+    }
+    renderEditForm = () => {
+        const visible = this.state.editFormVisible
+        const group = this.props.group
+        return <GroupCreateComponent key={this.state.editFormReloadKey} group={group} visible={visible} onComplete={this.toggleEditForm} />
+    }
+    getGroupOptions = () => {
+        const options: OverflowMenuItem[] = []
+        if(this.props.group.permission >= Permission.admin)
+            options.push({id:"1", type:OverflowMenuItemType.option, title:translate("Edit"), onPress:this.toggleEditForm, iconClass:"fas fa-pen"})
+        return options
+    }
     render()
     {
         const {breakpoint, history, match, location, staticContext, group, community, contextNaturalKey, ...rest} = this.props
+        const groupOptions = this.getGroupOptions()
         return (<Module {...rest}>
                     <ModuleHeader headerTitle={group && group.name || translate("detail.module.title")} loading={this.state.isLoading}>
-                        <ModuleMenuTrigger onClick={this.menuItemClick} />
+                        {groupOptions.length > 0 && <DropDownMenu className="group-option-dropdown" triggerClass="fas fa-cog mx-1" items={groupOptions}></DropDownMenu>} 
                     </ModuleHeader>
                     {true && //breakpoint >= ResponsiveBreakpoint.standard && //do not render for small screens
                         <ModuleContent>
@@ -85,6 +119,7 @@ class GroupDetailsModule extends React.Component<Props, State> {
                                 ||
                                 <LoadingSpinner key="loading"/>
                             }
+                            {this.renderEditForm()}
                         </ModuleContent>
                     }
                     {group && group.permission >= Permission.read &&

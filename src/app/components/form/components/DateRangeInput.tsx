@@ -26,7 +26,7 @@ export type DateRangeInputState = {
 }
 export class DateRangeInput extends React.Component<DateRangeInputProps, DateRangeInputState> implements FormComponentBase{
     
-    serializedDateFormat = "YYYY-MM-DDTHH:mm"
+    serializedDateFormat = "YYYY-MM-DD HH:mm"
     constructor(props:DateRangeInputProps){
         super(props)
         this.state = {

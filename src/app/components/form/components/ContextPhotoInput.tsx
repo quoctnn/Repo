@@ -12,7 +12,9 @@ import { translate } from '../../../localization/AutoIntlProvider';
 import { InputGroup, Input } from 'reactstrap';
 import classnames from 'classnames';
 const cropRectToArea = (crop:CropRect) => {
-    return {x:crop.top_left[0], y:crop.top_left[1], width:crop.bottom_right[0] - crop.top_left[0] , height:crop.bottom_right[1] - crop.top_left[1]}
+    if(crop && crop.bottom_right && crop.bottom_right.length == 2 &&  crop.top_left && crop.top_left.length == 2)
+        return {x:crop.top_left[0], y:crop.top_left[1], width:crop.bottom_right[0] - crop.top_left[0] , height:crop.bottom_right[1] - crop.top_left[1]}
+    return null
 }
 const createImage = (url:string) =>
   new Promise<HTMLImageElement>((resolve, reject) => {
@@ -181,7 +183,7 @@ export class FileCropper extends React.Component<FileCropperProps, FileCropperSt
         this.processInputFile()
     }
     handleFetchedServerData = (data:CropInfo) => {
-        if(data)
+        if(data && data.image)
         {
             this.setState((prevState:FileCropperState) => {
                 const area:Area = prevState.initialCroppedAreaPixels || cropRectToArea(data)
@@ -223,7 +225,9 @@ export class FileCropper extends React.Component<FileCropperProps, FileCropperSt
         }
     }
     onCropChange = (crop:Location) => {
-        this.setState({ crop })
+        this.setState(() => {
+            return { crop }
+        })
     }
     onCropComplete = (croppedArea: Area, croppedAreaPixels: Area) => {
         this.croppedAreaPixels = croppedAreaPixels

@@ -136,6 +136,12 @@ export default  {
         groupMembershipRequestAcceptUrl: (id:number) => {
             return `/api/v2/group-memberrequest/${id}/accept/`
         },
+        groupAvatarUrl: (id:number) => {
+            return `/api/v2/group/${id}/avatar/`
+        },
+        groupCoverUrl: (id:number) => {
+            return `/api/v2/group/${id}/cover/`
+        },
         // Project URLs
         projectsUrl: '/api/v2/project/',
         projectDetailUrl: (id:number|string) => {

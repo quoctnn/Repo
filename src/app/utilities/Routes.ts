@@ -15,6 +15,7 @@ export default abstract class Routes {
     static CONVERSATION_CREATE = "/conversation/create/"
     static COMMUNITY_CREATE = "/community/create/"
     static EVENT_CREATE = "/event/create/"
+    static GROUP_CREATE = "/group/create/"
     static SEARCH = "/search/"
     static UPDATE_TOOL = "/app-update/"
     static NEWSFEED = "/newsfeed/"

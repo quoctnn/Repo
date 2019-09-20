@@ -38,8 +38,9 @@ import HTML5Backend from 'react-dnd-html5-backend'
 import FilesPage from "./components/pages/FilesPage";
 import DevToolPage from './components/pages/DevToolPage';
 import SearchComponent from "./components/navigation/SearchComponent";
-import CommunityCreateComponent from './modules/communities/CommunityCreateComponent';
-import EventCreateComponent from "./modules/events/EventCreateComponent";
+import CommunityCreateComponent from './components/general/contextCreation/CommunityCreateComponent';
+import EventCreateComponent from "./components/general/contextCreation/EventCreateComponent";
+import GroupCreateComponent from "./components/general/contextCreation/GroupCreateComponent";
 const WithSearch = () =>
     withRouter(class Modal extends React.Component<RouteComponentProps<any>, { visible: boolean, term:string, type:string }> {
         constructor(props: PathLoaderProps) {
@@ -240,6 +241,7 @@ class Main extends React.Component<Props, State> {
                                     <PrivateRoute path={Routes.SEARCH} component={ModalSearchComponent} />
                                     <PrivateRoute path={Routes.COMMUNITY_CREATE} component={CommunityCreateComponent} />
                                     <PrivateRoute path={Routes.EVENT_CREATE} component={EventCreateComponent} />
+                                    <PrivateRoute path={Routes.GROUP_CREATE} component={GroupCreateComponent} />
                                 </Switch>
                             </DndProvider>
                         }

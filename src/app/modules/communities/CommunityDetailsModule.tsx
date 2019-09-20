@@ -21,7 +21,7 @@ import classnames from 'classnames';
 import { uniqueId } from '../../utilities/Utilities';
 import { DropDownMenu } from '../../components/general/DropDownMenu';
 import { OverflowMenuItem, OverflowMenuItemType } from '../../components/general/OverflowMenu';
-import CommunityCreateComponent from './CommunityCreateComponent';
+import CommunityCreateComponent from '../../components/general/contextCreation/CommunityCreateComponent';
 type OwnProps = {
     breakpoint:ResponsiveBreakpoint
 } & CommonModuleProps

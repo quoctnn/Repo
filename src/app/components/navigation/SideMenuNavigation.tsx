@@ -450,6 +450,7 @@ class SideMenuNavigation extends React.Component<Props, State> {
                     {isSuperUser && 
                         <MenuBlock removeContentOnCollapsed={false} animationDuration={SideMenuNavigation.animationDuration} open={this.state.open} icon="fas fa-user-shield" title={translate("Superuser")}>
                             <Link to={{pathname:Routes.COMMUNITY_CREATE, state:{modal:true}}} onClick={closeMenu}>{translate("community.create")}</Link>
+                            <Link to={{pathname:Routes.GROUP_CREATE, state:{modal:true}}} onClick={closeMenu}>{translate("group.create")}</Link>
                             <Link to={{pathname:Routes.EVENT_CREATE, state:{modal:true}}} onClick={closeMenu}>{translate("event.create")}</Link>
                         </MenuBlock>
                     }

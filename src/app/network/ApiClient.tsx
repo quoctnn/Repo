@@ -7,6 +7,7 @@ import moment = require("moment");
 import { Settings } from "../utilities/Settings";
 import { ConversationManager } from '../managers/ConversationManager';
 import { CommunityConfigurationData } from '../types/intrasocial_types';
+import { groupsById } from '../redux/groupStore';
 const $ = require("jquery")
 import { Status, UserProfile, UploadedFile, Community, Group, Conversation, Project, Message, Event, Task,
     ElasticSearchType, ObjectAttributeType, StatusObjectAttribute, EmbedCardItem, ReportTag,
@@ -479,6 +480,8 @@ export abstract class ApiClient
             case ContextNaturalKey.COMMUNITY + ContextPhotoType.cover:url = Constants.apiRoute.communityCoverUrl(contextObjectId); break;
             case ContextNaturalKey.EVENT + ContextPhotoType.avatar:url = Constants.apiRoute.eventAvatarUrl(contextObjectId); break;
             case ContextNaturalKey.EVENT + ContextPhotoType.cover:url = Constants.apiRoute.eventCoverUrl(contextObjectId); break;
+            case ContextNaturalKey.GROUP + ContextPhotoType.avatar:url = Constants.apiRoute.groupAvatarUrl(contextObjectId); break;
+            case ContextNaturalKey.GROUP + ContextPhotoType.cover:url = Constants.apiRoute.groupCoverUrl(contextObjectId); break;
             default:break;
         }
         return url
@@ -759,6 +762,25 @@ export abstract class ApiClient
     {
         let url = Constants.apiRoute.groupUrl(groupId)
         AjaxRequest.get(url, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, new RequestErrorData(request.responseJSON, error))
+        })
+    }
+
+    static updateGroup(groupId:string|number, data:Partial<Group>, callback:ApiClientCallback<Group>)
+    {
+        let url = Constants.apiRoute.groupUrl(groupId)
+        AjaxRequest.patchJSON(url, data, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, new RequestErrorData(request.responseJSON, error))
+        })
+    }
+    static createGroup(data:Partial<Group>, callback:ApiClientCallback<Group>)
+    {
+        let url = Constants.apiRoute.groupsUrl
+        AjaxRequest.postJSON(url, data, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
             callback(null, status, new RequestErrorData(request.responseJSON, error))

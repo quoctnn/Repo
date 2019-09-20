@@ -993,6 +993,7 @@ export type ElasticResultFile = {
     context_object_id: number
     status_id:number
     community:number
+    conversation:number
 } & GenericElasticResult & ElasticResultCreator
 export type ElasticResultStatus = {
     has_documents: boolean

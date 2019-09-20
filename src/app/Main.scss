@@ -46,6 +46,7 @@ ul,li{ list-style-type: none; padding: 0;}
 .push-right {
     margin-left: auto;
 }
+.modal { -webkit-overflow-scrolling: touch; }
 .modal-dialog.has-module{
     .modal-body{
         padding: 0;

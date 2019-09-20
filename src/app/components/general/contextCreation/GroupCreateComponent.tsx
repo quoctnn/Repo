@@ -1,48 +1,45 @@
 import * as React from 'react';
-import "./EventCreateComponent.scss"
-import { translate } from '../../localization/AutoIntlProvider';
-import { ContextNaturalKey, CropRect, ContextPhotoType, CropInfo, RequestErrorData, ContextPrivacy, CommunityCategory, CommunityCreatePermission, Event } from '../../types/intrasocial_types';
-import FormController, {FormStatus } from '../../components/form/FormController';
-import {ApiClient, ApiClientCallback} from '../../network/ApiClient';
-import { uniqueId, removeEmptyEntriesFromObject, nullOrUndefined } from '../../utilities/Utilities';
-import { TextInput } from '../../components/form/components/TextInput';
-import { TextAreaInput } from '../../components/form/components/TextAreaInput';
-import { ContextPhotoInput } from '../../components/form/components/ContextPhotoInput';
-import { InputOption, RichRadioGroupInput } from '../../components/form/components/RichRadioGroupInput';
+import { translate } from '../../../localization/AutoIntlProvider';
+import { Group, ContextNaturalKey, CropRect, ContextPhotoType, CropInfo, RequestErrorData, ContextPrivacy} from '../../../types/intrasocial_types';
+import FormController, {  FormStatus } from '../../form/FormController';
+import {ApiClient, ApiClientCallback} from '../../../network/ApiClient';
+import { removeEmptyEntriesFromObject, nullOrUndefined } from '../../../utilities/Utilities';
+import { TextInput } from '../../form/components/TextInput';
+import { InputOption, RichRadioGroupInput } from '../../form/components/RichRadioGroupInput';
 import { RouteComponentProps, withRouter } from 'react-router';
-import { DateRangeInput } from '../../components/form/components/DateRangeInput';
-import { FormPage } from '../../components/form/FormPage';
-import { FormMenuItem } from '../../components/form/FormMenuItem';
-import { CommunityManager } from '../../managers/CommunityManager';
-import { EventManager } from '../../managers/EventManager';
-import { LocationInput } from '../../components/form/components/LocationInput';
-import { AddressInput } from '../../components/form/components/AddressInput';
+import { FormMenuItem } from '../../form/FormMenuItem';
+import { FormPage } from '../../form/FormPage';
+import { TextAreaInput } from '../../form/components/TextAreaInput';
+import { ContextPhotoInput } from '../../form/components/ContextPhotoInput';
+import { GroupManager } from '../../../managers/GroupManager';
+import { CommunityManager } from '../../../managers/CommunityManager';
 type OwnProps = {
-    event?:Event
+    group?:Group
     visible?:boolean
     onComplete?:() => void
 }
 type State = {
     formVisible:boolean
-    formReloadKey?:string
     formStatus:FormStatus
     formErrors?:RequestErrorData[]
-    formValues:Partial<Event>
+    formValues:Partial<Group>
 }
 type Props = OwnProps & RouteComponentProps<any>
-class EventCreateComponent extends React.Component<Props, State> {
+class GroupCreateComponent extends React.Component<Props, State> {
     formController:FormController = null
+    defaultPrimaryColor = "#428bca"
+    defaultSecondaryColor = "#00d4ff"
     constructor(props:Props) {
         super(props);
         this.state = {
             formVisible:true,
             formStatus:FormStatus.normal,
             formErrors:null,
-            formReloadKey:uniqueId(),
             formValues:{
             }
         }
     }
+
     private hasOutsideVisibilityToggle = () => {
         return !nullOrUndefined( this.props.visible)
     }
@@ -62,10 +59,10 @@ class EventCreateComponent extends React.Component<Props, State> {
     uploadContextPhoto = (type:ContextPhotoType, contextNaturalKey:ContextNaturalKey, contextObjectId:number, file:File|string, crop:CropRect, completion:ApiClientCallback<CropInfo>) => () => {
         ApiClient.setContextPhoto(type,contextNaturalKey, contextObjectId, file, crop, completion)
     }
-    handleCreateEventFormSubmit = () => {
-        const event:Partial<Event> = this.props.event || {}
-        const create = !this.props.event
+    handleCreateGroupFormSubmit = () => {
         const data = this.state.formValues
+        const group:Partial<Group> = this.props.group || {}
+        const create = !this.props.group
         if(create)
             data.community =  CommunityManager.getActiveCommunity().id
         console.log("formdata", data)
@@ -75,20 +72,16 @@ class EventCreateComponent extends React.Component<Props, State> {
             name, 
             description, 
             privacy,
-            start,
-            end,
             community,
-            location,
-            address,
             //
             avatar, 
             cover,
             //
             ...rest} = data
-        const updateData = removeEmptyEntriesFromObject({name, description, privacy, start, end, community, location, address})
+        const updateData = removeEmptyEntriesFromObject({name, description, privacy, community})
         const avatarData:{file:File|string, crop:CropRect} = avatar as any
         const coverData:{file:File|string, crop:CropRect} = cover as any
-        let createdEvent:Event = null
+        let createdGroup:Group = null
         const completed = () => {
             if(errors.length > 0)
             {
@@ -99,13 +92,13 @@ class EventCreateComponent extends React.Component<Props, State> {
             }
             else {
                 this.setFormStatus(FormStatus.normal)
-                const shouldRedirect = !!createdEvent && createdEvent.uri && ((create && !this.hasOutsideVisibilityToggle()) || (!create && createdEvent.uri != event.uri))
+                const shouldRedirect = !!createdGroup && createdGroup.uri && ((create && !this.hasOutsideVisibilityToggle()) || (!create && createdGroup.uri != group.uri))
                 if(shouldRedirect)
                 {
                     this.setState(() => {
                         return {formVisible :false}
                     }, () => {
-                        window.app.navigateToRoute(createdEvent.uri)
+                        window.app.navigateToRoute(createdGroup.uri)
                     })
                 }
                 else 
@@ -135,16 +128,16 @@ class EventCreateComponent extends React.Component<Props, State> {
         }
         if(create)
         {
-            ApiClient.createEvent(updateData, (data, status, errorData) => {
+            ApiClient.createGroup(updateData, (data, status, errorData) => {
                 if(!errorData && data && data.id)
                 {
-                    createdEvent = data
-                    if(!!createdEvent)
-                        EventManager.storeEvents([createdEvent])
+                    createdGroup = data
+                    if(!!createdGroup)
+                        GroupManager.storeGroups([createdGroup])
                     if(avatarData)
-                        requests.push(this.uploadContextPhoto(ContextPhotoType.avatar,ContextNaturalKey.EVENT, createdEvent.id, avatarData.file, avatarData.crop, requestCompleter))
+                        requests.push(this.uploadContextPhoto(ContextPhotoType.avatar,ContextNaturalKey.GROUP, createdGroup.id, avatarData.file, avatarData.crop, requestCompleter))
                     if(coverData)
-                        requests.push(this.uploadContextPhoto(ContextPhotoType.cover,ContextNaturalKey.EVENT, createdEvent.id, coverData.file, coverData.crop, requestCompleter))
+                        requests.push(this.uploadContextPhoto(ContextPhotoType.cover,ContextNaturalKey.GROUP, createdGroup.id, coverData.file, coverData.crop, requestCompleter))
                     if(requests.length > 0)
                         requests[0]() // start
                     else {
@@ -159,25 +152,23 @@ class EventCreateComponent extends React.Component<Props, State> {
             })
         }
         else {
-            
             if(Object.keys(updateData).length > 0)
-                requests.push(() => ApiClient.updateEvent(event.id, updateData, (data, status, error) => {
-                    createdEvent = data
-                    if(!!createdEvent)
-                        EventManager.storeEvents([createdEvent])
+                requests.push(() => ApiClient.updateGroup(this.props.group.id, updateData,(data, status, error) => {
+                    createdGroup = data
+                    if(!!createdGroup)
+                        GroupManager.storeGroups([createdGroup])
                     requestCompleter(data, status, error)
                 }))
             if(avatarData)
-                requests.push(this.uploadContextPhoto(ContextPhotoType.avatar,ContextNaturalKey.EVENT, event.id, avatarData.file, avatarData.crop, requestCompleter))
+                requests.push(this.uploadContextPhoto(ContextPhotoType.avatar,ContextNaturalKey.GROUP, group.id, avatarData.file, avatarData.crop, requestCompleter))
             if(coverData)
-                requests.push(this.uploadContextPhoto(ContextPhotoType.cover,ContextNaturalKey.EVENT, event.id, coverData.file, coverData.crop, requestCompleter))
+                requests.push(this.uploadContextPhoto(ContextPhotoType.cover,ContextNaturalKey.GROUP, group.id, coverData.file, coverData.crop, requestCompleter))
             if(requests.length > 0)
                 requests[0]() // start
             else {
                 completed()
             }
         }
-        
     }
     setFormStatus = (status:FormStatus, resetError?:boolean) => {
         this.setState((prevState:State) => {
@@ -204,8 +195,9 @@ class EventCreateComponent extends React.Component<Props, State> {
     }
     render = () => {
         const visible = this.isVisible()
-        const event:Partial<Event> = this.props.event || {}
-        const create = !this.props.event
+        const group:Partial<Group> = this.props.group || {}
+        const create = !this.props.group
+
         const privacyOptions:InputOption[] = ContextPrivacy.all.map(p => {
             return {
                 label:ContextPrivacy.titleForKey(p), 
@@ -216,13 +208,12 @@ class EventCreateComponent extends React.Component<Props, State> {
         })
         return <FormController 
                     ref={(controller) => this.formController = controller }
-                    key={this.state.formReloadKey} 
                     visible={visible} 
                     formErrors={this.state.formErrors} 
                     didCancel={this.didCancel} 
                     status={this.state.formStatus} 
-                    onFormSubmit={this.handleCreateEventFormSubmit} 
-                    title={translate(create ? "event.create" : "event.update")  } 
+                    onFormSubmit={this.handleCreateGroupFormSubmit} 
+                    title={translate(create ? "group.create" : "group.update")  } 
                     onValueChanged={this.handleValueChanged}
                     render={(form) => {
                         return {
@@ -230,14 +221,14 @@ class EventCreateComponent extends React.Component<Props, State> {
                                 <FormMenuItem key="1"
                                     form={form} 
                                     pageId="1" 
-                                    title={translate("event.settings.page.title.primary")} 
-                                    description={translate("event.settings.page.description.primary")}  
+                                    title={translate("group.settings.page.title.primary")} 
+                                    description={translate("group.settings.page.description.primary")}  
                                     />,
                                     <FormMenuItem key="2"
                                     form={form} 
                                     pageId="2" 
-                                    title={translate("event.settings.page.title.appearance")} 
-                                    description={translate("event.settings.page.description.appearance")}  
+                                    title={translate("group.settings.page.title.appearance")} 
+                                    description={translate("group.settings.page.description.appearance")}  
                                     />
                             ],
                             pages:[<FormPage key="page1" form={this.formController} pageId="1" render={(pageId, form) => {
@@ -248,7 +239,7 @@ class EventCreateComponent extends React.Component<Props, State> {
                                         hasSubmitted={form.hasSubmitted()}
                                         ref={form.setFormRef(pageId)} 
                                         onValueChanged={form.handleValueChanged(pageId)} 
-                                        value={event.name} 
+                                        value={group.name} 
                                         title={translate("common.name")} 
                                         id="name" 
                                         />
@@ -257,43 +248,9 @@ class EventCreateComponent extends React.Component<Props, State> {
                                         hasSubmitted={form.hasSubmitted()}
                                         ref={form.setFormRef(pageId)} 
                                         onValueChanged={form.handleValueChanged(pageId)} 
-                                        value={event.description} 
+                                        value={group.description} 
                                         title={translate("common.description")} 
                                         id="description" 
-                                        />
-                                        <AddressInput 
-                                        errors={form.getErrors} 
-                                        hasSubmitted={form.hasSubmitted()}
-                                        ref={form.setFormRef(pageId)} 
-                                        onValueChanged={form.handleValueChanged(pageId)} 
-                                        address={event.address} 
-                                        location={this.state.formValues.location || event.location}
-                                        title={translate("common.address")} 
-                                        id="address" 
-                                        />
-                                        <LocationInput 
-                                        errors={form.getErrors} 
-                                        hasSubmitted={form.hasSubmitted()}
-                                        ref={form.setFormRef(pageId)} 
-                                        onValueChanged={form.handleValueChanged(pageId)} 
-                                        location={event.location} 
-                                        title={translate("common.location")} 
-                                        id="location" 
-                                        />
-                                         <DateRangeInput
-                                        errors={form.getErrors} 
-                                        hasSubmitted={form.hasSubmitted()}
-                                        ref={form.setFormRef(pageId)} 
-                                        onValueChanged={form.handleValueChanged(pageId)}
-                                        start={event.start}
-                                        end={event.end}
-                                        startId="start"
-                                        endId="end"
-                                        startTitle={translate("event.date.start")}
-                                        endTitle={translate("event.date.end")}
-                                        title={translate("common.description")} 
-                                        id="date"
-                                        isRequired={true}
                                         />
                                         <RichRadioGroupInput
                                             options={privacyOptions}
@@ -301,7 +258,7 @@ class EventCreateComponent extends React.Component<Props, State> {
                                             hasSubmitted={form.hasSubmitted()}
                                             ref={form.setFormRef(pageId)} 
                                             onValueChanged={form.handleValueChanged(pageId)} 
-                                            value={event.privacy} 
+                                            value={group.privacy} 
                                             title={translate("common.privacy")} 
                                             id="privacy" 
                                             isRequired={true}
@@ -315,11 +272,11 @@ class EventCreateComponent extends React.Component<Props, State> {
                                             hasSubmitted={form.hasSubmitted()}
                                             ref={form.setFormRef(pageId)} 
                                             onValueChanged={form.handleValueChanged(pageId)} 
-                                            value={event.avatar} 
+                                            value={group.avatar} 
                                             title={translate("common.avatar")} 
                                             onRequestNavigation={form.handleRequestNavigation}
-                                            contextNaturalKey={ContextNaturalKey.EVENT}
-                                            contextObjectId={event.id}
+                                            contextNaturalKey={ContextNaturalKey.GROUP}
+                                            contextObjectId={group.id}
                                             id="avatar" 
                                         />
                                         <ContextPhotoInput 
@@ -327,14 +284,15 @@ class EventCreateComponent extends React.Component<Props, State> {
                                             hasSubmitted={form.hasSubmitted()}
                                             ref={form.setFormRef(pageId)} 
                                             onValueChanged={form.handleValueChanged(pageId)} 
-                                            value={event.cover} 
+                                            value={group.cover} 
                                             title={translate("common.cover")} 
                                             onRequestNavigation={form.handleRequestNavigation}
-                                            contextNaturalKey={ContextNaturalKey.EVENT}
-                                            contextObjectId={event.id}
+                                            contextNaturalKey={ContextNaturalKey.GROUP}
+                                            contextObjectId={group.id}
                                             id="cover" 
                                         />
                                     </>
+
                         }} />
                         ]
                         }
@@ -343,4 +301,4 @@ class EventCreateComponent extends React.Component<Props, State> {
                     </FormController>
     }
 }
-export default withRouter(EventCreateComponent)
+export default withRouter(GroupCreateComponent)

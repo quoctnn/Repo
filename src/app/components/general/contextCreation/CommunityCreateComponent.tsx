@@ -1,22 +1,21 @@
 import * as React from 'react';
-import "./CommunityCreateComponent.scss"
-import { translate } from '../../localization/AutoIntlProvider';
-import { Community, ContextNaturalKey, CropRect, ContextPhotoType, CropInfo, RequestErrorData, ContextPrivacy, CommunityCategory, CommunityConfigurationData, CommunityCreatePermission } from '../../types/intrasocial_types';
-import FormController, {  FormStatus } from '../../components/form/FormController';
-import {ApiClient, ApiClientCallback} from '../../network/ApiClient';
-import { uniqueId, removeEmptyEntriesFromObject, nullOrUndefined } from '../../utilities/Utilities';
-import { TextInput } from '../../components/form/components/TextInput';
-import { InputOption, RichRadioGroupInput } from '../../components/form/components/RichRadioGroupInput';
+import { translate } from '../../../localization/AutoIntlProvider';
+import { Community, ContextNaturalKey, CropRect, ContextPhotoType, CropInfo, RequestErrorData, ContextPrivacy, CommunityCategory, CommunityConfigurationData, CommunityCreatePermission } from '../../../types/intrasocial_types';
+import FormController, {  FormStatus } from '../../form/FormController';
+import {ApiClient, ApiClientCallback} from '../../../network/ApiClient';
+import { removeEmptyEntriesFromObject, nullOrUndefined } from '../../../utilities/Utilities';
+import { TextInput } from '../../form/components/TextInput';
+import { InputOption, RichRadioGroupInput } from '../../form/components/RichRadioGroupInput';
 import { RouteComponentProps, withRouter } from 'react-router';
-import { FormMenuItem } from '../../components/form/FormMenuItem';
-import { FormPage } from '../../components/form/FormPage';
-import { TextAreaInput } from '../../components/form/components/TextAreaInput';
-import { ContextPhotoInput } from '../../components/form/components/ContextPhotoInput';
-import { SelectInput } from '../../components/form/components/SelectInput';
-import { ColorInput } from '../../components/form/components/ColorInput';
-import { BooleanInput } from '../../components/form/components/BooleanInput';
-import LoadingSpinner from '../../components/LoadingSpinner';
-import { CommunityManager } from '../../managers/CommunityManager';
+import { FormMenuItem } from '../../form/FormMenuItem';
+import { FormPage } from '../../form/FormPage';
+import { TextAreaInput } from '../../form/components/TextAreaInput';
+import { ContextPhotoInput } from '../../form/components/ContextPhotoInput';
+import { SelectInput } from '../../form/components/SelectInput';
+import { ColorInput } from '../../form/components/ColorInput';
+import { BooleanInput } from '../../form/components/BooleanInput';
+import LoadingSpinner from '../../LoadingSpinner';
+import { CommunityManager } from '../../../managers/CommunityManager';
 type OwnProps = {
     community?:Community
     communityConfiguration?:CommunityConfigurationData

@@ -191,8 +191,16 @@ export class LocationInput extends React.Component<LocationInputProps, LocationI
             this.showSearchInput()
         }
     }
-    handleSearchBlur = (event:any) => {
-        this.hideSearchInput()
+    handleSearchBlur = (event:MouseEvent) => {
+        const el = event.target as HTMLElement
+        const searchEl = this.searchRef && this.searchRef.current
+        if(el && searchEl)
+        {
+            if(searchEl != el && !searchEl.contains(el))
+                this.hideSearchInput()
+        }
+        else 
+            this.hideSearchInput()
     }
     handleInputChange = (e:React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value

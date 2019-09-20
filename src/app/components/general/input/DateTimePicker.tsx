@@ -4,7 +4,7 @@ import 'react-moment-input/dist/css/style.css'
 import * as moment from 'moment-timezone';
 import { translate } from '../../../localization/AutoIntlProvider';
 import { Popover, PopoverBody, Input, InputGroup, Button, InputGroupAddon, ButtonGroup } from 'reactstrap';
-import { uniqueId } from '../../../utilities/Utilities';
+import { uniqueId, DateFormat } from '../../../utilities/Utilities';
 import Slider from 'react-input-slider';
 import "./DateTimePicker.scss"
 import Popper from 'popper.js';
@@ -339,7 +339,7 @@ class MomentInput extends React.Component<MomentInputProps, MomentInputState> {
     render = () => {
         const { options, onSave, today, value, style, className, inputClassName, inputStyle, name, readOnly, format, icon, translations, position} = this.props;
         const {selected, activeTab, date, isOpen, textValue, isValid} = this.state;
-        let inputValue = value ? value.format(format) : (date ? date.format(format): "");
+        let inputValue = value ? value.format(DateFormat.date) : (date ? date.format(DateFormat.date): "");
         const hasInputValue = inputValue && inputValue.length > 0
         const id = "momentinput_" + this._id
         const modifiers:Popper.Modifiers = {

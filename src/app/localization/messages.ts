@@ -481,6 +481,14 @@ var translations = {
     "common.location":"Location",
     "common.address":"Address",
     "common.update":"Update",
+    "group.create":"Create group",
+    "group.update":"Update group",
+    "group.settings.page.title.primary":"General",
+    "group.settings.page.description.primary":"name, description, privacy",
+    "group.settings.page.title.appearance":"Appearance",
+    "group.settings.page.description.appearance":"avatar, cover",
+    "common.filters":"Filters",
+    "search.result.empty":"No results found",
 
   },
   no: {
@@ -965,6 +973,14 @@ var translations = {
     "common.location":"Plassering",
     "common.address":"Adresse",
     "common.update":"Oppdater",
+    "group.create":"Opprett gruppe",
+    "group.update":"Oppdater gruppe",
+    "group.settings.page.title.primary":"Generelt",
+    "group.settings.page.description.primary":"navn, beskrivelse, personvern",
+    "group.settings.page.title.appearance":"Utseende",
+    "group.settings.page.description.appearance":"avatar, cover",
+    "common.filters":"Filtre",
+    "search.result.empty":"Ingen resultater funnet",
   },
   en: {
     "search.placeholder": "Search ...",
@@ -1459,6 +1475,14 @@ var translations = {
     "common.location":"Location",
     "common.address":"Address",
     "common.update":"Update",
+    "group.create":"Create group",
+    "group.update":"Update group",
+    "group.settings.page.title.primary":"General",
+    "group.settings.page.description.primary":"name, description, privacy",
+    "group.settings.page.title.appearance":"Appearance",
+    "group.settings.page.description.appearance":"avatar, cover",
+    "common.filters":"Filters",
+    "search.result.empty":"No results found",
   }
 };
 
