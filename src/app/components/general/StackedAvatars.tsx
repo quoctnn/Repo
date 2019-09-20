@@ -15,6 +15,7 @@ type OwnProps = {
 type DefaultProps = {
     size: number
     borderWidth:number
+    maxAvatars:number
 }
 type State = {
     isLoading:Boolean
@@ -28,7 +29,8 @@ type Props = OwnProps & DefaultProps & RouteComponentProps<any> & ReduxStateProp
 class StackedAvatars extends React.Component<Props, State> {
     static defaultProps:DefaultProps = {
         size:40,
-        borderWidth:2
+        borderWidth:2,
+        maxAvatars:5
     }
     constructor(props:Props) {
         super(props);
@@ -66,15 +68,19 @@ class StackedAvatars extends React.Component<Props, State> {
     }
     render() {
         let profiles = this.state.profiles
+        /* <canvas id="avatar" width={this.props.size} height={this.props.size} style={{background:"#FFFFFF"}}></canvas> */
         return(
             <div className="avatar-stacked">
                 {
                     !this.state.isLoading &&
-                        profiles.slice(0,5).map((profile) => {
+                        profiles.slice(0,this.props.maxAvatars).map((profile) => {
                         return(this.renderAvatar(profile))
                     })
                     ||
                     <LoadingSpinner/>
+                }
+                { profiles.length > this.props.maxAvatars &&
+                    <Avatar title={`${profiles.length}`} size={this.props.size} borderColor={"#FFFFFF"} borderWidth={this.props.borderWidth} />
                 }
             </div>
         )

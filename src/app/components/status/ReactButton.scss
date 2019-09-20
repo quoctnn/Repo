@@ -10,6 +10,9 @@
     cursor: pointer;
   }
 
+  .reactions-count {
+    padding: 0;
+  }
   .reactions-count.active {
     @include var(color, primary-theme-color);
   }
