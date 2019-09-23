@@ -18,7 +18,8 @@ import { TimezoneInput } from '../../form/components/TimezoneInput';
 type OwnProps = {
     profile:UserProfile
     visible?:boolean
-    onComplete?:() => void
+    onComplete?:(profile?:UserProfile) => void
+    onCancel?:() => void
 }
 type State = {
     formVisible:boolean
@@ -129,8 +130,6 @@ class ProfileUpdateComponent extends React.Component<Props, State> {
             }
         }
         if(Object.keys(updateData).length > 0)
-            requests.push(() => ApiClient.updateProfile(updateData, requestCompleter))
-        if(Object.keys(updateData).length > 0)
             requests.push(() => ApiClient.updateProfile(updateData, (data, status, error) => {
                 updatedProfile = data
                 requestCompleter(data, status, error)
@@ -163,8 +162,8 @@ class ProfileUpdateComponent extends React.Component<Props, State> {
         })
     }
     didCancel = () => {
-        if(this.props.onComplete)
-            this.props.onComplete()
+        if(this.props.onCancel)
+            this.props.onCancel()
         else 
             this.back()
     }

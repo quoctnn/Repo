@@ -17,12 +17,18 @@ import { DetailsContent } from '../../components/details/DetailsContent';
 import { ContextManager } from '../../managers/ContextManager';
 import { CommonModuleProps } from '../Module';
 import classnames from 'classnames';
+import { OverflowMenuItem, OverflowMenuItemType } from '../../components/general/OverflowMenu';
+import { uniqueId } from '../../utilities/Utilities';
+import ProjectCreateComponent from '../../components/general/contextCreation/ProjectCreateComponent';
+import { DropDownMenu } from '../../components/general/DropDownMenu';
 type OwnProps = {
     breakpoint:ResponsiveBreakpoint
 } & CommonModuleProps
 type State = {
     menuVisible:boolean
     isLoading:boolean
+    editFormVisible:boolean
+    editFormReloadKey:string
 }
 type ReduxStateProps = {
     community: Community
@@ -36,7 +42,9 @@ class ProjectDetailsModule extends React.Component<Props, State> {
         super(props);
         this.state = {
             isLoading:false,
-            menuVisible:false
+            menuVisible:false,
+            editFormVisible:false,
+            editFormReloadKey:uniqueId(),
         }
     }
     componentDidUpdate = (prevProps:Props) => {
@@ -45,29 +53,45 @@ class ProjectDetailsModule extends React.Component<Props, State> {
             this.setState({isLoading:false})
         }
     }
-    menuItemClick = (e) => {
-        e.preventDefault()
-        e.stopPropagation()
-        const visible = !this.state.menuVisible
-        const newState:any = {menuVisible:visible}
-        if(!visible)
-        {
-            /* TODO: Close the modal dialog with the project settings */
-        } else {
-            /* TODO: Show a modal dialog with the project settings */
-        }
-        this.setState(newState)
-    }
     feedLoadingStateChanged = (isLoading:boolean) => {
         this.setState({isLoading})
+    }
+    showProjectCreateForm = () => {
+        this.setState((prevState:State) => {
+            return {editFormVisible:true, editFormReloadKey:uniqueId()}
+        })
+    }
+    hideProjectCreateForm = () => {
+
+        this.setState((prevState:State) => {
+            return {editFormVisible:false}
+        })
+    }
+    handleProjectCreateForm = (project:Project) => {
+        if(project && project.uri)
+        {
+            window.app.navigateToRoute(project.uri)
+        }
+    }
+    getProjectOptions = () => {
+        const options: OverflowMenuItem[] = []
+        if(this.props.project.permission >= Permission.admin)
+            options.push({id:"1", type:OverflowMenuItemType.option, title:translate("Edit"), onPress:this.showProjectCreateForm, iconClass:"fas fa-pen"})
+        return options
+    }
+    renderEditForm = () => {
+        const visible = this.state.editFormVisible
+        const {project, community} = this.props
+        return <ProjectCreateComponent onCancel={this.hideProjectCreateForm} community={community.id} key={this.state.editFormReloadKey} project={project} visible={visible} onComplete={this.handleProjectCreateForm} />
     }
     render()
     {
         const { breakpoint, history, match, location, staticContext, project, community, contextNaturalKey, className,  ...rest} = this.props
         const cn = classnames("community-details-module", className)
+        const projectOptions = this.getProjectOptions()
         return (<Module {...rest} className={cn}>
                     <ModuleHeader headerTitle={project && project.name || translate("detail.module.title")} loading={this.state.isLoading}>
-                        <ModuleMenuTrigger onClick={this.menuItemClick} />
+                        {projectOptions.length > 0 && <DropDownMenu className="project-option-dropdown" triggerClass="fas fa-cog mx-1" items={projectOptions}></DropDownMenu>}
                     </ModuleHeader>
                     {true && //breakpoint >= ResponsiveBreakpoint.standard && //do not render for small screens
                         <ModuleContent>
@@ -78,6 +102,7 @@ class ProjectDetailsModule extends React.Component<Props, State> {
                                 ||
                                 <LoadingSpinner key="loading"/>
                             }
+                            {this.renderEditForm()}
                         </ModuleContent>
                     }
                     { project && project.permission >= Permission.read &&

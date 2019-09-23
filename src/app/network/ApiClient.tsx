@@ -484,6 +484,8 @@ export abstract class ApiClient
             case ContextNaturalKey.GROUP + ContextPhotoType.cover:url = Constants.apiRoute.groupCoverUrl(contextObjectId); break;
             case ContextNaturalKey.USER + ContextPhotoType.avatar:url = Constants.apiRoute.profileAvatarUrl(contextObjectId); break;
             case ContextNaturalKey.USER + ContextPhotoType.cover:url = Constants.apiRoute.profileCoverUrl(contextObjectId); break;
+            case ContextNaturalKey.PROJECT + ContextPhotoType.avatar:url = Constants.apiRoute.projectAvatarUrl(contextObjectId); break;
+            case ContextNaturalKey.PROJECT + ContextPhotoType.cover:url = Constants.apiRoute.projectCoverUrl(contextObjectId); break;
             default:break;
         }
         return url
@@ -568,6 +570,22 @@ export abstract class ApiClient
     {
         let url = Constants.apiRoute.projectDetailUrl(projectId)
         AjaxRequest.get(url, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, new RequestErrorData(request.responseJSON, error))
+        })
+    }
+    static updateProject(projectId:number, projectData:Partial<Project>, callback:ApiClientCallback<Project>)
+    {
+        AjaxRequest.patchJSON(Constants.apiRoute.projectDetailUrl(projectId), projectData, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, new RequestErrorData(request.responseJSON, error))
+        })
+    }
+    static createProject(projectData:Partial<Project>, callback:ApiClientCallback<Project>)
+    {
+        AjaxRequest.postJSON(Constants.apiRoute.projectsUrl, projectData, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
             callback(null, status, new RequestErrorData(request.responseJSON, error))

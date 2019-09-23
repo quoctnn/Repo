@@ -144,7 +144,7 @@ export class ContextPhotoInput extends React.Component<ContextPhotoInputProps,Co
                         </div>
                         <Button onClick={this.triggerUpload} className="file-upload-button mt-1" outline={true} color="secondary">
                             {translate("file.image.upload")}
-                            <Input innerRef={this.fileUploader}  className="d-none" id={this.props.id} type="file" onChange={this.handleInputChange} />
+                            <Input accept="image/*" innerRef={this.fileUploader}  className="d-none" id={this.props.id} type="file" onChange={this.handleInputChange} />
                         </Button>
                     </div>
                 </InputGroup>

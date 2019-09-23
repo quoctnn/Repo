@@ -153,6 +153,12 @@ export default  {
         projectDetailUrl: (id:number|string) => {
             return `/api/v2/project/${id}/`
         },
+        projectAvatarUrl: (id:string|number) => {
+            return `/api/v2/project/${id}/avatar/`
+        },
+        projectCoverUrl: (id:string|number) => {
+            return `/api/v2/project/${id}/cover/`
+        },
         //Task
         taskUrl: '/api/v2/task/',
         taskIdUrl: (id:number) => {

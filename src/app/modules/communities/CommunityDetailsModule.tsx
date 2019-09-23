@@ -7,7 +7,7 @@ import ModuleFooter from '../ModuleFooter';
 import "./CommunityDetailsModule.scss"
 import { ResponsiveBreakpoint } from '../../components/general/observers/ResponsiveComponent';
 import { translate } from '../../localization/AutoIntlProvider';
-import { Community, ContextNaturalKey, Permission, CropRect, ContextPhotoType, CropInfo, RequestErrorData, ContextPrivacy, CommunityCategory, CommunityConfigurationData, CommunityCreatePermission, UserProfile } from '../../types/intrasocial_types';
+import { Community, ContextNaturalKey, Permission, CommunityConfigurationData, Group, Event, Project} from '../../types/intrasocial_types';
 import { connect } from 'react-redux';
 import { ReduxState } from '../../redux';
 import CircularLoadingSpinner from '../../components/general/CircularLoadingSpinner';
@@ -22,6 +22,9 @@ import { uniqueId } from '../../utilities/Utilities';
 import { DropDownMenu } from '../../components/general/DropDownMenu';
 import { OverflowMenuItem, OverflowMenuItemType } from '../../components/general/OverflowMenu';
 import CommunityCreateComponent from '../../components/general/contextCreation/CommunityCreateComponent';
+import GroupCreateComponent from '../../components/general/contextCreation/GroupCreateComponent';
+import EventCreateComponent from '../../components/general/contextCreation/EventCreateComponent';
+import ProjectCreateComponent from '../../components/general/contextCreation/ProjectCreateComponent';
 type OwnProps = {
     breakpoint:ResponsiveBreakpoint
 } & CommonModuleProps
@@ -31,6 +34,12 @@ type State = {
     editFormVisible:boolean
     editFormReloadKey?:string
     communityConfiguration?:CommunityConfigurationData
+    createGroupFormVisible?:boolean
+    createGroupFormReloadKey?:string
+    createEventFormVisible?:boolean
+    createEventFormReloadKey?:string
+    createProjectFormVisible?:boolean
+    createProjectFormReloadKey?:string
 }
 type ReduxStateProps = {
     community: Community
@@ -48,6 +57,12 @@ class CommunityDetailsModule extends React.Component<Props, State> {
             editFormVisible:false,
             editFormReloadKey:uniqueId(),
             communityConfiguration:null,
+            createGroupFormVisible:false,
+            createGroupFormReloadKey:uniqueId(),
+            createEventFormVisible:false,
+            createEventFormReloadKey:uniqueId(),
+            createProjectFormVisible:false,
+            createProjectFormReloadKey:uniqueId(),
         }
     }
     componentDidUpdate = (prevProps:Props) => {
@@ -97,17 +112,94 @@ class CommunityDetailsModule extends React.Component<Props, State> {
         }
         
     }
+    showGroupCreateForm = () => {
+        this.setState((prevState:State) => {
+            return {createGroupFormVisible:true, createGroupFormReloadKey:uniqueId()}
+        })
+    }
+    hideGroupCreateForm = () => {
+
+        this.setState((prevState:State) => {
+            return {createGroupFormVisible:false}
+        })
+    }
+    handleGroupCreateForm = (group:Group) => {
+        if(group && group.uri)
+        {
+            window.app.navigateToRoute(group.uri)
+        }
+    }
+    //
+    showEventCreateForm = () => {
+        this.setState((prevState:State) => {
+            return {createEventFormVisible:true, createEventFormReloadKey:uniqueId()}
+        })
+    }
+    hideEventCreateForm = () => {
+
+        this.setState((prevState:State) => {
+            return {createEventFormVisible:false}
+        })
+    }
+    handleEventCreateForm = (event:Event) => {
+        if(event && event.uri)
+        {
+            window.app.navigateToRoute(event.uri)
+        }
+    }
+    //
+    showProjectCreateForm = () => {
+        this.setState((prevState:State) => {
+            return {createProjectFormVisible:true, createProjectFormReloadKey:uniqueId()}
+        })
+    }
+    hideProjectCreateForm = () => {
+
+        this.setState((prevState:State) => {
+            return {createProjectFormVisible:false}
+        })
+    }
+    handleProjectCreateForm = (project:Project) => {
+        if(project && project.uri)
+        {
+            window.app.navigateToRoute(project.uri)
+        }
+    }
+    getCommunityOptions = () => {
+        const options: OverflowMenuItem[] = []
+        if(this.props.community.permission >= Permission.admin)
+            options.push({id:"1", type:OverflowMenuItemType.option, title:translate("Edit"), onPress:this.toggleEditForm, iconClass:"fas fa-pen"})
+        
+        if(this.props.community.group_creation_permission >= Permission.write)
+            options.push({id:"2", type:OverflowMenuItemType.option, title:translate("group.add"), onPress:this.showGroupCreateForm, iconClass:"fas fa-plus"})
+        
+        if(this.props.community.event_creation_permission >= Permission.write)
+            options.push({id:"3", type:OverflowMenuItemType.option, title:translate("event.add"), onPress:this.showEventCreateForm, iconClass:"fas fa-plus"})
+        
+        if(this.props.community.project_creation_permission >= Permission.write)
+            options.push({id:"4", type:OverflowMenuItemType.option, title:translate("project.add"), onPress:this.showProjectCreateForm, iconClass:"fas fa-plus"})
+        return options
+    }
     renderEditForm = () => {
         const visible = this.state.editFormVisible
         const community = this.props.community
         const communityConfiguration = this.state.communityConfiguration
         return <CommunityCreateComponent key={this.state.editFormReloadKey} communityConfiguration={communityConfiguration} community={community} visible={visible} onComplete={this.toggleEditForm} />
     }
-    getCommunityOptions = () => {
-        const options: OverflowMenuItem[] = []
-        if(this.props.community.permission >= Permission.admin)
-            options.push({id:"1", type:OverflowMenuItemType.option, title:translate("Edit"), onPress:this.toggleEditForm, iconClass:"fas fa-pen"})
-        return options
+    renderAddGroupForm = () => {
+        const visible = this.state.createGroupFormVisible
+        const community = this.props.community
+        return <GroupCreateComponent onCancel={this.hideGroupCreateForm} community={community.id} key={this.state.createGroupFormReloadKey} visible={visible} onComplete={this.handleGroupCreateForm} />
+    }
+    renderAddEventForm = () => {
+        const visible = this.state.createEventFormVisible
+        const community = this.props.community
+        return <EventCreateComponent onCancel={this.hideEventCreateForm} community={community.id} key={this.state.createEventFormReloadKey} visible={visible} onComplete={this.handleEventCreateForm} />
+    }
+    renderAddProjectForm = () => {
+        const visible = this.state.createProjectFormVisible
+        const community = this.props.community
+        return <ProjectCreateComponent onCancel={this.hideProjectCreateForm} community={community.id} key={this.state.createProjectFormReloadKey} visible={visible} onComplete={this.handleProjectCreateForm} />
     }
     render = () => {
         const {breakpoint, history, match, location, staticContext, community, contextNaturalKey, className, ...rest} = this.props
@@ -125,6 +217,9 @@ class CommunityDetailsModule extends React.Component<Props, State> {
                             <LoadingSpinner key="loading"/>
                             }
                             {this.renderEditForm()}
+                            {this.renderAddGroupForm()}
+                            {this.renderAddEventForm()}
+                            {this.renderAddProjectForm()}
                         </ModuleContent>
                     }
                     { community && community.permission >= Permission.read &&

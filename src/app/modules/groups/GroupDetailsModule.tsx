@@ -74,30 +74,33 @@ class GroupDetailsModule extends React.Component<Props, State> {
             return (<CircularLoadingSpinner borderWidth={3} size={20} key="loading"/>)
         }
     }
-    toggleEditForm = () => {
-        const isFormVisible = this.state.editFormVisible
-        if(isFormVisible)
+    showGroupCreateForm = () => {
+        this.setState((prevState:State) => {
+            return {editFormVisible:true, editFormReloadKey:uniqueId()}
+        })
+    }
+    hideGroupCreateForm = (onComplete?:() => void) => {
+
+        this.setState((prevState:State) => {
+            return {editFormVisible:false}
+        },onComplete)
+    }
+    handleGroupCreateForm = (group:Group) => {
+        if(group && group.uri && group.uri != this.props.group.uri)
         {
-            this.setState(() => {
-                return {editFormVisible:false}
-            })
+            window.app.navigateToRoute(group.uri)
         }
-        else {
-            this.setState(() => {
-                return {editFormVisible:true, editFormReloadKey:uniqueId()}
-            })
-        }
-        
+        this.hideGroupCreateForm()
     }
     renderEditForm = () => {
         const visible = this.state.editFormVisible
         const group = this.props.group
-        return <GroupCreateComponent key={this.state.editFormReloadKey} group={group} visible={visible} onComplete={this.toggleEditForm} />
+        return <GroupCreateComponent onCancel={this.hideGroupCreateForm} community={group.community} key={this.state.editFormReloadKey} group={group} visible={visible} onComplete={this.handleGroupCreateForm} />
     }
     getGroupOptions = () => {
         const options: OverflowMenuItem[] = []
         if(this.props.group.permission >= Permission.admin)
-            options.push({id:"1", type:OverflowMenuItemType.option, title:translate("Edit"), onPress:this.toggleEditForm, iconClass:"fas fa-pen"})
+            options.push({id:"1", type:OverflowMenuItemType.option, title:translate("Edit"), onPress:this.showGroupCreateForm, iconClass:"fas fa-pen"})
         return options
     }
     render()

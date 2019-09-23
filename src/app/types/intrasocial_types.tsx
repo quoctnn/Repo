@@ -1297,6 +1297,12 @@ export type Community = {
     last_visited:string
     privacy: ContextPrivacy
     category:CommunityCategory
+    //
+    event_creation_permission:CommunityCreatePermission
+    group_creation_permission:CommunityCreatePermission
+    project_creation_permission:CommunityCreatePermission
+    subgroup_creation_permission:CommunityCreatePermission
+    //
 } & ICommunity & AvatarAndCover & Permissible
 
 export type SimpleUserProfile = {

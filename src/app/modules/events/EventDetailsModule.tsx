@@ -75,30 +75,33 @@ class EventDetailsModule extends React.Component<Props, State> {
             return (<CircularLoadingSpinner borderWidth={3} size={20} key="loading"/>)
         }
     }
-    toggleEditForm = () => {
-        const isFormVisible = this.state.editFormVisible
-        if(isFormVisible)
+    showEventCreateForm = () => {
+        this.setState((prevState:State) => {
+            return {editFormVisible:true, editFormReloadKey:uniqueId()}
+        })
+    }
+    hideEventCreateForm = () => {
+
+        this.setState((prevState:State) => {
+            return {editFormVisible:false}
+        })
+    }
+    handleEventCreateForm = (event:Event) => {
+        if(event && event.uri)
         {
-            this.setState(() => {
-                return {editFormVisible:false}
-            })
-        }
-        else {
-            this.setState(() => {
-                return {editFormVisible:true, editFormReloadKey:uniqueId()}
-            })
+            window.app.navigateToRoute(event.uri)
         }
     }
     getEventOptions = () => {
         const options: OverflowMenuItem[] = []
         if(this.props.community.permission >= Permission.admin)
-            options.push({id:"1", type:OverflowMenuItemType.option, title:translate("Edit"), onPress:this.toggleEditForm, iconClass:"fas fa-pen"})
+            options.push({id:"1", type:OverflowMenuItemType.option, title:translate("Edit"), onPress:this.showEventCreateForm, iconClass:"fas fa-pen"})
         return options
     }
     renderEditForm = () => {
         const visible = this.state.editFormVisible
         const event = this.props.event
-        return <EventCreateComponent key={this.state.editFormReloadKey} event={event} visible={visible} onComplete={this.toggleEditForm} />
+        return <EventCreateComponent onCancel={this.hideEventCreateForm} community={event.community} key={this.state.editFormReloadKey} event={event} visible={visible} onComplete={this.handleEventCreateForm} />
     }
     render()
     {

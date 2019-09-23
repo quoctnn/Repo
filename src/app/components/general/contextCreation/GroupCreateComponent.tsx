@@ -16,7 +16,9 @@ import { CommunityManager } from '../../../managers/CommunityManager';
 type OwnProps = {
     group?:Group
     visible?:boolean
-    onComplete?:() => void
+    onComplete?:(group?:Group) => void
+    onCancel?:() => void
+    community:number
 }
 type State = {
     formVisible:boolean
@@ -39,7 +41,6 @@ class GroupCreateComponent extends React.Component<Props, State> {
             }
         }
     }
-
     private hasOutsideVisibilityToggle = () => {
         return !nullOrUndefined( this.props.visible)
     }
@@ -56,6 +57,12 @@ class GroupCreateComponent extends React.Component<Props, State> {
             return { formVisible: false }
         }, goBack)
     }
+    didCancel = () => {
+        if(this.props.onCancel)
+            this.props.onCancel()
+        else 
+            this.back()
+    }
     uploadContextPhoto = (type:ContextPhotoType, contextNaturalKey:ContextNaturalKey, contextObjectId:number, file:File|string, crop:CropRect, completion:ApiClientCallback<CropInfo>) => () => {
         ApiClient.setContextPhoto(type,contextNaturalKey, contextObjectId, file, crop, completion)
     }
@@ -64,7 +71,7 @@ class GroupCreateComponent extends React.Component<Props, State> {
         const group:Partial<Group> = this.props.group || {}
         const create = !this.props.group
         if(create)
-            data.community =  CommunityManager.getActiveCommunity().id
+            data.community =  this.props.community || CommunityManager.getActiveCommunity().id
         console.log("formdata", data)
         //const hasDataToSave = Object.keys(communityData).length > 0
         this.setFormStatus(FormStatus.submitting)
@@ -92,17 +99,23 @@ class GroupCreateComponent extends React.Component<Props, State> {
             }
             else {
                 this.setFormStatus(FormStatus.normal)
-                const shouldRedirect = !!createdGroup && createdGroup.uri && ((create && !this.hasOutsideVisibilityToggle()) || (!create && createdGroup.uri != group.uri))
-                if(shouldRedirect)
+                if(this.props.onComplete)
                 {
-                    this.setState(() => {
-                        return {formVisible :false}
-                    }, () => {
-                        window.app.navigateToRoute(createdGroup.uri)
-                    })
+                    this.props.onComplete(createdGroup)
                 }
-                else 
-                    this.didCancel()
+                else {
+                    const shouldRedirect = createdGroup && createdGroup.uri
+                    if(shouldRedirect)
+                    {
+                        this.setState(() => {
+                            return {formVisible :false}
+                        }, () => {
+                            window.app.navigateToRoute(createdGroup.uri)
+                        })
+                    }
+                    else 
+                        this.didCancel()
+                }
             }
         }
         const errors:RequestErrorData[] = []
@@ -186,12 +199,6 @@ class GroupCreateComponent extends React.Component<Props, State> {
         }, () => {
             console.log(this.state.formValues)
         })
-    }
-    didCancel = () => {
-        if(this.props.onComplete)
-            this.props.onComplete()
-        else 
-            this.back()
     }
     render = () => {
         const visible = this.isVisible()

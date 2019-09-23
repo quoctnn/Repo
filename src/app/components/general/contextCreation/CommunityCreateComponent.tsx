@@ -20,7 +20,9 @@ type OwnProps = {
     community?:Community
     communityConfiguration?:CommunityConfigurationData
     visible?:boolean
-    onComplete?:() => void
+    onComplete?:(community?:Community) => void
+    onCancel?:() => void
+
 }
 type State = {
     formVisible:boolean
@@ -206,8 +208,8 @@ class CommunityCreateComponent extends React.Component<Props, State> {
         })
     }
     didCancel = () => {
-        if(this.props.onComplete)
-            this.props.onComplete()
+        if(this.props.onCancel)
+            this.props.onCancel()
         else 
             this.back()
     }
