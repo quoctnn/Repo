@@ -3,6 +3,14 @@
     margin-bottom:16px;
     display:flex;
     flex-direction:row-reverse;
+    .centered-text {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 12px;
+        color: black;
+    }
 }
 .avatar-stacked > a{
     margin-left: -16px;

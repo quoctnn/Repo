@@ -151,7 +151,7 @@ export class StatusComponent extends React.Component<Props, State> {
                     <div className="right">
                         { Object.keys(status.reactions).map(k => {
                             return (
-                                <div className="reaction-wrapper avatars">
+                                <div key={k} className="reaction-wrapper avatars">
                                     <span className={"reaction"}>{StatusReactionUtilities.Component({reaction:k as StatusReaction, large:false, selected:false})}</span>
                                     <StackedAvatars userIds={status.reactions[k]} size={18} borderWidth={1}/>
                                 </div>
@@ -169,7 +169,7 @@ export class StatusComponent extends React.Component<Props, State> {
                             <ReactionStats reactions={status.reactions} reactionsCount={status.reaction_count}>
                                 { Object.keys(status.reactions).map(k => {
                                     return (
-                                        <span className={"reaction"}>{StatusReactionUtilities.Component({reaction:k as StatusReaction, large:false, selected:false})}</span>
+                                        <span key={k} className={"reaction"}>{StatusReactionUtilities.Component({reaction:k as StatusReaction, large:false, selected:false})}</span>
                                     )
                                 })
                                 }

@@ -66,9 +66,14 @@ class StackedAvatars extends React.Component<Props, State> {
             </Link>
         )
     }
+    renderAvatarCount = (count: number) => {
+        return <div style={{position: "relative"}}>
+                <Avatar size={this.props.size} borderColor={"#FFFFFF"} borderWidth={this.props.borderWidth} />
+                <div className={"centered-text"}>{count}</div>
+            </div>
+    }
     render() {
         let profiles = this.state.profiles
-        /* <canvas id="avatar" width={this.props.size} height={this.props.size} style={{background:"#FFFFFF"}}></canvas> */
         return(
             <div className="avatar-stacked">
                 {
@@ -80,7 +85,7 @@ class StackedAvatars extends React.Component<Props, State> {
                     <LoadingSpinner/>
                 }
                 { profiles.length > this.props.maxAvatars &&
-                    <Avatar title={`${profiles.length}`} size={this.props.size} borderColor={"#FFFFFF"} borderWidth={this.props.borderWidth} />
+                    this.renderAvatarCount(profiles.length > 99 ? 99 : profiles.length)
                 }
             </div>
         )
