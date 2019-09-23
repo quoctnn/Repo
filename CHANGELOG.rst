@@ -10,6 +10,7 @@ Added:
 
 * Sorting options for 'Recent Activities'
 * Unfriend button on profile page
+* Multi-select edit on ListComponent
 
 
 Changes:

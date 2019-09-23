@@ -27,6 +27,7 @@ type DefaultProps = {
 type State = {
     menuVisible:boolean
     isLoading:boolean
+    isSelecting:boolean
     menuData:ActivityMenuData
 }
 type Props = OwnProps & DefaultProps & RouteComponentProps<any>
@@ -45,6 +46,7 @@ class ActivityModule extends React.Component<Props, State> {
         this.state = {
             menuVisible:false,
             isLoading:false,
+            isSelecting:false,
             menuData:{
                 sorting:props.sorting
             }
@@ -122,6 +124,10 @@ class ActivityModule extends React.Component<Props, State> {
         const md = {sorting: sorting}
         this.setState({menuData:md})
     }
+    multiSelectAction = (items: number[]) => {
+        if (items.length > 0)
+            console.log("Items were selected: " + items)
+    }
     renderSorting = () => {
         if(this.state.menuVisible)
             return null
@@ -147,18 +153,31 @@ class ActivityModule extends React.Component<Props, State> {
                     fetchData={this.fetchActivity}
                     renderItem={this.renderActivity}
                     loadMoreOnScroll={!showLoadMore}
+                    selectedItems={this.multiSelectAction}
+                    isSelecting={this.state.isSelecting}
                     className="activity-module-list" />}
             </>
     }
     renderModalContent = () => {
         return <ActivityModule {...this.props} pageSize={50} style={{height:undefined, maxHeight:undefined}} showLoadMore={false} showInModal={false} isModal={true}/>
     }
+    toggleSelect = () => {
+        this.setState({isSelecting: !this.state.isSelecting})
+    }
+    renderEnableSelect = () => {
+        return (
+            <button className="btn btn-edit" onClick={this.toggleSelect}>{translate('common.edit')}</button>
+        )
+    }
     render()
     {
         const {history, match, location, staticContext, pageSize, showHeader, showLoadMore, showInModal, isModal, ...rest} = this.props
         const {breakpoint } = this.props
         const menu = <ActivityMenu data={this.state.menuData} onUpdate={this.menuDataUpdated}  />
-        const headerContent = this.renderSorting()
+        const headerContent = <>
+            {this.renderSorting()}
+            {this.renderEnableSelect()}
+        </>
         const renderModalContent = !showInModal || isModal ? undefined : this.renderModalContent
         return (<SimpleModule {...rest}
                     showHeader={showHeader}

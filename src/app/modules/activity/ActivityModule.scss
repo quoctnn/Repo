@@ -1,0 +1,9 @@
+@import "../../Config";
+
+.btn-edit:hover {
+    @include var(color, text-secondary);
+}
+.btn-edit {
+    @include var(color, link-color);
+    font-size: 12px;
+}

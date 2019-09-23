@@ -95,7 +95,7 @@ class Signin extends React.Component<Props, State> {
                 return
             }
             else {
-                let error = (errorData.detail && errorData.detail.error_description) || errorData.data.non_field_errors 
+                let error = (errorData.detail && errorData.detail.error_description) || errorData.data.non_field_errors
                 if (error) {
                     // Invalid password on nativeLogin
                     this.setState(() => {
@@ -108,7 +108,7 @@ class Signin extends React.Component<Props, State> {
                         return {formErrors:normalizeformErrors(errorData.data)}
                     })
                 }
-                
+
             }
             ToastManager.showRequestErrorToast(errorData)
             return
@@ -156,7 +156,6 @@ class Signin extends React.Component<Props, State> {
         if (error) {
             console.error(error)
         }
-        console.log(code)
         this.loginContinuationData = {provider:LoginProvider.linkedIn, accessToken:code}
         this.continueSignin(this.loginContinuationData)
     }
