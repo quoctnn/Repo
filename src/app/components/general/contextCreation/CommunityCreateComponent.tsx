@@ -245,7 +245,7 @@ class CommunityCreateComponent extends React.Component<Props, State> {
                     didCancel={this.didCancel} 
                     status={this.state.formStatus} 
                     onFormSubmit={this.handleCreateCommunityFormSubmit} 
-                    title={translate("community.create")} 
+                    title={translate(create ? "community.create":"community.update")} 
                     onValueChanged={this.handleValueChanged}
                     render={(form) => {
                         if(!create && !hasConfigurationData)
