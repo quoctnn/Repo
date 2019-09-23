@@ -127,6 +127,16 @@ class ProfileDetailsModule extends React.PureComponent<Props, State> {
             }
         })
     }
+    unfriendUser = (profile: UserProfile) => (event: React.SyntheticEvent<any>) => {
+        ApiClient.friendshipGetId(profile.id, (data, status, error) => {
+            if (!error || status != "error") {
+                data.results.map((friendship) => {
+                    ApiClient.userUnfriend(friendship.id, (status) => {})
+                })
+                return status;
+            }
+        })
+    }
     sendInvitationToUser = () => (event: React.SyntheticEvent<any>) => {
         ApiClient.friendInvitationSend(this.props.profile.id, () => {})
     }
@@ -251,6 +261,15 @@ class ProfileDetailsModule extends React.PureComponent<Props, State> {
                     type: OverflowMenuItemType.option,
                     title: translate("common.relationship.block"),
                     onPress: this.blockUser(profile),
+                    toggleMenu: false
+                })
+            }
+            if (profile.relationship && profile.relationship.contains("friends")) {
+                options.push({
+                    id: "unfriend",
+                    type: OverflowMenuItemType.option,
+                    title: translate("common.relationship.unfriend"),
+                    onPress: this.unfriendUser(profile),
                     toggleMenu: false
                 })
             }

@@ -107,6 +107,9 @@ export default  {
 
         // Friends URLs
         friendsUrl: '/api/v2/friends/',
+        friendsDelete: (id:number) => {
+            return `/api/v2/friends/${id}/`
+        },
         friendInvitation: '/api/v2/friend-invitation/',
         friendInvitationDelete: (id:number) => {
             return `/api/v2/friend-invitation/${id}/`

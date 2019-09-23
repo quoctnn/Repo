@@ -1003,6 +1003,22 @@ export abstract class ApiClient
             callback(null, status, new RequestErrorData(request.responseJSON, error))
         })
     }
+    static friendshipGetId = (userId:number, callback:ApiClientCallback<any>) => {
+        let url = Constants.apiRoute.friendsUrl + `?user_id=${userId}`
+        AjaxRequest.get(url, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, new RequestErrorData(request.responseJSON, error))
+        })
+    }
+    static userUnfriend(friendship:number, callback:ApiClientCallback<any>){
+        let url = Constants.apiRoute.friendsDelete(friendship)
+        AjaxRequest.delete(url, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, new RequestErrorData(request.responseJSON, error))
+        })
+    }
     static userBlockGetId = (userId:number, callback:ApiClientCallback<any>) => {
         let url = Constants.apiRoute.blockUrl + `?user_id=${userId}`
         AjaxRequest.get(url, (data, status, request) => {

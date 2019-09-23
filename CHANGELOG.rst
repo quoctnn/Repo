@@ -7,7 +7,17 @@ Leslie: Legg dette til på neste changelog versjon
 
 Added:
 ======
+
 * Sorting options for 'Recent Activities'
+* Unfriend button on profile page
+* Multi-select edit on ListComponent
+
+
+Changes:
+======
+
+* Improved reaction display
+
 
 +++++++++++++++++++++++++++++++++++++++++++++++++
 
