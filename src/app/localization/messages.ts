@@ -502,6 +502,7 @@ var translations = {
     "language.es":"Spanish",
     "common.language":"Language",
     "common.timezone":"Timezone",
+    "community.update":"Update community",
 
   },
   no: {
@@ -1007,6 +1008,7 @@ var translations = {
     "language.es":"Spansk",
     "common.language":"Språk",
     "common.timezone":"Tidssone",
+    "community.update":"Oppdater community",
   },
   en: {
     "search.placeholder": "Search ...",
@@ -1522,6 +1524,7 @@ var translations = {
     "language.es":"Spanish",
     "common.language":"Language",
     "common.timezone":"Timezone",
+    "community.update":"Update community",
   }
 };
 

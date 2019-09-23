@@ -236,7 +236,7 @@ class ConversationDetailsModule extends React.Component<Props, State> {
         const title = this.state.title
         return (
             <>
-                <List enableAnimation={false} className="conversation-editor">
+                <List enableAnimation={false} className="conversation-editor scrollbar">
                     <div className="d-flex">
                         {ConversationUtilities.getAvatar(conversation, authenticatedUser.id, true)}
                         <InputGroup className="input-group-transparent">
