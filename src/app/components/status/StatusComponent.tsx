@@ -34,6 +34,7 @@ interface OwnProps
     className?:string
     isComment:boolean
     innerRef?: (element:HTMLElement) => void
+    isHighlighted?:boolean
 }
 interface State
 {
@@ -198,7 +199,7 @@ export class StatusComponent extends React.Component<Props, State> {
             return <div ref={this.element} className={itemClass}></div>
         }
         const contextObject =  isComment || !addLinkToContext ? null : status.context_object
-        const truncateLength = this.state.readMoreActive ? 0 : Settings.statusTruncationLength
+        const truncateLength = this.state.readMoreActive || this.props.isHighlighted ? 0 : Settings.statusTruncationLength
         const content = getTextContent(status.id.toString(), status.text, true, truncateLength, Settings.statusLinebreakLimit)
         const {textContent, linkCards, hasMore} = content
         const cn = classnames("status-component", className, "lvl" + (status.level || 0) , "sid-" + status.id + "_p_" + (status.position || 0), {comment:isComment, highlight:status.highlightMode})

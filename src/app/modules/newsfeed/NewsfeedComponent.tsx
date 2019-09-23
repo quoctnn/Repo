@@ -854,6 +854,11 @@ export class NewsfeedComponent extends React.Component<Props, State> {
         const tempIndex = tempId ? this.findIndexByStatusId(tempId) : -1
         const updateArray:ArrayItem[] = []
         let onUpdateCompleted:() => void = onCompleted
+        if(!parent)
+        {
+            //ignore
+            return
+        }
         const updateParent = () => {
             let updatedParent = this.getClonedStatus(parent)
             updatedParent.comments += 1
@@ -1131,7 +1136,8 @@ export class NewsfeedComponent extends React.Component<Props, State> {
     }
     renderStatus = (authUser:UserProfile, item:Status, isComment:boolean, index:number, color:string, isLast:boolean) =>
     {
-        const ref = !!this.props.highlightStatusId && item.id == this.props.highlightStatusId && this.highlightRef || undefined
+        const isHighlighted = !!this.props.highlightStatusId && item.id == this.props.highlightStatusId
+        const ref = isHighlighted && this.highlightRef || undefined
         const cn = classnames(color, {"last":isLast})
         let observerRegister = undefined;
         if (!this.props.authenticatedProfile.is_anonymous){
@@ -1140,6 +1146,7 @@ export class NewsfeedComponent extends React.Component<Props, State> {
         return <StatusComponent
                     innerRef={observerRegister}
                     ref={ref}
+                    isHighlighted={isHighlighted}
                     canUpload={true}
                     addLinkToContext={true}
                     key={"status_" + item.id}
