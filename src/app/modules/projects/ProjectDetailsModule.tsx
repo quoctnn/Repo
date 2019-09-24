@@ -72,6 +72,7 @@ class ProjectDetailsModule extends React.Component<Props, State> {
         {
             window.app.navigateToRoute(project.uri)
         }
+        this.hideProjectCreateForm()
     }
     getProjectOptions = () => {
         const options: OverflowMenuItem[] = []

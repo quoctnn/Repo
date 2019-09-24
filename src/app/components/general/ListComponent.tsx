@@ -294,10 +294,12 @@ export default class ListComponent<T extends IdentifiableObject> extends React.C
         }
     }
     renderSelectableItem = (id: number, item: React.ReactNode) => {
-        var classNames: string[] = ["select-box", "fa"]
-        classNames.push(this.isSelected(id) ? "fa-check-square" : "fa-square")
-        return <div className={"selectable-item"}>
-            <i id={`${id}`} className={classnames(classNames)} onClick={this.selectedItem} hidden={!this.props.isSelecting}></i>{item}
+        if(!this.props.isSelecting)
+            return item
+        const isSelected = this.isSelected(id)
+        const cn = classnames("select-box", "fa", {"fa-check-square":isSelected, "fa-square":!isSelected})
+        return <div key={id} className="selectable-item">
+            <i id={`${id}`} className={cn} onClick={this.selectedItem}></i>{item}
         </div>
     }
     renderItems = () => {

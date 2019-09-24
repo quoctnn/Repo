@@ -72,12 +72,13 @@ class ProjectCreateComponent extends React.Component<Props, State> {
         const {
             name,
             description,
+            community,
             //
             avatar, 
             cover,
             //
             ...rest} = data
-        const updateData = removeEmptyEntriesFromObject({name, description})
+        const updateData = removeEmptyEntriesFromObject({name, description, community})
         const avatarData:{file:File|string, crop:CropRect} = avatar as any
         const coverData:{file:File|string, crop:CropRect} = cover as any
 
@@ -203,6 +204,7 @@ class ProjectCreateComponent extends React.Component<Props, State> {
     render = () => {
         const visible = this.isVisible()
         const project:Partial<Project> = this.props.project || {}
+        const create = !this.props.project
         return <FormController 
                     ref={(controller) => this.formController = controller }
                     key={this.state.formReloadKey} 
@@ -211,7 +213,7 @@ class ProjectCreateComponent extends React.Component<Props, State> {
                     didCancel={this.didCancel} 
                     status={this.state.formStatus} 
                     onFormSubmit={this.handleUpdateProfileFormSubmit} 
-                    title={translate("project.update")  } 
+                    title={translate(create ? "project.create" : "project.update")  } 
                     onValueChanged={this.handleValueChanged}
                     render={(form) => {
                         return {

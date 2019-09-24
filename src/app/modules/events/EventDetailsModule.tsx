@@ -91,6 +91,7 @@ class EventDetailsModule extends React.Component<Props, State> {
         {
             window.app.navigateToRoute(event.uri)
         }
+        this.hideEventCreateForm()
     }
     getEventOptions = () => {
         const options: OverflowMenuItem[] = []

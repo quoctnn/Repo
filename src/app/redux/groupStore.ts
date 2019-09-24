@@ -1,5 +1,6 @@
 import { combineReducers } from 'redux'
 import { Group } from "../types/intrasocial_types";
+import { shallowCompareFields } from '../utilities/Utilities';
 export enum GroupStoreActionTypes {
     AddGroups = 'groupstore.add_groups',
     Reset = 'groupstore.reset',
@@ -7,6 +8,7 @@ export enum GroupStoreActionTypes {
 export interface AddGroupsAction{
     type:string
     groups:Group[]
+    force?:boolean
 }
 export interface ResetGroupsAction{
     type:string
@@ -26,13 +28,23 @@ export const resetGroupsAction = ():ResetGroupsAction => ({
     
     return []
 }
+const shouldUpdate = (oldGroup:Group, newGroup:Group) => {
+    if(!oldGroup)
+        return true
+    const fieldsUpdated = !shallowCompareFields(["avatar", "cover", "slug"], oldGroup, newGroup)
+    if(fieldsUpdated)
+    {
+        return true
+    }
+    return new Date(newGroup.updated_at).getTime() > new Date(oldGroup.updated_at).getTime()
+}
 const addGroups = (state, action:AddGroupsAction) => {
     let groups = action.groups
     let newState = {  ...state }
     groups.forEach(c => {
         let id = c.id
         let old = state[id]
-        if(!old || new Date(c.updated_at).getTime() > new Date(old.updated_at).getTime()) // update
+        if(action.force || shouldUpdate(old, c)) // update
         {
             newState[c.id] = c
         }

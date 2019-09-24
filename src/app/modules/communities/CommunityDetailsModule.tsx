@@ -97,21 +97,26 @@ class CommunityDetailsModule extends React.Component<Props, State> {
             })
         })
     }
-    toggleEditForm = () => {
-        const isFormVisible = this.state.editFormVisible
-        if(isFormVisible) //close
-        {
-            this.setState(() => {
-                return {editFormVisible:!isFormVisible, communityConfiguration:null}
-            })
-        }
-        else {
-            this.setState((prevState:State) => {
-                return {isLoading:true}
-            }, this.loadConfigurationDataAndShowForm )
-        }
-        
+    showCommunityEditForm = () => {
+        this.setState((prevState:State) => {
+            return {isLoading:true}
+        }, this.loadConfigurationDataAndShowForm )
     }
+    hideCommunityEditForm = () => {
+
+        this.setState((prevState:State) => {
+            return {editFormVisible:false, communityConfiguration:null}
+        })
+    }
+    handleCommunityEditFormComplete = (community:Community) => {
+        const prevCommunity = this.props.community
+        if(community && community.uri && prevCommunity.uri != community.uri)
+        {
+            window.app.navigateToRoute(community.uri)
+        }
+        this.hideCommunityEditForm()
+    }
+    //
     showGroupCreateForm = () => {
         this.setState((prevState:State) => {
             return {createGroupFormVisible:true, createGroupFormReloadKey:uniqueId()}
@@ -168,7 +173,7 @@ class CommunityDetailsModule extends React.Component<Props, State> {
     getCommunityOptions = () => {
         const options: OverflowMenuItem[] = []
         if(this.props.community.permission >= Permission.admin)
-            options.push({id:"1", type:OverflowMenuItemType.option, title:translate("Edit"), onPress:this.toggleEditForm, iconClass:"fas fa-pen"})
+            options.push({id:"1", type:OverflowMenuItemType.option, title:translate("Edit"), onPress:this.showCommunityEditForm, iconClass:"fas fa-pen"})
         
         if(this.props.community.group_creation_permission >= Permission.write)
             options.push({id:"2", type:OverflowMenuItemType.option, title:translate("group.add"), onPress:this.showGroupCreateForm, iconClass:"fas fa-plus"})
@@ -184,7 +189,7 @@ class CommunityDetailsModule extends React.Component<Props, State> {
         const visible = this.state.editFormVisible
         const community = this.props.community
         const communityConfiguration = this.state.communityConfiguration
-        return <CommunityCreateComponent key={this.state.editFormReloadKey} communityConfiguration={communityConfiguration} community={community} visible={visible} onComplete={this.toggleEditForm} />
+        return <CommunityCreateComponent onCancel={this.hideCommunityEditForm} key={this.state.editFormReloadKey} communityConfiguration={communityConfiguration} community={community} visible={visible} onComplete={this.handleCommunityEditFormComplete} />
     }
     renderAddGroupForm = () => {
         const visible = this.state.createGroupFormVisible

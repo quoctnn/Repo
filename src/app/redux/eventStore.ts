@@ -1,5 +1,6 @@
 import { combineReducers } from 'redux'
 import { Event } from "../types/intrasocial_types";
+import { shallowCompareFields } from '../utilities/Utilities';
 export enum EventStoreActionTypes {
     AddEvents = 'eventstore.add_event',
     Reset = 'eventstore.reset',
@@ -7,6 +8,7 @@ export enum EventStoreActionTypes {
 export interface AddEventsAction{
     type:string
     events:Event[]
+    force?:boolean
 }
 export interface ResetEventsAction{
     type:string
@@ -26,13 +28,23 @@ export const resetEventsAction = ():ResetEventsAction => ({
     
     return []
 }
+const shouldUpdate = (oldEvent:Event, newEvent:Event) => {
+    if(!oldEvent)
+        return true
+    const fieldsUpdated = !shallowCompareFields(["avatar", "cover", "slug"], oldEvent, newEvent)
+    if(fieldsUpdated)
+    {
+        return true
+    }
+    return new Date(newEvent.updated_at).getTime() > new Date(oldEvent.updated_at).getTime()
+}
 const addEvents = (state, action:AddEventsAction) => {
     let events = action.events
     let newState = {  ...state }
     events.forEach(c => {
         let id = c.id
         let old = state[id]
-        if(!old || new Date(c.updated_at).getTime() > new Date(old.updated_at).getTime()) // update
+        if(action.force || shouldUpdate(old, c)) // update
         {
             newState[c.id] = c
         }

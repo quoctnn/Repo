@@ -104,17 +104,23 @@ class CommunityCreateComponent extends React.Component<Props, State> {
             }
             else {
                 this.setFormStatus(FormStatus.normal)
-                const shouldRedirect = !!createdCommunity && createdCommunity.uri && ((create && !this.hasOutsideVisibilityToggle()) || (!create && createdCommunity.uri != community.uri))
-                if(shouldRedirect)
+                if(this.props.onComplete)
                 {
-                    this.setState(() => {
-                        return {formVisible :false}
-                    }, () => {
-                        window.app.navigateToRoute(createdCommunity.uri)
-                    })
+                    this.props.onComplete(createdCommunity)
                 }
-                else 
-                    this.didCancel()
+                else {
+                    const shouldRedirect = createdCommunity && createdCommunity.uri
+                    if(shouldRedirect)
+                    {
+                        this.setState(() => {
+                            return {formVisible :false}
+                        }, () => {
+                            window.app.navigateToRoute(createdCommunity.uri)
+                        })
+                    }
+                    else 
+                        this.didCancel()
+                }
             }
         }
         const errors:RequestErrorData[] = []
@@ -319,7 +325,7 @@ class CommunityCreateComponent extends React.Component<Props, State> {
                                             hasSubmitted={form.hasSubmitted()}
                                             ref={form.setFormRef(pageId)} 
                                             onValueChanged={form.handleValueChanged(pageId)} 
-                                            value={community.privacy} 
+                                            value={community.category} 
                                             title={translate("common.category")} 
                                             id="category" 
                                             isRequired={true}
