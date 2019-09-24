@@ -1,6 +1,6 @@
 import {  Store } from 'redux';
 import { ReduxState } from '../redux/index';
-import { setApplicationLoadedAction } from '../redux/application';
+import { setApplicationLoadedAction, resetApplicationAction } from '../redux/application';
 import { AuthenticationManager } from './AuthenticationManager';
 import { Dashboard, GridColumn } from '../types/intrasocial_types';
 import {ApiClient,  ListOrdering } from '../network/ApiClient';
@@ -65,6 +65,9 @@ export abstract class ApplicationManager
             ApplicationManager.reset()
         }
     }
+    static compatVersion = () => {
+        return ApplicationManager.getStore().getState().application.version
+    }
     static getDashboards = (category:string) => {
         const all = ApplicationManager.applicationData.dashboards[category]
         const clone = {...all}
@@ -89,6 +92,11 @@ export abstract class ApplicationManager
     static loadApplication = (resetCachedData:boolean) => {
         ApplicationManager.resetData(resetCachedData)
         ApplicationManager.getStore().dispatch(setApplicationLoadedAction(false))
+        if(ApplicationManager.compatVersion() != Settings.compatVersion())
+        {
+            ApplicationManager.hardReset()
+            console.warn("APPLICATION RESET")
+        }
         const requests:RequestObject[] = []
         const progress:LoadingProgress = {percent: 0, text:"Fetching data"}
         ApplicationManager.fetchBackendInfo((result, message) => {
@@ -119,6 +127,7 @@ export abstract class ApplicationManager
             }
         })
     }
+
     private static fetchBackendInfo = (completion:(result:number, message:string) => void) => {
         const compatibility = {major_version: Settings.compatMajor, minor_version: Settings.compatMinor}
         ApiClient.getBackendVersionInfo((data, status) => {
@@ -196,6 +205,7 @@ export abstract class ApplicationManager
     }
     static hardReset = () => {
         const dispatch = ApplicationManager.getStore().dispatch
+        dispatch(resetApplicationAction())
         dispatch(resetMessageQueueAction())
         dispatch(resetEndpointAction())
         dispatch(resetEmbedlyStoreAction())

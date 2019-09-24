@@ -14,7 +14,7 @@ import activeCommunity from './activeCommunity';
 import { eventStore } from './eventStore';
 import {taskStore} from './taskStore';
 import { projectStore } from "./projectStore";
-import application from "./application";
+import application, { ApplicationData } from "./application";
 import { conversationStore } from './conversationStore';
 import messageQueue, { MessageQueue } from "./messageQueue";
 import tempCache, { TempCache } from './tempCache';
@@ -52,7 +52,7 @@ export interface ReduxState
     taskStore:{ byId: { [id: number]: Task},allIds: number[]}
     favoriteStore:{ byId: { [id: number]: Favorite},allIds: number[]}
     activeCommunity:{activeCommunity:number}
-    application:{loaded:boolean}
+    application:ApplicationData
     messageQueue:MessageQueue
     tempCache:TempCache
     unreadNotifications:UnreadNotifications

@@ -242,7 +242,7 @@ class ConversationDetailsModule extends React.Component<Props, State> {
                         <InputGroup className="input-group-transparent">
                             <Input innerRef={this.titleRef} placeholder={translate("common.title")} tabIndex={1} className="text-truncate form-control-transparent primary-text title-text" value={title} onChange={this.onTitleChange} onBlur={this.onTitleBlur} /> 
                         </InputGroup>
-                        {!conversation.temporary && <DropDownMenu items={this.getOptionMenuItems()} triggerClass="fas fa-cog action-button push-right" />}
+                        {!conversation.temporary && <DropDownMenu boundariesElement={document.body} items={this.getOptionMenuItems()} triggerClass="fas fa-cog action-button push-right" />}
                     </div>
                     {!conversation.private && <ListHeader>{translate("conversation.members")}</ListHeader>}
                     {this.renderAddMembers()}

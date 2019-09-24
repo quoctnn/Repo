@@ -16,6 +16,9 @@ type DefaultProps = {
     size: number
     borderWidth:number
     maxAvatars:number
+    showTotalCount:boolean
+    showOverflowCount:boolean
+    onOverflowCountClick?:() => void
 }
 type State = {
     isLoading:Boolean
@@ -30,7 +33,9 @@ class StackedAvatars extends React.Component<Props, State> {
     static defaultProps:DefaultProps = {
         size:40,
         borderWidth:2,
-        maxAvatars:5
+        maxAvatars:5,
+        showTotalCount:false,
+        showOverflowCount:false
     }
     constructor(props:Props) {
         super(props);
@@ -66,26 +71,32 @@ class StackedAvatars extends React.Component<Props, State> {
             </Link>
         )
     }
-    renderAvatarCount = (count: number) => {
-        return <div style={{position: "relative"}}>
+    renderAvatarCount = (count: string) => {
+        return <div className="link" onClick={this.props.onOverflowCountClick} style={{position: "relative"}}>
                 <Avatar size={this.props.size} borderColor={"#FFFFFF"} borderWidth={this.props.borderWidth} />
                 <div className={"centered-text"}>{count}</div>
             </div>
     }
     render() {
+        const {showOverflowCount, showTotalCount, onOverflowCountClick} = this.props
         let profiles = this.state.profiles
+        const max = this.props.maxAvatars
+        const newMax = showOverflowCount && profiles.length > max ? max - 1 : max
         return(
             <div className="avatar-stacked">
+                {showTotalCount &&
+                    <div onClick={onOverflowCountClick} className="total link ml-1">{profiles.length}</div>
+                }
                 {
                     !this.state.isLoading &&
-                        profiles.slice(0,this.props.maxAvatars).map((profile) => {
+                        profiles.slice(0, newMax).map((profile) => {
                         return(this.renderAvatar(profile))
                     })
                     ||
                     <LoadingSpinner/>
                 }
-                { profiles.length > this.props.maxAvatars &&
-                    this.renderAvatarCount(profiles.length > 99 ? 99 : profiles.length)
+                {showOverflowCount && profiles.length > max &&
+                    this.renderAvatarCount("+" + Math.min(profiles.length - newMax, 99))
                 }
             </div>
         )

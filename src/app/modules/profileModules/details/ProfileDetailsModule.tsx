@@ -221,29 +221,35 @@ class ProfileDetailsModule extends React.PureComponent<Props, State> {
     renderEditForm = () => {
         const visible = this.state.editFormVisible
         const profile = this.props.profile
-        return <ProfileUpdateComponent key={this.state.editFormReloadKey} profile={profile} visible={visible} onComplete={this.toggleEditForm} />
+        return <ProfileUpdateComponent onCancel={this.hideProfileUpdateForm} key={this.state.editFormReloadKey} profile={profile} visible={visible} onComplete={this.handleProfileUpdateForm} />
     }
-    toggleEditForm = () => {
-        const isFormVisible = this.state.editFormVisible
-        if(isFormVisible)
+    showProfileUpdateForm = () => {
+        this.setState((prevState:State) => {
+            return {editFormVisible:true, editFormReloadKey:uniqueId()}
+        })
+    }
+    hideProfileUpdateForm = () => {
+
+        this.setState((prevState:State) => {
+            return {editFormVisible:false}
+        })
+    }
+    handleProfileUpdateForm = (profile:UserProfile) => {
+        const prevProfile = this.props.profile
+        if(profile && profile.uri && prevProfile.uri != profile.uri)
         {
-            this.setState(() => {
-                return {editFormVisible:false}
-            })
+            window.app.navigateToRoute(profile.uri)
         }
-        else {
-            this.setState(() => {
-                return {editFormVisible:true, editFormReloadKey:uniqueId()}
-            })
-        }
+        this.hideProfileUpdateForm()
     }
+
     getProfileOptions = () => {
         const options: OverflowMenuItem[] = []
         const profile = this.props.profile
         if(!profile)
             return options
         if (this.props.authenticatedProfile.id == profile.id) {
-            options.push({id:"1", type:OverflowMenuItemType.option, title:translate("Edit"), onPress:this.toggleEditForm, iconClass:"fas fa-pen"})
+            options.push({id:"1", type:OverflowMenuItemType.option, title:translate("Edit"), onPress:this.showProfileUpdateForm, iconClass:"fas fa-pen"})
         }
         else{
             // TODO: Check if user is already blocked and have unblock instead

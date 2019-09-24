@@ -1,6 +1,6 @@
 import {  Store } from 'redux';
 import { AjaxRequest } from '../network/AjaxRequest';
-import { UserProfile, UserStatus, ContextNaturalKey, RecentActivity } from '../types/intrasocial_types';
+import { UserProfile, UserStatus, ContextNaturalKey, RecentActivity, AppLanguage } from '../types/intrasocial_types';
 import {EventStreamMessageType } from '../network/ChannelEventStream';
 import { ReduxState } from '../redux/index';
 import { setAuthenticationProfileAction, setAuthenticationTokenAction } from '../redux/authentication';
@@ -10,6 +10,7 @@ import { CommunityManager } from './CommunityManager';
 import { ContextManager } from './ContextManager';
 import { ToastManager } from './ToastManager';
 import { WindowAppManager } from './WindowAppManager';
+import { setLanguageAction } from '../redux/language';
 
 export const AuthenticationManagerAuthenticatedUserChangedNotification = "AuthenticationManagerAuthenticatedUserChangedNotification"
 export abstract class AuthenticationManager
@@ -89,7 +90,7 @@ export abstract class AuthenticationManager
     static setAuthenticatedUser(profile:UserProfile|null)
     {
         //AjaxRequest.setup(AuthenticationManager.getAuthenticationToken())
-        AuthenticationManager.getStore().dispatch(setAuthenticationProfileAction(profile))
+        AuthenticationManager.setUpdatedProfileStatus(profile)
         AuthenticationManager.updateProfileStatus(profile)
         if(profile)
         {
@@ -98,8 +99,23 @@ export abstract class AuthenticationManager
         NotificationCenter.push(AuthenticationManagerAuthenticatedUserChangedNotification,[{profile}])
     }
     static setUpdatedProfileStatus = (profile:UserProfile) => {
-
+        let updateLanguage:AppLanguage = null
+        const currentLanguage = AuthenticationManager.getStore().getState().language.language
+        if(!!profile)
+        {
+            if(currentLanguage != profile.locale)
+            {
+                updateLanguage = profile.locale
+            }
+        }
+        else if( currentLanguage != AppLanguage.english){
+            updateLanguage = AppLanguage.english
+        }
         AuthenticationManager.getStore().dispatch(setAuthenticationProfileAction(profile))
+        if(updateLanguage)
+        {
+            AuthenticationManager.getStore().dispatch(setLanguageAction(updateLanguage))
+        }
     }
     static clearKeepAliveTimer()
     {
@@ -115,7 +131,7 @@ export abstract class AuthenticationManager
 
         // Clean up userProfile and token
         AuthenticationManager.getStore().dispatch(setAuthenticationTokenAction(null))
-        AuthenticationManager.getStore().dispatch(setAuthenticationProfileAction(null))
+        AuthenticationManager.setUpdatedProfileStatus(null)
         AjaxRequest.setup(null)
         ApplicationManager.loadApplication(true)
 

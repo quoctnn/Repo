@@ -11,6 +11,7 @@ type Props = {
     triggerTitle?:string
     triggerIcon?:string
     modifiers?:any
+    boundariesElement?: Popper.Boundary | Element
 }
 type DefaultProps = {
 
@@ -74,6 +75,7 @@ export class DropDownMenu extends React.Component<Props, State> {
                         target={this.triggerRef.current} 
                         toggle={this.closePopoverPanel}
                         modifiers={modifiers}
+                        boundariesElement={this.props.boundariesElement}
                         >
                     <PopoverBody className="pl-0 pr-0">
                         {items.map(i => createDropdownItem(i, this.closePopoverPanel))}

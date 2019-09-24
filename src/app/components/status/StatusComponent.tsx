@@ -142,6 +142,9 @@ export class StatusComponent extends React.Component<Props, State> {
         const badgeSettings = this.getAttributeBadgeSettings(status)
         return <StatusBadgeList setting={badgeSettings} />
     }
+    toggleReadByDialog = () => {
+        alert("NOT IMPLEMENTED")
+    }
     renderStatusReactions = (status:Status) => {
         let avatars = false
         return (
@@ -160,7 +163,7 @@ export class StatusComponent extends React.Component<Props, State> {
                         }
                     </div>
                     { status.owner.id == this.props.authorizedUserId &&
-                        <StackedAvatars userIds={status.read_by} size={20} borderWidth={1}/>
+                        <StackedAvatars showOverflowCount={false} showTotalCount={true} userIds={status.read_by} size={20} borderWidth={1}/>
                     }
                 </div>
                 ||<div className="summary">
@@ -177,7 +180,7 @@ export class StatusComponent extends React.Component<Props, State> {
                         }
                     </div>
                     { status.owner.id == this.props.authorizedUserId &&
-                        <StackedAvatars userIds={status.read_by} size={20} borderWidth={1}/>
+                        <StackedAvatars onOverflowCountClick={this.toggleReadByDialog} showOverflowCount={false} showTotalCount={true} userIds={status.read_by} size={20} borderWidth={1}/>
                     }
                 </div>}
             </>
