@@ -20,6 +20,7 @@ import GroupCreateComponent from '../../components/general/contextCreation/Group
 import { uniqueId } from '../../utilities/Utilities';
 import { OverflowMenuItemType, OverflowMenuItem } from '../../components/general/OverflowMenu';
 import { DropDownMenu } from '../../components/general/DropDownMenu';
+import { GroupManager } from '../../managers/GroupManager';
 type OwnProps = {
     breakpoint:ResponsiveBreakpoint
     contextNaturalKey: ContextNaturalKey
@@ -86,9 +87,13 @@ class GroupDetailsModule extends React.Component<Props, State> {
         },onComplete)
     }
     handleGroupCreateForm = (group:Group) => {
-        if(group && group.uri && group.uri != this.props.group.uri)
+        if(!!group)
         {
-            window.app.navigateToRoute(group.uri)
+            GroupManager.storeGroups([group])
+            if(group.uri && group.uri != this.props.group.uri)
+            {
+                window.app.navigateToRoute(group.uri)
+            }
         }
         this.hideGroupCreateForm()
     }

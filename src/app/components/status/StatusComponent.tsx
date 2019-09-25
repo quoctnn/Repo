@@ -222,7 +222,7 @@ export class StatusComponent extends React.Component<Props, State> {
                         </IntraSocialLink>
                     </div>
                     <div className="d-flex header-center flex-grow-1">
-                        <div className="d-flex header-center-content text-truncate">
+                        <div className="h-100 d-flex header-center-content text-truncate">
                             <div className="text-truncate flex-grow-1 d-flex flex-wrap header-center-left align-self-center">
                                 <div className="text-truncate">
                                     <IntraSocialLink to={this.props.status.owner} type={ContextNaturalKey.USER}>

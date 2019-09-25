@@ -235,10 +235,14 @@ class ProfileDetailsModule extends React.PureComponent<Props, State> {
         })
     }
     handleProfileUpdateForm = (profile:UserProfile) => {
-        const prevProfile = this.props.profile
-        if(profile && profile.uri && prevProfile.uri != profile.uri)
+        if(!!profile)
         {
-            window.app.navigateToRoute(profile.uri)
+            const prevProfile = this.props.profile
+            AuthenticationManager.setUpdatedProfileStatus(profile)
+            if(profile.uri && (!prevProfile || prevProfile.uri != profile.uri))
+            {
+                window.app.navigateToRoute(profile.uri)
+            }
         }
         this.hideProfileUpdateForm()
     }

@@ -172,7 +172,7 @@ const PathLoadedCommunityPage = PathLoader(CommunityPage, "CommunityPage", (path
 const PathLoadedGroupPage = PathLoader(GroupPage, "GroupPage", (path) => { return path })
 const PathLoadedProjectPage = PathLoader(ProjectPage, "ProjectPage", (path) => { return path })
 const PathLoadedEventPage = PathLoader(EventPage, "EventPage", (path) => { return path })
-const PathLoadedTaskPage = PathLoader(TaskPage, "TaskPage", (path) => { return path })
+const PathLoadedTaskPage = PathLoader(TaskPage, "TaskPage", (path) => { return path }) 
 const PathLoadedConversationsPage = PathLoader(ConversationsPage, "ConversationsPage", (path) => { return "/conversations/" }, (path) => path)
 const PathLoadedDashboardPage = PathLoader(DashboardPage, "DashboardPage", (path) => { return path })
 const ModalChangelog = WithModal(Changelog, "Changelog")

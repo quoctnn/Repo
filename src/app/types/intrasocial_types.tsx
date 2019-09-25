@@ -157,6 +157,8 @@ export type CropRect = {
 }
 export type CropInfo = {
     image:string
+    cropped:string
+    thumbnail:string
 } & CropRect
 export type GDPRData = {
     requiredActions:OUPRequiredAction[]

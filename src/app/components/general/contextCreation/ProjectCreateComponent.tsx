@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { translate } from '../../../localization/AutoIntlProvider';
-import { ContextNaturalKey, CropRect, ContextPhotoType, CropInfo, RequestErrorData, Project } from '../../../types/intrasocial_types';
+import { ContextNaturalKey, CropRect, ContextPhotoType, RequestErrorData, Project } from '../../../types/intrasocial_types';
 import FormController, {FormStatus } from '../../form/FormController';
-import {ApiClient, ApiClientCallback} from '../../../network/ApiClient';
+import {ApiClient} from '../../../network/ApiClient';
 import { uniqueId, removeEmptyEntriesFromObject, nullOrUndefined } from '../../../utilities/Utilities';
 import { TextInput } from '../../form/components/TextInput';
 import { TextAreaInput } from '../../form/components/TextAreaInput';
@@ -57,9 +57,6 @@ class ProjectCreateComponent extends React.Component<Props, State> {
             return { formVisible: false }
         }, goBack)
     }
-    uploadContextPhoto = (type:ContextPhotoType, contextNaturalKey:ContextNaturalKey, contextObjectId:number, file:File|string, crop:CropRect, completion:ApiClientCallback<CropInfo>) => () => {
-        ApiClient.setContextPhoto(type,contextNaturalKey, contextObjectId, file, crop, completion)
-    }
     handleUpdateProfileFormSubmit = () => {
         const project:Partial<Project> = this.props.project || {}
         const data = this.state.formValues
@@ -83,6 +80,10 @@ class ProjectCreateComponent extends React.Component<Props, State> {
         const coverData:{file:File|string, crop:CropRect} = cover as any
 
         let createdProject:Project = null
+        let updatedAvatar:string = null
+        let updatedAvatarThumbnail:string = null
+        let updatedCover:string = null
+        let updatedCoverThumbnail:string = null
         const completed = () => {
             if(errors.length > 0)
             {
@@ -92,19 +93,28 @@ class ProjectCreateComponent extends React.Component<Props, State> {
                 this.setFormStatus(FormStatus.normal)
             }
             else {
+                const updatedProject =  {...(createdProject  || project)} as Project
+                if(updatedAvatar)
+                    updatedProject.avatar = updatedAvatar
+                if(updatedAvatarThumbnail)
+                    updatedProject.avatar_thumbnail = updatedAvatarThumbnail
+                if(updatedCover)
+                    updatedProject.cover_cropped = updatedCover
+                if(updatedCoverThumbnail)
+                    updatedProject.cover_thumbnail = updatedCoverThumbnail
                 this.setFormStatus(FormStatus.normal)
                 if(this.props.onComplete)
                 {
-                    this.props.onComplete(createdProject)
+                    this.props.onComplete(updatedProject)
                 }
                 else {
-                    const shouldRedirect = createdProject && createdProject.uri
+                    const shouldRedirect = updatedProject && updatedProject.uri
                     if(shouldRedirect)
                     {
                         this.setState(() => {
                             return {formVisible :false}
                         }, () => {
-                            window.app.navigateToRoute(createdProject.uri)
+                            window.app.navigateToRoute(updatedProject.uri)
                         })
                     }
                     else 
@@ -141,11 +151,20 @@ class ProjectCreateComponent extends React.Component<Props, State> {
                     createdProject = data
                     if(!!createdProject)
                         ProjectManager.storeProjects([createdProject])
+                    
                     if(avatarData)
-                        requests.push(this.uploadContextPhoto(ContextPhotoType.avatar,ContextNaturalKey.PROJECT, createdProject.id, avatarData.file, avatarData.crop, requestCompleter))
+                        requests.push(() => ApiClient.setContextPhoto(ContextPhotoType.avatar,ContextNaturalKey.PROJECT, createdProject.id, avatarData.file, avatarData.crop, (cropInfo, status, error) => {
+                            updatedAvatar = cropInfo && cropInfo.cropped
+                            updatedAvatarThumbnail = cropInfo && cropInfo.thumbnail
+                            requestCompleter(cropInfo, status, error)
+                        }))
                     if(coverData)
-                        requests.push(this.uploadContextPhoto(ContextPhotoType.cover,ContextNaturalKey.PROJECT, createdProject.id, coverData.file, coverData.crop, requestCompleter))
-                    if(requests.length > 0)
+                        requests.push(() => ApiClient.setContextPhoto(ContextPhotoType.cover,ContextNaturalKey.PROJECT, createdProject.id, coverData.file, coverData.crop, (cropInfo, status, error) => {
+                            updatedCover = cropInfo && cropInfo.cropped
+                            updatedCoverThumbnail = cropInfo && cropInfo.thumbnail
+                            requestCompleter(cropInfo, status, error)
+                        }))
+                   if(requests.length > 0)
                         requests[0]() // start
                     else {
                         completed()
@@ -168,9 +187,17 @@ class ProjectCreateComponent extends React.Component<Props, State> {
                     requestCompleter(data, status, error)
                 }))
             if(avatarData)
-                requests.push(this.uploadContextPhoto(ContextPhotoType.avatar,ContextNaturalKey.PROJECT, project.id, avatarData.file, avatarData.crop, requestCompleter))
+                requests.push(() => ApiClient.setContextPhoto(ContextPhotoType.avatar,ContextNaturalKey.PROJECT, project.id, avatarData.file, avatarData.crop, (cropInfo, status, error) => {
+                    updatedAvatar = cropInfo && cropInfo.cropped
+                    updatedAvatarThumbnail = cropInfo && cropInfo.thumbnail
+                    requestCompleter(cropInfo, status, error)
+                }))
             if(coverData)
-                requests.push(this.uploadContextPhoto(ContextPhotoType.cover,ContextNaturalKey.PROJECT, project.id, coverData.file, coverData.crop, requestCompleter))
+                requests.push(() => ApiClient.setContextPhoto(ContextPhotoType.cover,ContextNaturalKey.PROJECT, project.id, coverData.file, coverData.crop, (cropInfo, status, error) => {
+                    updatedCover = cropInfo && cropInfo.cropped
+                    updatedCoverThumbnail = cropInfo && cropInfo.thumbnail
+                    requestCompleter(cropInfo, status, error)
+                }))
             if(requests.length > 0)
                 requests[0]() // start
             else {
@@ -273,7 +300,7 @@ class ProjectCreateComponent extends React.Component<Props, State> {
                                             hasSubmitted={form.hasSubmitted()}
                                             ref={form.setFormRef(pageId)} 
                                             onValueChanged={form.handleValueChanged(pageId)} 
-                                            value={project.cover} 
+                                            value={project.cover_cropped} 
                                             title={translate("common.cover")} 
                                             onRequestNavigation={form.handleRequestNavigation}
                                             contextNaturalKey={ContextNaturalKey.PROJECT}

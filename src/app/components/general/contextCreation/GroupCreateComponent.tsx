@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { translate } from '../../../localization/AutoIntlProvider';
-import { Group, ContextNaturalKey, CropRect, ContextPhotoType, CropInfo, RequestErrorData, ContextPrivacy} from '../../../types/intrasocial_types';
+import { Group, ContextNaturalKey, CropRect, ContextPhotoType, RequestErrorData, ContextPrivacy} from '../../../types/intrasocial_types';
 import FormController, {  FormStatus } from '../../form/FormController';
-import {ApiClient, ApiClientCallback} from '../../../network/ApiClient';
+import {ApiClient} from '../../../network/ApiClient';
 import { removeEmptyEntriesFromObject, nullOrUndefined } from '../../../utilities/Utilities';
 import { TextInput } from '../../form/components/TextInput';
 import { InputOption, RichRadioGroupInput } from '../../form/components/RichRadioGroupInput';
@@ -11,7 +11,6 @@ import { FormMenuItem } from '../../form/FormMenuItem';
 import { FormPage } from '../../form/FormPage';
 import { TextAreaInput } from '../../form/components/TextAreaInput';
 import { ContextPhotoInput } from '../../form/components/ContextPhotoInput';
-import { GroupManager } from '../../../managers/GroupManager';
 import { CommunityManager } from '../../../managers/CommunityManager';
 type OwnProps = {
     group?:Group
@@ -63,9 +62,6 @@ class GroupCreateComponent extends React.Component<Props, State> {
         else 
             this.back()
     }
-    uploadContextPhoto = (type:ContextPhotoType, contextNaturalKey:ContextNaturalKey, contextObjectId:number, file:File|string, crop:CropRect, completion:ApiClientCallback<CropInfo>) => () => {
-        ApiClient.setContextPhoto(type,contextNaturalKey, contextObjectId, file, crop, completion)
-    }
     handleCreateGroupFormSubmit = () => {
         const data = this.state.formValues
         const group:Partial<Group> = this.props.group || {}
@@ -89,6 +85,10 @@ class GroupCreateComponent extends React.Component<Props, State> {
         const avatarData:{file:File|string, crop:CropRect} = avatar as any
         const coverData:{file:File|string, crop:CropRect} = cover as any
         let createdGroup:Group = null
+        let updatedAvatar:string = null
+        let updatedAvatarThumbnail:string = null
+        let updatedCover:string = null
+        let updatedCoverThumbnail:string = null
         const completed = () => {
             if(errors.length > 0)
             {
@@ -98,19 +98,28 @@ class GroupCreateComponent extends React.Component<Props, State> {
                 this.setFormStatus(FormStatus.normal)
             }
             else {
+                const updatedGroup =  {...(createdGroup  || group)} as Group
+                if(updatedAvatar)
+                    updatedGroup.avatar = updatedAvatar
+                if(updatedAvatarThumbnail)
+                    updatedGroup.avatar_thumbnail = updatedAvatarThumbnail
+                if(updatedCover)
+                    updatedGroup.cover_cropped = updatedCover
+                if(updatedCoverThumbnail)
+                    updatedGroup.cover_thumbnail = updatedCoverThumbnail
                 this.setFormStatus(FormStatus.normal)
                 if(this.props.onComplete)
                 {
-                    this.props.onComplete(createdGroup)
+                    this.props.onComplete(updatedGroup)
                 }
                 else {
-                    const shouldRedirect = createdGroup && createdGroup.uri
+                    const shouldRedirect = updatedGroup && updatedGroup.uri
                     if(shouldRedirect)
                     {
                         this.setState(() => {
                             return {formVisible :false}
                         }, () => {
-                            window.app.navigateToRoute(createdGroup.uri)
+                            window.app.navigateToRoute(updatedGroup.uri)
                         })
                     }
                     else 
@@ -145,12 +154,19 @@ class GroupCreateComponent extends React.Component<Props, State> {
                 if(!errorData && data && data.id)
                 {
                     createdGroup = data
-                    if(!!createdGroup)
-                        GroupManager.storeGroups([createdGroup])
+                    
                     if(avatarData)
-                        requests.push(this.uploadContextPhoto(ContextPhotoType.avatar,ContextNaturalKey.GROUP, createdGroup.id, avatarData.file, avatarData.crop, requestCompleter))
+                        requests.push(() => ApiClient.setContextPhoto(ContextPhotoType.avatar,ContextNaturalKey.GROUP, createdGroup.id, avatarData.file, avatarData.crop, (cropInfo, status, error) => {
+                            updatedAvatar = cropInfo && cropInfo.cropped
+                            updatedAvatarThumbnail = cropInfo && cropInfo.thumbnail
+                            requestCompleter(cropInfo, status, error)
+                        }))
                     if(coverData)
-                        requests.push(this.uploadContextPhoto(ContextPhotoType.cover,ContextNaturalKey.GROUP, createdGroup.id, coverData.file, coverData.crop, requestCompleter))
+                        requests.push(() => ApiClient.setContextPhoto(ContextPhotoType.cover,ContextNaturalKey.GROUP, createdGroup.id, coverData.file, coverData.crop, (cropInfo, status, error) => {
+                            updatedCover = cropInfo && cropInfo.cropped
+                            updatedCoverThumbnail = cropInfo && cropInfo.thumbnail
+                            requestCompleter(cropInfo, status, error)
+                        }))
                     if(requests.length > 0)
                         requests[0]() // start
                     else {
@@ -168,14 +184,20 @@ class GroupCreateComponent extends React.Component<Props, State> {
             if(Object.keys(updateData).length > 0)
                 requests.push(() => ApiClient.updateGroup(this.props.group.id, updateData,(data, status, error) => {
                     createdGroup = data
-                    if(!!createdGroup)
-                        GroupManager.storeGroups([createdGroup])
                     requestCompleter(data, status, error)
                 }))
             if(avatarData)
-                requests.push(this.uploadContextPhoto(ContextPhotoType.avatar,ContextNaturalKey.GROUP, group.id, avatarData.file, avatarData.crop, requestCompleter))
+                requests.push(() => ApiClient.setContextPhoto(ContextPhotoType.avatar,ContextNaturalKey.GROUP, group.id, avatarData.file, avatarData.crop, (cropInfo, status, error) => {
+                    updatedAvatar = cropInfo && cropInfo.cropped
+                    updatedAvatarThumbnail = cropInfo && cropInfo.thumbnail
+                    requestCompleter(cropInfo, status, error)
+                }))
             if(coverData)
-                requests.push(this.uploadContextPhoto(ContextPhotoType.cover,ContextNaturalKey.GROUP, group.id, coverData.file, coverData.crop, requestCompleter))
+                requests.push(() => ApiClient.setContextPhoto(ContextPhotoType.cover,ContextNaturalKey.GROUP, group.id, coverData.file, coverData.crop, (cropInfo, status, error) => {
+                    updatedCover = cropInfo && cropInfo.cropped
+                    updatedCoverThumbnail = cropInfo && cropInfo.thumbnail
+                    requestCompleter(cropInfo, status, error)
+                }))
             if(requests.length > 0)
                 requests[0]() // start
             else {
@@ -291,7 +313,7 @@ class GroupCreateComponent extends React.Component<Props, State> {
                                             hasSubmitted={form.hasSubmitted()}
                                             ref={form.setFormRef(pageId)} 
                                             onValueChanged={form.handleValueChanged(pageId)} 
-                                            value={group.cover} 
+                                            value={group.cover_cropped} 
                                             title={translate("common.cover")} 
                                             onRequestNavigation={form.handleRequestNavigation}
                                             contextNaturalKey={ContextNaturalKey.GROUP}

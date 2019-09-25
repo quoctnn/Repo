@@ -79,7 +79,9 @@ class StackedAvatars extends React.Component<Props, State> {
     }
     render() {
         const {showOverflowCount, showTotalCount, onOverflowCountClick} = this.props
-        let profiles = this.state.profiles
+        const profiles = this.state.profiles
+        if(profiles.length == 0)
+            return null
         const max = this.props.maxAvatars
         const newMax = showOverflowCount && profiles.length > max ? max - 1 : max
         return(

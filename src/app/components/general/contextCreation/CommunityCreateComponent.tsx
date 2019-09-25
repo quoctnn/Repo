@@ -2,7 +2,7 @@ import * as React from 'react';
 import { translate } from '../../../localization/AutoIntlProvider';
 import { Community, ContextNaturalKey, CropRect, ContextPhotoType, CropInfo, RequestErrorData, ContextPrivacy, CommunityCategory, CommunityConfigurationData, CommunityCreatePermission } from '../../../types/intrasocial_types';
 import FormController, {  FormStatus } from '../../form/FormController';
-import {ApiClient, ApiClientCallback} from '../../../network/ApiClient';
+import {ApiClient} from '../../../network/ApiClient';
 import { removeEmptyEntriesFromObject, nullOrUndefined } from '../../../utilities/Utilities';
 import { TextInput } from '../../form/components/TextInput';
 import { InputOption, RichRadioGroupInput } from '../../form/components/RichRadioGroupInput';
@@ -15,7 +15,6 @@ import { SelectInput } from '../../form/components/SelectInput';
 import { ColorInput } from '../../form/components/ColorInput';
 import { BooleanInput } from '../../form/components/BooleanInput';
 import LoadingSpinner from '../../LoadingSpinner';
-import { CommunityManager } from '../../../managers/CommunityManager';
 type OwnProps = {
     community?:Community
     communityConfiguration?:CommunityConfigurationData
@@ -62,9 +61,6 @@ class CommunityCreateComponent extends React.Component<Props, State> {
             return { formVisible: false }
         }, goBack)
     }
-    uploadContextPhoto = (type:ContextPhotoType, contextNaturalKey:ContextNaturalKey, contextObjectId:number, file:File|string, crop:CropRect, completion:ApiClientCallback<CropInfo>) => () => {
-        ApiClient.setContextPhoto(type,contextNaturalKey, contextObjectId, file, crop, completion)
-    }
     handleCreateCommunityFormSubmit = () => {
         const data = this.state.formValues
         const community:Partial<Community> = this.props.community || {}
@@ -88,13 +84,11 @@ class CommunityCreateComponent extends React.Component<Props, State> {
         let createdCommunity:Community = null
         let primary_color = community.primary_color
         let secondary_color = community.secondary_color
+        let updatedAvatar:string = null
+        let updatedAvatarThumbnail:string = null
+        let updatedCover:string = null
+        let updatedCoverThumbnail:string = null
         const completed = () => {
-            if(!create && (primary_color != community.primary_color || secondary_color != community.secondary_color))
-            {
-                community.primary_color = primary_color
-                community.secondary_color = secondary_color
-                CommunityManager.applyCommunityTheme(community as Community)
-            }
             if(errors.length > 0)
             {
                 this.setState(() => {
@@ -103,19 +97,34 @@ class CommunityCreateComponent extends React.Component<Props, State> {
                 this.setFormStatus(FormStatus.normal)
             }
             else {
+
+                const updatedCommunity =  {...(createdCommunity  || community)} as Community
+                if(!create && (primary_color != community.primary_color || secondary_color != community.secondary_color))
+                {
+                    updatedCommunity.primary_color = primary_color
+                    updatedCommunity.secondary_color = secondary_color
+                }
+                if(updatedAvatar)
+                    updatedCommunity.avatar = updatedAvatar
+                if(updatedAvatarThumbnail)
+                    updatedCommunity.avatar_thumbnail = updatedAvatarThumbnail
+                if(updatedCover)
+                    updatedCommunity.cover_cropped = updatedCover
+                if(updatedCoverThumbnail)
+                    updatedCommunity.cover_thumbnail = updatedCoverThumbnail
                 this.setFormStatus(FormStatus.normal)
                 if(this.props.onComplete)
                 {
-                    this.props.onComplete(createdCommunity)
+                    this.props.onComplete(updatedCommunity)
                 }
                 else {
-                    const shouldRedirect = createdCommunity && createdCommunity.uri
+                    const shouldRedirect = updatedCommunity && updatedCommunity.uri
                     if(shouldRedirect)
                     {
                         this.setState(() => {
                             return {formVisible :false}
                         }, () => {
-                            window.app.navigateToRoute(createdCommunity.uri)
+                            window.app.navigateToRoute(updatedCommunity.uri)
                         })
                     }
                     else 
@@ -154,12 +163,18 @@ class CommunityCreateComponent extends React.Component<Props, State> {
                 if(!errorData && data && data.id)
                 {
                     createdCommunity = data
-                    if(!!createdCommunity)
-                        CommunityManager.storeCommunities([createdCommunity])
                     if(avatarData)
-                        requests.push(this.uploadContextPhoto(ContextPhotoType.avatar,ContextNaturalKey.COMMUNITY, createdCommunity.id, avatarData.file, avatarData.crop, requestCompleter))
+                        requests.push(() => ApiClient.setContextPhoto(ContextPhotoType.avatar,ContextNaturalKey.COMMUNITY, createdCommunity.id, avatarData.file, avatarData.crop, (cropInfo, status, error) => {
+                            updatedAvatar = cropInfo && cropInfo.cropped
+                            updatedAvatarThumbnail = cropInfo && cropInfo.thumbnail
+                            requestCompleter(cropInfo, status, error)
+                        }))
                     if(coverData)
-                        requests.push(this.uploadContextPhoto(ContextPhotoType.cover,ContextNaturalKey.COMMUNITY, createdCommunity.id, coverData.file, coverData.crop, requestCompleter))
+                        requests.push(() => ApiClient.setContextPhoto(ContextPhotoType.cover,ContextNaturalKey.COMMUNITY, createdCommunity.id, coverData.file, coverData.crop, (cropInfo, status, error) => {
+                            updatedCover = cropInfo && cropInfo.cropped
+                            updatedCoverThumbnail = cropInfo && cropInfo.thumbnail
+                            requestCompleter(cropInfo, status, error)
+                        }))
                     if(Object.keys(communityConfigurationData).length > 0)
                         requests.push(() => ApiClient.updateCommunityConfiguration(createdCommunity.id, communityConfigurationData, requestCompleter))
                     if(requests.length > 0)
@@ -179,14 +194,20 @@ class CommunityCreateComponent extends React.Component<Props, State> {
             if(Object.keys(updateData).length > 0)
                 requests.push(() => ApiClient.updateCommunity(this.props.community.id, updateData,(data, status, error) => {
                     createdCommunity = data
-                    if(!!createdCommunity)
-                        CommunityManager.storeCommunities([createdCommunity])
                     requestCompleter(data, status, error)
                 }))
             if(avatarData)
-                requests.push(this.uploadContextPhoto(ContextPhotoType.avatar,ContextNaturalKey.COMMUNITY, community.id, avatarData.file, avatarData.crop, requestCompleter))
+                requests.push(() => ApiClient.setContextPhoto(ContextPhotoType.avatar,ContextNaturalKey.COMMUNITY, community.id, avatarData.file, avatarData.crop, (cropInfo, status, error) => {
+                    updatedAvatar = cropInfo && cropInfo.cropped
+                    updatedAvatarThumbnail = cropInfo && cropInfo.thumbnail
+                    requestCompleter(cropInfo, status, error)
+                }))
             if(coverData)
-                requests.push(this.uploadContextPhoto(ContextPhotoType.cover,ContextNaturalKey.COMMUNITY, community.id, coverData.file, coverData.crop, requestCompleter))
+                requests.push(() => ApiClient.setContextPhoto(ContextPhotoType.cover,ContextNaturalKey.COMMUNITY, community.id, coverData.file, coverData.crop, (cropInfo, status, error) => {
+                    updatedCover = cropInfo && cropInfo.cropped
+                    updatedCoverThumbnail = cropInfo && cropInfo.thumbnail
+                    requestCompleter(cropInfo, status, error)
+                }))
             if(Object.keys(communityConfigurationData).length > 0)
                 requests.push(() => ApiClient.updateCommunityConfiguration(this.props.community.id, communityConfigurationData, requestCompleter))
             if(requests.length > 0)
@@ -351,7 +372,7 @@ class CommunityCreateComponent extends React.Component<Props, State> {
                                             hasSubmitted={form.hasSubmitted()}
                                             ref={form.setFormRef(pageId)} 
                                             onValueChanged={form.handleValueChanged(pageId)} 
-                                            value={community.cover} 
+                                            value={community.cover_cropped} 
                                             title={translate("common.cover")} 
                                             onRequestNavigation={form.handleRequestNavigation}
                                             contextNaturalKey={ContextNaturalKey.COMMUNITY}

@@ -21,6 +21,7 @@ import { OverflowMenuItem, OverflowMenuItemType } from '../../components/general
 import { uniqueId } from '../../utilities/Utilities';
 import ProjectCreateComponent from '../../components/general/contextCreation/ProjectCreateComponent';
 import { DropDownMenu } from '../../components/general/DropDownMenu';
+import { ProjectManager } from '../../managers/ProjectManager';
 type OwnProps = {
     breakpoint:ResponsiveBreakpoint
 } & CommonModuleProps
@@ -68,9 +69,13 @@ class ProjectDetailsModule extends React.Component<Props, State> {
         })
     }
     handleProjectCreateForm = (project:Project) => {
-        if(project && project.uri)
+        if(!!project)
         {
-            window.app.navigateToRoute(project.uri)
+            ProjectManager.storeProjects([project])
+            if(project.uri && project.uri != this.props.project.uri)
+            {
+                window.app.navigateToRoute(project.uri)
+            }
         }
         this.hideProjectCreateForm()
     }

@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { translate } from '../../../localization/AutoIntlProvider';
-import { ContextNaturalKey, CropRect, ContextPhotoType, CropInfo, RequestErrorData, UserProfile, AppLanguage } from '../../../types/intrasocial_types';
+import { ContextNaturalKey, CropRect, ContextPhotoType, RequestErrorData, UserProfile, AppLanguage } from '../../../types/intrasocial_types';
 import FormController, {FormStatus } from '../../form/FormController';
-import {ApiClient, ApiClientCallback} from '../../../network/ApiClient';
+import {ApiClient} from '../../../network/ApiClient';
 import { uniqueId, removeEmptyEntriesFromObject, nullOrUndefined } from '../../../utilities/Utilities';
 import { TextInput } from '../../form/components/TextInput';
 import { TextAreaInput } from '../../form/components/TextAreaInput';
@@ -10,7 +10,6 @@ import { ContextPhotoInput } from '../../form/components/ContextPhotoInput';
 import { RouteComponentProps, withRouter } from 'react-router';
 import { FormPage } from '../../form/FormPage';
 import { FormMenuItem } from '../../form/FormMenuItem';
-import { AuthenticationManager } from '../../../managers/AuthenticationManager';
 import { SelectInput } from '../../form/components/SelectInput';
 import { InputOption } from '../../form/components/RichRadioGroupInput';
 import { TimezoneInput } from '../../form/components/TimezoneInput';
@@ -58,9 +57,6 @@ class ProfileUpdateComponent extends React.Component<Props, State> {
             return { formVisible: false }
         }, goBack)
     }
-    uploadContextPhoto = (type:ContextPhotoType, contextNaturalKey:ContextNaturalKey, contextObjectId:number, file:File|string, crop:CropRect, completion:ApiClientCallback<CropInfo>) => () => {
-        ApiClient.setContextPhoto(type,contextNaturalKey, contextObjectId, file, crop, completion)
-    }
     handleUpdateProfileFormSubmit = () => {
         const profile:Partial<UserProfile> = this.props.profile || {}
         const data = this.state.formValues
@@ -82,7 +78,11 @@ class ProfileUpdateComponent extends React.Component<Props, State> {
         const avatarData:{file:File|string, crop:CropRect} = avatar as any
         const coverData:{file:File|string, crop:CropRect} = cover as any
 
-        let updatedProfile:UserProfile = null
+        let updatedUserProfile:UserProfile = null
+        let updatedAvatar:string = null
+        let updatedAvatarThumbnail:string = null
+        let updatedCover:string = null
+        let updatedCoverThumbnail:string = null
         const completed = () => {
             if(errors.length > 0)
             {
@@ -92,20 +92,33 @@ class ProfileUpdateComponent extends React.Component<Props, State> {
                 this.setFormStatus(FormStatus.normal)
             }
             else {
+                const updatedProfile =  {...(updatedUserProfile  || profile)} as UserProfile
+                if(updatedAvatar)
+                    updatedProfile.avatar = updatedAvatar
+                if(updatedAvatarThumbnail)
+                    updatedProfile.avatar_thumbnail = updatedAvatarThumbnail
+                if(updatedCover)
+                    updatedProfile.cover_cropped = updatedCover
+                if(updatedCoverThumbnail)
+                    updatedProfile.cover_thumbnail = updatedCoverThumbnail
                 this.setFormStatus(FormStatus.normal)
-
-                const shouldRedirect = !!updatedProfile && !!updatedProfile.uri && (updatedProfile.uri != profile.uri)
-                if(!!updatedProfile)
-                    AuthenticationManager.setUpdatedProfileStatus(updatedProfile)
-                if(shouldRedirect)
+                if(this.props.onComplete)
                 {
-                    window.app.navigateToRoute(updatedProfile.uri)
-                    this.setState(() => {
-                        return {formVisible :false}
-                    })
+                    this.props.onComplete(updatedProfile)
                 }
-                else 
-                    this.didCancel()
+                else {
+                    const shouldRedirect = updatedProfile && updatedProfile.uri
+                    if(shouldRedirect)
+                    {
+                        this.setState(() => {
+                            return {formVisible :false}
+                        }, () => {
+                            window.app.navigateToRoute(updatedProfile.uri)
+                        })
+                    }
+                    else 
+                        this.didCancel()
+                }
             }
         }
         const errors:RequestErrorData[] = []
@@ -131,13 +144,21 @@ class ProfileUpdateComponent extends React.Component<Props, State> {
         }
         if(Object.keys(updateData).length > 0)
             requests.push(() => ApiClient.updateProfile(updateData, (data, status, error) => {
-                updatedProfile = data
+                updatedUserProfile = data
                 requestCompleter(data, status, error)
             }))
         if(avatarData)
-            requests.push(this.uploadContextPhoto(ContextPhotoType.avatar,ContextNaturalKey.USER, profile.id, avatarData.file, avatarData.crop, requestCompleter))
+            requests.push(() => ApiClient.setContextPhoto(ContextPhotoType.avatar,ContextNaturalKey.USER, profile.id, avatarData.file, avatarData.crop, (cropInfo, status, error) => {
+                updatedAvatar = cropInfo && cropInfo.cropped
+                updatedAvatarThumbnail = cropInfo && cropInfo.thumbnail
+                requestCompleter(cropInfo, status, error)
+        }))
         if(coverData)
-            requests.push(this.uploadContextPhoto(ContextPhotoType.cover,ContextNaturalKey.USER, profile.id, coverData.file, coverData.crop, requestCompleter))
+            requests.push(() => ApiClient.setContextPhoto(ContextPhotoType.cover,ContextNaturalKey.USER, profile.id, coverData.file, coverData.crop, (cropInfo, status, error) => {
+                updatedCover = cropInfo && cropInfo.cropped
+                updatedCoverThumbnail = cropInfo && cropInfo.thumbnail
+                requestCompleter(cropInfo, status, error)
+            }))
         if(requests.length > 0)
             requests[0]() // start
         else {
@@ -275,7 +296,7 @@ class ProfileUpdateComponent extends React.Component<Props, State> {
                                             hasSubmitted={form.hasSubmitted()}
                                             ref={form.setFormRef(pageId)} 
                                             onValueChanged={form.handleValueChanged(pageId)} 
-                                            value={profile.cover} 
+                                            value={profile.cover_cropped} 
                                             title={translate("common.cover")} 
                                             onRequestNavigation={form.handleRequestNavigation}
                                             contextNaturalKey={ContextNaturalKey.USER}

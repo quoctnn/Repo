@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { translate } from '../../../localization/AutoIntlProvider';
-import { ContextNaturalKey, CropRect, ContextPhotoType, CropInfo, RequestErrorData, ContextPrivacy, Event } from '../../../types/intrasocial_types';
+import { ContextNaturalKey, CropRect, ContextPhotoType, RequestErrorData, ContextPrivacy, Event } from '../../../types/intrasocial_types';
 import FormController, {FormStatus } from '../../form/FormController';
-import {ApiClient, ApiClientCallback} from '../../../network/ApiClient';
+import {ApiClient} from '../../../network/ApiClient';
 import { uniqueId, removeEmptyEntriesFromObject, nullOrUndefined } from '../../../utilities/Utilities';
 import { TextInput } from '../../form/components/TextInput';
 import { TextAreaInput } from '../../form/components/TextAreaInput';
@@ -12,7 +12,6 @@ import { RouteComponentProps, withRouter } from 'react-router';
 import { DateRangeInput } from '../../form/components/DateRangeInput';
 import { FormPage } from '../../form/FormPage';
 import { FormMenuItem } from '../../form/FormMenuItem';
-import { EventManager } from '../../../managers/EventManager';
 import { LocationInput } from '../../form/components/LocationInput';
 import { AddressInput } from '../../form/components/AddressInput';
 import { CommunityManager } from '../../../managers/CommunityManager';
@@ -60,9 +59,6 @@ class EventCreateComponent extends React.Component<Props, State> {
             return { formVisible: false }
         }, goBack)
     }
-    uploadContextPhoto = (type:ContextPhotoType, contextNaturalKey:ContextNaturalKey, contextObjectId:number, file:File|string, crop:CropRect, completion:ApiClientCallback<CropInfo>) => () => {
-        ApiClient.setContextPhoto(type,contextNaturalKey, contextObjectId, file, crop, completion)
-    }
     handleCreateEventFormSubmit = () => {
         const event:Partial<Event> = this.props.event || {}
         const create = !this.props.event
@@ -90,6 +86,10 @@ class EventCreateComponent extends React.Component<Props, State> {
         const avatarData:{file:File|string, crop:CropRect} = avatar as any
         const coverData:{file:File|string, crop:CropRect} = cover as any
         let createdEvent:Event = null
+        let updatedAvatar:string = null
+        let updatedAvatarThumbnail:string = null
+        let updatedCover:string = null
+        let updatedCoverThumbnail:string = null
         const completed = () => {
             if(errors.length > 0)
             {
@@ -99,19 +99,29 @@ class EventCreateComponent extends React.Component<Props, State> {
                 this.setFormStatus(FormStatus.normal)
             }
             else {
+
+                const updatedEvent =  {...(createdEvent  || event)} as Event
+                if(updatedAvatar)
+                    updatedEvent.avatar = updatedAvatar
+                if(updatedAvatarThumbnail)
+                    updatedEvent.avatar_thumbnail = updatedAvatarThumbnail
+                if(updatedCover)
+                    updatedEvent.cover_cropped = updatedCover
+                if(updatedCoverThumbnail)
+                    updatedEvent.cover_thumbnail = updatedCoverThumbnail
                 this.setFormStatus(FormStatus.normal)
                 if(this.props.onComplete)
                 {
-                    this.props.onComplete(createdEvent)
+                    this.props.onComplete(updatedEvent)
                 }
                 else {
-                    const shouldRedirect = createdEvent && createdEvent.uri
+                    const shouldRedirect = updatedEvent && updatedEvent.uri
                     if(shouldRedirect)
                     {
                         this.setState(() => {
                             return {formVisible :false}
                         }, () => {
-                            window.app.navigateToRoute(createdEvent.uri)
+                            window.app.navigateToRoute(updatedEvent.uri)
                         })
                     }
                     else 
@@ -146,12 +156,18 @@ class EventCreateComponent extends React.Component<Props, State> {
                 if(!errorData && data && data.id)
                 {
                     createdEvent = data
-                    if(!!createdEvent)
-                        EventManager.storeEvents([createdEvent])
                     if(avatarData)
-                        requests.push(this.uploadContextPhoto(ContextPhotoType.avatar,ContextNaturalKey.EVENT, createdEvent.id, avatarData.file, avatarData.crop, requestCompleter))
+                        requests.push(() => ApiClient.setContextPhoto(ContextPhotoType.avatar,ContextNaturalKey.EVENT, createdEvent.id, avatarData.file, avatarData.crop, (cropInfo, status, error) => {
+                            updatedAvatar = cropInfo && cropInfo.cropped
+                            updatedAvatarThumbnail = cropInfo && cropInfo.thumbnail
+                            requestCompleter(cropInfo, status, error)
+                    }))
                     if(coverData)
-                        requests.push(this.uploadContextPhoto(ContextPhotoType.cover,ContextNaturalKey.EVENT, createdEvent.id, coverData.file, coverData.crop, requestCompleter))
+                        requests.push(() => ApiClient.setContextPhoto(ContextPhotoType.cover,ContextNaturalKey.EVENT, createdEvent.id, coverData.file, coverData.crop, (cropInfo, status, error) => {
+                            updatedCover = cropInfo && cropInfo.cropped
+                            updatedCoverThumbnail = cropInfo && cropInfo.thumbnail
+                            requestCompleter(cropInfo, status, error)
+                    }))
                     if(requests.length > 0)
                         requests[0]() // start
                     else {
@@ -170,14 +186,20 @@ class EventCreateComponent extends React.Component<Props, State> {
             if(Object.keys(updateData).length > 0)
                 requests.push(() => ApiClient.updateEvent(event.id, updateData, (data, status, error) => {
                     createdEvent = data
-                    if(!!createdEvent)
-                        EventManager.storeEvents([createdEvent])
                     requestCompleter(data, status, error)
                 }))
             if(avatarData)
-                requests.push(this.uploadContextPhoto(ContextPhotoType.avatar,ContextNaturalKey.EVENT, event.id, avatarData.file, avatarData.crop, requestCompleter))
+                requests.push(() => ApiClient.setContextPhoto(ContextPhotoType.avatar,ContextNaturalKey.EVENT, event.id, avatarData.file, avatarData.crop, (cropInfo, status, error) => {
+                    updatedAvatar = cropInfo && cropInfo.cropped
+                    updatedAvatarThumbnail = cropInfo && cropInfo.thumbnail
+                    requestCompleter(cropInfo, status, error)
+            }))
             if(coverData)
-                requests.push(this.uploadContextPhoto(ContextPhotoType.cover,ContextNaturalKey.EVENT, event.id, coverData.file, coverData.crop, requestCompleter))
+                requests.push(() => ApiClient.setContextPhoto(ContextPhotoType.cover,ContextNaturalKey.EVENT, event.id, coverData.file, coverData.crop, (cropInfo, status, error) => {
+                    updatedCover = cropInfo && cropInfo.cropped
+                    updatedCoverThumbnail = cropInfo && cropInfo.thumbnail
+                    requestCompleter(cropInfo, status, error)
+            }))
             if(requests.length > 0)
                 requests[0]() // start
             else {
@@ -334,7 +356,7 @@ class EventCreateComponent extends React.Component<Props, State> {
                                             hasSubmitted={form.hasSubmitted()}
                                             ref={form.setFormRef(pageId)} 
                                             onValueChanged={form.handleValueChanged(pageId)} 
-                                            value={event.cover} 
+                                            value={event.cover_cropped} 
                                             title={translate("common.cover")} 
                                             onRequestNavigation={form.handleRequestNavigation}
                                             contextNaturalKey={ContextNaturalKey.EVENT}

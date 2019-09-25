@@ -25,6 +25,9 @@ import CommunityCreateComponent from '../../components/general/contextCreation/C
 import GroupCreateComponent from '../../components/general/contextCreation/GroupCreateComponent';
 import EventCreateComponent from '../../components/general/contextCreation/EventCreateComponent';
 import ProjectCreateComponent from '../../components/general/contextCreation/ProjectCreateComponent';
+import { CommunityManager } from '../../managers/CommunityManager';
+import { GroupManager } from '../../managers/GroupManager';
+import { EventManager } from '../../managers/EventManager';
 type OwnProps = {
     breakpoint:ResponsiveBreakpoint
 } & CommonModuleProps
@@ -109,10 +112,16 @@ class CommunityDetailsModule extends React.Component<Props, State> {
         })
     }
     handleCommunityEditFormComplete = (community:Community) => {
-        const prevCommunity = this.props.community
-        if(community && community.uri && prevCommunity.uri != community.uri)
+        if(!!community)
         {
-            window.app.navigateToRoute(community.uri)
+            const prevCommunity = this.props.community
+            CommunityManager.storeCommunities([community])
+            if(community.id == CommunityManager.getActiveCommunity().id)
+                CommunityManager.applyCommunityTheme(community)
+            if(community.uri && prevCommunity.uri != community.uri)
+            {
+                window.app.navigateToRoute(community.uri)
+            }
         }
         this.hideCommunityEditForm()
     }
@@ -129,9 +138,13 @@ class CommunityDetailsModule extends React.Component<Props, State> {
         })
     }
     handleGroupCreateForm = (group:Group) => {
-        if(group && group.uri)
+        if(!!group)
         {
-            window.app.navigateToRoute(group.uri)
+            GroupManager.storeGroups([group])
+            if(group.uri)
+            {
+                window.app.navigateToRoute(group.uri)
+            }
         }
     }
     //
@@ -147,9 +160,13 @@ class CommunityDetailsModule extends React.Component<Props, State> {
         })
     }
     handleEventCreateForm = (event:Event) => {
-        if(event && event.uri)
+        if(!!event)
         {
-            window.app.navigateToRoute(event.uri)
+            EventManager.storeEvents([event])
+            if(event.uri)
+            {
+                window.app.navigateToRoute(event.uri)
+            }
         }
     }
     //

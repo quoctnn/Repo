@@ -19,6 +19,7 @@ import { OverflowMenuItem, OverflowMenuItemType } from '../../components/general
 import FormController from '../../components/form/FormController';
 import { DropDownMenu } from '../../components/general/DropDownMenu';
 import EventCreateComponent from '../../components/general/contextCreation/EventCreateComponent';
+import { EventManager } from '../../managers/EventManager';
 const shortMonth:string[] = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 type OwnProps = {
     breakpoint:ResponsiveBreakpoint
@@ -87,9 +88,14 @@ class EventDetailsModule extends React.Component<Props, State> {
         })
     }
     handleEventCreateForm = (event:Event) => {
-        if(event && event.uri)
+
+        if(!!event)
         {
-            window.app.navigateToRoute(event.uri)
+            EventManager.storeEvents([event])
+            if(event.uri && event.uri != this.props.event.uri)
+            {
+                window.app.navigateToRoute(event.uri)
+            }
         }
         this.hideEventCreateForm()
     }
