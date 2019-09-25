@@ -1,0 +1,90 @@
+.form-location-input-component{
+    .crosshairs-container{
+        position: absolute;
+        top:0;
+        left:0;
+        right:0;
+        bottom:0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        pointer-events: none;
+        .crosshairs{
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border:2px solid blue;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            &::before{
+                content:"";
+                width:3px;
+                height: 3px;
+                border-radius: 50%;
+                background: blue;
+            }
+        }
+    }
+    .searchbar-container{
+        position: absolute;
+        top:5px;
+        right:5px;
+        display: flex;
+        z-index: 200;
+        .search_input{
+            transition: max-width 200ms;
+        }
+        .input-group{
+            justify-content: flex-end;
+        }
+        .input-group-append{
+            z-index: 200;
+        }
+        .search_icon{
+            border-radius: 50%;
+            width: 38px;
+            height: 38px;
+            display: flex;
+            justify-content: center;
+        }
+        .search_input{
+            border-radius: 19px;
+        }
+        &:not(.active){
+            .search_input{
+                padding: 0;
+                max-width: 0;
+                border:0;
+                margin-right: -19px;
+            }
+        }
+        &.active{
+            .searchbar{
+                width: 250px;
+            }
+            .search_input{
+                max-width: 250px;
+                margin-right: -38px;
+                padding-right: 38px;
+            }
+        }
+        .autocomplete-component{
+            background: white;
+            > .list{
+                max-height: 150px;
+                overflow-y: auto;
+            }
+            .cursor-list-item{
+                padding: 0.3rem;
+                cursor: pointer;
+                &.active{
+                    border-color:#A64DA9;
+                    border-width: 3px;
+                    border-style: solid;
+                    border-radius: 6px;
+                }
+            }
+        }
+    }
+}

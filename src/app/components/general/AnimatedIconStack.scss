@@ -1,0 +1,21 @@
+.animated-icon-stack{
+    text-align: center;
+    cursor: pointer;
+    .icon-active, .icon-default{
+        transition: opacity .3s, transform .3s;
+    }
+    .icon-active{
+        opacity: 0;
+    }
+    &.active{
+        .icon-active {
+            display: inline-block;
+            transform: rotate(180deg) scale(1);
+            opacity: 1;
+        }
+        .icon-default {
+            transform: rotate(180deg) scale(.5);
+            opacity: 0;
+        }
+    }
+}

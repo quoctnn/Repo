@@ -2,18 +2,11 @@ import * as React from 'react';
 import { FormComponentBase, FormComponentErrorMessage, FormComponentRequiredMessage } from '../FormController';
 import { InputGroup, Popover, PopoverBody } from 'reactstrap';
 import { translate } from '../../../localization/AutoIntlProvider';
-import { FormComponentData, FormComponentBaseProps } from '../definitions';
+import {  FormComponentBaseProps } from '../definitions';
 import { SketchPicker, ColorResult } from 'react-color';
 import "./ColorInput.scss"
 import classnames from 'classnames';
 import Popper from 'popper.js';
-export class ColorInputData extends FormComponentData implements ColorInputProps{
-    value:string
-    constructor(value:string, title:string, id:string, isRequired?:boolean){
-        super(title, id, isRequired)
-        this.value = value
-    }
-}
 export type ColorInputProps = {
     value:string
 } & FormComponentBaseProps
@@ -40,14 +33,22 @@ export class ColorInput extends React.Component<ColorInputProps, ColorInputState
     isValid = () => {
         return this.props.isRequired ? this.state.value.trim().length > 0 : true
     }
-    getError = () => {
-        if(this.props.error)
-            return this.props.error
+    getErrors = () => {
+        const performValidation = this.props.hasSubmitted  && this.props.isRequired
+        if(!performValidation)
+            return null
+        let e = this.props.errors && this.props.errors([this.props.id]) || {}
+        if(Object.keys(e).length > 0)
+            return e
         if(!this.isValid())
-            return translate("input.error.length.required")
+        {
+            e[this.props.id] = translate("input.error.length.required")
+        }
+        return e
     }
     sendValueChanged = () => {
-        this.props.onValueChanged && this.props.onValueChanged(this.props.id, this.state.value)
+        const val = this.props.value == this.state.value ? null : this.state.value
+        this.props.onValueChanged && this.props.onValueChanged(this.props.id, val, this.props.isRequired)
     }
     handleInputChange = (color: ColorResult) => {
         this.setState(() => {
@@ -104,8 +105,9 @@ export class ColorInput extends React.Component<ColorInputProps, ColorInputState
                 </Popover>
     }
     render = () => {
-        const error = this.getError()
-        const cn = classnames({"d-block":!!error})
+        const errors = this.getErrors()
+        const hasError = errors && Object.keys( errors ).length > 0
+        const cn = classnames({"d-block":hasError})
         return <div key={this.props.id} className="form-color-input">
                 <InputGroup className="form-group form-input d-block">
                     <label htmlFor={this.props.id} className="col-form-label" >
@@ -118,7 +120,7 @@ export class ColorInput extends React.Component<ColorInputProps, ColorInputState
                             </div>
                         </div>
                     </div>
-                    <FormComponentErrorMessage error={error} className={cn}/>
+                    <FormComponentErrorMessage errors={errors} errorKey={this.props.id} className={cn}/>
                 </InputGroup>
                 {this.renderPopover()}
             </div>

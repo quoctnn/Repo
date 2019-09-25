@@ -7,12 +7,14 @@ import { ContextNaturalKey, CropRect, CropInfo, ContextPhotoType } from '../../.
 import {ApiClient} from '../../../network/ApiClient';
 import LoadingSpinner from '../../LoadingSpinner';
 import { FormComponentBase, FormComponentRequiredMessage, FormComponentErrorMessage } from '../FormController';
-import { FormComponentData, FormComponentBaseProps } from '../definitions';
+import { FormComponentBaseProps } from '../definitions';
 import { translate } from '../../../localization/AutoIntlProvider';
 import { InputGroup, Input } from 'reactstrap';
 import classnames from 'classnames';
 const cropRectToArea = (crop:CropRect) => {
-    return {x:crop.top_left[0], y:crop.top_left[1], width:crop.bottom_right[0] - crop.top_left[0] , height:crop.bottom_right[1] - crop.top_left[1]}
+    if(crop && crop.bottom_right && crop.bottom_right.length == 2 &&  crop.top_left && crop.top_left.length == 2)
+        return {x:crop.top_left[0], y:crop.top_left[1], width:crop.bottom_right[0] - crop.top_left[0] , height:crop.bottom_right[1] - crop.top_left[1]}
+    return null
 }
 const createImage = (url:string) =>
   new Promise<HTMLImageElement>((resolve, reject) => {
@@ -44,17 +46,6 @@ export async function getCroppedImg(imageSrc:string, pixelCrop:Area):Promise<str
     // As Base64 string 
     return canvas.toDataURL('image/jpeg')
 }
-export class ContextPhotoInputData extends FormComponentData implements ContextPhotoInputProps{
-    value:string
-    contextNaturalKey?:ContextNaturalKey
-    contextObjectId?:number
-    constructor(value:string, title:string, id:string, contextNaturalKey?:ContextNaturalKey, contextObjectId?:number, isRequired?:boolean){
-        super(title, id, isRequired)
-        this.value = value
-        this.contextNaturalKey = contextNaturalKey
-        this.contextObjectId = contextObjectId
-    }
-}
 export type ContextPhotoInputProps = {
     value:string
     contextNaturalKey?:ContextNaturalKey
@@ -84,12 +75,15 @@ export class ContextPhotoInput extends React.Component<ContextPhotoInputProps,Co
     }
     sendValueChanged = () => {
         const data = this.getValue()
-        this.props.onValueChanged && this.props.onValueChanged(this.props.id, data)
+        this.props.onValueChanged && this.props.onValueChanged(this.props.id, data, this.props.isRequired)
     }
     handleCropCompleted = (source:string, crop:CropRect, file?:File) => {
         this.setState(() => {
             return { value:file, crop, preview:source }
-        }, this.props.onRequestNavigation)
+        }, () => {
+            this.props.onRequestNavigation()
+            this.sendValueChanged()
+        })
     }
     handleCancelCrop = () => {
         this.props.onRequestNavigation()
@@ -129,27 +123,28 @@ export class ContextPhotoInput extends React.Component<ContextPhotoInputProps,Co
         else 
             this.navigateToCropper()
     }
-    getError = () => {
-        return this.props.error  
+    getErrors = () => {
+        return this.props.errors([this.props.id])
     }
     render = () => {
         const cn = classnames("form-photo-upload-preview", this.props.id)
-        const error = this.getError()
-        const errorCn = classnames({"d-block":!!error})
+        const errors = this.getErrors()
+        const hasError = errors && Object.keys( errors ).length > 0
+        const errorCn = classnames({"d-block":hasError})
         return <div key={this.props.id} className={cn}>
                 <InputGroup className="form-group form-input d-block">
                     <label htmlFor={this.props.id} className="col-form-label" >
                         {this.props.title}
                         <FormComponentRequiredMessage required={this.props.isRequired} />
                     </label>
-                    <FormComponentErrorMessage error={error} className={errorCn}/>
+                    <FormComponentErrorMessage errors={errors} className={errorCn} errorKey={this.props.id}/>
                     <div className="">
                         <div className="image-preview-container" onClick={this.handleImagePreviewClick}>
                             {this.state.preview && <SecureImage url={this.state.preview} />}
                         </div>
                         <Button onClick={this.triggerUpload} className="file-upload-button mt-1" outline={true} color="secondary">
                             {translate("file.image.upload")}
-                            <Input innerRef={this.fileUploader}  className="d-none" id={this.props.id} type="file" onChange={this.handleInputChange} />
+                            <Input accept="image/*" innerRef={this.fileUploader}  className="d-none" id={this.props.id} type="file" onChange={this.handleInputChange} />
                         </Button>
                     </div>
                 </InputGroup>
@@ -188,7 +183,7 @@ export class FileCropper extends React.Component<FileCropperProps, FileCropperSt
         this.processInputFile()
     }
     handleFetchedServerData = (data:CropInfo) => {
-        if(data)
+        if(data && data.image)
         {
             this.setState((prevState:FileCropperState) => {
                 const area:Area = prevState.initialCroppedAreaPixels || cropRectToArea(data)
@@ -230,7 +225,9 @@ export class FileCropper extends React.Component<FileCropperProps, FileCropperSt
         }
     }
     onCropChange = (crop:Location) => {
-        this.setState({ crop })
+        this.setState(() => {
+            return { crop }
+        })
     }
     onCropComplete = (croppedArea: Area, croppedAreaPixels: Area) => {
         this.croppedAreaPixels = croppedAreaPixels

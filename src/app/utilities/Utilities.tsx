@@ -32,7 +32,7 @@ export const parseJSONObject = (param: string) => {
 export const removeEmptyEntriesFromObject = <T extends {}>(object:T):T => {
     const newObject = Object.keys(object).reduce((acc, key) => {
         const _acc = acc;
-        if (object[key] !== undefined) _acc[key] = object[key];
+        if ( !nullOrUndefined(object[key])) _acc[key] = object[key];
         return _acc;
       }, {} as T)
     return newObject
@@ -154,7 +154,7 @@ export function eventCover(event: Event, thumbnail = false) {
 }
 
 export const coordinateIsValid = (coordinate: Coordinate) => {
-    return coordinate && coordinate.lat && coordinate.lon
+    return coordinate && coordinate.lat && coordinate.long
 }
 export enum DateFormat {
     date = "L LT",

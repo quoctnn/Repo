@@ -1,10 +1,9 @@
 
-import AsyncSelect, { AsyncProps } from 'react-select/lib/Async'
 import * as React from 'react';
-import { Props as SelectProps } from 'react-select/lib/Select';
 import { uniqueId } from '../../../utilities/Utilities';
+import AsyncSelect, { AsyncProps } from 'react-select/async';
+import { Props as SelectProps } from 'react-select/async';
 type Props<T> = {
-
 } & SelectProps<T> & AsyncProps<T>
 export class AsyncSelectIW extends React.PureComponent<Props<any>, {}>{
     id = uniqueId()
@@ -20,7 +19,7 @@ export class AsyncSelectIW extends React.PureComponent<Props<any>, {}>{
         document.body.classList.remove("select-active-"+ this.id)
     }
     render(){
-        return <AsyncSelect {...this.props} 
+        return <AsyncSelect {...this.props}
         onMenuOpen={this.onMenuOpen}
         onMenuClose={this.onMenuClose}
         closeMenuOnScroll={true}

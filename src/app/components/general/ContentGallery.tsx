@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as PhotoSwipe from "photoswipe"
 import Swiper from "react-id-swiper";
-import "react-id-swiper/src/styles/css/swiper.css"
+import "react-id-swiper/lib/styles/css/swiper.css"
 import VideoPlayer from './video/VideoPlayer';
 import { UploadedFile, UploadedFileType } from '../../types/intrasocial_types';
 import { IntraSocialUtilities } from '../../utilities/IntraSocialUtilities';
@@ -291,15 +291,20 @@ export default class ContentGallery extends React.Component<Props, State> {
         const maxWidth = Math.min( targetWidth * scale , targetWidth)
         return {points:newPoints, maxWidth:maxWidth, width:targetWidth, height:targetHeight / scale }
     }
+    updateSwiper = (node: any) => {
+        if (node) {
+            this.swiper = node
+        }
+    }
     renderModal = () =>
     {
         if(!this.state.visible)
             return null
         const options:PhotoSwipe.Options = {index:this.state.index, getThumbBoundsFn:(index) => {
-            const child = (this.swiper && this.swiper.wrapperEl || this.galleryContainer && this.galleryContainer.current).children[index]
-            if(child)
+            const container = (this.swiper && this.swiper.wrapperEl || this.galleryContainer && this.galleryContainer.current)
+            if(container && container.children[index])
             {
-                const rect = child.getBoundingClientRect()
+                const rect = container.children[index].getBoundingClientRect()
                 var pageYScroll = window.pageYOffset || document.documentElement.scrollTop
                 return {x:rect.left, y:rect.top + pageYScroll, w:rect.width}
             }
@@ -348,9 +353,10 @@ export default class ContentGallery extends React.Component<Props, State> {
               el: '.swiper-pagination',
               clickable: false,
             },
-            style:{height:this.props.height}
+            style:{height:this.props.height},
+            getSwiper: this.updateSwiper
           }
-        return  (<Swiper ref={(node) => {if(node) this.swiper = node.swiper}  } {...params}>
+        return  (<Swiper {...params}>
                     {items}
                 </Swiper>)
     }

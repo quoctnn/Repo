@@ -116,7 +116,7 @@ class FilesModule extends React.Component<Props, State> {
         const isListMode = this.isListMode()
         const targetWidth = isListMode ? 100000 : 200
         const updateKey = this.state.menuData.viewMode.toString()
-        return <ResizeObserverColumnsComponent className="d-flex flex-column" updateKey={updateKey} targetColumnWidth={targetWidth}
+        return <ResizeObserverColumnsComponent className="d-flex flex-column h-100" updateKey={updateKey} targetColumnWidth={targetWidth}
                 render={(state) => {
                     const cn = classnames("files-module-list grid")
                     this.calculatedPageSize = this.getCalculatedPageSize(state.colums, state.height, isListMode ? 76 : 76 /*200*/)

@@ -3,7 +3,7 @@ import { ReduxState } from '../redux';
 import { resetProjectsAction } from '../redux/projectStore';
 import { resetEventsAction } from '../redux/eventStore';
 import ReconnectingWebSocket from "reconnecting-websocket";
-import { eventStreamNotificationPrefix, EventStreamMessageType } from '../network/ChannelEventStream';
+import { eventStreamNotificationPrefix } from '../network/ChannelEventStream';
 import { NotificationCenter } from '../utilities/NotificationCenter';
 import { ToastManager } from './ToastManager';
 import { translate } from '../localization/AutoIntlProvider';
@@ -12,8 +12,10 @@ import { resetMessageQueueAction } from '../redux/messageQueue';
 import { ApplicationManager } from './ApplicationManager';
 import { CommunityManager } from './CommunityManager';
 import { Settings } from '../utilities/Settings';
-import { setLanguageAction, availableLanguages } from '../redux/language';
-import { RequestErrorData } from '../types/intrasocial_types';
+import { setLanguageAction } from '../redux/language';
+import { RequestErrorData, AppLanguage } from '../types/intrasocial_types';
+import { SideMenuNavigationToggleMenuNotification } from '../components/navigation/SideMenuNavigation';
+import { ResponsiveBreakpoint } from '../components/general/observers/ResponsiveComponent';
 
 const url = require('url');
 const path = require("path")
@@ -32,9 +34,11 @@ export type AppWindowObject = {
     sendMessageElectron:(channel:string, msg:any) => void
     setTheme:(index:number) => void
     navigateToRoute:(route:string, modal?:boolean) => void
-    setLanguage:(index:number) => void
+    setLanguage:(language:AppLanguage) => void
     language:string
     createError:() => void
+    toggleMenu:() => void
+    breakpoint:ResponsiveBreakpoint
 }
 export abstract class WindowAppManager
 {
@@ -56,10 +60,14 @@ export abstract class WindowAppManager
             navigateToRoute:WindowAppManager.navigateToRoute,
             setLanguage:WindowAppManager.setLanguage,
             language:WindowAppManager.language,
-            createError:WindowAppManager.createError
-            
+            createError:WindowAppManager.createError,
+            toggleMenu:WindowAppManager.toggleMenu,
+            breakpoint:ResponsiveBreakpoint.micro
         }
         //
+    }
+    static toggleMenu = () => {
+        NotificationCenter.push(SideMenuNavigationToggleMenuNotification,[])
     }
     static createError = () => {
         try {
@@ -73,11 +81,11 @@ export abstract class WindowAppManager
     static setTheme = (index:number) => {
         ThemeManager.setTheme(index)
     }
-    static setLanguage = (index:number) => {
-        WindowAppManager.getStore().dispatch(setLanguageAction(index))
+    static setLanguage = (language:AppLanguage) => {
+        WindowAppManager.getStore().dispatch(setLanguageAction(language))
     }
     static get language(): string {
-        return availableLanguages[WindowAppManager.getStore().getState().language.language]
+        return WindowAppManager.getStore().getState().language.language
     }
     static sendMessageElectron = (channel:string, msg:any) => {
         if (window.isElectron) {

@@ -39,11 +39,11 @@ export type ConversationActionArgument = {conversation:number, users?:number[], 
 type IsTypingStore = {[conversation:number]:{[user:number]:NodeJS.Timer}}
 type OwnProps = {
     breakpoint:ResponsiveBreakpoint
-} & CommonModuleProps & DispatchProp
+} & CommonModuleProps
 type DefaultProps = {
     activeConversation:number
     preventShowTypingInChatId:number,
-}
+} & DispatchProp
 type State = {
     isLoading:boolean
     isTyping:IsTypingStore
@@ -68,7 +68,8 @@ class ConversationsModule extends React.Component<Props, State> {
     private observers:EventSubscription[] = []
     static defaultProps:DefaultProps = {
         activeConversation:-1,
-        preventShowTypingInChatId:-1
+        preventShowTypingInChatId:-1,
+        dispatch:null
     }
     constructor(props:Props) {
         super(props);
@@ -144,13 +145,13 @@ class ConversationsModule extends React.Component<Props, State> {
         {
             this.conversationsList.current.safeUnshift(this.props.tempConversation)
         }
-        if(!this.props.routeConversationId)
+        const bp = window.app.breakpoint
+        if(bp >= ResponsiveBreakpoint.big && !this.props.routeConversationId)
         {
             this.navigateToFirstConversation()
         }
     }
-    processIncomingConversation = (...args:any[]) =>
-    {
+    processIncomingConversation = (...args:any[]) => {
         let conversation = args[0] as Conversation
         const viewModeIsArchived = this.state.filter == ConversationFilter.archived
         const isArchived = (conversation.archived_by || []).contains(this.props.authenticatedUser.id)
@@ -378,7 +379,8 @@ class ConversationsModule extends React.Component<Props, State> {
         return items.filter(i => !i.temporary).length
     }
     onDidLoadData = (offset:number) => {
-        if(offset == 0 && this.props.activeConversation == null)
+        const bp = window.app.breakpoint
+        if(bp >= ResponsiveBreakpoint.big && offset == 0 && this.props.activeConversation == null)
         {
             this.navigateToFirstConversation()
         }
@@ -508,9 +510,5 @@ const mapStateToProps = (state:ReduxState, ownProps: OwnProps & RouteComponentPr
         tempConversation,
         routeConversationId: conversationId
     }
-}
-const mergeProps = (stateProps, dispatchProps, ownProps) =>
-{
-    return {...ownProps, ...stateProps}
 }
 export default withRouter(connect(mapStateToProps, undefined)(ConversationsModule))

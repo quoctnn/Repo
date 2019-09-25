@@ -1,0 +1,6 @@
+@import "../../../Config";
+.form-date-range-input{
+    .date-time-picker-input .input-group{
+      @include var(background-color, main-content-background);
+    }
+}

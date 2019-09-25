@@ -16,7 +16,6 @@ import LoadingSpinner from '../../components/LoadingSpinner';
 import SimpleModule from '../SimpleModule';
 import { ContextManager } from '../../managers/ContextManager';
 import { EventSorting } from './EventsMenu';
-import { ButtonGroup, Button } from 'reactstrap';
 import { CommonModuleProps } from '../Module';
 import { DropDownMenu } from '../../components/general/DropDownMenu';
 import { OverflowMenuItem, OverflowMenuItemType } from '../../components/general/OverflowMenu';

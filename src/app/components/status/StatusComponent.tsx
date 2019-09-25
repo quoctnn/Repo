@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Status, StatusActions, ObjectAttributeType, Permission, ContextNaturalKey } from '../../types/intrasocial_types';
+import { Status, StatusActions, ObjectAttributeType, Permission, ContextNaturalKey, StatusReactionUtilities, StatusReaction } from '../../types/intrasocial_types';
 import Avatar from "../general/Avatar";
 import { userAvatar, userFullName, getTextContent } from '../../utilities/Utilities';
 
@@ -20,6 +20,8 @@ import { IntraSocialLink } from "../general/IntraSocialLink";
 import { Button } from "reactstrap";
 import StackedAvatars from "../general/StackedAvatars";
 import { TimeComponent } from "../general/TimeComponent";
+import { Stats } from "webpack";
+import classNames = require("classnames");
 
 interface OwnProps
 {
@@ -32,6 +34,7 @@ interface OwnProps
     className?:string
     isComment:boolean
     innerRef?: (element:HTMLElement) => void
+    isHighlighted?:boolean
 }
 interface State
 {
@@ -139,8 +142,49 @@ export class StatusComponent extends React.Component<Props, State> {
         const badgeSettings = this.getAttributeBadgeSettings(status)
         return <StatusBadgeList setting={badgeSettings} />
     }
-    renderStatusRead = (status:Status) => {
-        return <StackedAvatars userIds={status.read_by} size={24} borderWidth={1}/>
+    toggleReadByDialog = () => {
+        alert("NOT IMPLEMENTED")
+    }
+    renderStatusReactions = (status:Status) => {
+        let avatars = false
+        return (
+            <>
+                { avatars &&
+                <div className="reactions">
+                    <div className="right">
+                        { Object.keys(status.reactions).map(k => {
+                            return (
+                                <div key={k} className="reaction-wrapper avatars">
+                                    <span className={"reaction"}>{StatusReactionUtilities.Component({reaction:k as StatusReaction, large:false, selected:false})}</span>
+                                    <StackedAvatars userIds={status.reactions[k]} size={18} borderWidth={1}/>
+                                </div>
+                            )
+                        })
+                        }
+                    </div>
+                    { status.owner.id == this.props.authorizedUserId &&
+                        <StackedAvatars showOverflowCount={false} showTotalCount={true} userIds={status.read_by} size={20} borderWidth={1}/>
+                    }
+                </div>
+                ||<div className="summary">
+                    <div className="right">
+                        { status.reaction_count > 0 &&
+                            <ReactionStats reactions={status.reactions} reactionsCount={status.reaction_count}>
+                                { Object.keys(status.reactions).map(k => {
+                                    return (
+                                        <span key={k} className={"reaction"}>{StatusReactionUtilities.Component({reaction:k as StatusReaction, large:false, selected:false})}</span>
+                                    )
+                                })
+                                }
+                            </ReactionStats>
+                        }
+                    </div>
+                    { status.owner.id == this.props.authorizedUserId &&
+                        <StackedAvatars onOverflowCountClick={this.toggleReadByDialog} showOverflowCount={false} showTotalCount={true} userIds={status.read_by} size={20} borderWidth={1}/>
+                    }
+                </div>}
+            </>
+        )
     }
     refresh = () => {
         this.setState((prevState) => {
@@ -158,14 +202,14 @@ export class StatusComponent extends React.Component<Props, State> {
             return <div ref={this.element} className={itemClass}></div>
         }
         const contextObject =  isComment || !addLinkToContext ? null : status.context_object
-        const truncateLength = this.state.readMoreActive ? 0 : Settings.statusTruncationLength
+        const truncateLength = this.state.readMoreActive || this.props.isHighlighted ? 0 : Settings.statusTruncationLength
         const content = getTextContent(status.id.toString(), status.text, true, truncateLength, Settings.statusLinebreakLimit)
         const {textContent, linkCards, hasMore} = content
         const cn = classnames("status-component", className, "lvl" + (status.level || 0) , "sid-" + status.id + "_p_" + (status.position || 0), {comment:isComment, highlight:status.highlightMode})
         const avatarSize = isComment ? 40 : 50
         const files = status.files || []
         let communityId = status.community && status.community.id ? status.community.id : null
-        const readBy = this.props.status.read_by || []
+        const readBy = status.read_by || []
         //console.log("Render Status ", status.id)
         const large = files.length > 0 || linkCards.length > 0
         const largeText = !isComment && !content.hasMore && content.length > 0 && content.length < Settings.StatusAdaptiveFontSizeLimit
@@ -178,7 +222,7 @@ export class StatusComponent extends React.Component<Props, State> {
                         </IntraSocialLink>
                     </div>
                     <div className="d-flex header-center flex-grow-1">
-                        <div className="d-flex header-center-content text-truncate">
+                        <div className="h-100 d-flex header-center-content text-truncate">
                             <div className="text-truncate flex-grow-1 d-flex flex-wrap header-center-left align-self-center">
                                 <div className="text-truncate">
                                     <IntraSocialLink to={this.props.status.owner} type={ContextNaturalKey.USER}>
@@ -202,7 +246,9 @@ export class StatusComponent extends React.Component<Props, State> {
                                         </div>
                                     </div>
                                 }
-                                {readBy.length > 0 && status.owner.id == authorizedUserId && this.renderStatusRead(status)}
+                                {(status.reaction_count > 0 || (readBy.length > 0 && status.owner.id == authorizedUserId)) &&
+                                        this.renderStatusReactions(status)
+                                }
                             </div>
                         </div>
                         {isComment && <div className={statusContentClass}>
@@ -221,8 +267,6 @@ export class StatusComponent extends React.Component<Props, State> {
                     <div className="status-footer d-flex">
                         <div className="reaction-wrapper">
                             {this.renderReactButton()}
-                            <ReactionStats reactions={this.props.status.reactions}
-                                reactionsCount={this.props.status.reaction_count}/>
                         </div>
                         {isComment &&
                             <div className="comments-reply">

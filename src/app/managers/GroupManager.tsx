@@ -3,11 +3,31 @@ import { Group } from '../types/intrasocial_types';
 import {ApiClient} from '../network/ApiClient';
 import { ReduxState } from '../redux';
 import { addGroupsAction } from '../redux/groupStore';
+import { NotificationCenter } from '../utilities/NotificationCenter';
+import { EventStreamMessageType } from '../network/ChannelEventStream';
 export abstract class GroupManager
 {
     static setup = () =>
     {
+        NotificationCenter.addObserver('eventstream_' + EventStreamMessageType.GROUP_NEW, GroupManager.processGroupNew)
+        NotificationCenter.addObserver('eventstream_' + EventStreamMessageType.GROUP_UPDATE, GroupManager.processGroupUpdate)
     }
+    static processGroupNew = (...args:any[]) => {
+        const groupId = args[0]["group_id"] as number
+        GroupManager.updateGroup(groupId)
+    }
+    static processGroupUpdate = (...args:any[]) => {
+        const groupId = args[0]["group_id"] as number
+        GroupManager.updateGroup(groupId)
+    }
+    static updateGroup = (groupId:number) => (
+        ApiClient.getGroup(groupId.toString(), (data, status, error) => {
+            if(data)
+            {
+                GroupManager.storeGroups([data])
+            }
+        })
+    )
     static storeGroups = (groups:Group[]) => {
         GroupManager.getStore().dispatch(addGroupsAction(groups))
     }

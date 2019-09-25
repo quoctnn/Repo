@@ -31,19 +31,15 @@ body.has-side-menu {
             margin-left: $sideMenuActiveWidth;
         }
     }
+    @media (max-width: 640px){
+        .dashboard-container{
+            margin-left:0;
+        }
+    }
 }
 .dashboard-container{
     #page-header + *{
         position: relative;
         /*margin-top: -30px !important;*/
-    }
-}
-body.rb-200
-{
-    #dashboard{
-        .module-grid-item{
-            min-height: 0;
-        }
-
     }
 }

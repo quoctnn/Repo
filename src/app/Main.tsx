@@ -38,7 +38,9 @@ import HTML5Backend from 'react-dnd-html5-backend'
 import FilesPage from "./components/pages/FilesPage";
 import DevToolPage from './components/pages/DevToolPage';
 import SearchComponent from "./components/navigation/SearchComponent";
-import CommunityCreateComponent from './modules/communities/CommunityCreateComponent';
+import CommunityCreateComponent from './components/general/contextCreation/CommunityCreateComponent';
+import EventCreateComponent from "./components/general/contextCreation/EventCreateComponent";
+import GroupCreateComponent from "./components/general/contextCreation/GroupCreateComponent";
 const WithSearch = () =>
     withRouter(class Modal extends React.Component<RouteComponentProps<any>, { visible: boolean, term:string, type:string }> {
         constructor(props: PathLoaderProps) {
@@ -105,14 +107,19 @@ type State = {
 type PathLoaderProps = {
 
 } & RouteComponentProps<any>
-type PathLoaderState = { loading: boolean, key:string }
-const PathLoader = (Component: any, extractKey: (path: string) => string, forceUpdate?: (path: string) => string) =>
+type PathLoaderState = { 
+    loading: boolean
+    key:string
+    name:string
+}
+const PathLoader = (Component: any, name:string, extractKey: (path: string) => string, forceUpdate?: (path: string) => string) =>
     class WithLoading extends React.Component<PathLoaderProps, PathLoaderState> {
         constructor(props: PathLoaderProps) {
             super(props)
             this.state = {
                 loading: true,
-                key:null
+                key:null,
+                name:name
             }
         }
         shouldComponentUpdate = (nextProps: PathLoaderProps, nextState: PathLoaderState) => {
@@ -160,14 +167,14 @@ const PathLoader = (Component: any, extractKey: (path: string) => string, forceU
             return loading ? this.renderLoading() : <Component key={key} {...this.props} updateKey={updateKey} />
         }
     }
-const PathLoadedProfilePage = PathLoader(ProfilePage, (path) => { return path })
-const PathLoadedCommunityPage = PathLoader(CommunityPage, (path) => { return path })
-const PathLoadedGroupPage = PathLoader(GroupPage, (path) => { return path })
-const PathLoadedProjectPage = PathLoader(ProjectPage, (path) => { return path })
-const PathLoadedEventPage = PathLoader(EventPage, (path) => { return path })
-const PathLoadedTaskPage = PathLoader(TaskPage, (path) => { return path })
-const PathLoadedConversationsPage = PathLoader(ConversationsPage, (path) => { return "/conversations/" }, (path) => path)
-const PathLoadedDashboardPage = PathLoader(DashboardPage, (path) => { return path })
+const PathLoadedProfilePage = PathLoader(ProfilePage, "ProfilePage", (path) => { return path })
+const PathLoadedCommunityPage = PathLoader(CommunityPage, "CommunityPage", (path) => { return path })
+const PathLoadedGroupPage = PathLoader(GroupPage, "GroupPage", (path) => { return path })
+const PathLoadedProjectPage = PathLoader(ProjectPage, "ProjectPage", (path) => { return path })
+const PathLoadedEventPage = PathLoader(EventPage, "EventPage", (path) => { return path })
+const PathLoadedTaskPage = PathLoader(TaskPage, "TaskPage", (path) => { return path }) 
+const PathLoadedConversationsPage = PathLoader(ConversationsPage, "ConversationsPage", (path) => { return "/conversations/" }, (path) => path)
+const PathLoadedDashboardPage = PathLoader(DashboardPage, "DashboardPage", (path) => { return path })
 const ModalChangelog = WithModal(Changelog, "Changelog")
 const ModalSearchComponent = WithSearch()
 
@@ -233,6 +240,8 @@ class Main extends React.Component<Props, State> {
                                     <Route path={Routes.CHANGELOG} component={ModalChangelog} />
                                     <PrivateRoute path={Routes.SEARCH} component={ModalSearchComponent} />
                                     <PrivateRoute path={Routes.COMMUNITY_CREATE} component={CommunityCreateComponent} />
+                                    <PrivateRoute path={Routes.EVENT_CREATE} component={EventCreateComponent} />
+                                    <PrivateRoute path={Routes.GROUP_CREATE} component={GroupCreateComponent} />
                                 </Switch>
                             </DndProvider>
                         }

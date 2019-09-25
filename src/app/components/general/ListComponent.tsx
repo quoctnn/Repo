@@ -32,6 +32,7 @@ type OwnProps<T> = {
     renderEmpty?:() => React.ReactNode
     renderError?:() => React.ReactNode
     sortItems?:(items:T[]) => T[]
+    selectedItems?:(items:number[]) => void
     reloadContext?:string
     redrawContext?:string
     /** Filter out elements that should not count for offset */
@@ -42,6 +43,7 @@ type DefaultProps = {
 
     loadMoreOnScroll?:boolean
     allowDivider?:boolean
+    isSelecting?:boolean
 
 }
 type Props<T> = OwnProps<T> & DefaultProps
@@ -49,6 +51,8 @@ type State<T> = {
     items:T[]
     isLoading: boolean
     isRefreshing: boolean
+    multiSelect: boolean
+    selected:number[]
     hasMore:boolean
     requestId:number
     hasReceivedData:boolean
@@ -61,13 +65,16 @@ export default class ListComponent<T extends IdentifiableObject> extends React.C
     private listRef = React.createRef<List>()
     static defaultProps:DefaultProps = {
         loadMoreOnScroll:true,
-        allowDivider:true
+        allowDivider:true,
+        isSelecting:false
     }
     constructor(props:Props<T>) {
         super(props);
         this.state = {
             isLoading:false,
             isRefreshing:false,
+            multiSelect:false,
+            selected:[],
             items:[],
             hasMore:true,
             requestId:0,
@@ -147,6 +154,10 @@ export default class ListComponent<T extends IdentifiableObject> extends React.C
         }), this.loadData)
     }
     componentDidUpdate = (prevProps:Props<T>, prevState:State<T>) => {
+        if (prevProps.isSelecting && !this.props.isSelecting && prevState.selected.length > 0) {
+            this.props.selectedItems(prevState.selected)
+            this.setState({selected: []})
+        }
         if(prevProps.reloadContext != this.props.reloadContext && !this.state.isLoading)
         {
             //console.log("componentDidUpdate", this.props.reloadContext)
@@ -216,7 +227,7 @@ export default class ListComponent<T extends IdentifiableObject> extends React.C
             {
                 let newData = data.results
                 let divider = this.props.allowDivider && data.divider
-                if (divider == data.count) 
+                if (divider == data.count)
                     divider = null
                 if(requestId == this.state.requestId)
                 {
@@ -262,12 +273,41 @@ export default class ListComponent<T extends IdentifiableObject> extends React.C
             return <div className="d-flex justify-content-center p-1"><Button onClick={this.handleLoadMore} size="xs">{translate("common.load.more")}</Button></div>
         return null
     }
+    isSelected = (id: number) => {
+        if (!this.props.isSelecting)
+            return false
+        return this.state.selected.contains(id)
+    }
+    selectedItem = (e: React.MouseEvent) => {
+        if (e.currentTarget) {
+            const currentId = parseInt(e.currentTarget.id)
+            if (currentId) {
+                var currentSelected = this.state.selected
+                const index = currentSelected.indexOf(currentId)
+                if (index != -1) {
+                    currentSelected.splice(index, 1)
+                    this.setState({selected: currentSelected})
+                } else {
+                    this.setState({selected: currentSelected.concat([currentId])})
+                }
+            }
+        }
+    }
+    renderSelectableItem = (id: number, item: React.ReactNode) => {
+        if(!this.props.isSelecting)
+            return item
+        const isSelected = this.isSelected(id)
+        const cn = classnames("select-box", "fa", {"fa-check-square":isSelected, "fa-square":!isSelected})
+        return <div key={id} className="selectable-item">
+            <i id={`${id}`} className={cn} onClick={this.selectedItem}></i>{item}
+        </div>
+    }
     renderItems = () => {
         const cn = classnames("list-component-list vertical-scroll", this.props.className)
         const scroll = this.props.loadMoreOnScroll ? (this.props.scrollParent ? undefined : this.onScroll) : undefined
         const listItems = this.props.sortItems ? this.props.sortItems(this.state.items) : this.state.items
         let items = listItems.map(i => {
-                            return this.props.renderItem(i)
+                            return this.renderSelectableItem(i.id, this.props.renderItem(i))
                         }).concat(this.renderLoading())
         if (this.state.dividerPosition) items.splice(this.state.dividerPosition, 0, <ListComponentDivider key="divider"/>)
         return (<List ref={this.listRef} enableAnimation={false}

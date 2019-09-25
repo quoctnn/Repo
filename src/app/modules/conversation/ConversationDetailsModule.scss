@@ -1,8 +1,8 @@
 @import "../../Config";
 .conversation-details-module{
-    height: min-content;
     .conversation-editor{
         padding: 0.5rem 0.7rem;
+        overflow-y: auto;
     }
     .avatar .user-status-indicator {
         bottom: -2px;

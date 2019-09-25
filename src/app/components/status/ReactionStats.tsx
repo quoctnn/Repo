@@ -30,10 +30,10 @@ export default class ReactionStats extends React.Component<ReactionStatsProps,Re
             (this.state.showInteractionsDialog != nextState.nextState)
     }
 
-    loadReactedUsersFromServer() 
+    loadReactedUsersFromServer()
     {
         let keys = Object.keys(this.props.reactions)
-        if (keys.length > 0) 
+        if (keys.length > 0)
         {
             let users = keys.map(k => this.props.reactions[k]).reduce((result, val) => result.concat(val),[])
             ProfileManager.ensureProfilesExists(users, () => {
@@ -64,6 +64,7 @@ export default class ReactionStats extends React.Component<ReactionStatsProps,Re
         return (
             <>
                 <button className={classes} onClick={this.handleShowReactions}>
+                    {this.props.children}
                     {this.props.reactionsCount}
                 </button>
                 {this.renderReactionsModal()}

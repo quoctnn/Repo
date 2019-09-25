@@ -46,6 +46,7 @@ ul,li{ list-style-type: none; padding: 0;}
 .push-right {
     margin-left: auto;
 }
+.modal { -webkit-overflow-scrolling: touch; }
 .modal-dialog.has-module{
     .modal-body{
         padding: 0;
@@ -292,16 +293,18 @@ button{@include var(color, primary-text-color);}
     cursor: pointer;
 }
 body.has-side-menu {
-    .page
-    {
-        margin-left: $sideMenuInactiveWidth;    
-        margin-top: 15px;
-        margin-bottom: 15px;
-    }
-    &.side-menu-locked{
+    @media (min-width: 640px){
         .page
         {
-            margin-left: $sideMenuActiveWidth;
+            margin-left: $sideMenuInactiveWidth;    
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+        &.side-menu-locked{
+            .page
+            {
+                margin-left: $sideMenuActiveWidth;
+            }
         }
     }
 }

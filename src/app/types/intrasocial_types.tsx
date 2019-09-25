@@ -5,6 +5,21 @@ import { translate } from "../localization/AutoIntlProvider";
 import { userFullName, groupCover, communityCover, userCover, projectCover, eventCover } from '../utilities/Utilities';
 import { CommunityManager } from '../managers/CommunityManager';
 import { ProjectManager } from '../managers/ProjectManager';
+export enum AppLanguage{
+    english = "en",
+    norwegian = "nb",
+    spanish = "es",
+}
+export namespace AppLanguage {
+    export const all = [
+        AppLanguage.english,
+        AppLanguage.norwegian,
+        AppLanguage.spanish,
+    ]
+    export function translationForKey(key: AppLanguage) {
+        return translate(`language.${key}`)
+    }
+}
 export type CommunityConfigurationData = {
     id:number
     members_publication:boolean
@@ -27,7 +42,8 @@ export enum CommunityCreatePermission{
     createDenied = 0,
     createLimited = 20,
     createAllowed = 21,
-}export namespace CommunityCreatePermission {
+}
+export namespace CommunityCreatePermission {
     export const all = [
         CommunityCreatePermission.createDenied,
         CommunityCreatePermission.createLimited,
@@ -141,6 +157,8 @@ export type CropRect = {
 }
 export type CropInfo = {
     image:string
+    cropped:string
+    thumbnail:string
 } & CropRect
 export type GDPRData = {
     requiredActions:OUPRequiredAction[]
@@ -193,7 +211,7 @@ export enum OUPRequiredAction{
     gdprTermsAndCondition = "GDPR_TERMS_AND_CONDITIONS",
 }
 export type RequestErrorDetail = {
-    error:string 
+    error:string
     error_description:string
     extra:GDPRData
 }
@@ -236,6 +254,19 @@ export class RequestErrorData{
         if(this.data && typeof this.data == "object")
         {
             return this.data[key]
+        }
+        return null
+    }
+    getErrorMessagesForFields = (keys:string[]) => {
+        if(this.data && typeof this.data == "object")
+        {
+            const obj:{[key:string]:string} = {}
+            keys.forEach(k => {
+                const s = this.data[k]
+                if(s)
+                    obj[k] = s
+            })
+            return obj
         }
         return null
     }
@@ -707,6 +738,30 @@ export namespace GroupSorting {
     }
 }
 //notifications
+export enum ActivitySorting {
+    recent = "recent",
+    onlyUnseen = "only_unseen",
+}
+export namespace ActivitySorting {
+    export const all = [
+        ActivitySorting.recent,
+        ActivitySorting.onlyUnseen,
+    ]
+    export function translatedText(type: ActivitySorting) {
+        switch (type) {
+            case ActivitySorting.recent: return translate("common.sorting.recent")
+            case ActivitySorting.onlyUnseen: return translate("common.sorting.unSeen")
+            default: return "N/A"
+        }
+    }
+    export function icon(type: ActivitySorting) {
+        switch (type) {
+            case ActivitySorting.recent: return "fas fa-user-clock"
+            case ActivitySorting.onlyUnseen: return "fas fa-eye-slash"
+            default: return ""
+        }
+    }
+}
 export type NotificationObject = {
     type: NotificationGroupKey
     created_at: string
@@ -842,6 +897,7 @@ export interface FileUpload {
     type: string
     error: string | null
     fileId?: number
+    id:string
 }
 
 export class Message {
@@ -857,7 +913,7 @@ export class Message {
     read_by!: number[]
     mentions!: number[]
     files?: UploadedFile[]
-    tempFile?: FileUpload
+    tempFiles?: FileUpload[]
     error?: string
 }
 export enum Permission {
@@ -955,6 +1011,7 @@ export type ElasticResultFile = {
     context_object_id: number
     status_id:number
     community:number
+    conversation:number
 } & GenericElasticResult & ElasticResultCreator
 export type ElasticResultStatus = {
     has_documents: boolean
@@ -1217,7 +1274,7 @@ export type Conversation =
     unread_messages: number[]
     temporary?: boolean
     temporary_id?:number
-    private?:boolean 
+    private?:boolean
     admins?:number[]
 
 } & Linkable & IdentifiableObject & Permissible
@@ -1242,6 +1299,12 @@ export type Community = {
     last_visited:string
     privacy: ContextPrivacy
     category:CommunityCategory
+    //
+    event_creation_permission:CommunityCreatePermission
+    group_creation_permission:CommunityCreatePermission
+    project_creation_permission:CommunityCreatePermission
+    subgroup_creation_permission:CommunityCreatePermission
+    //
 } & ICommunity & AvatarAndCover & Permissible
 
 export type SimpleUserProfile = {
@@ -1256,7 +1319,7 @@ export type ProfileConnections = {
 }
 export type UserProfile = {
     email: string | null
-    locale: string | null
+    locale: AppLanguage
     timezone: string | null
     username: string
     uuid: string | null
@@ -1296,9 +1359,19 @@ export type Favorite = {
     object: ContextObject
     object_id: number
 } & IdentifiableObject
-export type Coordinate = {
+export class Coordinate {
     lat: number
-    lon: number
+    long: number
+    static equals(a: Coordinate, b: Coordinate): boolean {
+        if((!a && b) || (a && !b))
+            return false
+        return (!a && !b) || ( a.lat == b.lat && a.long == b.long)
+    }
+    static isValid(coordinate: Coordinate): boolean {
+        if(!coordinate)
+            return false
+        return coordinate.lat > 0 && coordinate.long > 0
+    }
 }
 export type Event = {
     name: string
@@ -1545,6 +1618,7 @@ export type Module = {
     type: string
     disabled: boolean
     properties: Object
+    parent?:GridColumn
 }
 export type GridColumn = {
     id: number
@@ -1554,6 +1628,7 @@ export type GridColumn = {
     index: number
     sticky?: boolean
     tabbed_layout?: boolean
+    parent?:GridColumn
 }
 export type GridColumns = {
     id: number

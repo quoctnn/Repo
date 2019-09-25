@@ -30,6 +30,7 @@ type State = {
 type Props = OwnProps & DefaultProps
 export default class CursorList extends React.Component<Props, State> {
     component = React.createRef<HTMLDivElement>()
+    listRef = React.createRef<HTMLDivElement>()
     static defaultProps:DefaultProps = {
     }
     constructor(props:Props) {
@@ -75,7 +76,19 @@ export default class CursorList extends React.Component<Props, State> {
             cursor = maxIndex
         else if (cursor > maxIndex)
             cursor = 0
+        this.scrollToIndex(cursor)
         this.setState({cursor:cursor})
+    }
+    scrollToIndex = (index:number) => {
+        const el = this.listRef && this.listRef.current
+        if(index > -1 && el)
+        {
+            const child = el.children[index]
+            if(child)
+            {
+                child.scrollIntoView({block: "end", behavior: "smooth"})
+            }
+        }
     }
     onKeyDown = (e:KeyboardEvent) => {
         if(e.key == "ArrowDown")
@@ -151,7 +164,7 @@ export default class CursorList extends React.Component<Props, State> {
                     onMouseDown={this.onListMouseDown}
                     onMouseLeave={this.onComponentMouseLeave}
                     >
-                    {<div className="list">
+                    {<div className="list" ref={this.listRef}>
                         {this.props.items.map((item, index) => {
                             if(item.type === cursorListItemComparer.type)
                             {

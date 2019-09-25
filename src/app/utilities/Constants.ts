@@ -93,6 +93,12 @@ export default  {
         profileUrl: (id:string|number) => {
             return `/api/v2/profile/${id}/`
         },
+        profileAvatarUrl: (id:string|number) => {
+            return `/api/v2/profile/${id}/avatar/`
+        },
+        profileCoverUrl: (id:string|number) => {
+            return `/api/v2/profile/${id}/cover/`
+        },
         profilesUrl: '/api/v2/profile/',
         profilesV1Url: '/api/v1/profile/',
 
@@ -101,6 +107,9 @@ export default  {
 
         // Friends URLs
         friendsUrl: '/api/v2/friends/',
+        friendsDelete: (id:number) => {
+            return `/api/v2/friends/${id}/`
+        },
         friendInvitation: '/api/v2/friend-invitation/',
         friendInvitationDelete: (id:number) => {
             return `/api/v2/friend-invitation/${id}/`
@@ -136,10 +145,22 @@ export default  {
         groupMembershipRequestAcceptUrl: (id:number) => {
             return `/api/v2/group-memberrequest/${id}/accept/`
         },
+        groupAvatarUrl: (id:number) => {
+            return `/api/v2/group/${id}/avatar/`
+        },
+        groupCoverUrl: (id:number) => {
+            return `/api/v2/group/${id}/cover/`
+        },
         // Project URLs
         projectsUrl: '/api/v2/project/',
         projectDetailUrl: (id:number|string) => {
             return `/api/v2/project/${id}/`
+        },
+        projectAvatarUrl: (id:string|number) => {
+            return `/api/v2/project/${id}/avatar/`
+        },
+        projectCoverUrl: (id:string|number) => {
+            return `/api/v2/project/${id}/cover/`
         },
         //Task
         taskUrl: '/api/v2/task/',
@@ -187,6 +208,13 @@ export default  {
 
         // Event URLs
         upcomingEventsUrl: '/api/v2/event/upcoming/',
+
+        eventAvatarUrl: (id:number) => {
+            return `/api/v2/event/${id}/avatar/`
+        },
+        eventCoverUrl: (id:number) => {
+            return `/api/v2/event/${id}/cover/`
+        },
         eventsUrl: '/api/v2/event/',
         eventDetailUrl: (id:number|string) => {
             return `/api/v2/event/${id}/`

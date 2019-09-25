@@ -6,7 +6,7 @@ import { GroupManager } from './GroupManager';
 import { ProjectManager } from './ProjectManager';
 import { ReduxState } from '../redux';
 import { addProfilesAction } from '../redux/profileStore';
-import { userFullName } from '../utilities/Utilities';
+import { userFullName, nullOrUndefined } from '../utilities/Utilities';
 import { NotificationCenter } from '../utilities/NotificationCenter';
 import { EventStreamMessageType } from '../network/ChannelEventStream';
 import { ProfileResolver } from '../network/ProfileResolver';
@@ -53,20 +53,18 @@ export abstract class ProfileManager
         let profile = ProfileManager.getProfile(id)
         if(!profile || forceUpdate)
         {
-            if(id.isNumber())
-            {
-                ProfileResolver.resolveProfiles([parseInt(id)], (data) => {
-                    if(data)
-                    {
-                        ProfileManager.storeProfiles(data)
-                    }
-                    else
-                    {
-                        console.log("error fetching profile", profileId)
-                    }
-                    completion(data[0])
-                })
-            }
+            ProfileResolver.resolveProfiles([id], (data) => {
+                const profile = data && data[0]
+                if(profile)
+                {
+                    ProfileManager.storeProfiles([profile])
+                }
+                else
+                {
+                    console.log("error fetching profile", profileId)
+                }
+                completion(profile)
+            })
         }
         else
         {
@@ -96,7 +94,8 @@ export abstract class ProfileManager
         {
             ProfileResolver.resolveProfiles(requestIds, (data) =>
             {
-                if(data && data.length > 0)
+                const profiles = data && data.filter(p => !nullOrUndefined(p))
+                if(profiles && profiles.length > 0)
                 {
                     store.dispatch(addProfilesAction(data))
                 }

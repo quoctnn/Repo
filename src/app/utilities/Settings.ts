@@ -42,6 +42,7 @@ export interface ISettings
     GoogleClientID:string
     LinkedInClientID:string
     StatusAdaptiveFontSizeLimit:number
+    compatVersion:() => string
 }
 export const Settings:ISettings = {
     isProduction : process.env.NODE_ENV === "production",
@@ -73,5 +74,6 @@ export const Settings:ISettings = {
     FBAppId:"1011246482308121",
     GoogleClientID:"506961766547-9ocgkcnjrkg72v26licv1n6s2a6u2lh7.apps.googleusercontent.com",
     LinkedInClientID:"78xd4ygq4gvmh8",
-    StatusAdaptiveFontSizeLimit:85
+    StatusAdaptiveFontSizeLimit:85,
+    compatVersion:() => Settings.compatMajor + "." + Settings.compatMinor
 }

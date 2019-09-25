@@ -3,11 +3,31 @@ import { Event } from '../types/intrasocial_types';
 import {ApiClient} from '../network/ApiClient';
 import { ReduxState } from '../redux/index';
 import { addEventsAction, eventStore } from '../redux/eventStore';
+import { NotificationCenter } from '../utilities/NotificationCenter';
+import { EventStreamMessageType } from '../network/ChannelEventStream';
 export abstract class EventManager
 {
     static setup = () =>
     {
+        NotificationCenter.addObserver('eventstream_' + EventStreamMessageType.EVENT_NEW, EventManager.processEventNew)
+        NotificationCenter.addObserver('eventstream_' + EventStreamMessageType.EVENT_UPDATE, EventManager.processEventUpdate)
     }
+    static processEventNew = (...args:any[]) => {
+        const eventId = args[0]["event_id"] as number
+        EventManager.updateEvent(eventId)
+    }
+    static processEventUpdate = (...args:any[]) => {
+        const eventId = args[0]["event_id"] as number
+        EventManager.updateEvent(eventId)
+    }
+    static updateEvent = (eventId:number) => (
+        ApiClient.getEvent(eventId, (data, status, error) => {
+            if(data)
+            {
+                EventManager.storeEvents([data])
+            }
+        })
+    )
     static storeEvents = (events:Event[]) => {
         EventManager.getStore().dispatch(addEventsAction(events))
     }

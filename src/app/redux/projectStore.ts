@@ -1,5 +1,6 @@
 import { combineReducers } from 'redux'
 import { Project } from "../types/intrasocial_types";
+import { shallowCompareFields } from '../utilities/Utilities';
 export enum ProjectStoreActionTypes {
     AddProjects = 'projectstore.add_projects',
     Reset = 'projectstore.reset',
@@ -7,13 +8,15 @@ export enum ProjectStoreActionTypes {
 export interface AddProjectsAction{
     type:string
     projects:Project[]
+    force?:boolean
 }
 export interface ResetProjectsAction{
     type:string
 }
-export const addProjectsAction = (projects: Project[]):AddProjectsAction => ({
+export const addProjectsAction = (projects: Project[], force?:boolean):AddProjectsAction => ({
     type: ProjectStoreActionTypes.AddProjects,
-    projects
+    projects,
+    force
 })
 export const resetProjectsAction = ():ResetProjectsAction => ({
     type: ProjectStoreActionTypes.Reset,
@@ -26,13 +29,23 @@ export const resetProjectsAction = ():ResetProjectsAction => ({
     
     return []
 }
+const shouldUpdate = (oldProject:Project, newProject:Project) => {
+    if(!oldProject)
+        return true
+    const fieldsUpdated = !shallowCompareFields(["avatar", "cover", "slug"], oldProject, newProject)
+    if(fieldsUpdated)
+    {
+        return true
+    }
+    return new Date(newProject.updated_at).getTime() > new Date(oldProject.updated_at).getTime()
+}
 const addProjects = (state, action:AddProjectsAction) => {
     let projects = action.projects
     let newState = {  ...state }
     projects.forEach(c => {
         let id = c.id
         let old = state[id]
-        if(!old || new Date(c.updated_at).getTime() > new Date(old.updated_at).getTime()) // update
+        if(action.force || shouldUpdate(old, c)) // update
         {
             newState[c.id] = c
         }

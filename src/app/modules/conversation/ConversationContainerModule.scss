@@ -1,0 +1,21 @@
+.conversation-container-module{
+    background: none !important;
+    margin-bottom:0 !important;
+    .module{
+        padding: 0;
+        margin-bottom:0;
+    }
+    &:not(.single-mode){
+        .module{
+            margin-left: 15px;
+            &:first-child{
+                margin-left: 0;
+            }
+        }
+    }
+    &.single-mode{
+        .module{
+
+        }
+    }
+}

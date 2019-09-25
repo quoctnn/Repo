@@ -165,7 +165,7 @@ class ConversationDetailsModule extends React.Component<Props, State> {
         if(!canAddMembers)
             return
         return <ListItem hasAction={true} onClick={this.toggleAddMembersDialog} className="d-flex align-items-center">
-                    <div className="mr-2 d-flex align-items-center justify-content-center main-content-secondary-background" style={{width:40, height:40, borderRadius:"50%", background:"white", color:"black"}}>
+                    <div className="mr-2 d-flex align-items-center justify-content-center main-content-secondary-background flex-shrink-0" style={{width:40, height:40, borderRadius:"50%", background:"white", color:"black"}}>
                         <i style={{height:20}} className="fas fa-plus"></i>
                     </div>
                     <div className="text-truncate">{translate("conversation.add.members")}</div>
@@ -236,13 +236,13 @@ class ConversationDetailsModule extends React.Component<Props, State> {
         const title = this.state.title
         return (
             <>
-                <List enableAnimation={false} className="conversation-editor">
+                <List enableAnimation={false} className="conversation-editor scrollbar">
                     <div className="d-flex">
                         {ConversationUtilities.getAvatar(conversation, authenticatedUser.id, true)}
                         <InputGroup className="input-group-transparent">
                             <Input innerRef={this.titleRef} placeholder={translate("common.title")} tabIndex={1} className="text-truncate form-control-transparent primary-text title-text" value={title} onChange={this.onTitleChange} onBlur={this.onTitleBlur} /> 
                         </InputGroup>
-                        {!conversation.temporary && <DropDownMenu items={this.getOptionMenuItems()} triggerClass="fas fa-cog action-button push-right" />}
+                        {!conversation.temporary && <DropDownMenu boundariesElement={document.body} items={this.getOptionMenuItems()} triggerClass="fas fa-cog action-button push-right" />}
                     </div>
                     {!conversation.private && <ListHeader>{translate("conversation.members")}</ListHeader>}
                     {this.renderAddMembers()}

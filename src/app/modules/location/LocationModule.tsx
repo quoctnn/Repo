@@ -56,7 +56,8 @@ class LocationModule extends React.Component<Props, State> {
         if(!this.state.isResolvingAddress && address && address.length > 0 && !coordinateIsValid(this.props.coordinate) && this.state.resolvedAddress != address)
         {
             this.setState({isResolvingAddress:true}, () => {
-                ApiClient.forwardGeocode(address, (location, status, error) => {
+                ApiClient.forwardGeocode(address, (features, status, error) => {
+                    const location:Coordinate = features && features.length > 0 && features[0].center && {lat:features[0].center[1], long:features[0].center[0]}
                     this.setState({resolvedCoordinate:location, resolvedAddress:address, isResolvingAddress:false})
                 })
             })
@@ -84,12 +85,12 @@ class LocationModule extends React.Component<Props, State> {
                 return <div key={c} className="address">{c}</div>
             })}
             {resolvedLocation && 
-                <MapboxMapComponent zoom={[15]} interactive={false} center={[resolvedLocation.lon, resolvedLocation.lat]} style="mapbox://styles/mapbox/streets-v9">
+                <MapboxMapComponent zoom={[15]} interactive={false} center={[resolvedLocation.long, resolvedLocation.lat]} style="mapbox://styles/mapbox/streets-v9">
                 <Layer
                     type="symbol"
                     id="marker"
                     layout={mapLayout} images={mapImages} >
-                    <Feature  coordinates={[resolvedLocation.lon, resolvedLocation.lat]}/>
+                    <Feature  coordinates={[resolvedLocation.long, resolvedLocation.lat]}/>
                     </Layer>
                 </MapboxMapComponent>
             }

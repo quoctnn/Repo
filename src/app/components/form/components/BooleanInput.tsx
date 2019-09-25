@@ -1,18 +1,9 @@
 import * as React from 'react';
 import { FormComponentBase, FormComponentErrorMessage } from '../FormController';
-import { InputGroup, Input, Label, FormGroup } from 'reactstrap';
+import { Input, Label, FormGroup } from 'reactstrap';
 import { translate } from '../../../localization/AutoIntlProvider';
-import { FormComponentData, FormComponentBaseProps } from '../definitions';
+import {FormComponentBaseProps } from '../definitions';
 import "./BooleanInput.scss"
-export class BooleanInputData extends FormComponentData implements BooleanInputProps{
-    value:boolean
-    description:string
-    constructor(value:boolean, title:string, id:string, description:string){
-        super(title, id, false)
-        this.value = value
-        this.description = description
-    }
-}
 export type BooleanInputProps = {
     value:boolean
     description:string
@@ -35,14 +26,22 @@ export class BooleanInput extends React.Component<BooleanInputProps, BooleanInpu
     isValid = () => {
         return true
     }
-    getError = () => {
-        if(this.props.error)
-            return this.props.error
+    getErrors = () => {
+        const performValidation = this.props.hasSubmitted && this.props.isRequired
+        if(!performValidation)
+            return null
+        let e = this.props.errors && this.props.errors([this.props.id]) || {}
+        if(Object.keys(e).length > 0)
+            return e
         if(!this.isValid())
-            return translate("input.error.length.required")
+        {
+            e[this.props.id] = translate("input.error.length.required")
+        }
+        return e
     }
     sendValueChanged = () => {
-        this.props.onValueChanged && this.props.onValueChanged(this.props.id, this.state.value)
+        const val = this.props.value == this.state.value ? null : this.state.value
+        this.props.onValueChanged && this.props.onValueChanged(this.props.id, val, this.props.isRequired)
     }
     handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const checked = event.target.checked
@@ -51,7 +50,7 @@ export class BooleanInput extends React.Component<BooleanInputProps, BooleanInpu
         }, this.sendValueChanged)
     }
     render = () => {
-        const error = this.getError()
+        const error = this.getErrors()
         return <div key={this.props.id} className="form-boolean-input">
                 <FormGroup className="form-group form-input d-block">
                     <Label className="col-form-label d-flex" >
@@ -59,7 +58,7 @@ export class BooleanInput extends React.Component<BooleanInputProps, BooleanInpu
                         {" "}{this.props.title}
                     </Label>
                     {this.props.description && <div className="description">{this.props.description}</div>}
-                    <FormComponentErrorMessage error={error} />
+                    <FormComponentErrorMessage errors={error} errorKey={this.props.id} />
                 </FormGroup>
             </div>
     }

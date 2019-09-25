@@ -3,7 +3,7 @@ import { Settings } from '../../utilities/Settings';
 import { UploadedFile, UploadedFileType, UserProfile } from '../../types/intrasocial_types';
 import Dropzone from 'react-dropzone';
 import * as Mime from "mime-types"
-import "./FilesUpload.scss" 
+import "./FilesUpload.scss"
 import FileListItem from '../../modules/files/FileListItem';
 import ListComponent, { ListComponentHeader } from '../general/ListComponent';
 import { FileUploaderService, FileQueueObject, ExtendedFile } from './FileUploadService';
@@ -11,6 +11,8 @@ import { ReduxState } from '../../redux';
 import { connect } from 'react-redux';
 import { AuthenticationManager } from '../../managers/AuthenticationManager';
 import { translate } from '../../localization/AutoIntlProvider';
+import Swiper from "react-id-swiper";
+import classnames from 'classnames';
 
 type OwnProps = {
     onFileRemoved?:(file:UploadedFile) => void
@@ -22,10 +24,14 @@ type OwnProps = {
     communityId:number
     files?:UploadedFile[]
     className?:string
+    renderFile?:(file:UploadedFile) => JSX.Element
 }
 type DefaultProps = {
     maxFileSize:number
     acceptedFiles:string
+    showDropzoneTarget:boolean
+    showListHeader:boolean
+    horizontalLayout:boolean
 }
 type FileListItemType = UploadedFile | ExtendedFile
 type State = {
@@ -37,12 +43,16 @@ type ReduxStateProps = {
 }
 type Props = DefaultProps & OwnProps & ReduxStateProps
 
-class FilesUpload extends React.Component<Props, State> { 
+class FilesUpload extends React.Component<Props, State> {
     filesList = React.createRef<ListComponent<FileListItemType>>()
+    listComponent = React.createRef<HTMLDivElement>()
     private fileUploaderService:FileUploaderService = null
     static defaultProps:DefaultProps = {
         maxFileSize:Settings.maxFileSize,
         acceptedFiles:Settings.allowedTypesFileUpload,
+        showDropzoneTarget:true,
+        showListHeader:true,
+        horizontalLayout:false
     }
     constructor(props:Props) {
         super(props)
@@ -55,6 +65,12 @@ class FilesUpload extends React.Component<Props, State> {
           files: [],
           queueWorking:false,
         }
+    }
+    scrollToTop = () => {
+        this.listComponent && this.listComponent.current && this.listComponent.current.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        })
     }
     componentWillUnmount = () => {
         this.cleanup()
@@ -133,6 +149,8 @@ class FilesUpload extends React.Component<Props, State> {
         }
     }
     renderFile = (file:UploadedFile) =>  {
+        if(this.props.renderFile)
+            return this.props.renderFile(file)
         const rename = this.props.onFileRename && file.user == this.props.authenticatedUser.id ? this.props.onFileRename : undefined
         const handleRetry = file.custom && file.hasError ? this.handleFileRetryUpload : undefined
         return <FileListItem onRetryUpload={handleRetry} key={file.id} file={file} onRemove={this.handleRemoveFile} onRename={rename} useLink={false} />
@@ -151,7 +169,7 @@ class FilesUpload extends React.Component<Props, State> {
             thumbnail: queueObj.file.preview,
             size: queueObj.file.size,
             created_at: new Date().toUTCString(),
-            //ext  
+            //ext
             tempId:queueObj.file.tempId,
             custom: true,
             uploadProgress:queueObj.progress,
@@ -162,24 +180,39 @@ class FilesUpload extends React.Component<Props, State> {
     }
     renderFiles = () => {
         const incomingFiles = this.props.files || []
-        return <div className="list list-component-list vertical-scroll">
+        return <div ref={this.listComponent} className="list list-component-list vertical-scroll">
                     {this.state.files.map(f => this.renderFile(this.convertFile(f)))}
-                    {incomingFiles.length > 0 && 
+                    {this.props.showListHeader && incomingFiles.length > 0 &&
                         <ListComponentHeader title={translate("files.uploaded")} />
                     }
                     {incomingFiles.map(f => this.renderFile(f))}
                 </div>
     }
+    renderFilesHorizontal = () => {
+        const incomingFiles = this.props.files || []
+        const params = {
+            slidesPerView: "auto",
+            spaceBetween: 10,
+            freeMode: true,
+            shouldSwiperUpdate:true,
+          }
+        const files = incomingFiles.map(f => this.renderFile(f)).concat(
+            this.state.files.map(f => this.renderFile(this.convertFile(f)))
+        )
+        return  (<Swiper {...params}>
+                    { files }
+                </Swiper>)
+    }
     render = () => {
-        
+        const {horizontalLayout} = this.props
         return <Dropzone onDrop={this.onDrop} accept={this.props.acceptedFiles}>
                     {({getRootProps, getInputProps}) => (
-                        <div className="dropzone-container">
-                            <div {...getRootProps({className: 'dropzone primary-text-color'})}>
+                        <div className={classnames("dropzone-container", this.props.className)}>
+                            {this.props.showDropzoneTarget && <div {...getRootProps({className: 'dropzone primary-text-color'})}>
                                 <input {...getInputProps()} />
                                 <p><i className="fas fa-cloud-upload-alt"></i></p>
-                            </div>
-                            {this.renderFiles()}
+                            </div>}
+                            {horizontalLayout ? this.renderFilesHorizontal() :  this.renderFiles()}
                         </div>
                     )}
                 </Dropzone>
@@ -190,4 +223,8 @@ const mapStateToProps = (state:ReduxState, ownProps: OwnProps):ReduxStateProps =
         authenticatedUser: AuthenticationManager.getAuthenticatedUser()
     }
 }
-export default connect<ReduxStateProps, {}, OwnProps>(mapStateToProps, null)(FilesUpload);
+const mergeProps = (stateProps, dispatchProps, ownProps) =>
+{
+    return {...ownProps, ...stateProps}
+}
+export default connect(mapStateToProps, undefined, mergeProps, { forwardRef:true })(FilesUpload);

@@ -99,6 +99,7 @@ export default class FileResultItem extends React.Component<FileResultItemProps,
         const creatorLink = breadcrumbs({profile:item.user_id}, this.props.onNavigate)
         const bcContext = getBreadcrumbDataFromContext(item.context_natural_key, item.context_object_id, this.props.onNavigate)
         bcContext.community = item.community
+        bcContext.conversation = item.conversation
         bcContext.status = item.status_id
         const bc = breadcrumbs(bcContext, this.props.onNavigate)
         const hasBreadcrumbs = bc.length > 0

@@ -15,7 +15,7 @@ $gridItemHeight:70px;
     left: 0;
     bottom: 0;
     transition-timing-function: ease-in-out;
-    transition-property: width;
+    transition-property: width, transform;
     display: flex;
     flex-direction: column;
     .spacer{
@@ -152,7 +152,7 @@ $gridItemHeight:70px;
         &.active{
             .menu-block-side{
                 cursor: initial;
-                height: 100%;
+                height: auto;
             }
         }
     }
@@ -209,6 +209,12 @@ $gridItemHeight:70px;
         }
         &.locked{
 
+        }
+    }
+    @media (max-width: 640px){
+        &:not(.active)
+        {
+            transform: translate(-$sideMenuInactiveWidth, 0px);
         }
     }
 }

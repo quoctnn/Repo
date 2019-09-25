@@ -7,6 +7,7 @@ import moment = require("moment");
 import { Settings } from "../utilities/Settings";
 import { ConversationManager } from '../managers/ConversationManager';
 import { CommunityConfigurationData } from '../types/intrasocial_types';
+import { groupsById } from '../redux/groupStore';
 const $ = require("jquery")
 import { Status, UserProfile, UploadedFile, Community, Group, Conversation, Project, Message, Event, Task,
     ElasticSearchType, ObjectAttributeType, StatusObjectAttribute, EmbedCardItem, ReportTag,
@@ -43,6 +44,16 @@ export type SearchArguments = {
     from_date?:string
     to_date?:string
 }
+export type MapBoxFeature = {
+    center:[number, number]
+    place_name:string
+    type:string
+    bbox:[number, number, number, number]
+    place_type:string[]
+    properties:{[key:string]:any}
+    text:string
+    id:string
+}
 export enum ListOrdering {
     ALPHABETICALLY = "alphabetically",
     RECENT = "recent",
@@ -73,16 +84,26 @@ export abstract class ApiClient
         })
         return arr.join('&');
     }
-    static forwardGeocode(address:string, callback:ApiClientCallback<Coordinate>){
+    static forwardGeocode(address:string, callback:ApiClientCallback<MapBoxFeature[]>){
         const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(address)}.json?types=address&access_token=${Settings.mapboxAccessToken}`
-        AjaxRequest.get(url, (data:{features:[{center:number[]}]}, status, request) => {
-            let location:Coordinate = null
-            const feature = data && data.features && data.features[0]
-            if(feature && feature.center && feature.center.length == 2)
-            {
-                location = {lat:feature.center[1], lon:feature.center[0]}
-            }
-            callback(location, status, null)
+        AjaxRequest.get(url, (data:{features:MapBoxFeature[]}, status, request) => {
+            callback(data && data.features || [], status, null)
+        }, (request, status, error) => {
+            callback(null, status, new RequestErrorData(request.responseJSON, error))
+        })
+    }
+    static reverseGeocode(location:Coordinate, callback:ApiClientCallback<MapBoxFeature[]>){
+        const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(location.long + "," + location.lat)}.json?types=address&access_token=${Settings.mapboxAccessToken}`
+        AjaxRequest.get(url, (data:{features:MapBoxFeature[]}, status, request) => {
+            callback(data && data.features || [], status, null)
+        }, (request, status, error) => {
+            callback(null, status, new RequestErrorData(request.responseJSON, error))
+        })
+    }
+    static placeAutocomple(query:string, callback:ApiClientCallback<MapBoxFeature[]>){
+        const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?access_token=${Settings.mapboxAccessToken}&autocomplete=true`
+        AjaxRequest.get(url, (data:{features:MapBoxFeature[]}, status, request) => {
+            callback(data && data.features || [], status, null)
         }, (request, status, error) => {
             callback(null, status, new RequestErrorData(request.responseJSON, error))
         })
@@ -258,9 +279,12 @@ export abstract class ApiClient
         })
 
     }
-    static getRecentActivity(limit:number, offset:number, callback:ApiClientFeedPageCallback<RecentActivity>)
+    static getRecentActivity(limit:number, offset:number, onlyUnseen, callback:ApiClientFeedPageCallback<RecentActivity>)
     {
         let url = Constants.apiRoute.recentActivityUrl + "?" + this.getQueryString({limit, offset})
+        if (onlyUnseen) {
+            url += '&only_unseen=true'
+        }
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
@@ -313,7 +337,7 @@ export abstract class ApiClient
             callback(null, status, new RequestErrorData(request.responseJSON, error))
         })
     }
-    
+
     static archiveConversation(conversationId:number, callback:ApiClientCallback<any>)
     {
         let url = Constants.apiRoute.archiveConversation(conversationId)
@@ -418,7 +442,7 @@ export abstract class ApiClient
         const url = this.getContextPhotoUrl(type, contextNaturalKey, contextObjectId)
         if(!url)
         {
-            callback(null, "500", new RequestErrorData({detail:{error_description:"not supported"}}, "error"))
+            callback(null, "500", new RequestErrorData({detail:`api endpoint not set for ${contextNaturalKey} and type ${type}`}, "error"))
             return
         }
         if(file instanceof File)
@@ -437,7 +461,7 @@ export abstract class ApiClient
                 callback(data, status, error)
             })
         }
-        else 
+        else
         {
             AjaxRequest.postJSON(url, crop, (data, status, request) => {
                 callback(data, status, null)
@@ -454,6 +478,14 @@ export abstract class ApiClient
         switch (contextNaturalKey + type) {
             case ContextNaturalKey.COMMUNITY + ContextPhotoType.avatar:url = Constants.apiRoute.communityAvatarUrl(contextObjectId); break;
             case ContextNaturalKey.COMMUNITY + ContextPhotoType.cover:url = Constants.apiRoute.communityCoverUrl(contextObjectId); break;
+            case ContextNaturalKey.EVENT + ContextPhotoType.avatar:url = Constants.apiRoute.eventAvatarUrl(contextObjectId); break;
+            case ContextNaturalKey.EVENT + ContextPhotoType.cover:url = Constants.apiRoute.eventCoverUrl(contextObjectId); break;
+            case ContextNaturalKey.GROUP + ContextPhotoType.avatar:url = Constants.apiRoute.groupAvatarUrl(contextObjectId); break;
+            case ContextNaturalKey.GROUP + ContextPhotoType.cover:url = Constants.apiRoute.groupCoverUrl(contextObjectId); break;
+            case ContextNaturalKey.USER + ContextPhotoType.avatar:url = Constants.apiRoute.profileAvatarUrl(contextObjectId); break;
+            case ContextNaturalKey.USER + ContextPhotoType.cover:url = Constants.apiRoute.profileCoverUrl(contextObjectId); break;
+            case ContextNaturalKey.PROJECT + ContextPhotoType.avatar:url = Constants.apiRoute.projectAvatarUrl(contextObjectId); break;
+            case ContextNaturalKey.PROJECT + ContextPhotoType.cover:url = Constants.apiRoute.projectCoverUrl(contextObjectId); break;
             default:break;
         }
         return url
@@ -463,7 +495,7 @@ export abstract class ApiClient
         const url = this.getContextPhotoUrl(type, contextNaturalKey, contextObjectId)
         if(!url)
         {
-            callback(null, "500", new RequestErrorData({detail:{error_description:"not supported"}}, "error"))
+            callback(null, "500", new RequestErrorData({detail:`api endpoint not set for ${contextNaturalKey} and type ${type}`}, "error"))
             return
         }
         AjaxRequest.get(url, (data, status, request) => {
@@ -543,6 +575,22 @@ export abstract class ApiClient
             callback(null, status, new RequestErrorData(request.responseJSON, error))
         })
     }
+    static updateProject(projectId:number, projectData:Partial<Project>, callback:ApiClientCallback<Project>)
+    {
+        AjaxRequest.patchJSON(Constants.apiRoute.projectDetailUrl(projectId), projectData, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, new RequestErrorData(request.responseJSON, error))
+        })
+    }
+    static createProject(projectData:Partial<Project>, callback:ApiClientCallback<Project>)
+    {
+        AjaxRequest.postJSON(Constants.apiRoute.projectsUrl, projectData, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, new RequestErrorData(request.responseJSON, error))
+        })
+    }
     static getTasks(limit:number,
                     offset:number,
                     project:number,
@@ -592,7 +640,25 @@ export abstract class ApiClient
             callback(null, status, new RequestErrorData(request.responseJSON, error))
         })
     }
-    static getProfilesByIds(profiles:number[], callback:ApiClientFeedPageCallback<UserProfile>)
+    static updateEvent(eventId:string|number, data:Partial<Event>, callback:ApiClientCallback<Event>)
+    {
+        let url = Constants.apiRoute.eventDetailUrl(eventId)
+        AjaxRequest.patchJSON(url, data, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, new RequestErrorData(request.responseJSON, error))
+        })
+    }
+    static createEvent(data:Partial<Event>, callback:ApiClientCallback<Event>)
+    {
+        let url = Constants.apiRoute.eventsUrl
+        AjaxRequest.postJSON(url, data, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, new RequestErrorData(request.responseJSON, error))
+        })
+    }
+    static getProfilesByIds(profiles:(number|string)[], callback:ApiClientFeedPageCallback<UserProfile>)
     {
         let url = Constants.apiRoute.profilesUrl + "?" + this.getQueryString({limit:profiles.length, id:profiles.join(",")})
         AjaxRequest.get(url, (data, status, request) => {
@@ -634,6 +700,14 @@ export abstract class ApiClient
     static getProfile(id:string|number, callback:ApiClientCallback<UserProfile>)
     {
         AjaxRequest.get(Constants.apiRoute.profileUrl(id), (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, new RequestErrorData(request.responseJSON, error))
+        })
+    }
+    static updateProfile(profileData:Partial<UserProfile>, callback:ApiClientCallback<UserProfile>)
+    {
+        AjaxRequest.putJSON(Constants.apiRoute.myProfileUrl, profileData, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
             callback(null, status, new RequestErrorData(request.responseJSON, error))
@@ -721,6 +795,25 @@ export abstract class ApiClient
             callback(null, status, new RequestErrorData(request.responseJSON, error))
         })
     }
+
+    static updateGroup(groupId:string|number, data:Partial<Group>, callback:ApiClientCallback<Group>)
+    {
+        let url = Constants.apiRoute.groupUrl(groupId)
+        AjaxRequest.patchJSON(url, data, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, new RequestErrorData(request.responseJSON, error))
+        })
+    }
+    static createGroup(data:Partial<Group>, callback:ApiClientCallback<Group>)
+    {
+        let url = Constants.apiRoute.groupsUrl
+        AjaxRequest.postJSON(url, data, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, new RequestErrorData(request.responseJSON, error))
+        })
+    }
     static getTimesheets(community:number, user:number, project:number, task:number, limit:number, offset:number,callback:ApiClientFeedPageCallback<Timesheet>)
     {
         let url = Constants.apiRoute.timeSheetUrl + "?" + this.getQueryString({community, user, project, task, limit, offset})
@@ -770,21 +863,7 @@ export abstract class ApiClient
     }
     static createMessage(message:Message, callback:ApiClientCallback<Message>)
     {
-        if(message.tempFile && message.tempFile.file && message.tempFile.file instanceof File)
-        {
-            this.uploadFile(message, (m:Message) => {
-                if(m.tempFile && m.tempFile.error)
-                {
-                    callback(null, "Error", new RequestErrorData("Error uploading file", "error") )
-                }
-                else {
-                    this.sendMessage(m, callback)
-                }
-            })
-        }
-        else {
-            this.sendMessage(message, callback)
-        }
+        this.sendMessage(message, callback)
 
     }
     static getFavorites(callback:ApiClientFeedPageCallback<Favorite>)
@@ -829,15 +908,11 @@ export abstract class ApiClient
     }
     private static sendMessage(message:Message, callback:ApiClientCallback<Message>){
         var data = { conversation: message.conversation, text: message.text, uid: message.uid, mentions:message.mentions, files:(message.files || []).map(f => f.id) }
-        if(message.tempFile && message.tempFile.fileId)
-        {
-            data.files.push(message.tempFile.fileId)
-        }
         AjaxRequest.postJSON(Constants.apiRoute.conversationMessagesUrl, data, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
             let m = Object.assign({}, message)
-            m.tempFile = Object.assign({}, m.tempFile)
+            m.tempFiles = (m.tempFiles || []).map(f => Object.assign({}, f))
             m.error = status
             ConversationManager.updateQueuedMessage(m)
             callback(null, status, new RequestErrorData(request.responseJSON, error))
@@ -851,37 +926,13 @@ export abstract class ApiClient
             callback(null, status, new RequestErrorData(request.responseJSON, error))
         })
     }
-    private static uploadFile(message:Message, completion:(message:Message) => void){
-        let file = message.tempFile.file
+    private static uploadFile(file:File, id:string,  update:(tempFileId:string, progress:number ) => void, completion:(tempFileId:string, file?:UploadedFile) => void){
         let uploader = FileUploader.fromUploadedFile(file, (progress) => {
-            let m = Object.assign({}, message)
-            m.tempFile = Object.assign({}, m.tempFile)
-            m.tempFile.progress = progress
-            ConversationManager.updateQueuedMessage(m)
+            update(id, progress)
         })
         uploader.doUpload((response) => {
             const file = response && response.files && response.files[0]
-            let m = Object.assign({}, message)
-            if(file)
-            {
-                m.tempFile = null
-                if(m.files)
-                {
-                    m.files.push(file)
-                }
-                else
-                {
-                    m.files = [file]
-                }
-            }
-            else
-            {
-                m.tempFile = Object.assign({}, m.tempFile)
-                m.tempFile.progress = 0
-                m.tempFile.error = "error"
-            }
-            ConversationManager.updateQueuedMessage(m)
-            completion(m)
+            completion(id, file)
         })
     }
     static getConversationMessages(conversation:number, limit:number, offset:number,callback:ApiClientFeedPageCallback<Message>)
@@ -946,6 +997,22 @@ export abstract class ApiClient
     }
     static friendInvitationDelete(invitation:number, block:boolean, callback:ApiClientCallback<any>){
         let url = Constants.apiRoute.friendInvitationDelete(invitation) + "?" + this.getQueryString({block})
+        AjaxRequest.delete(url, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, new RequestErrorData(request.responseJSON, error))
+        })
+    }
+    static friendshipGetId = (userId:number, callback:ApiClientCallback<any>) => {
+        let url = Constants.apiRoute.friendsUrl + `?user_id=${userId}`
+        AjaxRequest.get(url, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, new RequestErrorData(request.responseJSON, error))
+        })
+    }
+    static userUnfriend(friendship:number, callback:ApiClientCallback<any>){
+        let url = Constants.apiRoute.friendsDelete(friendship)
         AjaxRequest.delete(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {

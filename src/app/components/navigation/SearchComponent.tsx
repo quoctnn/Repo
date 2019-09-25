@@ -7,7 +7,7 @@ import {ApiClient, ElasticResult, SearchArguments } from "../../network/ApiClien
 import Avatar from '../general/Avatar';
 import { SearchBox } from "../general/input/contextsearch/SearchBox";
 import { EditorState } from "draft-js";
-import { nullOrUndefined, truncate, userFullName, stringToDateFormat } from '../../utilities/Utilities';
+import { nullOrUndefined, truncate, userFullName, stringToDateFormat, DateFormat } from '../../utilities/Utilities';
 import { FormGroup, Label, Input, Button } from "reactstrap";
 import { translate } from "../../localization/AutoIntlProvider";
 import CursorList from "../general/input/contextsearch/CursorList";
@@ -35,9 +35,11 @@ import FileResultItem from './FileResultItem';
 import { ReduxState } from "../../redux";
 import { connect } from 'react-redux';
 import { FavoriteManager } from "../../managers/FavoriteManager";
+import CollapseComponent from "../general/CollapseComponent";
+import { AnimatedIconStack } from "../general/AnimatedIconStack";
 let timezone = moment.tz.guess()
 
-type BreadcrumbData = {community?:number, group?:number, event?:number, project?:number, task?:number, profile?:number, status?:number}
+type BreadcrumbData = {community?:number, group?:number, event?:number, project?:number, task?:number, profile?:number, status?:number, conversation?:number}
 export enum SearchSortOptions {
     relevance = "relevance",
     date = "date"
@@ -81,17 +83,18 @@ export const getTextForField = (object:GenericElasticResult, field:string, maxTe
         if(higlightValues && higlightValues.length > 0)
         {
             let highlight = higlightValues[0]
+            /*
             let start = origFieldVal.substring(0, Math.min(10, origFieldVal.length))
             let preEndPos = Math.min(10, origFieldVal.length)
             let end = origFieldVal.substring(origFieldVal.length - preEndPos)
-            if(!highlight.startsWith(start))
+            if(!highlight.startsWith(start) && !highlight.startsWith("<em>"))
             {
                 highlight = "&hellip; " + highlight
             }
-            if(!highlight.endsWith(end))
+            if(!highlight.endsWith(end) && !highlight.endsWith("</em>"))
             {
                 highlight = highlight +  " &hellip;"
-            }
+            }*/
             return highlight
         }
     }
@@ -109,13 +112,17 @@ const truncateWithBoundary = (value:string, n:number, useWordBoundary:boolean) =
         : subString) + "&hellip;";
 }
 export const breadcrumbs = (data:BreadcrumbData, onNavigate:(uri:string) => (event:React.SyntheticEvent) => void) => {
-    const {community, group, event, project, task, profile, status} = data
+    const {community, group, event, project, task, profile, status, conversation} = data
     let breadcrumbs:LinkObject[] = []
     if(community)
     {
         const communityObject = CommunityManager.getCommunityById(community)
         if(communityObject)
             breadcrumbs.push({uri:communityObject.uri, title:communityObject.name})
+    }
+    if(conversation)
+    {
+        breadcrumbs.push({uri:Routes.conversationUrl(conversation), title:translate("common.conversation.conversation")})
     }
     if(group)
     {
@@ -214,6 +221,8 @@ type State = {
     searchSortValue:SearchSortOptions
     fromDate:Moment
     toDate:Moment
+    filtersActive:boolean
+    error:string
 }
 class SearchComponent extends React.Component<Props, State> {
 
@@ -244,6 +253,8 @@ class SearchComponent extends React.Component<Props, State> {
             searchSortValue:SearchSortOptions.relevance,
             fromDate:null,
             toDate:null,
+            filtersActive:false,
+            error:null,
         }
     }
     onDidScroll = (event: React.UIEvent<any>) => {
@@ -416,7 +427,13 @@ class SearchComponent extends React.Component<Props, State> {
         }
         ApiClient.search2(this.pageSize, offset, args,(searchResult, status, error) => {
             if(!searchResult)
+            {
+                this.setState(() => {
+                    return {searchResult:null, hasMore:false, isLoading:false}
+                })
                 return
+            }
+
             this.setState((prevState) => {
                 if(requestId == prevState.requestId)
                 {
@@ -561,7 +578,7 @@ class SearchComponent extends React.Component<Props, State> {
     }
     renderSearchDateFilter = () => {
         return <div>
-                    <div className="filter-header">{translate("search.filter.date.title")}</div>
+                    <div className="filter-header my-1">{translate("search.filter.date.title")}</div>
                     <DateTimePicker
                         ref={this.fromDatimepicker}
                         onChange={this.onFromTimeChanged}
@@ -613,7 +630,7 @@ class SearchComponent extends React.Component<Props, State> {
         const description = <span dangerouslySetInnerHTML={{__html: d}}></span>
         const right = ElasticSearchType.nameForKey( item.object_type )
         const n = getTextForField(item, "name", 150)
-        const name = <span className="d-flex align-items-center">{this.renderIsFavorite(item.django_id, contextNaturalKey)}{n}</span>
+        const name = <span className="d-flex align-items-center">{this.renderIsFavorite(item.django_id, contextNaturalKey)}<span dangerouslySetInnerHTML={{__html: n}}></span></span>
         return <SearchResultItem className={item.object_type.toLowerCase()} header={name} description={description} footer={footer} left={left} right={right} />
     }
     renderGroupItem = (item:ElasticResultGroup) => {
@@ -628,7 +645,7 @@ class SearchComponent extends React.Component<Props, State> {
         const description = <span dangerouslySetInnerHTML={{__html: d}}></span>
         const right = ElasticSearchType.nameForKey( item.object_type )
         const n = getTextForField(item, "name", 150)
-        const name = <span className="d-flex align-items-center">{this.renderIsFavorite(item.django_id, contextNaturalKey)}{n}</span>
+        const name = <span className="d-flex align-items-center">{this.renderIsFavorite(item.django_id, contextNaturalKey)}<span dangerouslySetInnerHTML={{__html: n}}></span></span>
         return <SearchResultItem className={item.object_type.toLowerCase()} header={name} description={description} footer={footer} left={left} right={right} />
     }
     renderUserItem = (item:ElasticResultUser) => {
@@ -639,7 +656,7 @@ class SearchComponent extends React.Component<Props, State> {
         const description = <span dangerouslySetInnerHTML={{__html: d}}></span>
         const right = ElasticSearchType.nameForKey( item.object_type )
         const n = getTextForField(item, "user_name", 150)
-        const name = <span className="d-flex align-items-center">{this.renderIsFavorite(item.django_id, contextNaturalKey)}{n}</span>
+        const name = <span className="d-flex align-items-center">{this.renderIsFavorite(item.django_id, contextNaturalKey)}<span dangerouslySetInnerHTML={{__html: n}}></span></span>
         return <SearchResultItem className={item.object_type.toLowerCase()} header={name} description={description} left={left} right={right} />
     }
     renderProjectItem = (item:ElasticResultProject) => {
@@ -653,7 +670,7 @@ class SearchComponent extends React.Component<Props, State> {
         const description = <span dangerouslySetInnerHTML={{__html: d}}></span>
         const right = ElasticSearchType.nameForKey( item.object_type )
         const n = getTextForField(item, "name", 150)
-        const name = <span className="d-flex align-items-center">{this.renderIsFavorite(item.django_id, contextNaturalKey)}{n}</span>
+        const name = <span className="d-flex align-items-center">{this.renderIsFavorite(item.django_id, contextNaturalKey)}<span dangerouslySetInnerHTML={{__html: n}}></span></span>
         return <SearchResultItem className={item.object_type.toLowerCase()} header={name} description={description} footer={footer} left={left} right={right} />
     }
     navigateToLocation = (url:string) => (e:React.SyntheticEvent) => {
@@ -671,7 +688,7 @@ class SearchComponent extends React.Component<Props, State> {
         const description = <span dangerouslySetInnerHTML={{__html: d}}></span>
         const right = ElasticSearchType.nameForKey( item.object_type )
         const t = getTextForField(item, "title", 150)
-        const title = <span className="d-flex align-items-center">{this.renderIsFavorite(item.django_id, contextNaturalKey)}{t}</span>
+        const title = <span className="d-flex align-items-center">{this.renderIsFavorite(item.django_id, contextNaturalKey)}<span dangerouslySetInnerHTML={{__html: t}}></span></span>
         return <SearchResultItem className={item.object_type.toLowerCase()} header={title} description={description} footer={footer} left={left} right={right} />
     }
     renderEventItem = (item:ElasticResultEvent) => {
@@ -691,7 +708,7 @@ class SearchComponent extends React.Component<Props, State> {
         const description = <span dangerouslySetInnerHTML={{__html: d}}></span>
         const right = ElasticSearchType.nameForKey( item.object_type )
         const n = getTextForField(item, "name", 150)
-        const name = <span className="d-flex align-items-center">{this.renderIsFavorite(item.django_id, contextNaturalKey)}{n}</span>
+        const name = <span className="d-flex align-items-center">{this.renderIsFavorite(item.django_id, contextNaturalKey)}<span dangerouslySetInnerHTML={{__html: n}}></span></span>
         return <SearchResultItem className={item.object_type.toLowerCase()} header={name} description={description} footer={footer} left={left} right={right} />
     }
     renderStatusItem = (item:ElasticResultStatus) => {
@@ -703,7 +720,7 @@ class SearchComponent extends React.Component<Props, State> {
         const description = <span dangerouslySetInnerHTML={{__html: text}}></span>
         const right = ElasticSearchType.nameForKey( item.object_type )
         const un = getTextForField(item, "user_name", 150)
-        const user_name = <span className="d-flex align-items-center">{un}</span>
+        const user_name = <span className="d-flex align-items-center"><span dangerouslySetInnerHTML={{__html: un}}></span></span>
         return <SearchResultItem className={item.object_type.toLowerCase()} header={user_name} description={description} footer={footer} left={left} right={right} />
     }
     renderFileItem = (item:ElasticResultFile) => {
@@ -739,6 +756,24 @@ class SearchComponent extends React.Component<Props, State> {
             </div>
         )
     }
+    toggleFilters = () => {
+        this.setState((prevState:State) => {
+            return {filtersActive:!prevState.filtersActive}
+        })
+    }
+    filterSummary = () => {
+        const arr:string[] = []
+        const tf = this.state.searchTypeFilters.map(tf => ElasticSearchType.nameForKey(tf)).join(", ")
+        if(tf)
+            arr.push("type: " + tf)
+        if(this.state.fromDate)
+            arr.push("from: " + this.state.fromDate.format(DateFormat.date))
+        
+        if(this.state.toDate)
+            arr.push("to: " + this.state.fromDate.format(DateFormat.date))
+
+        return arr.join(" • ")
+    }
     renderSearchResult = () => {
 
         const isEmptySearch = this.isEmptySearchQuery()
@@ -749,6 +784,7 @@ class SearchComponent extends React.Component<Props, State> {
         const result = this.state.searchResult && this.state.searchResult.results || []
         const aggregations = this.state.searchResult && this.state.searchResult.stats && this.state.searchResult.stats.aggregations || {}
         const hasActiveContextSearchType = !!this.state.activeSearchType
+        const filterSummary = this.filterSummary()
         const items = result.map(r => {
 
             return <CursorListItem key={r.object_type + "_" + r.django_id } onSelect={() => {
@@ -806,23 +842,35 @@ class SearchComponent extends React.Component<Props, State> {
                         </div>
                         {this.renderHashtags()}
                         <CursorList items={items} />
+                        {!isLoading && items.length == 0 && <div className="empty-result">{translate("search.result.empty")}</div>}
                         {isLoading && <LoadingSpinner />}
                     </div>
                     <StickyBox className="right" offsetTop={0} offsetBottom={0}>
-                        <div className="filter-header">{translate("search.filter.types.title")}</div>
-                        {allowedSearchTypeFilters.map(tf => {
-                            const checked = this.state.searchTypeFilters.contains(tf)
-                            const aggr = aggregations[tf]
-                            const count = aggr && aggr.doc_count || -1
-                            const filterName = ElasticSearchType.nameForKey(tf)
-                            const text = count > -1 ? `${filterName}(${count})` : filterName
-                            return <FormGroup className="type-filter" key={tf} check={true}>
-                                <Label check={true}>
-                                    <Input type="checkbox" onChange={this.toggleTypeFilter(tf)} checked={checked} />{text}
-                                </Label>
-                            </FormGroup>
-                        })}
-                        {this.renderSearchDateFilter()}
+                        <div onClick={this.toggleFilters} className="filter-header my-1 d-flex">
+                            <div className="flex-grow-1">
+                                <div className="filter-title">{translate("common.filters")}</div>
+                                {filterSummary && <div className="filter-summary">{filterSummary}</div>}
+                            </div>
+                            <AnimatedIconStack iconA="fas fa-plus" iconB="fas fa-minus" active={this.state.filtersActive} />
+                        </div>
+                        <CollapseComponent removeContentOnCollapsed={false} className="filter-content-wrapper" visible={this.state.filtersActive}>
+                            <div className="filter-content scrollbar border-1">
+                                <div className="filter-header my-1">{translate("search.filter.types.title")}</div>
+                                {allowedSearchTypeFilters.map(tf => {
+                                    const checked = this.state.searchTypeFilters.contains(tf)
+                                    const aggr = aggregations[tf]
+                                    const count = aggr && aggr.doc_count || -1
+                                    const filterName = ElasticSearchType.nameForKey(tf)
+                                    const text = count > -1 ? `${filterName}(${count})` : filterName
+                                    return <FormGroup className="type-filter" key={tf} check={true}>
+                                        <Label check={true}>
+                                            <Input type="checkbox" onChange={this.toggleTypeFilter(tf)} checked={checked} />{text}
+                                        </Label>
+                                    </FormGroup>
+                                })}
+                                {this.renderSearchDateFilter()}
+                            </div>
+                        </CollapseComponent>
                     </StickyBox>
                 </div></>)
     }

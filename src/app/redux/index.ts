@@ -1,12 +1,12 @@
 import { combineReducers } from "redux";
-import { persistReducer, PersistConfig } from "redux-persist";
+import { persistReducer } from "redux-persist";
 import storage from 'redux-persist/lib/storage';
 import language from './language';
 import { theme } from "./theme";
 import endpoint from './endpoint';
 import authentication, { AuthenticationData } from "./authentication";
 import { embedlyStore } from "../components/general/embedly/redux";
-import { EmbedCardItem, Community, UserProfile, Group, Project, Event, Task, Conversation, Favorite } from '../types/intrasocial_types';
+import { EmbedCardItem, Community, UserProfile, Group, Project, Event, Task, Conversation, Favorite, AppLanguage } from '../types/intrasocial_types';
 import { communityStore } from "./communityStore";
 import { profileStore } from './profileStore';
 import {groupStore} from './groupStore';
@@ -14,18 +14,18 @@ import activeCommunity from './activeCommunity';
 import { eventStore } from './eventStore';
 import {taskStore} from './taskStore';
 import { projectStore } from "./projectStore";
-import application from "./application";
+import application, { ApplicationData } from "./application";
 import { conversationStore } from './conversationStore';
 import messageQueue, { MessageQueue } from "./messageQueue";
 import tempCache, { TempCache } from './tempCache';
 import { unreadNotifications, UnreadNotifications } from './unreadNotifications';
 import { favoriteStore } from './favoriteStore';
-const rootPersistConfig:PersistConfig = {
+const rootPersistConfig = {
     key: 'root',
     storage: storage,
-    blacklist: [    
+    blacklist: [
                     'authentication',
-                    "application", 
+                    "application",
                     "tempCache",
                     "embedlyStore",
                 ],
@@ -38,7 +38,7 @@ const rootReducer = combineReducers({
 export default persistReducer(rootPersistConfig, rootReducer)
 export interface ReduxState
 {
-    language:{language:number}
+    language:{language:AppLanguage}
     theme:{theme:number}
     endpoint: {endpoint: number}
     authentication: AuthenticationData;
@@ -52,7 +52,7 @@ export interface ReduxState
     taskStore:{ byId: { [id: number]: Task},allIds: number[]}
     favoriteStore:{ byId: { [id: number]: Favorite},allIds: number[]}
     activeCommunity:{activeCommunity:number}
-    application:{loaded:boolean}
+    application:ApplicationData
     messageQueue:MessageQueue
     tempCache:TempCache
     unreadNotifications:UnreadNotifications

@@ -136,6 +136,7 @@ type OwnProps = {
     focusEnd?:(f:() => void) => void
     forceUpdate?:string
     submitOnEnter:ConstrainBoolean
+    topChildren?:React.ReactNode
 }
 type DefaultProps = {
     showSubmitButton:boolean
@@ -195,7 +196,9 @@ export class ChatMessageComposer extends React.Component<Props,State> {
                 nextProps.content != this.props.content ||
                 nextProps.className != this.props.className ||
                 nextProps.forceUpdate != this.props.forceUpdate ||
-                nextProps.singleLine != this.props.singleLine
+                nextProps.singleLine != this.props.singleLine || 
+                nextProps.minimumTextLength != this.props.minimumTextLength || 
+                nextProps.topChildren != this.props.topChildren
         return update
     }
     componentDidUpdate = (prevProps:Props) => {
@@ -213,7 +216,7 @@ export class ChatMessageComposer extends React.Component<Props,State> {
         this.setState(() => {
             return { editorState, plainText:"" }
         })
-        this.focusEnd()
+        //this.focusEnd()
     }
     getContent = () => {
         return this.getProcessedText()
@@ -331,6 +334,7 @@ export class ChatMessageComposer extends React.Component<Props,State> {
         const cn = classnames("chat-message-composer", this.props.className, {"single-line":this.props.singleLine, "af":largeText})
         return (
             <div className={cn}>
+                {this.props.topChildren}
                 <form className="clearfix" action="." onSubmit={this.handleSubmit}>
                     <div className="input-group">
                         <div className="input-wrap"

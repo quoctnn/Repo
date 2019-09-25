@@ -100,7 +100,7 @@ class BreadcrumbNavigation extends React.Component<Props, State> {
     }
     render() {
         return (
-            <div id="breadcrumb-navigation d-flex flex-column justify-content-center ">
+            <div className="breadcrumb-navigation d-flex flex-column justify-content-center ">
                 {this.renderContent()}
             </div>
         );
