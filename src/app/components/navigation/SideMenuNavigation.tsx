@@ -438,20 +438,18 @@ class SideMenuNavigation extends React.Component<Props, State> {
                     }
                     <MenuBlock removeContentOnCollapsed={false} animationDuration={SideMenuNavigation.animationDuration} open={this.state.open} icon="fas fa-users" title={translate("Groups")}>
                         <ConnectedTopGroups onItemSelected={this.handleLinkItemSelected} mode={mode} />
-                        <Link style={{textAlign:"center", width:"100%"}} to={{pathname:Routes.SEARCH, state:{modal:true}, search:"type=" + ElasticSearchType.GROUP}} onClick={closeMenu}>{translate("common.find.more")}...</Link>
+                        <Link className="d-block text-center w-100" to={{pathname:Routes.SEARCH, state:{modal:true}, search:"type=" + ElasticSearchType.GROUP}} onClick={closeMenu}>{translate("common.find.more")}...</Link>
                     </MenuBlock>
                     { noProjects || <>
                         <div className="hbar main-border-color-background align-self-center" style={{ height: borderHeight, width: "90%" , transitionDuration: transDur}}></div>
                         <MenuBlock removeContentOnCollapsed={false} animationDuration={SideMenuNavigation.animationDuration} open={this.state.open} icon="fas fa-clipboard-list" title={translate("Projects")}>
                             <ConnectedTopProjects onItemSelected={this.handleLinkItemSelected} mode={mode} />
-                            <Link style={{textAlign:"center", width:"100%"}} to={{pathname:Routes.SEARCH, state:{modal:true}, search:"type=" + ElasticSearchType.PROJECT}} onClick={closeMenu}>{translate("common.find.more")}...</Link>
+                            <Link className="d-block text-center w-100" to={{pathname:Routes.SEARCH, state:{modal:true}, search:"type=" + ElasticSearchType.PROJECT}} onClick={closeMenu}>{translate("common.find.more")}...</Link>
                         </MenuBlock>
                     </>}
                     {isSuperUser && 
                         <MenuBlock removeContentOnCollapsed={false} animationDuration={SideMenuNavigation.animationDuration} open={this.state.open} icon="fas fa-user-shield" title={translate("Superuser")}>
-                            <Link to={{pathname:Routes.COMMUNITY_CREATE, state:{modal:true}}} onClick={closeMenu}>{translate("community.create")}</Link>
-                            <Link to={{pathname:Routes.GROUP_CREATE, state:{modal:true}}} onClick={closeMenu}>{translate("group.create")}</Link>
-                            <Link to={{pathname:Routes.EVENT_CREATE, state:{modal:true}}} onClick={closeMenu}>{translate("event.create")}</Link>
+                            <Link className="d-block w-100" to={{pathname:Routes.COMMUNITY_CREATE, state:{modal:true}}} onClick={closeMenu}>{translate("community.create")}</Link>
                         </MenuBlock>
                     }
                 </div>

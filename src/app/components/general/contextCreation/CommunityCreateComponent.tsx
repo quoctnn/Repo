@@ -467,7 +467,7 @@ class CommunityCreateComponent extends React.Component<Props, State> {
                                             hasSubmitted={form.hasSubmitted()}
                                             ref={form.setFormRef(pageId)} 
                                             onValueChanged={form.handleValueChanged(pageId)} 
-                                            value={create ? CommunityCreatePermission.createAllowed.toString() : configurationData.members_group_creation.toString()} 
+                                            value={create ? CommunityCreatePermission.createAllowed.toString() : configurationData.members_group_creation && configurationData.members_group_creation.toString()} 
                                             title={translate("community.config.title.members_group_creation")} 
                                             description={translate("community.config.description.members_group_creation")}
                                             id="members_group_creation" 
@@ -479,7 +479,7 @@ class CommunityCreateComponent extends React.Component<Props, State> {
                                             hasSubmitted={form.hasSubmitted()}
                                             ref={form.setFormRef(pageId)} 
                                             onValueChanged={form.handleValueChanged(pageId)} 
-                                            value={create ? CommunityCreatePermission.createAllowed.toString() : configurationData.subgroups.toString()} 
+                                            value={create ? CommunityCreatePermission.createAllowed.toString() : configurationData.subgroups && configurationData.subgroups.toString()} 
                                             title={translate("community.config.title.subgroups")} 
                                             description={translate("community.config.description.subgroups")}
                                             id="subgroups" 
@@ -491,7 +491,7 @@ class CommunityCreateComponent extends React.Component<Props, State> {
                                             hasSubmitted={form.hasSubmitted()}
                                             ref={form.setFormRef(pageId)} 
                                             onValueChanged={form.handleValueChanged(pageId)}
-                                            value={create ? CommunityCreatePermission.createAllowed.toString() : configurationData.members_event_creation.toString()} 
+                                            value={create ? CommunityCreatePermission.createAllowed.toString() : configurationData.members_event_creation && configurationData.members_event_creation.toString()} 
                                             title={translate("community.config.title.members_event_creation")} 
                                             description={translate("community.config.description.members_event_creation")}
                                             id="members_event_creation" 
@@ -503,7 +503,7 @@ class CommunityCreateComponent extends React.Component<Props, State> {
                                             hasSubmitted={form.hasSubmitted()}
                                             ref={form.setFormRef(pageId)} 
                                             onValueChanged={form.handleValueChanged(pageId)} 
-                                            value={create ? CommunityCreatePermission.createAllowed.toString() : configurationData.members_project_creation.toString()} 
+                                            value={create ? CommunityCreatePermission.createAllowed.toString() : configurationData.members_project_creation && configurationData.members_project_creation.toString()} 
                                             title={translate("community.config.title.members_project_creation")} 
                                             description={translate("community.config.description.members_project_creation")}
                                             id="members_project_creation" 
