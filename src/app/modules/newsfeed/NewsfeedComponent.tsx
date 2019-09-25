@@ -161,6 +161,13 @@ export class NewsfeedComponent extends React.Component<Props, State> {
     completeHighlight = () => {
         if(this.highlightRef && this.highlightRef.current && !this.state.highlightComplete)
         {
+            const highlightId = this.props.highlightStatusId
+            if(!nullOrUndefined( highlightId ))
+            {
+                const status = this.findStatusByStatusId(highlightId)
+                if(status)
+                    this.scheduleHighlightRemoval(status)
+            }
             this.setState((prevState:State) => {
                 return {highlightComplete:true}
             }, () => {
@@ -168,15 +175,11 @@ export class NewsfeedComponent extends React.Component<Props, State> {
                 if(node)
                 {
                     node.scrollIntoView({behavior: "smooth", block: "start"})
-                    setTimeout(() => {
-                        node.classList.remove("highlight")
-                    }, 1000)
                 }
             })
         }
     }
     componentDidUpdate = (prevProps:Props, prevState:State) => {
-        const newContext = this.props.contextObject != prevProps.contextObject
         if(this.props.contextNaturalKey != prevProps.contextNaturalKey ||
             this.props.contextObjectId != prevProps.contextObjectId ||
             this.props.contextObject != prevProps.contextObject ||
@@ -505,12 +508,14 @@ export class NewsfeedComponent extends React.Component<Props, State> {
             i = this.findIndexByStatusId(status.id)
         }
         const newStatus = clone ? this.getClonedStatus(status) : status
-        newStatus.highlightMode = true
         let stateItems = this.state.items
         stateItems[i] = newStatus
-        this.setState({items:stateItems}, () => {
+        const cb = newStatus.highlightMode ? () => {
             this.scheduleHighlightRemoval(newStatus)
-        })
+        } : undefined
+        this.setState(() => {
+            return {items:stateItems}
+        }, cb)
         return newStatus
     }
     handleDeleteAttribute(id:number, status:Status) {
@@ -563,6 +568,7 @@ export class NewsfeedComponent extends React.Component<Props, State> {
         clone.reactions = data.reactions
         clone.reaction_count = data.reactionsCount
         this.updateStatusItem(clone, index, false)
+        //console.log("handleReaction", clone.reactions)
         ApiClient.reactToStatus(clone.id, reaction, (data, statusCode, error) => {
             if(!this._mounted)
                 return
