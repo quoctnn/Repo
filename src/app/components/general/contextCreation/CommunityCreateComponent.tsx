@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { translate } from '../../../localization/AutoIntlProvider';
-import { Community, ContextNaturalKey, CropRect, ContextPhotoType, CropInfo, RequestErrorData, ContextPrivacy, CommunityCategory, CommunityConfigurationData, CommunityCreatePermission } from '../../../types/intrasocial_types';
+import { Community, ContextNaturalKey, CropRect, ContextPhotoType, RequestErrorData, ContextPrivacy, CommunityCategory, CommunityConfigurationData, CommunityCreatePermission } from '../../../types/intrasocial_types';
 import FormController, {  FormStatus } from '../../form/FormController';
 import {ApiClient} from '../../../network/ApiClient';
 import { removeEmptyEntriesFromObject, nullOrUndefined } from '../../../utilities/Utilities';
@@ -21,7 +21,6 @@ type OwnProps = {
     visible?:boolean
     onComplete?:(community?:Community) => void
     onCancel?:() => void
-
 }
 type State = {
     formVisible:boolean

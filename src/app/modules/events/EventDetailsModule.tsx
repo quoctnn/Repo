@@ -92,10 +92,6 @@ class EventDetailsModule extends React.Component<Props, State> {
         if(!!event)
         {
             EventManager.storeEvents([event])
-            if(event.uri && event.uri != this.props.event.uri)
-            {
-                window.app.navigateToRoute(event.uri)
-            }
         }
         this.hideEventCreateForm()
     }

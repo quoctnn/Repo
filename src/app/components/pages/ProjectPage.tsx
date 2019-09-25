@@ -8,10 +8,10 @@ import { DashboardWithData } from "../../DashboardWithData";
 import { ProjectManager } from "../../managers/ProjectManager";
 import { CommunityManager } from "../../managers/CommunityManager";
 import { Error404 } from "../../views/error/Error404";
-export interface OwnProps
-{
+import { RouteComponentProps } from "react-router-dom";
+type OwnProps = {
     match:any,
-}
+} & RouteComponentProps<any>
 interface ReduxStateProps
 {
     community:Community
@@ -35,6 +35,19 @@ class ProjectPage extends React.Component<Props, State>
     componentDidMount = () => {
         if (this.props.project)
             ProjectManager.ensureProjectExists(this.props.project.id, () => {}, true)
+    }
+    componentDidUpdate = (prevProps:Props) => {
+        const p = prevProps.project
+        const c = this.props.project
+        const pPath = prevProps.location.pathname
+        const cPath = this.props.location.pathname
+        if(p && !c && pPath == cPath)
+        {
+            const obj = ProjectManager.getProjectById(p.id)
+            if(obj && obj.uri)
+                window.app.navigateToRoute(obj.uri)
+
+        }
     }
     renderLoading = () =>
     {

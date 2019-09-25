@@ -8,10 +8,10 @@ import { DashboardWithData } from "../../DashboardWithData";
 import { CommunityManager } from "../../managers/CommunityManager";
 import { Error404 } from "../../views/error/Error404";
 import { EventManager } from "../../managers/EventManager";
-export interface OwnProps
-{
+import { RouteComponentProps } from "react-router";
+type OwnProps = {
     match:any,
-}
+} & RouteComponentProps<any>
 interface ReduxStateProps
 {
     community:Community
@@ -35,6 +35,19 @@ class EventPage extends React.Component<Props, State>
     componentDidMount = () => {
         if (this.props.event)
             EventManager.ensureEventExists(this.props.event.id, () => {}, true)
+    }
+    componentDidUpdate = (prevProps:Props) => {
+        const p = prevProps.event
+        const c = this.props.event
+        const pPath = prevProps.location.pathname
+        const cPath = this.props.location.pathname
+        if(p && !c && pPath == cPath)
+        {
+            const obj = EventManager.getEventById(p.id)
+            if(obj && obj.uri)
+                window.app.navigateToRoute(obj.uri)
+
+        }
     }
     renderLoading = () =>
     {

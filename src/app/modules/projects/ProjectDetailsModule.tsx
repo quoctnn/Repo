@@ -72,10 +72,6 @@ class ProjectDetailsModule extends React.Component<Props, State> {
         if(!!project)
         {
             ProjectManager.storeProjects([project])
-            if(project.uri && project.uri != this.props.project.uri)
-            {
-                window.app.navigateToRoute(project.uri)
-            }
         }
         this.hideProjectCreateForm()
     }

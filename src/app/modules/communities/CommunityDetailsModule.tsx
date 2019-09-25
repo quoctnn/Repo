@@ -28,6 +28,7 @@ import ProjectCreateComponent from '../../components/general/contextCreation/Pro
 import { CommunityManager } from '../../managers/CommunityManager';
 import { GroupManager } from '../../managers/GroupManager';
 import { EventManager } from '../../managers/EventManager';
+import { ProjectManager } from '../../managers/ProjectManager';
 type OwnProps = {
     breakpoint:ResponsiveBreakpoint
 } & CommonModuleProps
@@ -114,14 +115,9 @@ class CommunityDetailsModule extends React.Component<Props, State> {
     handleCommunityEditFormComplete = (community:Community) => {
         if(!!community)
         {
-            const prevCommunity = this.props.community
             CommunityManager.storeCommunities([community])
             if(community.id == CommunityManager.getActiveCommunity().id)
                 CommunityManager.applyCommunityTheme(community)
-            if(community.uri && prevCommunity.uri != community.uri)
-            {
-                window.app.navigateToRoute(community.uri)
-            }
         }
         this.hideCommunityEditForm()
     }
@@ -182,9 +178,13 @@ class CommunityDetailsModule extends React.Component<Props, State> {
         })
     }
     handleProjectCreateForm = (project:Project) => {
-        if(project && project.uri)
+        if(!!project)
         {
-            window.app.navigateToRoute(project.uri)
+            ProjectManager.storeProjects([project])
+            if(project.uri)
+            {
+                window.app.navigateToRoute(project.uri)
+            }
         }
     }
     getCommunityOptions = () => {
