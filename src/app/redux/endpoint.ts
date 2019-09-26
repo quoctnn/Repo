@@ -15,25 +15,11 @@ export interface ApiEndpoint {
 }
 export const availableEndpoints: ApiEndpoint[] = [
     {
-        endpoint: 'https://intra.work',
+        endpoint: 'https://community-dev.city.live',
         loginType: EndpointLoginType.API,
-        defaultCommunity: 127,
-        websocket: 'wss://intra.work/socket/'
+        defaultCommunity: 1,
+        websocket: 'wss://community-dev.city.live/socket/'
     }
-]
-export const allowedUsers: string[] = [
-    "godoppl@gmail.com",
-    "kimandre@intrahouse.com",
-    "andre",
-    "leslie@intrahouse.com",
-    "divya@intrahouse.com",
-    "karen@intrahouse.com",
-    "torben@intrahouse.com",
-    "irina@intrahouse.com",
-    "leon.he@outlook.com",
-    "lourdes@intrahouse.com",
-    "fernando@intrahouse.com",
-    "helen@intrahouse.com"
 ]
 const defaultEndpoint = 0
 export interface SetEndpointAction{

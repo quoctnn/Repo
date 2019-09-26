@@ -9,7 +9,7 @@ import { connect } from 'react-redux'
 import { AuthenticationManager } from '../../managers/AuthenticationManager'
 import { ToastManager } from '../../managers/ToastManager'
 import { ReduxState } from '../../redux'
-import { EndpointLoginType, allowedUsers} from '../../redux/endpoint';
+import { EndpointLoginType } from '../../redux/endpoint';
 import { EndpointManager } from '../../managers/EndpointManager'
 import "./Signin.scss"
 import { translate } from '../../localization/AutoIntlProvider';
