@@ -90,10 +90,6 @@ class GroupDetailsModule extends React.Component<Props, State> {
         if(!!group)
         {
             GroupManager.storeGroups([group])
-            if(group.uri && group.uri != this.props.group.uri)
-            {
-                window.app.navigateToRoute(group.uri)
-            }
         }
         this.hideGroupCreateForm()
     }

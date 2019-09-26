@@ -7,10 +7,10 @@ import { ReduxState } from "../../redux";
 import { DashboardWithData } from "../../DashboardWithData";
 import { Error404 } from '../../views/error/Error404';
 import { ProfileManager } from "../../managers/ProfileManager";
-export interface OwnProps
-{
+import { RouteComponentProps } from "react-router";
+type OwnProps = {
     match:any,
-}
+} & RouteComponentProps<any>
 interface ReduxStateProps
 {
     profile:UserProfile
@@ -33,6 +33,19 @@ class ProfilePage extends React.Component<Props, State>
     componentDidMount = () => {
         if (this.props.profile)
             ProfileManager.ensureProfileExists(this.props.profile.id, () => {}, true)
+    }
+    componentDidUpdate = (prevProps:Props) => {
+        const p = prevProps.profile
+        const c = this.props.profile
+        const pPath = prevProps.location.pathname
+        const cPath = this.props.location.pathname
+        if(p && !c && pPath == cPath)
+        {
+            const obj = ProfileManager.getProfileById(p.id)
+            if(obj && obj.uri)
+                window.app.navigateToRoute(obj.uri)
+
+        }
     }
     renderNotFound = () => {
         return <Error404 />
