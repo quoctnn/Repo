@@ -71,9 +71,9 @@ export const Settings:ISettings = {
     CDN:false,
     CDNHost:"cdn.intra.work",
     CDNPath:"0.5.5/0",
-    FBAppId:"",
-    GoogleClientID:"",
-    LinkedInClientID:"",
+    FBAppId:"None",
+    GoogleClientID:"None",
+    LinkedInClientID:"None",
     StatusAdaptiveFontSizeLimit:85,
     compatVersion:() => Settings.compatMajor + "." + Settings.compatMinor
 }

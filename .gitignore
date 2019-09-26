@@ -16,3 +16,5 @@ intraSocial/out/
 
 # Webpack
 webpack/webpack-stats-dev.json
+
+.directory

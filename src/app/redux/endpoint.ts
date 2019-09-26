@@ -17,7 +17,7 @@ export const availableEndpoints: ApiEndpoint[] = [
     {
         endpoint: 'https://community-dev.city.live',
         loginType: EndpointLoginType.API,
-        defaultCommunity: 1,
+        defaultCommunity: 2,
         websocket: 'wss://community-dev.city.live/socket/'
     }
 ]
