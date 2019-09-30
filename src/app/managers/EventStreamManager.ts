@@ -1,5 +1,4 @@
 import {  Store } from 'redux';
-import { AuthenticationManager } from './AuthenticationManager';
 import { NotificationCenter } from '../utilities/NotificationCenter';
 import { EventStreamMessageType, eventStreamNotificationPrefix } from '../network/ChannelEventStream';
 import { ReduxState } from '../redux/index';
