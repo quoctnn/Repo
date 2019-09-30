@@ -6,8 +6,7 @@ import { nullOrUndefined, DateFormat } from '../utilities/Utilities';
 import moment = require("moment");
 import { Settings } from "../utilities/Settings";
 import { ConversationManager } from '../managers/ConversationManager';
-import { CommunityConfigurationData, CommunityInvitation, AppLanguage } from '../types/intrasocial_types';
-import { groupsById } from '../redux/groupStore';
+import { CommunityConfigurationData, CommunityInvitation, AppLanguage, ContextInvitation, ContextSegmentKey } from '../types/intrasocial_types';
 const $ = require("jquery")
 import { Status, UserProfile, UploadedFile, Community, Group, Conversation, Project, Message, Event, Task,
     ElasticSearchType, ObjectAttributeType, StatusObjectAttribute, EmbedCardItem, ReportTag,
@@ -1089,6 +1088,71 @@ export abstract class ApiClient
             data.search_fields = searchFilters
         let url = Constants.apiRoute.communityInvitationUrl + "?" + ApiClient.getQueryString(data)
         AjaxRequest.get(url, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, new RequestErrorData(request.responseJSON, error))
+        })
+    }
+    private static getContextInvitationUrl = (contextNaturalKey:ContextNaturalKey) => {
+        let url:string = null
+        switch (contextNaturalKey) {
+            case ContextNaturalKey.EVENT :url = Constants.apiRoute.eventInvitationListUrl; break;
+            case ContextNaturalKey.GROUP :url = Constants.apiRoute.groupInvitationListUrl; break;
+            default:break;
+        }
+        return url
+    }
+    private static getContextInvitationBatchUrl = (contextNaturalKey:ContextNaturalKey) => {
+        let url:string = null
+        switch (contextNaturalKey) {
+            case ContextNaturalKey.EVENT :url = Constants.apiRoute.eventInvitationBatchUrl; break;
+            case ContextNaturalKey.GROUP :url = Constants.apiRoute.groupInvitationBatchUrl; break;
+            default:break;
+        }
+        return url
+    }
+    static deleteContextInvitations = (contextNaturalKey:ContextNaturalKey, ids:number[], callback:ApiClientCallback<{failed:{delete:number}[]}>) => {
+        let url = ApiClient.getContextInvitationBatchUrl(contextNaturalKey)
+        if(!url)
+        {
+            callback(null, "500", new RequestErrorData({detail:`delete invitation endpoint not set for ${contextNaturalKey}`}, "error"))
+            return
+        }
+        const data = ids.map(id => {return {delete:id}})
+        AjaxRequest.postJSON(url, data, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, new RequestErrorData(request.responseJSON, error))
+        })
+    }
+    static getContextInvitations = (contextNaturalKey:ContextNaturalKey, contextObjectId:number, limit:number, offset:number, search:string, callback:ApiClientFeedPageCallback<ContextInvitation>) => {
+        let url = ApiClient.getContextInvitationUrl(contextNaturalKey)
+        if(!url)
+        {
+            callback(null, "500", new RequestErrorData({detail:`invitation endpoint not set for ${contextNaturalKey}`}, "error"))
+            return
+        }
+        const key = ContextSegmentKey.keyForNaturalKey(contextNaturalKey)
+        const data = {limit, offset, search}
+        data[key] = contextObjectId
+        url = url + "?" + ApiClient.getQueryString(data)
+        AjaxRequest.get(url, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, new RequestErrorData(request.responseJSON, error))
+        })
+    }
+    static createContextInvitation = (contextNaturalKey:ContextNaturalKey, contextObjectId:number, users:number[], callback:ApiClientCallback<any>) => {
+        let url = ApiClient.getContextInvitationUrl(contextNaturalKey)
+        if(!url)
+        {
+            callback(null, "500", new RequestErrorData({detail:`invitation endpoint not set for ${contextNaturalKey}`}, "error"))
+            return
+        }
+        const key = ContextSegmentKey.keyForNaturalKey(contextNaturalKey)
+        const data = { users }
+        data[key] = contextObjectId
+        AjaxRequest.postJSON(url, data, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
             callback(null, status, new RequestErrorData(request.responseJSON, error))
