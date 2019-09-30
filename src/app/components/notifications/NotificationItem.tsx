@@ -80,8 +80,18 @@ const CommunityInvitation = (props: InvitationProps) => {
     const title = community.name
     const profile = props.invitation.invited_by
     const inviterName = userFullName(profile, null) || translate("Someone")
-    const message = <><Link onClick={props.onClose} to={profile.uri}>{inviterName}</Link> {translate("invitation.invite.join")}</>
-    return <InvitationComponent onClose={props.onClose} avatarLink={link} createdAt={props.invitation.created_at} title={title} link={link} avatar={avatar} message={message}>
+    const message = <>
+                    <Link onClick={props.onClose} to={profile.uri}>{inviterName}</Link> {translate("invitation.invite.join")}
+                    {props.invitation.message && <div>{props.invitation.message}</div>}
+                    </>
+    return <InvitationComponent 
+                onClose={props.onClose} 
+                avatarLink={link} 
+                createdAt={props.invitation.created_at} 
+                title={title} 
+                link={link} 
+                avatar={avatar} 
+                message={message}>
         <Button onClick={join} color="secondary" size="xs">{translate("invitation.join")}</Button>
         <Button outline={true} className="ml-1" onClick={dismiss} color="secondary" size="xs">{translate("invitation.dismiss")}</Button>
     </InvitationComponent>

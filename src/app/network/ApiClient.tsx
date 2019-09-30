@@ -6,7 +6,7 @@ import { nullOrUndefined, DateFormat } from '../utilities/Utilities';
 import moment = require("moment");
 import { Settings } from "../utilities/Settings";
 import { ConversationManager } from '../managers/ConversationManager';
-import { CommunityConfigurationData } from '../types/intrasocial_types';
+import { CommunityConfigurationData, CommunityInvitation, AppLanguage } from '../types/intrasocial_types';
 import { groupsById } from '../redux/groupStore';
 const $ = require("jquery")
 import { Status, UserProfile, UploadedFile, Community, Group, Conversation, Project, Message, Event, Task,
@@ -125,7 +125,7 @@ export abstract class ApiClient
         })
     }
     static getDashboards(callback:ApiClientFeedPageCallback<Dashboard>){
-        const url = Constants.apiRoute.dashboardListEndpoint + "?" + this.getQueryString({})
+        const url = Constants.apiRoute.dashboardListEndpoint + "?" + ApiClient.getQueryString({})
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
@@ -217,7 +217,7 @@ export abstract class ApiClient
         })
     }
     static getEmbedCards(urls:string[], callback:ApiClientCallback<EmbedCardItem[]>){
-        const url = Constants.apiRoute.embedlyApiEndpoint + "?" + this.getQueryString({urls})
+        const url = Constants.apiRoute.embedlyApiEndpoint + "?" + ApiClient.getQueryString({urls})
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
@@ -225,7 +225,7 @@ export abstract class ApiClient
         })
     }
     static search2( limit:number, offset:number, params:SearchArguments, callback:ApiClientCallback<ElasticResult<any>>){
-        let url = Constants.apiRoute.searchUrl + "?" + this.getQueryString({limit, offset})
+        let url = Constants.apiRoute.searchUrl + "?" + ApiClient.getQueryString({limit, offset})
         AjaxRequest.postJSON(url, params, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
@@ -235,7 +235,7 @@ export abstract class ApiClient
     static statusComments(parent:number, position:number, children:number, includeParent:boolean, callback:ApiClientCallback<StatusCommentsResult<Status>>)
     {
         const inclParent = includeParent ? true : undefined
-        let url = Constants.apiRoute.postCommentsUrl(parent) + "?" + this.getQueryString({children, indices:position, parent:inclParent })
+        let url = Constants.apiRoute.postCommentsUrl(parent) + "?" + ApiClient.getQueryString({children, indices:position, parent:inclParent })
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
@@ -253,7 +253,7 @@ export abstract class ApiClient
     }
     static newsfeedV2(limit:number,offset:number,context_natural_key:ContextNaturalKey, context_object_id:number, parent:number, children:number,attribute:ObjectAttributeType, include_sub_context:boolean = true, after:number, callback:ApiClientFeedPageCallback<Status>)
     {
-        let url = Constants.apiRoute.postUrl + "?" + this.getQueryString({limit,offset,context_natural_key	,context_object_id, parent, children, attribute, include_sub_context, after })
+        let url = Constants.apiRoute.postUrl + "?" + ApiClient.getQueryString({limit,offset,context_natural_key	,context_object_id, parent, children, attribute, include_sub_context, after })
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
@@ -262,7 +262,7 @@ export abstract class ApiClient
     }
     static newsfeed(limit:number,offset:number, parent:number|null, children:number|null, callback:ApiClientFeedPageCallback<Status>)
     {
-        let url = Constants.apiRoute.postUrl + "?" + this.getQueryString({limit,offset,parent,children})
+        let url = Constants.apiRoute.postUrl + "?" + ApiClient.getQueryString({limit,offset,parent,children})
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
@@ -281,7 +281,7 @@ export abstract class ApiClient
     }
     static getRecentActivity(limit:number, offset:number, onlyUnseen, callback:ApiClientFeedPageCallback<RecentActivity>)
     {
-        let url = Constants.apiRoute.recentActivityUrl + "?" + this.getQueryString({limit, offset})
+        let url = Constants.apiRoute.recentActivityUrl + "?" + ApiClient.getQueryString({limit, offset})
         if (onlyUnseen) {
             url += '&only_unseen=true'
         }
@@ -550,7 +550,7 @@ export abstract class ApiClient
         })
     }
     static getFiles(context_natural_key:ContextNaturalKey, context_object_id:number, limit:number, offset:number, callback:ApiClientFeedPageCallback<UploadedFile>){
-        let url = Constants.apiRoute.fileUploadUrl + "?" + this.getQueryString({context_natural_key,context_object_id, limit, offset})
+        let url = Constants.apiRoute.fileUploadUrl + "?" + ApiClient.getQueryString({context_natural_key,context_object_id, limit, offset})
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
@@ -559,7 +559,7 @@ export abstract class ApiClient
     }
     static getCommunityFiles(communityId:string|number, limit:number, offset:number, callback:ApiClientFeedPageCallback<UploadedFile>)
     {
-        let url = Constants.apiRoute.communityFilesUrl(communityId) + "?" + this.getQueryString({limit, offset})
+        let url = Constants.apiRoute.communityFilesUrl(communityId) + "?" + ApiClient.getQueryString({limit, offset})
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
@@ -604,7 +604,7 @@ export abstract class ApiClient
                     category:string,
                     term:string,
                     callback:ApiClientFeedPageCallback<Task>){
-        let url = Constants.apiRoute.taskUrl + "?" + this.getQueryString({limit,
+        let url = Constants.apiRoute.taskUrl + "?" + ApiClient.getQueryString({limit,
                                                                         offset,
                                                                         project,
                                                                         state,
@@ -660,7 +660,7 @@ export abstract class ApiClient
     }
     static getProfilesByIds(profiles:(number|string)[], callback:ApiClientFeedPageCallback<UserProfile>)
     {
-        let url = Constants.apiRoute.profilesUrl + "?" + this.getQueryString({limit:profiles.length, id:profiles.join(",")})
+        let url = Constants.apiRoute.profilesUrl + "?" + ApiClient.getQueryString({limit:profiles.length, id:profiles.join(",")})
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
@@ -669,7 +669,7 @@ export abstract class ApiClient
     }
     static getProfiles(limit:number, offset:number, callback:ApiClientFeedPageCallback<UserProfile>)
     {
-        let url = Constants.apiRoute.profilesUrl + "?" + this.getQueryString({limit, offset})
+        let url = Constants.apiRoute.profilesUrl + "?" + ApiClient.getQueryString({limit, offset})
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
@@ -715,7 +715,7 @@ export abstract class ApiClient
     }
     static getProfilesBySlug(slug:string, callback:ApiClientFeedPageCallback<UserProfile>)
     {
-        const url = Constants.apiRoute.profilesUrl + "?" + this.getQueryString({slug_name:encodeURIComponent( slug )})
+        const url = Constants.apiRoute.profilesUrl + "?" + ApiClient.getQueryString({slug_name:encodeURIComponent( slug )})
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
@@ -732,7 +732,7 @@ export abstract class ApiClient
     }
     static getGDPRForm(preferredLanguage:string, callback:ApiClientCallback<GDPRInfo>)
     {
-        let url = Constants.apiRoute.gdprForm + "?" + this.getQueryString({preferred_language:preferredLanguage})
+        let url = Constants.apiRoute.gdprForm + "?" + ApiClient.getQueryString({preferred_language:preferredLanguage})
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
@@ -741,7 +741,7 @@ export abstract class ApiClient
     }
     static apiLogin(email:string, password:string, update_gdpr_continuation_key:string, gdpr_user_response:GDPRFormAnswers,callback:ApiClientCallback<{token:string}>)
     {
-        const data = this.getQueryString({username:email,password,update_gdpr_continuation_key, gdpr_user_response:gdpr_user_response && JSON.stringify(gdpr_user_response)})
+        const data = ApiClient.getQueryString({username:email,password,update_gdpr_continuation_key, gdpr_user_response:gdpr_user_response && JSON.stringify(gdpr_user_response)})
         AjaxRequest.post(Constants.apiRoute.login,data, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
@@ -750,7 +750,7 @@ export abstract class ApiClient
     }
     static apiSocialLogin(provider:string, accessToken:string, code:string, id_token:string, update_gdpr_continuation_key:string, gdpr_user_response:GDPRFormAnswers, callback:ApiClientCallback<{token:string}>)
     {
-        const data = this.getQueryString({provider,access_token:accessToken,code,id_token, update_gdpr_continuation_key, gdpr_user_response:gdpr_user_response && JSON.stringify(gdpr_user_response)})
+        const data = ApiClient.getQueryString({provider,access_token:accessToken,code,id_token, update_gdpr_continuation_key, gdpr_user_response:gdpr_user_response && JSON.stringify(gdpr_user_response)})
         AjaxRequest.post(Constants.apiRoute.socialLogin, data, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
@@ -759,7 +759,7 @@ export abstract class ApiClient
     }
     static nativeLogin(email:string, password:string, update_gdpr_continuation_key:string, gdpr_user_response:GDPRFormAnswers, callback:ApiClientCallback<{token:string}>)
     {
-        const data = this.getQueryString({username:email,password,update_gdpr_continuation_key, gdpr_user_response:gdpr_user_response && JSON.stringify(gdpr_user_response)})
+        const data = ApiClient.getQueryString({username:email,password,update_gdpr_continuation_key, gdpr_user_response:gdpr_user_response && JSON.stringify(gdpr_user_response)})
         AjaxRequest.post(Constants.apiRoute.nativeLogin, data, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
@@ -768,7 +768,7 @@ export abstract class ApiClient
     }
     static getCommunities(is_member:boolean, ordering:ListOrdering, limit:number, offset:number,callback:ApiClientFeedPageCallback<Community>)
     {
-        let url = Constants.apiRoute.communityList + "?" + this.getQueryString({is_member:(is_member ? "True":"False"), limit, offset, ordering})
+        let url = Constants.apiRoute.communityList + "?" + ApiClient.getQueryString({is_member:(is_member ? "True":"False"), limit, offset, ordering})
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
@@ -778,7 +778,7 @@ export abstract class ApiClient
     static getGroups(community:number, parent:number, limit:number, offset:number, ordering:GroupSorting, callback:ApiClientFeedPageCallback<Group>)
     {
         const subgroups = parent ? true : false
-        let url = Constants.apiRoute.groupsUrl + "?" + this.getQueryString({community, parent, subgroups, limit, offset, ordering})
+        let url = Constants.apiRoute.groupsUrl + "?" + ApiClient.getQueryString({community, parent, subgroups, limit, offset, ordering})
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
@@ -816,7 +816,7 @@ export abstract class ApiClient
     }
     static getTimesheets(community:number, user:number, project:number, task:number, limit:number, offset:number,callback:ApiClientFeedPageCallback<Timesheet>)
     {
-        let url = Constants.apiRoute.timeSheetUrl + "?" + this.getQueryString({community, user, project, task, limit, offset})
+        let url = Constants.apiRoute.timeSheetUrl + "?" + ApiClient.getQueryString({community, user, project, task, limit, offset})
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
@@ -827,7 +827,7 @@ export abstract class ApiClient
     {
         let start_date = upcoming ? "&start_after=" : "&start_before="
         let sessions = parent ? true : false
-        let url = Constants.apiRoute.eventsUrl + "?" + this.getQueryString({community, limit, offset, ordering, parent, sessions, group}) + start_date + moment().format("YYYY-MM-DD")
+        let url = Constants.apiRoute.eventsUrl + "?" + ApiClient.getQueryString({community, limit, offset, ordering, parent, sessions, group}) + start_date + moment().format("YYYY-MM-DD")
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
@@ -836,7 +836,7 @@ export abstract class ApiClient
     }
     static getProjects(community:number, group:number, limit:number, offset:number, ordering:ProjectSorting, responsible:boolean, assigned:boolean, callback:ApiClientFeedPageCallback<Project>)
     {
-        let url = Constants.apiRoute.projectsUrl + "?" + this.getQueryString({community, group, limit, offset, ordering, responsible, assigned})
+        let url = Constants.apiRoute.projectsUrl + "?" + ApiClient.getQueryString({community, group, limit, offset, ordering, responsible, assigned})
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
@@ -845,7 +845,7 @@ export abstract class ApiClient
     }
     static getConversations(limit:number, offset:number, archived:boolean, withUsers:number[], callback:ApiClientFeedPageCallback<Conversation>)
     {
-        let url = Constants.apiRoute.conversations + "?" + this.getQueryString({limit, offset, archived, with_users:withUsers && withUsers.join(",")})
+        let url = Constants.apiRoute.conversations + "?" + ApiClient.getQueryString({limit, offset, archived, with_users:withUsers && withUsers.join(",")})
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
@@ -868,7 +868,7 @@ export abstract class ApiClient
     }
     static getFavorites(callback:ApiClientFeedPageCallback<Favorite>)
     {
-        let url = Constants.apiRoute.favoritesUrl + "?" + this.getQueryString({limit:100})
+        let url = Constants.apiRoute.favoritesUrl + "?" + ApiClient.getQueryString({limit:100})
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
@@ -937,7 +937,7 @@ export abstract class ApiClient
     }
     static getConversationMessages(conversation:number, limit:number, offset:number,callback:ApiClientFeedPageCallback<Message>)
     {
-        let url = Constants.apiRoute.conversationMessagesUrl +  "?" + this.getQueryString({limit, offset, conversation})
+        let url = Constants.apiRoute.conversationMessagesUrl +  "?" + ApiClient.getQueryString({limit, offset, conversation})
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
@@ -964,7 +964,7 @@ export abstract class ApiClient
     }
     static getPage<T>(endpoint:string, limit:number, offset:number,callback:ApiClientFeedPageCallback<T>)
     {
-        let url = endpoint + "?" + this.getQueryString({ limit, offset})
+        let url = endpoint + "?" + ApiClient.getQueryString({ limit, offset})
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
@@ -996,7 +996,7 @@ export abstract class ApiClient
         })
     }
     static friendInvitationDelete(invitation:number, block:boolean, callback:ApiClientCallback<any>){
-        let url = Constants.apiRoute.friendInvitationDelete(invitation) + "?" + this.getQueryString({block})
+        let url = Constants.apiRoute.friendInvitationDelete(invitation) + "?" + ApiClient.getQueryString({block})
         AjaxRequest.delete(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
@@ -1071,6 +1071,42 @@ export abstract class ApiClient
     static groupMembershipRequestDelete(id:number, callback:ApiClientCallback<any>){
         let url = Constants.apiRoute.groupMembershipRequestDeleteUrl(id)
         AjaxRequest.delete(url, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, new RequestErrorData(request.responseJSON, error))
+        })
+    }
+    static getCommunityInvitations = (limit:number, offset:number, community:number, search:string, email:boolean, user:boolean, search_email:boolean, search_user:boolean, search_from_user:boolean,  callback:ApiClientFeedPageCallback<CommunityInvitation>) => {
+        const data = {community, limit, offset, email, user, search, search_fields:undefined}
+        const searchFilters:string[] = []
+        if(search_email)
+            searchFilters.push("email")
+        if(search_user)
+            searchFilters.push("user")
+        if(search_from_user)
+            searchFilters.push("from_user")
+        if(searchFilters.length > 0)
+            data.search_fields = searchFilters
+        let url = Constants.apiRoute.communityInvitationUrl + "?" + ApiClient.getQueryString(data)
+        AjaxRequest.get(url, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, new RequestErrorData(request.responseJSON, error))
+        })
+    }
+    static deleteCommunityInvitations = (ids:number[], callback:ApiClientCallback<{failed:{delete:number}[]}>) => {
+        let url = Constants.apiRoute.communityInvitationBatchUrl
+        const data = ids.map(id => {return {delete:id}})
+        AjaxRequest.postJSON(url, data, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, new RequestErrorData(request.responseJSON, error))
+        })
+    }
+    static createCommunityInvitation = (community:number, message:string, language:AppLanguage, email:string[], users:number[], callback:ApiClientCallback<any>) => {
+        let url = Constants.apiRoute.communityInvitationUrl
+        const data = {community, message, language, email, users}
+        AjaxRequest.postJSON(url, data, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
             callback(null, status, new RequestErrorData(request.responseJSON, error))
@@ -1157,7 +1193,7 @@ export abstract class ApiClient
         })
     }
     static getLanguages(limit:number, offset:number, user:number, callback:ApiClientFeedPageCallback<ProfileLanguage>){
-        let url = Constants.apiRoute.languageUrl + "?" + this.getQueryString({limit, offset, user})
+        let url = Constants.apiRoute.languageUrl + "?" + ApiClient.getQueryString({limit, offset, user})
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
@@ -1165,7 +1201,7 @@ export abstract class ApiClient
         })
     }
     static getCertifications(limit:number, offset:number, user:number, callback:ApiClientFeedPageCallback<ProfileCertification>){
-        let url = Constants.apiRoute.certificationUrl + "?" + this.getQueryString({limit, offset, user})
+        let url = Constants.apiRoute.certificationUrl + "?" + ApiClient.getQueryString({limit, offset, user})
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
@@ -1173,7 +1209,7 @@ export abstract class ApiClient
         })
     }
     static getEducations(limit:number, offset:number, user:number, callback:ApiClientFeedPageCallback<ProfileEducation>){
-        let url = Constants.apiRoute.educationUrl + "?" + this.getQueryString({limit, offset, user})
+        let url = Constants.apiRoute.educationUrl + "?" + ApiClient.getQueryString({limit, offset, user})
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
@@ -1181,7 +1217,7 @@ export abstract class ApiClient
         })
     }
     static getPositions(limit:number, offset:number, user:number, callback:ApiClientFeedPageCallback<ProfilePosition>){
-        let url = Constants.apiRoute.positionUrl + "?" + this.getQueryString({limit, offset, user})
+        let url = Constants.apiRoute.positionUrl + "?" + ApiClient.getQueryString({limit, offset, user})
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
@@ -1189,7 +1225,7 @@ export abstract class ApiClient
         })
     }
     static getVolunteering(limit:number, offset:number, user:number, callback:ApiClientFeedPageCallback<ProfileVolunteeringExperience>){
-        let url = Constants.apiRoute.volunteeringUrl + "?" + this.getQueryString({limit, offset, user})
+        let url = Constants.apiRoute.volunteeringUrl + "?" + ApiClient.getQueryString({limit, offset, user})
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
@@ -1207,7 +1243,7 @@ export abstract class ApiClient
     static getCalendarItems(start:Date, end:Date, callback:ApiClientCallback<(CalendarItem | Event | Task)[]>){
         const startString = moment(start).format(DateFormat.serverDay)
         const endString = moment(end).format(DateFormat.serverDay)
-        let url = Constants.apiRoute.calendarUrl + "?" + this.getQueryString({start:startString, end:endString})
+        let url = Constants.apiRoute.calendarUrl + "?" + ApiClient.getQueryString({start:startString, end:endString})
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {

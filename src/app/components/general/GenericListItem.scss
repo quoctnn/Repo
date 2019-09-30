@@ -1,0 +1,27 @@
+@import "../../Config";
+.generic-list-item{
+    min-width: 0;
+    .left{
+        margin-right: 0.25em;
+    }
+    .right{
+        margin-left: 0.25em;
+    }
+    .center{
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+        flex-grow: 1;
+        justify-content: center;
+        .header{
+            font-weight: 500;
+        }
+        .footer{
+            font-size: 0.8rem;
+        }
+    }
+    &.active, &:hover
+    {
+       @include var(background-color, main-content-secondary-background);
+    }
+}

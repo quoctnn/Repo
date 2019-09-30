@@ -81,6 +81,8 @@ export default  {
         communityInvitationAcceptUrl: (id:number) => {
             return `/api/v2/community-invitation/${id}/accept/`
         },
+        communityInvitationUrl:"/api/v2/community-invitation/",
+        communityInvitationBatchUrl:"/api/v2/community-invitation/batch/",
         communityMembershipRequestDeleteUrl: (id:number) => {
             return `/api/v2/community-memberrequest/${id}/`
         },

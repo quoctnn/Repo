@@ -78,7 +78,7 @@ class ProjectDetailsModule extends React.Component<Props, State> {
     getProjectOptions = () => {
         const options: OverflowMenuItem[] = []
         if(this.props.project.permission >= Permission.admin)
-            options.push({id:"1", type:OverflowMenuItemType.option, title:translate("Edit"), onPress:this.showProjectCreateForm, iconClass:"fas fa-pen"})
+            options.push({id:"1", type:OverflowMenuItemType.option, title:translate("Edit"), onPress:this.showProjectCreateForm, iconClass:"fas fa-pen", iconStackClass:Permission.getShield(this.props.project.permission)})
         return options
     }
     renderEditForm = () => {

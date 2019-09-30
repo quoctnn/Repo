@@ -25,6 +25,10 @@ declare global {
         isNumber():boolean
         trimLeftCharacters(charlist:string):string;
         format(...args:any[]):string
+        isEmail:(value:string) => boolean
+    }
+    interface StringConstructor {
+        isEmail:(value:string) => boolean
     }
     interface Array<T>
     {
@@ -34,6 +38,7 @@ declare global {
         contains(element): boolean
         cloneArray(): T[];
         toggleElement(element):void
+        except(element:T):Array<T>
     }
     interface Number
     {

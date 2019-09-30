@@ -20,8 +20,6 @@ import { IntraSocialLink } from "../general/IntraSocialLink";
 import { Button } from "reactstrap";
 import StackedAvatars from "../general/StackedAvatars";
 import { TimeComponent } from "../general/TimeComponent";
-import { Stats } from "webpack";
-import classNames = require("classnames");
 
 interface OwnProps
 {

@@ -79,7 +79,7 @@ export class AjaxRequest
         }
         return $.ajax({
             url: url,
-            dataType: 'json',
+            //dataType: 'text json',
             cache: false,
             type: type,
             data: JSON.stringify(json),

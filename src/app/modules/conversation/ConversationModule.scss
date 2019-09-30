@@ -4,6 +4,8 @@
 {
     &.temporary{
         .module-header{
+            height: auto !important;
+            min-height: 40px;
             .module-header-title-left{
                 flex-grow: 200;
                 .member-select-container{

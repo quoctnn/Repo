@@ -211,7 +211,7 @@ export default class Autocomplete extends React.Component<Props, State> {
                             count += 1
                             const hasCounter = item.count != null && item.count > 0
                             const hasSubtitle = !nullOrUndefined(item.subtitle)
-                            const cn = classNames("list-item section-list-item", {"active highlight-text":cursor == count,"has-counter":hasCounter, "has-subtitle":hasSubtitle })
+                            const cn = classNames("list-item section-list-item", {"active highlight-panel":cursor == count,"has-counter":hasCounter, "has-subtitle":hasSubtitle })
                             return (<li onMouseEnter={this.onMouseEnter.bind(this, count)} className={cn} key={item.id + section.type} onClick={this.onItemSelect(item)}>
                                 <div className="list-content">
                                     {item.avatar && <Avatar image={item.avatar} size={30} borderWidth={2} borderColor="white" />}

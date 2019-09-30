@@ -43,9 +43,15 @@ export default class SimpleDialog extends React.Component<Props, State> {
                 <i aria-hidden="true" className="fas fa-times"></i>
             </Button>
     }
+    showInfo = () => {
+        if(!this.props.visible)
+            console.warn(`content of SimpleDialog is processed regardless of visibility`)
+        return null
+    }
     render() 
     {
         const cn = classnames(this.props.className, {"modal-dialog-scrollable":this.props.scrollable})
+        
         return(
             <div>
                 <Modal fade={this.props.fade} centered={this.props.centered} toggle={this.props.didCancel} isOpen={this.props.visible} className={cn}>
@@ -65,6 +71,7 @@ export default class SimpleDialog extends React.Component<Props, State> {
                             {this.props.footer}
                         </ModalFooter>
                     }
+                    {this.showInfo()}
                 </Modal>
             </div>
         );
