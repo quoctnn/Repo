@@ -57,6 +57,9 @@ export abstract class ApplicationManager
     {
         ApplicationManager.resetData(false)
     }
+    static getLanguage = () => {
+        return ApplicationManager.getStore().getState().language.language
+    }
     private static resetData = (resetCachedData:boolean) => {
 
         ApplicationManager.applicationData = {dashboards:{}, communitiesLoaded:false, profileLoaded:false, contactsLoaded:false}

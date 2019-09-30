@@ -1,0 +1,23 @@
+@import "../../../Config";
+$size:1.1rem;
+.checkbox{
+    border-width: 2px;
+    border-style: solid;
+    border-radius: 4px;
+    width: $size;
+    height: $size;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0;
+    @include var(border-color, main-content-border);
+    cursor: pointer;
+    i{
+        font-size: 0.7rem;
+    }
+    &.checked{
+        color:white;
+        @include var(background, primary-theme-color);
+        @include var(border-color, primary-theme-color);
+    }
+}

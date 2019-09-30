@@ -10,10 +10,30 @@ import { nullOrUndefined } from '../../utilities/Utilities';
 import { FormPage } from './FormPage';
 
 
-export const FormComponentErrorMessage = (props:{errors?:{[key:string]:string}, errorKey:string, className?:string}) => {
-    const error = props.errors && props.errors[props.errorKey]
-    if(!!error)
-        return <FormFeedback className={props.className} tooltip={false}><i className="error-icon fas fa-exclamation-triangle"></i>{" "}{error}</FormFeedback>
+export const FormComponentErrorMessage = (props:{errors?:{[key:string]:string}, errorKey?:string, className?:string}) => {
+    if(!props.errors)
+        return null
+    const errors:string[] = []
+    if(props.errorKey)
+    {
+        const e = props.errors[props.errorKey]
+        if(e)
+            errors.push(e)
+    }
+    else {
+        const keys = Object.keys( props.errors )
+        keys.forEach(k => {
+            const val = props.errors[k]
+            if(val)
+                errors.push(val)
+        })
+    }
+    if(errors.length > 0)
+    {
+        return <>
+        {errors.map((e, i) => <FormFeedback key={i} className={props.className} tooltip={false}><i className="error-icon fas fa-exclamation-triangle"></i>{" "}{e}</FormFeedback>)}
+        </>
+    }
     return null
 }
 export const FormComponentRequiredMessage = (props:{required:boolean, className?:string}) => {
@@ -58,6 +78,7 @@ type Props = {
     formErrors:RequestErrorData[]
     visible:boolean
     render:(form:FormController) => FormContent
+    className?:string
 }
 type State = {
     activePageIndex:number
@@ -238,17 +259,17 @@ export default class FormController extends React.Component<Props, State> {
                                                     {submitTitle}
                                                     </Button>
                                                 </div>
-        const genericError = this.getErrors(["detail"])
+        const genericError = this.getErrors(["detail", "non_field_errors"])
         this.content = this.props.render(this)
         const {menuItems, pages} = this.content
         return <SimpleDialog className="form-controller-modal" didCancel={this.props.didCancel} visible={this.props.visible} header={header} footer={footer}>
-                    <div className="form-controller">
-                        {genericError && <FormComponentErrorMessage className="d-block" errors={genericError} errorKey="detail" />}
+                    <div className={classnames("form-controller", this.props.className)}>
+                        {genericError && <FormComponentErrorMessage className="d-block" errors={genericError} />}
                         <div className={mainContentCn}>
                             <div className="d-flex flex-column main-content-inner">
-                                <div className="form-controller-menu">
+                                {menuItems.length > 0 && <div className="form-controller-menu">
                                     {menuItems}
-                                </div>
+                                </div>}
                                 <div className="form-controller-page-container">
                                     {pages}
                                 </div>

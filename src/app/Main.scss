@@ -137,7 +137,11 @@ body[class^="select-active-"], body[class*=" select-active-"]{
 }
 button{@include var(color, primary-text-color);}
 .btn-rounded{
-    border-radius: 10em;}
+    border-radius: 10em;
+}
+.panel-rounded{
+    border-radius: 0.25rem;
+}
 .btn-xs{
     padding: 0.25rem 0.5rem;
     font-size: 0.75rem;
@@ -193,7 +197,7 @@ button{@include var(color, primary-text-color);}
     @include var(color, primary-text-color);
     border-width: 0;
 }
-.highlight-text {
+.highlight-panel {
 
     @include var(background, highlight-background-color);
     @include var(color, highlight-foreground-color);
@@ -372,5 +376,16 @@ body.dash-fill
         display: flex;
         height: 100%;
         width:100%;
+    }
+}
+
+.fa-menu-icon-stack{
+    position: relative;
+    .fa-menu-icon-stacked{
+        position: absolute;
+        font-size: 0.9em;
+        right:0.4em;
+        bottom: 0;
+        @include var(color, danger-color)
     }
 }

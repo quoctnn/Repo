@@ -1,7 +1,7 @@
 
 
 import * as Immutable from "immutable";
-import { nullOrUndefined } from "./Utilities";
+import { nullOrUndefined, SINGLE_EMAIL_REGEX } from "./Utilities";
 
 String.prototype.hashCode = function() {
     var hash = 0, i, chr;
@@ -32,6 +32,10 @@ String.prototype.format = function(...args:any[]) {
 String.prototype.isNumber = function(): boolean
 {
    return !isNaN(Number(this.toString()));
+}
+String.isEmail = (value:string) => {
+   const val = SINGLE_EMAIL_REGEX.test(value)
+   return val
 }
 Array.prototype.move = function(oldIndex, newIndex) {
   if (newIndex >= this.length) {
@@ -82,6 +86,13 @@ Array.prototype.toggleElement = function<T>(element:T){
     else 
         this.push(element)
 }
+Array.prototype.except = function<T>(element:T){
+    const index = this.indexOf(element)
+    if(index > -1)
+        this.splice(index, 1)
+    return this
+}
+
 Number.prototype.mod = function(n) {
   return ((this%n)+n)%n;
 };

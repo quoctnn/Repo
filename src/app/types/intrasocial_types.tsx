@@ -280,6 +280,8 @@ export class RequestErrorData{
                 errorMessage = error[0]
             else if(typeof error == "string")
                 errorMessage = error
+            else if (typeof error == "object" && error.hasOwnProperty("detail"))
+                errorMessage = error.detail
             else {
                 console.warn(`RequestErrorData:${error} is not a string`)
             }
@@ -934,6 +936,9 @@ export namespace Permission {
     export function usesElevatedPrivileges(permission: Permission) {
         return permission == Permission.moderate || permission == Permission.admin || permission == Permission.superuser
     }
+    export function getShield(permission: Permission) {
+        return Permission.usesElevatedPrivileges(permission) ? "fas fa-shield-alt" : undefined
+    }
 }
 export type GenericElasticResult = {
     object_type: ElasticSearchType
@@ -1289,7 +1294,14 @@ export type ICommunity = {
     secondary_color: string
     chapters?: boolean
 } & Linkable & IdentifiableObject
-
+export type CommunityInvitation = {
+    created_at: string
+    community:number
+    message:string 
+    language:AppLanguage
+    email:string
+    user:number
+} & IdentifiableObject
 export type Community = {
     members: number[]
     relationship: any

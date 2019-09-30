@@ -34,7 +34,7 @@ export type LocationInputState = {
 export class LocationInput extends React.Component<LocationInputProps, LocationInputState> implements FormComponentBase{
     private defaultLocation:[number, number] = [-0.1148677, 51.5139573]
     onIdleTimout: NodeJS.Timer = null
-    searchIdleTimout: NodeJS.Timer = null
+    searchIdleTimeout: NodeJS.Timer = null
     searchRef = React.createRef<HTMLInputElement>()
     constructor(props:LocationInputProps){
         super(props)
@@ -118,9 +118,9 @@ export class LocationInput extends React.Component<LocationInputProps, LocationI
         this.onIdleTimout = setTimeout(this.sendValueChanged, 500)
     }
     searhQueryOnIdle = (query:string) => () => {
-        if(this.searchIdleTimout)
-            clearTimeout(this.searchIdleTimout)
-        this.searchIdleTimout = setTimeout(this.search(query), 300)
+        if(this.searchIdleTimeout)
+            clearTimeout(this.searchIdleTimeout)
+        this.searchIdleTimeout = setTimeout(this.search(query), 300)
     }
     onMapMoveEnd = (map: any, evt: React.SyntheticEvent<any>) => {
         const location = map.getCenter()

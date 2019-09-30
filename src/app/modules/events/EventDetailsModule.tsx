@@ -97,8 +97,8 @@ class EventDetailsModule extends React.Component<Props, State> {
     }
     getEventOptions = () => {
         const options: OverflowMenuItem[] = []
-        if(this.props.community.permission >= Permission.admin)
-            options.push({id:"1", type:OverflowMenuItemType.option, title:translate("Edit"), onPress:this.showEventCreateForm, iconClass:"fas fa-pen"})
+        if(this.props.event.permission >= Permission.admin)
+            options.push({id:"1", type:OverflowMenuItemType.option, title:translate("Edit"), onPress:this.showEventCreateForm, iconClass:"fas fa-pen", iconStackClass:Permission.getShield(this.props.event.permission)})
         return options
     }
     renderEditForm = () => {

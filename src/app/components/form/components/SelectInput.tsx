@@ -108,7 +108,7 @@ export class SelectInput extends React.Component<SelectInputProps, SelectInputSt
                         closeMenuOnSelect={true}
                         isSearchable={true}
                         options={this.props.options} />
-                        {this.props.description && <div className="description">{this.props.description}</div>}
+                        {this.props.description && <div className="description" dangerouslySetInnerHTML={{__html:this.props.description}}></div>}
                     </div>
                 </InputGroup>
             </div>

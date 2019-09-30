@@ -6,9 +6,9 @@
     min-height: 0;
     .selectable-item {
         display: flex;
-        .select-box {
-            align-self: center;
-            margin-left: 8px;
+        align-items: center;
+        .checkbox {
+            margin: 12px;
         }
     }
 
