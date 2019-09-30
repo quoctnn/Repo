@@ -135,6 +135,8 @@ export default  {
         groupFilesUrl: (id:number) => {
             return `/api/v2/group/${id}/files/`
         },
+        groupInvitationListUrl: "/api/v2/group-invitation/",
+        groupInvitationBatchUrl:"/api/v2/group-invitation/batch/",
         groupInvitationDeleteUrl: (id:number) => {
             return `/api/v2/group-invitation/${id}/`
         },
@@ -233,6 +235,8 @@ export default  {
         eventInvitationDeleteUrl: (id:number) => {
             return `/api/v2/event-invitation/${id}/`
         },
+        eventInvitationBatchUrl:"/api/v2/event-invitation/batch/",
+        eventInvitationListUrl: "/api/v2/event-invitation/",
         eventMembershipRequestDeleteUrl: (id:number) => {
             return `/api/v2/event-memberrequest/${id}/`
         },

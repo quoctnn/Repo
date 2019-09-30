@@ -1294,6 +1294,14 @@ export type ICommunity = {
     secondary_color: string
     chapters?: boolean
 } & Linkable & IdentifiableObject
+export type ContextInvitation = {
+    created_at: string
+    target_user:number
+    user:number
+    moderator:boolean
+    event:number
+} & IdentifiableObject
+
 export type CommunityInvitation = {
     created_at: string
     community:number

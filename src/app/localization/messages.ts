@@ -535,6 +535,10 @@ var translations = {
     "common.invite":"Invite",
     "community.invitations":"Community invitations",
     "common.delete":"Delete",
+    "group.group.invite":"Group invite",
+    "group.group.invitations":"Group invitations",
+    "event.event.invite":"Event invite",
+    "event.event.invitations":"Event invitations",
   },
   no: {
     "search.placeholder": "Søk ...",
@@ -1061,7 +1065,7 @@ var translations = {
     "form.invite.email.description":"Skriv inn gyldige e-postadresser og trykk ENTER eller TAB",
     "form.invite.email.placeholder":"navn@eksempel.com",
     "form.invite.users.title":"Inviter brukere",
-    "form.invite.users.description":"Søk etter brukere som <b>ikke er medlemmer</b> basert på navn. Skriv inn et brukernavn og velg resultatet.",
+    "form.invite.users.description":"Søk etter brukere som <b>ikke er medlemmer</b>. Skriv inn et brukernavn og velg resultatet.",
     "form.invite.users.placeholder":"brukere",
     "form.invite.language.title":"Invitasjonsspråk",
     "form.invite.message.title":"Personlig melding",
@@ -1072,6 +1076,10 @@ var translations = {
     "common.invite":"Invitere",
     "community.invitations":"Community invitasjoner",
     "common.delete":"Slett",
+    "group.group.invite":"Gruppeinvitasjon",
+    "group.group.invitations":"Gruppeinvitasjoner",
+    "event.event.invite":"Arrangementinvitasjon",
+    "event.event.invitations":"Arrangementinvitasjoner",
   },
   en: {
     "search.placeholder": "Search ...",
@@ -1603,7 +1611,6 @@ var translations = {
     "group.add":"Add group",
     "event.add":"Add event",
     "project.add":"Add project",
-    //
     "form.invite.delete.error":"Some invitations could not be deleted",
     "form.invite.email.title":"Invite by emails",
     "form.invite.email.description":"Type valid email addresses and hit ENTER or TAB",
@@ -1620,6 +1627,11 @@ var translations = {
     "common.invite":"Invite",
     "community.invitations":"Community invitations",
     "common.delete":"Delete",
+    //
+    "group.group.invite":"Group invite",
+    "group.group.invitations":"Group invitations",
+    "event.event.invite":"Event invite",
+    "event.event.invitations":"Event invitations",
   }
 };
 
