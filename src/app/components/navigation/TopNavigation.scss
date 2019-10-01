@@ -26,6 +26,16 @@
         .fa {
             margin-right: 6px;
         }
+        .breadcrumb-navigation {
+            flex:1;
+            margin-right: auto;
+        }
+        .profile-shortcuts {
+            flex:1;
+            margin-left: auto;
+            display: flex;
+            justify-content: flex-end;
+        }
     }
     @media (max-width: 640px){
         .menu-toggle{
