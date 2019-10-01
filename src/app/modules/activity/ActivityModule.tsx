@@ -36,7 +36,6 @@ type State = {
 }
 type Props = OwnProps & DefaultProps & RouteComponentProps<any>
 class ActivityModule extends React.Component<Props, State> {
-    activityId = 0;
     tempMenuData:ActivityMenuData = null
     activityListInput = React.createRef<ListComponent<RecentActivity>>()
     observers:EventSubscription[] = []
@@ -94,11 +93,6 @@ class ActivityModule extends React.Component<Props, State> {
     headerClick = (e) => {
         return 0;
     }
-    getKey = (activity: RecentActivity) => {
-        // There is no unique key for notifications, so we use an incrementing integer
-        this.activityId += 1
-        return this.activityId
-    }
     feedLoadingStateChanged = (isLoading:boolean) => {
         this.setState({isLoading})
     }
@@ -122,8 +116,8 @@ class ActivityModule extends React.Component<Props, State> {
         }
         this.setState(newState as State)
     }
-    renderActivity = (activity:RecentActivity) =>  {
-        return <ActivityItem key={this.getKey(activity)} activity={activity} />
+    renderActivity = (activity:RecentActivity, index:number) =>  {
+        return <ActivityItem key={activity.id + "_" + index}  activity={activity} />
     }
     toggleSorting = (sorting: ActivitySorting) => (e) => {
         const md = {sorting: sorting}
@@ -173,13 +167,7 @@ class ActivityModule extends React.Component<Props, State> {
                 const list = this.activityListInput && this.activityListInput.current
                 if(list)
                 {
-                    const items = list.getItems()
-                    selected.forEach(id => {
-                        const index = items.findIndex(i => i.id == id)
-                        if(index > -1)
-                            items[index].is_seen = true
-                    })
-                    list.updateItems(items)
+                    list.reload()
                 }
                 this.toggleSelect()
             }
@@ -192,7 +180,7 @@ class ActivityModule extends React.Component<Props, State> {
                 <div className="header d-flex p-2 align-items-center">
                     {isSelecting && <Checkbox checked={selected.length > 0} checkedIcon="fas fa-minus" onValueChange={this.headerCheckboxChange} />}
                     <div className="flex-grow-1"></div>
-                    {isSelecting && selected.length > 0 &&  <Button color="light" size="xs" onClick={this.markActivitiesAsSeen}>{translate('common.mark.read')}</Button>}
+                    {isSelecting && selected.length > 0 &&  <Button color="light" size="xs" onClick={this.markActivitiesAsSeen}>{translate('common.mark.seen')}</Button>}
                     <Button color="light" size="xs" onClick={this.toggleSelect}>{translate(isSelecting ? "Cancel" : "common.edit")}</Button>
                 </div>
                 <ListComponent<RecentActivity>

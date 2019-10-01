@@ -30,7 +30,7 @@ type OwnProps<T> = {
     onLoadingStateChanged?:(isLoading:boolean) => void
     scrollParent?:any
     fetchData:(offset:number, completion:(items:PaginationResult<T>) => void) => void
-    renderItem:(item:T) => React.ReactNode
+    renderItem:(item:T, index:number) => React.ReactNode
     renderEmpty?:() => React.ReactNode
     renderError?:() => React.ReactNode
     sortItems?:(items:T[]) => T[]
@@ -343,7 +343,8 @@ export default class ListComponent<T extends IdentifiableObject> extends React.C
         if(!this.props.isSelecting)
             return item
         const isSelected = this.isSelected(id)
-        return <div key={id} className="selectable-item">
+        const key = (item as any).key || id
+        return <div key={key} className="selectable-item">
                     <Checkbox checked={isSelected} onValueChange={this.selectedItem(id)} />{item}
                 </div>
     }
@@ -351,8 +352,8 @@ export default class ListComponent<T extends IdentifiableObject> extends React.C
         const cn = classnames("vertical-scroll", this.props.className, {"list-component-list":!this.props.findScrollParent})
         const scroll = this.props.loadMoreOnScroll ? (this.props.scrollParent ? undefined : this.onScroll) : undefined
         const listItems = this.props.sortItems ? this.props.sortItems(this.state.items) : this.state.items
-        let items = listItems.map(i => {
-                            return this.renderSelectableItem(i.id, this.props.renderItem(i))
+        let items = listItems.map((i, index) => {
+                            return this.renderSelectableItem(i.id, this.props.renderItem(i, index))
                         }).concat(this.renderLoading())
         if (this.state.dividerPosition) items.splice(this.state.dividerPosition, 0, <ListComponentDivider key="divider"/>)
         return (<List ref={this.listRef} enableAnimation={false}

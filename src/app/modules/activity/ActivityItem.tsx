@@ -55,7 +55,7 @@ export default class ActivityItem extends React.Component<Props, State> {
         if (!this.state.seen) cl = cl.concat(" unseen")
         const text = activity.display_text
         const profiles = this.fetchProfiles()
-        return (<Link key={activity.id} onClick={this.handleActivityClick} to={activity.uri || "#"} {...rest} className={cl}>
+        return (<Link onClick={this.handleActivityClick} to={activity.uri || "#"} {...rest} className={cl}>
                     <div className="d-flex flex-row hover-card activity-content">
                         <Avatar images={profiles.slice(0,4).map((user) => {return user.avatar_thumbnail})} size={40} borderColor="white" borderWidth={2}></Avatar>
                         <div>
