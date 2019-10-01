@@ -8,7 +8,7 @@ import { ReduxState } from "../../../redux";
 import { ContextManager } from "../../../managers/ContextManager";
 import { withRouter, RouteComponentProps } from "react-router";
 import { UserProfile, ContextNaturalKey, ProfilePosition, ElasticSearchType, RelationshipStatus } from "../../../types/intrasocial_types";
-import { userFullName, stringToDate, DateFormat, uniqueId } from '../../../utilities/Utilities';
+import { userFullName, stringToDate, uniqueId } from '../../../utilities/Utilities';
 import ModuleContent from "../../ModuleContent";
 import ModuleHeader from "../../ModuleHeader";
 import ModuleFooter from '../../ModuleFooter';
@@ -114,29 +114,37 @@ class ProfileDetailsModule extends React.PureComponent<Props, State> {
             })
         })
     }
-    blockUser = (profile: UserProfile) => (event: React.SyntheticEvent<any>) => {
-        ApiClient.userBlock(profile.id, (status) => {
-            return status;
+    blockUser = (event: React.SyntheticEvent<any>) => {
+        const profile = {...this.props.profile}
+        ApiClient.userBlock(profile.id, (data, status, error) => {
+            if(!error)
+            {
+                profile.relationship = [RelationshipStatus.isBlocked]
+                this.updateProfile(profile)
+            }
+            ToastManager.showRequestErrorToast(error)
         })
     }
-    unBlockUser = (profile: UserProfile) => (event: React.SyntheticEvent<any>) => {
-        ApiClient.userBlockGetId(profile.id, (data, status, error) => {
-            if (!error || status != "error") {
-                data.results.map((block) => {
-                    ApiClient.userUnBlock(block.id, (status) => {})
-                })
-                return status;
+    unBlockUser = (event: React.SyntheticEvent<any>) => {
+        const profile = {...this.props.profile}
+        ApiClient.userUnBlock(profile.id, (data, status, error) => {
+            if(!error)
+            {
+                profile.relationship = []
+                this.updateProfile(profile)
             }
+            ToastManager.showRequestErrorToast(error)
         })
     }
-    unfriendUser = (profile: UserProfile) => (event: React.SyntheticEvent<any>) => {
-        ApiClient.friendshipGetId(profile.id, (data, status, error) => {
-            if (!error || status != "error") {
-                data.results.map((friendship) => {
-                    ApiClient.userUnfriend(friendship.id, (status) => {})
-                })
-                return status;
+    unfriendUser = (event: React.SyntheticEvent<any>) => {
+        const profile = {...this.props.profile}
+        ApiClient.userUnfriend(profile.id, (data, status, error) => {
+            if(!error)
+            {
+                profile.relationship = []
+                this.updateProfile(profile)
             }
+            ToastManager.showRequestErrorToast(error)
         })
     }
     sendInvitationToUser = () => (event: React.SyntheticEvent<any>) => {
@@ -144,41 +152,36 @@ class ProfileDetailsModule extends React.PureComponent<Props, State> {
         ApiClient.friendInvitationSend(profile.id, (data, status, error) => {
             if(data)
             {
-                const relationShip = profile.relationship || []
-                relationShip.push(RelationshipStatus.pendingRequest)
-                profile.relationship = relationShip
-                ProfileManager.storeProfile(profile)
+                profile.relationship = [RelationshipStatus.pendingRequest]
+                this.updateProfile(profile)
             }
             ToastManager.showRequestErrorToast(error)
         })
     }
     acceptInvitationFromUser = () => (event: React.SyntheticEvent<any>) => {
-        const profile = this.props.profile
-        ApiClient.friendInvitationGetId(profile.id, (data, status, error) => {
-            if (!error || status != "error") {
-                data.results.map((invite) => {
-                    ApiClient.friendInvitationAccept(invite.id, (data, status, error) => {})
-                })
-                return status;
+        const profile = {...this.props.profile}
+        ApiClient.friendInvitationAccept(profile.id, (data, status, error) => {
+            if(data)
+            {
+                profile.relationship = [RelationshipStatus.friends]
+                this.updateProfile(profile)
             }
+            ToastManager.showRequestErrorToast(error)
         })
     }
+    updateProfile = (profile:UserProfile) => {
+        profile.last_seen = new Date().getTime()
+        ProfileManager.storeProfile(profile)
+    }
     declineInvitationFromUser = () => (event: React.SyntheticEvent<any>) => {
-        const profile = this.props.profile
-        ApiClient.friendInvitationGetId(profile.id, (data, status, error) => {
-            if (!error || status != "error") {
-                data.results.map((invite) => {
-                    ApiClient.friendInvitationDelete(invite.id, false, (data, status, fidError) => {
-                        if(!fidError)
-                        {
-                            profile.relationship = []
-                            ProfileManager.storeProfile(profile)
-                        }
-                        ToastManager.showRequestErrorToast(fidError)
-                    })
-                })
-                return status;
+        const profile = {...this.props.profile}
+        ApiClient.friendInvitationDelete(profile.id, false, (data, status, error) => {
+            if(!error)
+            {
+                profile.relationship = []
+                this.updateProfile(profile)
             }
+            ToastManager.showRequestErrorToast(error)
         })
     }
     renderTimezoneInfo = () => {
@@ -270,32 +273,36 @@ class ProfileDetailsModule extends React.PureComponent<Props, State> {
             options.push({id:"1", type:OverflowMenuItemType.option, title:translate("Edit"), onPress:this.showProfileUpdateForm, iconClass:"fas fa-pen"})
         }
         else{
+            const relationship = profile.relationship && profile.relationship || []
             // TODO: Check if user is already blocked and have unblock instead
-            if (profile.relationship && profile.relationship.contains("blocked")) {
-                options.push({
-                    id: "unblock",
-                    type: OverflowMenuItemType.option,
-                    title: translate("common.relationship.unblock"),
-                    onPress: this.unBlockUser(profile),
-                    toggleMenu: false
-                })
-            } else {
-                options.push({
-                    id: "block",
-                    type: OverflowMenuItemType.option,
-                    title: translate("common.relationship.block"),
-                    onPress: this.blockUser(profile),
-                    toggleMenu: false
-                })
-            }
-            if (profile.relationship && profile.relationship.contains("friends")) {
-                options.push({
-                    id: "unfriend",
-                    type: OverflowMenuItemType.option,
-                    title: translate("common.relationship.unfriend"),
-                    onPress: this.unfriendUser(profile),
-                    toggleMenu: false
-                })
+            if(!relationship.contains(RelationshipStatus.blockedBy))
+            {
+                if (relationship.contains(RelationshipStatus.isBlocked)) {
+                    options.push({
+                        id: "unblock",
+                        type: OverflowMenuItemType.option,
+                        title: translate("common.relationship.unblock"),
+                        onPress: this.unBlockUser,
+                        toggleMenu: false
+                    })
+                } else {
+                    options.push({
+                        id: "block",
+                        type: OverflowMenuItemType.option,
+                        title: translate("common.relationship.block"),
+                        onPress: this.blockUser,
+                        toggleMenu: false
+                    })
+                }
+                if (profile.relationship && profile.relationship.contains(RelationshipStatus.friends)) {
+                    options.push({
+                        id: "unfriend",
+                        type: OverflowMenuItemType.option,
+                        title: translate("common.relationship.unfriend"),
+                        onPress: this.unfriendUser,
+                        toggleMenu: false
+                    })
+                }
             }
         }
         return options
@@ -307,13 +314,16 @@ class ProfileDetailsModule extends React.PureComponent<Props, State> {
                 {translate(`common.relationship.${relationship}`)}
             </div>
     }
-    renderFriendshipButtons = (relationship:string) => {
+    renderFriendshipButtons = (relationship:RelationshipStatus) => {
+        if(relationship == RelationshipStatus.blockedBy)
+        {
+            return null
+        }
         switch(relationship) {
-            case("friends"):
-                return;
-            case("blocked"):
-                return;
-            case("pending-invitation"):
+            case RelationshipStatus.friends:
+            case RelationshipStatus.isBlocked:
+                return
+            case RelationshipStatus.pendingInvitation:
                 return (
                     <>
                         <button onClick={this.acceptInvitationFromUser()} className='btn btn-success'>
@@ -324,7 +334,7 @@ class ProfileDetailsModule extends React.PureComponent<Props, State> {
                         </button>
                     </>
                 );
-            case("pending-request"):
+            case RelationshipStatus.pendingRequest:
                 return (
                     <button onClick={this.declineInvitationFromUser()} className='btn btn-danger'>
                         {translate("common.relationship.cancel")}

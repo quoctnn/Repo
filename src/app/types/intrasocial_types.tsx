@@ -15,6 +15,12 @@ export enum RelationshipStatus{
     friends = "friends",
     pendingRequest = "pending-request",
     pendingInvitation = "pending-invitation",
+    isBlocked = "is-blocked",
+    blockedBy = "blocked-by",
+    owner = "owner",
+    admin = "admin",
+    moderator = "moderator",
+    creator = "creator",
 }
 export enum AppLanguage{
     english = "en",
