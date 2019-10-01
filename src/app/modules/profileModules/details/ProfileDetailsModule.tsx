@@ -7,7 +7,7 @@ import Module, { CommonModuleProps } from "../../Module";
 import { ReduxState } from "../../../redux";
 import { ContextManager } from "../../../managers/ContextManager";
 import { withRouter, RouteComponentProps } from "react-router";
-import { UserProfile, ContextNaturalKey, ProfilePosition, ElasticSearchType } from "../../../types/intrasocial_types";
+import { UserProfile, ContextNaturalKey, ProfilePosition, ElasticSearchType, RelationshipStatus } from "../../../types/intrasocial_types";
 import { userFullName, stringToDate, DateFormat, uniqueId } from '../../../utilities/Utilities';
 import ModuleContent from "../../ModuleContent";
 import ModuleHeader from "../../ModuleHeader";
@@ -23,6 +23,8 @@ import { OverflowMenuItem, OverflowMenuItemType } from '../../../components/gene
 import ProfileUpdateComponent from "../../../components/general/contextCreation/ProfileUpdateComponent"
 import moment = require("moment");
 import { DropDownMenu } from "../../../components/general/DropDownMenu";
+import { ToastManager } from '../../../managers/ToastManager';
+import { ProfileManager } from '../../../managers/ProfileManager';
 
 type TimezoneInfoProps = {
     timezone:string
@@ -138,7 +140,17 @@ class ProfileDetailsModule extends React.PureComponent<Props, State> {
         })
     }
     sendInvitationToUser = () => (event: React.SyntheticEvent<any>) => {
-        ApiClient.friendInvitationSend(this.props.profile.id, () => {})
+        const profile = {...this.props.profile}
+        ApiClient.friendInvitationSend(profile.id, (data, status, error) => {
+            if(data)
+            {
+                const relationShip = profile.relationship || []
+                relationShip.push(RelationshipStatus.pendingRequest)
+                profile.relationship = relationShip
+                ProfileManager.storeProfile(profile)
+            }
+            ToastManager.showRequestErrorToast(error)
+        })
     }
     acceptInvitationFromUser = () => (event: React.SyntheticEvent<any>) => {
         const profile = this.props.profile
@@ -156,7 +168,14 @@ class ProfileDetailsModule extends React.PureComponent<Props, State> {
         ApiClient.friendInvitationGetId(profile.id, (data, status, error) => {
             if (!error || status != "error") {
                 data.results.map((invite) => {
-                    ApiClient.friendInvitationDelete(invite.id, false, () => {})
+                    ApiClient.friendInvitationDelete(invite.id, false, (data, status, fidError) => {
+                        if(!fidError)
+                        {
+                            profile.relationship = []
+                            ProfileManager.storeProfile(profile)
+                        }
+                        ToastManager.showRequestErrorToast(fidError)
+                    })
                 })
                 return status;
             }
@@ -281,28 +300,12 @@ class ProfileDetailsModule extends React.PureComponent<Props, State> {
         }
         return options
     }
-    renderFriendshipStatus = (relationship:string) => {
-        switch(relationship) {
-            case("friends"):
-                return (
-                    <div className='relationship'>
-                        {translate("common.relationship.friends")}
-                    </div>
-                );
-            case("pending-request"):
-                return (
-                    <div className='relationship'>
-                        {translate("common.relationship.pending")}
-                    </div>
-                );
-            case("pending-invitation"):
-                return (
-                    <div className='relationship'>
-                        {translate("common.relationship.invited")}
-                    </div>
-                );
-            default: return;
-        }
+    renderFriendshipStatus = (relationship:RelationshipStatus) => {
+        if(!relationship)
+            return null
+        return <div className='relationship'>
+                {translate(`common.relationship.${relationship}`)}
+            </div>
     }
     renderFriendshipButtons = (relationship:string) => {
         switch(relationship) {

@@ -6,7 +6,7 @@ import { nullOrUndefined, DateFormat } from '../utilities/Utilities';
 import moment = require("moment");
 import { Settings } from "../utilities/Settings";
 import { ConversationManager } from '../managers/ConversationManager';
-import { CommunityConfigurationData, CommunityInvitation, AppLanguage, ContextInvitation, ContextSegmentKey } from '../types/intrasocial_types';
+import { CommunityConfigurationData, CommunityInvitation, AppLanguage, ContextInvitation, ContextSegmentKey, FriendRequest } from '../types/intrasocial_types';
 const $ = require("jquery")
 import { Status, UserProfile, UploadedFile, Community, Group, Conversation, Project, Message, Event, Task,
     ElasticSearchType, ObjectAttributeType, StatusObjectAttribute, EmbedCardItem, ReportTag,
@@ -979,7 +979,7 @@ export abstract class ApiClient
             callback(null, status, new RequestErrorData(request.responseJSON, error))
         })
     }
-    static friendInvitationGetId = (userId:number, callback:ApiClientCallback<any>) => {
+    static friendInvitationGetId = (userId:number, callback:ApiClientFeedPageCallback<FriendRequest>) => {
         let url = Constants.apiRoute.friendInvitation + `?user_id=${userId}`
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
@@ -987,7 +987,7 @@ export abstract class ApiClient
             callback(null, status, new RequestErrorData(request.responseJSON, error))
         })
     }
-    static friendInvitationSend = (userId:number, callback:ApiClientCallback<any>) => {
+    static friendInvitationSend = (userId:number, callback:ApiClientCallback<FriendRequest>) => {
         let url = Constants.apiRoute.friendInvitation
         AjaxRequest.post(url, {to_user: userId }, (data, status, request) => {
             callback(data, status, null)

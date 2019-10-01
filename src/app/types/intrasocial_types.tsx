@@ -5,6 +5,17 @@ import { translate } from "../localization/AutoIntlProvider";
 import { userFullName, groupCover, communityCover, userCover, projectCover, eventCover } from '../utilities/Utilities';
 import { CommunityManager } from '../managers/CommunityManager';
 import { ProjectManager } from '../managers/ProjectManager';
+export type FriendRequest = {
+    created:string
+    from_user:number 
+    message:string 
+    to_user:number
+} & IdentifiableObject
+export enum RelationshipStatus{
+    friends = "friends",
+    pendingRequest = "pending-request",
+    pendingInvitation = "pending-invitation",
+}
 export enum AppLanguage{
     english = "en",
     norwegian = "nb",
@@ -1346,7 +1357,7 @@ export type UserProfile = {
     user_status: UserStatus
     biography: string
     slug_name: string
-    relationship?: string[]
+    relationship?: RelationshipStatus[]
     mutual_friends?: number[]
     last_seen?: number
     is_anonymous: boolean
