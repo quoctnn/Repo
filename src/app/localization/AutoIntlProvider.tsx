@@ -30,15 +30,21 @@ export const translate = (key:string):string => {
     return key
 }
 class AutoIntlProvider extends React.Component<Props, {}> {
+    constructor(props:Props){
+        super(props)
+        this.update(props.language)
+    }
+    update = (language:AppLanguage) => {
+        private_messages = messages[language]
+        moment.locale(language)
+    }
     componentDidMount = () => {
         const lang = this.props.language
-        private_messages = messages[lang]
-        moment.locale(lang)
+        this.update(lang)
     }
     UNSAFE_componentWillUpdate = (nextProps:Props, nextState) => {
         const lang = nextProps.language
-        private_messages = messages[lang]
-        moment.locale(lang)
+        this.update(lang)
     }
     render() {
         const lang = this.props.language
