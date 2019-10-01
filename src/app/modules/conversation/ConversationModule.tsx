@@ -737,7 +737,7 @@ class ConversationModule extends React.Component<Props, State> {
     }
     render()
     {
-        const {history, match, location, staticContext, contextNaturalKey, conversation, createNewConversation, authenticatedUser, queuedMessages, ...rest} = this.props
+        const {history, match, location, staticContext, contextNaturalKey, conversation, createNewConversation, authenticatedUser, queuedMessages, singleMode,  ...rest} = this.props
         const {breakpoint, className} = this.props
         const cn = classnames("conversation-module", className, {temporary:conversation && conversation.temporary})
         const title = createNewConversation ? this.renderMembersInput() : this.renderConversationEditorTitle()
