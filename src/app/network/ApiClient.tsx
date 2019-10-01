@@ -291,10 +291,19 @@ export abstract class ApiClient
         })
 
     }
-    static readActivity(id:number, callback: (success, response) => void)
+    static markActivitiesAsSeen(ids:number[], callback:ApiClientCallback<any>)
     {
-        let url = Constants.apiRoute.recentActivityMarkReadUrl
-        AjaxRequest.post(url, {serialization_ids:[id]}, (data, status, request) => {
+        let url = Constants.apiRoute.notificationMarkSeenUrl
+        AjaxRequest.post(url, {serialization_ids:ids}, (data, status, request) => {
+            callback(true, data)
+        }, (request, status, error) => {
+            callback(false, error)
+        })
+    }
+    static markActivitiesAsRead(ids:number[], callback: (success, response) => void)
+    {
+        let url = Constants.apiRoute.notificationMarkReadUrl
+        AjaxRequest.post(url, {serialization_ids:ids}, (data, status, request) => {
             callback(true, data)
         }, (request, status, error) => {
             callback(false, error)

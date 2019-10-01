@@ -99,7 +99,7 @@ export default class ListComponent<T extends IdentifiableObject> extends React.C
         return this.state.items.find(t => t[key] == value)
     }
     getItems = () => {
-        return this.state.items
+        return [...this.state.items]
     }
     updateItem = (item:T) => {
         this.setState((prevState:State<T>) => {
@@ -107,6 +107,17 @@ export default class ListComponent<T extends IdentifiableObject> extends React.C
             let stateItems = this.state.items
             stateItems[index!] = item
             return {items:stateItems}
+        })
+    }
+    updateItems = (items:T[]) => {
+        this.setState((prevState:State<T>) => { 
+            const prevItems = [...prevState.items]
+            items.forEach(i => {
+                const index = prevState.items.findIndex(t => t.id == i.id)
+                if(index > -1)
+                    prevItems[index] = i
+            })
+            return {items:prevItems}
         })
     }
     removeItemById = (id:number) => {

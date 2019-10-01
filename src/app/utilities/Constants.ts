@@ -246,7 +246,6 @@ export default  {
         // Recent Activity URLs
         recentActivityUrl: '/api/v2/notification/',
         recentActivityUnreadUrl: '/api/v2/notification/unread-count/',
-        recentActivityMarkReadUrl: '/api/v2/notification/update-as-read/',
         recentActivityMarkAllReadUrl: '/api/v2/notification/mark-all-as-read/',
         notificationsMarkActionsReadUrl: '/api/v2/notification/mark-actions-as-read/',
 
@@ -255,6 +254,7 @@ export default  {
         notificationLastActivityTimeUrl: '/api/v2/notification/last-activity-time/',
         notificationUnreadUrl: '/api/v2/notification/unread-count/',
         notificationMarkReadUrl: '/api/v2/notification/update-as-read/',
+        notificationMarkSeenUrl: '/api/v2/notification/update-as-seen/',
         notificationMarkAllReadUrl: '/api/v2/notification/mark-all-as-read/',
         notificationsUnhandledUrl:'/api/v2/notification/unhandled/',
 

@@ -184,7 +184,7 @@ export const SENTENCES_REGEX = /[^\.!\?]+[\.!\?]+|[^\.!\?]+$/g
 export const truncate = (text, maxChars) => {
     return text && text.length > (maxChars - 3) ? text.substring(0, maxChars - 3) + '...' : text;
 }
-export const MENTION_REGEX = new RegExp("@(" + ContextNaturalKey.all.map(s => s.replace(".", "\\.")).join("|") + "):(\\d+)(:([^.:]+):)?", 'g') 
+export const MENTION_REGEX = new RegExp("@(" + ContextNaturalKey.all.map(s => s.replace(".", "\\.")).join("|") + "):(\\d+)(:([^:]+):)?", 'g') 
 export class MentionData{
     contextNaturalKey:ContextNaturalKey
     contextId:number
