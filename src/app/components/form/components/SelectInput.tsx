@@ -7,6 +7,7 @@ import { FormComponentBaseProps } from '../definitions';
 import { InputOption } from './RichRadioGroupInput';
 import classnames from 'classnames';
 import { ActionMeta } from 'react-select/src/types';
+import { nullOrUndefined } from '../../../utilities/Utilities';
 export type InputOptionGroup = {
     label:string 
     options:InputOption[]
@@ -25,7 +26,7 @@ export class SelectInput extends React.Component<SelectInputProps, SelectInputSt
     constructor(props:SelectInputProps){
         super(props)
         this.state = {
-            value:this.props.value || ""
+            value:nullOrUndefined(this.props.value) ? "" : this.props.value.toString()
         }
     }
     getValue = () => {
