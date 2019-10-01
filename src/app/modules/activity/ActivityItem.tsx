@@ -34,7 +34,7 @@ export default class ActivityItem extends React.Component<Props, State> {
     }
     handleActivityClick = (event:React.SyntheticEvent<any>) => {
         this.setState({seen:true, read:true})
-        ApiClient.readActivity(this.props.activity.id, () => {}) // Ignore response for now
+        ApiClient.markActivitiesAsRead([this.props.activity.id], () => {}) // Ignore response for now
     }
     fetchProfiles = () => {
         return ProfileManager.getProfiles(this.props.activity.actors)
