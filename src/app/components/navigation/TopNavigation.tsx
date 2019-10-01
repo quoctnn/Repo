@@ -120,17 +120,17 @@ class TopNavigation extends React.Component<Props, State> {
                     <div className="main-border-color-background mx-2" style={{ width: 1, height: "75%" }}></div>
                     <BreadcrumbNavigation />
                     {this.renderMenuLinks()}
-                    { profile && !profile.is_anonymous &&
-                        <div className="profile-shortcuts">
-                            <Button onClick={this.toggleNotificationPanel} color="link" className="badge-notification-container">
-                                <i className="fas fa-bell"></i>
-                                {this.props.unreadNotifications > 0 && <Badge pill={true} color="danger" className="badge-notification">{this.props.unreadNotifications}</Badge>}
-                            </Button>
-                            <Link className="btn btn-link" to={{pathname:Routes.SEARCH, state:{modal:true}}}>
-                                <i className="fas fa-search"></i>
-                            </Link>
-                        </div>
-                    }
+                    <div className="profile-shortcuts">
+                        { profile && !profile.is_anonymous && <>
+                                <Button onClick={this.toggleNotificationPanel} color="link" className="badge-notification-container">
+                                    <i className="fas fa-bell"></i>
+                                    {this.props.unreadNotifications > 0 && <Badge pill={true} color="danger" className="badge-notification">{this.props.unreadNotifications}</Badge>}
+                                </Button>
+                                <Link className="btn btn-link" to={{pathname:Routes.SEARCH, state:{modal:true}}}>
+                                    <i className="fas fa-search"></i>
+                                </Link></>
+                        }
+                    </div>
                     <div className="main-border-color-background mx-2" style={{ width: 1, height: "75%" }}></div>
                     <UserMenu />
                 </div>
