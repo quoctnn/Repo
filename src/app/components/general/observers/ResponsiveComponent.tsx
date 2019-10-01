@@ -47,7 +47,7 @@ class ResponsiveComponent extends React.Component<Props, State>
         doc.removeChild(dummyScroller);
         return scrollbarSize;
     }
-    componentWillReceiveProps(nextProps:Props)
+    UNSAFE_componentWillReceiveProps(nextProps:Props)
     {
         const width = nextProps.contentRect.bounds.width
         const bp = ResponsiveBreakpoint.parse(width)

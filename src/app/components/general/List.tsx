@@ -69,7 +69,7 @@ export class List extends React.PureComponent<Props, State> {
     componentWillUnmount = () => {
         this.listRef = null
     }
-    componentWillReceiveProps = (newProps:Props) =>  {
+    UNSAFE_componentWillReceiveProps = (newProps:Props) =>  {
         if (this.props.enableAnimation) {
             let items = this.getChildren() as any[]
             if (items.length > 0) {
