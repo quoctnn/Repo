@@ -1,15 +1,14 @@
 import * as React from "react";
 import SimpleDialog from "../general/dialogs/SimpleDialog";
 import {ApiClient} from "../../network/ApiClient";
-import { CrashLogLevel, NotificationObject } from '../../types/intrasocial_types';
+import { CrashLogLevel } from '../../types/intrasocial_types';
 import { AuthenticationManager } from "../../managers/AuthenticationManager";
 import { EndpointManager } from '../../managers/EndpointManager';
 import { EventSubscription } from 'fbemitter';
 import ReconnectingWebSocket from 'reconnecting-websocket';
 import { NotificationCenter } from "../../utilities/NotificationCenter";
-import ChannelEventStream, { eventStreamNotificationPrefix, EventStreamMessageType } from "../../network/ChannelEventStream";
+import { eventStreamNotificationPrefix, EventStreamMessageType } from "../../network/ChannelEventStream";
 import "./GlobalErrorBoundary.scss"
-import { applyMiddleware } from 'redux';
 import classnames from 'classnames';
 import { translate } from '../../localization/AutoIntlProvider';
 type State = {
@@ -17,17 +16,20 @@ type State = {
     errorInfo:any
     windowError:Error
     websocket:number
+    online:boolean
 }
 type Props = {}
 export default class GlobalErrorBoundary extends React.Component<Props, State> {
     observers:EventSubscription[] = []
         constructor(props:Props) {
         super(props);
-        this.state = { error: null,  errorInfo:null, windowError:null, websocket:null};
+        this.state = { error: null,  errorInfo:null, windowError:null, websocket:null, online:true};
         const stateChangeObserver = NotificationCenter.addObserver(eventStreamNotificationPrefix + EventStreamMessageType.SOCKET_STATE_CHANGE, this.websocketStateChangedEvent)
         this.observers.push(stateChangeObserver)
     }
     componentWillMount = () => {
+        window.addEventListener('online',  this.networkStateChangedEvent);
+        window.addEventListener('offline', this.networkStateChangedEvent);
         window.addEventListener('error', this.onWindowError)
     }
     componentWillUnmount() {
@@ -39,6 +41,9 @@ export default class GlobalErrorBoundary extends React.Component<Props, State> {
     }
     websocketStateChangedEvent = (...args:any[]) => {
         this.setState({websocket: args[0]})
+    }
+    networkStateChangedEvent = () => {
+        this.setState({ online: navigator.onLine })
     }
     componentDidCatch(error:Error, errorInfo:any) {
         this.setState({ error, errorInfo })
@@ -74,7 +79,7 @@ export default class GlobalErrorBoundary extends React.Component<Props, State> {
         this.setState({websocket:0})
     }
     renderWebsocketError = () => {
-        const classes = classnames("websocket-error",
+        const classes = classnames("error-banner websocket-error",
             {active: this.state.websocket == ReconnectingWebSocket.CLOSED})
         return (
             <div className={classes}>
@@ -82,6 +87,17 @@ export default class GlobalErrorBoundary extends React.Component<Props, State> {
                     <h5>{translate("websocket.error.title")}</h5>
                     <h6>{translate("websocket.error.description")}</h6>
                     <button className="btn" onClick={this.ignoreWebSocketError}>{translate("common.close")}</button>
+                </div>
+            </div>)
+    }
+    renderNetworkConnectionError = () => {
+        const classes = classnames("error-banner network-error",
+            {active: !this.state.online})
+        return (
+            <div className={classes}>
+                <div className="text-center">
+                    <h5>{translate("network.error.title")}</h5>
+                    <h6>{translate("network.error.description")}</h6>
                 </div>
             </div>)
     }
@@ -110,6 +126,7 @@ export default class GlobalErrorBoundary extends React.Component<Props, State> {
         }
         return <>
             {this.renderWindowErrorModal()}
+            {this.renderNetworkConnectionError()}
             {this.renderWebsocketError()}
             {this.props.children}
             </>
