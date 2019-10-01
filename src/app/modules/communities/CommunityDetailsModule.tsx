@@ -210,13 +210,13 @@ class CommunityDetailsModule extends React.Component<Props, State> {
             options.push({id:"invite", type:OverflowMenuItemType.option, title:translate("common.invitations"), onPress:this.toggleCommunityInviteForm, iconClass:"fas fa-paper-plane", iconStackClass:Permission.getShield(permission)})
         }
         
-        if(this.props.community.group_creation_permission >= Permission.write)
+        if(this.props.community.group_creation_permission >= Permission.limited_write)
             options.push({id:"2", type:OverflowMenuItemType.option, title:translate("group.add"), onPress:this.showGroupCreateForm, iconClass:"fas fa-plus"})
         
-        if(this.props.community.event_creation_permission >= Permission.write)
+        if(this.props.community.event_creation_permission >= Permission.limited_write)
             options.push({id:"3", type:OverflowMenuItemType.option, title:translate("event.add"), onPress:this.showEventCreateForm, iconClass:"fas fa-plus"})
         
-        if(this.props.community.project_creation_permission >= Permission.write)
+        if(this.props.community.project_creation_permission >= Permission.limited_write)
             options.push({id:"4", type:OverflowMenuItemType.option, title:translate("project.add"), onPress:this.showProjectCreateForm, iconClass:"fas fa-plus"})
         return options
     }
