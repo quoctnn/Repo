@@ -55,7 +55,7 @@ class Embedly extends React.Component<Props, State> {
                 nextProps.isLoading != this.props.isLoading || 
                 nextProps.data != this.props.data
     }
-    componentWillMount() {
+    componentDidMount() {
         if(!this.props.data && !this.props.isLoading)
                 this.props.requestEmbedData([this.props.url], this.state.cardType)
         

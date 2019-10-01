@@ -27,7 +27,7 @@ export default class GlobalErrorBoundary extends React.Component<Props, State> {
         const stateChangeObserver = NotificationCenter.addObserver(eventStreamNotificationPrefix + EventStreamMessageType.SOCKET_STATE_CHANGE, this.websocketStateChangedEvent)
         this.observers.push(stateChangeObserver)
     }
-    componentWillMount = () => {
+    componentDidMount = () => {
         window.addEventListener('online',  this.networkStateChangedEvent);
         window.addEventListener('offline', this.networkStateChangedEvent);
         window.addEventListener('error', this.onWindowError)

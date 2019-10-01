@@ -189,10 +189,10 @@ class Main extends React.Component<Props, State> {
             developerToolVisible: false
         }
     }
-    componentWillReceiveProps(nextProps) {
+    UNSAFE_componentWillReceiveProps(nextProps) {
         this.previousLocation = this.props.location;
     }
-    componentWillMount() {
+    componentDidMount() {
         window.routerHistory = this.props.history;
     }
     render() {

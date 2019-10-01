@@ -43,7 +43,7 @@ export default class CursorList extends React.Component<Props, State> {
     getInitialCursor = (props) => {
         return -1
     }
-    componentWillMount = () => {
+    componentDidMount = () => {
         document.addEventListener("keydown", this.onKeyDown)
     }
     componentWillUnmount = () => {
