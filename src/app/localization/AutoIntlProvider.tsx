@@ -35,7 +35,7 @@ class AutoIntlProvider extends React.Component<Props, {}> {
         private_messages = messages[lang]
         moment.locale(lang)
     }
-    componentWillUpdate = (nextProps:Props, nextState) => {
+    UNSAFE_componentWillUpdate = (nextProps:Props, nextState) => {
         const lang = nextProps.language
         private_messages = messages[lang]
         moment.locale(lang)

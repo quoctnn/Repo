@@ -67,7 +67,7 @@ export class ChatMessageList extends React.Component<Props & React.HTMLAttribute
         return nextProps.messages != this.props.messages || nextProps.children != this.props.children || nextProps.loading != this.props.loading || nextProps.conversation != this.props.conversation;
     }
 
-    componentWillUpdate = (nextProps:Props, nextState) => {
+    UNSAFE_componentWillUpdate = (nextProps:Props, nextState) => {
         if (this.listUpdateAfterInitialRender(this.props, nextProps)) {
             this.SCROLL_POSITION.prepareFor('up')
         }
