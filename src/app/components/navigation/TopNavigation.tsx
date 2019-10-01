@@ -88,7 +88,7 @@ class TopNavigation extends React.Component<Props, State> {
         const communityLinkClass = classnames("btn nav-link d-flex align-items-center mw0", {active:path.startsWith(communityLink)})
         const dashboardClass = classnames("btn nav-link d-flex align-items-center mw0", {active:path == dashboardLink})
         const conversationsLinkClass = classnames("btn nav-link d-flex align-items-center mw0", {active:path.startsWith(conversationsLink)})
-        return <div className="flex-grow-1 d-flex justify-content-center mw0">
+        return <div className="d-flex justify-content-center mw0">
                     { profile && !profile.is_anonymous &&
                         <>
                             <Link className={communityLinkClass} to={communityLink}>
@@ -121,7 +121,7 @@ class TopNavigation extends React.Component<Props, State> {
                     <BreadcrumbNavigation />
                     {this.renderMenuLinks()}
                     { profile && !profile.is_anonymous &&
-                        <>
+                        <div className="profile-shortcuts">
                             <Button onClick={this.toggleNotificationPanel} color="link" className="badge-notification-container">
                                 <i className="fas fa-bell"></i>
                                 {this.props.unreadNotifications > 0 && <Badge pill={true} color="danger" className="badge-notification">{this.props.unreadNotifications}</Badge>}
@@ -129,7 +129,7 @@ class TopNavigation extends React.Component<Props, State> {
                             <Link className="btn btn-link" to={{pathname:Routes.SEARCH, state:{modal:true}}}>
                                 <i className="fas fa-search"></i>
                             </Link>
-                        </>
+                        </div>
                     }
                     <div className="main-border-color-background mx-2" style={{ width: 1, height: "75%" }}></div>
                     <UserMenu />
