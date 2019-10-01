@@ -979,57 +979,34 @@ export abstract class ApiClient
             callback(null, status, new RequestErrorData(request.responseJSON, error))
         })
     }
-    static friendInvitationGetId = (userId:number, callback:ApiClientCallback<any>) => {
-        let url = Constants.apiRoute.friendInvitation + `?user_id=${userId}`
-        AjaxRequest.get(url, (data, status, request) => {
-            callback(data, status, null)
-        }, (request, status, error) => {
-            callback(null, status, new RequestErrorData(request.responseJSON, error))
-        })
-    }
     static friendInvitationSend = (userId:number, callback:ApiClientCallback<any>) => {
         let url = Constants.apiRoute.friendInvitation
-        AjaxRequest.post(url, {to_user: userId }, (data, status, request) => {
+        const data = { to_user: userId }
+        AjaxRequest.post(url, data, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
             callback(null, status, new RequestErrorData(request.responseJSON, error))
         })
     }
-    static friendInvitationAccept = (invitation:number, callback:ApiClientCallback<any>) => {
-        let url = Constants.apiRoute.friendInvitationAccept(invitation)
+    static friendInvitationAccept = (userId:number, callback:ApiClientCallback<any>) => {
+        let url = Constants.apiRoute.friendInvitationAccept(userId)
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
             callback(null, status, new RequestErrorData(request.responseJSON, error))
         })
     }
-    static friendInvitationDelete(invitation:number, block:boolean, callback:ApiClientCallback<any>){
-        let url = Constants.apiRoute.friendInvitationDelete(invitation) + "?" + ApiClient.getQueryString({block})
+    static friendInvitationDelete(userId:number, block:boolean, callback:ApiClientCallback<any>){
+        let url = Constants.apiRoute.friendInvitationDelete(userId) + "?" + ApiClient.getQueryString({block})
         AjaxRequest.delete(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
             callback(null, status, new RequestErrorData(request.responseJSON, error))
         })
     }
-    static friendshipGetId = (userId:number, callback:ApiClientCallback<any>) => {
-        let url = Constants.apiRoute.friendsUrl + `?user_id=${userId}`
-        AjaxRequest.get(url, (data, status, request) => {
-            callback(data, status, null)
-        }, (request, status, error) => {
-            callback(null, status, new RequestErrorData(request.responseJSON, error))
-        })
-    }
-    static userUnfriend(friendship:number, callback:ApiClientCallback<any>){
-        let url = Constants.apiRoute.friendsDelete(friendship)
+    static userUnfriend(userId:number, callback:ApiClientCallback<any>){
+        let url = Constants.apiRoute.friendsDelete(userId)
         AjaxRequest.delete(url, (data, status, request) => {
-            callback(data, status, null)
-        }, (request, status, error) => {
-            callback(null, status, new RequestErrorData(request.responseJSON, error))
-        })
-    }
-    static userBlockGetId = (userId:number, callback:ApiClientCallback<any>) => {
-        let url = Constants.apiRoute.blockUrl + `?user_id=${userId}`
-        AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
             callback(null, status, new RequestErrorData(request.responseJSON, error))
@@ -1044,8 +1021,8 @@ export abstract class ApiClient
             callback(null, status, new RequestErrorData(request.responseJSON, error))
         })
     }
-    static userUnBlock(blocking:number, callback:ApiClientCallback<any>){
-        let url = Constants.apiRoute.blockDelete(blocking)
+    static userUnBlock(userId:number, callback:ApiClientCallback<any>){
+        let url = Constants.apiRoute.blockDelete(userId)
         AjaxRequest.delete(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
