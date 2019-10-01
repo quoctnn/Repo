@@ -149,7 +149,7 @@ class ActivityModule extends React.Component<Props, State> {
             return
         if(checked)
             list.selectAll()
-        else 
+        else
             list.clearSelection()
     }
     clearSelection = () => {
@@ -175,14 +175,8 @@ class ActivityModule extends React.Component<Props, State> {
     }
     renderContent = () => {
         const {showLoadMore} = this.props
-        const {isSelecting, selected} = this.state
         return <>
-                <div className="header d-flex p-2 align-items-center">
-                    {isSelecting && <Checkbox checked={selected.length > 0} checkedIcon="fas fa-minus" onValueChange={this.headerCheckboxChange} />}
-                    <div className="flex-grow-1"></div>
-                    {isSelecting && selected.length > 0 &&  <Button color="light" size="xs" onClick={this.markActivitiesAsSeen}>{translate('common.mark.seen')}</Button>}
-                    <Button color="light" size="xs" onClick={this.toggleSelect}>{translate(isSelecting ? "Cancel" : "common.edit")}</Button>
-                </div>
+                {this.renderOptions()}
                 <ListComponent<RecentActivity>
                     ref={this.activityListInput}
                     onLoadingStateChanged={this.feedLoadingStateChanged}
@@ -193,6 +187,16 @@ class ActivityModule extends React.Component<Props, State> {
                     isSelecting={this.state.isSelecting}
                     className="activity-module-list" />
             </>
+    }
+    renderOptions = () => {
+        const {isSelecting, selected} = this.state
+        return <div className="header d-flex p-2 align-items-center">
+            {isSelecting && <Checkbox checked={selected.length > 0} checkedIcon="fas fa-minus" onValueChange={this.headerCheckboxChange} />}
+            <div className="flex-grow-1"></div>
+            {isSelecting && selected.length > 0 &&  <Button color="light" size="xs" onClick={this.markActivitiesAsSeen}>{translate('common.mark.seen')}</Button>}
+            <Button color="light" size="xs" onClick={this.toggleSelect}>{translate(isSelecting ? "Cancel" : "common.edit")}</Button>
+            {this.renderSorting()}
+        </div>
     }
     renderModalContent = () => {
         return <ActivityModule {...this.props} pageSize={50} style={{height:undefined, maxHeight:undefined}} showLoadMore={false} showInModal={false} isModal={true}/>
@@ -208,22 +212,15 @@ class ActivityModule extends React.Component<Props, State> {
     {
         const {history, match, location, staticContext, pageSize, showHeader, showLoadMore, showInModal, isModal, className, ...rest} = this.props
         const {breakpoint } = this.props
-        const menu = <ActivityMenu data={this.state.menuData} onUpdate={this.menuDataUpdated}  />
-        const headerContent = <>
-            {this.renderSorting()}
-        </>
         const renderModalContent = !showInModal || isModal ? undefined : this.renderModalContent
         const cn = classnames("activity-module", className)
         return (<SimpleModule {...rest}
-                    showHeader={showHeader}
+                    showHeader={!isModal}
                     showHeaderTitle={!isModal}
                     headerClick={this.headerClick}
                     breakpoint={breakpoint}
                     isLoading={this.state.isLoading}
                     renderModalContent={renderModalContent}
-                    onMenuToggle={this.onMenuToggle}
-                    menu={menu}
-                    headerContent={headerContent}
                     className={cn}
                     headerTitle={translate("common.activity")}>
                     {this.renderContent()}
