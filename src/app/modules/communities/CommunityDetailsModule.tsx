@@ -254,20 +254,18 @@ class CommunityDetailsModule extends React.Component<Props, State> {
                     <ModuleHeader headerTitle={community && community.name || translate("detail.module.title")} loading={this.state.isLoading}>
                        {communityOptions.length > 0 && <DropDownMenu className="community-option-dropdown" triggerClass="fas fa-cog mx-1" items={communityOptions}></DropDownMenu>} 
                     </ModuleHeader>
-                    {true && //breakpoint >= ResponsiveBreakpoint.standard && //do not render for small screens
-                        <ModuleContent>
-                            { community && community.permission >= Permission.read &&
-                                <DetailsContent description={community.description}/>
-                            ||
-                            <LoadingSpinner key="loading"/>
-                            }
-                            {this.renderEditForm()}
-                            {this.renderAddGroupForm()}
-                            {this.renderAddEventForm()}
-                            {this.renderAddProjectForm()}
-                            {this.renderInvitationList()}
-                        </ModuleContent>
-                    }
+                    <ModuleContent>
+                        { community && community.permission >= Permission.read &&
+                            <DetailsContent description={community.description}/>
+                        ||
+                        <LoadingSpinner key="loading"/>
+                        }
+                        {this.renderEditForm()}
+                        {this.renderAddGroupForm()}
+                        {this.renderAddEventForm()}
+                        {this.renderAddProjectForm()}
+                        {this.renderInvitationList()}
+                    </ModuleContent>
                     { community && community.permission >= Permission.read &&
                         <ModuleFooter className="mt-1">
                             <DetailsMembers members={community.members} />

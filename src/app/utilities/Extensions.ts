@@ -86,6 +86,13 @@ Array.prototype.toggleElement = function<T>(element:T){
     else 
         this.push(element)
 }
+
+Array.prototype.remove = function<T>(element:T):T[]{
+    const index = this.indexOf(element)
+    if(index > -1)
+       return this.splice(index, 1)
+}
+
 Array.prototype.except = function<T>(element:T){
     const index = this.indexOf(element)
     if(index > -1)

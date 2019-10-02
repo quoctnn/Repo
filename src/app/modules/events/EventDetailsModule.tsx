@@ -133,32 +133,30 @@ class EventDetailsModule extends React.Component<Props, State> {
                     <ModuleHeader className="event-detail" headerTitle={event && event.name || translate("detail.module.title")} loading={this.state.isLoading}>
                         {eventOptions.length > 0 && <DropDownMenu className="event-option-dropdown" triggerClass="fas fa-cog mx-1" items={eventOptions}></DropDownMenu>} 
                     </ModuleHeader>
-                    {true && //breakpoint >= ResponsiveBreakpoint.standard && //do not render for small screens
-                        <ModuleContent>
-                            { event && event.permission >= Permission.read &&
-                                <div className="event-details-content">
-                                    <DetailsContent community={community} description={event.description}>
-                                        { event.parent &&
-                                            <div>
-                                                <span className="details-field-name">
-                                                    {translate("common.event.event")}:&nbsp;
-                                                </span>
-                                                <span className="details-field-value">
-                                                    <Link to={event.parent.uri || "#"}>
-                                                        {event.parent.name}
-                                                    </Link>
-                                                </span>
-                                            </div>
-                                        }
-                                    </DetailsContent>
-                                </div>
-                                ||
-                                <LoadingSpinner key="loading"/>
-                            }
-                            {this.renderEditForm()}
-                            {this.renderInvitationList()}
-                        </ModuleContent>
-                    }
+                    <ModuleContent>
+                        { event && event.permission >= Permission.read &&
+                            <div className="event-details-content">
+                                <DetailsContent community={community} description={event.description}>
+                                    { event.parent &&
+                                        <div>
+                                            <span className="details-field-name">
+                                                {translate("common.event.event")}:&nbsp;
+                                            </span>
+                                            <span className="details-field-value">
+                                                <Link to={event.parent.uri || "#"}>
+                                                    {event.parent.name}
+                                                </Link>
+                                            </span>
+                                        </div>
+                                    }
+                                </DetailsContent>
+                            </div>
+                            ||
+                            <LoadingSpinner key="loading"/>
+                        }
+                        {this.renderEditForm()}
+                        {this.renderInvitationList()}
+                    </ModuleContent>
                     { event && event.permission >= Permission.read &&
                         <ModuleFooter>
                             { startDate &&

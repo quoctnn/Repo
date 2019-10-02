@@ -37,7 +37,8 @@ declare global {
         isEqual(arr:T[])
         contains(element): boolean
         cloneArray(): T[];
-        toggleElement(element):void
+        toggleElement(element:T):void
+        remove(elemen:T):T[]
         except(element:T):Array<T>
     }
     interface Number

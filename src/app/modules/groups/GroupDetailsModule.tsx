@@ -130,21 +130,19 @@ class GroupDetailsModule extends React.Component<Props, State> {
                     <ModuleHeader headerTitle={group && group.name || translate("detail.module.title")} loading={this.state.isLoading}>
                         {groupOptions.length > 0 && <DropDownMenu className="group-option-dropdown" triggerClass="fas fa-cog mx-1" items={groupOptions}></DropDownMenu>} 
                     </ModuleHeader>
-                    {true && //breakpoint >= ResponsiveBreakpoint.standard && //do not render for small screens
-                        <ModuleContent>
-                            { group &&
-                                <div>
-                                    { group.permission >= Permission.read &&
-                                        <DetailsContent community={community} description={group.description}/>
-                                    }
-                                </div>
-                                ||
-                                <LoadingSpinner key="loading"/>
-                            }
-                            {this.renderEditForm()}
-                            {this.renderInvitationList()}
-                        </ModuleContent>
-                    }
+                    <ModuleContent>
+                        { group &&
+                            <div>
+                                { group.permission >= Permission.read &&
+                                    <DetailsContent community={community} description={group.description}/>
+                                }
+                            </div>
+                            ||
+                            <LoadingSpinner key="loading"/>
+                        }
+                        {this.renderEditForm()}
+                        {this.renderInvitationList()}
+                    </ModuleContent>
                     {group && group.permission >= Permission.read &&
                         <ModuleFooter className="mt-1">
                             <DetailsMembers members={group.members} />

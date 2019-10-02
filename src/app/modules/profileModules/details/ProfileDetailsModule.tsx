@@ -119,7 +119,12 @@ class ProfileDetailsModule extends React.PureComponent<Props, State> {
         ApiClient.userBlock(profile.id, (data, status, error) => {
             if(!error)
             {
-                profile.relationship = [RelationshipStatus.isBlocked]
+                const relationship =  profile.relationship || []
+                relationship.push(RelationshipStatus.isBlocked)
+                relationship.remove(RelationshipStatus.friends)
+                relationship.remove(RelationshipStatus.pendingInvitation)
+                relationship.remove(RelationshipStatus.pendingRequest)
+                profile.relationship = relationship
                 this.updateProfile(profile)
             }
             ToastManager.showRequestErrorToast(error)
@@ -130,7 +135,9 @@ class ProfileDetailsModule extends React.PureComponent<Props, State> {
         ApiClient.userUnBlock(profile.id, (data, status, error) => {
             if(!error)
             {
-                profile.relationship = []
+                const relationship =  profile.relationship || []
+                relationship.remove(RelationshipStatus.isBlocked)
+                profile.relationship = relationship
                 this.updateProfile(profile)
             }
             ToastManager.showRequestErrorToast(error)
@@ -141,7 +148,9 @@ class ProfileDetailsModule extends React.PureComponent<Props, State> {
         ApiClient.userUnfriend(profile.id, (data, status, error) => {
             if(!error)
             {
-                profile.relationship = []
+                const relationship =  profile.relationship || []
+                relationship.remove(RelationshipStatus.friends)
+                profile.relationship = relationship
                 this.updateProfile(profile)
             }
             ToastManager.showRequestErrorToast(error)
@@ -152,7 +161,9 @@ class ProfileDetailsModule extends React.PureComponent<Props, State> {
         ApiClient.friendInvitationSend(profile.id, (data, status, error) => {
             if(data)
             {
-                profile.relationship = [RelationshipStatus.pendingRequest]
+                const relationship =  profile.relationship || []
+                relationship.push(RelationshipStatus.pendingRequest)
+                profile.relationship = relationship
                 this.updateProfile(profile)
             }
             ToastManager.showRequestErrorToast(error)
@@ -161,9 +172,12 @@ class ProfileDetailsModule extends React.PureComponent<Props, State> {
     acceptInvitationFromUser = () => (event: React.SyntheticEvent<any>) => {
         const profile = {...this.props.profile}
         ApiClient.friendInvitationAccept(profile.id, (data, status, error) => {
-            if(data)
+            if(!error)
             {
-                profile.relationship = [RelationshipStatus.friends]
+                const relationship =  profile.relationship || []
+                relationship.push(RelationshipStatus.friends)
+                relationship.remove(RelationshipStatus.pendingInvitation)
+                profile.relationship = relationship
                 this.updateProfile(profile)
             }
             ToastManager.showRequestErrorToast(error)
@@ -173,12 +187,14 @@ class ProfileDetailsModule extends React.PureComponent<Props, State> {
         profile.last_seen = new Date().getTime()
         ProfileManager.storeProfile(profile)
     }
-    declineInvitationFromUser = () => (event: React.SyntheticEvent<any>) => {
+    declineInvitationFromUser = (toRemove:RelationshipStatus) => (event: React.SyntheticEvent<any>) => {
         const profile = {...this.props.profile}
         ApiClient.friendInvitationDelete(profile.id, false, (data, status, error) => {
             if(!error)
             {
-                profile.relationship = []
+                const relationship =  profile.relationship || []
+                relationship.remove(toRemove)
+                profile.relationship = relationship
                 this.updateProfile(profile)
             }
             ToastManager.showRequestErrorToast(error)
@@ -275,34 +291,31 @@ class ProfileDetailsModule extends React.PureComponent<Props, State> {
         else{
             const relationship = profile.relationship && profile.relationship || []
             // TODO: Check if user is already blocked and have unblock instead
-            if(!relationship.contains(RelationshipStatus.blockedBy))
-            {
-                if (relationship.contains(RelationshipStatus.isBlocked)) {
-                    options.push({
-                        id: "unblock",
-                        type: OverflowMenuItemType.option,
-                        title: translate("common.relationship.unblock"),
-                        onPress: this.unBlockUser,
-                        toggleMenu: false
-                    })
-                } else {
-                    options.push({
-                        id: "block",
-                        type: OverflowMenuItemType.option,
-                        title: translate("common.relationship.block"),
-                        onPress: this.blockUser,
-                        toggleMenu: false
-                    })
-                }
-                if (profile.relationship && profile.relationship.contains(RelationshipStatus.friends)) {
-                    options.push({
-                        id: "unfriend",
-                        type: OverflowMenuItemType.option,
-                        title: translate("common.relationship.unfriend"),
-                        onPress: this.unfriendUser,
-                        toggleMenu: false
-                    })
-                }
+            if (relationship.contains(RelationshipStatus.isBlocked)) {
+                options.push({
+                    id: "unblock",
+                    type: OverflowMenuItemType.option,
+                    title: translate("common.relationship.unblock"),
+                    onPress: this.unBlockUser,
+                    toggleMenu: false
+                })
+            } else {
+                options.push({
+                    id: "block",
+                    type: OverflowMenuItemType.option,
+                    title: translate("common.relationship.block"),
+                    onPress: this.blockUser,
+                    toggleMenu: false
+                })
+            }
+            if (profile.relationship && profile.relationship.contains(RelationshipStatus.friends)) {
+                options.push({
+                    id: "unfriend",
+                    type: OverflowMenuItemType.option,
+                    title: translate("common.relationship.unfriend"),
+                    onPress: this.unfriendUser,
+                    toggleMenu: false
+                })
             }
         }
         return options
@@ -329,14 +342,14 @@ class ProfileDetailsModule extends React.PureComponent<Props, State> {
                         <button onClick={this.acceptInvitationFromUser()} className='btn btn-success'>
                             {translate("invitation.accept")}
                         </button>&nbsp;
-                        <button onClick={this.declineInvitationFromUser()} className='btn btn-danger'>
+                        <button onClick={this.declineInvitationFromUser(relationship)} className='btn btn-danger'>
                             {translate("invitation.dismiss")}
                         </button>
                     </>
                 );
             case RelationshipStatus.pendingRequest:
                 return (
-                    <button onClick={this.declineInvitationFromUser()} className='btn btn-danger'>
+                    <button onClick={this.declineInvitationFromUser(relationship)} className='btn btn-danger'>
                         {translate("common.relationship.cancel")}
                     </button>
                 );

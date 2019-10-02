@@ -14,7 +14,6 @@ import NewsfeedComponentRouted, { NewsfeedComponent } from './NewsfeedComponent'
 import CircularLoadingSpinner from '../../components/general/CircularLoadingSpinner';
 import NewsfeedMenu, { NewsfeedMenuData, allowedSearchOptions } from './NewsfeedMenu';
 import { ObjectAttributeType, ContextNaturalKey, StatusActions, Permission, Permissible } from '../../types/intrasocial_types';
-import { ButtonGroup, Button } from 'reactstrap';
 import { ContextSearchData } from '../../components/general/input/contextsearch/extensions';
 import { translate } from '../../localization/AutoIntlProvider';
 import { ReduxState } from '../../redux';
@@ -238,22 +237,18 @@ class NewsfeedModule extends React.Component<Props, State> {
                         {this.renderHeaderFilter()}
                         <ModuleMenuTrigger onClick={this.menuItemClick} />
                     </ModuleHeader>
-                    {breakpoint >= ResponsiveBreakpoint.standard && //do not render for small screens
-                        <>
-                            <ModuleContent>
-                                <NewsfeedComponentRouted wrappedComponentRef={this.connectRef}
-                                    onLoadingStateChanged={this.feedLoadingStateChanged}
-                                    includeSubContext={this.state.includeSubContext}
-                                    contextNaturalKey={resolvedContextNaturalKey}
-                                    contextObjectId={resolvedContextObjectId}
-                                    contextObject={contextObject}
-                                    filter={this.state.filter}
-                                    scrollParent={window}
-                                    />
-                            </ModuleContent>
-                            <ModuleFooter></ModuleFooter>
-                        </>
-                    }
+                    <ModuleContent>
+                        <NewsfeedComponentRouted wrappedComponentRef={this.connectRef}
+                            onLoadingStateChanged={this.feedLoadingStateChanged}
+                            includeSubContext={this.state.includeSubContext}
+                            contextNaturalKey={resolvedContextNaturalKey}
+                            contextObjectId={resolvedContextObjectId}
+                            contextObject={contextObject}
+                            filter={this.state.filter}
+                            scrollParent={window}
+                            />
+                    </ModuleContent>
+                    <ModuleFooter></ModuleFooter>
                     <ModuleMenu visible={this.state.menuVisible}>
                         <NewsfeedMenu
                             onUpdate={this.menuDataUpdated}

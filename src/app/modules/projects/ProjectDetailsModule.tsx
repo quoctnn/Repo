@@ -95,18 +95,16 @@ class ProjectDetailsModule extends React.Component<Props, State> {
                     <ModuleHeader headerTitle={project && project.name || translate("detail.module.title")} loading={this.state.isLoading}>
                         {projectOptions.length > 0 && <DropDownMenu className="project-option-dropdown" triggerClass="fas fa-cog mx-1" items={projectOptions}></DropDownMenu>}
                     </ModuleHeader>
-                    {true && //breakpoint >= ResponsiveBreakpoint.standard && //do not render for small screens
-                        <ModuleContent>
-                            { project && project.permission >= Permission.read &&
-                                <div className="project-details-content">
-                                    <DetailsContent community={community} description={project.description}/>
-                                </div>
-                                ||
-                                <LoadingSpinner key="loading"/>
-                            }
-                            {this.renderEditForm()}
-                        </ModuleContent>
-                    }
+                    <ModuleContent>
+                        { project && project.permission >= Permission.read &&
+                            <div className="project-details-content">
+                                <DetailsContent community={community} description={project.description}/>
+                            </div>
+                            ||
+                            <LoadingSpinner key="loading"/>
+                        }
+                        {this.renderEditForm()}
+                    </ModuleContent>
                     { project && project.permission >= Permission.read &&
                         <ModuleFooter className="mt-1">
                             <div className="d-flex flex-row justify-content-between">
