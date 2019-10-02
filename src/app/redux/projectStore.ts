@@ -32,7 +32,7 @@ export const resetProjectsAction = ():ResetProjectsAction => ({
 const shouldUpdate = (oldProject:Project, newProject:Project) => {
     if(!oldProject)
         return true
-    const fieldsUpdated = !shallowCompareFields(["avatar", "cover", "slug"], oldProject, newProject)
+    const fieldsUpdated = !shallowCompareFields(["avatar", "cover_cropped", "slug"], oldProject, newProject)
     if(fieldsUpdated)
     {
         return true

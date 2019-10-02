@@ -41,7 +41,7 @@ export const resetCommunitiesAction = ():ResetCommunitiesAction => ({
 const shouldUpdate = (oldCommunity:Community, newCommunity:Community) => {
     if(!oldCommunity)
         return true
-    const fieldsUpdated = !shallowCompareFields(["avatar", "cover"], oldCommunity, newCommunity)
+    const fieldsUpdated = !shallowCompareFields(["avatar", "cover_cropped"], oldCommunity, newCommunity)
     if(fieldsUpdated)
     {
         return true
