@@ -7,6 +7,7 @@ import { SketchPicker, ColorResult } from 'react-color';
 import "./ColorInput.scss"
 import classnames from 'classnames';
 import Popper from 'popper.js';
+import { nullOrUndefined } from '../../../utilities/Utilities';
 export type ColorInputProps = {
     value:string
 } & FormComponentBaseProps
@@ -20,7 +21,7 @@ export class ColorInput extends React.Component<ColorInputProps, ColorInputState
     constructor(props:ColorInputProps){
         super(props)
         this.state = {
-            value:this.props.value || "#ddddddd",
+            value:nullOrUndefined(this.props.value) ? "#dddddd" : this.props.value.toString(),
             popoverRemoved:true,
             popoverVisible:false
         }

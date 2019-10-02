@@ -1,10 +1,9 @@
 import * as React from 'react';
-import { withRouter, RouteComponentProps, Link } from "react-router-dom";
+import { withRouter, RouteComponentProps } from "react-router-dom";
 import Module from '../Module';
 import ModuleHeader from '../ModuleHeader';
 import ModuleContent from '../ModuleContent';
 import ModuleFooter from '../ModuleFooter';
-import ModuleMenuTrigger from '../ModuleMenuTrigger';
 import "./GroupDetailsModule.scss"
 import { ResponsiveBreakpoint } from '../../components/general/observers/ResponsiveComponent';
 import { translate } from '../../localization/AutoIntlProvider';
@@ -21,6 +20,7 @@ import { uniqueId } from '../../utilities/Utilities';
 import { OverflowMenuItemType, OverflowMenuItem } from '../../components/general/OverflowMenu';
 import { DropDownMenu } from '../../components/general/DropDownMenu';
 import { GroupManager } from '../../managers/GroupManager';
+import ContextInvitationComponent from '../../components/general/contextInvitation/ContextInvitationComponent';
 type OwnProps = {
     breakpoint:ResponsiveBreakpoint
     contextNaturalKey: ContextNaturalKey
@@ -30,6 +30,8 @@ type State = {
     isLoading:boolean
     editFormVisible:boolean
     editFormReloadKey:string
+    invitationListVisible?:boolean
+    invitationReloadKey?:string
 }
 type ReduxStateProps = {
     community: Community
@@ -46,6 +48,8 @@ class GroupDetailsModule extends React.Component<Props, State> {
             menuVisible:false,
             editFormVisible:false,
             editFormReloadKey:uniqueId(),
+            invitationListVisible:false,
+            invitationReloadKey:uniqueId(),
         }
     }
     componentDidUpdate = (prevProps:Props) => {
@@ -98,11 +102,25 @@ class GroupDetailsModule extends React.Component<Props, State> {
         const group = this.props.group
         return <GroupCreateComponent onCancel={this.hideGroupCreateForm} community={group.community} key={this.state.editFormReloadKey} group={group} visible={visible} onComplete={this.handleGroupCreateForm} />
     }
+
+    toggleInviteForm = () => {
+        this.setState((prevState:State) => {
+            const invitationReloadKey = prevState.invitationListVisible ? null : uniqueId()
+            return {invitationListVisible:!prevState.invitationListVisible, invitationReloadKey}
+        })
+    }
     getGroupOptions = () => {
         const options: OverflowMenuItem[] = []
         if(this.props.group.permission >= Permission.admin)
-            options.push({id:"1", type:OverflowMenuItemType.option, title:translate("Edit"), onPress:this.showGroupCreateForm, iconClass:"fas fa-pen"})
+            options.push({id:"1", type:OverflowMenuItemType.option, title:translate("Edit"), onPress:this.showGroupCreateForm, iconClass:"fas fa-pen", iconStackClass:Permission.getShield(this.props.group.permission)})
+        if(this.props.group.permission >= Permission.admin)
+            options.push({id:"invite", type:OverflowMenuItemType.option, title:translate("common.invitations"), onPress:this.toggleInviteForm, iconClass:"fas fa-paper-plane", iconStackClass:Permission.getShield(this.props.group.permission)})
         return options
+    }
+    renderInvitationList = () => {
+        const visible = this.state.invitationListVisible
+        const contextObject = this.props.group
+        return <ContextInvitationComponent  members={contextObject.members} availableMembers={this.props.community.members} contextNaturalKey={ContextNaturalKey.GROUP} key={this.state.invitationReloadKey} didCancel={this.toggleInviteForm} visible={visible} contextObject={contextObject} />
     }
     render()
     {
@@ -112,20 +130,19 @@ class GroupDetailsModule extends React.Component<Props, State> {
                     <ModuleHeader headerTitle={group && group.name || translate("detail.module.title")} loading={this.state.isLoading}>
                         {groupOptions.length > 0 && <DropDownMenu className="group-option-dropdown" triggerClass="fas fa-cog mx-1" items={groupOptions}></DropDownMenu>} 
                     </ModuleHeader>
-                    {true && //breakpoint >= ResponsiveBreakpoint.standard && //do not render for small screens
-                        <ModuleContent>
-                            { group &&
-                                <div>
-                                    { group.permission >= Permission.read &&
-                                        <DetailsContent community={community} description={group.description}/>
-                                    }
-                                </div>
-                                ||
-                                <LoadingSpinner key="loading"/>
-                            }
-                            {this.renderEditForm()}
-                        </ModuleContent>
-                    }
+                    <ModuleContent>
+                        { group &&
+                            <div>
+                                { group.permission >= Permission.read &&
+                                    <DetailsContent community={community} description={group.description}/>
+                                }
+                            </div>
+                            ||
+                            <LoadingSpinner key="loading"/>
+                        }
+                        {this.renderEditForm()}
+                        {this.renderInvitationList()}
+                    </ModuleContent>
                     {group && group.permission >= Permission.read &&
                         <ModuleFooter className="mt-1">
                             <DetailsMembers members={group.members} />

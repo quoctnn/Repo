@@ -170,6 +170,7 @@ export const stringToDateFormat = (string: string, format?: DateFormat) => {
 export const stringToDate = (string?: string) => {
     return moment(string).tz(timezone)
 }
+export const SINGLE_EMAIL_REGEX = /^(([a-zA-Z0-9\-\_\.])+@[a-zA-Z\_]+?(\.[a-zA-Z]{2,6})+)$/
 export const EMAIL_REGEX = /(\b\s+)(([a-zA-Z0-9\-\_\.])+@[a-zA-Z\_]+?(\.[a-zA-Z]{2,6})+)/gm
 export const URL_REGEX = /(\b(https?|ftp):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/gim
 export const URL_WWW_REGEX = /(^(\b|\s+)(www)\.[\S]+(\b|$))/gim
@@ -183,7 +184,7 @@ export const SENTENCES_REGEX = /[^\.!\?]+[\.!\?]+|[^\.!\?]+$/g
 export const truncate = (text, maxChars) => {
     return text && text.length > (maxChars - 3) ? text.substring(0, maxChars - 3) + '...' : text;
 }
-export const MENTION_REGEX = new RegExp("@(" + ContextNaturalKey.all.map(s => s.replace(".", "\\.")).join("|") + "):(\\d+)(:([^.:]+):)?", 'g') 
+export const MENTION_REGEX = new RegExp("@(" + ContextNaturalKey.all.map(s => s.replace(".", "\\.")).join("|") + "):(\\d+)(:([^:]+):)?", 'g') 
 export class MentionData{
     contextNaturalKey:ContextNaturalKey
     contextId:number
@@ -501,3 +502,18 @@ export const shallowCompareFields = (keys:string[], obj1:Object, obj2:Object) =>
     keys.every(key => 
         obj1.hasOwnProperty(key) && obj2.hasOwnProperty(key) && obj1[key] === obj2[key]
   )
+
+export const findScrollParent = (node:HTMLElement) => {
+    let parent = node;
+    while ((parent = parent.parentElement)) {
+      const overflowYVal = getComputedStyle(parent, null).getPropertyValue("overflow-y");
+      if (parent === document.body) return window;
+      if (overflowYVal === "auto" || overflowYVal === "scroll") return parent;
+    }
+    return window;
+}
+export const listPageSize = (elementHeight:number) => {
+    const elementsPerPage = screen.height / elementHeight
+    return Math.round(elementsPerPage * 3 )
+}
+export const nameofFactory = <T extends {}>() => (name: keyof T) => name;

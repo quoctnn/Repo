@@ -75,7 +75,7 @@ export class Grid extends React.PureComponent<Props, State> {
             document.body.classList.remove(Grid.modeFillClass)
         this.bodyClassAdded = null;
     }
-    componentWillReceiveProps = (newProps:Props) => {
+    UNSAFE_componentWillReceiveProps = (newProps:Props) => {
         if(this.props.enableAnimation)
         {
             let keys = this.getKeys()

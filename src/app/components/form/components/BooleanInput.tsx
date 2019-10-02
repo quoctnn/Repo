@@ -57,7 +57,7 @@ export class BooleanInput extends React.Component<BooleanInputProps, BooleanInpu
                         <Input className="mr-1" invalid={!!error} id={this.props.id} checked={this.state.value} type="checkbox" onChange={this.handleInputChange}/>
                         {" "}{this.props.title}
                     </Label>
-                    {this.props.description && <div className="description">{this.props.description}</div>}
+                    {this.props.description && <div className="description" dangerouslySetInnerHTML={{__html:this.props.description}}></div>}
                     <FormComponentErrorMessage errors={error} errorKey={this.props.id} />
                 </FormGroup>
             </div>

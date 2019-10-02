@@ -79,7 +79,7 @@ class ConversationContainerModule extends React.Component<Props, State> {
     }
     render()
     {
-        const {history, match, location, staticContext, contextNaturalKey, conversation, createNewConversation, authenticatedUser, queuedMessages, ...rest} = this.props
+        const {history, match, location, staticContext, contextNaturalKey, conversation, createNewConversation, authenticatedUser, queuedMessages, conversationId,  ...rest} = this.props
         const {breakpoint, className} = this.props
         const cn = classnames("conversation-container-module", className, {temporary:conversation && conversation.temporary, "single-mode":this.state.singleMode})
         return (<SimpleModule {...rest}

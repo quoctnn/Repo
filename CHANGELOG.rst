@@ -2,8 +2,8 @@
 Task schedule
 -->
 
-+++++++++++++++++++++++++++++++++++++++++++++++++
-Leslie: Legg dette til på neste changelog versjon
+v0.5.6 | 01.10.2019
+-----------------------------------------
 
 Added:
 ======
@@ -11,16 +11,41 @@ Added:
 * Sorting options for 'Recent Activities'
 * Unfriend button on profile page
 * Multi-select edit on ListComponent
+* Community selector top/most used
+* Favorite button on search result items
+* Conversation detail module
+* Multiple file upload for conversation messages
+* Community create/update form
+* Group create/update form
+* Event create/update form
+* Project create/update form
+* Components for avatar/cover cropping
+* More context links in search results 
+* Invitations list for Community, Group and Event
+* Invite form for Community, Group and Event
+* Warning/info box for Internet connection loss
+* Warning/info box for Websocket connection loss
+* Profile update form
 
 
 Changes:
 ======
 
 * Improved reaction display
+* Improved error logging
+* Improved mobile support for Conversation page
+* Improved mobile support for Search page
 
+Bugfixes:
+=========
 
-+++++++++++++++++++++++++++++++++++++++++++++++++
-
+* Fixed bug with duplicate messages when creating conversation
+* Fixed logo issues on Safari
+* Fixed issues with text input cursor positioning
+* Fixed issue with mentions containing '.'
+* Fixed small layout issue on conversation
+* Fixed issues inserting comment when status(parent) not available
+* Fixed issue with multiple reloads when reacting to status/comment
 
 
 v0.5.5 | 26.08.2019

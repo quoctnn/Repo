@@ -6,7 +6,8 @@ import { ContextValue } from "../../components/general/input/ContextFilter";
 import { TaskState, TaskPriority, UserProfile } from '../../types/intrasocial_types';
 import { ProfileManager } from "../../managers/ProfileManager";
 import { userFullName, userAvatar } from '../../utilities/Utilities';
-import { ProjectProfileFilter, ProfileFilterOption } from "./ProjectProfileFilter";
+import { ProjectProfileFilter } from "./ProjectProfileFilter";
+import { ProfileSelectorOption } from "../../components/general/input/SelectExtensions";
 
 export type TasksMenuData = {
     project:ContextValue
@@ -59,17 +60,17 @@ export default class TaskMenu extends React.Component<Props, State> {
         data.project = context
         this.setState({data}, this.sendUpdate)
     }
-    onAssignedChange = (value:ProfileFilterOption) => {
+    onAssignedChange = (value:ProfileSelectorOption) => {
         const data = this.state.data
         data.assignedTo = value && value.id
         this.setState({data}, this.sendUpdate)
     }
-    onResponsibleChange = (value:ProfileFilterOption) => {
+    onResponsibleChange = (value:ProfileSelectorOption) => {
         const data = this.state.data
         data.responsible = value && value.id
         this.setState({data}, this.sendUpdate)
     }
-    onCreatorChange = (value:ProfileFilterOption) => {
+    onCreatorChange = (value:ProfileSelectorOption) => {
         const data = this.state.data
         data.creator = value && value.id
         this.setState({data}, this.sendUpdate)
@@ -99,7 +100,7 @@ export default class TaskMenu extends React.Component<Props, State> {
         data.priority = arr
         this.setState({data}, this.sendUpdate)
     }
-    getProfileFilterOption = (profile:UserProfile):ProfileFilterOption => {
+    getProfileFilterOption = (profile:UserProfile):ProfileSelectorOption => {
         return {value:profile.slug_name, label:userFullName(profile), id:profile.id, icon:userAvatar(profile, true)}
     }
     render() {

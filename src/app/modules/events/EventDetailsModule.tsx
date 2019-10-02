@@ -20,6 +20,7 @@ import FormController from '../../components/form/FormController';
 import { DropDownMenu } from '../../components/general/DropDownMenu';
 import EventCreateComponent from '../../components/general/contextCreation/EventCreateComponent';
 import { EventManager } from '../../managers/EventManager';
+import ContextInvitationComponent from '../../components/general/contextInvitation/ContextInvitationComponent';
 const shortMonth:string[] = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 type OwnProps = {
     breakpoint:ResponsiveBreakpoint
@@ -30,6 +31,8 @@ type State = {
     isLoading:boolean
     editFormVisible:boolean
     editFormReloadKey:string
+    invitationListVisible?:boolean
+    invitationReloadKey?:string
 }
 type ReduxStateProps = {
     community: Community
@@ -47,6 +50,8 @@ class EventDetailsModule extends React.Component<Props, State> {
             menuVisible:false,
             editFormVisible:false,
             editFormReloadKey:uniqueId(),
+            invitationListVisible:false,
+            invitationReloadKey:uniqueId(),
         }
     }
     componentDidUpdate = (prevProps:Props) => {
@@ -95,11 +100,24 @@ class EventDetailsModule extends React.Component<Props, State> {
         }
         this.hideEventCreateForm()
     }
+    toggleInviteForm = () => {
+        this.setState((prevState:State) => {
+            const invitationReloadKey = prevState.invitationListVisible ? null : uniqueId()
+            return {invitationListVisible:!prevState.invitationListVisible, invitationReloadKey}
+        })
+    }
     getEventOptions = () => {
         const options: OverflowMenuItem[] = []
-        if(this.props.community.permission >= Permission.admin)
-            options.push({id:"1", type:OverflowMenuItemType.option, title:translate("Edit"), onPress:this.showEventCreateForm, iconClass:"fas fa-pen"})
+        if(this.props.event.permission >= Permission.admin)
+            options.push({id:"1", type:OverflowMenuItemType.option, title:translate("Edit"), onPress:this.showEventCreateForm, iconClass:"fas fa-pen", iconStackClass:Permission.getShield(this.props.event.permission)})
+        if(this.props.event.permission >= Permission.admin)
+            options.push({id:"invite", type:OverflowMenuItemType.option, title:translate("common.invitations"), onPress:this.toggleInviteForm, iconClass:"fas fa-paper-plane", iconStackClass:Permission.getShield(this.props.event.permission)})
         return options
+    }
+    renderInvitationList = () => {
+        const visible = this.state.invitationListVisible
+        const contextObject = this.props.event
+        return <ContextInvitationComponent members={contextObject.attending} availableMembers={this.props.community.members} contextNaturalKey={ContextNaturalKey.EVENT} key={this.state.invitationReloadKey} didCancel={this.toggleInviteForm} visible={visible} contextObject={contextObject} />
     }
     renderEditForm = () => {
         const visible = this.state.editFormVisible
@@ -115,31 +133,30 @@ class EventDetailsModule extends React.Component<Props, State> {
                     <ModuleHeader className="event-detail" headerTitle={event && event.name || translate("detail.module.title")} loading={this.state.isLoading}>
                         {eventOptions.length > 0 && <DropDownMenu className="event-option-dropdown" triggerClass="fas fa-cog mx-1" items={eventOptions}></DropDownMenu>} 
                     </ModuleHeader>
-                    {true && //breakpoint >= ResponsiveBreakpoint.standard && //do not render for small screens
-                        <ModuleContent>
-                            { event && event.permission >= Permission.read &&
-                                <div className="event-details-content">
-                                    <DetailsContent community={community} description={event.description}>
-                                        { event.parent &&
-                                            <div>
-                                                <span className="details-field-name">
-                                                    {translate("common.event.event")}:&nbsp;
-                                                </span>
-                                                <span className="details-field-value">
-                                                    <Link to={event.parent.uri || "#"}>
-                                                        {event.parent.name}
-                                                    </Link>
-                                                </span>
-                                            </div>
-                                        }
-                                    </DetailsContent>
-                                </div>
-                                ||
-                                <LoadingSpinner key="loading"/>
-                            }
-                            {this.renderEditForm()}
-                        </ModuleContent>
-                    }
+                    <ModuleContent>
+                        { event && event.permission >= Permission.read &&
+                            <div className="event-details-content">
+                                <DetailsContent community={community} description={event.description}>
+                                    { event.parent &&
+                                        <div>
+                                            <span className="details-field-name">
+                                                {translate("common.event.event")}:&nbsp;
+                                            </span>
+                                            <span className="details-field-value">
+                                                <Link to={event.parent.uri || "#"}>
+                                                    {event.parent.name}
+                                                </Link>
+                                            </span>
+                                        </div>
+                                    }
+                                </DetailsContent>
+                            </div>
+                            ||
+                            <LoadingSpinner key="loading"/>
+                        }
+                        {this.renderEditForm()}
+                        {this.renderInvitationList()}
+                    </ModuleContent>
                     { event && event.permission >= Permission.read &&
                         <ModuleFooter>
                             { startDate &&

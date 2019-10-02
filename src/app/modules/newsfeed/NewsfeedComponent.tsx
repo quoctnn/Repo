@@ -1039,7 +1039,7 @@ export class NewsfeedComponent extends React.Component<Props, State> {
             }
             case StatusActions.new:
             {
-                if(extra && extra.message)
+                if(extra && (extra.message || extra.files))
                 {
                     this.createNewComment(status, extra.message, extra.files, extra.completion)
                 }
@@ -1051,7 +1051,7 @@ export class NewsfeedComponent extends React.Component<Props, State> {
             }
             case StatusActions.edit:
             {
-                if(extra && extra.status)
+                if(extra && (extra.status || extra.files))
                 {
                     this.updateStatus(status.id, extra.status, extra.files, extra.completion)
                 }

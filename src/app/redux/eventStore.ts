@@ -31,7 +31,7 @@ export const resetEventsAction = ():ResetEventsAction => ({
 const shouldUpdate = (oldEvent:Event, newEvent:Event) => {
     if(!oldEvent)
         return true
-    const fieldsUpdated = !shallowCompareFields(["avatar", "cover", "slug"], oldEvent, newEvent)
+    const fieldsUpdated = !shallowCompareFields(["avatar", "cover_cropped", "slug"], oldEvent, newEvent)
     if(fieldsUpdated)
     {
         return true

@@ -80,8 +80,18 @@ const CommunityInvitation = (props: InvitationProps) => {
     const title = community.name
     const profile = props.invitation.invited_by
     const inviterName = userFullName(profile, null) || translate("Someone")
-    const message = <><Link onClick={props.onClose} to={profile.uri}>{inviterName}</Link> {translate("invitation.invite.join")}</>
-    return <InvitationComponent onClose={props.onClose} avatarLink={link} createdAt={props.invitation.created_at} title={title} link={link} avatar={avatar} message={message}>
+    const message = <>
+                    <Link onClick={props.onClose} to={profile.uri}>{inviterName}</Link> {translate("invitation.invite.join")}
+                    {props.invitation.message && <div>{props.invitation.message}</div>}
+                    </>
+    return <InvitationComponent
+                onClose={props.onClose}
+                avatarLink={link}
+                createdAt={props.invitation.created_at}
+                title={title}
+                link={link}
+                avatar={avatar}
+                message={message}>
         <Button onClick={join} color="secondary" size="xs">{translate("invitation.join")}</Button>
         <Button outline={true} className="ml-1" onClick={dismiss} color="secondary" size="xs">{translate("invitation.dismiss")}</Button>
     </InvitationComponent>
@@ -120,7 +130,7 @@ const GroupInvitation = (props: InvitationProps) => {
 }
 const FriendshipInvitation = (props: InvitationProps) => {
     const accept = () => {
-        ApiClient.friendInvitationAccept(props.invitation.id, (data, status, error) => {
+        ApiClient.friendInvitationAccept(props.invitation.invited_by.id, (data, status, error) => {
             if (!error) {
                 sendCompleted()
             }
@@ -128,7 +138,7 @@ const FriendshipInvitation = (props: InvitationProps) => {
         })
     }
     const dismiss = () => {
-        ApiClient.friendInvitationDelete(props.invitation.id, false, (data, status, error) => {
+        ApiClient.friendInvitationDelete(props.invitation.invited_by.id, false, (data, status, error) => {
             if (!error) {
                 sendCompleted()
             }
@@ -136,7 +146,7 @@ const FriendshipInvitation = (props: InvitationProps) => {
         })
     }
     const block = () => {
-        ApiClient.friendInvitationDelete(props.invitation.id, true, (data, status, error) => {
+        ApiClient.friendInvitationDelete(props.invitation.invited_by.id, true, (data, status, error) => {
             if (!error) {
                 sendCompleted()
             }
