@@ -1,6 +1,6 @@
 {
   "name": "intraSocial",
-  "version": "0.5.5",
+  "version": "0.5.6",
   "description": "intraSocial client (Typescript)",
   "main": "index.js",
   "scripts": {
