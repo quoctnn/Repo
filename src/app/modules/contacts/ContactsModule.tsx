@@ -50,13 +50,13 @@ class ContactsModule extends React.PureComponent<Props, State> {
         this.state = {
             isTyping:{},
             activeVisible:true,
-            activeCount:0,
+            activeCount:undefined,
             awayVisible:true,
-            awayCount:0,
+            awayCount:undefined,
             dndVisible:true,
-            dndCount:0,
+            dndCount:undefined,
             inactiveVisible:false,
-            inactiveCount:0
+            inactiveCount:undefined
         }
     }
     componentDidMount = () =>
@@ -145,7 +145,7 @@ class ContactsModule extends React.PureComponent<Props, State> {
                     {this.state.activeCount}
                 </div>
             </div>
-            <CollapseComponent removeContentOnCollapsed={true} className="filter-content-wrapper" visible={this.state.activeVisible && this.state.activeCount != 0}>
+            <CollapseComponent removeContentOnCollapsed={false} className="filter-content-wrapper" visible={this.state.activeVisible && this.state.activeCount != 0}>
                 {this.renderProfileList(this.fetchActiveContacts)}
             </CollapseComponent>
         </div>
@@ -170,7 +170,7 @@ class ContactsModule extends React.PureComponent<Props, State> {
                     {this.state.awayCount}
                 </div>
             </div>
-            <CollapseComponent removeContentOnCollapsed={true} className="filter-content-wrapper" visible={this.state.awayVisible && this.state.awayCount != 0}>
+            <CollapseComponent removeContentOnCollapsed={false} className="filter-content-wrapper" visible={this.state.awayVisible && this.state.awayCount != 0}>
                 {this.renderProfileList(this.fetchAwayContacts)}
             </CollapseComponent>
         </div>
@@ -195,7 +195,7 @@ class ContactsModule extends React.PureComponent<Props, State> {
                     {this.state.dndCount}
                 </div>
             </div>
-            <CollapseComponent removeContentOnCollapsed={true} className="filter-content-wrapper" visible={this.state.dndVisible && this.state.dndCount != 0}>
+            <CollapseComponent removeContentOnCollapsed={false} className="filter-content-wrapper" visible={this.state.dndVisible && this.state.dndCount != 0}>
                 {this.renderProfileList(this.fetchDNDContacts)}
             </CollapseComponent>
         </div>
