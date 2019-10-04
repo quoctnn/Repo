@@ -26,7 +26,6 @@ import { ChatMessageComposer } from '../../components/general/input/ChatMessageC
 import { Mention } from '../../components/general/input/MentionEditor';
 import { ConversationUtilities } from '../../utilities/ConversationUtilities';
 import Select from 'react-select';
-import { ProfileOptionComponent, ProfileSingleValueComponent, createProfileFilterOption, ProfileFilterOption } from '../tasks/ProjectProfileFilter';
 import { ActionMeta } from 'react-select/src/types';
 import { NavigationUtilities } from '../../utilities/NavigationUtilities';
 import { tempConversationId } from '../conversations/ConversationsModule';
@@ -40,6 +39,7 @@ import { Button } from 'reactstrap';
 import Routes from '../../utilities/Routes';
 import SimpleDialog from '../../components/general/dialogs/SimpleDialog';
 import ConversationDetailsModule from './ConversationDetailsModule';
+import { ProfileOptionComponent, ProfileSingleValueComponent, ProfileMultiValueLabel, ProfileSelectorOption } from '../../components/general/input/SelectExtensions';
 
 type FilePreviewProps = {
     file:File
@@ -665,9 +665,10 @@ class ConversationModule extends React.Component<Props, State> {
                         </div>}
                 </div>
     }
-    onMemberSelectChange = (value: ProfileFilterOption[], action: ActionMeta) => {
+    onMemberSelectChange = (value: ProfileSelectorOption[], action: ActionMeta) => {
+        const val = value || []
         const temp = {...this.props.conversation}
-        temp.users = value.map(v => v.id)
+        temp.users = val.map(v => v.id)
         if(!temp.title)
             temp.temporary_id = undefined
         ConversationManager.updateTemporaryConversation(temp)
@@ -676,23 +677,25 @@ class ConversationModule extends React.Component<Props, State> {
 
         const availableMembers = ProfileManager.getProfiles(ProfileManager.getContactListIds(false))
         const currentMembers = ProfileManager.getProfiles(this.props.conversation && this.props.conversation.users || [])
-        const availableOptions = availableMembers.map(createProfileFilterOption)
-        const defaultValue = currentMembers.map(createProfileFilterOption)
-        return <div className="member-select-container"><span className="to-label">{translate("To")+ ":"}</span><Select
-            defaultValue={defaultValue}
-            isMulti={true}
-            name="members"
-            options={availableOptions}
-            className="member-select"
-            classNamePrefix="select"
-            isClearable={false}
-            onChange={this.onMemberSelectChange}
-            components={{ Option: ProfileOptionComponent, SingleValue:ProfileSingleValueComponent }}
-            styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
-            menuPortalTarget={document.body}
-            autoFocus={true}
-            placeholder={translate("conversation.create.members.placeholder")}
-        /></div>
+        const availableOptions = availableMembers.map(ProfileSelectorOption.fromUserProfile)
+        const defaultValue = currentMembers.map(ProfileSelectorOption.fromUserProfile)
+        return <div className="member-select-container"><span className="to-label">{translate("To")+ ":"}</span>
+                    <Select
+                        defaultValue={defaultValue}
+                        isMulti={true}
+                        name="members"
+                        options={availableOptions}
+                        className="member-select"
+                        classNamePrefix="select"
+                        isClearable={false}
+                        onChange={this.onMemberSelectChange}
+                        components={{ Option: ProfileOptionComponent, SingleValue:ProfileSingleValueComponent, MultiValueLabel:ProfileMultiValueLabel }}
+                        styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
+                        menuPortalTarget={document.body}
+                        autoFocus={true}
+                        placeholder={translate("conversation.create.members.placeholder")}
+                    />
+                </div>
     }
     navigateToConversations = () => {
         window.app.navigateToRoute(Routes.conversationUrl(null))
@@ -734,7 +737,7 @@ class ConversationModule extends React.Component<Props, State> {
     }
     render()
     {
-        const {history, match, location, staticContext, contextNaturalKey, conversation, createNewConversation, authenticatedUser, queuedMessages, ...rest} = this.props
+        const {history, match, location, staticContext, contextNaturalKey, conversation, createNewConversation, authenticatedUser, queuedMessages, singleMode,  ...rest} = this.props
         const {breakpoint, className} = this.props
         const cn = classnames("conversation-module", className, {temporary:conversation && conversation.temporary})
         const title = createNewConversation ? this.renderMembersInput() : this.renderConversationEditorTitle()

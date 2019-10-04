@@ -271,24 +271,19 @@ export class ChatMessageComposer extends React.Component<Props,State> {
         return 'not-handled';
     }
     insertLinebreak = (editorState: EditorState): EditorState => {
-        const contentState = Modifier.insertText(
-          editorState.getCurrentContent(),
-          editorState.getSelection(),
-          '\n',
-          editorState.getCurrentInlineStyle(),
-          null,
-        );
-
-        const newEditorState = EditorState.push(
-          editorState,
-          contentState,
-          'insert-characters',
-        );
-
-        return EditorState.forceSelection(
-          newEditorState,
-          contentState.getSelectionAfter(),
-        );
+        const selection = editorState.getSelection()
+        const block = editorState.getCurrentContent().getBlockForKey(selection.getAnchorKey())
+        const start = selection.getStartOffset()
+        const end = selection.getEndOffset()
+        const newSelectionState = new SelectionState({
+            anchorKey: block.getKey(),
+            anchorOffset: start,
+            focusKey: block.getKey(),
+            focusOffset: end
+        })
+        const contentState = Modifier.replaceText(editorState.getCurrentContent(), newSelectionState, '\n')
+        const newEditorState = EditorState.push(editorState, contentState, 'insert-characters')
+        return EditorState.forceSelection(newEditorState, contentState.getSelectionAfter())
     }
     sendDidType = () =>{
         this.props.onDidType(this.state.plainText)

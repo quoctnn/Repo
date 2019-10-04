@@ -14,7 +14,6 @@ import NewsfeedComponentRouted, { NewsfeedComponent } from './NewsfeedComponent'
 import CircularLoadingSpinner from '../../components/general/CircularLoadingSpinner';
 import NewsfeedMenu, { NewsfeedMenuData, allowedSearchOptions } from './NewsfeedMenu';
 import { ObjectAttributeType, ContextNaturalKey, StatusActions, Permission, Permissible } from '../../types/intrasocial_types';
-import { ButtonGroup, Button } from 'reactstrap';
 import { ContextSearchData } from '../../components/general/input/contextsearch/extensions';
 import { translate } from '../../localization/AutoIntlProvider';
 import { ReduxState } from '../../redux';
@@ -22,6 +21,10 @@ import { ContextManager } from '../../managers/ContextManager';
 import { StatusComposerComponent } from '../../components/general/input/StatusComposerComponent';
 import { DropDownMenu } from '../../components/general/DropDownMenu';
 import { OverflowMenuItem, OverflowMenuItemType } from '../../components/general/OverflowMenu';
+import { EventSubscription } from 'fbemitter';
+import { NotificationCenter } from '../../utilities/NotificationCenter';
+import { eventStreamNotificationPrefix, EventStreamMessageType } from '../../network/ChannelEventStream';
+import ReconnectingWebSocket from 'reconnecting-websocket';
 
 type OwnProps = {
     className?:string
@@ -45,6 +48,7 @@ interface State
 {
     menuVisible:boolean
     isLoading:boolean
+    feedInvalidated:boolean
     selectedSearchContext:ContextSearchData
     includeSubContext:boolean
     filter:ObjectAttributeType
@@ -52,12 +56,12 @@ interface State
     contextNaturalKey:ContextNaturalKey,
     contextObjectId:number
     contextTitle?:string
-
     statusComposerFocus:boolean
 }
 type Props = ReduxStateProps & ReduxDispatchProps & OwnProps & DefaultProps & RouteComponentProps<any>
 
 class NewsfeedModule extends React.Component<Props, State> {
+    private observers:EventSubscription[] = []
     static defaultProps:DefaultProps = {
         includeSubContext:true
     }
@@ -73,29 +77,36 @@ class NewsfeedModule extends React.Component<Props, State> {
             includeSubContext:props.includeSubContext,
             filter:null,
             isLoading:false,
+            feedInvalidated:false,
             contextNaturalKey:undefined,
             contextObjectId:undefined,
             statusComposerFocus:false
         }
     }
     componentDidMount = () => {
-
+        const websocketUpdate = NotificationCenter.addObserver(eventStreamNotificationPrefix + EventStreamMessageType.SOCKET_STATE_CHANGE, this.websocketConnect)
+        this.observers.push(websocketUpdate)
     }
     componentWillUnmount = () => {
         this.tempMenuData = null
         this.availableFilters = null
         this.newsfeedComponent = null
         this.statuscomposer = null
+        this.observers.forEach(o => o.remove())
+        this.observers = null
     }
     componentDidUpdate = (prevProps:Props) => {
         //turn off loading spinner if feed is removed
         if(prevProps.breakpoint != this.props.breakpoint && this.props.breakpoint < ResponsiveBreakpoint.standard && this.state.isLoading)
         {
-            this.setState({isLoading:false})
+            this.setState({isLoading:false, feedInvalidated:false})
+        } else {
+            this.setState({feedInvalidated:false})
         }
     }
     shouldComponentUpdate = (nextProps:Props, nextState:State) => {
-        return nextProps.breakpoint != this.props.breakpoint ||
+        if (nextState.feedInvalidated) return true
+        else return nextProps.breakpoint != this.props.breakpoint ||
                 nextProps.contextNaturalKey != this.props.contextNaturalKey ||
                 nextProps.contextObjectId != this.props.contextObjectId ||
                 nextProps.includeSubContext != this.props.includeSubContext ||
@@ -108,6 +119,11 @@ class NewsfeedModule extends React.Component<Props, State> {
                 nextState.selectedSearchContext != this.state.selectedSearchContext ||
                 nextState.menuVisible != this.state.menuVisible ||
                 nextState.statusComposerFocus != this.state.statusComposerFocus
+    }
+    websocketConnect = (...args:any[]) => {
+        if (args[0] == ReconnectingWebSocket.OPEN) {
+            this.setState({feedInvalidated:true})
+        }
     }
     headerClick = (e) => {
         const context = this.state.selectedSearchContext
@@ -133,7 +149,7 @@ class NewsfeedModule extends React.Component<Props, State> {
         this.setState(newState as State)
     }
     feedLoadingStateChanged = (isLoading:boolean) => {
-        this.setState({isLoading})
+        this.setState({isLoading, feedInvalidated:false})
     }
     renderLoading = () => {
         if (this.state.isLoading) {
@@ -238,22 +254,19 @@ class NewsfeedModule extends React.Component<Props, State> {
                         {this.renderHeaderFilter()}
                         <ModuleMenuTrigger onClick={this.menuItemClick} />
                     </ModuleHeader>
-                    {breakpoint >= ResponsiveBreakpoint.standard && //do not render for small screens
-                        <>
-                            <ModuleContent>
-                                <NewsfeedComponentRouted wrappedComponentRef={this.connectRef}
-                                    onLoadingStateChanged={this.feedLoadingStateChanged}
-                                    includeSubContext={this.state.includeSubContext}
-                                    contextNaturalKey={resolvedContextNaturalKey}
-                                    contextObjectId={resolvedContextObjectId}
-                                    contextObject={contextObject}
-                                    filter={this.state.filter}
-                                    scrollParent={window}
-                                    />
-                            </ModuleContent>
-                            <ModuleFooter></ModuleFooter>
-                        </>
-                    }
+                    <ModuleContent>
+                        <NewsfeedComponentRouted wrappedComponentRef={this.connectRef}
+                            onLoadingStateChanged={this.feedLoadingStateChanged}
+                            includeSubContext={this.state.includeSubContext}
+                            contextNaturalKey={resolvedContextNaturalKey}
+                            contextObjectId={resolvedContextObjectId}
+                            contextObject={contextObject}
+                            filter={this.state.filter}
+                            feedInvalidated={this.state.feedInvalidated}
+                            scrollParent={window}
+                            />
+                    </ModuleContent>
+                    <ModuleFooter></ModuleFooter>
                     <ModuleMenu visible={this.state.menuVisible}>
                         <NewsfeedMenu
                             onUpdate={this.menuDataUpdated}

@@ -81,6 +81,8 @@ export default  {
         communityInvitationAcceptUrl: (id:number) => {
             return `/api/v2/community-invitation/${id}/accept/`
         },
+        communityInvitationUrl:"/api/v2/community-invitation/",
+        communityInvitationBatchUrl:"/api/v2/community-invitation/batch/",
         communityMembershipRequestDeleteUrl: (id:number) => {
             return `/api/v2/community-memberrequest/${id}/`
         },
@@ -133,6 +135,8 @@ export default  {
         groupFilesUrl: (id:number) => {
             return `/api/v2/group/${id}/files/`
         },
+        groupInvitationListUrl: "/api/v2/group-invitation/",
+        groupInvitationBatchUrl:"/api/v2/group-invitation/batch/",
         groupInvitationDeleteUrl: (id:number) => {
             return `/api/v2/group-invitation/${id}/`
         },
@@ -231,6 +235,8 @@ export default  {
         eventInvitationDeleteUrl: (id:number) => {
             return `/api/v2/event-invitation/${id}/`
         },
+        eventInvitationBatchUrl:"/api/v2/event-invitation/batch/",
+        eventInvitationListUrl: "/api/v2/event-invitation/",
         eventMembershipRequestDeleteUrl: (id:number) => {
             return `/api/v2/event-memberrequest/${id}/`
         },
@@ -240,7 +246,6 @@ export default  {
         // Recent Activity URLs
         recentActivityUrl: '/api/v2/notification/',
         recentActivityUnreadUrl: '/api/v2/notification/unread-count/',
-        recentActivityMarkReadUrl: '/api/v2/notification/update-as-read/',
         recentActivityMarkAllReadUrl: '/api/v2/notification/mark-all-as-read/',
         notificationsMarkActionsReadUrl: '/api/v2/notification/mark-actions-as-read/',
 
@@ -249,6 +254,7 @@ export default  {
         notificationLastActivityTimeUrl: '/api/v2/notification/last-activity-time/',
         notificationUnreadUrl: '/api/v2/notification/unread-count/',
         notificationMarkReadUrl: '/api/v2/notification/update-as-read/',
+        notificationMarkSeenUrl: '/api/v2/notification/update-as-seen/',
         notificationMarkAllReadUrl: '/api/v2/notification/mark-all-as-read/',
         notificationsUnhandledUrl:'/api/v2/notification/unhandled/',
 

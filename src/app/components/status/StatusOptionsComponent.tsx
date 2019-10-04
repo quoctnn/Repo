@@ -231,8 +231,7 @@ export default class StatusOptionsComponent extends React.Component<Props, State
         const items:OverflowMenuItem[] = []
         if((this.props.isOwner && status.permission >= Permission.post) || status.permission >= Permission.moderate)
         {
-            const shieldClass =  Permission.usesElevatedPrivileges(status.permission) ? "fas fa-shield-alt" : undefined
-            items.push({id:"1",title:translate("Delete"), iconClass:"fa fa-trash", iconStackClass:shieldClass, onPress:this.toggleDeleteModal, type:OverflowMenuItemType.option})
+            items.push({id:"1",title:translate("Delete"), iconClass:"fa fa-trash", iconStackClass:Permission.getShield(status.permission), onPress:this.toggleDeleteModal, type:OverflowMenuItemType.option})
             if(status.permission == Permission.update)
                 items.push({id:"0", title:translate("Edit"), iconClass:"fa fa-edit", onPress:this.toggleEditModal, type:OverflowMenuItemType.option})
         }

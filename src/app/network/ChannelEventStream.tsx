@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
-import ReconnectingWebSocket, { Message } from 'reconnecting-websocket';
+import ReconnectingWebSocket from 'reconnecting-websocket';
 import { ReduxState } from '../redux/index';
 import { availableEndpoints } from '../redux/endpoint';
 import { uniqueId, nullOrUndefined } from '../utilities/Utilities';
@@ -14,7 +14,7 @@ export enum EventStreamMessageType {
     CLIENT_LAST_SEEN = "client.last_seen",
     CLIENT_UPDATE = "client.update",
     CLIENT_STATUS_CHANGE = "client.status_change",
-    
+
     CONVERSATION_TYPING = "conversation.typing",
     CONVERSATION_MESSAGE = "conversation.message",
     CONVERSATION_REMOVE = "conversation.remove",
@@ -25,17 +25,17 @@ export enum EventStreamMessageType {
     STATUS_UPDATE = "status.update",
     STATUS_DELETED = "status.deleted",
     STATUS_INTERACTION_UPDATE = "status.interaction.update",
-    
+
     ACTIVITY_NEW = "activity.new",
     SOCKET_STATE_CHANGE = "socket.state.change",
     COMMUNITY_MAIN = "community.main",
     COMMUNITY_UPDATE = "community.update",
     COMMUNITY_DELETE = "community.delete",
-    EVENT_NEW = "event.new", 
+    EVENT_NEW = "event.new",
     EVENT_UPDATE = "event.update",
-    GROUP_NEW = "group.new", 
+    GROUP_NEW = "group.new",
     GROUP_UPDATE = "group.update",
-    PROJECT_NEW = "project.new", 
+    PROJECT_NEW = "project.new",
     PROJECT_UPDATE = "project.update",
     NOTIFICATIONS_UNHANDLED = "notifications.unhandled",
     FAVORITES_UPDATE = "favorites.update",

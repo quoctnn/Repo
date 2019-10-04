@@ -29,9 +29,6 @@ class DashboardPage extends React.Component<Props, State>
             loading:false
         }
     }
-    componentWillMount = () => {
-        console.log("Dashboard unmount")
-    }
     renderLoading = () => 
     {
         if (!this.props.community) {

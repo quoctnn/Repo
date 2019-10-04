@@ -57,7 +57,9 @@ export default class ReportStatusDialog extends React.Component<Props, State> {
         })
     }
     handleSelectChange = (value:ReportTag[]) => {
-        this.setState({ value });
+        this.setState(() => {
+            return { value:value || [] }
+        });
     }
     tagTitleForKey = (key) => 
     {

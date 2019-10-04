@@ -78,6 +78,7 @@ type OwnProps = {
     contextObject?:Permissible
     includeSubContext?:boolean
     filter:ObjectAttributeType
+    feedInvalidated?:boolean
     defaultChildrenLimit:number//children fetched upfront
     childrenLimit:number//children when fetching pages
     scrollParent?:any
@@ -185,7 +186,8 @@ export class NewsfeedComponent extends React.Component<Props, State> {
             this.props.contextObject != prevProps.contextObject ||
             this.props.includeSubContext != prevProps.includeSubContext ||
             this.props.isResolvingContext != prevProps.isResolvingContext ||
-            this.props.filter != prevProps.filter)
+            this.props.filter != prevProps.filter ||
+            this.props.feedInvalidated)
         {
             const hasContextError = this.hasContextError(this.props)
             const action = hasContextError ? undefined : this.loadStatuses
@@ -1039,7 +1041,7 @@ export class NewsfeedComponent extends React.Component<Props, State> {
             }
             case StatusActions.new:
             {
-                if(extra && extra.message)
+                if(extra && (extra.message || extra.files))
                 {
                     this.createNewComment(status, extra.message, extra.files, extra.completion)
                 }
@@ -1051,7 +1053,7 @@ export class NewsfeedComponent extends React.Component<Props, State> {
             }
             case StatusActions.edit:
             {
-                if(extra && extra.status)
+                if(extra && (extra.status || extra.files))
                 {
                     this.updateStatus(status.id, extra.status, extra.files, extra.completion)
                 }

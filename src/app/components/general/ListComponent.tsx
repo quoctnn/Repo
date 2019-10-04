@@ -9,6 +9,8 @@ import EmptyBox from './images/EmptyBox';
 import IceCream from './images/IceCream';
 import { Button } from 'reactstrap';
 import { translate } from '../../localization/AutoIntlProvider';
+import { findScrollParent } from '../../utilities/Utilities';
+import { Checkbox } from './input/Checkbox';
 
 export const ListComponentHeader = (props:{title:React.ReactNode}) => {
     return (
@@ -28,7 +30,7 @@ type OwnProps<T> = {
     onLoadingStateChanged?:(isLoading:boolean) => void
     scrollParent?:any
     fetchData:(offset:number, completion:(items:PaginationResult<T>) => void) => void
-    renderItem:(item:T) => React.ReactNode
+    renderItem:(item:T, index:number) => React.ReactNode
     renderEmpty?:() => React.ReactNode
     renderError?:() => React.ReactNode
     sortItems?:(items:T[]) => T[]
@@ -44,6 +46,8 @@ type DefaultProps = {
     loadMoreOnScroll?:boolean
     allowDivider?:boolean
     isSelecting?:boolean
+    findScrollParent:boolean
+    clearDataBeforeFetch:boolean
 
 }
 type Props<T> = OwnProps<T> & DefaultProps
@@ -66,7 +70,9 @@ export default class ListComponent<T extends IdentifiableObject> extends React.C
     static defaultProps:DefaultProps = {
         loadMoreOnScroll:true,
         allowDivider:true,
-        isSelecting:false
+        isSelecting:false,
+        findScrollParent:false,
+        clearDataBeforeFetch:true
     }
     constructor(props:Props<T>) {
         super(props);
@@ -92,12 +98,26 @@ export default class ListComponent<T extends IdentifiableObject> extends React.C
     getItemByProperty = (key:string, value:any) => {
         return this.state.items.find(t => t[key] == value)
     }
+    getItems = () => {
+        return [...this.state.items]
+    }
     updateItem = (item:T) => {
         this.setState((prevState:State<T>) => {
             const index = prevState.items.findIndex(t => t.id == item.id)
             let stateItems = this.state.items
             stateItems[index!] = item
             return {items:stateItems}
+        })
+    }
+    updateItems = (items:T[]) => {
+        this.setState((prevState:State<T>) => { 
+            const prevItems = [...prevState.items]
+            items.forEach(i => {
+                const index = prevState.items.findIndex(t => t.id == i.id)
+                if(index > -1)
+                    prevItems[index] = i
+            })
+            return {items:prevItems}
         })
     }
     removeItemById = (id:number) => {
@@ -126,10 +146,11 @@ export default class ListComponent<T extends IdentifiableObject> extends React.C
         }
     }
     reload = () => {
+        const items = this.props.clearDataBeforeFetch ? [] : this.state.items
         this.setState((prevState:State<T>) => ({
             isRefreshing: true,
             isLoading: true,
-            items:[],
+            items:items,
             requestId:prevState.requestId + 1,
             hasReceivedData:false,
         }), this.loadData)
@@ -143,9 +164,15 @@ export default class ListComponent<T extends IdentifiableObject> extends React.C
     }
     componentDidMount = () =>
     {
-        if(this.props.scrollParent)
+
+        let scrollParent = this.props.scrollParent
+        if(!scrollParent && this.props.findScrollParent && this.listRef && this.listRef.current && this.listRef.current.listRef && this.listRef.current.listRef.current)
         {
-            this.props.scrollParent.addEventListener("scroll", this.onScroll)
+            scrollParent = findScrollParent(this.listRef.current.listRef.current)
+        }
+        if(scrollParent)
+        {
+            scrollParent.addEventListener("scroll", this.onScroll)
         }
         //console.log("componentDidMount", this.props.reloadContext)
         this.setState((prevState:State<T>) => ({ // first load
@@ -154,19 +181,18 @@ export default class ListComponent<T extends IdentifiableObject> extends React.C
         }), this.loadData)
     }
     componentDidUpdate = (prevProps:Props<T>, prevState:State<T>) => {
-        if (prevProps.isSelecting && !this.props.isSelecting && prevState.selected.length > 0) {
-            this.props.selectedItems(prevState.selected)
-            this.setState({selected: []})
-        }
         if(prevProps.reloadContext != this.props.reloadContext && !this.state.isLoading)
         {
             //console.log("componentDidUpdate", this.props.reloadContext)
-            this.setState((prevState:State<T>) => ({
-                isRefreshing: true,
-                isLoading: true,
-                items:[],
-                requestId:prevState.requestId + 1
-            }), this.loadData)
+            this.setState((prevState:State<T>) => {
+                const items = this.props.clearDataBeforeFetch ? [] : this.state.items
+                return {
+                    isRefreshing: true,
+                    isLoading: true,
+                    items:items,
+                    requestId:prevState.requestId + 1
+                }
+            }, this.loadData)
         }
         if(prevProps.redrawContext != this.props.redrawContext)
         {
@@ -182,6 +208,17 @@ export default class ListComponent<T extends IdentifiableObject> extends React.C
                 this.props.onDidLoadData(this.state.lastFetchOffset)
             }
         }
+        if(this.props.isSelecting && this.state.selected.length > 0)
+        {
+
+            const selected = this.getUpdatedSelectedItems(this.state.items)
+            if(!selected.isEqual(this.state.selected))
+            {
+                this.setState(() => {
+                    return {selected}
+                }, this.sendSelectionUpdate)
+            }
+        }   
     }
     scrollToTop = () => {
         this.listRef.current.scrollToTop()
@@ -211,7 +248,7 @@ export default class ListComponent<T extends IdentifiableObject> extends React.C
     }
     getOffset = () => {
 
-        const { items } = this.state
+        const items = !this.props.clearDataBeforeFetch && this.state.isRefreshing ? [] : this.state.items
         if(this.props.offsetCountFilter)
             return this.props.offsetCountFilter(items)
         return items.length
@@ -233,7 +270,7 @@ export default class ListComponent<T extends IdentifiableObject> extends React.C
                 {
                     //console.log("setData", this.props.reloadContext)
                     this.setState((prevState:State<T>) => {
-                        const items = prevState.items
+                        const items = !this.props.clearDataBeforeFetch && prevState.isRefreshing ? [] : prevState.items
                         const d = offset == 0 ?  newData :  [...items, ...newData]
                         return {
                             items: d,
@@ -278,36 +315,45 @@ export default class ListComponent<T extends IdentifiableObject> extends React.C
             return false
         return this.state.selected.contains(id)
     }
-    selectedItem = (e: React.MouseEvent) => {
-        if (e.currentTarget) {
-            const currentId = parseInt(e.currentTarget.id)
-            if (currentId) {
-                var currentSelected = this.state.selected
-                const index = currentSelected.indexOf(currentId)
-                if (index != -1) {
-                    currentSelected.splice(index, 1)
-                    this.setState({selected: currentSelected})
-                } else {
-                    this.setState({selected: currentSelected.concat([currentId])})
-                }
-            }
-        }
+    sendSelectionUpdate = () => {
+        this.props.selectedItems && this.props.selectedItems(this.state.selected)
+    }
+    getUpdatedSelectedItems = (items:T[]) =>     {
+        const itemIds = items.map(i => i.id)
+        return this.state.selected.filter(id => itemIds.contains(id))
+    }
+    selectedItem = (id:number) => (checked:boolean) => {
+        this.setState((prevState:State<T>) => {
+            const currentSelected = [...prevState.selected]
+            currentSelected.toggleElement(id)
+            return {selected: currentSelected}
+        },this.sendSelectionUpdate)
+    }
+    clearSelection = () => {
+        this.setState((prevState:State<T>) => {
+            return {selected: []}
+        },this.sendSelectionUpdate)
+    }
+    selectAll = () => {
+        this.setState((prevState:State<T>) => {
+            return {selected: this.getItems().map(i => i.id)}
+        },this.sendSelectionUpdate)
     }
     renderSelectableItem = (id: number, item: React.ReactNode) => {
         if(!this.props.isSelecting)
             return item
         const isSelected = this.isSelected(id)
-        const cn = classnames("select-box", "fa", {"fa-check-square":isSelected, "fa-square":!isSelected})
-        return <div key={id} className="selectable-item">
-            <i id={`${id}`} className={cn} onClick={this.selectedItem}></i>{item}
-        </div>
+        const key = (item as any).key || id
+        return <div key={key} className="selectable-item">
+                    <Checkbox checked={isSelected} onValueChange={this.selectedItem(id)} />{item}
+                </div>
     }
     renderItems = () => {
-        const cn = classnames("list-component-list vertical-scroll", this.props.className)
+        const cn = classnames("vertical-scroll", this.props.className, {"list-component-list":!this.props.findScrollParent})
         const scroll = this.props.loadMoreOnScroll ? (this.props.scrollParent ? undefined : this.onScroll) : undefined
         const listItems = this.props.sortItems ? this.props.sortItems(this.state.items) : this.state.items
-        let items = listItems.map(i => {
-                            return this.renderSelectableItem(i.id, this.props.renderItem(i))
+        let items = listItems.map((i, index) => {
+                            return this.renderSelectableItem(i.id, this.props.renderItem(i, index))
                         }).concat(this.renderLoading())
         if (this.state.dividerPosition) items.splice(this.state.dividerPosition, 0, <ListComponentDivider key="divider"/>)
         return (<List ref={this.listRef} enableAnimation={false}

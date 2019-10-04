@@ -10,6 +10,7 @@ import FilesUpload from "../../status/FilesUpload";
 import { translate, lazyTranslate } from "../../../localization/AutoIntlProvider";
 import {ApiClient} from "../../../network/ApiClient";
 import { ToastManager } from "../../../managers/ToastManager";
+import { uniqueId } from "../../../utilities/Utilities";
 
 type OwnProps =
 {
@@ -51,6 +52,7 @@ type State =
     renderPlaceholder:boolean
     showDropzone: boolean
     files:UploadedFile[]
+    messageComposerReloadKey?:string
 }
 type Props = OwnProps & DefaultProps
 export class StatusComposerComponent extends React.Component<Props, State> {
@@ -73,6 +75,7 @@ export class StatusComposerComponent extends React.Component<Props, State> {
             renderPlaceholder:props.renderPlaceholder,
             showDropzone:false,
             files:[],
+            messageComposerReloadKey:uniqueId()
         }
     }
     shouldComponentUpdate = (nextProps:Props, nextState:State) => {
@@ -136,11 +139,10 @@ export class StatusComposerComponent extends React.Component<Props, State> {
     handleSubmit = () => {
         let content = this.getContent()
         if(this.canPost()){
-            this.setState({text:content.text, mentions: content.mentions}, () => {
+            this.setState({text:content.text, mentions: content.mentions, }, () => {
                 let text = this.state.text.trim();
                 this.props.onActionPress(StatusActions.new, {message:text, mentions:this.state.mentions, files:this.state.files})
                 this.clearStatusState()//maybe not here?
-                this.clearEditor()//maybe not here?
             })
         }
     }
@@ -156,6 +158,7 @@ export class StatusComposerComponent extends React.Component<Props, State> {
             files: [],
             link: null,
             mentions: [],
+            messageComposerReloadKey:uniqueId(),
             showDropzone:false
         }, this.canPost);
     }
@@ -251,6 +254,7 @@ export class StatusComposerComponent extends React.Component<Props, State> {
         const uploadHandler = this.props.canUpload ? this.handleUploadClick : undefined
         return (
             <ChatMessageComposer
+                key={this.state.messageComposerReloadKey}
                 className={cn}
                 canSubmit={canSubmit}
                 onHandleUploadClick={uploadHandler}

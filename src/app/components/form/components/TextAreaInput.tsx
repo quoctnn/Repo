@@ -4,6 +4,7 @@ import { InputGroup, Input } from 'reactstrap';
 import { translate } from '../../../localization/AutoIntlProvider';
 import { FormComponentBaseProps } from '../definitions';
 import classnames from 'classnames';
+import { nullOrUndefined } from '../../../utilities/Utilities';
 
 export type TextAreaInputProps = {
     value:string
@@ -17,7 +18,7 @@ export class TextAreaInput extends React.Component<TextAreaInputProps, TextAreaI
     constructor(props:TextAreaInputProps){
         super(props)
         this.state = {
-            value:this.props.value || ""
+            value:nullOrUndefined(this.props.value) ? "" : this.props.value.toString()
         }
     }
     getValue = () => {

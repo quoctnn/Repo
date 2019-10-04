@@ -16,6 +16,9 @@ import { CommonModuleProps } from '../Module';
 import ActivityMenu, { ActivityMenuData } from './ActivityMenu';
 import { OverflowMenuItemType, OverflowMenuItem } from '../../components/general/OverflowMenu';
 import { DropDownMenu } from '../../components/general/DropDownMenu';
+import { Checkbox } from '../../components/general/input/Checkbox';
+import classnames from 'classnames';
+import { Button } from 'reactstrap';
 
 type OwnProps = {
     breakpoint:ResponsiveBreakpoint
@@ -29,10 +32,10 @@ type State = {
     isLoading:boolean
     isSelecting:boolean
     menuData:ActivityMenuData
+    selected:number[]
 }
 type Props = OwnProps & DefaultProps & RouteComponentProps<any>
 class ActivityModule extends React.Component<Props, State> {
-    activityId = 0;
     tempMenuData:ActivityMenuData = null
     activityListInput = React.createRef<ListComponent<RecentActivity>>()
     observers:EventSubscription[] = []
@@ -49,7 +52,8 @@ class ActivityModule extends React.Component<Props, State> {
             isSelecting:false,
             menuData:{
                 sorting:props.sorting
-            }
+            },
+            selected:[],
         }
     }
     shouldReloadList = (prevProps:Props, prevState:State) => {
@@ -89,11 +93,6 @@ class ActivityModule extends React.Component<Props, State> {
     headerClick = (e) => {
         return 0;
     }
-    getKey = (activity: RecentActivity) => {
-        // There is no unique key for notifications, so we use an incrementing integer
-        this.activityId += 1
-        return this.activityId
-    }
     feedLoadingStateChanged = (isLoading:boolean) => {
         this.setState({isLoading})
     }
@@ -117,16 +116,17 @@ class ActivityModule extends React.Component<Props, State> {
         }
         this.setState(newState as State)
     }
-    renderActivity = (activity:RecentActivity) =>  {
-        return <ActivityItem key={this.getKey(activity)} activity={activity} />
+    renderActivity = (activity:RecentActivity, index:number) =>  {
+        return <ActivityItem key={activity.id + "_" + index}  activity={activity} />
     }
     toggleSorting = (sorting: ActivitySorting) => (e) => {
         const md = {sorting: sorting}
         this.setState({menuData:md})
     }
     multiSelectAction = (items: number[]) => {
-        if (items.length > 0)
-            console.log("Items were selected: " + items)
+        this.setState(() => {
+            return {selected:items}
+        })
     }
     renderSorting = () => {
         if(this.state.menuVisible)
@@ -143,10 +143,40 @@ class ActivityModule extends React.Component<Props, State> {
         const title = ActivitySorting.translatedText(this.state.menuData.sorting)
         return <DropDownMenu triggerIcon={ActivitySorting.icon(this.state.menuData.sorting)} triggerTitle={title} triggerClass="fas fa-caret-down mx-1" items={ddi}></DropDownMenu>
     }
+    headerCheckboxChange = (checked: boolean) => {
+        const list = this.activityListInput && this.activityListInput.current
+        if(!list)
+            return
+        if(checked)
+            list.selectAll()
+        else
+            list.clearSelection()
+    }
+    clearSelection = () => {
+
+        const list = this.activityListInput && this.activityListInput.current
+        if(!list)
+            return
+        list.clearSelection()
+    }
+    markActivitiesAsSeen = () => {
+        const selected = this.state.selected
+        ApiClient.markActivitiesAsSeen(selected, (data, status, error) => {
+            if(!error)
+            {
+                const list = this.activityListInput && this.activityListInput.current
+                if(list)
+                {
+                    list.reload()
+                }
+                this.toggleSelect()
+            }
+        })
+    }
     renderContent = () => {
         const {showLoadMore} = this.props
         return <>
-            {
+                {this.renderOptions()}
                 <ListComponent<RecentActivity>
                     ref={this.activityListInput}
                     onLoadingStateChanged={this.feedLoadingStateChanged}
@@ -155,40 +185,43 @@ class ActivityModule extends React.Component<Props, State> {
                     loadMoreOnScroll={!showLoadMore}
                     selectedItems={this.multiSelectAction}
                     isSelecting={this.state.isSelecting}
-                    className="activity-module-list" />}
+                    className="activity-module-list" />
             </>
+    }
+    renderOptions = () => {
+        const {isSelecting, selected} = this.state
+        return <div className="header d-flex p-2 align-items-center">
+            {isSelecting && <Checkbox checked={selected.length > 0} checkedIcon="fas fa-minus" onValueChange={this.headerCheckboxChange} />}
+            <div className="flex-grow-1"></div>
+            {isSelecting && selected.length > 0 &&  <Button color="light" size="xs" onClick={this.markActivitiesAsSeen}>{translate('common.mark.seen')}</Button>}
+            <Button color="light" size="xs" onClick={this.toggleSelect}>{translate(isSelecting ? "Cancel" : "common.edit")}</Button>
+            {this.renderSorting()}
+        </div>
     }
     renderModalContent = () => {
         return <ActivityModule {...this.props} pageSize={50} style={{height:undefined, maxHeight:undefined}} showLoadMore={false} showInModal={false} isModal={true}/>
     }
     toggleSelect = () => {
-        this.setState({isSelecting: !this.state.isSelecting})
-    }
-    renderEnableSelect = () => {
-        return (
-            <button className="btn btn-edit" onClick={this.toggleSelect}>{translate('common.edit')}</button>
-        )
+        const selecting = !this.state.isSelecting
+        const completion = !selecting ? undefined : this.clearSelection
+        this.setState((prevState:State) => {
+           return {isSelecting: selecting}
+        }, completion)
     }
     render()
     {
-        const {history, match, location, staticContext, pageSize, showHeader, showLoadMore, showInModal, isModal, ...rest} = this.props
+        const {history, match, location, staticContext, pageSize, showHeader, showLoadMore, showInModal, isModal, className, ...rest} = this.props
         const {breakpoint } = this.props
-        const menu = <ActivityMenu data={this.state.menuData} onUpdate={this.menuDataUpdated}  />
-        const headerContent = <>
-            {this.renderSorting()}
-            {this.renderEnableSelect()}
-        </>
         const renderModalContent = !showInModal || isModal ? undefined : this.renderModalContent
+        const cn = classnames("activity-module", className)
         return (<SimpleModule {...rest}
-                    showHeader={showHeader}
+                    showHeader={!isModal}
                     showHeaderTitle={!isModal}
                     headerClick={this.headerClick}
                     breakpoint={breakpoint}
                     isLoading={this.state.isLoading}
                     renderModalContent={renderModalContent}
-                    onMenuToggle={this.onMenuToggle}
-                    menu={menu}
-                    headerContent={headerContent}
+                    className={cn}
                     headerTitle={translate("common.activity")}>
                     {this.renderContent()}
                 </SimpleModule>

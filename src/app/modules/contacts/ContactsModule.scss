@@ -1,8 +1,18 @@
 @import "../../Config";
 .contacts-module {
-    > ul {
+    .vertical-scroll {
         overflow-y: auto;
         height:100%;
+    }
+    .group-header{
+        @include var(background-color, main-content-secondary-background);
+        padding: 0 8px;
+        .group-title{
+            margin-right: auto;
+        }
+        .count{
+            margin: 3px 0;
+        }
     }
     .grid{
         padding:  0.25rem;
