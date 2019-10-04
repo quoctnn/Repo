@@ -11,10 +11,12 @@ import { ContextManager } from './ContextManager';
 import { ToastManager } from './ToastManager';
 import { WindowAppManager } from './WindowAppManager';
 import { setLanguageAction } from '../redux/language';
+import ReconnectingWebSocket from 'reconnecting-websocket';
 
 export const AuthenticationManagerAuthenticatedUserChangedNotification = "AuthenticationManagerAuthenticatedUserChangedNotification"
 export abstract class AuthenticationManager
 {
+    private static previous: number = 0;
     private static lastUserActivity: number = 0;
     private static keepAliveFrequency: number = 5; // How often do we send keepAlive message (in seconds)
     private static keepAlive: (NodeJS.Timer|null);
@@ -138,13 +140,13 @@ export abstract class AuthenticationManager
     }
     static resetUserActivityCounter()
     {
-        AuthenticationManager.lastUserActivity = 0
+        AuthenticationManager.lastUserActivity = Math.floor(Date.now() / 1000)
         let profile = AuthenticationManager.getAuthenticatedUser() as UserProfile;
         if (profile && profile.user_status == UserStatus.away){
             WindowAppManager.sendOutgoingOnSocket(
                 JSON.stringify({
                 type: EventStreamMessageType.CLIENT_LAST_SEEN,
-                data: { seconds: AuthenticationManager.lastUserActivity }
+                data: { seconds: 0 }
                 })
             )
         }
@@ -162,11 +164,15 @@ export abstract class AuthenticationManager
             window.addEventListener('focus', AuthenticationManager.resetUserActivityCounter);
             AuthenticationManager.keepAlive = setInterval(
                 () => {
-                    AuthenticationManager.lastUserActivity += AuthenticationManager.keepAliveFrequency;
+                    const currentTimeout = Math.floor(Date.now() / 1000) - AuthenticationManager.lastUserActivity
+                    if (AuthenticationManager.previous + 60 < currentTimeout) {
+                        window.app.socket.reconnect()
+                    }
+                    AuthenticationManager.previous = currentTimeout
                     WindowAppManager.sendOutgoingOnSocket(
                         JSON.stringify({
                         type: EventStreamMessageType.CLIENT_LAST_SEEN,
-                        data: { seconds: AuthenticationManager.lastUserActivity }
+                        data: { seconds: currentTimeout }
                         })
                     );
                 }, AuthenticationManager.keepAliveFrequency * 1000);
