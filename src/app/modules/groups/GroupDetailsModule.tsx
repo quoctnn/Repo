@@ -20,7 +20,8 @@ import { uniqueId } from '../../utilities/Utilities';
 import { OverflowMenuItemType, OverflowMenuItem } from '../../components/general/OverflowMenu';
 import { DropDownMenu } from '../../components/general/DropDownMenu';
 import { GroupManager } from '../../managers/GroupManager';
-import ContextInvitationComponent from '../../components/general/contextInvitation/ContextInvitationComponent';
+import ContextInvitationComponent from '../../components/general/contextMembers/ContextInvitationComponent';
+import ContextMembersForm from '../../components/general/contextMembers/ContextMembersForm';
 type OwnProps = {
     breakpoint:ResponsiveBreakpoint
     contextNaturalKey: ContextNaturalKey
@@ -30,8 +31,8 @@ type State = {
     isLoading:boolean
     editFormVisible:boolean
     editFormReloadKey:string
-    invitationListVisible?:boolean
-    invitationReloadKey?:string
+    membersFormVisible?:boolean
+    membersFormReloadKey?:string
 }
 type ReduxStateProps = {
     community: Community
@@ -48,8 +49,8 @@ class GroupDetailsModule extends React.Component<Props, State> {
             menuVisible:false,
             editFormVisible:false,
             editFormReloadKey:uniqueId(),
-            invitationListVisible:false,
-            invitationReloadKey:uniqueId(),
+            membersFormVisible:false,
+            membersFormReloadKey:uniqueId(),
         }
     }
     componentDidUpdate = (prevProps:Props) => {
@@ -103,10 +104,10 @@ class GroupDetailsModule extends React.Component<Props, State> {
         return <GroupCreateComponent onCancel={this.hideGroupCreateForm} community={group.community} key={this.state.editFormReloadKey} group={group} visible={visible} onComplete={this.handleGroupCreateForm} />
     }
 
-    toggleInviteForm = () => {
+    toggleMembersForm = () => {
         this.setState((prevState:State) => {
-            const invitationReloadKey = prevState.invitationListVisible ? null : uniqueId()
-            return {invitationListVisible:!prevState.invitationListVisible, invitationReloadKey}
+            const invitationReloadKey = prevState.membersFormVisible ? null : uniqueId()
+            return {membersFormVisible:!prevState.membersFormVisible, membersFormReloadKey: invitationReloadKey}
         })
     }
     getGroupOptions = () => {
@@ -114,13 +115,13 @@ class GroupDetailsModule extends React.Component<Props, State> {
         if(this.props.group.permission >= Permission.admin)
             options.push({id:"1", type:OverflowMenuItemType.option, title:translate("Edit"), onPress:this.showGroupCreateForm, iconClass:"fas fa-pen", iconStackClass:Permission.getShield(this.props.group.permission)})
         if(this.props.group.permission >= Permission.admin)
-            options.push({id:"invite", type:OverflowMenuItemType.option, title:translate("common.invitations"), onPress:this.toggleInviteForm, iconClass:"fas fa-paper-plane", iconStackClass:Permission.getShield(this.props.group.permission)})
+        options.push({id:"members", type:OverflowMenuItemType.option, title:translate("common.member.management"), onPress:this.toggleMembersForm, iconClass:"fas fa-users-cog", iconStackClass:Permission.getShield(this.props.group.permission)})
         return options
     }
-    renderInvitationList = () => {
-        const visible = this.state.invitationListVisible
+    renderMembersForm = () => {
+        const visible = this.state.membersFormVisible
         const contextObject = this.props.group
-        return <ContextInvitationComponent  members={contextObject.members} availableMembers={this.props.community.members} contextNaturalKey={ContextNaturalKey.GROUP} key={this.state.invitationReloadKey} didCancel={this.toggleInviteForm} visible={visible} contextObject={contextObject} />
+        return <ContextMembersForm community={this.props.community} contextNaturalKey={ContextNaturalKey.GROUP} key={this.state.membersFormReloadKey} didCancel={this.toggleMembersForm} visible={visible} contextObject={contextObject} />
     }
     render()
     {
@@ -141,7 +142,7 @@ class GroupDetailsModule extends React.Component<Props, State> {
                             <LoadingSpinner key="loading"/>
                         }
                         {this.renderEditForm()}
-                        {this.renderInvitationList()}
+                        {this.renderMembersForm()}
                     </ModuleContent>
                     {group && group.permission >= Permission.read &&
                         <ModuleFooter className="mt-1">

@@ -1,10 +1,9 @@
 import * as React from 'react';
-import { withRouter, RouteComponentProps, Link } from "react-router-dom";
+import { withRouter, RouteComponentProps } from "react-router-dom";
 import Module from '../Module';
 import ModuleHeader from '../ModuleHeader';
 import ModuleContent from '../ModuleContent';
 import ModuleFooter from '../ModuleFooter';
-import ModuleMenuTrigger from '../ModuleMenuTrigger';
 import "./ProjectDetailsModule.scss"
 import { ResponsiveBreakpoint } from '../../components/general/observers/ResponsiveComponent';
 import { translate } from '../../localization/AutoIntlProvider';
@@ -22,6 +21,7 @@ import { uniqueId } from '../../utilities/Utilities';
 import ProjectCreateComponent from '../../components/general/contextCreation/ProjectCreateComponent';
 import { DropDownMenu } from '../../components/general/DropDownMenu';
 import { ProjectManager } from '../../managers/ProjectManager';
+import ContextMembersForm from '../../components/general/contextMembers/ContextMembersForm';
 type OwnProps = {
     breakpoint:ResponsiveBreakpoint
 } & CommonModuleProps
@@ -30,6 +30,8 @@ type State = {
     isLoading:boolean
     editFormVisible:boolean
     editFormReloadKey:string
+    membersFormVisible?:boolean
+    membersFormReloadKey?:string
 }
 type ReduxStateProps = {
     community: Community
@@ -46,6 +48,8 @@ class ProjectDetailsModule extends React.Component<Props, State> {
             menuVisible:false,
             editFormVisible:false,
             editFormReloadKey:uniqueId(),
+            membersFormVisible:false,
+            membersFormReloadKey:uniqueId(),
         }
     }
     componentDidUpdate = (prevProps:Props) => {
@@ -79,12 +83,25 @@ class ProjectDetailsModule extends React.Component<Props, State> {
         const options: OverflowMenuItem[] = []
         if(this.props.project.permission >= Permission.admin)
             options.push({id:"1", type:OverflowMenuItemType.option, title:translate("Edit"), onPress:this.showProjectCreateForm, iconClass:"fas fa-pen", iconStackClass:Permission.getShield(this.props.project.permission)})
+        if(this.props.project.permission >= Permission.admin)
+            options.push({id:"members", type:OverflowMenuItemType.option, title:translate("common.member.management"), onPress:this.toggleMembersForm, iconClass:"fas fa-users-cog", iconStackClass:Permission.getShield(this.props.project.permission)})
         return options
     }
     renderEditForm = () => {
         const visible = this.state.editFormVisible
         const {project, community} = this.props
         return <ProjectCreateComponent onCancel={this.hideProjectCreateForm} community={community.id} key={this.state.editFormReloadKey} project={project} visible={visible} onComplete={this.handleProjectCreateForm} />
+    }
+    toggleMembersForm = () => {
+        this.setState((prevState:State) => {
+            const invitationReloadKey = prevState.membersFormVisible ? null : uniqueId()
+            return {membersFormVisible:!prevState.membersFormVisible, membersFormReloadKey: invitationReloadKey}
+        })
+    }
+    renderMembersForm = () => {
+        const visible = this.state.membersFormVisible
+        const contextObject = this.props.project
+        return <ContextMembersForm community={this.props.community} contextNaturalKey={ContextNaturalKey.PROJECT} key={this.state.membersFormReloadKey} didCancel={this.toggleMembersForm} visible={visible} contextObject={contextObject} />
     }
     render()
     {
@@ -104,6 +121,7 @@ class ProjectDetailsModule extends React.Component<Props, State> {
                             <LoadingSpinner key="loading"/>
                         }
                         {this.renderEditForm()}
+                        {this.renderMembersForm()}
                     </ModuleContent>
                     { project && project.permission >= Permission.read &&
                         <ModuleFooter className="mt-1">

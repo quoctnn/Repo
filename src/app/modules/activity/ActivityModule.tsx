@@ -123,9 +123,11 @@ class ActivityModule extends React.Component<Props, State> {
         const md = {sorting: sorting}
         this.setState({menuData:md})
     }
-    multiSelectAction = (items: number[]) => {
+    handleSelectionChange = (id:number, selected:boolean) => {
+        const selectedItems = [...this.state.selected]
+        selectedItems.toggleElement(id)
         this.setState(() => {
-            return {selected:items}
+            return {selected:selectedItems}
         })
     }
     renderSorting = () => {
@@ -143,21 +145,26 @@ class ActivityModule extends React.Component<Props, State> {
         const title = ActivitySorting.translatedText(this.state.menuData.sorting)
         return <DropDownMenu triggerIcon={ActivitySorting.icon(this.state.menuData.sorting)} triggerTitle={title} triggerClass="fas fa-caret-down mx-1" items={ddi}></DropDownMenu>
     }
-    headerCheckboxChange = (checked: boolean) => {
-        const list = this.activityListInput && this.activityListInput.current
-        if(!list)
-            return
-        if(checked)
-            list.selectAll()
-        else
-            list.clearSelection()
+    getList = () => {
+        return this.activityListInput && this.activityListInput.current
+    }
+    selectAll = () => {
+        const list = this.getList()
+        const items = list && list.getItems().map(i => i.id) || []
+        this.setState(() => {
+            return {selected:items}
+        })
     }
     clearSelection = () => {
-
-        const list = this.activityListInput && this.activityListInput.current
-        if(!list)
-            return
-        list.clearSelection()
+        this.setState(() => {
+            return {selected:[]}
+        })
+    }
+    headerCheckboxChange = (checked: boolean) => {
+        if(checked)
+            this.selectAll()
+        else
+            this.clearSelection()
     }
     markActivitiesAsSeen = () => {
         const selected = this.state.selected
@@ -183,7 +190,8 @@ class ActivityModule extends React.Component<Props, State> {
                     fetchData={this.fetchActivity}
                     renderItem={this.renderActivity}
                     loadMoreOnScroll={!showLoadMore}
-                    selectedItems={this.multiSelectAction}
+                    onItemSelectionChange={this.handleSelectionChange}
+                    selected={this.state.selected}
                     isSelecting={this.state.isSelecting}
                     className="activity-module-list" />
             </>

@@ -1,8 +1,5 @@
 @import "../../../Config";
-.context-invitations{
-    .modal-content{
-        height: 100%;
-    }
+.community-invitations{
     .list-component{
         height: auto;
     }
@@ -20,11 +17,5 @@
         &.active{
             @include var(background, main-content-secondary-background);
         }
-    }
-    @media (min-height: 640px)
-    {
-        .modal-content{
-            max-height: 640px !important;
-        };
     }
 }

@@ -11,14 +11,11 @@ import { TimeComponent } from '../TimeComponent';
 import { Checkbox } from '../input/Checkbox';
 import "./ContextInvitationComponent.scss"
 import classnames from 'classnames';
-import SimpleDialog from '../dialogs/SimpleDialog';
 import { userFullName, userAvatar, listPageSize, uniqueId } from '../../../utilities/Utilities';
 import { Input } from 'reactstrap';
 import { FormComponentErrorMessage } from '../../form/FormController';
 import ContextInviteComponent from './ContextInviteComponent';
 type OwnProps = {
-    didCancel:() => void
-    visible:boolean
     contextNaturalKey:ContextNaturalKey
     contextObject:IdentifiableObject
     members:number[]
@@ -29,9 +26,9 @@ type InvitationFilters = {
 }
 type State = {
     selectedInvitations:number[]
-    inviteFormVisible:boolean
     filters:InvitationFilters
     failed:number[]
+    inviteFormVisible:boolean
     inviteFormReloadKey:string
 }
 type Props = OwnProps
@@ -48,6 +45,13 @@ export default class ContextInvitationComponent extends React.Component<Props, S
                 search:"",
             },
             failed:[]
+        }
+    }
+    componentDidUpdate = (prevProps:Props) => {
+        if(this.props.contextObject != prevProps.contextObject)
+        {
+            const list = this.getList()
+            list && list.reload()
         }
     }
     renderInvitation = (invitation:ContextInvitation) =>  {
@@ -69,19 +73,30 @@ export default class ContextInvitationComponent extends React.Component<Props, S
             completion(data)
         })
     }
-    handleListSelect = (items: number[]) => {
+    handleSelectionChange = (id: number, selected:boolean) => {
+        const selectedItems = [...this.state.selectedInvitations]
+        selectedItems.toggleElement(id)
         this.setState((prevState:State) => {
-            const failed = [...prevState.failed].filter(fid => items.contains(fid))
-            return {selectedInvitations:items, failed}
+            const failed = [...prevState.failed]
+            if(!selected)
+                failed.remove(id)
+            return {selectedInvitations:selectedItems, failed}
         })
     }
-    clearSelection = () => {
-        const list = this.getList()
-        list && list.clearSelection()
+    getList = () => {
+        return this.listRef && this.listRef.current
     }
     selectAll = () => {
         const list = this.getList()
-        list && list.selectAll()
+        const items = list && list.getItems().map(i => i.id) || []
+        this.setState(() => {
+            return {selectedInvitations:items}
+        })
+    }
+    clearSelection = () => {
+        this.setState(() => {
+            return {selectedInvitations:[]}
+        })
     }
     headerToggle = () => {
         const selected = this.state.selectedInvitations
@@ -98,13 +113,9 @@ export default class ContextInvitationComponent extends React.Component<Props, S
         })
     }
     hideInviteForm = () => {
-
         this.setState((prevState:State) => {
             return {inviteFormVisible:false}
         })
-    }
-    getList = () => {
-        return this.listRef && this.listRef.current
     }
     reloadList = () => {
         this.hideInviteForm()
@@ -118,10 +129,12 @@ export default class ContextInvitationComponent extends React.Component<Props, S
         let ids = [...this.state.selectedInvitations]
         ApiClient.deleteContextInvitations(this.props.contextNaturalKey, ids, (response, status, error) => {
             const errors = response && response.failed || []
-            if(error)
-                errors.push({delete:-1})
+            const selected = errors.map(f => f.delete)
+            const failed = [...selected]
+            if(error && failed.length == 0)
+                failed.push(-1)// show default error
             this.setState(() => {
-                return {failed:errors.map(f => f.delete)}
+                return {failed, selectedInvitations:selected}
             }, this.reloadList)
             console.log("deleted response", response)
         })
@@ -166,7 +179,8 @@ export default class ContextInvitationComponent extends React.Component<Props, S
                     fetchData={this.fetchInvitations}
                     renderItem={this.renderInvitation}
                     loadMoreOnScroll={true}
-                    selectedItems={this.handleListSelect}
+                    onItemSelectionChange={this.handleSelectionChange}
+                    selected={this.state.selectedInvitations}
                     isSelecting={true}
                     findScrollParent={true}
                     clearDataBeforeFetch={false}
@@ -178,14 +192,13 @@ export default class ContextInvitationComponent extends React.Component<Props, S
         const contextObject = this.props.contextObject
         const list = this.getList()
         const activeMemberInvitations = list && list.getItems().map(i => i.target_user).filter(u => !!u) || []
-        return <ContextInviteComponent members={this.props.members} availableMembers={this.props.availableMembers} contextNaturalKey={this.props.contextNaturalKey} key={this.state.inviteFormReloadKey} onInvited={this.handleInviteCompleted} didCancel={this.hideInviteForm} visible={visible} contextObject={contextObject} activeMembershipInvitations={activeMemberInvitations} />
+        return <ContextInviteComponent members={this.props.members} availableMembers={this.props.availableMembers} contextNaturalKey={this.props.contextNaturalKey} key={this.state.inviteFormReloadKey} onCompleted={this.handleInviteCompleted} didCancel={this.hideInviteForm} visible={visible} contextObject={contextObject} activeMembershipInvitations={activeMemberInvitations} />
     }
     render = () => {
-        const {visible, didCancel} = this.props
-        return <SimpleDialog className="context-invitations" didCancel={didCancel} visible={visible} header={translate(`${this.props.contextNaturalKey}.invitations`)}>
+        return <div className="context-invitation">
                     {this.renderList()}
                     {this.renderInviteForm()}
-                </SimpleDialog>
+                </div>
         
     }
 }

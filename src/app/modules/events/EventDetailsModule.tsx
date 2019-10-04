@@ -20,7 +20,7 @@ import FormController from '../../components/form/FormController';
 import { DropDownMenu } from '../../components/general/DropDownMenu';
 import EventCreateComponent from '../../components/general/contextCreation/EventCreateComponent';
 import { EventManager } from '../../managers/EventManager';
-import ContextInvitationComponent from '../../components/general/contextInvitation/ContextInvitationComponent';
+import ContextMembersForm from '../../components/general/contextMembers/ContextMembersForm';
 const shortMonth:string[] = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 type OwnProps = {
     breakpoint:ResponsiveBreakpoint
@@ -31,8 +31,8 @@ type State = {
     isLoading:boolean
     editFormVisible:boolean
     editFormReloadKey:string
-    invitationListVisible?:boolean
-    invitationReloadKey?:string
+    membersFormVisible?:boolean
+    membersFormReloadKey?:string
 }
 type ReduxStateProps = {
     community: Community
@@ -50,8 +50,8 @@ class EventDetailsModule extends React.Component<Props, State> {
             menuVisible:false,
             editFormVisible:false,
             editFormReloadKey:uniqueId(),
-            invitationListVisible:false,
-            invitationReloadKey:uniqueId(),
+            membersFormVisible:false,
+            membersFormReloadKey:uniqueId(),
         }
     }
     componentDidUpdate = (prevProps:Props) => {
@@ -100,10 +100,10 @@ class EventDetailsModule extends React.Component<Props, State> {
         }
         this.hideEventCreateForm()
     }
-    toggleInviteForm = () => {
+    toggleMembersForm = () => {
         this.setState((prevState:State) => {
-            const invitationReloadKey = prevState.invitationListVisible ? null : uniqueId()
-            return {invitationListVisible:!prevState.invitationListVisible, invitationReloadKey}
+            const invitationReloadKey = prevState.membersFormVisible ? null : uniqueId()
+            return {membersFormVisible:!prevState.membersFormVisible, membersFormReloadKey: invitationReloadKey}
         })
     }
     getEventOptions = () => {
@@ -111,13 +111,13 @@ class EventDetailsModule extends React.Component<Props, State> {
         if(this.props.event.permission >= Permission.admin)
             options.push({id:"1", type:OverflowMenuItemType.option, title:translate("Edit"), onPress:this.showEventCreateForm, iconClass:"fas fa-pen", iconStackClass:Permission.getShield(this.props.event.permission)})
         if(this.props.event.permission >= Permission.admin)
-            options.push({id:"invite", type:OverflowMenuItemType.option, title:translate("common.invitations"), onPress:this.toggleInviteForm, iconClass:"fas fa-paper-plane", iconStackClass:Permission.getShield(this.props.event.permission)})
+            options.push({id:"members", type:OverflowMenuItemType.option, title:translate("common.member.management"), onPress:this.toggleMembersForm, iconClass:"fas fa-users-cog", iconStackClass:Permission.getShield(this.props.event.permission)})
         return options
     }
-    renderInvitationList = () => {
-        const visible = this.state.invitationListVisible
+    renderMembersForm = () => {
+        const visible = this.state.membersFormVisible
         const contextObject = this.props.event
-        return <ContextInvitationComponent members={contextObject.attending} availableMembers={this.props.community.members} contextNaturalKey={ContextNaturalKey.EVENT} key={this.state.invitationReloadKey} didCancel={this.toggleInviteForm} visible={visible} contextObject={contextObject} />
+        return <ContextMembersForm community={this.props.community} contextNaturalKey={ContextNaturalKey.EVENT} key={this.state.membersFormReloadKey} didCancel={this.toggleMembersForm} visible={visible} contextObject={contextObject} />
     }
     renderEditForm = () => {
         const visible = this.state.editFormVisible
@@ -155,7 +155,7 @@ class EventDetailsModule extends React.Component<Props, State> {
                             <LoadingSpinner key="loading"/>
                         }
                         {this.renderEditForm()}
-                        {this.renderInvitationList()}
+                        {this.renderMembersForm()}
                     </ModuleContent>
                     { event && event.permission >= Permission.read &&
                         <ModuleFooter>

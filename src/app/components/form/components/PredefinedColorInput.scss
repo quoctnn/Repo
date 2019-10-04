@@ -1,0 +1,18 @@
+.color-picker{
+    > *{
+        display: flex;
+        flex-wrap: wrap;
+    }
+    .color-item{
+        width: 25px;
+        height: 25px;
+        border-radius: 4px;
+        margin: 4px;
+        color:white;
+        align-items: center;
+        justify-content: center;
+        display: flex;
+        flex-shrink: 0;
+        cursor: pointer;
+    } 
+}

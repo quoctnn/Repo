@@ -14,7 +14,7 @@ type OwnProps = {
     contextNaturalKey:ContextNaturalKey
     contextObject:IdentifiableObject
     activeMembershipInvitations:number[]
-    onInvited:() => void
+    onCompleted:() => void
     availableMembers:number[]
     members:number[]
 }
@@ -53,26 +53,33 @@ export default class ContextInviteComponent extends React.Component<Props, State
         })
     }
     handleFormSubmit = () => {
-
+        const {contextNaturalKey, contextObject} = this.props
         this.setFormStatus(FormStatus.submitting)
         const data = this.state.formValues
         const formData = removeEmptyEntriesFromObject(data)
         const hasDataToSave = Object.keys(formData).length > 0
+        const onComplete = (response:any, status:string, error:RequestErrorData) => {
+            if(error)
+            {
+                this.setState(() => {
+                    return {formErrors:[error]}
+                })
+                this.setFormStatus(FormStatus.normal)
+            }
+            else {
+                this.setFormStatus(FormStatus.normal)
+                this.props.onCompleted()
+            }
+        }
         if(hasDataToSave)
         {
-            ApiClient.createContextInvitation(this.props.contextNaturalKey, this.props.contextObject.id, formData.users, (response, status, error) => {
-                if(error)
-                {
-                    this.setState(() => {
-                        return {formErrors:[error]}
-                    })
-                    this.setFormStatus(FormStatus.normal)
-                }
-                else {
-                    this.setFormStatus(FormStatus.normal)
-                    this.props.onInvited()
-                }
-            })
+            if(contextNaturalKey == ContextNaturalKey.PROJECT)
+            {
+                ApiClient.updateProjectMembership(contextObject.id, formData.users, undefined, onComplete)
+            }
+            else {
+                ApiClient.createContextInvitation(this.props.contextNaturalKey, this.props.contextObject.id, formData.users, onComplete)
+            }
         }   
         else {
             this.props.didCancel()
@@ -86,7 +93,7 @@ export default class ContextInviteComponent extends React.Component<Props, State
         })
     }
     render = () => {
-        const {visible, didCancel, contextObject, activeMembershipInvitations} = this.props
+        const {visible, didCancel, activeMembershipInvitations} = this.props
         const members:number[] = this.props.members || [] 
         const invitationFilterList = [].concat(activeMembershipInvitations).concat(members)
         const availableMembers = ProfileManager.getProfiles(this.props.availableMembers.filter(id => !invitationFilterList.contains(id))) 

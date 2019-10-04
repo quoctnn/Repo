@@ -1,0 +1,13 @@
+
+    .context-members-form-modal{
+        .modal-content{
+            height: 100%;
+        }
+        @media (min-height: 640px)
+        {
+            .modal-content{
+                max-height: 640px !important;
+            };
+        }
+    }
+    

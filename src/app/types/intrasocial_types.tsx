@@ -5,6 +5,20 @@ import { translate } from "../localization/AutoIntlProvider";
 import { userFullName, groupCover, communityCover, userCover, projectCover, eventCover } from '../utilities/Utilities';
 import { CommunityManager } from '../managers/CommunityManager';
 import { ProjectManager } from '../managers/ProjectManager';
+export type CommunityRole = {
+    community:number
+    users:number[]
+    groups:number[]
+    projects:number[]
+    role:string
+    moderator:boolean
+    manager:boolean
+    group_creation:CommunityRoleCreatePermission
+    subgroup_creation:CommunityRoleCreatePermission
+    event_creation:CommunityRoleCreatePermission
+    project_creation:CommunityRoleCreatePermission
+    color:string
+} & IdentifiableObject
 export type FriendRequest = {
     created:string
     from_user:number 
@@ -21,6 +35,8 @@ export enum RelationshipStatus{
     admin = "admin",
     moderator = "moderator",
     creator = "creator",
+    manager = "manager",
+
 }
 export enum AppLanguage{
     english = "en",
@@ -67,6 +83,23 @@ export namespace CommunityCreatePermission {
         CommunityCreatePermission.createAllowed,
     ]
     export function translationForKey(key: CommunityCreatePermission) {
+        return translate(`community.create_permission.${key}`)
+    }
+}
+export enum CommunityRoleCreatePermission{
+    createDenied = 0,
+    createLimited = 20,
+    createAllowed = 21,
+    inherit = -1
+}
+export namespace CommunityRoleCreatePermission {
+    export const all = [
+        CommunityRoleCreatePermission.createDenied,
+        CommunityRoleCreatePermission.createLimited,
+        CommunityRoleCreatePermission.createAllowed,
+        CommunityRoleCreatePermission.inherit,
+    ]
+    export function translationForKey(key: CommunityRoleCreatePermission) {
         return translate(`community.create_permission.${key}`)
     }
 }

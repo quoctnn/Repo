@@ -17,8 +17,6 @@ import CommunityInviteComponent from './CommunityInviteComponent';
 import { Input } from 'reactstrap';
 import { FormComponentErrorMessage } from '../../form/FormController';
 type OwnProps = {
-    didCancel:() => void
-    visible:boolean
     community:Community
 }
 type InvitationFilters = {
@@ -31,9 +29,9 @@ type InvitationFilters = {
 }
 type State = {
     selectedInvitations:number[]
-    inviteFormVisible:boolean
     filters:InvitationFilters
     failed:number[]
+    inviteFormVisible:boolean
     inviteFormReloadKey:string
 }
 type Props = OwnProps
@@ -76,19 +74,27 @@ export default class CommunityInvitationsComponent extends React.Component<Props
             completion(data)
         })
     }
-    handleListSelect = (items: number[]) => {
+    handleSelectionChange = (id: number, selected:boolean) => {
+        const selectedItems = [...this.state.selectedInvitations]
+        selectedItems.toggleElement(id)
         this.setState((prevState:State) => {
-            const failed = [...prevState.failed].filter(fid => items.contains(fid))
-            return {selectedInvitations:items, failed}
+            const failed = [...prevState.failed]
+            if(!selected)
+                failed.remove(id)
+            return {selectedInvitations:selectedItems, failed}
         })
-    }
-    clearSelection = () => {
-        const list = this.getList()
-        list && list.clearSelection()
     }
     selectAll = () => {
         const list = this.getList()
-        list && list.selectAll()
+        const items = list && list.getItems().map(i => i.id) || []
+        this.setState(() => {
+            return {selectedInvitations:items}
+        })
+    }
+    clearSelection = () => {
+        this.setState(() => {
+            return {selectedInvitations:[]}
+        })
     }
     headerToggle = () => {
         const selected = this.state.selectedInvitations
@@ -122,17 +128,15 @@ export default class CommunityInvitationsComponent extends React.Component<Props
         this.reloadList()
     }
     deleteInvitations = () => {
-        const testId = 5
         let ids = [...this.state.selectedInvitations]
-        const hasTest = ids.contains(testId)
-        if(hasTest)
-            ids = ids.except(5)
         ApiClient.deleteCommunityInvitations(ids, (response, status, error) => {
-            if (hasTest)
-                response && response.failed && response.failed.push({delete:5})
             const errors = response && response.failed || []
+            const selected = errors.map(f => f.delete)
+            const failed = [...selected]
+            if(error && failed.length == 0)
+                failed.push(-1)// show default error
             this.setState(() => {
-                return {failed:errors.map(f => f.delete)}
+                return {failed:failed, selectedInvitations:selected}
             }, this.reloadList)
             console.log("deleted response", response)
         })
@@ -177,7 +181,8 @@ export default class CommunityInvitationsComponent extends React.Component<Props
                     fetchData={this.fetchInvitations}
                     renderItem={this.renderInvitation}
                     loadMoreOnScroll={true}
-                    selectedItems={this.handleListSelect}
+                    onItemSelectionChange={this.handleSelectionChange}
+                    selected={this.state.selectedInvitations}
                     isSelecting={true}
                     findScrollParent={true}
                     clearDataBeforeFetch={false}
@@ -192,11 +197,10 @@ export default class CommunityInvitationsComponent extends React.Component<Props
         return <CommunityInviteComponent key={this.state.inviteFormReloadKey} onInvited={this.handleInviteCompleted} didCancel={this.hideInviteForm} visible={visible} community={community} activeMembershipInvitations={activeMemberInvitations} />
     }
     render = () => {
-        const {visible, didCancel} = this.props
-        return <SimpleDialog className="community-invitations" didCancel={didCancel} visible={visible} header={translate("community.invitations")}>
+        return <div className="community-invitations">
                     {this.renderList()}
                     {this.renderInviteForm()}
-                </SimpleDialog>
+                </div>
         
     }
 }
