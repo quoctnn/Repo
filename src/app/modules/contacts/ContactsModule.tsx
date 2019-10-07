@@ -233,7 +233,7 @@ class ContactsModule extends React.PureComponent<Props, State> {
 
     render = () =>
     {
-        const {className, breakpoint, isModal, ...rest} = this.props
+        const {className, breakpoint, isModal, authenticatedUser, dispatch, ...rest} = this.props
         const cn = classnames("contacts-module", className)
         return <SimpleModule {...rest}
                 showHeader={!isModal}
