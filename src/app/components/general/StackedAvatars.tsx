@@ -6,11 +6,13 @@ import { ReduxState } from '../../redux';
 import Avatar from './Avatar';
 import { UserProfile } from '../../types/intrasocial_types';
 import { ProfileManager } from '../../managers/ProfileManager';
-import { userAvatar } from '../../utilities/Utilities';
+import { userAvatar, userFullName } from '../../utilities/Utilities';
 import LoadingSpinner from '../LoadingSpinner';
+import classnames from 'classnames';
 
 type OwnProps = {
     userIds: number[]
+    className?:string
 }
 type DefaultProps = {
     size: number
@@ -19,6 +21,7 @@ type DefaultProps = {
     showTotalCount:boolean
     showOverflowCount:boolean
     onOverflowCountClick?:() => void
+    showTextOnly:boolean
 }
 type State = {
     isLoading:Boolean
@@ -35,7 +38,8 @@ class StackedAvatars extends React.Component<Props, State> {
         borderWidth:2,
         maxAvatars:5,
         showTotalCount:false,
-        showOverflowCount:false
+        showOverflowCount:false,
+        showTextOnly:false,
     }
     constructor(props:Props) {
         super(props);
@@ -72,31 +76,36 @@ class StackedAvatars extends React.Component<Props, State> {
         )
     }
     renderAvatarCount = (count: string) => {
+        if(this.props.showTextOnly)
+            return ", " + count
         return <div className="link" onClick={this.props.onOverflowCountClick} style={{position: "relative"}}>
                 <Avatar size={this.props.size} borderColor={"#FFFFFF"} borderWidth={this.props.borderWidth} />
                 <div className={"centered-text"}>{count}</div>
             </div>
     }
+    renderContent = (profiles:UserProfile[], max:number) => {
+        const filteredProfiles = profiles.slice(0, max)
+        if(this.props.showTextOnly)
+            return filteredProfiles.map(p => userFullName(p)).join(", ")
+        return filteredProfiles.map((profile) => {
+            return(this.renderAvatar(profile))
+        })
+    }
     render() {
-        const {showOverflowCount, showTotalCount, onOverflowCountClick} = this.props
+        const {showOverflowCount, showTotalCount, onOverflowCountClick, showTextOnly, className} = this.props
         const profiles = this.state.profiles
         if(profiles.length == 0)
             return null
         const max = this.props.maxAvatars
-        const newMax = showOverflowCount && profiles.length > max ? max - 1 : max
+        const newMax = showOverflowCount && !showTextOnly && profiles.length > max ? max - 1 : max
+
         return(
-            <div className="avatar-stacked">
+            <div className={classnames("avatar-stacked", className)}>
                 {showTotalCount &&
                     <div onClick={onOverflowCountClick} className="total link ml-1">{profiles.length}</div>
                 }
-                {
-                    !this.state.isLoading &&
-                        profiles.slice(0, newMax).map((profile) => {
-                        return(this.renderAvatar(profile))
-                    })
-                    ||
-                    <LoadingSpinner/>
-                }
+                {this.state.isLoading &&  <LoadingSpinner/>}
+                {!this.state.isLoading && this.renderContent(profiles, newMax)}
                 {showOverflowCount && profiles.length > max &&
                     this.renderAvatarCount("+" + Math.min(profiles.length - newMax, 99))
                 }

@@ -6,7 +6,7 @@ import { nullOrUndefined, DateFormat } from '../utilities/Utilities';
 import moment = require("moment");
 import { Settings } from "../utilities/Settings";
 import { ConversationManager } from '../managers/ConversationManager';
-import { CommunityConfigurationData, CommunityInvitation, AppLanguage, ContextInvitation, ContextSegmentKey, FriendRequest } from '../types/intrasocial_types';
+import { CommunityConfigurationData, CommunityInvitation, AppLanguage, ContextInvitation, ContextSegmentKey, FriendRequest, CommunityRole, CommunityRoleCreatePermission } from '../types/intrasocial_types';
 const $ = require("jquery")
 import { Status, UserProfile, UploadedFile, Community, Group, Conversation, Project, Message, Event, Task,
     ElasticSearchType, ObjectAttributeType, StatusObjectAttribute, EmbedCardItem, ReportTag,
@@ -445,6 +445,16 @@ export abstract class ApiClient
             callback(null, status, new RequestErrorData(request.responseJSON, error))
         })
     }
+    static updateCommunityAdmin(communityId:number, add:number[], remove:number[], callback:ApiClientCallback<any>)
+    {
+        let url = Constants.apiRoute.communityAdminUrl(communityId)
+        const data = {add, remove}
+        AjaxRequest.postJSON(url, data, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, new RequestErrorData(request.responseJSON, error))
+        })
+    }
     static setContextPhoto(type:ContextPhotoType, contextNaturalKey:ContextNaturalKey, contextObjectId:number, file:File|string, crop:CropRect, callback:ApiClientCallback<CropInfo>)
     {
         const url = this.getContextPhotoUrl(type, contextNaturalKey, contextObjectId)
@@ -512,6 +522,117 @@ export abstract class ApiClient
             callback(null, status, new RequestErrorData(request.responseJSON, error))
         })
     }
+    private static getContextMembersKickUrl = (contextNaturalKey:ContextNaturalKey, contextObjectId:number) => {
+        let url:string = null
+        switch (contextNaturalKey ) {
+            case ContextNaturalKey.COMMUNITY:url = Constants.apiRoute.communityMembersKickUrl(contextObjectId); break;
+            case ContextNaturalKey.EVENT:url = Constants.apiRoute.eventMembersKickUrl(contextObjectId); break;
+            case ContextNaturalKey.GROUP:url = Constants.apiRoute.groupMembersKickUrl(contextObjectId); break;
+            case ContextNaturalKey.PROJECT:url = Constants.apiRoute.projectMembersKickUrl(contextObjectId); break;
+            default:break;
+        }
+        return url
+    }
+    static kickContextMembers = (ids:number[], contextNaturalKey:ContextNaturalKey, contextObjectId:number, callback:ApiClientCallback<any>) => {
+        let url = ApiClient.getContextMembersKickUrl(contextNaturalKey, contextObjectId)
+        if(!url)
+        {
+            callback(null, "500", new RequestErrorData({detail:`kick members api endpoint not set for ${contextNaturalKey}`}, "error"))
+            return
+        }
+        const data = {remove:ids}
+        AjaxRequest.postJSON(url, data, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, new RequestErrorData(request.responseJSON, error))
+        })
+    }
+    private static getContextRolesUrl = (contextNaturalKey:ContextNaturalKey, contextObjectId:number) => {
+        let url:string = null
+        switch (contextNaturalKey ) {
+            case ContextNaturalKey.GROUP:url = Constants.apiRoute.groupRolesUrl(contextObjectId); break;
+            case ContextNaturalKey.PROJECT:url = Constants.apiRoute.projectRolesUrl(contextObjectId); break;
+            default:break;
+        }
+        return url
+    }
+    static updateContextRoles(contextNaturalKey:ContextNaturalKey, contextObjectId:number, add:number[], remove:number[], callback:ApiClientCallback<any>)
+    {
+        let url = ApiClient.getContextRolesUrl(contextNaturalKey, contextObjectId)
+        if(!url)
+        {
+            callback(null, "500", new RequestErrorData({detail:`roles api endpoint not set for ${contextNaturalKey}`}, "error"))
+            return
+        }
+        const data = {add, remove}
+        AjaxRequest.postJSON(url, data, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, new RequestErrorData(request.responseJSON, error))
+        })
+    }
+
+    private static getContextModeratorUrl = (contextNaturalKey:ContextNaturalKey, contextObjectId:number) => {
+        let url:string = null
+        switch (contextNaturalKey ) {
+            case ContextNaturalKey.GROUP:url = Constants.apiRoute.groupModerateUrl(contextObjectId); break;
+            case ContextNaturalKey.PROJECT:url = Constants.apiRoute.projectModerateUrl(contextObjectId); break;
+            case ContextNaturalKey.EVENT:url = Constants.apiRoute.eventModerateUrl(contextObjectId); break;
+            default:break;
+        }
+        return url
+    }   
+    static updateContextModerators(contextNaturalKey:ContextNaturalKey, contextObjectId:number, add:number[], remove:number[], callback:ApiClientCallback<any>)
+    {
+        let url = ApiClient.getContextModeratorUrl(contextNaturalKey, contextObjectId)
+        if(!url)
+        {
+            callback(null, "500", new RequestErrorData({detail:`moderate api endpoint not set for ${contextNaturalKey}`}, "error"))
+            return
+        }
+        const data = {add, remove}
+        AjaxRequest.postJSON(url, data, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, new RequestErrorData(request.responseJSON, error))
+        })
+    }
+    static updateContextManagers(contextNaturalKey:ContextNaturalKey, contextObjectId:number, add:number[], remove:number[], callback:ApiClientCallback<any>)
+    {
+        let url = Constants.apiRoute.projectManagerUrl(contextObjectId)
+        const data = {add, remove}
+        AjaxRequest.postJSON(url, data, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, new RequestErrorData(request.responseJSON, error))
+        })
+    }
+    private static getContextMembersUrl = (contextNaturalKey:ContextNaturalKey, contextObjectId:number) => {
+        let url:string = null
+        switch (contextNaturalKey ) {
+            case ContextNaturalKey.COMMUNITY:url = Constants.apiRoute.communityMembersUrl(contextObjectId); break;
+            case ContextNaturalKey.EVENT:url = Constants.apiRoute.eventMembersUrl(contextObjectId); break;
+            case ContextNaturalKey.GROUP:url = Constants.apiRoute.groupMembersUrl(contextObjectId); break;
+            case ContextNaturalKey.PROJECT:url = Constants.apiRoute.projectMembersUrl(contextObjectId); break;
+            default:break;
+        }
+        return url
+    }
+    static getContextMembers(contextNaturalKey:ContextNaturalKey, contextObjectId:number, limit:number, offset:number, search:string, callback:ApiClientFeedPageCallback<UserProfile>)
+    {
+        let url = this.getContextMembersUrl(contextNaturalKey, contextObjectId)
+        if(!url)
+        {
+            callback(null, "500", new RequestErrorData({detail:`members api endpoint not set for ${contextNaturalKey}`}, "error"))
+            return
+        }
+        url += "?" + ApiClient.getQueryString({ limit, offset, search })
+        AjaxRequest.get(url, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, new RequestErrorData(request.responseJSON, error))
+        })
+    }
     static updateCommunity(communityId:string|number, data:Partial<Community>, callback:ApiClientCallback<Community>)
     {
         let url = Constants.apiRoute.communityUrl(communityId)
@@ -565,6 +686,44 @@ export abstract class ApiClient
             callback(null, status, new RequestErrorData(request.responseJSON, error))
         })
     }
+    static getCommunityRoles(communityId:number, limit:number, offset:number, callback:ApiClientFeedPageCallback<CommunityRole>)
+    {
+        let url = Constants.apiRoute.communityRolesUrl + "?" + ApiClient.getQueryString({limit, offset, id:communityId})
+        AjaxRequest.get(url, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, new RequestErrorData(request.responseJSON, error))
+        })
+    }
+    static createCommunityRole(role:CommunityRole, callback:ApiClientCallback<CommunityRole>)
+    {
+        let url = Constants.apiRoute.communityRolesUrl
+        AjaxRequest.postJSON(url, role, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, new RequestErrorData(request.responseJSON, error))
+        })
+    }
+    
+    static deleteCommunityRoles = (ids:number[], callback:ApiClientCallback<{failed:{delete:number}[]}>) => {
+        let url = Constants.apiRoute.communityRolesBatchUrl
+        const data = ids.map(id => {return {delete:id}})
+        AjaxRequest.postJSON(url, data, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, new RequestErrorData(request.responseJSON, error))
+        })
+    }
+    static updateCommunityRole(role:Partial<CommunityRole>, callback:ApiClientCallback<CommunityRole>)
+    {
+        let url = Constants.apiRoute.communityRoleUrl(role.id)
+        AjaxRequest.patchJSON(url, role, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, new RequestErrorData(request.responseJSON, error))
+        })
+    }
+    
     static getCommunityFiles(communityId:string|number, limit:number, offset:number, callback:ApiClientFeedPageCallback<UploadedFile>)
     {
         let url = Constants.apiRoute.communityFilesUrl(communityId) + "?" + ApiClient.getQueryString({limit, offset})
@@ -586,6 +745,16 @@ export abstract class ApiClient
     static updateProject(projectId:number, projectData:Partial<Project>, callback:ApiClientCallback<Project>)
     {
         AjaxRequest.patchJSON(Constants.apiRoute.projectDetailUrl(projectId), projectData, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, new RequestErrorData(request.responseJSON, error))
+        })
+    }
+    static updateProjectMembership(projectId:number, add:number[], remove:number[], moderator:boolean, manager:boolean, callback:ApiClientCallback<any>)
+    {
+        let url = Constants.apiRoute.projectMembershipUrl(projectId)
+        const data = {add, remove, moderator, manager}
+        AjaxRequest.postJSON(url, data, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
             callback(null, status, new RequestErrorData(request.responseJSON, error))
@@ -1128,7 +1297,7 @@ export abstract class ApiClient
             callback(null, status, new RequestErrorData(request.responseJSON, error))
         })
     }
-    static createContextInvitation = (contextNaturalKey:ContextNaturalKey, contextObjectId:number, users:number[], callback:ApiClientCallback<any>) => {
+    static createContextInvitation = (contextNaturalKey:ContextNaturalKey, contextObjectId:number, users:number[], moderator:boolean,  callback:ApiClientCallback<any>) => {
         let url = ApiClient.getContextInvitationUrl(contextNaturalKey)
         if(!url)
         {
@@ -1136,7 +1305,7 @@ export abstract class ApiClient
             return
         }
         const key = ContextSegmentKey.keyForNaturalKey(contextNaturalKey)
-        const data = { users }
+        const data = { users, moderator }
         data[key] = contextObjectId
         AjaxRequest.postJSON(url, data, (data, status, request) => {
             callback(data, status, null)

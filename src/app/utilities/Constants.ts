@@ -51,11 +51,19 @@ export default  {
         removeSearchHistoryUrl: (id:number) => {
             return `/api/v1/search/${id}/remove_from_history/`
         },
+        communityRolesBatchUrl:"/api/v2/community-roles/batch/",
+        communityRolesUrl:"/api/v2/community-roles/",
+        communityRoleUrl: (id:number) => {
+            return `/api/v2/community-roles/${id}/`
+        },
         // Community URLs
         myCommunitiesUrl: '/api/v2/community/as-member/',
         invitedCommunitiesUrl: '/api/v2/community/invitations/',
         communityMembersUrl: (id:number) => {
             return `/api/v2/community/${id}/members/`
+        },
+        communityMembersKickUrl: (id:number) => {
+            return `/api/v2/community/${id}/kick/`
         },
         communityFilesUrl: (id:number|string) => {
             return `/api/v1/community/${id}/files/`
@@ -68,6 +76,9 @@ export default  {
         },
         communityAvatarUrl: (id:number) => {
             return `/api/v2/community/${id}/avatar/`
+        },
+        communityAdminUrl: (id:number) => {
+            return `/api/v2/community/${id}/admin/`
         },
         communityCoverUrl: (id:number) => {
             return `/api/v2/community/${id}/cover/`
@@ -140,6 +151,18 @@ export default  {
         groupInvitationDeleteUrl: (id:number) => {
             return `/api/v2/group-invitation/${id}/`
         },
+        groupMembersUrl: (id:number) => {
+            return `/api/v2/group/${id}/members/`
+        },
+        groupMembersKickUrl: (id:number) => {
+            return `/api/v2/group/${id}/kick/`
+        },
+        groupRolesUrl: (id:number) => {
+            return `/api/v2/group/${id}/roles/`
+        },
+        groupModerateUrl: (id:number) => {
+            return `/api/v2/group/${id}/moderate/`
+        },
         groupInvitationAcceptUrl: (id:number) => {
             return `/api/v2/group-invitation/${id}/accept/`
         },
@@ -156,6 +179,24 @@ export default  {
             return `/api/v2/group/${id}/cover/`
         },
         // Project URLs
+        projectMembersUrl: (id:number) => {
+            return `/api/v2/project/${id}/members/`
+        },
+        projectMembershipUrl: (id:number) => {
+            return `/api/v2/project/${id}/membership/`
+        },
+        projectMembersKickUrl: (id:number) => {
+            return `/api/v2/project/${id}/kick/`
+        },
+        projectRolesUrl: (id:number) => {
+            return `/api/v2/project/${id}/roles/`
+        },
+        projectModerateUrl: (id:number) => {
+            return `/api/v2/project/${id}/moderate/`
+        },
+        projectManagerUrl: (id:number) => {
+            return `/api/v2/project/${id}/manager/`
+        },
         projectsUrl: '/api/v2/project/',
         projectDetailUrl: (id:number|string) => {
             return `/api/v2/project/${id}/`
@@ -212,7 +253,15 @@ export default  {
 
         // Event URLs
         upcomingEventsUrl: '/api/v2/event/upcoming/',
-
+        eventModerateUrl: (id:number) => {
+            return `/api/v2/event/${id}/moderate/`
+        },
+        eventMembersUrl: (id:number) => {
+            return `/api/v2/event/${id}/members/`
+        },
+        eventMembersKickUrl: (id:number) => {
+            return `/api/v2/event/${id}/kick/`
+        },
         eventAvatarUrl: (id:number) => {
             return `/api/v2/event/${id}/avatar/`
         },

@@ -30,7 +30,7 @@ import { GroupManager } from '../../managers/GroupManager';
 import { EventManager } from '../../managers/EventManager';
 import { ProjectManager } from '../../managers/ProjectManager';
 import { ToastManager } from '../../managers/ToastManager';
-import CommunityInvitationsComponent from '../../components/general/contextInvitation/CommunityInvitationsComponent';
+import ContextMembersForm from '../../components/general/contextMembers/ContextMembersForm';
 type OwnProps = {
     breakpoint:ResponsiveBreakpoint
 } & CommonModuleProps
@@ -46,8 +46,8 @@ type State = {
     createEventFormReloadKey?:string
     createProjectFormVisible?:boolean
     createProjectFormReloadKey?:string
-    invitationListVisible?:boolean
-    invitationReloadKey?:string
+    membersFormVisible?:boolean
+    membersFormReloadKey?:string
 }
 type ReduxStateProps = {
     community: Community
@@ -71,8 +71,8 @@ class CommunityDetailsModule extends React.Component<Props, State> {
             createEventFormReloadKey:uniqueId(),
             createProjectFormVisible:false,
             createProjectFormReloadKey:uniqueId(),
-            invitationListVisible:false,
-            invitationReloadKey:uniqueId(),
+            membersFormVisible:false,
+            membersFormReloadKey:uniqueId(),
         }
     }
     componentDidUpdate = (prevProps:Props) => {
@@ -109,10 +109,10 @@ class CommunityDetailsModule extends React.Component<Props, State> {
             ToastManager.showRequestErrorToast(errorData)
         })
     }
-    toggleCommunityInviteForm = () => {
+    toggleCommunityMembersForm = () => {
         this.setState((prevState:State) => {
-            const invitationReloadKey = prevState.invitationListVisible ? null : uniqueId()
-            return {invitationListVisible:!prevState.invitationListVisible, invitationReloadKey}
+            const invitationReloadKey = prevState.membersFormVisible ? null : uniqueId()
+            return {membersFormVisible:!prevState.membersFormVisible, membersFormReloadKey: invitationReloadKey}
         })
     }
     showCommunityEditForm = () => {
@@ -207,7 +207,7 @@ class CommunityDetailsModule extends React.Component<Props, State> {
         if(permission >= Permission.admin)
         {
             options.push({id:"edit", type:OverflowMenuItemType.option, title:translate("common.edit"), onPress:this.showCommunityEditForm, iconClass:"fas fa-pen", iconStackClass:Permission.getShield(permission)})
-            options.push({id:"invite", type:OverflowMenuItemType.option, title:translate("common.invitations"), onPress:this.toggleCommunityInviteForm, iconClass:"fas fa-paper-plane", iconStackClass:Permission.getShield(permission)})
+            options.push({id:"members", type:OverflowMenuItemType.option, title:translate("common.member.management"), onPress:this.toggleCommunityMembersForm, iconClass:"fas fa-users-cog", iconStackClass:Permission.getShield(permission)})
         }
         
         if(this.props.community.group_creation_permission >= Permission.limited_write)
@@ -220,10 +220,10 @@ class CommunityDetailsModule extends React.Component<Props, State> {
             options.push({id:"4", type:OverflowMenuItemType.option, title:translate("project.add"), onPress:this.showProjectCreateForm, iconClass:"fas fa-plus"})
         return options
     }
-    renderInvitationList = () => {
-        const visible = this.state.invitationListVisible
+    renderMembersForm = () => {
+        const visible = this.state.membersFormVisible
         const community = this.props.community
-        return <CommunityInvitationsComponent key={this.state.invitationReloadKey} didCancel={this.toggleCommunityInviteForm} visible={visible} community={community} />
+        return <ContextMembersForm contextNaturalKey={ContextNaturalKey.COMMUNITY} contextObject={community} key={this.state.membersFormReloadKey} didCancel={this.toggleCommunityMembersForm} visible={visible} community={community} />
     }
     renderEditForm = () => {
         const visible = this.state.editFormVisible
@@ -264,7 +264,7 @@ class CommunityDetailsModule extends React.Component<Props, State> {
                         {this.renderAddGroupForm()}
                         {this.renderAddEventForm()}
                         {this.renderAddProjectForm()}
-                        {this.renderInvitationList()}
+                        {this.renderMembersForm()}
                     </ModuleContent>
                     { community && community.permission >= Permission.read &&
                         <ModuleFooter className="mt-1">

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { translate } from '../../../localization/AutoIntlProvider';
-import { ContextInvitation, IdentifiableObject, ContextNaturalKey } from '../../../types/intrasocial_types';
+import { Community, CommunityInvitation } from '../../../types/intrasocial_types';
 import { ProfileManager } from '../../../managers/ProfileManager';
 import { ApiClient, PaginationResult } from '../../../network/ApiClient';
 import ListComponent from '../ListComponent';
@@ -9,34 +9,34 @@ import { GenericListItem } from '../GenericListItem';
 import Avatar from '../Avatar';
 import { TimeComponent } from '../TimeComponent';
 import { Checkbox } from '../input/Checkbox';
-import "./ContextInvitationComponent.scss"
+import "./CommunityInvitationsComponent.scss"
 import classnames from 'classnames';
 import SimpleDialog from '../dialogs/SimpleDialog';
 import { userFullName, userAvatar, listPageSize, uniqueId } from '../../../utilities/Utilities';
+import CommunityInviteComponent from './CommunityInviteComponent';
 import { Input } from 'reactstrap';
 import { FormComponentErrorMessage } from '../../form/FormController';
-import ContextInviteComponent from './ContextInviteComponent';
 type OwnProps = {
-    didCancel:() => void
-    visible:boolean
-    contextNaturalKey:ContextNaturalKey
-    contextObject:IdentifiableObject
-    members:number[]
-    availableMembers:number[]
+    community:Community
 }
 type InvitationFilters = {
     search:string
+    email:boolean 
+    user:boolean
+    searchEmail:boolean
+    searchUser:boolean
+    searchFromUser:boolean
 }
 type State = {
     selectedInvitations:number[]
-    inviteFormVisible:boolean
     filters:InvitationFilters
     failed:number[]
+    inviteFormVisible:boolean
     inviteFormReloadKey:string
 }
 type Props = OwnProps
-export default class ContextInvitationComponent extends React.Component<Props, State> {
-    listRef = React.createRef<ListComponent<ContextInvitation>>()
+export default class CommunityInvitationsComponent extends React.Component<Props, State> {
+    listRef = React.createRef<ListComponent<CommunityInvitation>>()
     reloadIdleTimeout: NodeJS.Timer = null
     constructor(props:Props) {
         super(props);
@@ -46,42 +46,55 @@ export default class ContextInvitationComponent extends React.Component<Props, S
             inviteFormReloadKey:uniqueId(),
             filters:{
                 search:"",
+                email:null,
+                user:null,
+                searchEmail:true,
+                searchUser:true,
+                searchFromUser:false,
             },
             failed:[]
         }
     }
-    renderInvitation = (invitation:ContextInvitation) =>  {
+    renderInvitation = (invitation:CommunityInvitation) =>  {
         const failedArray = this.state.failed
-        const user = invitation.user && ProfileManager.getProfileById(invitation.target_user)
-        const title = user && userFullName(user) || `Unknown(${invitation.target_user})`
+        const user = invitation.user && ProfileManager.getProfileById(invitation.user)
+        const title = <div className="text-truncate">{user && userFullName(user) || invitation.email}</div>
         const avatarUrl = userAvatar(user)
         const failed = failedArray.contains( invitation.id )
         const cn = classnames({"bg-warning":failed})
         return <GenericListItem className={cn} header={title} left={<Avatar size={44} image={avatarUrl} />} footer={<TimeComponent date={invitation.created_at} />}/>
     }
-    fetchInvitations = (offset:number, completion:(items:PaginationResult<ContextInvitation>) => (void)) => {
-        let {search} = this.state.filters
+    fetchInvitations = (offset:number, completion:(items:PaginationResult<CommunityInvitation>) => (void)) => {
+        let {search, email, user, searchEmail, searchUser, searchFromUser} = this.state.filters
         if(search.length == 0)
         {
             search = null
         }
-        ApiClient.getContextInvitations(this.props.contextNaturalKey, this.props.contextObject.id, listPageSize(44), offset, search,  (data) => {
+        ApiClient.getCommunityInvitations(listPageSize(44), offset, this.props.community.id, search, email, user,searchEmail, searchUser, searchFromUser, (data) => {
             completion(data)
         })
     }
-    handleListSelect = (items: number[]) => {
+    handleSelectionChange = (id: number, selected:boolean) => {
+        const selectedItems = [...this.state.selectedInvitations]
+        selectedItems.toggleElement(id)
         this.setState((prevState:State) => {
-            const failed = [...prevState.failed].filter(fid => items.contains(fid))
-            return {selectedInvitations:items, failed}
+            const failed = [...prevState.failed]
+            if(!selected)
+                failed.remove(id)
+            return {selectedInvitations:selectedItems, failed}
         })
-    }
-    clearSelection = () => {
-        const list = this.getList()
-        list && list.clearSelection()
     }
     selectAll = () => {
         const list = this.getList()
-        list && list.selectAll()
+        const items = list && list.getItems().map(i => i.id) || []
+        this.setState(() => {
+            return {selectedInvitations:items}
+        })
+    }
+    clearSelection = () => {
+        this.setState(() => {
+            return {selectedInvitations:[]}
+        })
     }
     headerToggle = () => {
         const selected = this.state.selectedInvitations
@@ -116,12 +129,14 @@ export default class ContextInvitationComponent extends React.Component<Props, S
     }
     deleteInvitations = () => {
         let ids = [...this.state.selectedInvitations]
-        ApiClient.deleteContextInvitations(this.props.contextNaturalKey, ids, (response, status, error) => {
+        ApiClient.deleteCommunityInvitations(ids, (response, status, error) => {
             const errors = response && response.failed || []
-            if(error)
-                errors.push({delete:-1})
+            const selected = errors.map(f => f.delete)
+            const failed = [...selected]
+            if(error && failed.length == 0)
+                failed.push(-1)// show default error
             this.setState(() => {
-                return {failed:errors.map(f => f.delete)}
+                return {failed:failed, selectedInvitations:selected}
             }, this.reloadList)
             console.log("deleted response", response)
         })
@@ -161,12 +176,13 @@ export default class ContextInvitationComponent extends React.Component<Props, S
                         </Button>
                     }
                 </div>
-                <ListComponent<ContextInvitation> 
+                <ListComponent<CommunityInvitation> 
                     ref={this.listRef}
                     fetchData={this.fetchInvitations}
                     renderItem={this.renderInvitation}
                     loadMoreOnScroll={true}
-                    selectedItems={this.handleListSelect}
+                    onItemSelectionChange={this.handleSelectionChange}
+                    selected={this.state.selectedInvitations}
                     isSelecting={true}
                     findScrollParent={true}
                     clearDataBeforeFetch={false}
@@ -175,17 +191,16 @@ export default class ContextInvitationComponent extends React.Component<Props, S
     }
     renderInviteForm = () => {
         const visible = this.state.inviteFormVisible
-        const contextObject = this.props.contextObject
+        const community = this.props.community
         const list = this.getList()
-        const activeMemberInvitations = list && list.getItems().map(i => i.target_user).filter(u => !!u) || []
-        return <ContextInviteComponent members={this.props.members} availableMembers={this.props.availableMembers} contextNaturalKey={this.props.contextNaturalKey} key={this.state.inviteFormReloadKey} onInvited={this.handleInviteCompleted} didCancel={this.hideInviteForm} visible={visible} contextObject={contextObject} activeMembershipInvitations={activeMemberInvitations} />
+        const activeMemberInvitations = list && list.getItems().map(i => i.user).filter(u => !!u) || []
+        return <CommunityInviteComponent key={this.state.inviteFormReloadKey} onInvited={this.handleInviteCompleted} didCancel={this.hideInviteForm} visible={visible} community={community} activeMembershipInvitations={activeMemberInvitations} />
     }
     render = () => {
-        const {visible, didCancel} = this.props
-        return <SimpleDialog className="context-invitations" didCancel={didCancel} visible={visible} header={translate(`${this.props.contextNaturalKey}.invitations`)}>
+        return <div className="community-invitations">
                     {this.renderList()}
                     {this.renderInviteForm()}
-                </SimpleDialog>
+                </div>
         
     }
 }

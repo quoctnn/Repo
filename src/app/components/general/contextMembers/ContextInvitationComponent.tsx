@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { translate } from '../../../localization/AutoIntlProvider';
-import { Community, CommunityInvitation } from '../../../types/intrasocial_types';
+import { ContextInvitation, IdentifiableObject, ContextNaturalKey, UserProfile, RelationshipStatus } from '../../../types/intrasocial_types';
 import { ProfileManager } from '../../../managers/ProfileManager';
 import { ApiClient, PaginationResult } from '../../../network/ApiClient';
 import ListComponent from '../ListComponent';
@@ -9,36 +9,31 @@ import { GenericListItem } from '../GenericListItem';
 import Avatar from '../Avatar';
 import { TimeComponent } from '../TimeComponent';
 import { Checkbox } from '../input/Checkbox';
-import "./CommunityInvitationsComponent.scss"
+import "./ContextInvitationComponent.scss"
 import classnames from 'classnames';
-import SimpleDialog from '../dialogs/SimpleDialog';
 import { userFullName, userAvatar, listPageSize, uniqueId } from '../../../utilities/Utilities';
-import CommunityInviteComponent from './CommunityInviteComponent';
 import { Input } from 'reactstrap';
 import { FormComponentErrorMessage } from '../../form/FormController';
+import ContextInviteComponent from './ContextInviteComponent';
 type OwnProps = {
-    didCancel:() => void
-    visible:boolean
-    community:Community
+    contextNaturalKey:ContextNaturalKey
+    contextObject:IdentifiableObject
+    members:number[]
+    availableMembers:number[]
 }
 type InvitationFilters = {
     search:string
-    email:boolean 
-    user:boolean
-    searchEmail:boolean
-    searchUser:boolean
-    searchFromUser:boolean
 }
 type State = {
     selectedInvitations:number[]
-    inviteFormVisible:boolean
     filters:InvitationFilters
     failed:number[]
+    inviteFormVisible:boolean
     inviteFormReloadKey:string
 }
 type Props = OwnProps
-export default class CommunityInvitationsComponent extends React.Component<Props, State> {
-    listRef = React.createRef<ListComponent<CommunityInvitation>>()
+export default class ContextInvitationComponent extends React.Component<Props, State> {
+    listRef = React.createRef<ListComponent<ContextInvitation>>()
     reloadIdleTimeout: NodeJS.Timer = null
     constructor(props:Props) {
         super(props);
@@ -48,47 +43,67 @@ export default class CommunityInvitationsComponent extends React.Component<Props
             inviteFormReloadKey:uniqueId(),
             filters:{
                 search:"",
-                email:null,
-                user:null,
-                searchEmail:true,
-                searchUser:true,
-                searchFromUser:false,
             },
             failed:[]
         }
     }
-    renderInvitation = (invitation:CommunityInvitation) =>  {
+    componentDidUpdate = (prevProps:Props) => {
+        if(this.props.contextObject != prevProps.contextObject)
+        {
+            const list = this.getList()
+            list && list.reload()
+        }
+    }
+    renderInvitationHeader = (profile:UserProfile, invitation:ContextInvitation) => {
+        const arr = []
+        if(invitation.moderator)
+            arr.push(<i title={RelationshipStatus.moderator} key={RelationshipStatus.moderator} className="fas fa-user-shield mr-1"></i>)
+        arr.push(<div key="user" className="text-truncate">{userFullName(profile)}</div>)
+        return arr
+    }
+    renderInvitation = (invitation:ContextInvitation) =>  {
         const failedArray = this.state.failed
-        const user = invitation.user && ProfileManager.getProfileById(invitation.user)
-        const title = user && userFullName(user) || invitation.email
-        const avatarUrl = userAvatar(user)
+        const profile = invitation.user && ProfileManager.getProfileById(invitation.target_user)
+        const title =this.renderInvitationHeader(profile, invitation)
+        const avatarUrl = userAvatar(profile)
         const failed = failedArray.contains( invitation.id )
         const cn = classnames({"bg-warning":failed})
         return <GenericListItem className={cn} header={title} left={<Avatar size={44} image={avatarUrl} />} footer={<TimeComponent date={invitation.created_at} />}/>
     }
-    fetchInvitations = (offset:number, completion:(items:PaginationResult<CommunityInvitation>) => (void)) => {
-        let {search, email, user, searchEmail, searchUser, searchFromUser} = this.state.filters
+    fetchInvitations = (offset:number, completion:(items:PaginationResult<ContextInvitation>) => (void)) => {
+        let {search} = this.state.filters
         if(search.length == 0)
         {
             search = null
         }
-        ApiClient.getCommunityInvitations(listPageSize(44), offset, this.props.community.id, search, email, user,searchEmail, searchUser, searchFromUser, (data) => {
+        ApiClient.getContextInvitations(this.props.contextNaturalKey, this.props.contextObject.id, listPageSize(44), offset, search,  (data) => {
             completion(data)
         })
     }
-    handleListSelect = (items: number[]) => {
+    handleSelectionChange = (id: number, selected:boolean) => {
+        const selectedItems = [...this.state.selectedInvitations]
+        selectedItems.toggleElement(id)
         this.setState((prevState:State) => {
-            const failed = [...prevState.failed].filter(fid => items.contains(fid))
-            return {selectedInvitations:items, failed}
+            const failed = [...prevState.failed]
+            if(!selected)
+                failed.remove(id)
+            return {selectedInvitations:selectedItems, failed}
         })
     }
-    clearSelection = () => {
-        const list = this.getList()
-        list && list.clearSelection()
+    getList = () => {
+        return this.listRef && this.listRef.current
     }
     selectAll = () => {
         const list = this.getList()
-        list && list.selectAll()
+        const items = list && list.getItems().map(i => i.id) || []
+        this.setState(() => {
+            return {selectedInvitations:items}
+        })
+    }
+    clearSelection = () => {
+        this.setState(() => {
+            return {selectedInvitations:[]}
+        })
     }
     headerToggle = () => {
         const selected = this.state.selectedInvitations
@@ -105,13 +120,9 @@ export default class CommunityInvitationsComponent extends React.Component<Props
         })
     }
     hideInviteForm = () => {
-
         this.setState((prevState:State) => {
             return {inviteFormVisible:false}
         })
-    }
-    getList = () => {
-        return this.listRef && this.listRef.current
     }
     reloadList = () => {
         this.hideInviteForm()
@@ -122,17 +133,15 @@ export default class CommunityInvitationsComponent extends React.Component<Props
         this.reloadList()
     }
     deleteInvitations = () => {
-        const testId = 5
         let ids = [...this.state.selectedInvitations]
-        const hasTest = ids.contains(testId)
-        if(hasTest)
-            ids = ids.except(5)
-        ApiClient.deleteCommunityInvitations(ids, (response, status, error) => {
-            if (hasTest)
-                response && response.failed && response.failed.push({delete:5})
+        ApiClient.deleteContextInvitations(this.props.contextNaturalKey, ids, (response, status, error) => {
             const errors = response && response.failed || []
+            const selected = errors.map(f => f.delete)
+            const failed = [...selected]
+            if(error && failed.length == 0)
+                failed.push(-1)// show default error
             this.setState(() => {
-                return {failed:errors.map(f => f.delete)}
+                return {failed, selectedInvitations:selected}
             }, this.reloadList)
             console.log("deleted response", response)
         })
@@ -172,12 +181,13 @@ export default class CommunityInvitationsComponent extends React.Component<Props
                         </Button>
                     }
                 </div>
-                <ListComponent<CommunityInvitation> 
+                <ListComponent<ContextInvitation> 
                     ref={this.listRef}
                     fetchData={this.fetchInvitations}
                     renderItem={this.renderInvitation}
                     loadMoreOnScroll={true}
-                    selectedItems={this.handleListSelect}
+                    onItemSelectionChange={this.handleSelectionChange}
+                    selected={this.state.selectedInvitations}
                     isSelecting={true}
                     findScrollParent={true}
                     clearDataBeforeFetch={false}
@@ -186,17 +196,16 @@ export default class CommunityInvitationsComponent extends React.Component<Props
     }
     renderInviteForm = () => {
         const visible = this.state.inviteFormVisible
-        const community = this.props.community
+        const contextObject = this.props.contextObject
         const list = this.getList()
-        const activeMemberInvitations = list && list.getItems().map(i => i.user).filter(u => !!u) || []
-        return <CommunityInviteComponent key={this.state.inviteFormReloadKey} onInvited={this.handleInviteCompleted} didCancel={this.hideInviteForm} visible={visible} community={community} activeMembershipInvitations={activeMemberInvitations} />
+        const activeMemberInvitations = list && list.getItems().map(i => i.target_user).filter(u => !!u) || []
+        return <ContextInviteComponent members={this.props.members} availableMembers={this.props.availableMembers} contextNaturalKey={this.props.contextNaturalKey} key={this.state.inviteFormReloadKey} onCompleted={this.handleInviteCompleted} didCancel={this.hideInviteForm} visible={visible} contextObject={contextObject} activeMembershipInvitations={activeMemberInvitations} />
     }
     render = () => {
-        const {visible, didCancel} = this.props
-        return <SimpleDialog className="community-invitations" didCancel={didCancel} visible={visible} header={translate("community.invitations")}>
+        return <div className="context-invitation">
                     {this.renderList()}
                     {this.renderInviteForm()}
-                </SimpleDialog>
+                </div>
         
     }
 }

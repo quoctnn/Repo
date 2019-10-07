@@ -1,0 +1,46 @@
+@import "../../../Config";
+.context-members{
+    .list-component{
+        height: auto;
+    }
+    .list-header{
+        display: flex;
+        align-items: center;
+        padding: 0 8px 0 0;
+        border-radius: 8px;
+        height: 44px;
+        .checkbox{
+            margin: 4px;
+            margin-left: 12px;
+            margin-right: 12px;
+        }
+        &.active{
+            @include var(background, main-content-secondary-background);
+        }
+    }
+    .generic-list-item{
+        cursor: pointer;
+        .footer{
+            display: flex;
+            align-items: center;
+            > *:not(:first-child)
+            {
+                margin-left: 0.25rem;
+            }
+        }
+        .header{
+            display: flex;
+            align-items: center;
+            > i{
+                font-size: 0.8rem;
+            }
+        }
+    }
+}
+.community-member-option-dropdown{
+    .dropdown-item.no-bg{
+        background-color: transparent !important;
+        outline:0 !important;
+        color: inherit !important;
+    }
+}

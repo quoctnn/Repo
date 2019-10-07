@@ -278,7 +278,7 @@ class CommunityCreateComponent extends React.Component<Props, State> {
                     render={(form) => {
                         if(!create && !hasConfigurationData)
                         {
-                            return {menuItems:[], pages:[<LoadingSpinner />]}
+                            return {menuItems:[], pages:[<LoadingSpinner key="spinner"/>]}
                         }
                         return {
                             menuItems:[

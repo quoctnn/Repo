@@ -34,12 +34,12 @@ type OwnProps<T> = {
     renderEmpty?:() => React.ReactNode
     renderError?:() => React.ReactNode
     sortItems?:(items:T[]) => T[]
-    selectedItems?:(items:number[]) => void
     reloadContext?:string
     redrawContext?:string
     /** Filter out elements that should not count for offset */
     offsetCountFilter?:(items:T[]) => number
     onDidLoadData?:(offset:number) => void
+    onItemSelectionChange?:(id:number, selected:boolean) => void
 }
 type DefaultProps = {
 
@@ -48,6 +48,7 @@ type DefaultProps = {
     isSelecting?:boolean
     findScrollParent:boolean
     clearDataBeforeFetch:boolean
+    selected:number[]
 
 }
 type Props<T> = OwnProps<T> & DefaultProps
@@ -56,7 +57,6 @@ type State<T> = {
     isLoading: boolean
     isRefreshing: boolean
     multiSelect: boolean
-    selected:number[]
     hasMore:boolean
     requestId:number
     hasReceivedData:boolean
@@ -72,7 +72,8 @@ export default class ListComponent<T extends IdentifiableObject> extends React.C
         allowDivider:true,
         isSelecting:false,
         findScrollParent:false,
-        clearDataBeforeFetch:true
+        clearDataBeforeFetch:true,
+        selected:[],
     }
     constructor(props:Props<T>) {
         super(props);
@@ -80,7 +81,6 @@ export default class ListComponent<T extends IdentifiableObject> extends React.C
             isLoading:false,
             isRefreshing:false,
             multiSelect:false,
-            selected:[],
             items:[],
             hasMore:true,
             requestId:0,
@@ -118,6 +118,11 @@ export default class ListComponent<T extends IdentifiableObject> extends React.C
                     prevItems[index] = i
             })
             return {items:prevItems}
+        })
+    }
+    setItems = (items:T[]) => {
+        this.setState((prevState:State<T>) => { 
+            return {items}
         })
     }
     removeItemById = (id:number) => {
@@ -200,25 +205,14 @@ export default class ListComponent<T extends IdentifiableObject> extends React.C
                 return {redrawContext:this.props.redrawContext}
             })
         }
-        if(this.props.onLoadingStateChanged && prevState.isLoading != this.state.isLoading)
+        if(prevState.isLoading != this.state.isLoading)
         {
-            this.props.onLoadingStateChanged(this.state.isLoading)
-            if(this.props.onDidLoadData && !this.state.isLoading)
+            this.props.onLoadingStateChanged && this.props.onLoadingStateChanged(this.state.isLoading)
+            if(!this.state.isLoading)
             {
-                this.props.onDidLoadData(this.state.lastFetchOffset)
+                this.props.onDidLoadData && this.props.onDidLoadData(this.state.lastFetchOffset)
             }
         }
-        if(this.props.isSelecting && this.state.selected.length > 0)
-        {
-
-            const selected = this.getUpdatedSelectedItems(this.state.items)
-            if(!selected.isEqual(this.state.selected))
-            {
-                this.setState(() => {
-                    return {selected}
-                }, this.sendSelectionUpdate)
-            }
-        }   
     }
     scrollToTop = () => {
         this.listRef.current.scrollToTop()
@@ -310,34 +304,13 @@ export default class ListComponent<T extends IdentifiableObject> extends React.C
             return <div className="d-flex justify-content-center p-1"><Button onClick={this.handleLoadMore} size="xs">{translate("common.load.more")}</Button></div>
         return null
     }
-    isSelected = (id: number) => {
+    private isSelected = (id: number) => {
         if (!this.props.isSelecting)
             return false
-        return this.state.selected.contains(id)
-    }
-    sendSelectionUpdate = () => {
-        this.props.selectedItems && this.props.selectedItems(this.state.selected)
-    }
-    getUpdatedSelectedItems = (items:T[]) =>     {
-        const itemIds = items.map(i => i.id)
-        return this.state.selected.filter(id => itemIds.contains(id))
+        return this.props.selected.contains(id)
     }
     selectedItem = (id:number) => (checked:boolean) => {
-        this.setState((prevState:State<T>) => {
-            const currentSelected = [...prevState.selected]
-            currentSelected.toggleElement(id)
-            return {selected: currentSelected}
-        },this.sendSelectionUpdate)
-    }
-    clearSelection = () => {
-        this.setState((prevState:State<T>) => {
-            return {selected: []}
-        },this.sendSelectionUpdate)
-    }
-    selectAll = () => {
-        this.setState((prevState:State<T>) => {
-            return {selected: this.getItems().map(i => i.id)}
-        },this.sendSelectionUpdate)
+        this.props.onItemSelectionChange && this.props.onItemSelectionChange(id, checked)
     }
     renderSelectableItem = (id: number, item: React.ReactNode) => {
         if(!this.props.isSelecting)
