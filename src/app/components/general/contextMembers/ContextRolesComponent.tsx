@@ -164,6 +164,7 @@ export default class ContextRolesComponent extends React.Component<Props, State>
                 })
             }
             else {
+                this.props.roleManager.forceReload()
                 this.setState((prevState:State) => {
                     return {updatesInProgress:inProgress}
                 })

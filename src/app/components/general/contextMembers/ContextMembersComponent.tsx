@@ -6,7 +6,7 @@ import { listPageSize, userFullName, userAvatar, uniqueId } from '../../../utili
 import ListComponent from '../ListComponent';
 import classnames from 'classnames';
 import { Checkbox } from '../input/Checkbox';
-import { Button } from 'reactstrap';
+import { Button, Input } from 'reactstrap';
 import { GenericListItem } from '../GenericListItem';
 import { PaginationResult, ApiClient } from '../../../network/ApiClient';
 import "./ContextMembersComponent.scss"
@@ -22,6 +22,9 @@ import Avatar from '../Avatar';
 import { TimeComponent } from '../TimeComponent';
 import ContextInviteComponent from './ContextInviteComponent';
 
+type MembersFilters = {
+    search:string
+}
 type OwnProps = {
     contextNaturalKey:ContextNaturalKey
     contextObject:IdentifiableObject
@@ -34,12 +37,14 @@ type State = {
     failed:number[]
     addMembersFormVisible:boolean
     addMembersFormReloadKey:string
+    filters:MembersFilters
 }
 type Props = OwnProps
 export default class ContextMembersComponent extends React.Component<Props, State> {
     formController:FormController = null
     listRef = React.createRef<ListComponent<UserProfile>>()
     authenticatedUser = AuthenticationManager.getAuthenticatedUser()
+    reloadIdleTimeout: NodeJS.Timer = null
     private observers:EventSubscription[] = []
     constructor(props:Props) {
         super(props);
@@ -48,6 +53,9 @@ export default class ContextMembersComponent extends React.Component<Props, Stat
             failed:[],
             addMembersFormVisible:false,
             addMembersFormReloadKey:uniqueId(),
+            filters:{
+                search:"",
+            },
         }
         this.observers.push(props.roleManager.addRolesUpdatedObserver(this.handleRolesUpdated))
     }
@@ -185,7 +193,7 @@ export default class ContextMembersComponent extends React.Component<Props, Stat
         switch (contextNaturalKey) {
             case ContextNaturalKey.GROUP:return role.groups.contains(contextObject.id)
             case ContextNaturalKey.PROJECT:return role.projects.contains(contextObject.id)
-            default:return true
+            default:return false
         }
     }
     renderMemberFooter = (profile:UserProfile) => {
@@ -212,7 +220,7 @@ export default class ContextMembersComponent extends React.Component<Props, Stat
             arr.push(<i title={RelationshipStatus.moderator} key={RelationshipStatus.moderator} className="fas fa-user-shield mr-1"></i>)
         if(relations.contains(RelationshipStatus.manager))
             arr.push(<i title={RelationshipStatus.manager} key={RelationshipStatus.manager} className="fas fa-user-ninja mr-1"></i>)
-        arr.push(<div className="text-truncate">{userFullName(profile)}</div>)
+        arr.push(<div key="user" className="text-truncate">{userFullName(profile)}</div>)
         return arr
     }
     renderMember = (profile:UserProfile) =>  {
@@ -228,7 +236,12 @@ export default class ContextMembersComponent extends React.Component<Props, Stat
         return <GenericListItem className={cn} header={title} left={<Avatar size={44} image={avatarUrl} />} footer={footer} right={right}/>
     }
     fetchMembers = (offset:number, completion:(items:PaginationResult<UserProfile>) => (void)) => {
-        ApiClient.getContextMembers(this.props.contextNaturalKey, this.props.contextObject.id, listPageSize(44), offset,  (data) => {
+        let {search} = this.state.filters
+        if(search.length == 0)
+        {
+            search = null
+        }
+        ApiClient.getContextMembers(this.props.contextNaturalKey, this.props.contextObject.id, listPageSize(44), offset, search,  (data) => {
             completion(data)
         })
     }
@@ -263,7 +276,7 @@ export default class ContextMembersComponent extends React.Component<Props, Stat
     removeMembers = () => {
         const {contextObject} = this.props
         const {selected} = this.state
-        ApiClient.updateProjectMembership(contextObject.id, undefined, selected, (response, status, error) => {
+        ApiClient.updateProjectMembership(contextObject.id, undefined, selected, undefined, undefined, (response, status, error) => {
             if(!error)
                 this.clearSelection()
             this.reloadList()
@@ -336,12 +349,26 @@ export default class ContextMembersComponent extends React.Component<Props, Stat
                 </Button>
         }
     }
+    handleSearchInputChange = (e:React.ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value
+        this.setState((prevState:State) => {
+            const filters = {...prevState.filters}
+            filters.search = value
+            return {filters}
+        }, this.reloadListOnIdle)
+    }
+    reloadListOnIdle = () => {
+        if(this.reloadIdleTimeout)
+            clearTimeout(this.reloadIdleTimeout)
+        this.reloadIdleTimeout = setTimeout(this.reloadList, 300)
+    }
     renderList = () => {
         const {selected} = this.state
         const headerActive = selected.length > 0
-        const error = this.state.failed.length > 0 ? translate("form.role.delete.error") : undefined
+        const error = this.state.failed.length > 0 ? translate("form.member.delete.error") : undefined
         return <>
                 {error && <FormComponentErrorMessage className="d-block" errors={{error}} />}
+                <Input value={this.state.filters.search} type="text" onChange={this.handleSearchInputChange} placeholder={translate("common.filter.members")}/>
                 <div className={classnames("list-header", {active:headerActive})}>
                     <Checkbox checked={headerActive} checkedIcon="fas fa-minus" onValueChange={this.headerToggle} />
                     <div className="flex-grow-1 text-truncate p-1">{translate("Member")}</div>

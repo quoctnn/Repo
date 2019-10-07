@@ -577,16 +577,17 @@ export abstract class ApiClient
         switch (contextNaturalKey ) {
             case ContextNaturalKey.GROUP:url = Constants.apiRoute.groupModerateUrl(contextObjectId); break;
             case ContextNaturalKey.PROJECT:url = Constants.apiRoute.projectModerateUrl(contextObjectId); break;
+            case ContextNaturalKey.EVENT:url = Constants.apiRoute.eventModerateUrl(contextObjectId); break;
             default:break;
         }
         return url
-    }
+    }   
     static updateContextModerators(contextNaturalKey:ContextNaturalKey, contextObjectId:number, add:number[], remove:number[], callback:ApiClientCallback<any>)
     {
         let url = ApiClient.getContextModeratorUrl(contextNaturalKey, contextObjectId)
         if(!url)
         {
-            callback(null, "500", new RequestErrorData({detail:`roles api endpoint not set for ${contextNaturalKey}`}, "error"))
+            callback(null, "500", new RequestErrorData({detail:`moderate api endpoint not set for ${contextNaturalKey}`}, "error"))
             return
         }
         const data = {add, remove}
@@ -617,7 +618,7 @@ export abstract class ApiClient
         }
         return url
     }
-    static getContextMembers(contextNaturalKey:ContextNaturalKey, contextObjectId:number, limit:number, offset:number, callback:ApiClientFeedPageCallback<UserProfile>)
+    static getContextMembers(contextNaturalKey:ContextNaturalKey, contextObjectId:number, limit:number, offset:number, search:string, callback:ApiClientFeedPageCallback<UserProfile>)
     {
         let url = this.getContextMembersUrl(contextNaturalKey, contextObjectId)
         if(!url)
@@ -625,7 +626,7 @@ export abstract class ApiClient
             callback(null, "500", new RequestErrorData({detail:`members api endpoint not set for ${contextNaturalKey}`}, "error"))
             return
         }
-        url += "?" + ApiClient.getQueryString({ limit, offset })
+        url += "?" + ApiClient.getQueryString({ limit, offset, search })
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
@@ -749,10 +750,10 @@ export abstract class ApiClient
             callback(null, status, new RequestErrorData(request.responseJSON, error))
         })
     }
-    static updateProjectMembership(projectId:number, add:number[], remove:number[], callback:ApiClientCallback<any>)
+    static updateProjectMembership(projectId:number, add:number[], remove:number[], moderator:boolean, manager:boolean, callback:ApiClientCallback<any>)
     {
         let url = Constants.apiRoute.projectMembershipUrl(projectId)
-        const data = {add, remove}
+        const data = {add, remove, moderator, manager}
         AjaxRequest.postJSON(url, data, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
@@ -1296,7 +1297,7 @@ export abstract class ApiClient
             callback(null, status, new RequestErrorData(request.responseJSON, error))
         })
     }
-    static createContextInvitation = (contextNaturalKey:ContextNaturalKey, contextObjectId:number, users:number[], callback:ApiClientCallback<any>) => {
+    static createContextInvitation = (contextNaturalKey:ContextNaturalKey, contextObjectId:number, users:number[], moderator:boolean,  callback:ApiClientCallback<any>) => {
         let url = ApiClient.getContextInvitationUrl(contextNaturalKey)
         if(!url)
         {
@@ -1304,7 +1305,7 @@ export abstract class ApiClient
             return
         }
         const key = ContextSegmentKey.keyForNaturalKey(contextNaturalKey)
-        const data = { users }
+        const data = { users, moderator }
         data[key] = contextObjectId
         AjaxRequest.postJSON(url, data, (data, status, request) => {
             callback(data, status, null)

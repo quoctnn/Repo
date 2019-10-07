@@ -253,6 +253,9 @@ export default  {
 
         // Event URLs
         upcomingEventsUrl: '/api/v2/event/upcoming/',
+        eventModerateUrl: (id:number) => {
+            return `/api/v2/event/${id}/moderate/`
+        },
         eventMembersUrl: (id:number) => {
             return `/api/v2/event/${id}/members/`
         },

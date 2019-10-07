@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { translate } from '../../../localization/AutoIntlProvider';
-import { ContextInvitation, IdentifiableObject, ContextNaturalKey } from '../../../types/intrasocial_types';
+import { ContextInvitation, IdentifiableObject, ContextNaturalKey, UserProfile, RelationshipStatus } from '../../../types/intrasocial_types';
 import { ProfileManager } from '../../../managers/ProfileManager';
 import { ApiClient, PaginationResult } from '../../../network/ApiClient';
 import ListComponent from '../ListComponent';
@@ -54,11 +54,18 @@ export default class ContextInvitationComponent extends React.Component<Props, S
             list && list.reload()
         }
     }
+    renderInvitationHeader = (profile:UserProfile, invitation:ContextInvitation) => {
+        const arr = []
+        if(invitation.moderator)
+            arr.push(<i title={RelationshipStatus.moderator} key={RelationshipStatus.moderator} className="fas fa-user-shield mr-1"></i>)
+        arr.push(<div key="user" className="text-truncate">{userFullName(profile)}</div>)
+        return arr
+    }
     renderInvitation = (invitation:ContextInvitation) =>  {
         const failedArray = this.state.failed
-        const user = invitation.user && ProfileManager.getProfileById(invitation.target_user)
-        const title = <div className="text-truncate">{user && userFullName(user) || `Unknown(${invitation.target_user})`}</div>
-        const avatarUrl = userAvatar(user)
+        const profile = invitation.user && ProfileManager.getProfileById(invitation.target_user)
+        const title =this.renderInvitationHeader(profile, invitation)
+        const avatarUrl = userAvatar(profile)
         const failed = failedArray.contains( invitation.id )
         const cn = classnames({"bg-warning":failed})
         return <GenericListItem className={cn} header={title} left={<Avatar size={44} image={avatarUrl} />} footer={<TimeComponent date={invitation.created_at} />}/>

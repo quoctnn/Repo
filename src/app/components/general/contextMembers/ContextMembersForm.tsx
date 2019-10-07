@@ -46,6 +46,8 @@ export default class ContextMembersForm extends React.Component<Props, State> {
     }
     renderRolesPage = () => {
         const {contextObject, contextNaturalKey, community} = this.props
+        if(contextNaturalKey == ContextNaturalKey.EVENT)
+            return null
         return <ContextRolesComponent roleManager={this.roleManager} community={community} contextNaturalKey={contextNaturalKey} contextObject={contextObject}/>
     }
     renderInvitationPage = () => {
@@ -67,6 +69,17 @@ export default class ContextMembersForm extends React.Component<Props, State> {
             description={translate("members.page.description.invites")}  
             />
     }
+    renderRolesMenuItem = (form:FormController) => {
+        const {contextObject, contextNaturalKey, community} = this.props
+        if(contextNaturalKey == ContextNaturalKey.EVENT)
+            return null
+        return <FormMenuItem key="2"
+        form={form} 
+        pageId="2" 
+        title={translate("members.page.title.roles")} 
+        description={translate("members.page.description.roles")}  
+        />
+    }
     render = () => {
         const {visible, didCancel} = this.props
         return <FormController 
@@ -86,12 +99,8 @@ export default class ContextMembersForm extends React.Component<Props, State> {
                                     title={translate("members.page.title.members")} 
                                     description={translate("members.page.description.members")}  
                                     />,
-                                    <FormMenuItem key="2"
-                                    form={form} 
-                                    pageId="2" 
-                                    title={translate("members.page.title.roles")} 
-                                    description={translate("members.page.description.roles")}  
-                                    />,
+                                    this.renderRolesMenuItem(form)
+                                    ,
                                     this.renderInvitationMenuItem(form)
                             ].filter(i => !!i),
                             pages:[
