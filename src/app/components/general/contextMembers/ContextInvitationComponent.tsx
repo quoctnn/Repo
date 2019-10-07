@@ -57,7 +57,7 @@ export default class ContextInvitationComponent extends React.Component<Props, S
     renderInvitation = (invitation:ContextInvitation) =>  {
         const failedArray = this.state.failed
         const user = invitation.user && ProfileManager.getProfileById(invitation.target_user)
-        const title = user && userFullName(user) || `Unknown(${invitation.target_user})`
+        const title = <div className="text-truncate">{user && userFullName(user) || `Unknown(${invitation.target_user})`}</div>
         const avatarUrl = userAvatar(user)
         const failed = failedArray.contains( invitation.id )
         const cn = classnames({"bg-warning":failed})

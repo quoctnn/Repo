@@ -177,7 +177,10 @@ export default class ContextRolesComponent extends React.Component<Props, State>
     }
     renderRoleHeader = (role:CommunityRole) => {
         const arr = []
-        arr.push(<div key="title" className="d-flex align-items-center mr-1"><ColorMarkComponent color={role.color} className="mr-1" /><span>{role.role}</span></div>)
+        arr.push(<div key="title" className="d-flex align-items-center mr-1 mw0">
+                        <ColorMarkComponent color={role.color} className="mr-1" />
+                        <div className="text-truncate">{role.role}</div>
+                    </div>)
         if(role.moderator)
             arr.push(<i title={RelationshipStatus.admin} key={RelationshipStatus.admin} className="fas fa-user-shield mr-1"></i>)
         if(role.manager)
@@ -191,10 +194,10 @@ export default class ContextRolesComponent extends React.Component<Props, State>
         const cn = classnames({"bg-warning":failed})
         const users = role.users || []
         const updateKey = users.join(",")
-        const footer = users.length > 0 ? <StackedAvatars key={updateKey} showTextOnly={true} size={20} userIds={users} showOverflowCount={true} /> : translate("role.users.empty")
+        const footer = users.length > 0 ? <StackedAvatars className="text-truncate d-block" key={updateKey} showTextOnly={true} size={20} userIds={users} showOverflowCount={true} /> : <div className="text-truncate">{translate("role.users.empty")}</div>
         const canEditRole = this.isCommunityContext()
         const action = canEditRole ? this.editRole(role) : undefined
-        return <GenericListItem onClick={action} className={cn} header={title} footer={footer}/>
+    return <GenericListItem onClick={action} className={cn} header={title} footer={<div className="mw0">{footer}</div>}/>
     }
     fetchRoles = (offset:number, completion:(items:PaginationResult<CommunityRole>) => (void)) => {
         this.props.roleManager.fetchRoles(offset, (data) => {

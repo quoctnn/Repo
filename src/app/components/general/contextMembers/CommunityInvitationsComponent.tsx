@@ -58,7 +58,7 @@ export default class CommunityInvitationsComponent extends React.Component<Props
     renderInvitation = (invitation:CommunityInvitation) =>  {
         const failedArray = this.state.failed
         const user = invitation.user && ProfileManager.getProfileById(invitation.user)
-        const title = user && userFullName(user) || invitation.email
+        const title = <div className="text-truncate">{user && userFullName(user) || invitation.email}</div>
         const avatarUrl = userAvatar(user)
         const failed = failedArray.contains( invitation.id )
         const cn = classnames({"bg-warning":failed})

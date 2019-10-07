@@ -212,7 +212,7 @@ export default class ContextMembersComponent extends React.Component<Props, Stat
             arr.push(<i title={RelationshipStatus.moderator} key={RelationshipStatus.moderator} className="fas fa-user-shield mr-1"></i>)
         if(relations.contains(RelationshipStatus.manager))
             arr.push(<i title={RelationshipStatus.manager} key={RelationshipStatus.manager} className="fas fa-user-ninja mr-1"></i>)
-        arr.push(userFullName(profile))
+        arr.push(<div className="text-truncate">{userFullName(profile)}</div>)
         return arr
     }
     renderMember = (profile:UserProfile) =>  {

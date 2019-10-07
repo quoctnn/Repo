@@ -25,6 +25,7 @@ import { EventSubscription } from 'fbemitter';
 import { NotificationCenter } from '../../utilities/NotificationCenter';
 import { eventStreamNotificationPrefix, EventStreamMessageType } from '../../network/ChannelEventStream';
 import ReconnectingWebSocket from 'reconnecting-websocket';
+import { uniqueId } from '../../utilities/Utilities';
 
 type OwnProps = {
     className?:string
@@ -48,7 +49,7 @@ interface State
 {
     menuVisible:boolean
     isLoading:boolean
-    feedInvalidated:boolean
+    feedReloadContext:string
     selectedSearchContext:ContextSearchData
     includeSubContext:boolean
     filter:ObjectAttributeType
@@ -77,7 +78,7 @@ class NewsfeedModule extends React.Component<Props, State> {
             includeSubContext:props.includeSubContext,
             filter:null,
             isLoading:false,
-            feedInvalidated:false,
+            feedReloadContext:uniqueId(),
             contextNaturalKey:undefined,
             contextObjectId:undefined,
             statusComposerFocus:false
@@ -99,14 +100,12 @@ class NewsfeedModule extends React.Component<Props, State> {
         //turn off loading spinner if feed is removed
         if(prevProps.breakpoint != this.props.breakpoint && this.props.breakpoint < ResponsiveBreakpoint.standard && this.state.isLoading)
         {
-            this.setState({isLoading:false, feedInvalidated:false})
-        } else {
-            this.setState({feedInvalidated:false})
+            this.setState({isLoading:false})
         }
     }
     shouldComponentUpdate = (nextProps:Props, nextState:State) => {
-        if (nextState.feedInvalidated) return true
-        else return nextProps.breakpoint != this.props.breakpoint ||
+        return nextState.feedReloadContext != this.state.feedReloadContext ||
+                nextProps.breakpoint != this.props.breakpoint ||
                 nextProps.contextNaturalKey != this.props.contextNaturalKey ||
                 nextProps.contextObjectId != this.props.contextObjectId ||
                 nextProps.includeSubContext != this.props.includeSubContext ||
@@ -122,7 +121,7 @@ class NewsfeedModule extends React.Component<Props, State> {
     }
     websocketConnect = (...args:any[]) => {
         if (args[0] == ReconnectingWebSocket.OPEN) {
-            this.setState({feedInvalidated:true})
+            this.setState({feedReloadContext:uniqueId()})
         }
     }
     headerClick = (e) => {
@@ -149,7 +148,7 @@ class NewsfeedModule extends React.Component<Props, State> {
         this.setState(newState as State)
     }
     feedLoadingStateChanged = (isLoading:boolean) => {
-        this.setState({isLoading, feedInvalidated:false})
+        this.setState({isLoading})
     }
     renderLoading = () => {
         if (this.state.isLoading) {
@@ -262,7 +261,7 @@ class NewsfeedModule extends React.Component<Props, State> {
                             contextObjectId={resolvedContextObjectId}
                             contextObject={contextObject}
                             filter={this.state.filter}
-                            feedInvalidated={this.state.feedInvalidated}
+                            feedReloadContext={this.state.feedReloadContext}
                             scrollParent={window}
                             />
                     </ModuleContent>

@@ -8,9 +8,11 @@ import { UserProfile } from '../../types/intrasocial_types';
 import { ProfileManager } from '../../managers/ProfileManager';
 import { userAvatar, userFullName } from '../../utilities/Utilities';
 import LoadingSpinner from '../LoadingSpinner';
+import classnames from 'classnames';
 
 type OwnProps = {
     userIds: number[]
+    className?:string
 }
 type DefaultProps = {
     size: number
@@ -90,7 +92,7 @@ class StackedAvatars extends React.Component<Props, State> {
         })
     }
     render() {
-        const {showOverflowCount, showTotalCount, onOverflowCountClick, showTextOnly} = this.props
+        const {showOverflowCount, showTotalCount, onOverflowCountClick, showTextOnly, className} = this.props
         const profiles = this.state.profiles
         if(profiles.length == 0)
             return null
@@ -98,7 +100,7 @@ class StackedAvatars extends React.Component<Props, State> {
         const newMax = showOverflowCount && !showTextOnly && profiles.length > max ? max - 1 : max
 
         return(
-            <div className="avatar-stacked">
+            <div className={classnames("avatar-stacked", className)}>
                 {showTotalCount &&
                     <div onClick={onOverflowCountClick} className="total link ml-1">{profiles.length}</div>
                 }

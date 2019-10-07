@@ -78,7 +78,7 @@ type OwnProps = {
     contextObject?:Permissible
     includeSubContext?:boolean
     filter:ObjectAttributeType
-    feedInvalidated?:boolean
+    reloadContext?:string
     defaultChildrenLimit:number//children fetched upfront
     childrenLimit:number//children when fetching pages
     scrollParent?:any
@@ -187,7 +187,7 @@ export class NewsfeedComponent extends React.Component<Props, State> {
             this.props.includeSubContext != prevProps.includeSubContext ||
             this.props.isResolvingContext != prevProps.isResolvingContext ||
             this.props.filter != prevProps.filter ||
-            this.props.feedInvalidated)
+            this.props.reloadContext)
         {
             const hasContextError = this.hasContextError(this.props)
             const action = hasContextError ? undefined : this.loadStatuses

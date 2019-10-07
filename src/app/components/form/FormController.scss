@@ -35,11 +35,10 @@
         flex-direction: row-reverse;
     }
     .form-controller-page-container {
-      width: 100%;
+      flex: 1;
+      overflow: hidden;
       display: flex;
       flex-direction: column;
-      flex-grow: 1;
-      justify-content: space-between;
       @include var(background-color, main-content-secondary-background);
       padding: 0.75rem;
       border-radius: 8px;
