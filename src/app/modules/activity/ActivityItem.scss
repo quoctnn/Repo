@@ -4,6 +4,8 @@ $margin:5px;
 .activity-list-item{
     padding: 8px;
     text-decoration: none;
+    display: block;
+    width: 100%;
     &:hover{
         text-decoration: none;
     }

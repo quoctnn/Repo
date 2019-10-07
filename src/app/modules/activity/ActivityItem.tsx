@@ -7,7 +7,6 @@ import Avatar from '../../components/general/Avatar';
 import { ProfileManager } from '../../managers/ProfileManager';
 import { userAvatar } from '../../utilities/Utilities';
 import {ApiClient} from '../../network/ApiClient';
-import * as moment from 'moment-timezone';
 import { TimeComponent } from '../../components/general/TimeComponent';
 
 type OwnProps = {

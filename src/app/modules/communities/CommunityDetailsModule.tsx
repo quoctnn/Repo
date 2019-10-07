@@ -7,7 +7,7 @@ import ModuleFooter from '../ModuleFooter';
 import "./CommunityDetailsModule.scss"
 import { ResponsiveBreakpoint } from '../../components/general/observers/ResponsiveComponent';
 import { translate } from '../../localization/AutoIntlProvider';
-import { Community, ContextNaturalKey, Permission, CommunityConfigurationData, Group, Event, Project} from '../../types/intrasocial_types';
+import { Community, ContextNaturalKey, Permission, CommunityConfigurationData, Group, Event, Project, ObjectHiddenReason, IdentifiableObject, ElasticSearchType } from '../../types/intrasocial_types';
 import { connect } from 'react-redux';
 import { ReduxState } from '../../redux';
 import CircularLoadingSpinner from '../../components/general/CircularLoadingSpinner';
@@ -31,6 +31,7 @@ import { EventManager } from '../../managers/EventManager';
 import { ProjectManager } from '../../managers/ProjectManager';
 import { ToastManager } from '../../managers/ToastManager';
 import ContextMembersForm from '../../components/general/contextMembers/ContextMembersForm';
+import ConfirmDialog from '../../components/general/dialogs/ConfirmDialog';
 type OwnProps = {
     breakpoint:ResponsiveBreakpoint
 } & CommonModuleProps
@@ -48,6 +49,8 @@ type State = {
     createProjectFormReloadKey?:string
     membersFormVisible?:boolean
     membersFormReloadKey?:string
+    inReviewDialogContextNaturalKey?:ContextNaturalKey
+    inReviewDialogContextObject?:IdentifiableObject
 }
 type ReduxStateProps = {
     community: Community
@@ -73,6 +76,8 @@ class CommunityDetailsModule extends React.Component<Props, State> {
             createProjectFormReloadKey:uniqueId(),
             membersFormVisible:false,
             membersFormReloadKey:uniqueId(),
+            inReviewDialogContextNaturalKey:null,
+            inReviewDialogContextObject:null,
         }
     }
     componentDidUpdate = (prevProps:Props) => {
@@ -147,11 +152,39 @@ class CommunityDetailsModule extends React.Component<Props, State> {
             return {createGroupFormVisible:false}
         })
     }
+    showObjectInReview = (object:IdentifiableObject, contextNaturalKey:ContextNaturalKey) => {
+        this.setState(() => {
+            return {inReviewDialogContextNaturalKey:contextNaturalKey, inReviewDialogContextObject:object}
+        })
+    }
+    hideObjectInReview = () => {
+        this.setState(() => {
+            return {inReviewDialogContextNaturalKey:null, inReviewDialogContextObject:null}
+        })
+    }
+    renderObjectInReviewDialog = () => {
+        const {inReviewDialogContextNaturalKey, inReviewDialogContextObject} = this.state
+        let title:string = null
+        let message:string = null
+        const visible = !!inReviewDialogContextNaturalKey && !!inReviewDialogContextObject
+        if(visible)
+        {
+            const elasticType = ContextNaturalKey.elasticTypeForKey(inReviewDialogContextNaturalKey)
+            const objectName = ElasticSearchType.nameForKey(elasticType)
+            title = translate("context.object.created.in.review.title").format(objectName)
+            message = translate("context.object.created.in.review.message").format(objectName)
+        }
+        return <ConfirmDialog visible={visible} didComplete={this.hideObjectInReview} title={title} message={message} />
+    }
     handleGroupCreateForm = (group:Group) => {
         if(!!group)
         {
             GroupManager.storeGroups([group])
-            if(group.uri)
+            if(group.hidden_reason && group.hidden_reason == ObjectHiddenReason.review)
+            {
+                this.showObjectInReview(group, ContextNaturalKey.GROUP)
+            }
+            else if(group.uri)
             {
                 window.app.navigateToRoute(group.uri)
             }
@@ -173,7 +206,11 @@ class CommunityDetailsModule extends React.Component<Props, State> {
         if(!!event)
         {
             EventManager.storeEvents([event])
-            if(event.uri)
+            if(event.hidden_reason && event.hidden_reason == ObjectHiddenReason.review)
+            {
+                this.showObjectInReview(event, ContextNaturalKey.EVENT)
+            }
+            else if(event.uri)
             {
                 window.app.navigateToRoute(event.uri)
             }
@@ -195,7 +232,11 @@ class CommunityDetailsModule extends React.Component<Props, State> {
         if(!!project)
         {
             ProjectManager.storeProjects([project])
-            if(project.uri)
+            if(project.hidden_reason && project.hidden_reason == ObjectHiddenReason.review)
+            {
+                this.showObjectInReview(project, ContextNaturalKey.PROJECT)
+            }
+            else if(project.uri)
             {
                 window.app.navigateToRoute(project.uri)
             }
@@ -265,6 +306,7 @@ class CommunityDetailsModule extends React.Component<Props, State> {
                         {this.renderAddEventForm()}
                         {this.renderAddProjectForm()}
                         {this.renderMembersForm()}
+                        {this.renderObjectInReviewDialog()}
                     </ModuleContent>
                     { community && community.permission >= Permission.read &&
                         <ModuleFooter className="mt-1">

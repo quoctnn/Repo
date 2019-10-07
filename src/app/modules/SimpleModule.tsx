@@ -73,7 +73,7 @@ export default class SimpleModule extends React.Component<Props, State> {
         if(!this.props.renderModalContent)
             return
             
-        return <SimpleDialog scrollable={false} className="module-modal has-module" header={this.props.headerTitle} visible={this.state.modalVisible} didCancel={this.toggleModal}>
+        return <SimpleDialog scrollable={true} className="module-modal has-module" header={this.props.headerTitle} visible={this.state.modalVisible} didCancel={this.toggleModal}>
                     {this.props.renderModalContent()}
                 </SimpleDialog>
     }

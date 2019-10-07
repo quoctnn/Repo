@@ -1699,6 +1699,8 @@ var translations = {
     "project.project.invite":"Project invite",
     "form.invite.description.manager":"Sets invited users as managers",
     "form.invite.title.manager":"Manager",
+    "context.object.created.in.review.title":"{0} created",
+    "context.object.created.in.review.message":"The {0} was successfully created and is now being reviewed",
   }
 };
 

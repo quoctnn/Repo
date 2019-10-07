@@ -1420,6 +1420,7 @@ export type Group = {
     created_at: string
     parent: number
     updated_at: string
+    hidden_reason: ObjectHiddenReason
 } & AvatarAndCover & Linkable & Permissible & IdentifiableObject
 
 export type Favorite = {
@@ -1464,7 +1465,7 @@ export type Event = {
     location: Coordinate
     address: string
     parent: Event
-
+    hidden_reason: ObjectHiddenReason
 } & AvatarAndCover & Linkable & Permissible & IdentifiableObject
 
 export type Project = {
@@ -1487,6 +1488,7 @@ export type Project = {
     tasks_attention: number
     tasks_completed: number
     tasks_responsible: number
+    hidden_reason: ObjectHiddenReason
 } & AvatarAndCover & Linkable & Permissible & IdentifiableObject
 
 export type TimeSpent = {
