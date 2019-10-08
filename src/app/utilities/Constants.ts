@@ -172,6 +172,7 @@ export default  {
         groupMembershipRequestAcceptUrl: (id:number) => {
             return `/api/v2/group-memberrequest/${id}/accept/`
         },
+        groupReviewUrl: "/api/v2/group/under-review/",
         groupAvatarUrl: (id:number) => {
             return `/api/v2/group/${id}/avatar/`
         },
@@ -198,6 +199,7 @@ export default  {
             return `/api/v2/project/${id}/manager/`
         },
         projectsUrl: '/api/v2/project/',
+        projectReviewUrl: "/api/v2/project/under-review/",
         projectDetailUrl: (id:number|string) => {
             return `/api/v2/project/${id}/`
         },
@@ -269,6 +271,7 @@ export default  {
             return `/api/v2/event/${id}/cover/`
         },
         eventsUrl: '/api/v2/event/',
+        eventReviewUrl: "/api/v2/event/under-review/",
         eventDetailUrl: (id:number|string) => {
             return `/api/v2/event/${id}/`
         },
