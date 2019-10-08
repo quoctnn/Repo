@@ -161,7 +161,7 @@ export default class CommunityInvitationsComponent extends React.Component<Props
         const error = this.state.failed.length > 0 ? translate("form.invite.delete.error") : undefined
         return <>
                 {error && <FormComponentErrorMessage className="d-block" errors={{error}} />}
-                <Input value={this.state.filters.search} type="text" onChange={this.handleSearchInputChange} placeholder={translate("common.filter.invitations")}/>
+                <Input className="mb-2" value={this.state.filters.search} type="text" onChange={this.handleSearchInputChange} placeholder={translate("common.filter.invitations")}/>
                 <div className={classnames("list-header", {active:headerActive})}>
                     <Checkbox checked={headerActive} checkedIcon="fas fa-minus" onValueChange={this.headerToggle} />
                     <div className="flex-grow-1 text-truncate p-1">{translate("common.invitation")}</div>

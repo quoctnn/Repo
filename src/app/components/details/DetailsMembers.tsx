@@ -12,6 +12,7 @@ type OwnProps = {
     title?:string
     showSeeAll?:boolean
     position?:HorisontalLayoutPosition
+    onSeeAllClick?:() => void
 }
 type State = {
 }
@@ -37,7 +38,7 @@ export class DetailsMembers extends React.Component<Props, State> {
                 {this.props.title && this.props.title
                 || <>{members.length}&nbsp;{(members.length > 1) ? translate("common.members") : translate("common.member")}&nbsp;-&nbsp;</>
                 }
-                {this.props.showSeeAll && <Link to="#">{translate("common.see.all")}</Link>}
+                {this.props.showSeeAll && <Link onClick={this.props.onSeeAllClick} to="#">{translate("common.see.all")}</Link>}
                 </div>
     }
     render()

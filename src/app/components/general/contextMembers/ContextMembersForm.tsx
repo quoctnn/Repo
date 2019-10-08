@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Community, ContextNaturalKey, IdentifiableObject, Event, Group, Project, CommunityRole } from '../../../types/intrasocial_types';
+import { Community, ContextNaturalKey, IdentifiableObject, Event, Group, Project, Permissible, Permission } from '../../../types/intrasocial_types';
 import FormController, { FormStatus } from '../../form/FormController';
 import { FormMenuItem } from '../../form/FormMenuItem';
 import { translate } from '../../../localization/AutoIntlProvider';
@@ -14,31 +14,34 @@ type OwnProps = {
     didCancel:() => void
     visible:boolean
     contextNaturalKey:ContextNaturalKey
-    contextObject:IdentifiableObject
+    contextObject:IdentifiableObject & Permissible
     community:Community
 }
 type State = {
+    
 }
 type Props = OwnProps
 export default class ContextMembersForm extends React.Component<Props, State> {
     formController:FormController = null
     roleManager:RoleManager = null
+    private hasAdminAccess = false
     constructor(props:Props) {
         super(props);
         this.state = {
         }
+        this.hasAdminAccess = Permission.hasAccess(props.contextObject, Permission.admin)
         this.roleManager = new RoleManager(props.community.id)
+
+    }
+    componentDidUpdate = (prevProps:Props) => {
+        if(this.props.contextObject != prevProps.contextObject)
+        {
+            this.hasAdminAccess = Permission.hasAccess(this.props.contextObject, Permission.admin)
+        }
     }
     getContextMembers = () => {
         const {contextObject, contextNaturalKey} = this.props
-        switch (contextNaturalKey) {
-            case ContextNaturalKey.EVENT: return (contextObject as Event).attending
-            case ContextNaturalKey.GROUP: return (contextObject as Group).members
-            case ContextNaturalKey.PROJECT: return (contextObject as Project).members
-            case ContextNaturalKey.COMMUNITY: return (contextObject as Project).members
-            default:
-                return []
-        }
+        return ContextNaturalKey.getMembers(contextNaturalKey, contextObject)
     }
     renderMembersPage = () => {
         const {contextObject, contextNaturalKey, community} = this.props
@@ -46,13 +49,13 @@ export default class ContextMembersForm extends React.Component<Props, State> {
     }
     renderRolesPage = () => {
         const {contextObject, contextNaturalKey, community} = this.props
-        if(contextNaturalKey == ContextNaturalKey.EVENT)
+        if(!this.hasAdminAccess || contextNaturalKey == ContextNaturalKey.EVENT)
             return null
         return <ContextRolesComponent roleManager={this.roleManager} community={community} contextNaturalKey={contextNaturalKey} contextObject={contextObject}/>
     }
     renderInvitationPage = () => {
         const {contextObject, contextNaturalKey, community} = this.props
-        if(contextNaturalKey == ContextNaturalKey.PROJECT)
+        if(!this.hasAdminAccess || contextNaturalKey == ContextNaturalKey.PROJECT)
             return null
         if(contextNaturalKey == ContextNaturalKey.COMMUNITY)
             return <CommunityInvitationsComponent community={community} />
@@ -60,7 +63,7 @@ export default class ContextMembersForm extends React.Component<Props, State> {
     }
     renderInvitationMenuItem = (form:FormController) => {
         const {contextObject, contextNaturalKey, community} = this.props
-        if(contextNaturalKey == ContextNaturalKey.PROJECT)
+        if(!this.hasAdminAccess || contextNaturalKey == ContextNaturalKey.PROJECT)
             return null
         return <FormMenuItem key="3"
             form={form} 
@@ -71,7 +74,7 @@ export default class ContextMembersForm extends React.Component<Props, State> {
     }
     renderRolesMenuItem = (form:FormController) => {
         const {contextObject, contextNaturalKey, community} = this.props
-        if(contextNaturalKey == ContextNaturalKey.EVENT)
+        if(!this.hasAdminAccess || contextNaturalKey == ContextNaturalKey.EVENT)
             return null
         return <FormMenuItem key="2"
         form={form} 
@@ -88,7 +91,7 @@ export default class ContextMembersForm extends React.Component<Props, State> {
                     formErrors={[]} 
                     didCancel={didCancel} 
                     status={FormStatus.normal} 
-                    title={translate("common.member.management")} 
+                    title={translate(this.hasAdminAccess ? "common.member.management" : "Members")} 
                     modalClassName="context-members-form-modal"
                     render={(form) => {
                         return {

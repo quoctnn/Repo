@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { ContextNaturalKey, IdentifiableObject, UserProfile, CommunityRole, RelationshipStatus, RequestErrorData, Community } from '../../../types/intrasocial_types';
+import { ContextNaturalKey, IdentifiableObject, UserProfile, CommunityRole, RelationshipStatus, RequestErrorData, Permissible, Permission } from '../../../types/intrasocial_types';
 import FormController, { FormComponentErrorMessage } from '../../form/FormController';
 import { translate } from '../../../localization/AutoIntlProvider';
 import { listPageSize, userFullName, userAvatar, uniqueId } from '../../../utilities/Utilities';
@@ -27,7 +27,7 @@ type MembersFilters = {
 }
 type OwnProps = {
     contextNaturalKey:ContextNaturalKey
-    contextObject:IdentifiableObject
+    contextObject:IdentifiableObject & Permissible
     roleManager:RoleManager
     members:number[]
     availableMembers:number[]
@@ -46,6 +46,7 @@ export default class ContextMembersComponent extends React.Component<Props, Stat
     authenticatedUser = AuthenticationManager.getAuthenticatedUser()
     reloadIdleTimeout: NodeJS.Timer = null
     private observers:EventSubscription[] = []
+    private hasAdminAccess = false
     constructor(props:Props) {
         super(props);
         this.state = {
@@ -57,11 +58,13 @@ export default class ContextMembersComponent extends React.Component<Props, Stat
                 search:"",
             },
         }
+        this.hasAdminAccess = Permission.hasAccess(props.contextObject, Permission.admin)
         this.observers.push(props.roleManager.addRolesUpdatedObserver(this.handleRolesUpdated))
     }
     componentDidUpdate = (prevProps:Props) => {
         if(this.props.contextObject != prevProps.contextObject)
         {
+            this.hasAdminAccess = Permission.hasAccess(this.props.contextObject, Permission.admin)
             const list = this.getList()
             list && list.reload()
         }
@@ -231,9 +234,9 @@ export default class ContextMembersComponent extends React.Component<Props, Stat
         const footer = this.renderMemberFooter(profile)
         const avatarUrl = userAvatar(profile)
         let right:React.ReactNode = undefined
-        const memberOptions = this.getMemberOptions(profile)
+        const memberOptions = this.hasAdminAccess ? this.getMemberOptions(profile) : []
         right = memberOptions.length > 0 && <DropDownMenu closeOnSelect={false} className="community-member-option-dropdown" triggerClass="fas fa-ellipsis-v mx-1" items={memberOptions}></DropDownMenu>
-        return <GenericListItem className={cn} header={title} left={<Avatar size={44} image={avatarUrl} />} footer={footer} right={right}/>
+        return <GenericListItem to={profile.uri} className={cn} header={title} left={<Avatar size={44} image={avatarUrl} />} footer={footer} right={right}/>
     }
     fetchMembers = (offset:number, completion:(items:PaginationResult<UserProfile>) => (void)) => {
         let {search} = this.state.filters
@@ -368,12 +371,12 @@ export default class ContextMembersComponent extends React.Component<Props, Stat
         const error = this.state.failed.length > 0 ? translate("form.member.delete.error") : undefined
         return <>
                 {error && <FormComponentErrorMessage className="d-block" errors={{error}} />}
-                <Input value={this.state.filters.search} type="text" onChange={this.handleSearchInputChange} placeholder={translate("common.filter.members")}/>
-                <div className={classnames("list-header", {active:headerActive})}>
+                <Input className="mb-2" value={this.state.filters.search} type="text" onChange={this.handleSearchInputChange} placeholder={translate("common.filter.members")}/>
+                {this.hasAdminAccess && <div className={classnames("list-header", {active:headerActive})}>
                     <Checkbox checked={headerActive} checkedIcon="fas fa-minus" onValueChange={this.headerToggle} />
                     <div className="flex-grow-1 text-truncate p-1">{translate("Member")}</div>
                     {this.renderHeaderButtons()}
-                </div>
+                </div>}
                 <ListComponent<UserProfile> 
                     ref={this.listRef}
                     fetchData={this.fetchMembers}
@@ -381,7 +384,7 @@ export default class ContextMembersComponent extends React.Component<Props, Stat
                     loadMoreOnScroll={true}
                     onItemSelectionChange={this.handleSelectionChange}
                     selected={this.state.selected}
-                    isSelecting={true}
+                    isSelecting={this.hasAdminAccess}
                     findScrollParent={true}
                     clearDataBeforeFetch={false}
                 />

@@ -31,7 +31,7 @@ export const resetGroupsAction = ():ResetGroupsAction => ({
 const shouldUpdate = (oldGroup:Group, newGroup:Group) => {
     if(!oldGroup)
         return true
-    const fieldsUpdated = !shallowCompareFields(["avatar", "cover_cropped", "slug"], oldGroup, newGroup)
+    const fieldsUpdated = !shallowCompareFields(["avatar", "cover_cropped", "slug", "members"], oldGroup, newGroup)
     if(fieldsUpdated)
     {
         return true

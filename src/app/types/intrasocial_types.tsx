@@ -497,6 +497,17 @@ export namespace ContextNaturalKey {
         ContextNaturalKey.TASK,
         ContextNaturalKey.CONVERSATION
     ]
+    export const getMembers = (key:ContextNaturalKey, contextObject:IdentifiableObject) => {
+        switch (key) {
+            case ContextNaturalKey.EVENT: return (contextObject as Event).attending
+            case ContextNaturalKey.GROUP: return (contextObject as Group).members
+            case ContextNaturalKey.PROJECT: return (contextObject as Project).members
+            case ContextNaturalKey.COMMUNITY: return (contextObject as Community).members
+            default:
+                console.warn(`${key} has no 'members' field`, contextObject)
+                return []
+        }
+    }
     export function defaultAvatarForKey(key: ContextNaturalKey) {
         switch (key) {
             case ContextNaturalKey.GROUP: return Constants.resolveUrl(Constants.defaultImg.groupAvatar)()
@@ -989,6 +1000,9 @@ export namespace Permission {
     export function getShield(permission: Permission) {
         return Permission.usesElevatedPrivileges(permission) ? "fas fa-shield-alt" : undefined
     }
+    export function hasAccess(permissible: Permissible, minimumRequiredPermission:Permission) {
+        return permissible.permission >= minimumRequiredPermission
+    }
 }
 export type GenericElasticResult = {
     object_type: ElasticSearchType
@@ -1130,6 +1144,9 @@ export namespace ElasticSearchType {
     }
     export function nameForKey(key: ElasticSearchType) {
         return translate("elasticsearch.type.name." + key)
+    }
+    export function nameSingularForKey(key: ElasticSearchType) {
+        return translate("elasticsearch.type.name.s1." + key)
     }
 }
 export type SimpleObjectAttribute = {
@@ -1333,7 +1350,9 @@ export type Conversation =
     admins?:number[]
 
 } & Linkable & IdentifiableObject & Permissible
-
+export type IPrivacy = {
+    privacy: ContextPrivacy
+}
 export type ICommunity = {
     cover_thumbnail: string
     avatar_thumbnail: string
@@ -1367,7 +1386,6 @@ export type Community = {
     updated_at: string
     visit_count:number
     last_visited:string
-    privacy: ContextPrivacy
     category:CommunityCategory
     //
     event_creation_permission:CommunityCreatePermission
@@ -1375,7 +1393,7 @@ export type Community = {
     project_creation_permission:CommunityCreatePermission
     subgroup_creation_permission:CommunityCreatePermission
     //
-} & ICommunity & AvatarAndCover & Permissible
+} & ICommunity & AvatarAndCover & Permissible & IPrivacy
 
 export type SimpleUserProfile = {
     absolute_url: string,
@@ -1414,14 +1432,13 @@ export type Group = {
     community: number
     description: string
     creator: UserProfile
-    privacy: ContextPrivacy
     members: number[]
     members_count: number
     created_at: string
     parent: number
     updated_at: string
     hidden_reason: ObjectHiddenReason
-} & AvatarAndCover & Linkable & Permissible & IdentifiableObject
+} & AvatarAndCover & Linkable & Permissible & IdentifiableObject & IPrivacy
 
 export type Favorite = {
     index: number
@@ -1450,7 +1467,6 @@ export type Event = {
     community: number
     description: string
     creator: UserProfile
-    privacy: ContextPrivacy
     attending: number[]
     attending_count: number
     not_attending: number[]
@@ -1466,7 +1482,7 @@ export type Event = {
     address: string
     parent: Event
     hidden_reason: ObjectHiddenReason
-} & AvatarAndCover & Linkable & Permissible & IdentifiableObject
+} & AvatarAndCover & Linkable & Permissible & IdentifiableObject & IPrivacy
 
 export type Project = {
     name: string
@@ -1474,7 +1490,6 @@ export type Project = {
     community: number
     description: string
     creator: UserProfile
-    privacy: ContextPrivacy
     tasks: number
     tags: string[]
     managers: number[]
@@ -1489,7 +1504,7 @@ export type Project = {
     tasks_completed: number
     tasks_responsible: number
     hidden_reason: ObjectHiddenReason
-} & AvatarAndCover & Linkable & Permissible & IdentifiableObject
+} & AvatarAndCover & Linkable & Permissible & IdentifiableObject & IPrivacy
 
 export type TimeSpent = {
     hours: number

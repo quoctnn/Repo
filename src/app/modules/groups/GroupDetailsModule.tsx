@@ -146,7 +146,7 @@ class GroupDetailsModule extends React.Component<Props, State> {
                     </ModuleContent>
                     {group && group.permission >= Permission.read &&
                         <ModuleFooter className="mt-1">
-                            <DetailsMembers members={group.members} />
+                            <DetailsMembers onSeeAllClick={this.toggleMembersForm} members={group.members} />
                         </ModuleFooter>
                     }
                 </Module>)

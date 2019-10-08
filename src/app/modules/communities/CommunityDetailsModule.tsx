@@ -31,7 +31,7 @@ import { EventManager } from '../../managers/EventManager';
 import { ProjectManager } from '../../managers/ProjectManager';
 import { ToastManager } from '../../managers/ToastManager';
 import ContextMembersForm from '../../components/general/contextMembers/ContextMembersForm';
-import ConfirmDialog from '../../components/general/dialogs/ConfirmDialog';
+import AlertDialog from '../../components/general/dialogs/AlertDialog';
 type OwnProps = {
     breakpoint:ResponsiveBreakpoint
 } & CommonModuleProps
@@ -171,10 +171,11 @@ class CommunityDetailsModule extends React.Component<Props, State> {
         {
             const elasticType = ContextNaturalKey.elasticTypeForKey(inReviewDialogContextNaturalKey)
             const objectName = ElasticSearchType.nameForKey(elasticType)
+            const objectNameSingular = ElasticSearchType.nameSingularForKey(elasticType)
             title = translate("context.object.created.in.review.title").format(objectName)
-            message = translate("context.object.created.in.review.message").format(objectName)
+            message = translate("context.object.created.in.review.message").format(objectNameSingular)
         }
-        return <ConfirmDialog visible={visible} didComplete={this.hideObjectInReview} title={title} message={message} />
+        return <AlertDialog visible={visible} didClose={this.hideObjectInReview} title={title} message={message} />
     }
     handleGroupCreateForm = (group:Group) => {
         if(!!group)
@@ -183,6 +184,7 @@ class CommunityDetailsModule extends React.Component<Props, State> {
             if(group.hidden_reason && group.hidden_reason == ObjectHiddenReason.review)
             {
                 this.showObjectInReview(group, ContextNaturalKey.GROUP)
+                this.hideGroupCreateForm()
             }
             else if(group.uri)
             {
@@ -209,6 +211,7 @@ class CommunityDetailsModule extends React.Component<Props, State> {
             if(event.hidden_reason && event.hidden_reason == ObjectHiddenReason.review)
             {
                 this.showObjectInReview(event, ContextNaturalKey.EVENT)
+                this.hideEventCreateForm()
             }
             else if(event.uri)
             {
@@ -235,6 +238,7 @@ class CommunityDetailsModule extends React.Component<Props, State> {
             if(project.hidden_reason && project.hidden_reason == ObjectHiddenReason.review)
             {
                 this.showObjectInReview(project, ContextNaturalKey.PROJECT)
+                this.hideProjectCreateForm()
             }
             else if(project.uri)
             {
@@ -310,7 +314,7 @@ class CommunityDetailsModule extends React.Component<Props, State> {
                     </ModuleContent>
                     { community && community.permission >= Permission.read &&
                         <ModuleFooter className="mt-1">
-                            <DetailsMembers members={community.members} />
+                            <DetailsMembers onSeeAllClick={this.toggleCommunityMembersForm} members={community.members} />
                         </ModuleFooter>
                     }
                 </Module>)
