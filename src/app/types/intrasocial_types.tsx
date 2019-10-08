@@ -21,8 +21,8 @@ export type CommunityRole = {
 } & IdentifiableObject
 export type FriendRequest = {
     created:string
-    from_user:number 
-    message:string 
+    from_user:number
+    message:string
     to_user:number
 } & IdentifiableObject
 export enum RelationshipStatus{
@@ -853,6 +853,14 @@ export type AttentionNotification = {
     created_at: string
     message?: string
 } & Linkable & NotificationObject
+export type ReviewNotification = {
+    name: string
+    community: Community
+    creator: UserProfile
+    created_at: string
+    uri: string
+    permission: number
+} & NotificationObject
 export type ReminderNotification = {
     datetime: string
 } & AttentionNotification
@@ -875,6 +883,10 @@ export enum NotificationGroupKey {
     STATUS_NOTIFICATIONS = "status_notifications",
     STATUS_REMINDERS = "status_reminders",
     STATUS_ATTENTIONS = "status_attentions",
+
+    GROUP_UNDER_REVIEW = "group_reviews",
+    EVENT_UNDER_REVIEW = "event_reviews",
+    PROJECT_UNDER_REVIEW = "project_reviews",
 
     REPORTED_CONTENT = "reported_content",
 
@@ -899,6 +911,10 @@ export type UnhandledNotifications = {
     task_notifications: TaskNotification[]
     task_reminders: ReminderNotification[]
     task_attentions: AttentionNotification[]
+
+    group_reviews: ReviewNotification[]
+    event_reviews: ReviewNotification[]
+    project_reviews: ReviewNotification[]
 
     reported_content: ReportNotification[]
     //requests
@@ -1355,7 +1371,7 @@ export type ContextInvitation = {
 export type CommunityInvitation = {
     created_at: string
     community:number
-    message:string 
+    message:string
     language:AppLanguage
     email:string
     user:number
