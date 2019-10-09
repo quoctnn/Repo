@@ -236,7 +236,7 @@ export default class ContextMembersComponent extends React.Component<Props, Stat
         let right:React.ReactNode = undefined
         const memberOptions = this.hasAdminAccess ? this.getMemberOptions(profile) : []
         right = memberOptions.length > 0 && <DropDownMenu closeOnSelect={false} className="community-member-option-dropdown" triggerClass="fas fa-ellipsis-v mx-1" items={memberOptions}></DropDownMenu>
-        return <GenericListItem to={profile.uri} className={cn} header={title} left={<Avatar size={44} image={avatarUrl} />} footer={footer} right={right}/>
+        return <GenericListItem key={profile.id} to={profile.uri} className={cn} header={title} left={<Avatar size={44} image={avatarUrl} />} footer={footer} right={right}/>
     }
     fetchMembers = (offset:number, completion:(items:PaginationResult<UserProfile>) => (void)) => {
         let {search} = this.state.filters

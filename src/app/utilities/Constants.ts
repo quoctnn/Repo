@@ -62,6 +62,9 @@ export default  {
         communityMembersUrl: (id:number) => {
             return `/api/v2/community/${id}/members/`
         },
+        communityJoinUrl: (id:number) => {
+            return `/api/v2/community/${id}/join/`
+        },
         communityMembersKickUrl: (id:number) => {
             return `/api/v2/community/${id}/kick/`
         },
@@ -94,6 +97,7 @@ export default  {
         },
         communityInvitationUrl:"/api/v2/community-invitation/",
         communityInvitationBatchUrl:"/api/v2/community-invitation/batch/",
+        communityMembershipRequestUrl: "/api/v2/community-memberrequest/",
         communityMembershipRequestDeleteUrl: (id:number) => {
             return `/api/v2/community-memberrequest/${id}/`
         },
@@ -146,6 +150,9 @@ export default  {
         groupFilesUrl: (id:number) => {
             return `/api/v2/group/${id}/files/`
         },
+        groupJoinUrl: (id:number) => {
+            return `/api/v2/group/${id}/join/`
+        },
         groupInvitationListUrl: "/api/v2/group-invitation/",
         groupInvitationBatchUrl:"/api/v2/group-invitation/batch/",
         groupInvitationDeleteUrl: (id:number) => {
@@ -166,6 +173,7 @@ export default  {
         groupInvitationAcceptUrl: (id:number) => {
             return `/api/v2/group-invitation/${id}/accept/`
         },
+        groupMembershipRequestUrl: "/api/v2/group-memberrequest/",
         groupMembershipRequestDeleteUrl: (id:number) => {
             return `/api/v2/group-memberrequest/${id}/`
         },
@@ -267,6 +275,9 @@ export default  {
         eventAvatarUrl: (id:number) => {
             return `/api/v2/event/${id}/avatar/`
         },
+        eventAttendUrl: (id:number) => {
+            return `/api/v2/event/${id}/attend/`
+        },
         eventCoverUrl: (id:number) => {
             return `/api/v2/event/${id}/cover/`
         },
@@ -289,6 +300,7 @@ export default  {
         },
         eventInvitationBatchUrl:"/api/v2/event-invitation/batch/",
         eventInvitationListUrl: "/api/v2/event-invitation/",
+        eventMembershipRequestUrl: "/api/v2/event-memberrequest/",
         eventMembershipRequestDeleteUrl: (id:number) => {
             return `/api/v2/event-memberrequest/${id}/`
         },

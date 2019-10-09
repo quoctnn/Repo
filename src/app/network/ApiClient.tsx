@@ -6,9 +6,9 @@ import { nullOrUndefined, DateFormat } from '../utilities/Utilities';
 import moment = require("moment");
 import { Settings } from "../utilities/Settings";
 import { ConversationManager } from '../managers/ConversationManager';
-import { CommunityConfigurationData, CommunityInvitation, AppLanguage, ContextInvitation, ContextSegmentKey, FriendRequest, CommunityRole, CommunityRoleCreatePermission } from '../types/intrasocial_types';
+import { CommunityConfigurationData, CommunityInvitation, AppLanguage, ContextInvitation, ContextSegmentKey, FriendRequest, CommunityRole, CommunityRoleCreatePermission, Event } from '../types/intrasocial_types';
 const $ = require("jquery")
-import { Status, UserProfile, UploadedFile, Community, Group, Conversation, Project, Message, Event, Task,
+import { Status, UserProfile, UploadedFile, Community, Group, Conversation, Project, Message, Task,
     ElasticSearchType, ObjectAttributeType, StatusObjectAttribute, EmbedCardItem, ReportTag,
     ContextNaturalKey, ReportResult, Dashboard, Timesheet, Coordinate, RecentActivity,
     UnhandledNotifications, UnreadNotificationCounts, GroupSorting, ProjectSorting, Favorite,
@@ -1284,6 +1284,32 @@ export abstract class ApiClient
             callback(null, status, new RequestErrorData(request.responseJSON, error))
         })
     }
+    private static getContextMembershipRequestUrl = (contextNaturalKey:ContextNaturalKey) => {
+        let url:string = null
+        switch (contextNaturalKey) {
+            case ContextNaturalKey.EVENT :url = Constants.apiRoute.eventMembershipRequestUrl; break;
+            case ContextNaturalKey.GROUP :url = Constants.apiRoute.groupMembershipRequestUrl; break;
+            case ContextNaturalKey.COMMUNITY :url = Constants.apiRoute.communityMembershipRequestUrl; break;
+            default:break;
+        }
+        return url
+    }
+    static createContextMembershipRequest(contextNaturalKey:ContextNaturalKey, contextObjectId:number, callback:ApiClientCallback<any>){
+        let url = ApiClient.getContextMembershipRequestUrl(contextNaturalKey)
+        if(!url)
+        {
+            callback(null, "500", new RequestErrorData({detail:`delete invitation endpoint not set for ${contextNaturalKey}`}, "error"))
+            return
+        }
+        const data:Object = {}
+        const key = ContextNaturalKey.elasticTypeForKey(contextNaturalKey).toLocaleLowerCase()
+        data[key] = contextObjectId
+        AjaxRequest.postJSON(url, data, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, new RequestErrorData(request.responseJSON, error))
+        })
+    }
     private static getContextInvitationUrl = (contextNaturalKey:ContextNaturalKey) => {
         let url:string = null
         switch (contextNaturalKey) {
@@ -1327,6 +1353,30 @@ export abstract class ApiClient
         const data = {limit, offset, search}
         data[key] = contextObjectId
         url = url + "?" + ApiClient.getQueryString(data)
+        AjaxRequest.get(url, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, new RequestErrorData(request.responseJSON, error))
+        })
+    }
+
+    private static getContextJoinUrl = (contextNaturalKey:ContextNaturalKey, contextObjectId:number) => {
+        let url:string = null
+        switch (contextNaturalKey) {
+            case ContextNaturalKey.COMMUNITY :url = Constants.apiRoute.communityJoinUrl(contextObjectId); break;
+            case ContextNaturalKey.GROUP :url = Constants.apiRoute.groupJoinUrl(contextObjectId); break;
+            case ContextNaturalKey.EVENT :url = Constants.apiRoute.eventAttendUrl(contextObjectId); break;
+            default:break;
+        }
+        return url
+    }
+    static joinContext = (contextNaturalKey:ContextNaturalKey, contextObjectId:number, callback:ApiClientCallback<any>) => {
+        let url = ApiClient.getContextJoinUrl(contextNaturalKey, contextObjectId)
+        if(!url)
+        {
+            callback(null, "500", new RequestErrorData({detail:`join endpoint not set for ${contextNaturalKey}`}, "error"))
+            return
+        }
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {

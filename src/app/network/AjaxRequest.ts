@@ -132,7 +132,7 @@ export class AjaxRequest
         }
         return $.ajax({
             url: url,
-            dataType: 'json',
+            //dataType: 'json',
             cache: false,
             type: method,
             traditional: true,

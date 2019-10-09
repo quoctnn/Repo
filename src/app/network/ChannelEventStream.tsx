@@ -28,15 +28,23 @@ export enum EventStreamMessageType {
 
     ACTIVITY_NEW = "activity.new",
     SOCKET_STATE_CHANGE = "socket.state.change",
+
     COMMUNITY_MAIN = "community.main",
     COMMUNITY_UPDATE = "community.update",
     COMMUNITY_DELETE = "community.delete",
+
     EVENT_NEW = "event.new",
     EVENT_UPDATE = "event.update",
+    EVENT_REMOVE = "event.remove",
+
     GROUP_NEW = "group.new",
     GROUP_UPDATE = "group.update",
+    GROUP_REMOVE = "group.remove",
+
     PROJECT_NEW = "project.new",
     PROJECT_UPDATE = "project.update",
+    PROJECT_REMOVE = "project.remove",
+
     NOTIFICATIONS_UNHANDLED = "notifications.unhandled",
     FAVORITES_UPDATE = "favorites.update",
 

@@ -597,6 +597,10 @@ var translations = {
     "form.invite.title.manager":"Manager",
     "context.object.created.in.review.title":"{0} created",
     "context.object.created.in.review.message":"The {0} was successfully created and is now being reviewed",
+    "context.join.format":"Join {0}",
+    "context.request.join.format":"Request to join {0}",
+    "context.membership.request.pending":"Your have a pending membership request",
+    "context.joined.format":"You joined the {0}",
   },
   no: {
     "search.placeholder": "Søk ...",
@@ -1196,6 +1200,10 @@ var translations = {
     "form.invite.title.manager":"Prosjektledere",
     "context.object.created.in.review.title":"{0} opprettet",
     "context.object.created.in.review.message":"{0} ble opprettet og blir nå gjennomgått",
+    "context.join.format":"Bli med i {0}",
+    "context.request.join.format":"Be om å få bli med i {0}",
+    "context.membership.request.pending":"Du har en ventende medlemskapforespørsel",
+    "context.joined.format":"Du ble med i {0}",
   },
   en: {
     "search.placeholder": "Search ...",
@@ -1806,6 +1814,11 @@ var translations = {
     "form.invite.title.manager":"Manager",
     "context.object.created.in.review.title":"{0} created",
     "context.object.created.in.review.message":"The {0} was successfully created and is now being reviewed",
+    //
+    "context.join.format":"Join {0}",
+    "context.request.join.format":"Request to join {0}",
+    "context.membership.request.pending":"Your have a pending membership request",
+    "context.joined.format":"You joined the {0}",
   }
 };
 

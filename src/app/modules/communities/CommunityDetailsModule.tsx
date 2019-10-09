@@ -32,6 +32,7 @@ import { ProjectManager } from '../../managers/ProjectManager';
 import { ToastManager } from '../../managers/ToastManager';
 import ContextMembersForm from '../../components/general/contextMembers/ContextMembersForm';
 import AlertDialog from '../../components/general/dialogs/AlertDialog';
+import ContextMembershipComponent from '../../components/general/contextMembership/ContextMembershipComponent';
 type OwnProps = {
     breakpoint:ResponsiveBreakpoint
 } & CommonModuleProps
@@ -302,8 +303,6 @@ class CommunityDetailsModule extends React.Component<Props, State> {
                     <ModuleContent>
                         { community && community.permission >= Permission.read &&
                             <DetailsContent description={community.description}/>
-                        ||
-                        <LoadingSpinner key="loading"/>
                         }
                         {this.renderEditForm()}
                         {this.renderAddGroupForm()}
@@ -315,6 +314,7 @@ class CommunityDetailsModule extends React.Component<Props, State> {
                     { community && community.permission >= Permission.read &&
                         <ModuleFooter className="mt-1">
                             <DetailsMembers onSeeAllClick={this.toggleCommunityMembersForm} members={community.members} />
+                            <ContextMembershipComponent contextNaturalKey={ContextNaturalKey.COMMUNITY} contextObject={this.props.community} />
                         </ModuleFooter>
                     }
                 </Module>)

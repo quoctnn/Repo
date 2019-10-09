@@ -499,10 +499,10 @@ export namespace ContextNaturalKey {
     ]
     export const getMembers = (key:ContextNaturalKey, contextObject:IdentifiableObject) => {
         switch (key) {
-            case ContextNaturalKey.EVENT: return (contextObject as Event).attending
-            case ContextNaturalKey.GROUP: return (contextObject as Group).members
-            case ContextNaturalKey.PROJECT: return (contextObject as Project).members
-            case ContextNaturalKey.COMMUNITY: return (contextObject as Community).members
+            case ContextNaturalKey.EVENT: return (contextObject as Event).attending || []
+            case ContextNaturalKey.GROUP: return (contextObject as Group).members || []
+            case ContextNaturalKey.PROJECT: return (contextObject as Project).members || []
+            case ContextNaturalKey.COMMUNITY: return (contextObject as Community).members || []
             default:
                 console.warn(`${key} has no 'members' field`, contextObject)
                 return []
@@ -1379,6 +1379,10 @@ export type ICommunity = {
     secondary_color: string
     chapters?: boolean
 } & Linkable & IdentifiableObject
+export type IMembershipStatus = {
+    invited:boolean
+    pending:boolean
+}
 export type ContextInvitation = {
     created_at: string
     target_user:number
@@ -1409,7 +1413,7 @@ export type Community = {
     project_creation_permission:CommunityCreatePermission
     subgroup_creation_permission:CommunityCreatePermission
     //
-} & ICommunity & AvatarAndCover & Permissible & IPrivacy
+} & ICommunity & AvatarAndCover & Permissible & IPrivacy & IMembershipStatus
 
 export type SimpleUserProfile = {
     absolute_url: string,
@@ -1454,7 +1458,7 @@ export type Group = {
     parent: number
     updated_at: string
     hidden_reason: ObjectHiddenReason
-} & AvatarAndCover & Linkable & Permissible & IdentifiableObject & IPrivacy
+} & AvatarAndCover & Linkable & Permissible & IdentifiableObject & IPrivacy & IMembershipStatus
 
 export type Favorite = {
     index: number
@@ -1487,7 +1491,6 @@ export type Event = {
     attending_count: number
     not_attending: number[]
     not_attending_count: number
-    invited: number[]
     invited_count: number
     created_at: string
     group: Group
@@ -1498,7 +1501,7 @@ export type Event = {
     address: string
     parent: Event
     hidden_reason: ObjectHiddenReason
-} & AvatarAndCover & Linkable & Permissible & IdentifiableObject & IPrivacy
+} & AvatarAndCover & Linkable & Permissible & IdentifiableObject & IPrivacy & IMembershipStatus
 
 export type Project = {
     name: string
