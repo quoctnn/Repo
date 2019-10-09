@@ -1,9 +1,9 @@
 import * as React from "react";
 import {  Store } from 'redux';
-import { Community } from '../types/intrasocial_types';
+import { Community, IdentifiableObject } from '../types/intrasocial_types';
 import {ApiClient} from '../network/ApiClient';
 import { ReduxState } from '../redux';
-import { addCommunitiesAction, removeCommunityAction } from '../redux/communityStore';
+import { addCommunitiesAction, removeCommunityAction, updateCommunityAction } from '../redux/communityStore';
 import { setActiveCommunityAction } from '../redux/activeCommunity';
 import { NotificationCenter } from '../utilities/NotificationCenter';
 import { EventStreamMessageType } from '../network/ChannelEventStream';
@@ -26,6 +26,9 @@ export abstract class CommunityManager
         let communityId = args[0]['community_id'] as number;
         const community = CommunityManager.getCommunityById(communityId)
         ToastManager.showInfoToast(translate("Main community changed"), community.name)
+    }
+    static updateCommunityObject = (community:Partial<Community> & IdentifiableObject) => {
+        CommunityManager.getStore().dispatch(updateCommunityAction(community))
     }
     static processCommunityUpdate = (...args:any[]) => {
         let communityId = args[0]['community_id'] as number;

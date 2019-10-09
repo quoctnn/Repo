@@ -11,7 +11,6 @@ import { Group, Community, ContextNaturalKey, Permission } from '../../types/int
 import { connect } from 'react-redux';
 import { ReduxState } from '../../redux';
 import CircularLoadingSpinner from '../../components/general/CircularLoadingSpinner';
-import LoadingSpinner from '../../components/LoadingSpinner';
 import { DetailsContent } from '../../components/details/DetailsContent';
 import { DetailsMembers } from '../../components/details/DetailsMembers';
 import { ContextManager } from '../../managers/ContextManager';
@@ -20,8 +19,8 @@ import { uniqueId } from '../../utilities/Utilities';
 import { OverflowMenuItemType, OverflowMenuItem } from '../../components/general/OverflowMenu';
 import { DropDownMenu } from '../../components/general/DropDownMenu';
 import { GroupManager } from '../../managers/GroupManager';
-import ContextInvitationComponent from '../../components/general/contextMembers/ContextInvitationComponent';
 import ContextMembersForm from '../../components/general/contextMembers/ContextMembersForm';
+import ContextMembershipComponent from '../../components/general/contextMembership/ContextMembershipComponent';
 type OwnProps = {
     breakpoint:ResponsiveBreakpoint
     contextNaturalKey: ContextNaturalKey
@@ -127,28 +126,21 @@ class GroupDetailsModule extends React.Component<Props, State> {
     {
         const {breakpoint, history, match, location, staticContext, group, community, contextNaturalKey, ...rest} = this.props
         const groupOptions = this.getGroupOptions()
+        if(!group)
+            return null
         return (<Module {...rest}>
-                    <ModuleHeader headerTitle={group && group.name || translate("detail.module.title")} loading={this.state.isLoading}>
+                    <ModuleHeader headerTitle={group.name || translate("detail.module.title")} loading={this.state.isLoading}>
                         {groupOptions.length > 0 && <DropDownMenu className="group-option-dropdown" triggerClass="fas fa-cog mx-1" items={groupOptions}></DropDownMenu>} 
                     </ModuleHeader>
                     <ModuleContent>
-                        { group &&
-                            <div>
-                                { group.permission >= Permission.read &&
-                                    <DetailsContent community={community} description={group.description}/>
-                                }
-                            </div>
-                            ||
-                            <LoadingSpinner key="loading"/>
-                        }
+                        <DetailsContent community={community} description={group.description}/>
                         {this.renderEditForm()}
                         {this.renderMembersForm()}
                     </ModuleContent>
-                    {group && group.permission >= Permission.read &&
-                        <ModuleFooter className="mt-1">
-                            <DetailsMembers members={group.members} />
-                        </ModuleFooter>
-                    }
+                    <ModuleFooter className="mt-1">
+                        <DetailsMembers onSeeAllClick={this.toggleMembersForm} members={group.members} />
+                        <ContextMembershipComponent contextNaturalKey={ContextNaturalKey.GROUP} contextObject={group} />
+                    </ModuleFooter>
                 </Module>)
     }
 }

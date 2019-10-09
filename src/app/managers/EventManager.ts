@@ -1,8 +1,8 @@
 import {  Store } from 'redux';
-import { Event } from '../types/intrasocial_types';
+import { Event, IdentifiableObject } from '../types/intrasocial_types';
 import {ApiClient} from '../network/ApiClient';
 import { ReduxState } from '../redux/index';
-import { addEventsAction, eventStore } from '../redux/eventStore';
+import { addEventsAction, updateEventAction, removeEventAction } from '../redux/eventStore';
 import { NotificationCenter } from '../utilities/NotificationCenter';
 import { EventStreamMessageType } from '../network/ChannelEventStream';
 export abstract class EventManager
@@ -11,6 +11,11 @@ export abstract class EventManager
     {
         NotificationCenter.addObserver('eventstream_' + EventStreamMessageType.EVENT_NEW, EventManager.processEventNew)
         NotificationCenter.addObserver('eventstream_' + EventStreamMessageType.EVENT_UPDATE, EventManager.processEventUpdate)
+        NotificationCenter.addObserver('eventstream_' + EventStreamMessageType.EVENT_REMOVE, EventManager.processEventRemove)
+    }
+    static processEventRemove = (...args:any[]) => {
+        const id = args[0]["event_id"] as number
+        EventManager.removeEvent(id)
     }
     static processEventNew = (...args:any[]) => {
         const eventId = args[0]["event_id"] as number
@@ -19,6 +24,12 @@ export abstract class EventManager
     static processEventUpdate = (...args:any[]) => {
         const eventId = args[0]["event_id"] as number
         EventManager.updateEvent(eventId)
+    }
+    static removeEvent = (event:number) => {
+        EventManager.getStore().dispatch(removeEventAction(event))
+    }
+    static updateEventObject = (event:Partial<Event> & IdentifiableObject) => {
+        EventManager.getStore().dispatch(updateEventAction(event))
     }
     static updateEvent = (eventId:number) => (
         ApiClient.getEvent(eventId, (data, status, error) => {

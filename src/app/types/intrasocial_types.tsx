@@ -21,8 +21,8 @@ export type CommunityRole = {
 } & IdentifiableObject
 export type FriendRequest = {
     created:string
-    from_user:number 
-    message:string 
+    from_user:number
+    message:string
     to_user:number
 } & IdentifiableObject
 export enum RelationshipStatus{
@@ -497,6 +497,17 @@ export namespace ContextNaturalKey {
         ContextNaturalKey.TASK,
         ContextNaturalKey.CONVERSATION
     ]
+    export const getMembers = (key:ContextNaturalKey, contextObject:IdentifiableObject) => {
+        switch (key) {
+            case ContextNaturalKey.EVENT: return (contextObject as Event).attending || []
+            case ContextNaturalKey.GROUP: return (contextObject as Group).members || []
+            case ContextNaturalKey.PROJECT: return (contextObject as Project).members || []
+            case ContextNaturalKey.COMMUNITY: return (contextObject as Community).members || []
+            default:
+                console.warn(`${key} has no 'members' field`, contextObject)
+                return []
+        }
+    }
     export function defaultAvatarForKey(key: ContextNaturalKey) {
         switch (key) {
             case ContextNaturalKey.GROUP: return Constants.resolveUrl(Constants.defaultImg.groupAvatar)()
@@ -853,6 +864,14 @@ export type AttentionNotification = {
     created_at: string
     message?: string
 } & Linkable & NotificationObject
+export type ReviewNotification = {
+    name: string
+    community: Community
+    creator: UserProfile
+    created_at: string
+    uri: string
+    permission: number
+} & NotificationObject
 export type ReminderNotification = {
     datetime: string
 } & AttentionNotification
@@ -875,6 +894,10 @@ export enum NotificationGroupKey {
     STATUS_NOTIFICATIONS = "status_notifications",
     STATUS_REMINDERS = "status_reminders",
     STATUS_ATTENTIONS = "status_attentions",
+
+    GROUP_UNDER_REVIEW = "group_reviews",
+    EVENT_UNDER_REVIEW = "event_reviews",
+    PROJECT_UNDER_REVIEW = "project_reviews",
 
     REPORTED_CONTENT = "reported_content",
 
@@ -899,6 +922,10 @@ export type UnhandledNotifications = {
     task_notifications: TaskNotification[]
     task_reminders: ReminderNotification[]
     task_attentions: AttentionNotification[]
+
+    group_reviews: ReviewNotification[]
+    event_reviews: ReviewNotification[]
+    project_reviews: ReviewNotification[]
 
     reported_content: ReportNotification[]
     //requests
@@ -988,6 +1015,9 @@ export namespace Permission {
     }
     export function getShield(permission: Permission) {
         return Permission.usesElevatedPrivileges(permission) ? "fas fa-shield-alt" : undefined
+    }
+    export function hasAccess(permissible: Permissible, minimumRequiredPermission:Permission) {
+        return permissible.permission >= minimumRequiredPermission
     }
 }
 export type GenericElasticResult = {
@@ -1130,6 +1160,9 @@ export namespace ElasticSearchType {
     }
     export function nameForKey(key: ElasticSearchType) {
         return translate("elasticsearch.type.name." + key)
+    }
+    export function nameSingularForKey(key: ElasticSearchType) {
+        return translate("elasticsearch.type.name.s1." + key)
     }
 }
 export type SimpleObjectAttribute = {
@@ -1333,7 +1366,9 @@ export type Conversation =
     admins?:number[]
 
 } & Linkable & IdentifiableObject & Permissible
-
+export type IPrivacy = {
+    privacy: ContextPrivacy
+}
 export type ICommunity = {
     cover_thumbnail: string
     avatar_thumbnail: string
@@ -1344,6 +1379,10 @@ export type ICommunity = {
     secondary_color: string
     chapters?: boolean
 } & Linkable & IdentifiableObject
+export type IMembershipStatus = {
+    invited:boolean
+    pending:boolean
+}
 export type ContextInvitation = {
     created_at: string
     target_user:number
@@ -1355,7 +1394,7 @@ export type ContextInvitation = {
 export type CommunityInvitation = {
     created_at: string
     community:number
-    message:string 
+    message:string
     language:AppLanguage
     email:string
     user:number
@@ -1367,7 +1406,6 @@ export type Community = {
     updated_at: string
     visit_count:number
     last_visited:string
-    privacy: ContextPrivacy
     category:CommunityCategory
     //
     event_creation_permission:CommunityCreatePermission
@@ -1375,7 +1413,7 @@ export type Community = {
     project_creation_permission:CommunityCreatePermission
     subgroup_creation_permission:CommunityCreatePermission
     //
-} & ICommunity & AvatarAndCover & Permissible
+} & ICommunity & AvatarAndCover & Permissible & IPrivacy & IMembershipStatus
 
 export type SimpleUserProfile = {
     absolute_url: string,
@@ -1414,13 +1452,13 @@ export type Group = {
     community: number
     description: string
     creator: UserProfile
-    privacy: ContextPrivacy
     members: number[]
     members_count: number
     created_at: string
     parent: number
     updated_at: string
-} & AvatarAndCover & Linkable & Permissible & IdentifiableObject
+    hidden_reason: ObjectHiddenReason
+} & AvatarAndCover & Linkable & Permissible & IdentifiableObject & IPrivacy & IMembershipStatus
 
 export type Favorite = {
     index: number
@@ -1449,12 +1487,10 @@ export type Event = {
     community: number
     description: string
     creator: UserProfile
-    privacy: ContextPrivacy
     attending: number[]
     attending_count: number
     not_attending: number[]
     not_attending_count: number
-    invited: number[]
     invited_count: number
     created_at: string
     group: Group
@@ -1464,8 +1500,8 @@ export type Event = {
     location: Coordinate
     address: string
     parent: Event
-
-} & AvatarAndCover & Linkable & Permissible & IdentifiableObject
+    hidden_reason: ObjectHiddenReason
+} & AvatarAndCover & Linkable & Permissible & IdentifiableObject & IPrivacy & IMembershipStatus
 
 export type Project = {
     name: string
@@ -1473,7 +1509,6 @@ export type Project = {
     community: number
     description: string
     creator: UserProfile
-    privacy: ContextPrivacy
     tasks: number
     tags: string[]
     managers: number[]
@@ -1487,7 +1522,8 @@ export type Project = {
     tasks_attention: number
     tasks_completed: number
     tasks_responsible: number
-} & AvatarAndCover & Linkable & Permissible & IdentifiableObject
+    hidden_reason: ObjectHiddenReason
+} & AvatarAndCover & Linkable & Permissible & IdentifiableObject & IPrivacy
 
 export type TimeSpent = {
     hours: number

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { translate } from '../../../localization/AutoIntlProvider';
-import { ContextInvitation, IdentifiableObject, ContextNaturalKey, UserProfile, RelationshipStatus } from '../../../types/intrasocial_types';
+import { ContextInvitation, IdentifiableObject, ContextNaturalKey, UserProfile, RelationshipStatus, Permissible } from '../../../types/intrasocial_types';
 import { ProfileManager } from '../../../managers/ProfileManager';
 import { ApiClient, PaginationResult } from '../../../network/ApiClient';
 import ListComponent from '../ListComponent';
@@ -17,7 +17,7 @@ import { FormComponentErrorMessage } from '../../form/FormController';
 import ContextInviteComponent from './ContextInviteComponent';
 type OwnProps = {
     contextNaturalKey:ContextNaturalKey
-    contextObject:IdentifiableObject
+    contextObject:IdentifiableObject & Permissible
     members:number[]
     availableMembers:number[]
 }
@@ -166,7 +166,7 @@ export default class ContextInvitationComponent extends React.Component<Props, S
         const error = this.state.failed.length > 0 ? translate("form.invite.delete.error") : undefined
         return <>
                 {error && <FormComponentErrorMessage className="d-block" errors={{error}} />}
-                <Input value={this.state.filters.search} type="text" onChange={this.handleSearchInputChange} placeholder={translate("common.filter.invitations")}/>
+                <Input className="mb-2" value={this.state.filters.search} type="text" onChange={this.handleSearchInputChange} placeholder={translate("common.filter.invitations")}/>
                 <div className={classnames("list-header", {active:headerActive})}>
                     <Checkbox checked={headerActive} checkedIcon="fas fa-minus" onValueChange={this.headerToggle} />
                     <div className="flex-grow-1 text-truncate p-1">{translate("common.invitation")}</div>

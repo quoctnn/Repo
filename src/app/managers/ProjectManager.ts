@@ -2,7 +2,7 @@ import {  Store } from 'redux';
 import { Project } from '../types/intrasocial_types';
 import {ApiClient} from '../network/ApiClient';
 import { ReduxState } from '../redux';
-import { addProjectsAction } from '../redux/projectStore';
+import { addProjectsAction, removeProjectAction } from '../redux/projectStore';
 import { NotificationCenter } from '../utilities/NotificationCenter';
 import { EventStreamMessageType } from '../network/ChannelEventStream';
 export abstract class ProjectManager
@@ -11,6 +11,11 @@ export abstract class ProjectManager
     {
         NotificationCenter.addObserver('eventstream_' + EventStreamMessageType.PROJECT_NEW, ProjectManager.processProjectNew)
         NotificationCenter.addObserver('eventstream_' + EventStreamMessageType.PROJECT_UPDATE, ProjectManager.processProjectUpdate)
+        NotificationCenter.addObserver('eventstream_' + EventStreamMessageType.PROJECT_REMOVE, ProjectManager.processProjectRemove)
+    }
+    static processProjectRemove = (...args:any[]) => {
+        const projectId = args[0]["project_id"] as number
+        ProjectManager.removeProject(projectId)
     }
     static processProjectNew = (...args:any[]) => {
         const projectId = args[0]["project_id"] as number
@@ -31,6 +36,10 @@ export abstract class ProjectManager
     static storeProjects = (projects:Project[]) => {
         ProjectManager.getStore().dispatch(addProjectsAction(projects))
     }
+    static removeProject = (project:number) => {
+        ProjectManager.getStore().dispatch(removeProjectAction(project))
+    }
+    
     static getProjectById = (projectId:number):Project|null =>
     {
         return ProjectManager.getStore().getState().projectStore.byId[projectId]

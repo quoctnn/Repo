@@ -21,6 +21,7 @@ import { DropDownMenu } from '../../components/general/DropDownMenu';
 import EventCreateComponent from '../../components/general/contextCreation/EventCreateComponent';
 import { EventManager } from '../../managers/EventManager';
 import ContextMembersForm from '../../components/general/contextMembers/ContextMembersForm';
+import ContextMembershipComponent from '../../components/general/contextMembership/ContextMembershipComponent';
 const shortMonth:string[] = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 type OwnProps = {
     breakpoint:ResponsiveBreakpoint
@@ -134,50 +135,45 @@ class EventDetailsModule extends React.Component<Props, State> {
                         {eventOptions.length > 0 && <DropDownMenu className="event-option-dropdown" triggerClass="fas fa-cog mx-1" items={eventOptions}></DropDownMenu>} 
                     </ModuleHeader>
                     <ModuleContent>
-                        { event && event.permission >= Permission.read &&
-                            <div className="event-details-content">
-                                <DetailsContent community={community} description={event.description}>
-                                    { event.parent &&
-                                        <div>
-                                            <span className="details-field-name">
-                                                {translate("common.event.event")}:&nbsp;
-                                            </span>
-                                            <span className="details-field-value">
-                                                <Link to={event.parent.uri || "#"}>
-                                                    {event.parent.name}
-                                                </Link>
-                                            </span>
-                                        </div>
-                                    }
-                                </DetailsContent>
-                            </div>
-                            ||
-                            <LoadingSpinner key="loading"/>
-                        }
+                        <div className="event-details-content">
+                            <DetailsContent community={community} description={event.description}>
+                                { event.parent &&
+                                    <div>
+                                        <span className="details-field-name">
+                                            {translate("common.event.event")}:&nbsp;
+                                        </span>
+                                        <span className="details-field-value">
+                                            <Link to={event.parent.uri || "#"}>
+                                                {event.parent.name}
+                                            </Link>
+                                        </span>
+                                    </div>
+                                }
+                            </DetailsContent>
+                        </div>
                         {this.renderEditForm()}
                         {this.renderMembersForm()}
                     </ModuleContent>
-                    { event && event.permission >= Permission.read &&
-                        <ModuleFooter>
-                            { startDate &&
-                            <div className="event-footer">
-                                <div className="event-date-big">
-                                        <span>
-                                            {shortMonth[startDate.getMonth()].toUpperCase()}<br/>
-                                            {startDate.getDate()}
-                                        </span>
-                                </div>
-                                <div className="event-start-end text-truncate">
-                                    <div className="details-field-value">
-                                        {stringToDateFormat(event.start, DateFormat.date)}
-                                        &nbsp;-<br/>
-                                        {stringToDateFormat(event.end, DateFormat.date)}
-                                    </div>
+                    <ModuleFooter>
+                        { startDate &&
+                        <div className="event-footer">
+                            <div className="event-date-big">
+                                    <span>
+                                        {shortMonth[startDate.getMonth()].toUpperCase()}<br/>
+                                        {startDate.getDate()}
+                                    </span>
+                            </div>
+                            <div className="event-start-end text-truncate">
+                                <div className="details-field-value">
+                                    {stringToDateFormat(event.start, DateFormat.date)}
+                                    &nbsp;-<br/>
+                                    {stringToDateFormat(event.end, DateFormat.date)}
                                 </div>
                             </div>
-                            }
-                        </ModuleFooter>
-                    }
+                        </div>
+                        }
+                        <ContextMembershipComponent contextNaturalKey={ContextNaturalKey.EVENT} contextObject={this.props.event} />
+                    </ModuleFooter>
                 </Module>)
     }
 }

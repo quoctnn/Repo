@@ -38,6 +38,7 @@
     "draft-js": "^0.11.0",
     "draft-js-mention-plugin": "^3.1.5",
     "draft-js-plugins-editor": "^3.0.0",
+    "electron-squirrel-startup": "^1.0.0",
     "emoji-js": "^3.4.1",
     "emoji-picker-react": "^2.1.1",
     "fbemitter": "^2.1.1",

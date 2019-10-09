@@ -83,8 +83,6 @@ class TaskDetailsModule extends React.Component<Props, State> {
                                                 }
                                         </DetailsContent>
                                     </div>
-                                        ||
-                                    <LoadingSpinner key="loading"/>
                                 }
                                 </ModuleContent>
                                 <ModuleFooter className="mt-1">

@@ -1,8 +1,8 @@
 import {  Store } from 'redux';
-import { Group } from '../types/intrasocial_types';
+import { Group, IdentifiableObject } from '../types/intrasocial_types';
 import {ApiClient} from '../network/ApiClient';
 import { ReduxState } from '../redux';
-import { addGroupsAction } from '../redux/groupStore';
+import { addGroupsAction, updateGroupAction, removeGroupAction } from '../redux/groupStore';
 import { NotificationCenter } from '../utilities/NotificationCenter';
 import { EventStreamMessageType } from '../network/ChannelEventStream';
 export abstract class GroupManager
@@ -11,6 +11,11 @@ export abstract class GroupManager
     {
         NotificationCenter.addObserver('eventstream_' + EventStreamMessageType.GROUP_NEW, GroupManager.processGroupNew)
         NotificationCenter.addObserver('eventstream_' + EventStreamMessageType.GROUP_UPDATE, GroupManager.processGroupUpdate)
+        NotificationCenter.addObserver('eventstream_' + EventStreamMessageType.GROUP_REMOVE, GroupManager.processGroupRemove)
+    }
+    static processGroupRemove = (...args:any[]) => {
+        const id = args[0]["group_id"] as number
+        GroupManager.removeGroup(id)
     }
     static processGroupNew = (...args:any[]) => {
         const groupId = args[0]["group_id"] as number
@@ -19,6 +24,12 @@ export abstract class GroupManager
     static processGroupUpdate = (...args:any[]) => {
         const groupId = args[0]["group_id"] as number
         GroupManager.updateGroup(groupId)
+    }
+    static updateGroupObject = (group:Partial<Group> & IdentifiableObject) => {
+        GroupManager.getStore().dispatch(updateGroupAction(group))
+    }
+    static removeGroup = (group:number) => {
+        GroupManager.getStore().dispatch(removeGroupAction(group))
     }
     static updateGroup = (groupId:number) => (
         ApiClient.getGroup(groupId.toString(), (data, status, error) => {

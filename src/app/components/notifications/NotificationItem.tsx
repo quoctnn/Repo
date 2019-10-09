@@ -1,6 +1,10 @@
 import * as React from "react";
 import classnames = require("classnames");
-import { NotificationGroupKey, InvitationNotification, Community, Group, UserProfile, Event, Conversation, StatusNotification, AttentionNotification, ReminderNotification, TaskNotification, TaskNotificationAction, ReportResult, ReportNotification, MembershipRequestNotification, NotificationObject, ConversationNotification } from '../../types/intrasocial_types';
+import { NotificationGroupKey, InvitationNotification, Community, Group, UserProfile,
+         Event, StatusNotification, AttentionNotification, ReminderNotification,
+         TaskNotification, TaskNotificationAction, ReportNotification,
+         MembershipRequestNotification, NotificationObject, ConversationNotification, ReviewNotification,
+         Permission } from '../../types/intrasocial_types';
 import {ApiClient} from '../../network/ApiClient';
 import { ToastManager } from '../../managers/ToastManager';
 import { translate, lazyTranslate } from '../../localization/AutoIntlProvider';
@@ -374,6 +378,69 @@ const TaskNotificationComponent = (props: TaskNotificationProps) => {
         <Button onClick={markAsRead} color="secondary" size="xs">{translate("notification.action.mark.read")}</Button>
     </InvitationComponent>
 }
+type ReviewContentNotificationProps = {
+    notification: ReviewNotification
+} & NotificationEvents
+const ReviewContentComponent = (props: ReviewContentNotificationProps) => {
+    const getAcceptEndpoint = () => {
+        switch (props.notification.type) {
+            case NotificationGroupKey.EVENT_UNDER_REVIEW: return ApiClient.eventReviewAccept
+            case NotificationGroupKey.GROUP_UNDER_REVIEW: return ApiClient.groupReviewAccept
+            case NotificationGroupKey.PROJECT_UNDER_REVIEW: return ApiClient.projectReviewAccept
+            default: return null
+        }
+    }
+    const getDismissEndpoint = () => {
+        switch (props.notification.type) {
+            case NotificationGroupKey.EVENT_UNDER_REVIEW: return ApiClient.eventReviewDelete
+            case NotificationGroupKey.GROUP_UNDER_REVIEW: return ApiClient.groupReviewDelete
+            case NotificationGroupKey.PROJECT_UNDER_REVIEW: return ApiClient.projectReviewDelete
+            default: return null
+        }
+    }
+    const acceptEndpoint = getAcceptEndpoint()
+    const dismissEndpoint = getDismissEndpoint()
+    const acceptRequest = () => {
+        if (acceptEndpoint) {
+            acceptEndpoint(props.notification.id, (data, status, error) => {
+                if (!error) {
+                    sendCompleted()
+                }
+                ToastManager.showRequestErrorToast(error, lazyTranslate("notification.error.respond"))
+            })
+        }
+    }
+    const dismissRequest = () => {
+        if (dismissEndpoint) {
+            dismissEndpoint(props.notification.id, (data, status, error) => {
+                if (!error) {
+                    sendCompleted()
+                }
+                ToastManager.showRequestErrorToast(error, lazyTranslate("notification.error.respond"))
+            })
+        }
+    }
+    const sendCompleted = () => {
+        props.onCompleted(props.notification.type, props.notification.id)
+    }
+    const profile = props.notification.creator
+    const creatorName = userFullName(profile, null) || translate("Someone")
+    const time = props.notification.created_at
+    const title = <Link onClick={props.onClose} className="no-link" to={profile.uri}>
+        <span className="link-text">{creatorName}</span>
+        {" "}{translate("review.action.submitted")}{" "}{props.notification.name}{" "}{translate("review.action.for_review")}
+    </Link>
+    const avatar = userAvatar(profile)
+    const avatarLink = profile && profile.uri
+    return <InvitationComponent onClose={props.onClose} avatarLink={avatarLink} createdAt={time} title={title} avatar={avatar}>
+        {acceptEndpoint && (props.notification.permission == Permission.admin || props.notification.permission == Permission.superuser) &&
+            <Button onClick={acceptRequest} color="secondary" size="xs">{translate("notification.action.accept")}</Button>
+        }
+        {dismissEndpoint && (props.notification.permission == Permission.admin || props.notification.permission == Permission.superuser) &&
+            <Button outline={true} className="ml-1" onClick={dismissRequest} color="secondary" size="xs">{translate("invitation.dismiss")}</Button>
+        }
+    </InvitationComponent>
+}
 type ReportedContentNotificationProps = {
     notification: ReportNotification
 } & NotificationEvents
@@ -484,6 +551,13 @@ export default class NotificationItem extends React.Component<Props, State> {
 
             case NotificationGroupKey.UNREAD_CONVERSATIONS:
                 return <UnreadConversation onClose={this.props.onClose} authenticatedUser={this.props.authenticatedUser} conversation={this.props.value as ConversationNotification} onCompleted={this.props.onCompleted} />
+
+            case NotificationGroupKey.GROUP_UNDER_REVIEW:
+                return <ReviewContentComponent onClose={this.props.onClose} notification={this.props.value as ReviewNotification} onCompleted={this.props.onCompleted} />
+            case NotificationGroupKey.EVENT_UNDER_REVIEW:
+                return <ReviewContentComponent onClose={this.props.onClose} notification={this.props.value as ReviewNotification} onCompleted={this.props.onCompleted} />
+            case NotificationGroupKey.PROJECT_UNDER_REVIEW:
+                return <ReviewContentComponent onClose={this.props.onClose} notification={this.props.value as ReviewNotification} onCompleted={this.props.onCompleted} />
 
             case NotificationGroupKey.REPORTED_CONTENT:
                 return <ReportedContentComponent onClose={this.props.onClose} notification={this.props.value as ReportNotification} onCompleted={this.props.onCompleted} />

@@ -268,7 +268,7 @@ export default class FormController extends React.Component<Props, State> {
                         {genericError && <FormComponentErrorMessage className="d-block" errors={genericError} />}
                         <div className={mainContentCn}>
                             <div className="d-flex flex-column main-content-inner">
-                                {menuItems.length > 0 && <div className="form-controller-menu">
+                                {menuItems.length > 1 && <div className="form-controller-menu">
                                     {menuItems}
                                 </div>}
                                 <div className="form-controller-page-container">

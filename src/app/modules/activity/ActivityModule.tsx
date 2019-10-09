@@ -19,6 +19,7 @@ import { DropDownMenu } from '../../components/general/DropDownMenu';
 import { Checkbox } from '../../components/general/input/Checkbox';
 import classnames from 'classnames';
 import { Button } from 'reactstrap';
+import { findScrollParent } from '../../utilities/Utilities';
 
 type OwnProps = {
     breakpoint:ResponsiveBreakpoint
@@ -193,6 +194,7 @@ class ActivityModule extends React.Component<Props, State> {
                     onItemSelectionChange={this.handleSelectionChange}
                     selected={this.state.selected}
                     isSelecting={this.state.isSelecting}
+                    findScrollParent={true}
                     className="activity-module-list" />
             </>
     }

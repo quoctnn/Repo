@@ -129,7 +129,7 @@ class ProjectDetailsModule extends React.Component<Props, State> {
                                 { project.managers &&
                                     <DetailsMembers title={translate('project.managers')} position={HorisontalLayoutPosition.left} members={project.managers} showSeeAll={false} />
                                 }
-                                <DetailsMembers members={project.members} />
+                                <DetailsMembers onSeeAllClick={this.toggleMembersForm} members={project.members} />
                             </div>
                         </ModuleFooter>
                     }

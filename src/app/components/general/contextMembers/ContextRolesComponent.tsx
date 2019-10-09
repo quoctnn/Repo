@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { ContextNaturalKey, IdentifiableObject, CommunityRole, Community, RelationshipStatus } from '../../../types/intrasocial_types';
+import { ContextNaturalKey, IdentifiableObject, CommunityRole, Community, RelationshipStatus, Permissible } from '../../../types/intrasocial_types';
 import FormController, { FormComponentErrorMessage } from '../../form/FormController';
 import { translate } from '../../../localization/AutoIntlProvider';
 import ContextRoleCreator from './ContextRoleCreator';
@@ -61,7 +61,7 @@ export class RoleManager{
 }
 type OwnProps = {
     contextNaturalKey:ContextNaturalKey
-    contextObject:IdentifiableObject
+    contextObject:IdentifiableObject & Permissible
     community:Community
     onRolesUpdate?:(roles:CommunityRole[]) => void
     roleManager:RoleManager
