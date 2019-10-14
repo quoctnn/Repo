@@ -4,7 +4,6 @@ import Constants from "../utilities/Constants";
 import { translate } from "../localization/AutoIntlProvider";
 import { userFullName, groupCover, communityCover, userCover, projectCover, eventCover } from '../utilities/Utilities';
 import { CommunityManager } from '../managers/CommunityManager';
-import { ProjectManager } from '../managers/ProjectManager';
 export type CommunityRole = {
     community:number
     users:number[]
@@ -594,10 +593,7 @@ export namespace ContextNaturalKey {
                 {
                     const obj = contextObject as Task
                     if (includeAncestor) {
-                        const project = ProjectManager.getProjectById(obj.project)
-                        if (project) {
-                            return obj.title + " - " + project.name
-                        }
+                        return obj.title + " - " + translate("common.project.project")//project.name
                     }
                     return obj.title
                 }

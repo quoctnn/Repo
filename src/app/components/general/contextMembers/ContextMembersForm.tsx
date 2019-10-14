@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Community, ContextNaturalKey, IdentifiableObject, Event, Group, Project, Permissible, Permission } from '../../../types/intrasocial_types';
+import { Community, ContextNaturalKey, IdentifiableObject, Permissible, Permission } from '../../../types/intrasocial_types';
 import FormController, { FormStatus } from '../../form/FormController';
 import { FormMenuItem } from '../../form/FormMenuItem';
 import { translate } from '../../../localization/AutoIntlProvider';

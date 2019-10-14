@@ -1,5 +1,4 @@
 import * as React from 'react';
-import classnames = require('classnames');
 import { ContextNaturalKey, IdentifiableObject, Permissible, UserProfile, IPrivacy, ContextPrivacy, ElasticSearchType, IMembershipStatus } from '../../../types/intrasocial_types';
 import { ReduxState } from '../../../redux';
 import { AuthenticationManager } from '../../../managers/AuthenticationManager';
@@ -9,9 +8,9 @@ import { translate } from '../../../localization/AutoIntlProvider';
 import { ApiClient } from '../../../network/ApiClient';
 import { ToastManager } from '../../../managers/ToastManager';
 import { CommunityManager } from '../../../managers/CommunityManager';
-import { GroupManager } from '../../../managers/GroupManager';
-import { EventManager } from '../../../managers/EventManager';
 import "./ContextMembershipComponent.scss"
+import { GroupController } from '../../../managers/GroupController';
+import { EventController } from '../../../managers/EventController';
 type OwnProps = {
     
     contextNaturalKey:ContextNaturalKey
@@ -39,8 +38,8 @@ class ContextMembershipComponent extends React.Component<Props, State> {
         const {contextNaturalKey, contextObject} = this.props
         switch (contextNaturalKey) {
             case ContextNaturalKey.COMMUNITY:CommunityManager.updateCommunityObject(object)
-            case ContextNaturalKey.GROUP:GroupManager.updateGroupObject(object)
-            case ContextNaturalKey.EVENT:EventManager.updateEventObject(object)
+            case ContextNaturalKey.GROUP:GroupController.partialUpdate(object)
+            case ContextNaturalKey.EVENT:EventController.partialUpdate(object)
             default:
                 break;
         }

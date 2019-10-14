@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { connect } from 'react-redux'
+import { connect, DispatchProp } from 'react-redux'
 import { withRouter, RouteComponentProps } from "react-router-dom";
 import Module from '../Module';
 import ModuleHeader from '../ModuleHeader';
@@ -17,7 +17,6 @@ import { ObjectAttributeType, ContextNaturalKey, StatusActions, Permission, Perm
 import { ContextSearchData } from '../../components/general/input/contextsearch/extensions';
 import { translate } from '../../localization/AutoIntlProvider';
 import { ReduxState } from '../../redux';
-import { ContextManager } from '../../managers/ContextManager';
 import { StatusComposerComponent } from '../../components/general/input/StatusComposerComponent';
 import { DropDownMenu } from '../../components/general/DropDownMenu';
 import { OverflowMenuItem, OverflowMenuItemType } from '../../components/general/OverflowMenu';
@@ -26,13 +25,14 @@ import { NotificationCenter } from '../../utilities/NotificationCenter';
 import { eventStreamNotificationPrefix, EventStreamMessageType } from '../../network/ChannelEventStream';
 import ReconnectingWebSocket from 'reconnecting-websocket';
 import { uniqueId } from '../../utilities/Utilities';
+import { ContextDataProps, withContextData } from '../../hoc/WithContextData';
 
 type OwnProps = {
     className?:string
     breakpoint:ResponsiveBreakpoint
     contextNaturalKey?:ContextNaturalKey
     contextObjectId:number
-}
+} & ContextDataProps & DispatchProp
 type DefaultProps = {
 
     includeSubContext:boolean
@@ -41,9 +41,6 @@ interface ReduxStateProps
 {
     contextObjectId:number
     contextObject:Permissible
-}
-interface ReduxDispatchProps
-{
 }
 interface State
 {
@@ -59,7 +56,7 @@ interface State
     contextTitle?:string
     statusComposerFocus:boolean
 }
-type Props = ReduxStateProps & ReduxDispatchProps & OwnProps & DefaultProps & RouteComponentProps<any>
+type Props = ReduxStateProps & OwnProps & DefaultProps & RouteComponentProps<any>
 
 class NewsfeedModule extends React.Component<Props, State> {
     private observers:EventSubscription[] = []
@@ -236,7 +233,7 @@ class NewsfeedModule extends React.Component<Props, State> {
     }
     render()
     {
-        const {breakpoint, history, match, location, staticContext, className, contextNaturalKey, contextObjectId, contextObject, includeSubContext, ...rest} = this.props
+        const {breakpoint, history, match, location, staticContext, className, contextNaturalKey, contextObjectId, contextObject, includeSubContext, contextData, dispatch, ...rest} = this.props
         const headerClick = breakpoint < ResponsiveBreakpoint.standard ? this.headerClick : undefined
         const {contextTitle} = this.state
         const resolvedContextNaturalKey = this.state.contextNaturalKey || this.props.contextNaturalKey
@@ -281,14 +278,10 @@ class NewsfeedModule extends React.Component<Props, State> {
 }
 const mapStateToProps = (state:ReduxState, ownProps: OwnProps & RouteComponentProps<any>):ReduxStateProps => {
 
-    const resolved = ContextManager.getContextObject(ownProps.location.pathname, ownProps.contextNaturalKey)
+    const resolved = ownProps.contextData.getContextObject(ownProps.contextNaturalKey)
     return {
         contextObject:resolved,
         contextObjectId:resolved && resolved.id,
     }
 }
-const mapDispatchToProps = (dispatch:ReduxState, ownProps: OwnProps):ReduxDispatchProps => {
-    return {
-    }
-}
-export default withRouter(connect<ReduxStateProps, ReduxDispatchProps, OwnProps>(mapStateToProps, mapDispatchToProps)(NewsfeedModule))
+export default  withContextData(withRouter(connect<ReduxStateProps, void, OwnProps>(mapStateToProps)(NewsfeedModule)))

@@ -3,7 +3,7 @@ import { withRouter, RouteComponentProps, Link } from "react-router-dom";
 import classnames from "classnames"
 import "./ConversationsModule.scss"
 import { ResponsiveBreakpoint } from '../../components/general/observers/ResponsiveComponent';
-import { ContextNaturalKey, Conversation, UserProfile, ConversationFilter } from '../../types/intrasocial_types';
+import { Conversation, UserProfile, ConversationFilter } from '../../types/intrasocial_types';
 import { connect, DispatchProp } from 'react-redux';
 import { ReduxState } from '../../redux';
 import SimpleModule from '../SimpleModule';
@@ -19,7 +19,6 @@ import { EventStreamMessageType } from '../../network/ChannelEventStream';
 import { Settings } from '../../utilities/Settings';
 import { AuthenticationManager } from '../../managers/AuthenticationManager';
 import { uniqueId } from '../../utilities/Utilities';
-import { ContextManager } from '../../managers/ContextManager';
 import { ConversationManager, ConversationManagerConversationRemovedEvent } from '../../managers/ConversationManager';
 import Routes from '../../utilities/Routes';
 import { ConversationAction } from './ConversationListItem';
@@ -498,10 +497,10 @@ class ConversationsModule extends React.Component<Props, State> {
 }
 const mapStateToProps = (state:ReduxState, ownProps: OwnProps & RouteComponentProps<any>):ReduxStateProps => {
 
-    const authenticatedUser = AuthenticationManager.getAuthenticatedUser()
-    const conversation = ContextManager.getContextObject(ownProps.location.pathname, ContextNaturalKey.CONVERSATION) as Conversation
     const conversationId:string = ownProps.match.params.conversationId
     const createNewConversation = conversationId == tempConversationId
+    const authenticatedUser = AuthenticationManager.getAuthenticatedUser()
+    const conversation = createNewConversation ? undefined : ConversationManager.getConversation(conversationId)
     const tempConversation = state.tempCache.conversation
     return {
         authenticatedUser,

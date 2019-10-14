@@ -7,21 +7,19 @@ import ModuleFooter from '../ModuleFooter';
 import "./ProjectDetailsModule.scss"
 import { ResponsiveBreakpoint } from '../../components/general/observers/ResponsiveComponent';
 import { translate } from '../../localization/AutoIntlProvider';
-import { Project, Community, ContextNaturalKey, Permission } from '../../types/intrasocial_types';
-import { connect } from 'react-redux';
-import { ReduxState } from '../../redux';
+import { Project, ContextNaturalKey, Permission } from '../../types/intrasocial_types';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import { DetailsMembers, HorisontalLayoutPosition } from '../../components/details/DetailsMembers';
 import { DetailsContent } from '../../components/details/DetailsContent';
-import { ContextManager } from '../../managers/ContextManager';
 import { CommonModuleProps } from '../Module';
 import classnames from 'classnames';
 import { OverflowMenuItem, OverflowMenuItemType } from '../../components/general/OverflowMenu';
 import { uniqueId } from '../../utilities/Utilities';
 import ProjectCreateComponent from '../../components/general/contextCreation/ProjectCreateComponent';
 import { DropDownMenu } from '../../components/general/DropDownMenu';
-import { ProjectManager } from '../../managers/ProjectManager';
 import ContextMembersForm from '../../components/general/contextMembers/ContextMembersForm';
+import { withContextData, ContextDataProps } from '../../hoc/WithContextData';
+import { ProjectController } from '../../managers/ProjectController';
 type OwnProps = {
     breakpoint:ResponsiveBreakpoint
 } & CommonModuleProps
@@ -33,13 +31,9 @@ type State = {
     membersFormVisible?:boolean
     membersFormReloadKey?:string
 }
-type ReduxStateProps = {
-    community: Community
-    project: Project
-}
 type ReduxDispatchProps = {
 }
-type Props = OwnProps & RouteComponentProps<any> & ReduxStateProps & ReduxDispatchProps
+type Props = OwnProps & RouteComponentProps<any> & ReduxDispatchProps & ContextDataProps
 class ProjectDetailsModule extends React.Component<Props, State> {
     constructor(props:Props) {
         super(props);
@@ -75,21 +69,21 @@ class ProjectDetailsModule extends React.Component<Props, State> {
     handleProjectCreateForm = (project:Project) => {
         if(!!project)
         {
-            ProjectManager.storeProjects([project])
+            ProjectController.partialUpdate(project)
         }
         this.hideProjectCreateForm()
     }
-    getProjectOptions = () => {
+    getProjectOptions = (project:Project) => {
         const options: OverflowMenuItem[] = []
-        if(this.props.project.permission >= Permission.admin)
-            options.push({id:"1", type:OverflowMenuItemType.option, title:translate("Edit"), onPress:this.showProjectCreateForm, iconClass:"fas fa-pen", iconStackClass:Permission.getShield(this.props.project.permission)})
-        if(this.props.project.permission >= Permission.admin)
-            options.push({id:"members", type:OverflowMenuItemType.option, title:translate("common.member.management"), onPress:this.toggleMembersForm, iconClass:"fas fa-users-cog", iconStackClass:Permission.getShield(this.props.project.permission)})
+        if(project.permission >= Permission.admin)
+            options.push({id:"1", type:OverflowMenuItemType.option, title:translate("Edit"), onPress:this.showProjectCreateForm, iconClass:"fas fa-pen", iconStackClass:Permission.getShield(project.permission)})
+        if(project.permission >= Permission.admin)
+            options.push({id:"members", type:OverflowMenuItemType.option, title:translate("common.member.management"), onPress:this.toggleMembersForm, iconClass:"fas fa-users-cog", iconStackClass:Permission.getShield(project.permission)})
         return options
     }
-    renderEditForm = () => {
+    renderEditForm = (project:Project) => {
         const visible = this.state.editFormVisible
-        const {project, community} = this.props
+        const {community} = this.props.contextData
         return <ProjectCreateComponent onCancel={this.hideProjectCreateForm} community={community.id} key={this.state.editFormReloadKey} project={project} visible={visible} onComplete={this.handleProjectCreateForm} />
     }
     toggleMembersForm = () => {
@@ -98,19 +92,26 @@ class ProjectDetailsModule extends React.Component<Props, State> {
             return {membersFormVisible:!prevState.membersFormVisible, membersFormReloadKey: invitationReloadKey}
         })
     }
-    renderMembersForm = () => {
+    renderMembersForm = (project:Project) => {
         const visible = this.state.membersFormVisible
-        const contextObject = this.props.project
-        return <ContextMembersForm community={this.props.community} contextNaturalKey={ContextNaturalKey.PROJECT} key={this.state.membersFormReloadKey} didCancel={this.toggleMembersForm} visible={visible} contextObject={contextObject} />
+        return <ContextMembersForm community={this.props.contextData.community} contextNaturalKey={ContextNaturalKey.PROJECT} key={this.state.membersFormReloadKey} didCancel={this.toggleMembersForm} visible={visible} contextObject={project} />
     }
-    render()
-    {
-        const { breakpoint, history, match, location, staticContext, project, community, contextNaturalKey, className,  ...rest} = this.props
+    renderOptions = (project:Project) => {
+
+        const projectOptions = this.getProjectOptions(project)
+        if(projectOptions.length > 0)
+            return <DropDownMenu className="project-option-dropdown" triggerClass="fas fa-cog mx-1" items={projectOptions}></DropDownMenu>
+        return null
+    }
+    renderModule = (project:Project) => {
+        if(!project)
+            return null
+        const { breakpoint, history, match, location, staticContext, contextNaturalKey, className, contextData,  ...rest} = this.props
+        const {community} = this.props.contextData
         const cn = classnames("community-details-module", className)
-        const projectOptions = this.getProjectOptions()
-        return (<Module {...rest} className={cn}>
+        return <Module {...rest} className={cn}>
                     <ModuleHeader headerTitle={project && project.name || translate("detail.module.title")} loading={this.state.isLoading}>
-                        {projectOptions.length > 0 && <DropDownMenu className="project-option-dropdown" triggerClass="fas fa-cog mx-1" items={projectOptions}></DropDownMenu>}
+                        {this.renderOptions(project)}
                     </ModuleHeader>
                     <ModuleContent>
                         { project && project.permission >= Permission.read &&
@@ -120,8 +121,8 @@ class ProjectDetailsModule extends React.Component<Props, State> {
                             ||
                             <LoadingSpinner key="loading"/>
                         }
-                        {this.renderEditForm()}
-                        {this.renderMembersForm()}
+                        {this.renderEditForm(project)}
+                        {this.renderMembersForm(project)}
                     </ModuleContent>
                     { project && project.permission >= Permission.read &&
                         <ModuleFooter className="mt-1">
@@ -133,20 +134,14 @@ class ProjectDetailsModule extends React.Component<Props, State> {
                             </div>
                         </ModuleFooter>
                     }
-                </Module>)
+                    </Module>
+    }
+    render()
+    {
+        const project = this.props.contextData.project
+        if(!project)
+            return null
+        return this.renderModule(project) 
     }
 }
-const mapStateToProps = (state:ReduxState, ownProps: OwnProps & RouteComponentProps<any>):ReduxStateProps => {
-
-    const project = ContextManager.getContextObject(ownProps.location.pathname, ownProps.contextNaturalKey) as Project
-    const community = ContextManager.getContextObject(ownProps.location.pathname, ContextNaturalKey.COMMUNITY) as Community
-    return {
-        community,
-        project,
-    }
-}
-const mapDispatchToProps = (dispatch:ReduxState, ownProps: OwnProps):ReduxDispatchProps => {
-    return {
-    }
-}
-export default withRouter(connect<ReduxStateProps, ReduxDispatchProps, OwnProps>(mapStateToProps, mapDispatchToProps)(ProjectDetailsModule))
+export default withContextData(withRouter(ProjectDetailsModule))

@@ -5,13 +5,12 @@ import "./ConversationModule.scss"
 import { ResponsiveBreakpoint } from '../../components/general/observers/ResponsiveComponent';
 import { translate, lazyTranslate } from '../../localization/AutoIntlProvider';
 import CircularLoadingSpinner from '../../components/general/CircularLoadingSpinner';
-import { ContextNaturalKey, Conversation, Message, UserProfile, UploadedFileType, UploadedFile } from '../../types/intrasocial_types';
+import { Conversation, Message, UserProfile, UploadedFileType, UploadedFile } from '../../types/intrasocial_types';
 import {ApiClient, PaginationResult } from '../../network/ApiClient';
 import { ToastManager } from '../../managers/ToastManager';
 import { connect } from 'react-redux';
 import { ReduxState } from '../../redux';
 import SimpleModule from '../SimpleModule';
-import { ContextManager } from '../../managers/ContextManager';
 import { ChatMessageList } from './ChatMessageList';
 import Avatar from '../../components/general/Avatar';
 import { AuthenticationManager } from '../../managers/AuthenticationManager';
@@ -755,11 +754,11 @@ class ConversationModule extends React.Component<Props, State> {
 }
 const mapStateToProps = (state:ReduxState, ownProps: OwnProps & RouteComponentProps<any>):ReduxStateProps => {
 
-    const conversation = ContextManager.getContextObject(ownProps.location.pathname, ContextNaturalKey.CONVERSATION) as Conversation || state.tempCache.conversation
-    const authenticatedUser = AuthenticationManager.getAuthenticatedUser()
-    const queuedMessages = (!!conversation && ConversationManager.getQueuedMessages(conversation.id)) || []
     const conversationId:string = ownProps.match.params.conversationId
     const createNewConversation = conversationId == tempConversationId
+    const conversation = createNewConversation ? state.tempCache.conversation : ConversationManager.getConversation(conversationId)
+    const authenticatedUser = AuthenticationManager.getAuthenticatedUser()
+    const queuedMessages = (!!conversation && ConversationManager.getQueuedMessages(conversation.id)) || []
     return {
         conversation,
         authenticatedUser,

@@ -55,6 +55,29 @@ export abstract class ConversationManager
             completion(success)
         })
     }
+    static ensureExists = (conversationId:number|string) =>
+    {
+        if(!conversationId.isNumber())
+        {
+            return null
+        }
+        let conversation = ConversationManager.getConversation(conversationId)
+        if(!conversation)
+        {
+            const id = parseInt(conversationId.toString())
+            ApiClient.getConversation(id, (data, status, error) => {
+                if(data)
+                {
+                    ConversationManager.storeConversations([data])
+                }
+                else
+                {
+                    console.log("error fetching conversation", error)
+                }
+            })
+        }
+        return conversation
+    }
     static ensureConversationExists = (conversationId:number|string, completion:(conversation:Conversation) => void) =>
     {
         if(!conversationId.isNumber())

@@ -6,7 +6,7 @@ import { withRouter } from 'react-router';
 import * as Immutable from 'immutable';
 import {ApiClient} from '../../network/ApiClient';
 import { ReduxState } from '../../redux/index';
-import { UserProfile, Status, UploadedFile, ContextNaturalKey, StatusActions, ObjectAttributeType, Permission, Permissible } from '../../types/intrasocial_types';
+import { UserProfile, Status, UploadedFile, ContextNaturalKey, StatusActions, ObjectAttributeType, Permission, Permissible, ContextObject } from '../../types/intrasocial_types';
 import { nullOrUndefined, uniqueId, userFullName } from '../../utilities/Utilities';
 import { ToastManager } from '../../managers/ToastManager';
 import { StatusComponent } from '../../components/status/StatusComponent';
@@ -954,17 +954,8 @@ export class NewsfeedComponent extends React.Component<Props, State> {
     navigateToCommunity = (community:number) => {
         NavigationUtilities.navigateToCommunity(this.props.history, community )
     }
-    navigateToGroup = (group:number) => {
-        NavigationUtilities.navigateToGroup(this.props.history, group )
-    }
-    navigateToProject = (project:number) => {
-        NavigationUtilities.navigateToProject(this.props.history, project )
-    }
-    navigateToTask = (task:number) => {
-        NavigationUtilities.navigateToTask(this.props.history, task )
-    }
-    navigateToEvent = (event:number) => {
-        NavigationUtilities.navigateToEvent(this.props.history, event )
+    navigateToContextObject = (context:ContextObject) => {
+        NavigationUtilities.navigateToUrl(this.props.history, context.uri)
     }
     navigateToWeb = (url:string) => {
         NavigationUtilities.navigateToUrl(this.props.history, url)
@@ -996,29 +987,9 @@ export class NewsfeedComponent extends React.Component<Props, State> {
             }
             case StatusActions.context:
             {
-                if(status.context_natural_key == ContextNaturalKey.GROUP)
+                if(status.context_object)
                 {
-                    this.navigateToGroup(status.context_object_id || -1)
-                }
-                else if(status.context_natural_key == ContextNaturalKey.COMMUNITY)
-                {
-                    this.navigateToCommunity(status.context_object_id || -1)
-                }
-                else if(status.context_natural_key == ContextNaturalKey.USER)
-                {
-                    this.navigateToProfile(status.context_object_id || -1)
-                }
-                else if(status.context_natural_key == ContextNaturalKey.PROJECT)
-                {
-                    this.navigateToProject(status.context_object_id || -1)
-                }
-                else if(status.context_natural_key == ContextNaturalKey.EVENT)
-                {
-                    this.navigateToEvent(status.context_object_id || -1)
-                }
-                else if(status.context_natural_key == ContextNaturalKey.TASK)
-                {
-                    this.navigateToTask(status.context_object_id || -1)
+                    this.navigateToContextObject(status.context_object)
                 }
                 else
                 {

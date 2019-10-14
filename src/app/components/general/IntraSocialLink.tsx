@@ -1,11 +1,10 @@
 import * as React from 'react'
-import { Community, Group, Project, Event, Task, UserProfile, Linkable, ContextNaturalKey } from "../../types/intrasocial_types";
+import { Linkable, ContextNaturalKey } from "../../types/intrasocial_types";
 import { Link } from "react-router-dom";
 import { translate } from '../../localization/AutoIntlProvider';
-import { userFullName, nullOrUndefined } from '../../utilities/Utilities';
+import {  nullOrUndefined } from '../../utilities/Utilities';
 import classnames = require('classnames');
 import { Settings } from '../../utilities/Settings';
-import { ContextManager } from '../../managers/ContextManager';
 
 type Props = {
     to:Linkable

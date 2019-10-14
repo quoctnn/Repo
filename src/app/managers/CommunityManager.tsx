@@ -81,6 +81,26 @@ export abstract class CommunityManager
     {
         return CommunityManager.getStore().getState().communityStore.byId[communityId]
     }
+    static ensureExists = (communityId:string|number, forceUpdate?: boolean) =>
+    {
+        const id = communityId.toString()
+        let community = CommunityManager.getCommunity(id)
+        if(!community || forceUpdate)
+        {
+            ApiClient.getCommunity(id, (data, status, error) => {
+                if(data)
+                {
+                    CommunityManager.storeCommunities([data])
+                }
+                else
+                {
+                    console.log("error fetching community", error)
+                }
+            })
+        }
+        return community
+
+    }
     static ensureCommunityExists = (communityId:string|number, completion?:(community:Community) => void, forceUpdate?: boolean) =>
     {
         const id = communityId.toString()

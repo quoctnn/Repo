@@ -10,7 +10,6 @@ import { ContextPhotoInput } from '../../form/components/ContextPhotoInput';
 import { RouteComponentProps, withRouter } from 'react-router';
 import { FormPage } from '../../form/FormPage';
 import { FormMenuItem } from '../../form/FormMenuItem';
-import { ProjectManager } from '../../../managers/ProjectManager';
 import { CommunityManager } from '../../../managers/CommunityManager';
 
 type OwnProps = {
@@ -149,9 +148,6 @@ class ProjectCreateComponent extends React.Component<Props, State> {
                 if(!errorData && data && data.id)
                 {
                     createdProject = data
-                    if(!!createdProject)
-                        ProjectManager.storeProjects([createdProject])
-                    
                     if(avatarData)
                         requests.push(() => ApiClient.setContextPhoto(ContextPhotoType.avatar,ContextNaturalKey.PROJECT, createdProject.id, avatarData.file, avatarData.crop, (cropInfo, status, error) => {
                             updatedAvatar = cropInfo && cropInfo.cropped
@@ -182,8 +178,6 @@ class ProjectCreateComponent extends React.Component<Props, State> {
             if(Object.keys(updateData).length > 0)
                 requests.push(() => ApiClient.updateProject(this.props.project.id, updateData, (data, status, error) => {
                     createdProject = data
-                    if(!!createdProject)
-                        ProjectManager.storeProjects([createdProject])
                     requestCompleter(data, status, error)
                 }))
             if(avatarData)

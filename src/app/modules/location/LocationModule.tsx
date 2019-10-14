@@ -4,8 +4,6 @@ import classnames from "classnames"
 import "./LocationModule.scss"
 import { ResponsiveBreakpoint } from '../../components/general/observers/ResponsiveComponent';
 import { ContextNaturalKey, Coordinate } from '../../types/intrasocial_types';
-import { connect } from 'react-redux';
-import { ReduxState } from '../../redux';
 import { nullOrUndefined, coordinateIsValid } from '../../utilities/Utilities';
 import { Feature, Layer } from 'react-mapbox-gl';
 import MapboxMapComponent, { mapLayout, mapImages } from '../../components/general/map/MapboxMapComponent';
@@ -13,6 +11,7 @@ import {ApiClient} from '../../network/ApiClient';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import SimpleModule from '../SimpleModule';
 import { translate } from '../../localization/AutoIntlProvider';
+import { ContextDataProps, withContextData } from '../../hoc/WithContextData';
 import { ContextManager } from '../../managers/ContextManager';
 type OwnProps = {
     className?:string
@@ -25,13 +24,11 @@ type State = {
     resolvedAddress:string
     isResolvingAddress:boolean
 }
-type ReduxStateProps = {
-    address:string
-    coordinate:Coordinate
+type LocationData = {
+    location: Coordinate
+    address: string
 }
-type ReduxDispatchProps = {
-}
-type Props = OwnProps & RouteComponentProps<any> & ReduxStateProps & ReduxDispatchProps
+type Props = OwnProps & RouteComponentProps<any> & ContextDataProps
 class LocationModule extends React.Component<Props, State> {  
     constructor(props:Props) {
         super(props);
@@ -42,18 +39,31 @@ class LocationModule extends React.Component<Props, State> {
             isResolvingAddress:false
         }
     }
+    getContextObject = ():LocationData => {
+        const contextObject = this.props.contextData.getContextObject(this.props.contextNaturalKey)
+        return contextObject as any as LocationData
+    }
+    getAddress = () => {
+        const contextObject = this.getContextObject()
+        return contextObject && contextObject.address
+    }
+    getLocation = () => {
+        const contextObject = this.getContextObject()
+        return contextObject && contextObject.location
+    }
     componentDidMount = () => {
-        this.resolveAddressIfNeeded(this.props.address)
+        this.resolveAddressIfNeeded(this.getAddress())
     }
     componentDidUpdate = (prevProps:Props) => {
         if(prevProps.breakpoint != this.props.breakpoint && this.props.breakpoint < ResponsiveBreakpoint.standard && this.state.isLoading)
         {
             this.setState({isLoading:false})
         }
-        this.resolveAddressIfNeeded(this.props.address)
+        this.resolveAddressIfNeeded(this.getAddress())
     }
     resolveAddressIfNeeded = (address:string) => {
-        if(!this.state.isResolvingAddress && address && address.length > 0 && !coordinateIsValid(this.props.coordinate) && this.state.resolvedAddress != address)
+        const coordinate = this.getLocation()
+        if(!this.state.isResolvingAddress && address && address.length > 0 && !coordinateIsValid(coordinate) && this.state.resolvedAddress != address)
         {
             this.setState({isResolvingAddress:true}, () => {
                 ApiClient.forwardGeocode(address, (features, status, error) => {
@@ -72,12 +82,13 @@ class LocationModule extends React.Component<Props, State> {
         }
     }
     getCoordinate = () => {
-        const coordinate = coordinateIsValid(this.props.coordinate) && this.props.coordinate || coordinateIsValid(this.state.resolvedCoordinate) && this.state.resolvedCoordinate
+        const contextCoordinate = this.getLocation()
+        const coordinate = coordinateIsValid(contextCoordinate) && contextCoordinate || coordinateIsValid(this.state.resolvedCoordinate) && this.state.resolvedCoordinate
         return coordinate
     }
     renderContent = () => {
 
-        const {address} = this.props
+        const address = this.getAddress()
         const addressComponents = address && address.split(",").filter(f => !nullOrUndefined(f) && f != "").map(s => s.trim()) || []
         const resolvedLocation = this.getCoordinate()
         return <>
@@ -99,7 +110,7 @@ class LocationModule extends React.Component<Props, State> {
     }
     render()
     {
-        const {history, match, location, staticContext, contextNaturalKey, address, coordinate, ...rest} = this.props
+        const {history, match, location, staticContext, contextNaturalKey, contextData, ...rest} = this.props
         const {breakpoint, className} = this.props
         const cn = classnames("location-module", className)
         return (<SimpleModule {...rest} 
@@ -112,18 +123,4 @@ class LocationModule extends React.Component<Props, State> {
                 </SimpleModule>)
     }
 }
-const mapStateToProps = (state:ReduxState, ownProps: OwnProps & RouteComponentProps<any>):ReduxStateProps => {
-
-    const contextObject = ContextManager.getContextObject(ownProps.location.pathname, ownProps.contextNaturalKey) as any
-    const address:string = contextObject && contextObject.address
-    const location:Coordinate = contextObject && contextObject.location
-    return {
-        address,
-        coordinate:location
-    }
-}
-const mapDispatchToProps = (dispatch:ReduxState, ownProps: OwnProps):ReduxDispatchProps => {
-    return {
-    }
-}
-export default withRouter(connect<ReduxStateProps, ReduxDispatchProps, OwnProps>(mapStateToProps, mapDispatchToProps)(LocationModule))
+export default withContextData(withRouter(LocationModule))

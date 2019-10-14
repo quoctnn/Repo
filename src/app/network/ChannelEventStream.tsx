@@ -45,6 +45,10 @@ export enum EventStreamMessageType {
     PROJECT_UPDATE = "project.update",
     PROJECT_REMOVE = "project.remove",
 
+    TASK_NEW = "project.task.new",
+    TASK_UPDATE = "project.task.update",
+    TASK_REMOVE = "project.task.remove",
+
     NOTIFICATIONS_UNHANDLED = "notifications.unhandled",
     FAVORITES_UPDATE = "favorites.update",
 

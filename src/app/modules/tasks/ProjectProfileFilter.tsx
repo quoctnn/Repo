@@ -1,6 +1,6 @@
 import * as React from 'react';
 import classnames from "classnames"
-import { ProjectManager } from '../../managers/ProjectManager';
+//import { ProjectManager } from '../../managers/ProjectController';
 import { ProfileManager } from '../../managers/ProfileManager';
 import { AsyncSelectIW } from '../../components/general/input/AsyncSelectIW';
 import { ProfileSelectorOption, ProfileOptionComponent, ProfileSingleValueComponent } from '../../components/general/input/SelectExtensions';
@@ -32,7 +32,7 @@ export class ProjectProfileFilter extends React.PureComponent<Props & React.HTML
                 })
             }
         }
-        if(this.props.project)
+        /*if(this.props.project)
         {
             ProjectManager.ensureProjectExists(this.props.project, (project) => {
                 resp(project.members || [])
@@ -40,7 +40,7 @@ export class ProjectProfileFilter extends React.PureComponent<Props & React.HTML
         }
         else {
             resp(null)
-        }
+        }*/
     }
     searchOptions = (text:string) => {
         return new Promise((resolve) => {

@@ -9,11 +9,7 @@ import { CommunityManager } from './CommunityManager';
 import { NotificationCenter } from '../utilities/NotificationCenter';
 import { ProfileManager } from './ProfileManager';
 import { resetCommunitiesAction } from '../redux/communityStore';
-import { resetGroupsAction } from '../redux/groupStore';
 import { resetProfilesAction } from '../redux/profileStore';
-import { resetProjectsAction } from '../redux/projectStore';
-import { resetEventsAction } from '../redux/eventStore';
-import { resetTasksAction } from '../redux/taskStore';
 import { resetConversationsAction } from '../redux/conversationStore';
 import { resetMessageQueueAction } from '../redux/messageQueue';
 import { resetEndpointAction } from '../redux/endpoint';
@@ -226,10 +222,6 @@ export abstract class ApplicationManager
         const dispatch = ApplicationManager.getStore().dispatch
         dispatch(resetCommunitiesAction())
         dispatch(resetProfilesAction())
-        dispatch(resetGroupsAction())
-        dispatch(resetEventsAction())
-        dispatch(resetTasksAction())
-        dispatch(resetProjectsAction())
         dispatch(resetConversationsAction())
         dispatch(resetUnreadNotificationsAction())
     }

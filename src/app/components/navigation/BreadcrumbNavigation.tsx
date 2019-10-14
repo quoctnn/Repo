@@ -1,11 +1,10 @@
 import * as React from "react";
 import "./BreadcrumbNavigation.scss"
-import { ReduxState } from "../../redux";
-import { connect } from "react-redux";
 import { Link, withRouter, RouteComponentProps } from "react-router-dom";
-import { ContextManager, ResolvedContextObjects } from "../../managers/ContextManager";
 import { communityName, userFullName, truncate } from '../../utilities/Utilities';
 import { ConversationUtilities } from '../../utilities/ConversationUtilities';
+import { withContextData, ContextDataProps } from "../../hoc/WithContextData";
+import { ContextData } from '../../hoc/WithContextData';
 
 export type LinkObject = {
     uri:string
@@ -14,35 +13,22 @@ export type LinkObject = {
 
 type OwnProps = {
 }
-type Props = OwnProps & ReduxStateProps & RouteComponentProps<any>
+type Props = OwnProps & ContextDataProps & RouteComponentProps<any>
 
-type ReduxStateProps = {
-    contextObjects:ResolvedContextObjects
-}
 type State = {
     links:LinkObject[]
-    contextPath:string
 }
 class BreadcrumbNavigation extends React.Component<Props, State> {
     constructor(props:Props) {
         super(props)
         this.state = {
             links:[],
-            contextPath:null
         }
     }
     static getDerivedStateFromProps = (props: Props, state: State): Partial<State> => {
-        if(!props.contextObjects || !props.contextObjects.success)
-        {
-            return {links:[]}
-        }
-        if (props.location.pathname != state.contextPath) {
-            const path = props.location.pathname
-            return { links: BreadcrumbNavigation.getLinks(ContextManager.getContextObjects(path)), contextPath:path }
-        }
-        return null
+        return { links: BreadcrumbNavigation.getLinks(props.contextData)}
     }
-    static getLinks = (contextObjects:ResolvedContextObjects) => {
+    static getLinks = (contextObjects:ContextData) => {
         const links:LinkObject[] = []
         if(contextObjects.community)
         {
@@ -106,10 +92,4 @@ class BreadcrumbNavigation extends React.Component<Props, State> {
         );
     }
 }
-const mapStateToProps = (state: ReduxState, ownProps: OwnProps & RouteComponentProps<any>): ReduxStateProps => {
-
-    return {
-        contextObjects:ContextManager.getContextObjects(ownProps.location.pathname)
-    }
-}
-export default withRouter(connect<ReduxStateProps, {}, OwnProps>(mapStateToProps, null)(BreadcrumbNavigation))
+export default withContextData(withRouter(BreadcrumbNavigation))

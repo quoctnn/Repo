@@ -3,20 +3,18 @@ import { withRouter, RouteComponentProps } from "react-router-dom";
 import classnames from "classnames"
 import "./ConversationContainerModule.scss"
 import { ResponsiveBreakpoint } from '../../components/general/observers/ResponsiveComponent';
-import { ContextNaturalKey, Conversation, Message, UserProfile} from '../../types/intrasocial_types';
+import { Conversation, UserProfile} from '../../types/intrasocial_types';
 import { connect } from 'react-redux';
 import { ReduxState } from '../../redux';
 import SimpleModule from '../SimpleModule';
-import { ContextManager } from '../../managers/ContextManager';
-import { AuthenticationManager } from '../../managers/AuthenticationManager';
 import { EventSubscription } from 'fbemitter';
-import { ConversationManager } from '../../managers/ConversationManager';
-import ConversationsModule, { tempConversationId } from '../conversations/ConversationsModule';
+import ConversationsModule from '../conversations/ConversationsModule';
 import { CommonModuleProps } from '../Module';
 import ConversationDetailsModule from './ConversationDetailsModule';
 import ConversationModule from './ConversationModule';
 import { NotificationCenter } from '../../utilities/NotificationCenter';
 import { ResponsiveNotifierDidUpdateNotification } from '../../components/general/observers/ResponsiveNotifier';
+import { ContextDataProps, withContextData } from '../../hoc/WithContextData';
 
 type OwnProps = {
     className?:string
@@ -26,15 +24,12 @@ type State = {
     singleMode:boolean
 }
 type ReduxStateProps = {
-    conversation: Conversation
-    authenticatedUser:UserProfile
-    queuedMessages:Message[]
-    createNewConversation:boolean
     conversationId:string
+    conversation:Conversation
 }
 type ReduxDispatchProps = {
 }
-type Props = OwnProps & RouteComponentProps<any> & ReduxStateProps & ReduxDispatchProps
+type Props = OwnProps & RouteComponentProps<any> & ReduxStateProps & ReduxDispatchProps & ContextDataProps
 class ConversationContainerModule extends React.Component<Props, State> {
 
     private observers:EventSubscription[] = []
@@ -79,7 +74,7 @@ class ConversationContainerModule extends React.Component<Props, State> {
     }
     render()
     {
-        const {history, match, location, staticContext, contextNaturalKey, conversation, createNewConversation, authenticatedUser, queuedMessages, conversationId,  ...rest} = this.props
+        const {history, match, location, staticContext, contextNaturalKey, conversation, conversationId,  ...rest} = this.props
         const {breakpoint, className} = this.props
         const cn = classnames("conversation-container-module", className, {temporary:conversation && conversation.temporary, "single-mode":this.state.singleMode})
         return (<SimpleModule {...rest}
@@ -91,18 +86,12 @@ class ConversationContainerModule extends React.Component<Props, State> {
                 </SimpleModule>)
     }
 }
-const mapStateToProps = (state:ReduxState, ownProps: OwnProps & RouteComponentProps<any>):ReduxStateProps => {
+const mapStateToProps = (state:ReduxState, ownProps: OwnProps & RouteComponentProps<any> & ContextDataProps):ReduxStateProps => {
 
-    const conversation = ContextManager.getContextObject(ownProps.location.pathname, ContextNaturalKey.CONVERSATION) as Conversation || state.tempCache.conversation
-    const authenticatedUser = AuthenticationManager.getAuthenticatedUser()
-    const queuedMessages = (!!conversation && ConversationManager.getQueuedMessages(conversation.id)) || []
+    const conversation = ownProps.contextData.conversation
     const conversationId:string = ownProps.match.params.conversationId
-    const createNewConversation = conversationId == tempConversationId
     return {
         conversation,
-        authenticatedUser,
-        queuedMessages,
-        createNewConversation,
         conversationId
     }
 }
@@ -110,4 +99,4 @@ const mapDispatchToProps = (dispatch:ReduxState, ownProps: OwnProps):ReduxDispat
     return {
     }
 }
-export default withRouter(connect<ReduxStateProps, ReduxDispatchProps, OwnProps>(mapStateToProps, mapDispatchToProps)(ConversationContainerModule))
+export default withContextData(withRouter(connect<ReduxStateProps, ReduxDispatchProps, OwnProps>(mapStateToProps, mapDispatchToProps)(ConversationContainerModule)))

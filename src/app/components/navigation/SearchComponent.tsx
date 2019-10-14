@@ -12,13 +12,9 @@ import { FormGroup, Label, Input, Button } from "reactstrap";
 import { translate } from "../../localization/AutoIntlProvider";
 import CursorList from "../general/input/contextsearch/CursorList";
 import { CursorListItem } from '../general/input/contextsearch/CursorList';
-import { ProjectManager } from '../../managers/ProjectManager';
 import { CommunityManager } from '../../managers/CommunityManager';
 import { LinkObject } from "./BreadcrumbNavigation";
 import { Link } from "react-router-dom";
-import { GroupManager } from '../../managers/GroupManager';
-import { EventManager } from "../../managers/EventManager";
-import { TaskManager } from "../../managers/TaskManager";
 import { TimeComponent } from "../general/TimeComponent";
 import { ProfileManager } from "../../managers/ProfileManager";
 import LoadingSpinner from "../LoadingSpinner";
@@ -126,27 +122,23 @@ export const breadcrumbs = (data:BreadcrumbData, onNavigate:(uri:string) => (eve
     }
     if(group)
     {
-        const groupObject = GroupManager.getGroupById(group)
-        if(groupObject)
-            breadcrumbs.push({uri:groupObject.uri, title:groupObject.name})
+        const url = Routes.groupUrl(community, group)
+        breadcrumbs.push({uri:url, title:translate("common.group.group")})
     }
-    if(event)
+    if(event && community)
     {
-        const eventObject = EventManager.getEventById(event)
-        if(eventObject)
-            breadcrumbs.push({uri:eventObject.uri, title:eventObject.name})
+        const url = Routes.eventUrl(community, event)
+        breadcrumbs.push({uri:url, title:translate("common.event.event")})
     }
-    if(project)
+    if(project && community)
     {
-        const projectObject = ProjectManager.getProjectById(project)
-        if(projectObject)
-            breadcrumbs.push({uri:projectObject.uri, title:projectObject.name})
+        const url = Routes.projectUrl(community, project)
+        breadcrumbs.push({uri:url, title:translate("common.project.project")})
     }
-    if(task)
+    if(task && project && community)
     {
-        const taskObject = TaskManager.getTask(task)
-        if(taskObject)
-            breadcrumbs.push({uri:taskObject.uri, title:taskObject.title})
+        const url = Routes.taskUrl(community, project, task)
+        breadcrumbs.push({uri:url, title:translate("common.project.task")})
     }
     if(profile)
     {

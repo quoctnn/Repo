@@ -30,7 +30,7 @@ export default abstract class Routes {
     private static TASK = "/task/"
     private static GROUP = "/group/"
     private static EVENT = "/event/"
-    private static CONVERSATION = "/conversation/"
+    static CONVERSATION_ROOT = "/conversation/"
     private static STATUS = "/status/"
     private static ERROR_NOT_FOUND = "/error404/"
 
@@ -65,7 +65,7 @@ export default abstract class Routes {
         return `${Routes.STATUS}${status}/`
     }
     static conversationUrl = (conversation:string|number, includeTrailingSlash:boolean = true) => {
-        return `${Routes.CONVERSATION}${conversation || ""}${!!conversation && includeTrailingSlash ? "/": ""}`
+        return `${Routes.CONVERSATION_ROOT}${conversation || ""}${!!conversation && includeTrailingSlash ? "/": ""}`
     }
     static communityUrl = (community:string|number, includeTrailingSlash:boolean = true) => {
         return `${Routes.COMMUNITY}${community}${includeTrailingSlash ? "/": ""}`

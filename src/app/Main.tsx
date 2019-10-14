@@ -8,7 +8,7 @@ import { ReduxState } from "./redux";
 import Signin from "./views/signin/Signin";
 import { Error404 } from "./views/error/Error404";
 import NewsfeedPage from "./components/pages/NewsfeedPage";
-import { Dashboard, UserProfile } from './types/intrasocial_types';
+import { UserProfile } from './types/intrasocial_types';
 import ApplicationLoader from "./views/loading/ApplicationLoader";
 import Signout from "./views/signout/Signout";
 import CommunityPage from "./components/pages/CommunityPage";
@@ -22,12 +22,7 @@ import { PrivateRoute } from "./components/router/PrivateRoute";
 import { isAdmin, parseQueryString } from "./utilities/Utilities";
 import EventPage from "./components/pages/EventPage";
 import DashboardBuilderPage from "./components/pages/admin/DashboardBuilderPage";
-import { ContextManager } from "./managers/ContextManager";
-import LoadingSpinner from "./components/LoadingSpinner";
-import { CommunityManager } from "./managers/CommunityManager";
 import ConversationsPage from "./components/pages/ConversationsPage";
-import "./Main.scss"
-import "./Overrides.scss"
 import { Changelog } from './components/Changelog';
 import SimpleDialog from "./components/general/dialogs/SimpleDialog";
 import { translate } from "./localization/AutoIntlProvider";
@@ -41,6 +36,14 @@ import SearchComponent from "./components/navigation/SearchComponent";
 import CommunityCreateComponent from './components/general/contextCreation/CommunityCreateComponent';
 import EventCreateComponent from "./components/general/contextCreation/EventCreateComponent";
 import GroupCreateComponent from "./components/general/contextCreation/GroupCreateComponent";
+import {  ContextDataResolver } from "./hoc/WithContextData";
+import * as H from 'history';
+import "./Main.scss"
+import "./Overrides.scss"
+
+type PathLoaderProps = {
+
+} & RouteComponentProps<any>
 const WithSearch = () =>
     withRouter(class Modal extends React.Component<RouteComponentProps<any>, { visible: boolean, term:string, type:string }> {
         constructor(props: PathLoaderProps) {
@@ -91,6 +94,10 @@ const WithModal = (Component: any, title?: string) =>
         }
     })
 
+const ModalChangelog = WithModal(Changelog, "Changelog")
+const ModalSearchComponent = WithSearch()
+
+
 type OwnProps = {
 }
 type ReduxStateProps = {
@@ -101,98 +108,24 @@ type ReduxStateProps = {
 type ReduxDispatchProps = {
 }
 type State = {
-    dashboards: Dashboard[]
-    developerToolVisible: boolean
 }
-type PathLoaderProps = {
-
-} & RouteComponentProps<any>
-type PathLoaderState = { 
-    loading: boolean
-    key:string
-    name:string
-}
-const PathLoader = (Component: any, name:string, extractKey: (path: string) => string, forceUpdate?: (path: string) => string) =>
-    class WithLoading extends React.Component<PathLoaderProps, PathLoaderState> {
-        constructor(props: PathLoaderProps) {
-            super(props)
-            this.state = {
-                loading: true,
-                key:null,
-                name:name
-            }
-        }
-        shouldComponentUpdate = (nextProps: PathLoaderProps, nextState: PathLoaderState) => {
-            const newKey = extractKey(nextProps.location.pathname)
-            const ret = newKey != this.state.key ||
-                nextState.loading != this.state.loading ||
-                ((!!forceUpdate && forceUpdate(nextProps.location.pathname) != forceUpdate(this.props.location.pathname)) || false)
-            return ret
-        }
-        static getDerivedStateFromProps = (props: PathLoaderProps, state: PathLoaderState): Partial<PathLoaderState> => {
-            const newKey = extractKey(props.location.pathname)
-            const setLoading = newKey != state.key
-            if(setLoading)
-            {
-                return {key:newKey, loading:true}
-            }
-            return null
-        }
-        componentDidMount = () => {
-            this.update()
-        }
-        componentDidUpdate = () => {
-            this.update()
-        }
-        update = () => {
-            const { location, history } = this.props
-            ContextManager.resolveContextObjects(location.pathname, (resolvedData) => {
-                if (resolvedData.success && resolvedData.resolvedPath && resolvedData.resolvedPath != location.pathname) {
-                    history.replace(resolvedData.resolvedPath)
-                }
-                CommunityManager.applyCommunityTheme((resolvedData && resolvedData.community) || CommunityManager.getActiveCommunity())
-                this.setState({ loading: false })
-            })
-        }
-        renderLoading = () => {
-            return <div key="loading" className="page">
-                        <LoadingSpinner />
-                    </div>
-        }
-        render() {
-            const { loading } = this.state
-            const updateKey = forceUpdate && forceUpdate(this.props.location.pathname)
-            const key = extractKey(location.pathname)
-            //console.log("HOC update", key, updateKey)
-            return loading ? this.renderLoading() : <Component key={key} {...this.props} updateKey={updateKey} />
-        }
-    }
-const PathLoadedProfilePage = PathLoader(ProfilePage, "ProfilePage", (path) => { return path })
-const PathLoadedCommunityPage = PathLoader(CommunityPage, "CommunityPage", (path) => { return path })
-const PathLoadedGroupPage = PathLoader(GroupPage, "GroupPage", (path) => { return path })
-const PathLoadedProjectPage = PathLoader(ProjectPage, "ProjectPage", (path) => { return path })
-const PathLoadedEventPage = PathLoader(EventPage, "EventPage", (path) => { return path })
-const PathLoadedTaskPage = PathLoader(TaskPage, "TaskPage", (path) => { return path }) 
-const PathLoadedConversationsPage = PathLoader(ConversationsPage, "ConversationsPage", (path) => { return "/conversations/" }, (path) => path)
-const PathLoadedDashboardPage = PathLoader(DashboardPage, "DashboardPage", (path) => { return path })
-const ModalChangelog = WithModal(Changelog, "Changelog")
-const ModalSearchComponent = WithSearch()
-
-
 type Props = ReduxStateProps & ReduxDispatchProps & OwnProps & RouteComponentProps<any>
 class Main extends React.Component<Props, State> {
-    previousLocation: any
+    previousLocation: H.Location<any>
     constructor(props: Props) {
         super(props)
         this.state = {
-            dashboards: [],
-            developerToolVisible: false
+            contextData:{
+                loading:false, loaded:false
+            },
+            loadingPath:null,
+
         }
     }
     UNSAFE_componentWillReceiveProps(nextProps) {
         this.previousLocation = this.props.location;
     }
-    componentDidMount() {
+    componentDidMount = () => {
         window.routerHistory = this.props.history;
     }
     render() {
@@ -201,52 +134,54 @@ class Main extends React.Component<Props, State> {
         const modal = location.state && location.state.modal
         return (
             <div id="main">
-                <div id="main-content">
-                    <ToastContainer />
-                    <div id="content-block" className="">
+                    <div id="main-content">
+                        <ToastContainer />
+                        <div id="content-block" className="">
 
-                        {!this.props.loaded &&
-                            <Switch>
-                                <Route path={Routes.ANY} component={ApplicationLoader} />
-                            </Switch>
-                        }
-                        {this.props.loaded &&
-                            <DndProvider backend={HTML5Backend}>
-                                <TopNavigation />
-                                <SideMenuNavigation />
-                                <Switch location={modal ? this.previousLocation : location}>
-                                    {userIsAdmin &&
-                                        <Route path={Routes.ADMIN_DASHBOARD_BUILDER.path} component={DashboardBuilderPage} />
-                                    }
-                                    <Redirect from={Routes.ELECTRON} to={Routes.ROOT} />
-                                    <Route path={Routes.DEVELOPER_TOOL.path} component={DevToolPage} />
-                                    <Route path={Routes.statusUrl(":statusid")} component={StatusPage} />
-                                    <Route path={Routes.taskUrl(":communityname", ":projectname", ":taskid")} component={PathLoadedTaskPage} />
-                                    <Route path={Routes.eventUrl(":communityname", ":eventname")} component={PathLoadedEventPage} exact={true} />
-                                    <Route path={Routes.projectUrl(":communityname", ":projectname")} component={PathLoadedProjectPage} exact={true} />
-                                    <Route path={Routes.groupUrl(":communityname", ":groupname")} component={PathLoadedGroupPage} exact={true}  />
-                                    <PrivateRoute path={Routes.profileUrl(":profilename")} component={PathLoadedProfilePage} />
-                                    <Route path={Routes.communityUrl(":communityname")} component={PathLoadedCommunityPage} exact={true} />
-                                    <Route path={Routes.newsfeedUrl(":contextNaturalKey?", ":contextObjectId?")} component={NewsfeedPage} />
-                                    <Route path={Routes.SIGNIN} component={Signin} />
-                                    <Route path={Routes.SIGNOUT} component={Signout} />
-                                    <Route path={Routes.ROOT} exact={true} component={PathLoadedDashboardPage} />
-                                    <Route path={Routes.conversationUrl(":conversationId?")} exact={true} component={PathLoadedConversationsPage} />
-                                    <Route path={Routes.FILES} exact={true} component={FilesPage} />
-                                    <Route path={Routes.ELECTRON} component={PathLoadedDashboardPage} />
-                                    <Route path={Routes.ANY} component={Error404} />
+                            {!this.props.loaded &&
+                                <Switch>
+                                    <Route path={Routes.ANY} component={ApplicationLoader} />
                                 </Switch>
-                                <Switch location={location}>
-                                    <Route path={Routes.CHANGELOG} component={ModalChangelog} />
-                                    <PrivateRoute path={Routes.SEARCH} component={ModalSearchComponent} />
-                                    <PrivateRoute path={Routes.COMMUNITY_CREATE} component={CommunityCreateComponent} />
-                                    <PrivateRoute path={Routes.EVENT_CREATE} component={EventCreateComponent} />
-                                    <PrivateRoute path={Routes.GROUP_CREATE} component={GroupCreateComponent} />
-                                </Switch>
-                            </DndProvider>
-                        }
+                            }
+                            {this.props.loaded &&
+                                <ContextDataResolver location={modal ? this.previousLocation : location}>
+                                    <DndProvider backend={HTML5Backend}>
+                                        <TopNavigation />
+                                        <SideMenuNavigation />
+                                        <Switch location={modal ? this.previousLocation : location}>
+                                            {userIsAdmin &&
+                                                <Route path={Routes.ADMIN_DASHBOARD_BUILDER.path} component={DashboardBuilderPage} />
+                                            }
+                                            <Redirect from={Routes.ELECTRON} to={Routes.ROOT} />
+                                            <Route path={Routes.DEVELOPER_TOOL.path} component={DevToolPage} />
+                                            <Route path={Routes.statusUrl(":statusid")} component={StatusPage} />
+                                            <Route path={Routes.taskUrl(":communityname", ":projectname", ":taskid")} component={TaskPage} />
+                                            <Route path={Routes.eventUrl(":communityname", ":eventname")} component={EventPage} exact={true} />
+                                            <Route path={Routes.projectUrl(":communityname", ":projectname")} component={ProjectPage} exact={true} />
+                                            <Route path={Routes.groupUrl(":communityname", ":groupname")} component={GroupPage} exact={true}  />
+                                            <PrivateRoute path={Routes.profileUrl(":profilename")} component={ProfilePage} />
+                                            <Route path={Routes.communityUrl(":communityname")} component={CommunityPage} exact={true} />
+                                            <Route path={Routes.newsfeedUrl(":contextNaturalKey?", ":contextObjectId?")} component={NewsfeedPage} />
+                                            <Route path={Routes.SIGNIN} component={Signin} />
+                                            <Route path={Routes.SIGNOUT} component={Signout} />
+                                            <Route path={Routes.ROOT} exact={true} component={DashboardPage} />
+                                            <Route path={Routes.conversationUrl(":conversationId?")} exact={true} component={ConversationsPage} />
+                                            <Route path={Routes.FILES} exact={true} component={FilesPage} />
+                                            <Route path={Routes.ELECTRON} component={DashboardPage} />
+                                            <Route path={Routes.ANY} component={Error404} />
+                                        </Switch>
+                                        <Switch location={location}>
+                                            <Route path={Routes.CHANGELOG} component={ModalChangelog} />
+                                            <PrivateRoute path={Routes.SEARCH} component={ModalSearchComponent} />
+                                            <PrivateRoute path={Routes.COMMUNITY_CREATE} component={CommunityCreateComponent} />
+                                            <PrivateRoute path={Routes.EVENT_CREATE} component={EventCreateComponent} />
+                                            <PrivateRoute path={Routes.GROUP_CREATE} component={GroupCreateComponent} />
+                                        </Switch>
+                                    </DndProvider>
+                                </ContextDataResolver> 
+                            }
+                        </div>
                     </div>
-                </div>
             </div>
         );
     }

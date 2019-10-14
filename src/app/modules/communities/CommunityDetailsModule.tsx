@@ -8,13 +8,9 @@ import "./CommunityDetailsModule.scss"
 import { ResponsiveBreakpoint } from '../../components/general/observers/ResponsiveComponent';
 import { translate } from '../../localization/AutoIntlProvider';
 import { Community, ContextNaturalKey, Permission, CommunityConfigurationData, Group, Event, Project, ObjectHiddenReason, IdentifiableObject, ElasticSearchType } from '../../types/intrasocial_types';
-import { connect } from 'react-redux';
-import { ReduxState } from '../../redux';
 import CircularLoadingSpinner from '../../components/general/CircularLoadingSpinner';
-import LoadingSpinner from '../../components/LoadingSpinner';
 import { DetailsContent } from '../../components/details/DetailsContent';
 import { DetailsMembers } from '../../components/details/DetailsMembers';
-import { ContextManager } from '../../managers/ContextManager';
 import FormController from '../../components/form/FormController';
 import {ApiClient} from '../../network/ApiClient';
 import classnames from 'classnames';
@@ -26,13 +22,11 @@ import GroupCreateComponent from '../../components/general/contextCreation/Group
 import EventCreateComponent from '../../components/general/contextCreation/EventCreateComponent';
 import ProjectCreateComponent from '../../components/general/contextCreation/ProjectCreateComponent';
 import { CommunityManager } from '../../managers/CommunityManager';
-import { GroupManager } from '../../managers/GroupManager';
-import { EventManager } from '../../managers/EventManager';
-import { ProjectManager } from '../../managers/ProjectManager';
 import { ToastManager } from '../../managers/ToastManager';
 import ContextMembersForm from '../../components/general/contextMembers/ContextMembersForm';
 import AlertDialog from '../../components/general/dialogs/AlertDialog';
 import ContextMembershipComponent from '../../components/general/contextMembership/ContextMembershipComponent';
+import { withContextData, ContextDataProps } from '../../hoc/WithContextData';
 type OwnProps = {
     breakpoint:ResponsiveBreakpoint
 } & CommonModuleProps
@@ -53,12 +47,7 @@ type State = {
     inReviewDialogContextNaturalKey?:ContextNaturalKey
     inReviewDialogContextObject?:IdentifiableObject
 }
-type ReduxStateProps = {
-    community: Community
-}
-type ReduxDispatchProps = {
-}
-type Props = OwnProps & RouteComponentProps<any> & ReduxStateProps & ReduxDispatchProps
+type Props = OwnProps & RouteComponentProps<any> & ContextDataProps
 class CommunityDetailsModule extends React.Component<Props, State> {
     formController:FormController = null
     constructor(props:Props) {
@@ -106,7 +95,7 @@ class CommunityDetailsModule extends React.Component<Props, State> {
         }
     }
     loadConfigurationDataAndShowForm = () => {
-        const community = this.props.community
+        const community = this.props.contextData.community
         ApiClient.getCommunityConfiguration(community.id, (data, status, errorData) => {
             const success = !!data
             this.setState(() => {
@@ -181,7 +170,6 @@ class CommunityDetailsModule extends React.Component<Props, State> {
     handleGroupCreateForm = (group:Group) => {
         if(!!group)
         {
-            GroupManager.storeGroups([group])
             if(group.hidden_reason && group.hidden_reason == ObjectHiddenReason.review)
             {
                 this.showObjectInReview(group, ContextNaturalKey.GROUP)
@@ -208,7 +196,6 @@ class CommunityDetailsModule extends React.Component<Props, State> {
     handleEventCreateForm = (event:Event) => {
         if(!!event)
         {
-            EventManager.storeEvents([event])
             if(event.hidden_reason && event.hidden_reason == ObjectHiddenReason.review)
             {
                 this.showObjectInReview(event, ContextNaturalKey.EVENT)
@@ -235,7 +222,6 @@ class CommunityDetailsModule extends React.Component<Props, State> {
     handleProjectCreateForm = (project:Project) => {
         if(!!project)
         {
-            ProjectManager.storeProjects([project])
             if(project.hidden_reason && project.hidden_reason == ObjectHiddenReason.review)
             {
                 this.showObjectInReview(project, ContextNaturalKey.PROJECT)
@@ -249,51 +235,57 @@ class CommunityDetailsModule extends React.Component<Props, State> {
     }
     getCommunityOptions = () => {
         const options: OverflowMenuItem[] = []
-        const permission = this.props.community.permission
+        const {community} = this.props.contextData
+        if(!community)
+            return options
+        const permission = community.permission
         if(permission >= Permission.admin)
         {
             options.push({id:"edit", type:OverflowMenuItemType.option, title:translate("common.edit"), onPress:this.showCommunityEditForm, iconClass:"fas fa-pen", iconStackClass:Permission.getShield(permission)})
             options.push({id:"members", type:OverflowMenuItemType.option, title:translate("common.member.management"), onPress:this.toggleCommunityMembersForm, iconClass:"fas fa-users-cog", iconStackClass:Permission.getShield(permission)})
         }
         
-        if(this.props.community.group_creation_permission >= Permission.limited_write)
+        if(community.group_creation_permission >= Permission.limited_write)
             options.push({id:"2", type:OverflowMenuItemType.option, title:translate("group.add"), onPress:this.showGroupCreateForm, iconClass:"fas fa-plus"})
         
-        if(this.props.community.event_creation_permission >= Permission.limited_write)
+        if(community.event_creation_permission >= Permission.limited_write)
             options.push({id:"3", type:OverflowMenuItemType.option, title:translate("event.add"), onPress:this.showEventCreateForm, iconClass:"fas fa-plus"})
         
-        if(this.props.community.project_creation_permission >= Permission.limited_write)
+        if(community.project_creation_permission >= Permission.limited_write)
             options.push({id:"4", type:OverflowMenuItemType.option, title:translate("project.add"), onPress:this.showProjectCreateForm, iconClass:"fas fa-plus"})
         return options
     }
     renderMembersForm = () => {
         const visible = this.state.membersFormVisible
-        const community = this.props.community
+        const {community} = this.props.contextData
         return <ContextMembersForm contextNaturalKey={ContextNaturalKey.COMMUNITY} contextObject={community} key={this.state.membersFormReloadKey} didCancel={this.toggleCommunityMembersForm} visible={visible} community={community} />
     }
     renderEditForm = () => {
         const visible = this.state.editFormVisible
-        const community = this.props.community
+        const {community} = this.props.contextData
         const communityConfiguration = this.state.communityConfiguration
         return <CommunityCreateComponent onCancel={this.hideCommunityEditForm} key={this.state.editFormReloadKey} communityConfiguration={communityConfiguration} community={community} visible={visible} onComplete={this.handleCommunityEditFormComplete} />
     }
     renderAddGroupForm = () => {
         const visible = this.state.createGroupFormVisible
-        const community = this.props.community
+        const {community} = this.props.contextData
         return <GroupCreateComponent onCancel={this.hideGroupCreateForm} community={community.id} key={this.state.createGroupFormReloadKey} visible={visible} onComplete={this.handleGroupCreateForm} />
     }
     renderAddEventForm = () => {
         const visible = this.state.createEventFormVisible
-        const community = this.props.community
+        const {community} = this.props.contextData
         return <EventCreateComponent onCancel={this.hideEventCreateForm} community={community.id} key={this.state.createEventFormReloadKey} visible={visible} onComplete={this.handleEventCreateForm} />
     }
     renderAddProjectForm = () => {
         const visible = this.state.createProjectFormVisible
-        const community = this.props.community
+        const {community} = this.props.contextData
         return <ProjectCreateComponent onCancel={this.hideProjectCreateForm} community={community.id} key={this.state.createProjectFormReloadKey} visible={visible} onComplete={this.handleProjectCreateForm} />
     }
     render = () => {
-        const {breakpoint, history, match, location, staticContext, community, contextNaturalKey, className, ...rest} = this.props
+        const {breakpoint, history, match, location, staticContext, contextNaturalKey, className, contextData, ...rest} = this.props
+        const {community} = this.props.contextData
+        if(!community)
+            return null
         const cn = classnames("community-details-module", className)
         const communityOptions = this.getCommunityOptions()
         return (<Module {...rest} className={cn}>
@@ -314,21 +306,10 @@ class CommunityDetailsModule extends React.Component<Props, State> {
                     { community && community.permission >= Permission.read &&
                         <ModuleFooter className="mt-1">
                             <DetailsMembers onSeeAllClick={this.toggleCommunityMembersForm} members={community.members} />
-                            <ContextMembershipComponent contextNaturalKey={ContextNaturalKey.COMMUNITY} contextObject={this.props.community} />
+                            <ContextMembershipComponent contextNaturalKey={ContextNaturalKey.COMMUNITY} contextObject={community} />
                         </ModuleFooter>
                     }
                 </Module>)
     }
 }
-const mapStateToProps = (state:ReduxState, ownProps: OwnProps & RouteComponentProps<any>):ReduxStateProps => {
-
-    const community = ContextManager.getContextObject(ownProps.location.pathname, ContextNaturalKey.COMMUNITY) as Community
-    return {
-        community,
-    }
-}
-const mapDispatchToProps = (dispatch:ReduxState, ownProps: OwnProps):ReduxDispatchProps => {
-    return {
-    }
-}
-export default withRouter(connect<ReduxStateProps, ReduxDispatchProps, OwnProps>(mapStateToProps, mapDispatchToProps)(CommunityDetailsModule))
+export default withContextData(withRouter(CommunityDetailsModule))
