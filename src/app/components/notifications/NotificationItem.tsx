@@ -1,6 +1,10 @@
 import * as React from "react";
 import classnames = require("classnames");
-import { NotificationGroupKey, InvitationNotification, Community, Group, UserProfile, Event, Conversation, StatusNotification, AttentionNotification, ReminderNotification, TaskNotification, TaskNotificationAction, ReportResult, ReportNotification, MembershipRequestNotification, NotificationObject, ConversationNotification, ReviewNotification, Permission } from '../../types/intrasocial_types';
+import { NotificationGroupKey, InvitationNotification, Community, Group, UserProfile,
+         Event, StatusNotification, AttentionNotification, ReminderNotification,
+         TaskNotification, TaskNotificationAction, ReportNotification,
+         MembershipRequestNotification, NotificationObject, ConversationNotification, ReviewNotification,
+         Permission } from '../../types/intrasocial_types';
 import {ApiClient} from '../../network/ApiClient';
 import { ToastManager } from '../../managers/ToastManager';
 import { translate, lazyTranslate } from '../../localization/AutoIntlProvider';
@@ -13,7 +17,6 @@ import { Link } from 'react-router-dom';
 import { TimeComponent } from "../general/TimeComponent";
 import { ConversationUtilities } from '../../utilities/ConversationUtilities';
 import { MessageContent } from "../../modules/conversation/MessageContent";
-import authentication from "../../redux/authentication";
 
 type NotificationEvents = {
     onCompleted: (key: NotificationGroupKey, id: number) => void
@@ -430,8 +433,12 @@ const ReviewContentComponent = (props: ReviewContentNotificationProps) => {
     const avatar = userAvatar(profile)
     const avatarLink = profile && profile.uri
     return <InvitationComponent onClose={props.onClose} avatarLink={avatarLink} createdAt={time} title={title} avatar={avatar}>
-        {acceptEndpoint && props.notification.permission >= Permission.admin && <Button onClick={acceptRequest} color="secondary" size="xs">{translate("notification.action.accept")}</Button>}
-        {dismissEndpoint && props.notification.permission >= Permission.admin && <Button outline={true} className="ml-1" onClick={dismissRequest} color="secondary" size="xs">{translate("invitation.dismiss")}</Button>}
+        {acceptEndpoint && (props.notification.permission == Permission.admin || props.notification.permission == Permission.superuser) &&
+            <Button onClick={acceptRequest} color="secondary" size="xs">{translate("notification.action.accept")}</Button>
+        }
+        {dismissEndpoint && (props.notification.permission == Permission.admin || props.notification.permission == Permission.superuser) &&
+            <Button outline={true} className="ml-1" onClick={dismissRequest} color="secondary" size="xs">{translate("invitation.dismiss")}</Button>
+        }
     </InvitationComponent>
 }
 type ReportedContentNotificationProps = {

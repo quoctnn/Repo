@@ -28,6 +28,7 @@ type NotificationGroupObject = {
 type State = {
     notifications:NotificationGroupObject[]
     open:{[key:string]:boolean}
+    lastNotificationCount:number
 }
 type ReduxStateProps = {
     authenticatedUser:UserProfile
@@ -43,7 +44,8 @@ class NotificationsComponent extends React.Component<Props, State> {
         super(props)
         this.state = {
             notifications:[],
-            open:{}
+            open:{},
+            lastNotificationCount:0
         }
     }
     componentDidMount = () => {
@@ -59,18 +61,19 @@ class NotificationsComponent extends React.Component<Props, State> {
             return
         }
         const currentCount = this.state.notifications.reduce((a, b) => a += b.values.length , 0)
-        if(this.props.unreadNotifications != currentCount)
+        if(this.props.unreadNotifications != currentCount && this.state.lastNotificationCount != currentCount)
         {
-            this.reloadNotifications()
+            console.log("currentCount mismatch")
+            this.reloadNotifications(currentCount)
         }
     }
-    reloadNotifications = () => {
+    reloadNotifications = (lastCount?:number) => {
         ApiClient.getNotifications((notifications, status, error) => {
             if(!!notifications)
             {
                 const list = this.groupNotifications(notifications)
                 this.setState((prevState:State) => {
-                    return {notifications:list}
+                    return {notifications:list, lastNotificationCount:lastCount}
                 })
             }
             ToastManager.showRequestErrorToast(error, lazyTranslate("notification.error.fetching"))
