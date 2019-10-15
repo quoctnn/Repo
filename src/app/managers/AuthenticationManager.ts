@@ -48,7 +48,7 @@ export abstract class AuthenticationManager
 
     }
     static processSwitchedMainCommunity = (...args:any[]) => {
-        let community = args[0]['community_id'] as number;
+        let community = args[0]["id"] as number;
         const currentProfile = AuthenticationManager.getAuthenticatedUser()
         if(!currentProfile)
             return

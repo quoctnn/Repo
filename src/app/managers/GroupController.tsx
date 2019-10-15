@@ -46,12 +46,12 @@ export class GroupController
         return this.objectId == id || this.object && this.object.id == id
     }
     private processGroupRemove = (...args:any[]) => {
-        const groupId = args[0]["group_id"] as number
+        const groupId = args[0]["id"] as number
         if(this.isSameId(groupId))
             this.setObject(null, false)
     }
     private processGroupUpdate = (...args:any[]) => {
-        const groupId = args[0]["group_id"] as number
+        const groupId = args[0]["id"] as number
         if(this.isSameId(groupId))
             this.fetchObject()
     }

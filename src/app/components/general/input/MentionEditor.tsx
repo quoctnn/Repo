@@ -9,7 +9,7 @@ import { UserProfile, Permissible, IdentifiableObject, Linkable, ContextNaturalK
 import { IntraSocialUtilities } from "../../../utilities/IntraSocialUtilities";
 import { Settings } from "../../../utilities/Settings";
 import { SecureImage } from '../SecureImage';
-import { userFullName, contextAvatar, MentionData, nullOrUndefined } from '../../../utilities/Utilities';
+import { userFullName, contextAvatar, MentionData, nullOrUndefined, uniqueId } from '../../../utilities/Utilities';
 import * as JSEMOJI from 'emoji-js';
 import "./MentionEditor.scss"
 import { translate } from "../../../localization/AutoIntlProvider";
@@ -446,7 +446,11 @@ export default class MentionEditor extends React.Component<Props, State> {
                 return val
         }
         if(this.mentionPlugin && this.mentionPlugin.keyBindingFn)
-            return this.mentionPlugin.keyBindingFn(e)
+        {
+            const val = this.mentionPlugin.keyBindingFn(e)
+            if(!nullOrUndefined(val))
+                return val
+        }
         return getDefaultKeyBinding(e)
     }
     render = () => {

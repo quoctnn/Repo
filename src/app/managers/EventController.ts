@@ -46,12 +46,12 @@ export class EventController
         return this.objectId == id || this.object && this.object.id == id
     }
     private processEventRemove = (...args:any[]) => {
-        const eventId = args[0]["event_id"] as number
+        const eventId = args[0]["id"] as number
         if(this.isSameId(eventId))
             this.setObject(null, false)
     }
     private processEventUpdate = (...args:any[]) => {
-        const eventId = args[0]["event_id"] as number
+        const eventId = args[0]["id"] as number
         if(this.isSameId(eventId))
             this.fetchObject()
     }

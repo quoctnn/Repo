@@ -7,7 +7,7 @@ import ModuleFooter from '../ModuleFooter';
 import "./EventDetailsModule.scss"
 import { ResponsiveBreakpoint } from '../../components/general/observers/ResponsiveComponent';
 import { translate } from '../../localization/AutoIntlProvider';
-import { Event, ContextNaturalKey, Permission} from '../../types/intrasocial_types';
+import { Event, ContextNaturalKey, Permission, ElasticSearchType} from '../../types/intrasocial_types';
 import CircularLoadingSpinner from '../../components/general/CircularLoadingSpinner';
 import { DetailsContent } from '../../components/details/DetailsContent';
 import { stringToDateFormat, DateFormat, uniqueId } from '../../utilities/Utilities';
@@ -19,6 +19,9 @@ import ContextMembersForm from '../../components/general/contextMembers/ContextM
 import ContextMembershipComponent from '../../components/general/contextMembership/ContextMembershipComponent';
 import { withContextData, ContextDataProps } from '../../hoc/WithContextData';
 import { EventController } from '../../managers/EventController';
+import ConfirmDialog from '../../components/general/dialogs/ConfirmDialog';
+import { ApiClient } from '../../network/ApiClient';
+import { ToastManager } from '../../managers/ToastManager';
 const shortMonth:string[] = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 type OwnProps = {
     breakpoint:ResponsiveBreakpoint
@@ -31,6 +34,7 @@ type State = {
     editFormReloadKey:string
     membersFormVisible?:boolean
     membersFormReloadKey?:string
+    confirmLeaveDialogVisible:boolean
 }
 type Props = OwnProps & RouteComponentProps<any> & ContextDataProps
 class EventDetailsModule extends React.Component<Props, State> {
@@ -44,6 +48,7 @@ class EventDetailsModule extends React.Component<Props, State> {
             editFormReloadKey:uniqueId(),
             membersFormVisible:false,
             membersFormReloadKey:uniqueId(),
+            confirmLeaveDialogVisible:false
         }
     }
     componentDidUpdate = (prevProps:Props) => {
@@ -96,13 +101,44 @@ class EventDetailsModule extends React.Component<Props, State> {
             return {membersFormVisible:!prevState.membersFormVisible, membersFormReloadKey: invitationReloadKey}
         })
     }
+    showConfirmLeaveDialog = () => {
+        this.setState(() => {
+            return {confirmLeaveDialogVisible:true}
+        })
+    }
+    leaveContext = (confirmed:boolean) => {
+        if(confirmed)
+        {
+            const id = this.props.contextData.event.id
+            const contextNaturalKey = ContextNaturalKey.EVENT
+            ApiClient.leaveContext(this.props.contextData.authenticatedUser.id, contextNaturalKey, id, (data, status, error) => {
+                ToastManager.showRequestErrorToast(error)
+                this.props.contextData.reloadContextObject(id, contextNaturalKey)
+            })
+        }
+        this.setState(() => {
+            return {confirmLeaveDialogVisible:false}
+        })
+    }
+    renderConfirmLeaveDialog = () => {
+        const visible = this.state.confirmLeaveDialogVisible
+        const title = translate("conversation.confirm.leave.title.format").format(this.props.contextData.event.name)
+        const contextName = ElasticSearchType.nameSingularForKey(ElasticSearchType.EVENT)
+        const message = translate("conversation.confirm.leave.message.format").format(contextName)
+        const okButtonTitle = translate("common.yes")
+        return <ConfirmDialog visible={visible} title={title} message={message} didComplete={this.leaveContext} okButtonTitle={okButtonTitle}/>
+    }
     getEventOptions = () => {
+        const authenticatedUser = this.props.contextData.authenticatedUser
         const options: OverflowMenuItem[] = []
         const {event} = this.props.contextData
         if(event.permission >= Permission.admin)
             options.push({id:"1", type:OverflowMenuItemType.option, title:translate("Edit"), onPress:this.showEventCreateForm, iconClass:"fas fa-pen", iconStackClass:Permission.getShield(event.permission)})
         if(event.permission >= Permission.admin)
             options.push({id:"members", type:OverflowMenuItemType.option, title:translate("common.member.management"), onPress:this.toggleMembersForm, iconClass:"fas fa-users-cog", iconStackClass:Permission.getShield(event.permission)})
+        const attending = event.attending || []
+        if(attending.contains(authenticatedUser.id))
+            options.push({id:"leave", type:OverflowMenuItemType.option, title:translate("common.leave"), onPress:this.showConfirmLeaveDialog, iconClass:"fas fa-sign-out-alt"})
         return options
     }
     renderMembersForm = () => {
@@ -146,6 +182,7 @@ class EventDetailsModule extends React.Component<Props, State> {
                         </div>
                         {this.renderEditForm()}
                         {this.renderMembersForm()}
+                        {this.renderConfirmLeaveDialog()}
                     </ModuleContent>
                     <ModuleFooter>
                         { startDate &&

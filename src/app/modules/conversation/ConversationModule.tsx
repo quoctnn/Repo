@@ -178,7 +178,7 @@ class ConversationModule extends React.Component<Props, State> {
     componentDidMount = () => {
         const obs1 = NotificationCenter.addObserver("eventstream_" + EventStreamMessageType.CONVERSATION_TYPING, this.isTypingHandler)
         this.observers.push(obs1)
-        const obs2 = NotificationCenter.addObserver("eventstream_" + EventStreamMessageType.CONVERSATION_MESSAGE, this.incomingMessageHandler)
+        const obs2 = NotificationCenter.addObserver("eventstream_" + EventStreamMessageType.CONVERSATION_MESSAGE_NEW, this.incomingMessageHandler)
         this.observers.push(obs2)
         if(this.props.conversation)
         {
@@ -407,7 +407,7 @@ class ConversationModule extends React.Component<Props, State> {
             completion([])
             return
         }
-        ProfileManager.searchProfilesInContext({search, taggableMembers:this.props.conversation.users, completion:(profiles) => {
+        ProfileManager.searchProfilesInMembers({search, taggableMembers:this.props.conversation.users, completion:(profiles) => {
             completion(profiles.map(u => Mention.fromUser(u)))
         }})
     }

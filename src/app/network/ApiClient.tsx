@@ -522,6 +522,31 @@ export abstract class ApiClient
             callback(null, status, new RequestErrorData(request.responseJSON, error))
         })
     }
+    private static getContextLeaveData = (contextNaturalKey:ContextNaturalKey, contextObjectId:number, userId :number) => {
+        let url:string = null
+        let data:any = null
+        switch (contextNaturalKey ) {
+            case ContextNaturalKey.COMMUNITY:url = Constants.apiRoute.communityLeaveUrl(contextObjectId); data = {id:userId}; break;
+            case ContextNaturalKey.EVENT:url = Constants.apiRoute.eventLeaveUrl(contextObjectId); data = {id:userId};  break;
+            case ContextNaturalKey.GROUP:url = Constants.apiRoute.groupLeaveUrl(contextObjectId); data = {id:userId};  break;
+            case ContextNaturalKey.PROJECT:url = Constants.apiRoute.projectMembershipUrl(contextObjectId); data = {remove:userId};  break;
+            default:break;
+        }
+        return {url, data}
+    }
+    static leaveContext = (userId:number, contextNaturalKey:ContextNaturalKey, contextObjectId:number, callback:ApiClientCallback<any>) => {
+        const d = ApiClient.getContextLeaveData(contextNaturalKey, contextObjectId, userId)
+        if(!d.url)
+        {
+            callback(null, "500", new RequestErrorData({detail:`leave api endpoint not set for ${contextNaturalKey}`}, "error"))
+            return
+        }
+        AjaxRequest.postJSON(d.url, d.data, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, new RequestErrorData(request.responseJSON, error))
+        })
+    }
     private static getContextMembersKickUrl = (contextNaturalKey:ContextNaturalKey, contextObjectId:number) => {
         let url:string = null
         switch (contextNaturalKey ) {

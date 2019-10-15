@@ -62,6 +62,17 @@ export abstract class ContextManager
             }
         }
     }
+    static pathToArray = (path:string):KeyValuePair[] => {
+        const arr:KeyValuePair[] = []
+        const segments = path.split("/").filter(f => !nullOrUndefined(f) && f != "")
+        if(segments.length > 0 && segments.length % 2 == 0)
+        {
+            for (let index = 0; index < segments.length; index += 2) {
+                arr.push({key:segments[index], value:segments[index + 1]})
+            }
+        }
+        return arr
+    }
     static pathToDictionary = (path:string) => {
         const dict:StringDictionary = {}
         const segments = path.split("/").filter(f => !nullOrUndefined(f) && f != "")

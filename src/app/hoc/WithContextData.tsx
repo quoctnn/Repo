@@ -16,6 +16,7 @@ import { NotificationCenter } from '../utilities/NotificationCenter';
 export const ContextDataResolverComponentLogContextDataNotification = "ContextDataResolverComponentLogContextDataNotification"
 export class ContextData{
     loading:boolean = false
+    loaded:boolean = false
     //
     task?:Task
     project?:Project
@@ -25,6 +26,9 @@ export class ContextData{
     conversation?:Conversation
     community?:Community
     profile?:UserProfile
+    authenticatedUser?:UserProfile
+    mainContextNaturalKey:ContextNaturalKey
+    path:string
 
     constructor(conversation:Conversation, 
                 community:Community, 
@@ -34,6 +38,7 @@ export class ContextData{
                 event:Event,
                 group:Group,
                 loading:boolean, 
+                authenticatedUser?:UserProfile
                 ){
                     this.conversation = conversation
                     this.community = community
@@ -43,7 +48,29 @@ export class ContextData{
                     this.event = event
                     this.group = group
                     this.loading = loading
+                    this.authenticatedUser = authenticatedUser
 
+    }
+    findContextObject = (id:number, contextNaturalKey:ContextNaturalKey) => {
+        switch (contextNaturalKey) {
+            case ContextNaturalKey.COMMUNITY:
+            case ContextNaturalKey.USER:
+            case ContextNaturalKey.CONVERSATION:return ContextManager.getStoreObject(contextNaturalKey, id)
+
+            case ContextNaturalKey.GROUP:return this.group
+            case ContextNaturalKey.PROJECT:return this.project
+            case ContextNaturalKey.EVENT:return this.event
+            case ContextNaturalKey.TASK:return this.task
+            default:
+                break;
+        }
+    }
+    reloadContextObject = (id:number, contextNaturalKey:ContextNaturalKey) => {
+        const type =ContextSegmentKey.keyForNaturalKey(contextNaturalKey)
+        const data = {}
+        const key = `${type}_id`
+        data[key] = id
+        window.app.sendInboundOnSocket({type:`${type}.update`, data})
     }
     getContextObject = (contextNaturalKey:ContextNaturalKey):Permissible & IdentifiableObject & Linkable => {
         switch (contextNaturalKey) {
@@ -67,6 +94,10 @@ export class ContextData{
         event:${this.event}, 
         group:${this.group}, 
         conversation:${this.conversation}`   
+    }
+
+    static get empty(){
+        return new ContextData(null, null, null, null, null, null, null, false)
     }
 
 }
@@ -99,6 +130,9 @@ type ReduxStateProps = {
     projectId:number|string
     groupId:number|string
     taskId:number
+    authenticatedUser?:UserProfile
+    mainContextNaturalKey:ContextNaturalKey
+    path:string
 }
 type ContextDataResolverProps = { location:H.Location<any> } & ReduxStateProps & OwnProps
 type ContextDataResolverState = {
@@ -119,10 +153,9 @@ class ContextDataResolverComponent extends React.Component<ContextDataResolverPr
     profileLoading:boolean = false
     private mounted = false
     private observers:EventSubscription[] = []
+    private nextData:ContextData = ContextData.empty
     constructor(props: ContextDataResolverProps) {
         super(props)
-        this.state = {
-        }
         this.eventResolver = new EventController(props.eventId, this.handleControllerUpdated)
         this.projectResolver = new ProjectController(props.projectId, this.handleControllerUpdated)
         this.groupResolver = new GroupController(props.groupId, this.handleControllerUpdated)
@@ -133,6 +166,8 @@ class ContextDataResolverComponent extends React.Component<ContextDataResolverPr
             this.handleProfileUpdate(this.props.profileId)
         if(this.props.conversationId)
             this.handleConversationUpdate(this.props.conversationId)
+        this.nextData = this.getData(props)
+        
     }
     componentDidMount = () => {
         this.mounted = true
@@ -140,7 +175,7 @@ class ContextDataResolverComponent extends React.Component<ContextDataResolverPr
         this.observers.push(observer1)
     }
     processLogContextDataNotification = (...args:any[]) => {
-        console.log("ContextData", this.getData())
+        console.log("ContextData", this.nextData)
     }
     tryForceUpdate = () => {
         if(this.mounted)
@@ -166,7 +201,10 @@ class ContextDataResolverComponent extends React.Component<ContextDataResolverPr
         ///
         if(this.props.communityId != nextProps.communityId)
         {
-            this.handleCommunityUpdate(nextProps.communityId)
+            let id = nextProps.communityId
+            if(id && this.props.community && this.props.community.slug_name == id) // if slug, switch to id
+                id = this.props.community.id
+            this.handleCommunityUpdate(id)
         }
         if(this.props.conversationId != nextProps.conversationId)
         {
@@ -174,8 +212,38 @@ class ContextDataResolverComponent extends React.Component<ContextDataResolverPr
         }
         if(this.props.profileId != nextProps.profileId)
         {
-            this.handleProfileUpdate(nextProps.profileId)
+            let id = nextProps.profileId
+            if(id && this.props.profile && this.props.profile.slug_name == id) // if slug, switch to id
+                id = this.props.profile.id
+            this.handleProfileUpdate(id)
         }
+       const nextData = this.getData(nextProps)
+        const prevData = this.nextData
+        if(nextData.mainContextNaturalKey && prevData.mainContextNaturalKey){
+            const p = prevData.getContextObject(prevData.mainContextNaturalKey)
+            const c = nextData.getContextObject(nextData.mainContextNaturalKey)
+            const pPath = prevData.path
+            const cPath = nextData.path
+            if(pPath == cPath)
+            {
+                if(p && !c)
+                {
+                    const obj = nextData.findContextObject(p.id, nextData.mainContextNaturalKey)
+                    if(obj && obj.uri)
+                    {
+                        window.app.navigateToRoute(obj.uri)
+                    }
+    
+                }
+                else if(p && c && c.uri && p.uri != c.uri)
+                {
+                    window.app.navigateToRoute(c.uri)
+                }
+            }
+            
+        }
+        this.nextData = nextData
+
     }
     handleConversationUpdate = (id:number|string) => {
         this.conversation = null
@@ -246,16 +314,17 @@ class ContextDataResolverComponent extends React.Component<ContextDataResolverPr
     handleControllerUpdated = () => {
         this.tryForceUpdate() 
     }
-    getData = () => {
+    getData = (props:ContextDataResolverProps) => {
         const {community, communityLoading, profile, profileLoading, conversation, conversationLoading} = this
-        const currentCommunity = this.props.community || community
-        const currentCommunityLoading = this.props.community ? false : communityLoading
+        const currentCommunity = props.community || community
+        const currentCommunityLoading = props.community ? false : communityLoading
 
-        const currentProfile = this.props.profile || profile
-        const currentProfileLoading = this.props.profile ? false : profileLoading
 
-        const currentConversation = this.props.conversation || conversation
-        const currentConversationLoading = this.props.conversation ? false : conversationLoading
+        const currentProfile = props.profile || profile
+        const currentProfileLoading = props.profile ? false : profileLoading
+
+        const currentConversation = props.conversation || conversation
+        const currentConversationLoading = props.conversation ? false : conversationLoading
 
         const event = this.eventResolver.event
         const eventLoading = this.eventResolver.isLoading
@@ -266,13 +335,17 @@ class ContextDataResolverComponent extends React.Component<ContextDataResolverPr
         const task = this.taskResolver.task
         const taskLoading = this.taskResolver.isLoading
         
+        const authenticatedUser = props.authenticatedUser
+        const loaded = false
         const loading = currentCommunityLoading || eventLoading || groupLoading || projectLoading || currentProfileLoading || currentConversationLoading || taskLoading
-        const data:ContextData = new ContextData(currentConversation, currentCommunity, currentProfile, task, project, event, group, loading)
+        const data:ContextData = new ContextData(currentConversation, currentCommunity, currentProfile, task, project, event, group, loading, authenticatedUser)
+        data.loaded = loaded
+        data.mainContextNaturalKey = props.mainContextNaturalKey
+        data.path = props.path
         return data
     }
     render = () => {
-        const data = this.getData()
-        console.log("DATA",data.toString())
+        const data = this.nextData
         return <ContextDataProvider value={data}>
                 {this.props.children}
             </ContextDataProvider>
@@ -280,7 +353,9 @@ class ContextDataResolverComponent extends React.Component<ContextDataResolverPr
 }
 
 const mapStateToProps = (state: ReduxState, ownProps: ContextDataResolverProps): ReduxStateProps => {
-    const contextDict = ContextManager.pathToDictionary(ownProps.location.pathname)
+    const path = ownProps.location.pathname
+    const contextDict = ContextManager.pathToDictionary(path)
+    const contextArray = ContextManager.pathToArray(ownProps.location.pathname)
     const eventId = contextDict[ContextSegmentKey.EVENT]
     const projectId = contextDict[ContextSegmentKey.PROJECT]
     const groupId = contextDict[ContextSegmentKey.GROUP]
@@ -294,6 +369,9 @@ const mapStateToProps = (state: ReduxState, ownProps: ContextDataResolverProps):
 
     const conversationId = contextDict[ContextSegmentKey.CONVERSATION]
     const conversation = conversationId && ConversationManager.getConversation(conversationId)
+    const authenticatedUser = state.authentication.profile
+    const lastSegmentKey = contextArray.length > 0 && contextArray[contextArray.length - 1].key as ContextSegmentKey
+    
     return {
         profileId: profile ? null : profileId,
         communityId: community ? null : communityId,
@@ -304,7 +382,10 @@ const mapStateToProps = (state: ReduxState, ownProps: ContextDataResolverProps):
         taskId:taskId && parseInt(taskId),
         profile,
         community,
-        conversation
+        conversation,
+        authenticatedUser,
+        mainContextNaturalKey:lastSegmentKey && ContextNaturalKey.fromSegmentKey(lastSegmentKey),
+        path
     }
 }
 export const ContextDataResolver = connect<ReduxStateProps, {}, OwnProps>(mapStateToProps)(ContextDataResolverComponent)

@@ -59,6 +59,10 @@ export default  {
         // Community URLs
         myCommunitiesUrl: '/api/v2/community/as-member/',
         invitedCommunitiesUrl: '/api/v2/community/invitations/',
+
+        communityLeaveUrl: (id:number) => {
+            return `/api/v2/community/${id}/leave/`
+        },
         communityMembersUrl: (id:number) => {
             return `/api/v2/community/${id}/members/`
         },
@@ -142,6 +146,9 @@ export default  {
         },
 
         // Group URLs
+        groupLeaveUrl: (id:number) => {
+            return `/api/v2/group/${id}/leave/`
+        },
         groupUrl: (id:number|string) => {
             return `/api/v2/group/${id}/`
         },
@@ -263,6 +270,9 @@ export default  {
 
         // Event URLs
         upcomingEventsUrl: '/api/v2/event/upcoming/',
+        eventLeaveUrl: (id:number) => {
+            return `/api/v2/event/${id}/leave/`
+        },
         eventModerateUrl: (id:number) => {
             return `/api/v2/event/${id}/moderate/`
         },

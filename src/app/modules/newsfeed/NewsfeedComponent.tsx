@@ -6,7 +6,7 @@ import { withRouter } from 'react-router';
 import * as Immutable from 'immutable';
 import {ApiClient} from '../../network/ApiClient';
 import { ReduxState } from '../../redux/index';
-import { UserProfile, Status, UploadedFile, ContextNaturalKey, StatusActions, ObjectAttributeType, Permission, Permissible, ContextObject } from '../../types/intrasocial_types';
+import { UserProfile, Status, UploadedFile, ContextNaturalKey, StatusActions, ObjectAttributeType, Permission, Permissible, ContextObject, IdentifiableObject } from '../../types/intrasocial_types';
 import { nullOrUndefined, uniqueId, userFullName } from '../../utilities/Utilities';
 import { ToastManager } from '../../managers/ToastManager';
 import { StatusComponent } from '../../components/status/StatusComponent';
@@ -22,6 +22,7 @@ import { EventSubscription } from 'fbemitter';
 import { Mention } from '../../components/general/input/MentionEditor';
 import { StatusComposerComponent } from '../../components/general/input/StatusComposerComponent';
 import { ReadObserver } from '../../library/ReadObserver';
+import { ProfileManager } from '../../managers/ProfileManager';
 import ReactDOM = require('react-dom');
 
 class StatusComposer
@@ -75,7 +76,7 @@ type OwnProps = {
     limit:number
     contextNaturalKey?:ContextNaturalKey
     contextObjectId?:number
-    contextObject?:Permissible
+    contextObject?:Permissible & IdentifiableObject
     includeSubContext?:boolean
     filter:ObjectAttributeType
     reloadContext?:string
@@ -108,7 +109,7 @@ type State = {
 }
 type IncomingUpdateItem = {
     type:string
-    status_id:number
+    id:number
     parent_id?:number
     position?:number
 }
@@ -269,7 +270,7 @@ export class NewsfeedComponent extends React.Component<Props, State> {
     }
     private processIncomingStatusNew = (...args:any[]) => {
         const object = args[0]
-        const id = object && object.status_id
+        const id = object && object.id
         if(id)
         {
             const update:IncomingUpdateItem = {type:EventStreamMessageType.STATUS_NEW, ...object}
@@ -312,7 +313,7 @@ export class NewsfeedComponent extends React.Component<Props, State> {
     }
     private processIncomingStatusUpdate = (...args:any[]) => {
         const object = args[0]
-        const id = object && object.status_id
+        const id = object && object.id
         if(id)
         {
             const update:IncomingUpdateItem = {type:EventStreamMessageType.STATUS_UPDATE, ...object}
@@ -346,7 +347,7 @@ export class NewsfeedComponent extends React.Component<Props, State> {
             {
                 this.setState({
                     isLoading: true
-                }, this.fetchComment(update.status_id));
+                }, this.fetchComment(update.id));
             }
         }
         else
@@ -359,7 +360,7 @@ export class NewsfeedComponent extends React.Component<Props, State> {
         }
     }
     private executeInteractionUpdate = (update:IncomingInteractionItem) => {
-        const oldStatus = this.findStatusByStatusId(update.status_id)
+        const oldStatus = this.findStatusByStatusId(update.id)
         if(oldStatus)
         {
             const status = this.getClonedStatus(oldStatus)
@@ -374,10 +375,10 @@ export class NewsfeedComponent extends React.Component<Props, State> {
     }
     private executeStatusUpdate = (update:IncomingUpdateItem) => {
             //fetch & update if feed contains status
-            const oldStatus = this.findStatusByStatusId(update.status_id)
+            const oldStatus = this.findStatusByStatusId(update.id)
             if(oldStatus)
             {
-                ApiClient.getStatus(update.status_id, (status, reqStatus, error) => {
+                ApiClient.getStatus(update.id, (status, reqStatus, error) => {
                     if(!this._mounted)
                         return
                     if(status)
@@ -392,7 +393,7 @@ export class NewsfeedComponent extends React.Component<Props, State> {
     }
     private processIncomingStatusDeleted = (...args:any[]) => {
         const object = args[0]
-        const id = object && object.status_id
+        const id = object && object.id
         if(id)
         {
             const update:IncomingUpdateItem = {type:EventStreamMessageType.STATUS_DELETED, ...object}
@@ -401,7 +402,7 @@ export class NewsfeedComponent extends React.Component<Props, State> {
     }
     private processIncomingStatusInteractionUpdate = (...args:any[]) => {
         const object = args[0]
-        const id = object && object.status_id
+        const id = object && object.id
         if(id)
         {
             const update:IncomingInteractionItem = {type:EventStreamMessageType.STATUS_INTERACTION_UPDATE, ...object}
@@ -656,14 +657,14 @@ export class NewsfeedComponent extends React.Component<Props, State> {
         console.log("<<START>>")
         let updateArray:ArrayItem[] = []
         let parentStatus = update.parent_id && this.findStatusByStatusId(update.parent_id)
-        const deletedStatus = this.findStatusByStatusId(update.status_id)
+        const deletedStatus = this.findStatusByStatusId(update.id)
         if(!parentStatus && !deletedStatus)
         {
             console.log("No parent status or deleted status, aborting!")
             return
         }
         const parentIndex = this.findIndexByStatusId(update.parent_id)
-        const deletedStatusIndex = this.findIndexByStatusId(update.status_id)
+        const deletedStatusIndex = this.findIndexByStatusId(update.id)
         const deletedStatusLevel = deletedStatus ? deletedStatus.level : parentStatus.level + 1
         let currentIndex = parentStatus ? parentIndex : deletedStatusIndex
         if(parentStatus)
@@ -709,7 +710,7 @@ export class NewsfeedComponent extends React.Component<Props, State> {
                     if(item.hasOwnProperty('id'))
                     {
                         const c = item as Status
-                        insideDeleteScope = c.id == update.status_id
+                        insideDeleteScope = c.id == update.id
                         if(c.position > update.position)//update position
                         {
                             const clone = {...c}
@@ -721,7 +722,7 @@ export class NewsfeedComponent extends React.Component<Props, State> {
                     else if(item instanceof StatusCommentLoader)
                     {
                         const c = item as StatusCommentLoader
-                        if(c.statusId == update.status_id)
+                        if(c.statusId == update.id)
                         {
                             updateArray.push({index:currentIndex, object:null})
                         }
@@ -740,7 +741,7 @@ export class NewsfeedComponent extends React.Component<Props, State> {
                     else if (item instanceof StatusComposer)
                     {
                         const c = item as StatusComposer
-                        if(c.statusId == update.status_id) // remove composers belonging to deleted status
+                        if(c.statusId == update.id) // remove composers belonging to deleted status
                         {
                             updateArray.push({index:currentIndex, object:null})
                         }
@@ -793,7 +794,7 @@ export class NewsfeedComponent extends React.Component<Props, State> {
                 return
             if(nullOrUndefined(error))
             {
-                this.postDeleteStatus({status_id:status.id, parent_id:status.parent, type:EventStreamMessageType.STATUS_DELETED})
+                this.postDeleteStatus({id:status.id, parent_id:status.parent, type:EventStreamMessageType.STATUS_DELETED})
             }
             ToastManager.showRequestErrorToast(error)
             this.setStashUpdates(false)
@@ -1176,7 +1177,13 @@ export class NewsfeedComponent extends React.Component<Props, State> {
     }
     getStatusTaggableMembers = (statusId:number) => {
         const status = this.findStatusByStatusId(statusId)
-        return status && status.visibility || []
+        let visibility = status && status.visibility || []
+        if(visibility.length > 0)
+            return visibility
+        visibility = ContextNaturalKey.getMembers(this.props.contextNaturalKey, this.props.contextObject)
+        if(visibility.length > 0)
+            return visibility
+        return ProfileManager.getContactListIds(true)
     }
     findStatusByStatusId = (statusId:number) =>
     {

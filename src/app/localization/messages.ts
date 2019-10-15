@@ -601,6 +601,7 @@ var translations = {
     "context.request.join.format":"Request to join {0}",
     "context.membership.request.pending":"Your have a pending membership request",
     "context.joined.format":"You joined the {0}",
+    "common.leave":"Leave",
   },
   no: {
     "search.placeholder": "Søk ...",
@@ -1204,6 +1205,7 @@ var translations = {
     "context.request.join.format":"Be om å få bli med i {0}",
     "context.membership.request.pending":"Du har en ventende medlemskapforespørsel",
     "context.joined.format":"Du ble med i {0}",
+    "common.leave":"Forlat",
   },
   en: {
     "search.placeholder": "Search ...",
@@ -1819,6 +1821,7 @@ var translations = {
     "context.request.join.format":"Request to join {0}",
     "context.membership.request.pending":"Your have a pending membership request",
     "context.joined.format":"You joined the {0}",
+    "common.leave":"Leave",
   }
 };
 

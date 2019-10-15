@@ -528,6 +528,18 @@ export namespace ContextNaturalKey {
             default: return null
         }
     }
+    export function fromSegmentKey(key: ContextSegmentKey) {
+        switch (key) {
+            case ContextSegmentKey.GROUP: return ContextNaturalKey.GROUP
+            case ContextSegmentKey.COMMUNITY: return ContextNaturalKey.COMMUNITY
+            case ContextSegmentKey.USER: return ContextNaturalKey.USER
+            case ContextSegmentKey.PROJECT: return ContextNaturalKey.PROJECT
+            case ContextSegmentKey.EVENT: return ContextNaturalKey.EVENT
+            case ContextSegmentKey.TASK: return ContextNaturalKey.TASK
+            case ContextSegmentKey.CONVERSATION: return ContextNaturalKey.CONVERSATION
+            default: return null
+        }
+    }
     export function elasticTypeForKey(key: ContextNaturalKey) {
         switch (key) {
             case ContextNaturalKey.GROUP: return ElasticSearchType.GROUP

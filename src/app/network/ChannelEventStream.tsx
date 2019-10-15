@@ -16,7 +16,7 @@ export enum EventStreamMessageType {
     CLIENT_STATUS_CHANGE = "client.status_change",
 
     CONVERSATION_TYPING = "conversation.typing",
-    CONVERSATION_MESSAGE = "conversation.message",
+    CONVERSATION_MESSAGE_NEW = "conversation.message.new",
     CONVERSATION_REMOVE = "conversation.remove",
     CONVERSATION_NEW = "conversation.new",
     CONVERSATION_UPDATE = "conversation.update",

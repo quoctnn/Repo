@@ -46,12 +46,12 @@ export class ProjectController
         return this.objectId == id || this.object && this.object.id == id
     }
     private processProjectRemove = (...args:any[]) => {
-        const projectId = args[0]["project_id"] as number
+        const projectId = args[0]["id"] as number
         if(this.isSameId(projectId))
             this.setObject(null, false)
     }
     private processProjectUpdate = (...args:any[]) => {
-        const projectId = args[0]["project_id"] as number
+        const projectId = args[0]["id"] as number
         if(this.isSameId(projectId))
             this.fetchObject()
     }

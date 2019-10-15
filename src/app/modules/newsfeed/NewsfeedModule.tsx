@@ -13,7 +13,7 @@ import { ResponsiveBreakpoint } from '../../components/general/observers/Respons
 import NewsfeedComponentRouted, { NewsfeedComponent } from './NewsfeedComponent';
 import CircularLoadingSpinner from '../../components/general/CircularLoadingSpinner';
 import NewsfeedMenu, { NewsfeedMenuData, allowedSearchOptions } from './NewsfeedMenu';
-import { ObjectAttributeType, ContextNaturalKey, StatusActions, Permission, Permissible } from '../../types/intrasocial_types';
+import { ObjectAttributeType, ContextNaturalKey, StatusActions, Permission, Permissible, IdentifiableObject } from '../../types/intrasocial_types';
 import { ContextSearchData } from '../../components/general/input/contextsearch/extensions';
 import { translate } from '../../localization/AutoIntlProvider';
 import { ReduxState } from '../../redux';
@@ -40,7 +40,7 @@ type DefaultProps = {
 interface ReduxStateProps
 {
     contextObjectId:number
-    contextObject:Permissible
+    contextObject:Permissible & IdentifiableObject
 }
 interface State
 {
@@ -175,11 +175,12 @@ class NewsfeedModule extends React.Component<Props, State> {
     }
     renderStatusComposer = (resolvedContextNaturalKey:ContextNaturalKey, resolvedContextObjectId:number) => {
 
-        const {contextObject} = this.props
+        const {contextObject, contextNaturalKey} = this.props
         const canPost = (contextObject && contextObject.permission >= Permission.post) || false
         let communityId = contextObject && ((contextObject as any).community || null)
         if(canPost)
         {
+            const taggableMembers = ContextNaturalKey.getMembers(contextNaturalKey, contextObject)
             return (<>
                 <div className="status-composer-backdrop" onMouseDown={this.blurStatusComposer}></div>
                 <div ref={this.statuscomposer} className="feed-composer-container main-content-background">
@@ -199,7 +200,7 @@ class NewsfeedModule extends React.Component<Props, State> {
                         singleLine={!this.state.statusComposerFocus}
                         forceHideDropzone={!this.state.statusComposerFocus}
                         useAdaptiveFontSize={this.state.statusComposerFocus}
-                        //taggableMembers={task.visibility}
+                        taggableMembers={taggableMembers}
                     />
                 </div>
             </>)

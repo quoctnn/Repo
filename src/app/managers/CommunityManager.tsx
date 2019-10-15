@@ -19,11 +19,11 @@ export abstract class CommunityManager
         NotificationCenter.addObserver('eventstream_' + EventStreamMessageType.COMMUNITY_MAIN, CommunityManager.processCommunityMainChanged)
     }
     static processCommunityDelete = (...args:any[]) => {
-        let communityId = args[0]['community_id'] as number;
+        let communityId = args[0]["id"] as number;
         CommunityManager.removeCommunity(communityId)
     }
     static processCommunityMainChanged = (...args:any[]) => {
-        let communityId = args[0]['community_id'] as number;
+        let communityId = args[0]["id"] as number;
         const community = CommunityManager.getCommunityById(communityId)
         ToastManager.showInfoToast(translate("Main community changed"), community.name)
     }
@@ -31,7 +31,7 @@ export abstract class CommunityManager
         CommunityManager.getStore().dispatch(updateCommunityAction(community))
     }
     static processCommunityUpdate = (...args:any[]) => {
-        let communityId = args[0]['community_id'] as number;
+        let communityId = args[0]["id"] as number;
         ApiClient.getCommunity(communityId, (community, status, error) => {
             if(community)
             {

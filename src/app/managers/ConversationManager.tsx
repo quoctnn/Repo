@@ -21,7 +21,7 @@ export abstract class ConversationManager
     {
         NotificationCenter.addObserver("eventstream_" + EventStreamMessageType.CONVERSATION_NEW, ConversationManager.processIncomingConversation)
         NotificationCenter.addObserver("eventstream_" + EventStreamMessageType.CONVERSATION_UPDATE, ConversationManager.processIncomingConversation)
-        NotificationCenter.addObserver("eventstream_" + EventStreamMessageType.CONVERSATION_MESSAGE, ConversationManager.processIncomingConversationMessage)
+        NotificationCenter.addObserver("eventstream_" + EventStreamMessageType.CONVERSATION_MESSAGE_NEW, ConversationManager.processIncomingConversationMessage)
         NotificationCenter.addObserver("eventstream_" + EventStreamMessageType.CONVERSATION_REMOVE, ConversationManager.processIncomingConversationRemove)
     }
     static storeConversations = (conversations:Conversation[]) => {
@@ -113,8 +113,8 @@ export abstract class ConversationManager
         ConversationManager.getStore().dispatch(addConversationsAction([conversation]))
     }
     private static processIncomingConversationRemove = (...args:any[]) => {
-        let data:{conversation_id:number} = args[0]
-        ConversationManager.removeConversation(data.conversation_id)
+        let data:{id:number} = args[0]
+        ConversationManager.removeConversation(data.id)
     }
     private static processIncomingConversationMessage = (...args:any[]) =>
     {

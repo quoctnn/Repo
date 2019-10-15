@@ -131,8 +131,8 @@ export class StatusComposerComponent extends React.Component<Props, State> {
             return
         }
         console.log("searching", search)
-        const {taggableMembers, contextNaturalKey, contextObjectId} = this.props
-        ProfileManager.searchProfilesInContext({search, taggableMembers, contextNaturalKey, contextObjectId, completion:(profiles) => {
+        const {taggableMembers} = this.props
+        ProfileManager.searchProfilesInMembers({search, taggableMembers, completion:(profiles) => {
             completion(profiles.map(u => Mention.fromUser(u)))
         }})
     }

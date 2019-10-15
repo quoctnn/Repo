@@ -167,9 +167,7 @@ export default class StatusEditorComponent extends React.Component<Props, State>
     {
         console.log("searching", search)
         const taggableMembers = this.props.status.visibility
-        const contextNaturalKey = this.props.status.context_natural_key
-        const contextObjectId = this.props.status.context_object_id
-        ProfileManager.searchProfilesInContext({search, taggableMembers, contextNaturalKey, contextObjectId, completion:(profiles) => {
+        ProfileManager.searchProfilesInMembers({search, taggableMembers, completion:(profiles) => {
             completion(profiles.map(u => Mention.fromUser(u)))
         }})
     }
