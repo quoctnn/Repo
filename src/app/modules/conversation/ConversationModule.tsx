@@ -214,10 +214,9 @@ class ConversationModule extends React.Component<Props, State> {
         }
         if(this.props.location.pathname != prevProps.location.pathname && this.messageComposer && this.messageComposer.current)
         {
-            this.messageComposer.current.clearEditorContent()
             this.setState((prevState:State) => {
                 return {files:[], uploading:false, showDropzone:false}
-            })
+            },this.messageComposer.current.clearEditorContent)
         }
         NavigationUtilities.protectNavigation(this.protectKey, this.state.files.length > 0)
     }

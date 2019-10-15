@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import EmojiPicker from 'emoji-picker-react';
-import { EditorState, DraftHandleValue, Modifier, SelectionState, getDefaultKeyBinding , } from 'draft-js';
+import { EditorState, DraftHandleValue, Modifier, SelectionState, getDefaultKeyBinding, convertToRaw , } from 'draft-js';
 import Editor from "draft-js-plugins-editor";
 import "draft-js-mention-plugin/lib/plugin.css";
 import createMentionPlugin, { defaultSuggestionsFilter } from "draft-js-mention-plugin";
@@ -180,7 +180,7 @@ export default class MentionEditor extends React.Component<Props, State> {
     static defaultProps:DefaultProps = {
             showEmojiPicker:true
     }
-    constructor(props) {
+    constructor(props:Props) {
         super(props);
 
         this.mentionPlugin = createMentionPlugin({
@@ -194,6 +194,11 @@ export default class MentionEditor extends React.Component<Props, State> {
         this.rootElement = null;
         this.positioningElement = null;
         this.observer = null;
+        this.logState(this.props.editorState)
+    }
+    logState(editorState:EditorState){
+        const content = editorState.getCurrentContent()
+        console.log("state", convertToRaw(content))
     }
     componentWillUnmount = () => {
         this.removeBackDrop()
@@ -392,17 +397,7 @@ export default class MentionEditor extends React.Component<Props, State> {
           contentState,
           'insert-characters',
         );
-        //force selection at end
         newEditorState = EditorState.moveFocusToEnd(newEditorState)
-        /*const block = newEditorState.getCurrentContent().getLastBlock()
-        const length = block.getLength();
-        const blockSelection = SelectionState
-            .createEmpty(block.getKey())
-            .merge({
-            anchorOffset: length,
-            focusOffset: length,
-          }) as SelectionState
-        newEditorState = EditorState.forceSelection(newEditorState, blockSelection )*/
         this.onChange(newEditorState)
     }
     onHandleBeforeInput = (chars: string, editorState: EditorState):DraftHandleValue => {
@@ -460,50 +455,48 @@ export default class MentionEditor extends React.Component<Props, State> {
         <div ref={this.container} className="mention-editor" onClick={this.focus}>
             <div>
                 <div className="d-flex">
-                <div className="flex-grow-1 editor-container">
-                    <div className="editor-inner-container">
-                        <Editor
-                            editorState={this.props.editorState}
-                            onChange={this.onChange}
-                            plugins={plugins}
-                            ref={this.editor}
-                            onBlur={this.props.onBlur}
-                            onFocus={this.props.onFocus}
-                            placeholder={this.props.placeholder}
-                            keyBindingFn={this.handlekeyBindingFn}
-                            handleBeforeInput={this.onHandleBeforeInput}
-                            handleKeyCommand={this.props.handleKeyCommand}
-
-                        />
+                    <div className="flex-grow-1 editor-container">
+                        <div className="editor-inner-container">
+                            <Editor
+                                editorState={this.props.editorState}
+                                onChange={this.onChange}
+                                plugins={plugins}
+                                ref={this.editor}
+                                onBlur={this.props.onBlur}
+                                onFocus={this.props.onFocus}
+                                placeholder={this.props.placeholder}
+                                keyBindingFn={this.handlekeyBindingFn}
+                                handleBeforeInput={this.onHandleBeforeInput}
+                                handleKeyCommand={this.props.handleKeyCommand}
+                            />
+                        </div>
+                    </div>
+                    <div className="d-flex align-items-end">
+                        {this.props.showEmojiPicker &&
+                            <button
+                                ref={this.emojiButton}
+                                className="emojiButton editor-button btn btn-default"
+                                onMouseUp={this.onEmojiButtonMouseUp}
+                                type="button" >
+                                    <i className="far fa-smile fa-lg"></i>
+                            </button>
+                        }
+                        {(this.props.filesAdded || this.props.onHandleUploadClick) &&
+                            <button
+                                className="upload-button editor-button btn btn-default"
+                                type="button" onClick={this.onFileuploadButtonClick} >
+                                {this.props.filesAdded &&
+                                    <input ref={this.fileUploader}
+                                            accept={Settings.allowedTypesFileUpload}
+                                            multiple={true}
+                                            className="form-control"
+                                            type="file"
+                                            onChange={this.uploadFileChanged} /> }
+                                <i className="fa fa-paperclip fa-lg"></i>
+                            </button>}
                     </div>
                 </div>
-                <div className="d-flex align-items-end">
-                    {this.props.showEmojiPicker &&
-                        <button
-                            ref={this.emojiButton}
-                            className="emojiButton editor-button btn btn-default"
-                            onMouseUp={this.onEmojiButtonMouseUp}
-                            type="button" >
-                                <i className="far fa-smile fa-lg"></i>
-                        </button>
-                    }
-                    {(this.props.filesAdded || this.props.onHandleUploadClick) &&
-                        <button
-                            className="upload-button editor-button btn btn-default"
-                            type="button" onClick={this.onFileuploadButtonClick} >
-                            {this.props.filesAdded &&
-                                <input ref={this.fileUploader}
-                                        accept={Settings.allowedTypesFileUpload}
-                                        multiple={true}
-                                        className="form-control"
-                                        type="file"
-                                        onChange={this.uploadFileChanged} /> }
-                            <i className="fa fa-paperclip fa-lg"></i>
-                        </button>}
-                </div>
             </div>
-            </div>
-
             <MentionSuggestions
                 onSearchChange={this.onSearchChange}
                 suggestions={this.state.suggestions}

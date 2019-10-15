@@ -212,7 +212,7 @@ export class ChatMessageComposer extends React.Component<Props,State> {
         }
     }
     clearEditorContent = () => {
-        const editorState = EditorState.push(this.state.editorState, ContentState.createFromText(''), "change-block-data");
+        const editorState = EditorState.push(this.state.editorState, ContentState.createFromText(''), null);
         this.setState(() => {
             return { editorState, plainText:"" }
         })
