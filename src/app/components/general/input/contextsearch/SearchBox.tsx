@@ -95,7 +95,6 @@ export class SearchBox extends React.Component<Props, State>{
         const selection = es.getSelection()
         let editorState = SearcQueryManager.getStateWithEntities(es, this.props.allowedSearchOptions)
         editorState = EditorState.acceptSelection(editorState, selection)
-        this.logState(editorState)
         const newText = es.getCurrentContent().getPlainText()
         const sendOnChange = forceOnChange || newText != this.state.text
         this.setState(() => {

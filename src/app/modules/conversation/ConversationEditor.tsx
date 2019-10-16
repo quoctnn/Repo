@@ -70,10 +70,6 @@ class ConversationEditor extends React.Component<Props, State> {
     leaveConversation = () => {
         const conversation = this.props.conversation
         ConversationManager.leaveConversation(conversation.id, (success) => {
-            if(success)
-            {
-                ToastManager.showInfoToast(translate("You left the conversation!"))
-            }
         })
     }
     renderMember = (member:number) => {

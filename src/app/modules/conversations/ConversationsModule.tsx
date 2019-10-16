@@ -292,10 +292,6 @@ class ConversationsModule extends React.Component<Props, State> {
             if(confirmed)
             {
                 ConversationManager.leaveConversation(action.argument.conversation, (success) => {
-                    if(success)
-                    {
-                        ToastManager.showInfoToast(translate("You left the conversation!"))
-                    }
                     this.resetAction()
                 })
             }

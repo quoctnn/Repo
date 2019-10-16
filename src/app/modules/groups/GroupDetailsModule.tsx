@@ -103,9 +103,9 @@ class GroupDetailsModule extends React.Component<Props, State> {
     getGroupOptions = () => {
         const options: OverflowMenuItem[] = []
         const {group} = this.props.contextData
-        if(group.permission >= Permission.admin)
+        if(group.permission >= Permission.moderate)
             options.push({id:"1", type:OverflowMenuItemType.option, title:translate("Edit"), onPress:this.showGroupCreateForm, iconClass:"fas fa-pen", iconStackClass:Permission.getShield(group.permission)})
-        if(group.permission >= Permission.admin)
+        if(group.permission >= Permission.moderate)
         options.push({id:"members", type:OverflowMenuItemType.option, title:translate("common.member.management"), onPress:this.toggleMembersForm, iconClass:"fas fa-users-cog", iconStackClass:Permission.getShield(group.permission)})
         return options
     }

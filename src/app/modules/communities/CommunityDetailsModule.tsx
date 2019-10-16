@@ -239,7 +239,7 @@ class CommunityDetailsModule extends React.Component<Props, State> {
         if(!community)
             return options
         const permission = community.permission
-        if(permission >= Permission.admin)
+        if(permission >= Permission.moderate)
         {
             options.push({id:"edit", type:OverflowMenuItemType.option, title:translate("common.edit"), onPress:this.showCommunityEditForm, iconClass:"fas fa-pen", iconStackClass:Permission.getShield(permission)})
             options.push({id:"members", type:OverflowMenuItemType.option, title:translate("common.member.management"), onPress:this.toggleCommunityMembersForm, iconClass:"fas fa-users-cog", iconStackClass:Permission.getShield(permission)})

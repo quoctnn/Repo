@@ -1,5 +1,5 @@
 import * as React from "react";
-import {  Button, ModalBody, Modal, ModalHeader, ModalFooter, FormGroup, Label, Input } from 'reactstrap';
+import {  Button } from 'reactstrap';
 import { UserProfile } from "../../../types/intrasocial_types";
 import Avatar from "../Avatar";
 import { translate } from "../../../localization/AutoIntlProvider";

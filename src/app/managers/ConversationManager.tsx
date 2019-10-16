@@ -207,6 +207,7 @@ export abstract class ConversationManager
             if(success)
             {
                 ConversationManager.removeConversation(conversationId)
+                ToastManager.showInfoToast(translate("You left the conversation!"))
             }
             completion(success)
         })

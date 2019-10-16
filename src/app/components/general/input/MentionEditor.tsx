@@ -194,7 +194,7 @@ export default class MentionEditor extends React.Component<Props, State> {
         this.rootElement = null;
         this.positioningElement = null;
         this.observer = null;
-        this.logState(this.props.editorState)
+        //this.logState(this.props.editorState)
     }
     logState(editorState:EditorState){
         const content = editorState.getCurrentContent()

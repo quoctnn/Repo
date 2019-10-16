@@ -1494,7 +1494,7 @@ export type Event = {
     slug: string
     community: number
     description: string
-    creator: UserProfile
+    creator: number
     attending: number[]
     attending_count: number
     not_attending: number[]

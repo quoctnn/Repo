@@ -33,6 +33,7 @@ type OwnProps = {
 type State = {
     title:string
     addMembersDialogVisible:boolean
+    addMembersDialogReloadKey:string
     canSubmitNewMembers:boolean
 }
 type ReduxStateProps = {
@@ -51,6 +52,7 @@ class ConversationDetailsModule extends React.Component<Props, State> {
         this.state = {
             title:this.getTitle(props),
             addMembersDialogVisible:false,
+            addMembersDialogReloadKey:uniqueId(),
             canSubmitNewMembers:false
         }
     }
@@ -163,7 +165,11 @@ class ConversationDetailsModule extends React.Component<Props, State> {
     }
     toggleAddMembersDialog = () => {
         this.setState((prevState:State) => {
-            return {addMembersDialogVisible:!prevState.addMembersDialogVisible}
+            const visible = !prevState.addMembersDialogVisible
+            const d:Partial<State> =  {addMembersDialogVisible:visible}
+            if(visible)
+                d.addMembersDialogReloadKey = uniqueId()
+            return d as State
         })
     }
     renderAddMembers = () => {
@@ -196,6 +202,7 @@ class ConversationDetailsModule extends React.Component<Props, State> {
     }
     renderAddmembersDialog = () => {
         const visible = this.state.addMembersDialogVisible
+
         let contacts:UserProfile[] = []
         if(visible)
         {
@@ -204,6 +211,7 @@ class ConversationDetailsModule extends React.Component<Props, State> {
             contacts = ProfileManager.getProfiles(possibleNewMembers)
         }
         return <SelectUsersDialog 
+                    key={this.state.addMembersDialogReloadKey}
                     contacts={contacts}
                     title={translate("conversation.add.members")}
                     visible={visible}

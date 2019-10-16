@@ -34,9 +34,14 @@ type State = {
     editFormReloadKey:string
     membersFormVisible?:boolean
     membersFormReloadKey?:string
-    confirmLeaveDialogVisible:boolean
+    confirmDialogVisible:boolean
+    confirmAction?:ConfirmableActions
 }
 type Props = OwnProps & RouteComponentProps<any> & ContextDataProps
+enum ConfirmableActions {
+    leave = "leave",
+    delete = "delete"
+}
 class EventDetailsModule extends React.Component<Props, State> {
     formController:FormController = null
     constructor(props:Props) {
@@ -48,7 +53,7 @@ class EventDetailsModule extends React.Component<Props, State> {
             editFormReloadKey:uniqueId(),
             membersFormVisible:false,
             membersFormReloadKey:uniqueId(),
-            confirmLeaveDialogVisible:false
+            confirmDialogVisible:false
         }
     }
     componentDidUpdate = (prevProps:Props) => {
@@ -101,43 +106,75 @@ class EventDetailsModule extends React.Component<Props, State> {
             return {membersFormVisible:!prevState.membersFormVisible, membersFormReloadKey: invitationReloadKey}
         })
     }
-    showConfirmLeaveDialog = () => {
+    showConfirmDeleteDialog = () => {
         this.setState(() => {
-            return {confirmLeaveDialogVisible:true}
+            return {confirmDialogVisible:true, confirmAction:ConfirmableActions.delete}
         })
     }
-    leaveContext = (confirmed:boolean) => {
+    showConfirmLeaveDialog = () => {
+        this.setState(() => {
+            return {confirmDialogVisible:true, confirmAction:ConfirmableActions.leave}
+        })
+    }
+    closeConfirmDialog = () => {
+
+        this.setState(() => {
+            return {confirmDialogVisible:false, confirmAction:null}
+        })
+    }
+    confirmationComplete = (confirmed:boolean) => {
         if(confirmed)
         {
             const id = this.props.contextData.event.id
             const contextNaturalKey = ContextNaturalKey.EVENT
-            ApiClient.leaveContext(this.props.contextData.authenticatedUser.id, contextNaturalKey, id, (data, status, error) => {
-                ToastManager.showRequestErrorToast(error)
-                this.props.contextData.reloadContextObject(id, contextNaturalKey)
-            })
+            switch (this.state.confirmAction) {
+                case ConfirmableActions.leave:
+                {
+                    ApiClient.leaveContext(contextNaturalKey, id, (data, status, error) => {
+                        ToastManager.showRequestErrorToast(error)
+                        this.props.contextData.reloadContextObject(id, contextNaturalKey)
+                        this.closeConfirmDialog()
+                    })
+                    break;
+                }  
+                case ConfirmableActions.delete:
+                {
+                    ApiClient.deleteContext(contextNaturalKey, id, (data, status, error) => {
+                        ToastManager.showRequestErrorToast(error)
+                        this.props.contextData.reloadContextObject(id, contextNaturalKey)
+                        this.closeConfirmDialog()
+                    })
+                    break;
+                }  
+                default:
+                    break;
+            }
         }
-        this.setState(() => {
-            return {confirmLeaveDialogVisible:false}
-        })
+        else{
+            this.closeConfirmDialog()
+        }
     }
     renderConfirmLeaveDialog = () => {
-        const visible = this.state.confirmLeaveDialogVisible
-        const title = translate("conversation.confirm.leave.title.format").format(this.props.contextData.event.name)
-        const contextName = ElasticSearchType.nameSingularForKey(ElasticSearchType.EVENT)
-        const message = translate("conversation.confirm.leave.message.format").format(contextName)
+        const action = this.state.confirmAction
+        const visible = this.state.confirmDialogVisible
+        const contextName = ElasticSearchType.nameSingularForKey(ElasticSearchType.EVENT).toLowerCase()
+        const title =  action && translate(`context.confirm.${this.state.confirmAction}.title.format`).format(this.props.contextData.event.name)
+        const message = action && translate(`context.confirm.${this.state.confirmAction}.message.format`).format(contextName)
         const okButtonTitle = translate("common.yes")
-        return <ConfirmDialog visible={visible} title={title} message={message} didComplete={this.leaveContext} okButtonTitle={okButtonTitle}/>
+        return <ConfirmDialog visible={visible} title={title} message={message} didComplete={this.confirmationComplete} okButtonTitle={okButtonTitle}/>
     }
     getEventOptions = () => {
         const authenticatedUser = this.props.contextData.authenticatedUser
         const options: OverflowMenuItem[] = []
         const {event} = this.props.contextData
-        if(event.permission >= Permission.admin)
-            options.push({id:"1", type:OverflowMenuItemType.option, title:translate("Edit"), onPress:this.showEventCreateForm, iconClass:"fas fa-pen", iconStackClass:Permission.getShield(event.permission)})
-        if(event.permission >= Permission.admin)
+        if(event.permission >= Permission.moderate)
+        {
+            options.push({id:"edit", type:OverflowMenuItemType.option, title:translate("Edit"), onPress:this.showEventCreateForm, iconClass:"fas fa-pen", iconStackClass:Permission.getShield(event.permission)})
             options.push({id:"members", type:OverflowMenuItemType.option, title:translate("common.member.management"), onPress:this.toggleMembersForm, iconClass:"fas fa-users-cog", iconStackClass:Permission.getShield(event.permission)})
+            options.push({id:"delete", type:OverflowMenuItemType.option, title:translate("common.delete"), onPress:this.showConfirmDeleteDialog, iconClass:"fas fa-trash-alt", iconStackClass:Permission.getShield(event.permission)})
+        }
         const attending = event.attending || []
-        if(attending.contains(authenticatedUser.id))
+        if(event.creator != authenticatedUser.id && attending.contains(authenticatedUser.id))
             options.push({id:"leave", type:OverflowMenuItemType.option, title:translate("common.leave"), onPress:this.showConfirmLeaveDialog, iconClass:"fas fa-sign-out-alt"})
         return options
     }

@@ -56,8 +56,10 @@ export class ContextFilter extends React.PureComponent<Props & React.HTMLAttribu
                 types:ContextFilter.searchTypes,
                 include_results:true,
                 slim_types:true,
+                offset:0,
+                limit:10
             }
-            return ApiClient.search2(10, 0, args, (data,status,error) => {
+            return ApiClient.search(args, (data,status,error) => {
                 const d = data && data.results || []
                 resolve(this.groupResultItems( d.map(r => convertElasticResultItem(r)).filter(r => r != null)) )
             })

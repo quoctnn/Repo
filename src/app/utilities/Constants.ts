@@ -45,7 +45,7 @@ export default  {
         //embed card
         parseUrl:'/api/v1/links/parse-url/',
         //search
-        searchUrl: '/api/v1/search/',
+        searchUrl: '/api/v2/search/',
         getSearchHistoryUrl: '/api/v1/search/history/',//GET
         createSearchHistoryUrl: '/api/v1/search/history/', //POST
         removeSearchHistoryUrl: (id:number) => {
@@ -62,6 +62,9 @@ export default  {
 
         communityLeaveUrl: (id:number) => {
             return `/api/v2/community/${id}/leave/`
+        },
+        communityDeleteUrl: (id:number) => {
+            return `/api/v2/community/${id}/`
         },
         communityMembersUrl: (id:number) => {
             return `/api/v2/community/${id}/members/`
@@ -149,6 +152,9 @@ export default  {
         groupLeaveUrl: (id:number) => {
             return `/api/v2/group/${id}/leave/`
         },
+        groupDeleteUrl: (id:number) => {
+            return `/api/v2/group/${id}/`
+        },
         groupUrl: (id:number|string) => {
             return `/api/v2/group/${id}/`
         },
@@ -197,6 +203,9 @@ export default  {
         // Project URLs
         projectMembersUrl: (id:number) => {
             return `/api/v2/project/${id}/members/`
+        },
+        projectDeleteUrl: (id:number) => {
+            return `/api/v2/project/${id}/`
         },
         projectMembershipUrl: (id:number) => {
             return `/api/v2/project/${id}/membership/`
@@ -272,6 +281,9 @@ export default  {
         upcomingEventsUrl: '/api/v2/event/upcoming/',
         eventLeaveUrl: (id:number) => {
             return `/api/v2/event/${id}/leave/`
+        },
+        eventDeleteUrl: (id:number) => {
+            return `/api/v2/event/${id}/`
         },
         eventModerateUrl: (id:number) => {
             return `/api/v2/event/${id}/moderate/`
