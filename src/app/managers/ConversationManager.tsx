@@ -3,7 +3,7 @@ import {ApiClient} from '../network/ApiClient';
 import { Conversation, Message, UserProfile, Permission } from '../types/intrasocial_types';
 import { EventStreamMessageType } from '../network/ChannelEventStream';
 import { ReduxState } from '../redux';
-import { addConversationsAction, removeConversationAction } from '../redux/conversationStore';
+import { addConversationsAction, removeConversationAction, updateConversationAction } from '../redux/conversationStore';
 import { updateMessageInQueueAction, removeMessageFromQueueAction, processNextMessageInQueueAction, addMessageToQueueAction } from '../redux/messageQueue';
 import { AuthenticationManager } from './AuthenticationManager';
 import { NotificationCenter } from '../utilities/NotificationCenter';
@@ -26,6 +26,9 @@ export abstract class ConversationManager
     }
     static storeConversations = (conversations:Conversation[]) => {
         ConversationManager.getStore().dispatch(addConversationsAction(conversations))
+    }
+    static updateConversation = (conversation:Partial<Conversation>) => {
+        ConversationManager.getStore().dispatch(updateConversationAction(conversation as Conversation))
     }
     static removeConversation = (conversationsId:number) => {
         ConversationManager.getStore().dispatch(removeConversationAction(conversationsId))
@@ -208,12 +211,12 @@ export abstract class ConversationManager
             completion(success)
         })
     }
-    static removeUsersFromConversation = (conversationId:number, users:number[], completion:(success:boolean) => void) =>
+    static removeUsersFromConversation = (conversationId:number, users:number[], completion:(success:boolean, conversation:Partial<Conversation>) => void) =>
     {
         ApiClient.removeConversationUsers(conversationId, users, (data, status, error) => {
             const success = !error
             ToastManager.showRequestErrorToast(error, lazyTranslate("Could not remove user(s) from conversation"))
-            completion(success)
+            completion(success, data)
         })
     }
     static markConversationAsRead = (conversationId:number, completion:() => void) =>

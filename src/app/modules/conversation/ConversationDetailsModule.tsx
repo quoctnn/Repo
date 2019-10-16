@@ -109,9 +109,16 @@ class ConversationDetailsModule extends React.Component<Props, State> {
         const conversationId = conversation.id
         if(conversationId && this.state.title != oldTitle)
         {
-            ApiClient.updateConversation(conversationId,{title:this.state.title}, (data, status, error) => {
+            ApiClient.updateConversation(conversationId,{title:this.state.title}, (conversation, status, error) => {
                 ToastManager.showRequestErrorToast(error, lazyTranslate("Could not update conversation"))
+                this.updateConversation(conversation)
             })
+        }
+    }
+    updateConversation = (conversation:Partial<Conversation>) => {
+        if(conversation)
+        {
+            ConversationManager.updateConversation(conversation)
         }
     }
     getMemberOptionMenuItems = (profile:UserProfile) => {
@@ -178,6 +185,7 @@ class ConversationDetailsModule extends React.Component<Props, State> {
         }, () => {
             ApiClient.addConversationUsers(conversationId, added, (conversation, status, errorData) => {
                 ToastManager.showRequestErrorToast(errorData, lazyTranslate("network.error"))
+                this.updateConversation(conversation)
             })
         })
     }

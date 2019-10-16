@@ -307,17 +307,24 @@ class ConversationsModule extends React.Component<Props, State> {
         {
             if(confirmed)
             {
-                ConversationManager.removeUsersFromConversation(action.argument.conversation, action.argument.users, (success) => {
+                ConversationManager.removeUsersFromConversation(action.argument.conversation, action.argument.users, (success, conversation) => {
                     if(success)
                     {
                         ToastManager.showInfoToast(translate("User(s) removed from conversation!"))
                     }
+                    this.updateConversation(conversation)
                     this.resetAction()
                 })
             }
             else {
                 this.resetAction()
             }
+        }
+    }
+    updateConversation = (conversation:Partial<Conversation>) => {
+        if(conversation)
+        {
+            ConversationManager.updateConversation(conversation)
         }
     }
     renderConfirmDialog = () => {
