@@ -46,7 +46,8 @@ export default class ContextMembersComponent extends React.Component<Props, Stat
     authenticatedUser = AuthenticationManager.getAuthenticatedUser()
     reloadIdleTimeout: NodeJS.Timer = null
     private observers:EventSubscription[] = []
-    private hasAdminAccess = false
+    private hasAccess = false
+    private minimumPermission = Permission.moderate
     constructor(props:Props) {
         super(props);
         this.state = {
@@ -58,13 +59,13 @@ export default class ContextMembersComponent extends React.Component<Props, Stat
                 search:"",
             },
         }
-        this.hasAdminAccess = Permission.hasAccess(props.contextObject, Permission.admin)
+        this.hasAccess = Permission.hasAccess(props.contextObject, this.minimumPermission)
         this.observers.push(props.roleManager.addRolesUpdatedObserver(this.handleRolesUpdated))
     }
     componentDidUpdate = (prevProps:Props) => {
         if(this.props.contextObject != prevProps.contextObject)
         {
-            this.hasAdminAccess = Permission.hasAccess(this.props.contextObject, Permission.admin)
+            this.hasAccess = Permission.hasAccess(this.props.contextObject, this.minimumPermission)
             const list = this.getList()
             list && list.reload()
         }
@@ -89,7 +90,9 @@ export default class ContextMembersComponent extends React.Component<Props, Stat
             return {selected:selectedItems, failed}
         })
     }
-    toggleRole = (roleId:number, profileId:number) => () => {
+    toggleRole = (roleId:number, profileId:number) => (event:React.SyntheticEvent) => {
+        event.preventDefault()
+        event.stopPropagation()
         const role = this.getRoles().find(r => r.id == roleId)
         if(role)
         {
@@ -156,13 +159,19 @@ export default class ContextMembersComponent extends React.Component<Props, Stat
             ApiClient.updateContextManagers(contextNaturalKey, contextObject.id, add, remove, onComplete)
         }
     }
-    toggleAdmin = (profile:UserProfile) => () => {
+    toggleAdmin = (profile:UserProfile) => (event:React.SyntheticEvent) => {
+        event.preventDefault()
+        event.stopPropagation()
         this.toggleModerate(profile, RelationshipStatus.admin)
     }
-    toggleModerator = (profile:UserProfile) => () => {
+    toggleModerator = (profile:UserProfile) => (event:React.SyntheticEvent) => {
+        event.preventDefault()
+        event.stopPropagation()
         this.toggleModerate(profile, RelationshipStatus.moderator)
     }
-    toggleManager = (profile:UserProfile) => () => {
+    toggleManager = (profile:UserProfile) => (event:React.SyntheticEvent) => {
+        event.preventDefault()
+        event.stopPropagation()
         this.toggleModerate(profile, RelationshipStatus.manager)
     }
     getMemberOptions = (profile:UserProfile) => {
@@ -234,7 +243,7 @@ export default class ContextMembersComponent extends React.Component<Props, Stat
         const footer = this.renderMemberFooter(profile)
         const avatarUrl = userAvatar(profile)
         let right:React.ReactNode = undefined
-        const memberOptions = this.hasAdminAccess ? this.getMemberOptions(profile) : []
+        const memberOptions = this.hasAccess ? this.getMemberOptions(profile) : []
         right = memberOptions.length > 0 && <DropDownMenu closeOnSelect={false} className="community-member-option-dropdown" triggerClass="fas fa-ellipsis-v mx-1" items={memberOptions}></DropDownMenu>
         return <GenericListItem key={profile.id} to={profile.uri} className={cn} header={title} left={<Avatar size={44} image={avatarUrl} />} footer={footer} right={right}/>
     }
@@ -372,7 +381,7 @@ export default class ContextMembersComponent extends React.Component<Props, Stat
         return <>
                 {error && <FormComponentErrorMessage className="d-block" errors={{error}} />}
                 <Input className="mb-2" value={this.state.filters.search} type="text" onChange={this.handleSearchInputChange} placeholder={translate("common.filter.members")}/>
-                {this.hasAdminAccess && <div className={classnames("list-header", {active:headerActive})}>
+                {this.hasAccess && <div className={classnames("list-header", {active:headerActive})}>
                     <Checkbox checked={headerActive} checkedIcon="fas fa-minus" onValueChange={this.headerToggle} />
                     <div className="flex-grow-1 text-truncate p-1">{translate("Member")}</div>
                     {this.renderHeaderButtons()}
@@ -384,7 +393,7 @@ export default class ContextMembersComponent extends React.Component<Props, Stat
                     loadMoreOnScroll={true}
                     onItemSelectionChange={this.handleSelectionChange}
                     selected={this.state.selected}
-                    isSelecting={this.hasAdminAccess}
+                    isSelecting={this.hasAccess}
                     findScrollParent={true}
                     clearDataBeforeFetch={false}
                 />

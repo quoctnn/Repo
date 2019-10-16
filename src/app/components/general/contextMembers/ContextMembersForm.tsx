@@ -24,19 +24,20 @@ type Props = OwnProps
 export default class ContextMembersForm extends React.Component<Props, State> {
     formController:FormController = null
     roleManager:RoleManager = null
-    private hasAdminAccess = false
+    private hasAccess = false
+    private minimumPermission = Permission.moderate
     constructor(props:Props) {
         super(props);
         this.state = {
         }
-        this.hasAdminAccess = Permission.hasAccess(props.contextObject, Permission.admin)
+        this.hasAccess = Permission.hasAccess(props.contextObject, this.minimumPermission)
         this.roleManager = new RoleManager(props.community.id)
 
     }
     componentDidUpdate = (prevProps:Props) => {
         if(this.props.contextObject != prevProps.contextObject)
         {
-            this.hasAdminAccess = Permission.hasAccess(this.props.contextObject, Permission.admin)
+            this.hasAccess = Permission.hasAccess(this.props.contextObject, this.minimumPermission)
         }
     }
     getContextMembers = () => {
@@ -49,13 +50,13 @@ export default class ContextMembersForm extends React.Component<Props, State> {
     }
     renderRolesPage = () => {
         const {contextObject, contextNaturalKey, community} = this.props
-        if(!this.hasAdminAccess || contextNaturalKey == ContextNaturalKey.EVENT)
+        if(contextObject.permission < Permission.admin || contextNaturalKey == ContextNaturalKey.EVENT)
             return null
         return <ContextRolesComponent roleManager={this.roleManager} community={community} contextNaturalKey={contextNaturalKey} contextObject={contextObject}/>
     }
     renderInvitationPage = () => {
         const {contextObject, contextNaturalKey, community} = this.props
-        if(!this.hasAdminAccess || contextNaturalKey == ContextNaturalKey.PROJECT)
+        if(!this.hasAccess || contextNaturalKey == ContextNaturalKey.PROJECT)
             return null
         if(contextNaturalKey == ContextNaturalKey.COMMUNITY)
             return <CommunityInvitationsComponent community={community} />
@@ -63,7 +64,7 @@ export default class ContextMembersForm extends React.Component<Props, State> {
     }
     renderInvitationMenuItem = (form:FormController) => {
         const {contextObject, contextNaturalKey, community} = this.props
-        if(!this.hasAdminAccess || contextNaturalKey == ContextNaturalKey.PROJECT)
+        if(!this.hasAccess || contextNaturalKey == ContextNaturalKey.PROJECT)
             return null
         return <FormMenuItem key="3"
             form={form} 
@@ -74,7 +75,7 @@ export default class ContextMembersForm extends React.Component<Props, State> {
     }
     renderRolesMenuItem = (form:FormController) => {
         const {contextObject, contextNaturalKey, community} = this.props
-        if(!this.hasAdminAccess || contextNaturalKey == ContextNaturalKey.EVENT)
+        if(contextObject.permission < Permission.admin || contextNaturalKey == ContextNaturalKey.EVENT)
             return null
         return <FormMenuItem key="2"
         form={form} 
@@ -91,7 +92,7 @@ export default class ContextMembersForm extends React.Component<Props, State> {
                     formErrors={[]} 
                     didCancel={didCancel} 
                     status={FormStatus.normal} 
-                    title={translate(this.hasAdminAccess ? "common.member.management" : "Members")} 
+                    title={translate(this.hasAccess ? "common.member.management" : "Members")} 
                     modalClassName="context-members-form-modal"
                     render={(form) => {
                         return {

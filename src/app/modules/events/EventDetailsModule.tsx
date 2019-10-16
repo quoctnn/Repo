@@ -154,7 +154,7 @@ class EventDetailsModule extends React.Component<Props, State> {
             this.closeConfirmDialog()
         }
     }
-    renderConfirmLeaveDialog = () => {
+    renderConfirmDialog = () => {
         const action = this.state.confirmAction
         const visible = this.state.confirmDialogVisible
         const contextName = ElasticSearchType.nameSingularForKey(ElasticSearchType.EVENT).toLowerCase()
@@ -219,7 +219,7 @@ class EventDetailsModule extends React.Component<Props, State> {
                         </div>
                         {this.renderEditForm()}
                         {this.renderMembersForm()}
-                        {this.renderConfirmLeaveDialog()}
+                        {this.renderConfirmDialog()}
                     </ModuleContent>
                     <ModuleFooter>
                         { startDate &&

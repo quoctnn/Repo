@@ -7,7 +7,7 @@ import ModuleFooter from '../ModuleFooter';
 import "./CommunityDetailsModule.scss"
 import { ResponsiveBreakpoint } from '../../components/general/observers/ResponsiveComponent';
 import { translate } from '../../localization/AutoIntlProvider';
-import { Community, ContextNaturalKey, Permission, CommunityConfigurationData, Group, Event, Project, ObjectHiddenReason, IdentifiableObject, ElasticSearchType } from '../../types/intrasocial_types';
+import { Community, ContextNaturalKey, Permission, CommunityConfigurationData, Group, Event, Project, ObjectHiddenReason, IdentifiableObject, ElasticSearchType, GroupSorting } from '../../types/intrasocial_types';
 import CircularLoadingSpinner from '../../components/general/CircularLoadingSpinner';
 import { DetailsContent } from '../../components/details/DetailsContent';
 import { DetailsMembers } from '../../components/details/DetailsMembers';
@@ -46,6 +46,7 @@ type State = {
     membersFormReloadKey?:string
     inReviewDialogContextNaturalKey?:ContextNaturalKey
     inReviewDialogContextObject?:IdentifiableObject
+    groups:Group[]
 }
 type Props = OwnProps & RouteComponentProps<any> & ContextDataProps
 class CommunityDetailsModule extends React.Component<Props, State> {
@@ -68,6 +69,7 @@ class CommunityDetailsModule extends React.Component<Props, State> {
             membersFormReloadKey:uniqueId(),
             inReviewDialogContextNaturalKey:null,
             inReviewDialogContextObject:null,
+            groups:[]
         }
     }
     componentDidUpdate = (prevProps:Props) => {
@@ -93,6 +95,16 @@ class CommunityDetailsModule extends React.Component<Props, State> {
         if (this.state.isLoading) {
             return (<CircularLoadingSpinner borderWidth={3} size={20} key="loading"/>)
         }
+    }
+    loadGroupsAndShowForm = () => {
+        const community = this.props.contextData.community
+        ApiClient.getGroups(community.id,null,100, 0, GroupSorting.mostUsed, (data, status, errorData) => {
+            const result = data && data.results || []
+            this.setState(() => {
+                return {isLoading:false, groups:result, createProjectFormVisible:true, createProjectFormReloadKey:uniqueId()}
+            })
+            ToastManager.showRequestErrorToast(errorData)
+        })
     }
     loadConfigurationDataAndShowForm = () => {
         const community = this.props.contextData.community
@@ -209,9 +221,7 @@ class CommunityDetailsModule extends React.Component<Props, State> {
     }
     //
     showProjectCreateForm = () => {
-        this.setState((prevState:State) => {
-            return {createProjectFormVisible:true, createProjectFormReloadKey:uniqueId()}
-        })
+        this.loadGroupsAndShowForm()
     }
     hideProjectCreateForm = () => {
 
@@ -279,7 +289,7 @@ class CommunityDetailsModule extends React.Component<Props, State> {
     renderAddProjectForm = () => {
         const visible = this.state.createProjectFormVisible
         const {community} = this.props.contextData
-        return <ProjectCreateComponent onCancel={this.hideProjectCreateForm} community={community.id} key={this.state.createProjectFormReloadKey} visible={visible} onComplete={this.handleProjectCreateForm} />
+        return <ProjectCreateComponent groups={this.state.groups} onCancel={this.hideProjectCreateForm} community={community.id} key={this.state.createProjectFormReloadKey} visible={visible} onComplete={this.handleProjectCreateForm} />
     }
     render = () => {
         const {breakpoint, history, match, location, staticContext, contextNaturalKey, className, contextData, ...rest} = this.props

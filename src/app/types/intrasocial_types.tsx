@@ -943,7 +943,7 @@ export type UnhandledNotifications = {
 }
 export type ContextObject = {
     name: string
-} & Linkable
+} & Linkable & IdentifiableObject
 export type Status = {
     //[key: string]: any
     can_comment: boolean
@@ -1523,7 +1523,7 @@ export type Project = {
     members: number[]
     members_count: number
     created_at: string
-    group: Group
+    group: ContextObject
     updated_at: string
     task_count: number
     tasks_assigned: number

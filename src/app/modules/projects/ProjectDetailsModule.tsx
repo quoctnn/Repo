@@ -7,7 +7,7 @@ import ModuleFooter from '../ModuleFooter';
 import "./ProjectDetailsModule.scss"
 import { ResponsiveBreakpoint } from '../../components/general/observers/ResponsiveComponent';
 import { translate } from '../../localization/AutoIntlProvider';
-import { Project, ContextNaturalKey, Permission } from '../../types/intrasocial_types';
+import { Project, ContextNaturalKey, Permission, Group } from '../../types/intrasocial_types';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import { DetailsMembers, HorisontalLayoutPosition } from '../../components/details/DetailsMembers';
 import { DetailsContent } from '../../components/details/DetailsContent';
@@ -84,7 +84,8 @@ class ProjectDetailsModule extends React.Component<Props, State> {
     renderEditForm = (project:Project) => {
         const visible = this.state.editFormVisible
         const {community} = this.props.contextData
-        return <ProjectCreateComponent onCancel={this.hideProjectCreateForm} community={community.id} key={this.state.editFormReloadKey} project={project} visible={visible} onComplete={this.handleProjectCreateForm} />
+        const groups = (project.group && [project.group] || []) as Group[]
+        return <ProjectCreateComponent groups={groups} onCancel={this.hideProjectCreateForm} community={community.id} key={this.state.editFormReloadKey} project={project} visible={visible} onComplete={this.handleProjectCreateForm} />
     }
     toggleMembersForm = () => {
         this.setState((prevState:State) => {

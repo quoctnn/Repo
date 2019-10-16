@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { translate } from '../../../localization/AutoIntlProvider';
-import { ContextNaturalKey, CropRect, ContextPhotoType, RequestErrorData, Project } from '../../../types/intrasocial_types';
+import { ContextNaturalKey, CropRect, ContextPhotoType, RequestErrorData, Project, Group } from '../../../types/intrasocial_types';
 import FormController, {FormStatus } from '../../form/FormController';
 import {ApiClient} from '../../../network/ApiClient';
 import { uniqueId, removeEmptyEntriesFromObject, nullOrUndefined } from '../../../utilities/Utilities';
@@ -11,6 +11,8 @@ import { RouteComponentProps, withRouter } from 'react-router';
 import { FormPage } from '../../form/FormPage';
 import { FormMenuItem } from '../../form/FormMenuItem';
 import { CommunityManager } from '../../../managers/CommunityManager';
+import { SelectInput } from '../../form/components/SelectInput';
+import { InputOption } from '../../form/components/RichRadioGroupInput';
 
 type OwnProps = {
     project?:Project
@@ -18,6 +20,7 @@ type OwnProps = {
     onComplete?:(project?:Project) => void
     onCancel?:() => void
     community:number
+    groups:Group[]
 }
 type State = {
     formVisible:boolean
@@ -69,12 +72,13 @@ class ProjectCreateComponent extends React.Component<Props, State> {
             name,
             description,
             community,
+            group,
             //
             avatar, 
             cover,
             //
             ...rest} = data
-        const updateData = removeEmptyEntriesFromObject({name, description, community})
+        const updateData = removeEmptyEntriesFromObject({name, description, community, group})
         const avatarData:{file:File|string, crop:CropRect} = avatar as any
         const coverData:{file:File|string, crop:CropRect} = cover as any
 
@@ -226,6 +230,12 @@ class ProjectCreateComponent extends React.Component<Props, State> {
         const visible = this.isVisible()
         const project:Partial<Project> = this.props.project || {}
         const create = !this.props.project
+        const groupSelectOptions:InputOption[] =  this.props.groups.map(p => {
+            return {
+                label:p.name, 
+                value:p.id.toString(), 
+            }
+        })
         return <FormController 
                     ref={(controller) => this.formController = controller }
                     key={this.state.formReloadKey} 
@@ -273,6 +283,18 @@ class ProjectCreateComponent extends React.Component<Props, State> {
                                         title={translate("common.description")} 
                                         id="description" 
                                         />
+                                        {<SelectInput 
+                                            options={groupSelectOptions}
+                                            errors={form.getErrors} 
+                                            hasSubmitted={form.hasSubmitted()}
+                                            ref={form.setFormRef(pageId)} 
+                                            onValueChanged={form.handleValueChanged(pageId)} 
+                                            value={project.group && project.group.id.toString()} 
+                                            title={translate("common.group")} 
+                                            id="group" 
+                                            isRequired={false}
+                                            isDisabled={!create}
+                                        />}
                                         </>
                             }} />,
                             <FormPage key="page2" form={this.formController} pageId="2" render={(pageId, form) => {
