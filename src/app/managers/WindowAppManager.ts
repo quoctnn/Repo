@@ -11,13 +11,14 @@ import { ApplicationManager } from './ApplicationManager';
 import { CommunityManager } from './CommunityManager';
 import { Settings } from '../utilities/Settings';
 import { setLanguageAction } from '../redux/language';
-import { RequestErrorData, AppLanguage } from '../types/intrasocial_types';
+import { RequestErrorData, AppLanguage, Version } from '../types/intrasocial_types';
 import { SideMenuNavigationToggleMenuNotification } from '../components/navigation/SideMenuNavigation';
 import { ResponsiveBreakpoint } from '../components/general/observers/ResponsiveComponent';
 import { ContextDataResolverComponentLogContextDataNotification } from '../hoc/WithContextData';
 
 const url = require('url');
 const path = require("path")
+const pack:{"version": string} = require('../../../package.json')
 
 export type AppWindowObject = {
     deleteCommunity:(id:number) => void
@@ -37,11 +38,19 @@ export type AppWindowObject = {
     toggleMenu:() => void
     logContextData:() => void
     breakpoint:ResponsiveBreakpoint
+    version:Version
 }
 export abstract class WindowAppManager
 {
     static setup = () =>
     {
+        const version_parts:string[] = pack.version.split('.')
+        const version:Version = {
+            major: Number(version_parts[0]),
+            minor: Number(version_parts[1]),
+            revision: Number(version_parts[2]),
+            version_string: pack.version + " on " + navigator.platform
+        }
         if(!window.appRoot)
             window.appRoot = "/app/"
         window.app = {
@@ -60,6 +69,7 @@ export abstract class WindowAppManager
             toggleMenu:WindowAppManager.toggleMenu,
             breakpoint:ResponsiveBreakpoint.micro,
             logContextData:WindowAppManager.logContextData,
+            version:version
         }
         //
     }

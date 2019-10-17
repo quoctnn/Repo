@@ -1776,6 +1776,13 @@ export type VersionInfo = {
     release_date: string
 }
 
+export type Version = {
+    major: number,
+    minor: number,
+    revision: number,
+    version_string: string
+}
+
 export type Timesheet = {
     id: number
     created_at: string

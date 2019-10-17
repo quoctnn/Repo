@@ -5,6 +5,7 @@ import { ReduxState } from '../redux/index';
 import { availableEndpoints } from '../redux/endpoint';
 import { uniqueId, nullOrUndefined } from '../utilities/Utilities';
 import { NotificationCenter } from '../utilities/NotificationCenter';
+import * as moment from 'moment-timezone';
 export enum EventStreamMessageType {
     STATE = "state",
     USER_UPDATE = "user.update",
@@ -202,6 +203,16 @@ class ChannelEventStream extends React.Component<Props, State> {
         {
             this.authorize()
         }
+        this.stream.send(JSON.stringify(
+            {
+                "type": "client.details",
+                "data": {
+                    "version": window.app.version,
+                    "timezone": moment.tz.guess(),
+                    "useragent": navigator.userAgent
+                }
+            })
+        )
     }
     componentDidMount = () => {
         this.connectStream()
