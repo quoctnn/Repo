@@ -20,6 +20,7 @@ import { DropDownMenu } from '../../components/general/DropDownMenu';
 import ContextMembersForm from '../../components/general/contextMembers/ContextMembersForm';
 import { withContextData, ContextDataProps } from '../../hoc/WithContextData';
 import { ProjectController } from '../../managers/ProjectController';
+import ContextConfirmableActionsComponent, { ContextConfirmableActions } from '../../components/general/context/ContextConfirmableActionsComponent';
 type OwnProps = {
     breakpoint:ResponsiveBreakpoint
 } & CommonModuleProps
@@ -35,6 +36,7 @@ type ReduxDispatchProps = {
 }
 type Props = OwnProps & RouteComponentProps<any> & ReduxDispatchProps & ContextDataProps
 class ProjectDetailsModule extends React.Component<Props, State> {
+    confirmActionComponent = React.createRef<ContextConfirmableActionsComponent>()
     constructor(props:Props) {
         super(props);
         this.state = {
@@ -73,12 +75,24 @@ class ProjectDetailsModule extends React.Component<Props, State> {
         }
         this.hideProjectCreateForm()
     }
+    showConfirmDeleteDialog = () => {
+        this.confirmActionComponent && this.confirmActionComponent.current && this.confirmActionComponent.current.showAction(ContextConfirmableActions.delete)
+    }
+    showConfirmLeaveDialog = () => {
+        this.confirmActionComponent && this.confirmActionComponent.current && this.confirmActionComponent.current.showAction(ContextConfirmableActions.leave)
+    }
     getProjectOptions = (project:Project) => {
         const options: OverflowMenuItem[] = []
+        const {authenticatedUser} = this.props.contextData
         if(project.permission >= Permission.moderate)
-            options.push({id:"1", type:OverflowMenuItemType.option, title:translate("Edit"), onPress:this.showProjectCreateForm, iconClass:"fas fa-pen", iconStackClass:Permission.getShield(project.permission)})
-        if(project.permission >= Permission.moderate)
+        {
+            options.push({id:"edit", type:OverflowMenuItemType.option, title:translate("Edit"), onPress:this.showProjectCreateForm, iconClass:"fas fa-pen", iconStackClass:Permission.getShield(project.permission)})
             options.push({id:"members", type:OverflowMenuItemType.option, title:translate("common.member.management"), onPress:this.toggleMembersForm, iconClass:"fas fa-users-cog", iconStackClass:Permission.getShield(project.permission)})
+            options.push({id:"delete", type:OverflowMenuItemType.option, title:translate("common.delete"), onPress:this.showConfirmDeleteDialog, iconClass:"fas fa-trash-alt", iconStackClass:Permission.getShield(project.permission)})
+        }
+        const members = project.members || []
+        if(project.creator != authenticatedUser.id && members.contains(authenticatedUser.id))
+            options.push({id:"leave", type:OverflowMenuItemType.option, title:translate("common.leave"), onPress:this.showConfirmLeaveDialog, iconClass:"fas fa-sign-out-alt"})
         return options
     }
     renderEditForm = (project:Project) => {
@@ -104,6 +118,10 @@ class ProjectDetailsModule extends React.Component<Props, State> {
             return <DropDownMenu className="project-option-dropdown" triggerClass="fas fa-cog mx-1" items={projectOptions}></DropDownMenu>
         return null
     }
+
+    handleConfirmableActionComplete = (action:ContextConfirmableActions, contextNaturalKey:ContextNaturalKey, contextObjectId:number) => {
+        this.props.contextData.reloadContextObject(contextObjectId, contextNaturalKey)
+    }
     renderModule = (project:Project) => {
         if(!project)
             return null
@@ -117,13 +135,14 @@ class ProjectDetailsModule extends React.Component<Props, State> {
                     <ModuleContent>
                         { project && project.permission >= Permission.read &&
                             <div className="project-details-content">
-                                <DetailsContent community={community} description={project.description}/>
+                                <DetailsContent community={community} group={project.group} description={project.description}/>
                             </div>
                             ||
                             <LoadingSpinner key="loading"/>
                         }
                         {this.renderEditForm(project)}
-                        {this.renderMembersForm(project)}
+                        {this.renderMembersForm(project)} 
+                        <ContextConfirmableActionsComponent ref={this.confirmActionComponent} contextNaturalKey={ContextNaturalKey.PROJECT} contextObject={project} onActionComplete={this.handleConfirmableActionComplete} />
                     </ModuleContent>
                     { project && project.permission >= Permission.read &&
                         <ModuleFooter className="mt-1">

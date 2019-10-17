@@ -27,6 +27,7 @@ import ContextMembersForm from '../../components/general/contextMembers/ContextM
 import AlertDialog from '../../components/general/dialogs/AlertDialog';
 import ContextMembershipComponent from '../../components/general/contextMembership/ContextMembershipComponent';
 import { withContextData, ContextDataProps } from '../../hoc/WithContextData';
+import ContextConfirmableActionsComponent, { ContextConfirmableActions } from '../../components/general/context/ContextConfirmableActionsComponent';
 type OwnProps = {
     breakpoint:ResponsiveBreakpoint
 } & CommonModuleProps
@@ -51,6 +52,7 @@ type State = {
 type Props = OwnProps & RouteComponentProps<any> & ContextDataProps
 class CommunityDetailsModule extends React.Component<Props, State> {
     formController:FormController = null
+    confirmActionComponent = React.createRef<ContextConfirmableActionsComponent>()
     constructor(props:Props) {
         super(props);
         this.state = {
@@ -77,6 +79,9 @@ class CommunityDetailsModule extends React.Component<Props, State> {
         {
             this.setState({isLoading:false})
         }
+    }
+    showConfirmLeaveDialog = () => {
+        this.confirmActionComponent && this.confirmActionComponent.current && this.confirmActionComponent.current.showAction(ContextConfirmableActions.leave)
     }
     menuItemClick = (e) => {
         e.preventDefault()
@@ -245,7 +250,7 @@ class CommunityDetailsModule extends React.Component<Props, State> {
     }
     getCommunityOptions = () => {
         const options: OverflowMenuItem[] = []
-        const {community} = this.props.contextData
+        const {community, authenticatedUser} = this.props.contextData
         if(!community)
             return options
         const permission = community.permission
@@ -256,13 +261,17 @@ class CommunityDetailsModule extends React.Component<Props, State> {
         }
         
         if(community.group_creation_permission >= Permission.limited_write)
-            options.push({id:"2", type:OverflowMenuItemType.option, title:translate("group.add"), onPress:this.showGroupCreateForm, iconClass:"fas fa-plus"})
+            options.push({id:"addGroup", type:OverflowMenuItemType.option, title:translate("group.add"), onPress:this.showGroupCreateForm, iconClass:"fas fa-plus"})
         
         if(community.event_creation_permission >= Permission.limited_write)
-            options.push({id:"3", type:OverflowMenuItemType.option, title:translate("event.add"), onPress:this.showEventCreateForm, iconClass:"fas fa-plus"})
+            options.push({id:"addEvent", type:OverflowMenuItemType.option, title:translate("event.add"), onPress:this.showEventCreateForm, iconClass:"fas fa-plus"})
         
         if(community.project_creation_permission >= Permission.limited_write)
-            options.push({id:"4", type:OverflowMenuItemType.option, title:translate("project.add"), onPress:this.showProjectCreateForm, iconClass:"fas fa-plus"})
+            options.push({id:"addProject", type:OverflowMenuItemType.option, title:translate("project.add"), onPress:this.showProjectCreateForm, iconClass:"fas fa-plus"})
+        
+        const members = community.members || []
+        if(community.creator != authenticatedUser.id && members.contains(authenticatedUser.id))
+            options.push({id:"leave", type:OverflowMenuItemType.option, title:translate("common.leave"), onPress:this.showConfirmLeaveDialog, iconClass:"fas fa-sign-out-alt"})
         return options
     }
     renderMembersForm = () => {
@@ -291,6 +300,9 @@ class CommunityDetailsModule extends React.Component<Props, State> {
         const {community} = this.props.contextData
         return <ProjectCreateComponent groups={this.state.groups} onCancel={this.hideProjectCreateForm} community={community.id} key={this.state.createProjectFormReloadKey} visible={visible} onComplete={this.handleProjectCreateForm} />
     }
+    handleConfirmableActionComplete = (action:ContextConfirmableActions, contextNaturalKey:ContextNaturalKey, contextObjectId:number) => {
+        this.props.contextData.reloadContextObject(contextObjectId, contextNaturalKey)
+    }
     render = () => {
         const {breakpoint, history, match, location, staticContext, contextNaturalKey, className, contextData, ...rest} = this.props
         const {community} = this.props.contextData
@@ -312,6 +324,7 @@ class CommunityDetailsModule extends React.Component<Props, State> {
                         {this.renderAddProjectForm()}
                         {this.renderMembersForm()}
                         {this.renderObjectInReviewDialog()}
+                        <ContextConfirmableActionsComponent ref={this.confirmActionComponent} contextNaturalKey={ContextNaturalKey.COMMUNITY} contextObject={community} onActionComplete={this.handleConfirmableActionComplete} />
                     </ModuleContent>
                     { community && community.permission >= Permission.read &&
                         <ModuleFooter className="mt-1">

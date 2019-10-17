@@ -3,7 +3,7 @@ import { translate } from '../../../localization/AutoIntlProvider';
 import { ContextNaturalKey, CropRect, ContextPhotoType, RequestErrorData, Project, Group } from '../../../types/intrasocial_types';
 import FormController, {FormStatus } from '../../form/FormController';
 import {ApiClient} from '../../../network/ApiClient';
-import { uniqueId, removeEmptyEntriesFromObject, nullOrUndefined } from '../../../utilities/Utilities';
+import { uniqueId, removeEmptyEntriesFromObject, nullOrUndefined, nameofFactory } from '../../../utilities/Utilities';
 import { TextInput } from '../../form/components/TextInput';
 import { TextAreaInput } from '../../form/components/TextAreaInput';
 import { ContextPhotoInput } from '../../form/components/ContextPhotoInput';
@@ -13,6 +13,7 @@ import { FormMenuItem } from '../../form/FormMenuItem';
 import { CommunityManager } from '../../../managers/CommunityManager';
 import { SelectInput } from '../../form/components/SelectInput';
 import { InputOption } from '../../form/components/RichRadioGroupInput';
+import { BooleanInput } from '../../form/components/BooleanInput';
 
 type OwnProps = {
     project?:Project
@@ -30,6 +31,8 @@ type State = {
     formValues:Partial<Project>
 }
 type Props = OwnProps & RouteComponentProps<any>
+
+const nameof = nameofFactory<Project>()
 class ProjectCreateComponent extends React.Component<Props, State> {
     formController:FormController = null
     constructor(props:Props) {
@@ -73,12 +76,13 @@ class ProjectCreateComponent extends React.Component<Props, State> {
             description,
             community,
             group,
+            is_private,
             //
             avatar, 
             cover,
             //
             ...rest} = data
-        const updateData = removeEmptyEntriesFromObject({name, description, community, group})
+        const updateData = removeEmptyEntriesFromObject({name, description, community, group, is_private})
         const avatarData:{file:File|string, crop:CropRect} = avatar as any
         const coverData:{file:File|string, crop:CropRect} = cover as any
 
@@ -272,7 +276,7 @@ class ProjectCreateComponent extends React.Component<Props, State> {
                                         onValueChanged={form.handleValueChanged(pageId)} 
                                         value={project.name} 
                                         title={translate("common.name")} 
-                                        id="name" 
+                                        id={nameof("name")}
                                         />
                                         <TextAreaInput 
                                         errors={form.getErrors} 
@@ -281,7 +285,17 @@ class ProjectCreateComponent extends React.Component<Props, State> {
                                         onValueChanged={form.handleValueChanged(pageId)} 
                                         value={project.description} 
                                         title={translate("common.description")} 
-                                        id="description" 
+                                        id={nameof("description")}
+                                        />
+                                        <BooleanInput 
+                                        errors={form.getErrors} 
+                                        hasSubmitted={form.hasSubmitted()}
+                                        ref={form.setFormRef(pageId)} 
+                                        onValueChanged={form.handleValueChanged(pageId)} 
+                                        value={project.is_private} 
+                                        title={translate("project.is_private.title")} 
+                                        description={translate("project.is_private.description")}
+                                        id={nameof("is_private")}
                                         />
                                         {<SelectInput 
                                             options={groupSelectOptions}
@@ -291,7 +305,7 @@ class ProjectCreateComponent extends React.Component<Props, State> {
                                             onValueChanged={form.handleValueChanged(pageId)} 
                                             value={project.group && project.group.id.toString()} 
                                             title={translate("common.group")} 
-                                            id="group" 
+                                            id={nameof("group")}
                                             isRequired={false}
                                             isDisabled={!create}
                                         />}
@@ -309,7 +323,7 @@ class ProjectCreateComponent extends React.Component<Props, State> {
                                             onRequestNavigation={form.handleRequestNavigation}
                                             contextNaturalKey={ContextNaturalKey.PROJECT}
                                             contextObjectId={project.id}
-                                            id="avatar" 
+                                            id={nameof("avatar")}
                                         />
                                         <ContextPhotoInput 
                                             errors={form.getErrors} 
@@ -321,7 +335,7 @@ class ProjectCreateComponent extends React.Component<Props, State> {
                                             onRequestNavigation={form.handleRequestNavigation}
                                             contextNaturalKey={ContextNaturalKey.PROJECT}
                                             contextObjectId={project.id}
-                                            id="cover" 
+                                            id={nameof("cover")}
                                         />
                                     </>
                         }} />

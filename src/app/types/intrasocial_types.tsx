@@ -1386,6 +1386,7 @@ export type ICommunity = {
     primary_color: string
     secondary_color: string
     chapters?: boolean
+    creator:number
 } & Linkable & IdentifiableObject
 export type IMembershipStatus = {
     invited:boolean
@@ -1459,7 +1460,7 @@ export type Group = {
     slug: string
     community: number
     description: string
-    creator: UserProfile
+    creator: number
     members: number[]
     members_count: number
     created_at: string
@@ -1501,7 +1502,7 @@ export type Event = {
     not_attending_count: number
     invited_count: number
     created_at: string
-    group: Group
+    group: ContextObject
     updated_at: string
     start: string
     end: string
@@ -1516,7 +1517,7 @@ export type Project = {
     slug: string
     community: number
     description: string
-    creator: UserProfile
+    creator: number
     tasks: number
     tags: string[]
     managers: number[]
@@ -1531,6 +1532,7 @@ export type Project = {
     tasks_completed: number
     tasks_responsible: number
     hidden_reason: ObjectHiddenReason
+    is_private:boolean
 } & AvatarAndCover & Linkable & Permissible & IdentifiableObject & IPrivacy
 
 export type TimeSpent = {

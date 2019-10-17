@@ -35,7 +35,7 @@ export class SelectInput extends React.Component<SelectInputProps, SelectInputSt
         return this.state.value
     }
     isValid = () => {
-        const performValidation = this.props.hasSubmitted || this.state.valueSet
+        const performValidation = (this.props.hasSubmitted || this.state.valueSet) && this.props.isRequired
         if(performValidation)
         {
             const selectedOption = this.state.value && this.findOption(this.state.value)

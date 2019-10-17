@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Community } from '../../types/intrasocial_types';
+import { Community, ContextObject } from '../../types/intrasocial_types';
 import { translate } from '../../localization/AutoIntlProvider';
 import { Link } from 'react-router-dom';
 import "./DetailsContent.scss"
@@ -7,6 +7,7 @@ import { MentionProcessorComponent } from '../MentionProcessorComponent';
 
 type OwnProps = {
     community?:Community
+    group?:ContextObject
     description?:string
 }
 type State = {
@@ -29,6 +30,12 @@ export class DetailsContent extends React.Component<Props, State> {
                     <div className="text-truncate">
                         <div className="details-field-name">{translate("common.core.community")}</div>
                         <div title={this.props.community.name} className="details-field-value"><Link to={this.props.community.uri}>{this.props.community.name}</Link></div>
+                    </div>
+                }
+                {this.props.group && 
+                    <div className="text-truncate">
+                        <div className="details-field-name">{translate("common.group.group")}</div>
+                        <div title={this.props.group.name} className="details-field-value"><Link to={this.props.group.uri}>{this.props.group.name}</Link></div>
                     </div>
                 }
                 {this.props.children}

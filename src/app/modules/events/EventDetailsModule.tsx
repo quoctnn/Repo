@@ -7,7 +7,7 @@ import ModuleFooter from '../ModuleFooter';
 import "./EventDetailsModule.scss"
 import { ResponsiveBreakpoint } from '../../components/general/observers/ResponsiveComponent';
 import { translate } from '../../localization/AutoIntlProvider';
-import { Event, ContextNaturalKey, Permission, ElasticSearchType} from '../../types/intrasocial_types';
+import { Event, ContextNaturalKey, Permission } from '../../types/intrasocial_types';
 import CircularLoadingSpinner from '../../components/general/CircularLoadingSpinner';
 import { DetailsContent } from '../../components/details/DetailsContent';
 import { stringToDateFormat, DateFormat, uniqueId } from '../../utilities/Utilities';
@@ -19,10 +19,9 @@ import ContextMembersForm from '../../components/general/contextMembers/ContextM
 import ContextMembershipComponent from '../../components/general/contextMembership/ContextMembershipComponent';
 import { withContextData, ContextDataProps } from '../../hoc/WithContextData';
 import { EventController } from '../../managers/EventController';
-import ConfirmDialog from '../../components/general/dialogs/ConfirmDialog';
-import { ApiClient } from '../../network/ApiClient';
-import { ToastManager } from '../../managers/ToastManager';
+import ContextConfirmableActionsComponent, { ContextConfirmableActions } from '../../components/general/context/ContextConfirmableActionsComponent';
 const shortMonth:string[] = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+
 type OwnProps = {
     breakpoint:ResponsiveBreakpoint
     contextNaturalKey: ContextNaturalKey
@@ -34,16 +33,11 @@ type State = {
     editFormReloadKey:string
     membersFormVisible?:boolean
     membersFormReloadKey?:string
-    confirmDialogVisible:boolean
-    confirmAction?:ConfirmableActions
 }
 type Props = OwnProps & RouteComponentProps<any> & ContextDataProps
-enum ConfirmableActions {
-    leave = "leave",
-    delete = "delete"
-}
 class EventDetailsModule extends React.Component<Props, State> {
     formController:FormController = null
+    confirmActionComponent = React.createRef<ContextConfirmableActionsComponent>()
     constructor(props:Props) {
         super(props);
         this.state = {
@@ -53,7 +47,6 @@ class EventDetailsModule extends React.Component<Props, State> {
             editFormReloadKey:uniqueId(),
             membersFormVisible:false,
             membersFormReloadKey:uniqueId(),
-            confirmDialogVisible:false
         }
     }
     componentDidUpdate = (prevProps:Props) => {
@@ -107,61 +100,10 @@ class EventDetailsModule extends React.Component<Props, State> {
         })
     }
     showConfirmDeleteDialog = () => {
-        this.setState(() => {
-            return {confirmDialogVisible:true, confirmAction:ConfirmableActions.delete}
-        })
+        this.confirmActionComponent && this.confirmActionComponent.current && this.confirmActionComponent.current.showAction(ContextConfirmableActions.delete)
     }
     showConfirmLeaveDialog = () => {
-        this.setState(() => {
-            return {confirmDialogVisible:true, confirmAction:ConfirmableActions.leave}
-        })
-    }
-    closeConfirmDialog = () => {
-
-        this.setState(() => {
-            return {confirmDialogVisible:false, confirmAction:null}
-        })
-    }
-    confirmationComplete = (confirmed:boolean) => {
-        if(confirmed)
-        {
-            const id = this.props.contextData.event.id
-            const contextNaturalKey = ContextNaturalKey.EVENT
-            switch (this.state.confirmAction) {
-                case ConfirmableActions.leave:
-                {
-                    ApiClient.leaveContext(contextNaturalKey, id, (data, status, error) => {
-                        ToastManager.showRequestErrorToast(error)
-                        this.props.contextData.reloadContextObject(id, contextNaturalKey)
-                        this.closeConfirmDialog()
-                    })
-                    break;
-                }  
-                case ConfirmableActions.delete:
-                {
-                    ApiClient.deleteContext(contextNaturalKey, id, (data, status, error) => {
-                        ToastManager.showRequestErrorToast(error)
-                        this.props.contextData.reloadContextObject(id, contextNaturalKey)
-                        this.closeConfirmDialog()
-                    })
-                    break;
-                }  
-                default:
-                    break;
-            }
-        }
-        else{
-            this.closeConfirmDialog()
-        }
-    }
-    renderConfirmDialog = () => {
-        const action = this.state.confirmAction
-        const visible = this.state.confirmDialogVisible
-        const contextName = ElasticSearchType.nameSingularForKey(ElasticSearchType.EVENT).toLowerCase()
-        const title =  action && translate(`context.confirm.${this.state.confirmAction}.title.format`).format(this.props.contextData.event.name)
-        const message = action && translate(`context.confirm.${this.state.confirmAction}.message.format`).format(contextName)
-        const okButtonTitle = translate("common.yes")
-        return <ConfirmDialog visible={visible} title={title} message={message} didComplete={this.confirmationComplete} okButtonTitle={okButtonTitle}/>
+        this.confirmActionComponent && this.confirmActionComponent.current && this.confirmActionComponent.current.showAction(ContextConfirmableActions.leave)
     }
     getEventOptions = () => {
         const authenticatedUser = this.props.contextData.authenticatedUser
@@ -188,6 +130,9 @@ class EventDetailsModule extends React.Component<Props, State> {
         const {event} = this.props.contextData
         return <EventCreateComponent onCancel={this.hideEventCreateForm} community={event.community} key={this.state.editFormReloadKey} event={event} visible={visible} onComplete={this.handleEventCreateForm} />
     }
+    handleConfirmableActionComplete = (action:ContextConfirmableActions, contextNaturalKey:ContextNaturalKey, contextObjectId:number) => {
+        this.props.contextData.reloadContextObject(contextObjectId, contextNaturalKey)
+    }
     render()
     {
         const {breakpoint, history, match, location, staticContext, contextNaturalKey, contextData, ...rest} = this.props
@@ -202,7 +147,7 @@ class EventDetailsModule extends React.Component<Props, State> {
                     </ModuleHeader>
                     <ModuleContent>
                         <div className="event-details-content">
-                            <DetailsContent community={community} description={event.description}>
+                            <DetailsContent community={community} group={event.group} description={event.description}>
                                 { event.parent &&
                                     <div>
                                         <span className="details-field-name">
@@ -219,7 +164,7 @@ class EventDetailsModule extends React.Component<Props, State> {
                         </div>
                         {this.renderEditForm()}
                         {this.renderMembersForm()}
-                        {this.renderConfirmDialog()}
+                        <ContextConfirmableActionsComponent ref={this.confirmActionComponent} contextNaturalKey={ContextNaturalKey.EVENT} contextObject={event} onActionComplete={this.handleConfirmableActionComplete} />
                     </ModuleContent>
                     <ModuleFooter>
                         { startDate &&

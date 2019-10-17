@@ -19,6 +19,7 @@ import ContextMembersForm from '../../components/general/contextMembers/ContextM
 import ContextMembershipComponent from '../../components/general/contextMembership/ContextMembershipComponent';
 import { withContextData, ContextDataProps } from '../../hoc/WithContextData';
 import { GroupController } from '../../managers/GroupController';
+import ContextConfirmableActionsComponent, { ContextConfirmableActions } from '../../components/general/context/ContextConfirmableActionsComponent';
 type OwnProps = {
     breakpoint:ResponsiveBreakpoint
     contextNaturalKey: ContextNaturalKey
@@ -33,6 +34,7 @@ type State = {
 }
 type Props = OwnProps & RouteComponentProps<any> & ContextDataProps
 class GroupDetailsModule extends React.Component<Props, State> {
+    confirmActionComponent = React.createRef<ContextConfirmableActionsComponent>()
     constructor(props:Props) {
         super(props);
         this.state = {
@@ -49,6 +51,12 @@ class GroupDetailsModule extends React.Component<Props, State> {
         {
             this.setState({isLoading:false})
         }
+    }
+    showConfirmDeleteDialog = () => {
+        this.confirmActionComponent && this.confirmActionComponent.current && this.confirmActionComponent.current.showAction(ContextConfirmableActions.delete)
+    }
+    showConfirmLeaveDialog = () => {
+        this.confirmActionComponent && this.confirmActionComponent.current && this.confirmActionComponent.current.showAction(ContextConfirmableActions.leave)
     }
     menuItemClick = (e) => {
         e.preventDefault()
@@ -102,17 +110,25 @@ class GroupDetailsModule extends React.Component<Props, State> {
     }
     getGroupOptions = () => {
         const options: OverflowMenuItem[] = []
-        const {group} = this.props.contextData
+        const {group, authenticatedUser} = this.props.contextData
         if(group.permission >= Permission.moderate)
-            options.push({id:"1", type:OverflowMenuItemType.option, title:translate("Edit"), onPress:this.showGroupCreateForm, iconClass:"fas fa-pen", iconStackClass:Permission.getShield(group.permission)})
-        if(group.permission >= Permission.moderate)
-        options.push({id:"members", type:OverflowMenuItemType.option, title:translate("common.member.management"), onPress:this.toggleMembersForm, iconClass:"fas fa-users-cog", iconStackClass:Permission.getShield(group.permission)})
+        {
+            options.push({id:"edit", type:OverflowMenuItemType.option, title:translate("Edit"), onPress:this.showGroupCreateForm, iconClass:"fas fa-pen", iconStackClass:Permission.getShield(group.permission)})
+            options.push({id:"members", type:OverflowMenuItemType.option, title:translate("common.member.management"), onPress:this.toggleMembersForm, iconClass:"fas fa-users-cog", iconStackClass:Permission.getShield(group.permission)})
+            options.push({id:"delete", type:OverflowMenuItemType.option, title:translate("common.delete"), onPress:this.showConfirmDeleteDialog, iconClass:"fas fa-trash-alt", iconStackClass:Permission.getShield(group.permission)})
+        }
+        const members = group.members || []
+        if(group.creator != authenticatedUser.id && members.contains(authenticatedUser.id))
+            options.push({id:"leave", type:OverflowMenuItemType.option, title:translate("common.leave"), onPress:this.showConfirmLeaveDialog, iconClass:"fas fa-sign-out-alt"})
         return options
     }
     renderMembersForm = () => {
         const visible = this.state.membersFormVisible
         const {community, group} = this.props.contextData
         return <ContextMembersForm community={community} contextNaturalKey={ContextNaturalKey.GROUP} key={this.state.membersFormReloadKey} didCancel={this.toggleMembersForm} visible={visible} contextObject={group} />
+    }
+    handleConfirmableActionComplete = (action:ContextConfirmableActions, contextNaturalKey:ContextNaturalKey, contextObjectId:number) => {
+        this.props.contextData.reloadContextObject(contextObjectId, contextNaturalKey)
     }
     render()
     {
@@ -129,6 +145,7 @@ class GroupDetailsModule extends React.Component<Props, State> {
                         <DetailsContent community={community} description={group.description}/>
                         {this.renderEditForm()}
                         {this.renderMembersForm()}
+                        <ContextConfirmableActionsComponent ref={this.confirmActionComponent} contextNaturalKey={ContextNaturalKey.GROUP} contextObject={group} onActionComplete={this.handleConfirmableActionComplete} />
                     </ModuleContent>
                     <ModuleFooter className="mt-1">
                         <DetailsMembers onSeeAllClick={this.toggleMembersForm} members={group.members} />
