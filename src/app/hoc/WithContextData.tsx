@@ -68,7 +68,7 @@ export class ContextData{
     reloadContextObject = (id:number, contextNaturalKey:ContextNaturalKey) => {
         const type =ContextSegmentKey.keyForNaturalKey(contextNaturalKey)
         const data = {}
-        const key = `${type}_id`
+        const key = "id"
         data[key] = id
         window.app.sendInboundOnSocket({type:`${type}.update`, data})
     }

@@ -63,6 +63,9 @@ export default  {
         communityLeaveUrl: (id:number) => {
             return `/api/v2/community/${id}/leave/`
         },
+        communityMuteUrl: (id:number) => {
+            return `/api/v2/community/${id}/mute/`
+        },
         communityDeleteUrl: (id:number) => {
             return `/api/v2/community/${id}/`
         },
@@ -152,6 +155,9 @@ export default  {
         groupLeaveUrl: (id:number) => {
             return `/api/v2/group/${id}/leave/`
         },
+        groupMuteUrl: (id:number) => {
+            return `/api/v2/group/${id}/mute/`
+        },
         groupDeleteUrl: (id:number) => {
             return `/api/v2/group/${id}/`
         },
@@ -203,6 +209,9 @@ export default  {
         // Project URLs
         projectMembersUrl: (id:number) => {
             return `/api/v2/project/${id}/members/`
+        },
+        projectMuteUrl: (id:number) => {
+            return `/api/v2/project/${id}/mute/`
         },
         projectDeleteUrl: (id:number) => {
             return `/api/v2/project/${id}/`
@@ -281,6 +290,9 @@ export default  {
         upcomingEventsUrl: '/api/v2/event/upcoming/',
         eventLeaveUrl: (id:number) => {
             return `/api/v2/event/${id}/leave/`
+        },
+        eventMuteUrl: (id:number) => {
+            return `/api/v2/event/${id}/mute/`
         },
         eventDeleteUrl: (id:number) => {
             return `/api/v2/event/${id}/`

@@ -1346,6 +1346,9 @@ export const documentIcon = (extension: string): FileIcon => {
 export type Permissible = {
     permission: number
 }
+export type INotifiable = {
+    muted: boolean
+}
 export type Linkable = {
     uri: string
 }
@@ -1422,7 +1425,7 @@ export type Community = {
     project_creation_permission:CommunityCreatePermission
     subgroup_creation_permission:CommunityCreatePermission
     //
-} & ICommunity & AvatarAndCover & Permissible & IPrivacy & IMembershipStatus
+} & INotifiable & ICommunity & AvatarAndCover & Permissible & IPrivacy & IMembershipStatus
 
 export type SimpleUserProfile = {
     absolute_url: string,
@@ -1467,7 +1470,7 @@ export type Group = {
     parent: number
     updated_at: string
     hidden_reason: ObjectHiddenReason
-} & AvatarAndCover & Linkable & Permissible & IdentifiableObject & IPrivacy & IMembershipStatus
+} & INotifiable & AvatarAndCover & Linkable & Permissible & IdentifiableObject & IPrivacy & IMembershipStatus
 
 export type Favorite = {
     index: number
@@ -1510,7 +1513,7 @@ export type Event = {
     address: string
     parent: Event
     hidden_reason: ObjectHiddenReason
-} & AvatarAndCover & Linkable & Permissible & IdentifiableObject & IPrivacy & IMembershipStatus
+} & INotifiable & AvatarAndCover & Linkable & Permissible & IdentifiableObject & IPrivacy & IMembershipStatus
 
 export type Project = {
     name: string
@@ -1533,7 +1536,7 @@ export type Project = {
     tasks_responsible: number
     hidden_reason: ObjectHiddenReason
     is_private:boolean
-} & AvatarAndCover & Linkable & Permissible & IdentifiableObject & IPrivacy
+} & INotifiable & AvatarAndCover & Linkable & Permissible & IdentifiableObject & IPrivacy
 
 export type TimeSpent = {
     hours: number

@@ -83,6 +83,10 @@ class CommunityDetailsModule extends React.Component<Props, State> {
     showConfirmLeaveDialog = () => {
         this.confirmActionComponent && this.confirmActionComponent.current && this.confirmActionComponent.current.showAction(ContextConfirmableActions.leave)
     }
+    toggleMute = () => {
+        const action = this.props.contextData.community.muted ? ContextConfirmableActions.unmute : ContextConfirmableActions.mute
+        this.confirmActionComponent && this.confirmActionComponent.current && this.confirmActionComponent.current.showAction(action, false)
+    }
     menuItemClick = (e) => {
         e.preventDefault()
         e.stopPropagation()
@@ -254,12 +258,19 @@ class CommunityDetailsModule extends React.Component<Props, State> {
         if(!community)
             return options
         const permission = community.permission
+        const members = community.members || []
         if(permission >= Permission.moderate)
         {
             options.push({id:"edit", type:OverflowMenuItemType.option, title:translate("common.edit"), onPress:this.showCommunityEditForm, iconClass:"fas fa-pen", iconStackClass:Permission.getShield(permission)})
             options.push({id:"members", type:OverflowMenuItemType.option, title:translate("common.member.management"), onPress:this.toggleCommunityMembersForm, iconClass:"fas fa-users-cog", iconStackClass:Permission.getShield(permission)})
         }
-        
+        if(members.contains(authenticatedUser.id))
+        {
+            if(community.muted)
+                options.push({id:"unmute", type:OverflowMenuItemType.option, title:translate("common.unmute"), onPress:this.toggleMute, iconClass:"fas fa-bell-slash"})
+            else 
+                options.push({id:"mute", type:OverflowMenuItemType.option, title:translate("common.mute"), onPress:this.toggleMute, iconClass:"fas fa-bell"})
+        }
         if(community.group_creation_permission >= Permission.limited_write)
             options.push({id:"addGroup", type:OverflowMenuItemType.option, title:translate("group.add"), onPress:this.showGroupCreateForm, iconClass:"fas fa-plus"})
         
@@ -269,7 +280,6 @@ class CommunityDetailsModule extends React.Component<Props, State> {
         if(community.project_creation_permission >= Permission.limited_write)
             options.push({id:"addProject", type:OverflowMenuItemType.option, title:translate("project.add"), onPress:this.showProjectCreateForm, iconClass:"fas fa-plus"})
         
-        const members = community.members || []
         if(community.creator != authenticatedUser.id && members.contains(authenticatedUser.id))
             options.push({id:"leave", type:OverflowMenuItemType.option, title:translate("common.leave"), onPress:this.showConfirmLeaveDialog, iconClass:"fas fa-sign-out-alt"})
         return options

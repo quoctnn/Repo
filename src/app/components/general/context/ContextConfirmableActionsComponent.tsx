@@ -5,9 +5,12 @@ import { ApiClient } from '../../../network/ApiClient';
 import { ToastManager } from '../../../managers/ToastManager';
 import { translate } from '../../../localization/AutoIntlProvider';
 import ConfirmDialog from '../dialogs/ConfirmDialog';
+import { nullOrUndefined } from '../../../utilities/Utilities';
 export enum ContextConfirmableActions {
     leave = "leave",
-    delete = "delete"
+    delete = "delete",
+    mute = "mute",
+    unmute = "unmute",
 }
 type ContextConfirmableProps = {
     contextNaturalKey:ContextNaturalKey
@@ -25,10 +28,20 @@ export default class ContextConfirmableActionsComponent extends React.Component<
             confirmDialogVisible:false
         }
     }
-    showAction = (action:ContextConfirmableActions) => {
-        this.setState(() => {
-            return {confirmDialogVisible:true, confirmAction:action}
-        })
+    showAction = (action:ContextConfirmableActions, needsConfirmation?:boolean) => {
+        const needsConf = nullOrUndefined(needsConfirmation) ? true : needsConfirmation
+        if(needsConf)
+        {
+            this.setState(() => {
+                return {confirmDialogVisible:true, confirmAction:action}
+            })
+        }
+        else {
+            this.setState(() => {
+                return {confirmDialogVisible:false, confirmAction:action}
+            }, () => this.confirmationComplete(true))
+            
+        }
     }
     private closeConfirmDialog = (completedAction?:ContextConfirmableActions, contextNaturalKey?:ContextNaturalKey, contextObjectId?:number) => {
 
@@ -60,6 +73,16 @@ export default class ContextConfirmableActionsComponent extends React.Component<
                     })
                     break;
                 }  
+                case ContextConfirmableActions.mute:
+                case ContextConfirmableActions.unmute:
+                {
+                    const muted = action == ContextConfirmableActions.mute
+                    ApiClient.muteContext(muted, contextNaturalKey, id, (data, status, error) => {
+                        ToastManager.showRequestErrorToast(error)
+                        this.closeConfirmDialog(action, contextNaturalKey, id)
+                    })
+                    break;
+                }
                 default:
                     break;
             }

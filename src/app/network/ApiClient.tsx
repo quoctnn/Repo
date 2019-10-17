@@ -554,7 +554,7 @@ export abstract class ApiClient
         }
         return url
     }
-    private static getContextDeleteData = (contextNaturalKey:ContextNaturalKey, contextObjectId:number) => {
+    private static getContextDeleteDataUrl = (contextNaturalKey:ContextNaturalKey, contextObjectId:number) => {
         let url:string = null
         switch (contextNaturalKey ) {
             case ContextNaturalKey.COMMUNITY:url = Constants.apiRoute.communityDeleteUrl(contextObjectId); break;
@@ -579,13 +579,37 @@ export abstract class ApiClient
         })
     }
     static deleteContext = (contextNaturalKey:ContextNaturalKey, contextObjectId:number, callback:ApiClientCallback<any>) => {
-        const url = ApiClient.getContextDeleteData(contextNaturalKey, contextObjectId)
+        const url = ApiClient.getContextDeleteDataUrl(contextNaturalKey, contextObjectId)
         if(!url)
         {
             callback(null, "500", new RequestErrorData({detail:`delete api endpoint not set for ${contextNaturalKey}`}, "error"))
             return
         }
         AjaxRequest.delete(url,(data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, new RequestErrorData(request.responseJSON, error))
+        })
+    }
+    private static getContextMuteUrl = (contextNaturalKey:ContextNaturalKey, contextObjectId:number) => {
+        let url:string = null
+        switch (contextNaturalKey ) {
+            case ContextNaturalKey.COMMUNITY:url = Constants.apiRoute.communityMuteUrl(contextObjectId); break;
+            case ContextNaturalKey.EVENT:url = Constants.apiRoute.eventMuteUrl(contextObjectId); break;
+            case ContextNaturalKey.GROUP:url = Constants.apiRoute.groupMuteUrl(contextObjectId); break;
+            case ContextNaturalKey.PROJECT:url = Constants.apiRoute.projectMuteUrl(contextObjectId); break;
+            default:break;
+        }
+        return url
+    }
+    static muteContext = (muted:boolean, contextNaturalKey:ContextNaturalKey, contextObjectId:number, callback:ApiClientCallback<any>) => {
+        const url = ApiClient.getContextMuteUrl(contextNaturalKey, contextObjectId)
+        if(!url)
+        {
+            callback(null, "500", new RequestErrorData({detail:`mute api endpoint not set for ${contextNaturalKey}`}, "error"))
+            return
+        }
+        AjaxRequest.post(url, {muted},(data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
             callback(null, status, new RequestErrorData(request.responseJSON, error))
