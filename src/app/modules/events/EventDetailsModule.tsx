@@ -105,17 +105,28 @@ class EventDetailsModule extends React.Component<Props, State> {
     showConfirmLeaveDialog = () => {
         this.confirmActionComponent && this.confirmActionComponent.current && this.confirmActionComponent.current.showAction(ContextConfirmableActions.leave)
     }
+    toggleMute = () => {
+        const action = this.props.contextData.event.muted ? ContextConfirmableActions.unmute : ContextConfirmableActions.mute
+        this.confirmActionComponent && this.confirmActionComponent.current && this.confirmActionComponent.current.showAction(action, false)
+    }
     getEventOptions = () => {
         const authenticatedUser = this.props.contextData.authenticatedUser
         const options: OverflowMenuItem[] = []
         const {event} = this.props.contextData
+        const attending = event.attending || []
         if(event.permission >= Permission.moderate)
         {
             options.push({id:"edit", type:OverflowMenuItemType.option, title:translate("Edit"), onPress:this.showEventCreateForm, iconClass:"fas fa-pen", iconStackClass:Permission.getShield(event.permission)})
             options.push({id:"members", type:OverflowMenuItemType.option, title:translate("common.member.management"), onPress:this.toggleMembersForm, iconClass:"fas fa-users-cog", iconStackClass:Permission.getShield(event.permission)})
             options.push({id:"delete", type:OverflowMenuItemType.option, title:translate("common.delete"), onPress:this.showConfirmDeleteDialog, iconClass:"fas fa-trash-alt", iconStackClass:Permission.getShield(event.permission)})
         }
-        const attending = event.attending || []
+        if(attending.contains(authenticatedUser.id))
+        {
+            if(event.muted)
+                options.push({id:"unmute", type:OverflowMenuItemType.option, title:translate("common.unmute"), onPress:this.toggleMute, iconClass:"fas fa-bell-slash"})
+            else 
+                options.push({id:"mute", type:OverflowMenuItemType.option, title:translate("common.mute"), onPress:this.toggleMute, iconClass:"fas fa-bell"})
+        }
         if(event.creator != authenticatedUser.id && attending.contains(authenticatedUser.id))
             options.push({id:"leave", type:OverflowMenuItemType.option, title:translate("common.leave"), onPress:this.showConfirmLeaveDialog, iconClass:"fas fa-sign-out-alt"})
         return options

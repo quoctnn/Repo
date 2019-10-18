@@ -108,16 +108,27 @@ class GroupDetailsModule extends React.Component<Props, State> {
             return {membersFormVisible:!prevState.membersFormVisible, membersFormReloadKey: invitationReloadKey}
         })
     }
+    toggleMute = () => {
+        const action = this.props.contextData.group.muted ? ContextConfirmableActions.unmute : ContextConfirmableActions.mute
+        this.confirmActionComponent && this.confirmActionComponent.current && this.confirmActionComponent.current.showAction(action, false)
+    }
     getGroupOptions = () => {
         const options: OverflowMenuItem[] = []
         const {group, authenticatedUser} = this.props.contextData
+        const members = group.members || []
         if(group.permission >= Permission.moderate)
         {
             options.push({id:"edit", type:OverflowMenuItemType.option, title:translate("Edit"), onPress:this.showGroupCreateForm, iconClass:"fas fa-pen", iconStackClass:Permission.getShield(group.permission)})
             options.push({id:"members", type:OverflowMenuItemType.option, title:translate("common.member.management"), onPress:this.toggleMembersForm, iconClass:"fas fa-users-cog", iconStackClass:Permission.getShield(group.permission)})
             options.push({id:"delete", type:OverflowMenuItemType.option, title:translate("common.delete"), onPress:this.showConfirmDeleteDialog, iconClass:"fas fa-trash-alt", iconStackClass:Permission.getShield(group.permission)})
         }
-        const members = group.members || []
+        if(members.contains(authenticatedUser.id))
+        {
+            if(group.muted)
+                options.push({id:"unmute", type:OverflowMenuItemType.option, title:translate("common.unmute"), onPress:this.toggleMute, iconClass:"fas fa-bell-slash"})
+            else 
+                options.push({id:"mute", type:OverflowMenuItemType.option, title:translate("common.mute"), onPress:this.toggleMute, iconClass:"fas fa-bell"})
+        }
         if(group.creator != authenticatedUser.id && members.contains(authenticatedUser.id))
             options.push({id:"leave", type:OverflowMenuItemType.option, title:translate("common.leave"), onPress:this.showConfirmLeaveDialog, iconClass:"fas fa-sign-out-alt"})
         return options

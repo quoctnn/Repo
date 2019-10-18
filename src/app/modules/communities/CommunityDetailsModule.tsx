@@ -83,10 +83,6 @@ class CommunityDetailsModule extends React.Component<Props, State> {
     showConfirmLeaveDialog = () => {
         this.confirmActionComponent && this.confirmActionComponent.current && this.confirmActionComponent.current.showAction(ContextConfirmableActions.leave)
     }
-    toggleMute = () => {
-        const action = this.props.contextData.community.muted ? ContextConfirmableActions.unmute : ContextConfirmableActions.mute
-        this.confirmActionComponent && this.confirmActionComponent.current && this.confirmActionComponent.current.showAction(action, false)
-    }
     menuItemClick = (e) => {
         e.preventDefault()
         e.stopPropagation()
@@ -251,6 +247,10 @@ class CommunityDetailsModule extends React.Component<Props, State> {
                 window.app.navigateToRoute(project.uri)
             }
         }
+    }
+    toggleMute = () => {
+        const action = this.props.contextData.community.muted ? ContextConfirmableActions.unmute : ContextConfirmableActions.mute
+        this.confirmActionComponent && this.confirmActionComponent.current && this.confirmActionComponent.current.showAction(action, false)
     }
     getCommunityOptions = () => {
         const options: OverflowMenuItem[] = []
