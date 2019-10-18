@@ -31,6 +31,7 @@ var translations = {
     "Report":"Report",
     "Show Permalink":"Show Permalink",
     "Edit":"Edit",
+    "Reload":"Reload",
     "in ":"in ",
     "published on the group":"published on the group",
     "published on the event":"published on the event",
@@ -608,6 +609,8 @@ var translations = {
     "context.confirm.leave.message.format":"Are you sure you want to leave this {0}?",
     "context.confirm.delete.title.format":"Delete {0}",
     "context.confirm.delete.message.format":"Are you sure you want to delete this {0}?",
+    "context.confirm.update.title.format":"Update pending",
+    "context.confirm.update.message.format":"An update is waiting, please reload the page to receive the latest version",
   },
   no: {
     "search.placeholder": "Søk ...",
@@ -641,6 +644,7 @@ var translations = {
     "Report":"Rapporter",
     "Show Permalink":"Vis permalink",
     "Edit":"Rediger",
+    "Reload":"Oppdater",
     "in ":"i ",
     "published on the group":"publiserte i gruppen",
     "published on the event":"publiserte på arrangementet",
@@ -1218,7 +1222,9 @@ var translations = {
     "context.confirm.leave.message.format":"Er du sikker på at du vil forlate dette {0}?",
     "context.confirm.delete.title.format":"Slett {0}",
     "context.confirm.delete.message.format":"Er du sikker på at du vil slette dette {0}?",
-  },
+    "context.confirm.update.title.format":"Oppdatering venter",
+    "context.confirm.update.message.format":"En oppdatering venter, vennligst last inn siden på nytt for å bruke den nyeste versjonen",
+},
   en: {
     "search.placeholder": "Search ...",
     "Sign in": "Sign in",
@@ -1251,6 +1257,7 @@ var translations = {
     "Report":"Report",
     "Show Permalink":"Show Permalink",
     "Edit":"Edit",
+    "Reload":"Reload",
     "in ":"in ",
     "published on the group":"published on the group",
     "published on the event":"published on the event",
@@ -1839,6 +1846,8 @@ var translations = {
     "context.confirm.leave.message.format":"Are you sure you want to leave this {0}?",
     "context.confirm.delete.title.format":"Delete {0}",
     "context.confirm.delete.message.format":"Are you sure you want to delete this {0}?",
+    "context.confirm.update.title.format":"Update pending",
+    "context.confirm.update.message.format":"An update is waiting, please reload the page to receive the latest version",
   }
 };
 

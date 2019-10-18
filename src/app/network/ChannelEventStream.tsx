@@ -6,6 +6,10 @@ import { availableEndpoints } from '../redux/endpoint';
 import { uniqueId, nullOrUndefined } from '../utilities/Utilities';
 import { NotificationCenter } from '../utilities/NotificationCenter';
 import * as moment from 'moment-timezone';
+import ContextConfirmableActionsComponent from '../components/general/context/ContextConfirmableActionsComponent';
+import { EventStreamManager } from '../managers/EventStreamManager';
+import { ContextConfirmableActions } from '../components/general/context/ContextConfirmableActionsComponent';
+import { EventSubscription } from 'fbemitter';
 export enum EventStreamMessageType {
     STATE = "state",
     USER_UPDATE = "user.update",
@@ -15,6 +19,12 @@ export enum EventStreamMessageType {
     CLIENT_LAST_SEEN = "client.last_seen",
     CLIENT_UPDATE = "client.update",
     CLIENT_STATUS_CHANGE = "client.status_change",
+    CLIENT_DETAILS = 'client.details',
+    CLIENT_RELOAD = 'client.reload',
+    CLIENT_SIGNOUT = 'client.signout',
+    CLIENT_DISCONNECT = 'client.disconnect',
+    CLIENT_REDUX_FLUSH = 'client.redux.flush',
+    CLIENT_MESSAGE = 'client.message',
 
     CONVERSATION_TYPING = "conversation.typing",
     CONVERSATION_MESSAGE_NEW = "conversation.message.new",
@@ -124,8 +134,10 @@ type Props = OwnProps & ReduxDispatchProps & ReduxStateProps
 class ChannelEventStream extends React.Component<Props, State> {
     stream: ReconnectingWebSocket|null = null
     oldStream: ReconnectingWebSocket|null = null
+    reloadObserver:EventSubscription = undefined
     queueEvents = false
     authorized:boolean = false
+    confirmActionComponent = React.createRef<ContextConfirmableActionsComponent>()
     constructor(props:Props) {
         super(props)
         this.state = {
@@ -174,6 +186,7 @@ class ChannelEventStream extends React.Component<Props, State> {
             );
             this.stream.onopen = () => {
                 NotificationCenter.push(eventStreamNotificationPrefix + EventStreamMessageType.SOCKET_STATE_CHANGE,[this.stream.readyState])
+                this.reloadObserver = NotificationCenter.addObserver(eventStreamNotificationPrefix + EventStreamMessageType.CLIENT_RELOAD, this.showConfirmUpdateDialog)
                 console.log('WebSocket OPEN');
                 (this.stream as any)._options.minReconnectionDelay = 8000
                 this.sendAuthorization()
@@ -191,6 +204,7 @@ class ChannelEventStream extends React.Component<Props, State> {
             this.stream.onclose = event => {
                 NotificationCenter.push(eventStreamNotificationPrefix + EventStreamMessageType.SOCKET_STATE_CHANGE,[this.stream.readyState])
                 this.authorized = false;
+                this.reloadObserver = undefined;
                 console.log('WebSocket CLOSED');
                 if (this.stream && (this.stream as any)._shouldReconnect)
                     (this.stream as any)._connect();
@@ -213,6 +227,9 @@ class ChannelEventStream extends React.Component<Props, State> {
                 }
             })
         )
+    }
+    showConfirmUpdateDialog = () => {
+        this.confirmActionComponent && this.confirmActionComponent.current && this.confirmActionComponent.current.showAction(ContextConfirmableActions.update)
     }
     componentDidMount = () => {
         this.connectStream()
@@ -238,11 +255,14 @@ class ChannelEventStream extends React.Component<Props, State> {
             console.log('Discarding WebSocket');
             this.stream.close()
             this.stream = null;
-            this.authorized = false
+            this.authorized = false;
+            this.reloadObserver = undefined;
         }
     }
     render = () => {
-        return null;
+        return (
+            <ContextConfirmableActionsComponent ref={this.confirmActionComponent} contextNaturalKey={null} contextObject={null} onActionComplete={null} />
+        );
     }
 }
 const mapStateToProps = (state:ReduxState):ReduxStateProps =>

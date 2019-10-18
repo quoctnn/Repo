@@ -11,6 +11,7 @@ export enum ContextConfirmableActions {
     delete = "delete",
     mute = "mute",
     unmute = "unmute",
+    update = "update"
 }
 type ContextConfirmableProps = {
     contextNaturalKey:ContextNaturalKey
@@ -40,7 +41,7 @@ export default class ContextConfirmableActionsComponent extends React.Component<
             this.setState(() => {
                 return {confirmDialogVisible:false, confirmAction:action}
             }, () => this.confirmationComplete(true))
-            
+
         }
     }
     private closeConfirmDialog = (completedAction?:ContextConfirmableActions, contextNaturalKey?:ContextNaturalKey, contextObjectId?:number) => {
@@ -53,7 +54,7 @@ export default class ContextConfirmableActionsComponent extends React.Component<
     private confirmationComplete = (confirmed:boolean) => {
         if(confirmed)
         {
-            const id = this.props.contextObject.id
+            const id = this.props.contextObject && this.props.contextObject.id
             const contextNaturalKey = this.props.contextNaturalKey
             const action = this.state.confirmAction
             switch (action) {
@@ -64,7 +65,7 @@ export default class ContextConfirmableActionsComponent extends React.Component<
                         this.closeConfirmDialog(action, contextNaturalKey, id)
                     })
                     break;
-                }  
+                }
                 case ContextConfirmableActions.delete:
                 {
                     ApiClient.deleteContext(contextNaturalKey, id, (data, status, error) => {
@@ -72,7 +73,7 @@ export default class ContextConfirmableActionsComponent extends React.Component<
                         this.closeConfirmDialog(action, contextNaturalKey, id)
                     })
                     break;
-                }  
+                }
                 case ContextConfirmableActions.mute:
                 case ContextConfirmableActions.unmute:
                 {
@@ -81,6 +82,10 @@ export default class ContextConfirmableActionsComponent extends React.Component<
                         ToastManager.showRequestErrorToast(error)
                         this.closeConfirmDialog(action, contextNaturalKey, id)
                     })
+                }
+                case ContextConfirmableActions.update:
+                {
+                    location.reload()
                     break;
                 }
                 default:
@@ -95,7 +100,7 @@ export default class ContextConfirmableActionsComponent extends React.Component<
         const action = this.state.confirmAction
         const visible = this.state.confirmDialogVisible
         const contextName = ElasticSearchType.nameSingularForKey(ContextNaturalKey.elasticTypeForKey(this.props.contextNaturalKey)).toLowerCase()
-        
+
         const title =  action && translate(`context.confirm.${this.state.confirmAction}.title.format`).format(ContextNaturalKey.nameForContextObject(this.props.contextNaturalKey, this.props.contextObject))
         const message = action && translate(`context.confirm.${this.state.confirmAction}.message.format`).format(contextName)
         const okButtonTitle = translate("common.yes")
