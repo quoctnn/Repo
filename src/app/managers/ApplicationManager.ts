@@ -19,7 +19,7 @@ import { resetEmbedlyStoreAction } from '../components/general/embedly/redux';
 import { resetUnreadNotificationsAction } from '../redux/unreadNotifications';
 import { FavoriteManager } from './FavoriteManager';
 import { Settings } from '../utilities/Settings';
-import { resetAuthenticationData } from '../redux/authentication';
+import { resetAuthenticationDataAction } from '../redux/authentication';
 import { resetLanguageAction } from '../redux/language';
 
 export type ApplicationData = {
@@ -208,7 +208,7 @@ export abstract class ApplicationManager
         dispatch(resetMessageQueueAction())
         dispatch(resetEndpointAction())
         dispatch(resetEmbedlyStoreAction())
-        dispatch(resetAuthenticationData())
+        dispatch(resetAuthenticationDataAction())
         dispatch(resetLanguageAction())
         ApplicationManager.softReset()
     }

@@ -609,8 +609,8 @@ var translations = {
     "context.confirm.leave.message.format":"Are you sure you want to leave this {0}?",
     "context.confirm.delete.title.format":"Delete {0}",
     "context.confirm.delete.message.format":"Are you sure you want to delete this {0}?",
-    "context.confirm.update.title.format":"Update pending",
-    "context.confirm.update.message.format":"An update is waiting, please reload the page to receive the latest version",
+    "context.confirm.update.title":"Update pending",
+    "context.confirm.update.message":"An update is waiting, please reload the page to receive the latest version",
   },
   no: {
     "search.placeholder": "Søk ...",
@@ -1222,8 +1222,8 @@ var translations = {
     "context.confirm.leave.message.format":"Er du sikker på at du vil forlate dette {0}?",
     "context.confirm.delete.title.format":"Slett {0}",
     "context.confirm.delete.message.format":"Er du sikker på at du vil slette dette {0}?",
-    "context.confirm.update.title.format":"Oppdatering venter",
-    "context.confirm.update.message.format":"En oppdatering venter, vennligst last inn siden på nytt for å bruke den nyeste versjonen",
+    "context.confirm.update.title":"Oppdatering venter",
+    "context.confirm.update.message":"En oppdatering venter, vennligst last inn siden på nytt for å bruke den nyeste versjonen",
 },
   en: {
     "search.placeholder": "Search ...",
@@ -1846,8 +1846,8 @@ var translations = {
     "context.confirm.leave.message.format":"Are you sure you want to leave this {0}?",
     "context.confirm.delete.title.format":"Delete {0}",
     "context.confirm.delete.message.format":"Are you sure you want to delete this {0}?",
-    "context.confirm.update.title.format":"Update pending",
-    "context.confirm.update.message.format":"An update is waiting, please reload the page to receive the latest version",
+    "context.confirm.update.title":"Update pending",
+    "context.confirm.update.message":"An update is waiting, please reload the page to receive the latest version",
   }
 };
 

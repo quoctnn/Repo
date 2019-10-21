@@ -6,10 +6,7 @@ import { availableEndpoints } from '../redux/endpoint';
 import { uniqueId, nullOrUndefined } from '../utilities/Utilities';
 import { NotificationCenter } from '../utilities/NotificationCenter';
 import * as moment from 'moment-timezone';
-import ContextConfirmableActionsComponent from '../components/general/context/ContextConfirmableActionsComponent';
-import { ContextConfirmableActions } from '../components/general/context/ContextConfirmableActionsComponent';
 import { EventSubscription } from 'fbemitter';
-import { ToastManager } from '../managers/ToastManager';
 export enum EventStreamMessageType {
     STATE = "state",
     USER_UPDATE = "user.update",
@@ -138,7 +135,6 @@ class ChannelEventStream extends React.Component<Props, State> {
     messageObserver:EventSubscription = undefined
     queueEvents = false
     authorized:boolean = false
-    confirmActionComponent = React.createRef<ContextConfirmableActionsComponent>()
     constructor(props:Props) {
         super(props)
         this.state = {
@@ -187,8 +183,6 @@ class ChannelEventStream extends React.Component<Props, State> {
             );
             this.stream.onopen = () => {
                 NotificationCenter.push(eventStreamNotificationPrefix + EventStreamMessageType.SOCKET_STATE_CHANGE,[this.stream.readyState])
-                this.reloadObserver = NotificationCenter.addObserver(eventStreamNotificationPrefix + EventStreamMessageType.CLIENT_RELOAD, this.showConfirmUpdateDialog)
-                this.messageObserver = NotificationCenter.addObserver(eventStreamNotificationPrefix + EventStreamMessageType.CLIENT_MESSAGE, this.showMessageDialog)
                 console.log('WebSocket OPEN');
                 (this.stream as any)._options.minReconnectionDelay = 8000
                 this.sendAuthorization()
@@ -231,12 +225,6 @@ class ChannelEventStream extends React.Component<Props, State> {
             })
         )
     }
-    showConfirmUpdateDialog = () => {
-        this.confirmActionComponent && this.confirmActionComponent.current && this.confirmActionComponent.current.showAction(ContextConfirmableActions.update)
-    }
-    showMessageDialog = (...args:any[]) => {
-        ToastManager.showInfoToast(args[0])
-    }
     componentDidMount = () => {
         this.connectStream()
     }
@@ -267,9 +255,7 @@ class ChannelEventStream extends React.Component<Props, State> {
         }
     }
     render = () => {
-        return (
-            <ContextConfirmableActionsComponent ref={this.confirmActionComponent} contextNaturalKey={null} contextObject={null} onActionComplete={null} />
-        );
+        return null
     }
 }
 const mapStateToProps = (state:ReduxState):ReduxStateProps =>

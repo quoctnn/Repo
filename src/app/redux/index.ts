@@ -32,6 +32,22 @@ const rootReducer = combineReducers({
      activeCommunity,  application, conversationStore, messageQueue, tempCache, unreadNotifications, favoriteStore
 })
 export default persistReducer(rootPersistConfig, rootReducer)
+export enum ReduxKeys{
+    language = 0, 
+    theme, 
+    endpoint,  
+    authentication, 
+    embedlyStore,
+    communityStore,
+    profileStore,
+    conversationStore,
+    favoriteStore,
+    activeCommunity,
+    application,
+    messageQueue,
+    tempCache,
+    unreadNotifications
+}
 export interface ReduxState
 {
     language:{language:AppLanguage}

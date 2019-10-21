@@ -31,6 +31,7 @@ import { ThemeManager } from "./managers/ThemeManager";
 import { NavigationUtilities } from "./utilities/NavigationUtilities";
 import GlobalErrorBoundary from "./components/error/GlobalErrorBoundary";
 import ResponsiveNotifier from "./components/general/observers/ResponsiveNotifier";
+import ClientNotificationManager from "./managers/ClientNotificationManager";
 
 
 const store = createStore(appReducer, applyMiddleware(...middleWares));
@@ -59,6 +60,7 @@ export const App = (props: any) => {
         <GlobalErrorBoundary>
             <ChannelEventStream />
             <ResponsiveNotifier />
+            <ClientNotificationManager />
             <PersistGate loading={null} persistor={persistor}>
                 <AutoIntlProvider>
                         <Router getUserConfirmation={NavigationUtilities.getProtectedNavigationConfirmation}>

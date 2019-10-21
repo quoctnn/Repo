@@ -1,4 +1,3 @@
-import * as React from "react";
 import {  Store } from 'redux';
 import { Community, IdentifiableObject } from '../types/intrasocial_types';
 import {ApiClient} from '../network/ApiClient';
