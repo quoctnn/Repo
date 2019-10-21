@@ -45,11 +45,12 @@ export abstract class WindowAppManager
     static setup = () =>
     {
         const version_parts:string[] = pack.version.split('.')
+        const platform:string = window.isElectron ? "Electron " + window.electronVersion : navigator.platform
         const version:Version = {
             major: Number(version_parts[0]),
             minor: Number(version_parts[1]),
             revision: Number(version_parts[2]),
-            version_string: pack.version + " on " + navigator.platform
+            version_string: pack.version + " on " + platform
         }
         if(!window.appRoot)
             window.appRoot = "/app/"

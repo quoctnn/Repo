@@ -82,7 +82,7 @@ export default class ClientNotificationManager extends React.Component<Props, St
         switch (key) {
                 case ReduxKeys.language:dispatch(resetLanguageAction());break;
                 case ReduxKeys.theme:dispatch(resetThemeAction());break;
-                case ReduxKeys.endpoint:dispatch(resetEndpointAction());break; 
+                case ReduxKeys.endpoint:dispatch(resetEndpointAction());break;
                 case ReduxKeys.authentication:dispatch(resetAuthenticationDataAction());break;
                 case ReduxKeys.embedlyStore:dispatch(resetEmbedlyStoreAction());break;
                 case ReduxKeys.communityStore:dispatch(resetCommunitiesAction());break;
@@ -113,7 +113,10 @@ export default class ClientNotificationManager extends React.Component<Props, St
     handleConfirmedReload = (confirmed:boolean) => {
         this.toggleClientReloadDialogVisible()
         if(confirmed)
-            window.location.reload()
+            if(window.isElectron) {
+                window.location.href = "file://" + window.appRoot + "/app/electron.html"
+            }
+            else window.location.reload()
     }
     renderConfirmReload = () => {
         const visible = this.state.clientReloadDialogVisible

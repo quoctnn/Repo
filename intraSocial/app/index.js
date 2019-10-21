@@ -30,7 +30,6 @@ function createWindow() {
         win = null;
     });
     win.webContents.on('new-window', function(event, url){
-        console.log('new-window', url, event)
         event.preventDefault();
         shell.openExternal(url);
       });
