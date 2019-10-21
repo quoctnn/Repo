@@ -101,7 +101,7 @@ class ActivityModule extends React.Component<Props, State> {
         const unseen = this.state.menuData.sorting == ActivitySorting.onlyUnseen
         ApiClient.getRecentActivity(this.props.pageSize, offset, unseen, (data, status, error) => {
             completion(data)
-            ToastManager.showRequestErrorToast(error)
+            // ToastManager.showRequestErrorToast(error)
         })
     }
     menuDataUpdated = (data:ActivityMenuData) => {
