@@ -132,6 +132,7 @@ class Main extends React.Component<Props, State> {
         const { profile, location } = this.props
         const userIsAdmin = isAdmin(profile)
         const modal = location.state && location.state.modal
+        const currentLocation = modal ? this.previousLocation : location
         return (
             <div id="main">
                     <div id="main-content">
@@ -144,11 +145,11 @@ class Main extends React.Component<Props, State> {
                                 </Switch>
                             }
                             {this.props.loaded &&
-                                <ContextDataResolver location={modal ? this.previousLocation : location}>
+                                <ContextDataResolver /*key={currentLocation.key}*/ location={currentLocation}>
                                     <DndProvider backend={HTML5Backend}>
                                         <TopNavigation />
                                         <SideMenuNavigation />
-                                        <Switch location={modal ? this.previousLocation : location}>
+                                        <Switch location={currentLocation}>
                                             {userIsAdmin &&
                                                 <Route path={Routes.ADMIN_DASHBOARD_BUILDER.path} component={DashboardBuilderPage} />
                                             }

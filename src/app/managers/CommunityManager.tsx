@@ -43,9 +43,21 @@ export abstract class CommunityManager
             }
         })
     }
+    static applyCommunityThemeIfNeeded = (updatedCommunities:Community[]) => {
+        if(updatedCommunities && updatedCommunities.length > 0)
+        {
+            const activeCommunity = CommunityManager.getActiveCommunity()
+            if(activeCommunity && updatedCommunities.map(i => i.id).contains(activeCommunity.id))
+            {
+                CommunityManager.applyCommunityTheme(activeCommunity)
+            }
+        }
+    }
     static storeCommunities = (communities:Community[], force?:boolean) => {
         if(communities.length > 0)
+        {
             CommunityManager.getStore().dispatch(addCommunitiesAction(communities, force))
+        }
     }
     static removeCommunity = (communityId:number) => {
         const activeCommunity = CommunityManager.getActiveCommunity()
@@ -53,7 +65,6 @@ export abstract class CommunityManager
         if(activeCommunity && activeCommunity.id == communityId)
         {
             CommunityManager.setInitialCommunity()
-            CommunityManager.applyCommunityTheme(CommunityManager.getActiveCommunity())
         }
     }
     static getCommunity = (communityId:string):Community|null =>

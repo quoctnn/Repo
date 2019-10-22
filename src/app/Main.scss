@@ -296,7 +296,7 @@ button{@include var(color, primary-text-color);}
 .dropdown-item{
     cursor: pointer;
 }
-body.has-side-menu {
+body[class*="has-side-menu-"]{
     @media (min-width: 640px){
         .page
         {

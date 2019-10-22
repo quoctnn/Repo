@@ -20,6 +20,7 @@ import { Settings } from '../../utilities/Settings';
 import { NotificationCenter } from "../../utilities/NotificationCenter";
 import { EventSubscription } from "fbemitter";
 import { withContextData, ContextDataProps } from "../../hoc/WithContextData";
+import { uniqueId } from '../../utilities/Utilities';
 
 type ContextItemProps = {
     name?:string
@@ -288,6 +289,7 @@ class SideMenuNavigation extends React.Component<Props, State> {
     static animationDuration = 300
     private contentRef = React.createRef<HTMLDivElement>()
     private observers:EventSubscription[] = []
+    private classId = uniqueId()
     constructor(props: Props) {
         super(props)
         this.state = {
@@ -295,7 +297,10 @@ class SideMenuNavigation extends React.Component<Props, State> {
             mode: MenuViewMode.grid,
             closeMenuOnNavigation:true,
         }
-        document.body.classList.add(SideMenuNavigation.bodyClass)
+        document.body.classList.add(this.getBodyClass())
+    }
+    getBodyClass = () => {
+        return SideMenuNavigation.bodyClass + "-" + this.classId
     }
     processToggleMenuNotification = (...args:any[]) => {
         this.toggleMenu()
@@ -334,7 +339,7 @@ class SideMenuNavigation extends React.Component<Props, State> {
         }
     }
     componentWillUnmount = () => {
-        document.body.classList.remove(SideMenuNavigation.bodyClass)
+        document.body.classList.remove(this.getBodyClass())
         document.body.classList.remove(SideMenuNavigation.sideMenuLockedClass)
         document.removeEventListener('click', this.outsideTrigger);
         this.observers.forEach(o => o.remove())

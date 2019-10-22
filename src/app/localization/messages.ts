@@ -611,6 +611,8 @@ var translations = {
     "context.confirm.delete.message.format":"Are you sure you want to delete this {0}?",
     "context.confirm.update.title":"Update pending",
     "context.confirm.update.message":"An update is waiting, please reload the page to receive the latest version",
+    "common.unmute":"Unmute notifications",
+    "common.mute":"Mute notifications",
   },
   no: {
     "search.placeholder": "Søk ...",
@@ -1224,6 +1226,8 @@ var translations = {
     "context.confirm.delete.message.format":"Er du sikker på at du vil slette dette {0}?",
     "context.confirm.update.title":"Oppdatering venter",
     "context.confirm.update.message":"En oppdatering venter, vennligst last inn siden på nytt for å bruke den nyeste versjonen",
+    "common.unmute":"Varsler på",
+    "common.mute":"Varsler av",
 },
   en: {
     "search.placeholder": "Search ...",
@@ -1848,6 +1852,8 @@ var translations = {
     "context.confirm.delete.message.format":"Are you sure you want to delete this {0}?",
     "context.confirm.update.title":"Update pending",
     "context.confirm.update.message":"An update is waiting, please reload the page to receive the latest version",
+    "common.unmute":"Unmute notifications",
+    "common.mute":"Mute notifications",
   }
 };
 

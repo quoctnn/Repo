@@ -142,8 +142,6 @@ class CommunityDetailsModule extends React.Component<Props, State> {
         if(!!community)
         {
             CommunityManager.storeCommunities([community])
-            if(community.id == CommunityManager.getActiveCommunity().id)
-                CommunityManager.applyCommunityTheme(community)
         }
         this.hideCommunityEditForm()
     }
