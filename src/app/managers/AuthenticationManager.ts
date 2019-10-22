@@ -1,17 +1,15 @@
 import {  Store } from 'redux';
 import { AjaxRequest } from '../network/AjaxRequest';
-import { UserProfile, UserStatus, ContextNaturalKey, RecentActivity, AppLanguage } from '../types/intrasocial_types';
+import { UserProfile, UserStatus, RecentActivity, AppLanguage } from '../types/intrasocial_types';
 import {EventStreamMessageType } from '../network/ChannelEventStream';
 import { ReduxState } from '../redux/index';
 import { setAuthenticationProfileAction, setAuthenticationTokenAction } from '../redux/authentication';
 import { NotificationCenter } from '../utilities/NotificationCenter';
 import { ApplicationManager } from './ApplicationManager';
 import { CommunityManager } from './CommunityManager';
-import { ContextManager } from './ContextManager';
 import { ToastManager } from './ToastManager';
 import { WindowAppManager } from './WindowAppManager';
 import { setLanguageAction } from '../redux/language';
-import ReconnectingWebSocket from 'reconnecting-websocket';
 
 export const AuthenticationManagerAuthenticatedUserChangedNotification = "AuthenticationManagerAuthenticatedUserChangedNotification"
 export abstract class AuthenticationManager
@@ -50,7 +48,7 @@ export abstract class AuthenticationManager
 
     }
     static processSwitchedMainCommunity = (...args:any[]) => {
-        let community = args[0]['community_id'] as number;
+        let community = args[0]["id"] as number;
         const currentProfile = AuthenticationManager.getAuthenticatedUser()
         if(!currentProfile)
             return
@@ -59,10 +57,6 @@ export abstract class AuthenticationManager
         AuthenticationManager.setUpdatedProfileStatus(profile)
         // Refresh the UI
         CommunityManager.setInitialCommunity(community)
-        if (!ContextManager.getContextObject(window.routerHistory.location.pathname, ContextNaturalKey.COMMUNITY)) {
-            CommunityManager.applyCommunityTheme(CommunityManager.getActiveCommunity())
-        }
-
     }
     static getAuthenticatedUser = () =>
     {

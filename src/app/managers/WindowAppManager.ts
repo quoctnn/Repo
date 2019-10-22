@@ -1,7 +1,5 @@
 import {  Store } from 'redux';
 import { ReduxState } from '../redux';
-import { resetProjectsAction } from '../redux/projectStore';
-import { resetEventsAction } from '../redux/eventStore';
 import ReconnectingWebSocket from "reconnecting-websocket";
 import { eventStreamNotificationPrefix } from '../network/ChannelEventStream';
 import { NotificationCenter } from '../utilities/NotificationCenter';
@@ -13,17 +11,17 @@ import { ApplicationManager } from './ApplicationManager';
 import { CommunityManager } from './CommunityManager';
 import { Settings } from '../utilities/Settings';
 import { setLanguageAction } from '../redux/language';
-import { RequestErrorData, AppLanguage } from '../types/intrasocial_types';
+import { RequestErrorData, AppLanguage, Version } from '../types/intrasocial_types';
 import { SideMenuNavigationToggleMenuNotification } from '../components/navigation/SideMenuNavigation';
 import { ResponsiveBreakpoint } from '../components/general/observers/ResponsiveComponent';
+import { ContextDataResolverComponentLogContextDataNotification } from '../hoc/WithContextData';
 
 const url = require('url');
 const path = require("path")
+const pack:{"version": string} = require('../../../package.json')
 
 export type AppWindowObject = {
     deleteCommunity:(id:number) => void
-    resetProjectStore:() => void
-    resetEventStore:() => void
     resetMessageQueue:() => void
     user_locale?:string
     socket?:ReconnectingWebSocket
@@ -38,18 +36,26 @@ export type AppWindowObject = {
     language:string
     createError:() => void
     toggleMenu:() => void
+    logContextData:() => void
     breakpoint:ResponsiveBreakpoint
+    version:Version
 }
 export abstract class WindowAppManager
 {
     static setup = () =>
     {
+        const version_parts:string[] = pack.version.split('.')
+        const platform:string = window.isElectron ? "Electron " + window.electronVersion : navigator.platform
+        const version:Version = {
+            major: Number(version_parts[0]),
+            minor: Number(version_parts[1]),
+            revision: Number(version_parts[2]),
+            version_string: pack.version + " on " + platform
+        }
         if(!window.appRoot)
             window.appRoot = "/app/"
         window.app = {
             deleteCommunity:WindowAppManager.deleteCachedCommunity,
-            resetProjectStore:WindowAppManager.resetProjectStore,
-            resetEventStore:WindowAppManager.resetEventStore,
             sendOutgoingOnSocket:WindowAppManager.sendOutgoingOnSocket,
             sendInboundOnSocket:WindowAppManager.sendInboundOnSocket,
             hardReset:WindowAppManager.hardReset,
@@ -62,9 +68,14 @@ export abstract class WindowAppManager
             language:WindowAppManager.language,
             createError:WindowAppManager.createError,
             toggleMenu:WindowAppManager.toggleMenu,
-            breakpoint:ResponsiveBreakpoint.micro
+            breakpoint:ResponsiveBreakpoint.micro,
+            logContextData:WindowAppManager.logContextData,
+            version:version
         }
         //
+    }
+    static logContextData = () => {
+        NotificationCenter.push(ContextDataResolverComponentLogContextDataNotification,[])
     }
     static toggleMenu = () => {
         NotificationCenter.push(SideMenuNavigationToggleMenuNotification,[])
@@ -95,17 +106,11 @@ export abstract class WindowAppManager
     static resetMessageQueue = () => {
         WindowAppManager.getStore().dispatch(resetMessageQueueAction())
     }
-    static resetEventStore = () => {
-        WindowAppManager.getStore().dispatch(resetEventsAction())
-    }
     static hardReset = () => {
         ApplicationManager.hardReset()
     }
     static softReset = () => {
         ApplicationManager.hardReset()
-    }
-    static resetProjectStore = () => {
-        WindowAppManager.getStore().dispatch(resetProjectsAction())
     }
     static deleteCachedCommunity = (id:number) => {
         CommunityManager.removeCommunity(id)

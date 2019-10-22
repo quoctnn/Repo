@@ -3,7 +3,7 @@ import { withRouter, RouteComponentProps, Link } from "react-router-dom";
 import classnames from "classnames"
 import "./ConversationsModule.scss"
 import { ResponsiveBreakpoint } from '../../components/general/observers/ResponsiveComponent';
-import { ContextNaturalKey, Conversation, UserProfile, ConversationFilter } from '../../types/intrasocial_types';
+import { Conversation, UserProfile, ConversationFilter } from '../../types/intrasocial_types';
 import { connect, DispatchProp } from 'react-redux';
 import { ReduxState } from '../../redux';
 import SimpleModule from '../SimpleModule';
@@ -19,7 +19,6 @@ import { EventStreamMessageType } from '../../network/ChannelEventStream';
 import { Settings } from '../../utilities/Settings';
 import { AuthenticationManager } from '../../managers/AuthenticationManager';
 import { uniqueId } from '../../utilities/Utilities';
-import { ContextManager } from '../../managers/ContextManager';
 import { ConversationManager, ConversationManagerConversationRemovedEvent } from '../../managers/ConversationManager';
 import Routes from '../../utilities/Routes';
 import { ConversationAction } from './ConversationListItem';
@@ -293,10 +292,6 @@ class ConversationsModule extends React.Component<Props, State> {
             if(confirmed)
             {
                 ConversationManager.leaveConversation(action.argument.conversation, (success) => {
-                    if(success)
-                    {
-                        ToastManager.showInfoToast(translate("You left the conversation!"))
-                    }
                     this.resetAction()
                 })
             }
@@ -308,17 +303,24 @@ class ConversationsModule extends React.Component<Props, State> {
         {
             if(confirmed)
             {
-                ConversationManager.removeUsersFromConversation(action.argument.conversation, action.argument.users, (success) => {
+                ConversationManager.removeUsersFromConversation(action.argument.conversation, action.argument.users, (success, conversation) => {
                     if(success)
                     {
                         ToastManager.showInfoToast(translate("User(s) removed from conversation!"))
                     }
+                    this.updateConversation(conversation)
                     this.resetAction()
                 })
             }
             else {
                 this.resetAction()
             }
+        }
+    }
+    updateConversation = (conversation:Partial<Conversation>) => {
+        if(conversation)
+        {
+            ConversationManager.updateConversation(conversation)
         }
     }
     renderConfirmDialog = () => {
@@ -498,10 +500,10 @@ class ConversationsModule extends React.Component<Props, State> {
 }
 const mapStateToProps = (state:ReduxState, ownProps: OwnProps & RouteComponentProps<any>):ReduxStateProps => {
 
-    const authenticatedUser = AuthenticationManager.getAuthenticatedUser()
-    const conversation = ContextManager.getContextObject(ownProps.location.pathname, ContextNaturalKey.CONVERSATION) as Conversation
     const conversationId:string = ownProps.match.params.conversationId
     const createNewConversation = conversationId == tempConversationId
+    const authenticatedUser = AuthenticationManager.getAuthenticatedUser()
+    const conversation = createNewConversation ? undefined : ConversationManager.getConversation(conversationId)
     const tempConversation = state.tempCache.conversation
     return {
         authenticatedUser,

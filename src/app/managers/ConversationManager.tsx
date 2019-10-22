@@ -3,7 +3,7 @@ import {ApiClient} from '../network/ApiClient';
 import { Conversation, Message, UserProfile, Permission } from '../types/intrasocial_types';
 import { EventStreamMessageType } from '../network/ChannelEventStream';
 import { ReduxState } from '../redux';
-import { addConversationsAction, removeConversationAction } from '../redux/conversationStore';
+import { addConversationsAction, removeConversationAction, updateConversationAction } from '../redux/conversationStore';
 import { updateMessageInQueueAction, removeMessageFromQueueAction, processNextMessageInQueueAction, addMessageToQueueAction } from '../redux/messageQueue';
 import { AuthenticationManager } from './AuthenticationManager';
 import { NotificationCenter } from '../utilities/NotificationCenter';
@@ -21,11 +21,14 @@ export abstract class ConversationManager
     {
         NotificationCenter.addObserver("eventstream_" + EventStreamMessageType.CONVERSATION_NEW, ConversationManager.processIncomingConversation)
         NotificationCenter.addObserver("eventstream_" + EventStreamMessageType.CONVERSATION_UPDATE, ConversationManager.processIncomingConversation)
-        NotificationCenter.addObserver("eventstream_" + EventStreamMessageType.CONVERSATION_MESSAGE, ConversationManager.processIncomingConversationMessage)
+        NotificationCenter.addObserver("eventstream_" + EventStreamMessageType.CONVERSATION_MESSAGE_NEW, ConversationManager.processIncomingConversationMessage)
         NotificationCenter.addObserver("eventstream_" + EventStreamMessageType.CONVERSATION_REMOVE, ConversationManager.processIncomingConversationRemove)
     }
     static storeConversations = (conversations:Conversation[]) => {
         ConversationManager.getStore().dispatch(addConversationsAction(conversations))
+    }
+    static updateConversation = (conversation:Partial<Conversation>) => {
+        ConversationManager.getStore().dispatch(updateConversationAction(conversation as Conversation))
     }
     static removeConversation = (conversationsId:number) => {
         ConversationManager.getStore().dispatch(removeConversationAction(conversationsId))
@@ -54,6 +57,29 @@ export abstract class ConversationManager
             ToastManager.showRequestErrorToast(error)
             completion(success)
         })
+    }
+    static ensureExists = (conversationId:number|string) =>
+    {
+        if(!conversationId.isNumber())
+        {
+            return null
+        }
+        let conversation = ConversationManager.getConversation(conversationId)
+        if(!conversation)
+        {
+            const id = parseInt(conversationId.toString())
+            ApiClient.getConversation(id, (data, status, error) => {
+                if(data)
+                {
+                    ConversationManager.storeConversations([data])
+                }
+                else
+                {
+                    console.log("error fetching conversation", error)
+                }
+            })
+        }
+        return conversation
     }
     static ensureConversationExists = (conversationId:number|string, completion:(conversation:Conversation) => void) =>
     {
@@ -90,8 +116,8 @@ export abstract class ConversationManager
         ConversationManager.getStore().dispatch(addConversationsAction([conversation]))
     }
     private static processIncomingConversationRemove = (...args:any[]) => {
-        let data:{conversation_id:number} = args[0]
-        ConversationManager.removeConversation(data.conversation_id)
+        let data:{id:number} = args[0]
+        ConversationManager.removeConversation(data.id)
     }
     private static processIncomingConversationMessage = (...args:any[]) =>
     {
@@ -181,16 +207,17 @@ export abstract class ConversationManager
             if(success)
             {
                 ConversationManager.removeConversation(conversationId)
+                ToastManager.showInfoToast(translate("You left the conversation!"))
             }
             completion(success)
         })
     }
-    static removeUsersFromConversation = (conversationId:number, users:number[], completion:(success:boolean) => void) =>
+    static removeUsersFromConversation = (conversationId:number, users:number[], completion:(success:boolean, conversation:Partial<Conversation>) => void) =>
     {
         ApiClient.removeConversationUsers(conversationId, users, (data, status, error) => {
             const success = !error
             ToastManager.showRequestErrorToast(error, lazyTranslate("Could not remove user(s) from conversation"))
-            completion(success)
+            completion(success, data)
         })
     }
     static markConversationAsRead = (conversationId:number, completion:() => void) =>

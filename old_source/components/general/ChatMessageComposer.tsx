@@ -61,13 +61,6 @@ const getBlocks = (contentState:ContentState) => {
     })
     return blocks
   };
-
-interface DraftEntity
-{
-    type:string 
-    mutability:string 
-    data:any
-}
 const generateContentState = (content:string, mentions:Mention[]):ContentState => 
 {
     var contentState = ContentState.createFromText(content || "")
@@ -152,13 +145,6 @@ export class ChatMessageComposer extends React.Component<Props,State> implements
     constructor(props) {
         super(props)
         this.state = {plainText:"", editorState:EditorState.createWithContent(generateContentState(this.props.content, this.props.mentions))}
-        this.handleSubmit = this.handleSubmit.bind(this)
-        this.fixFocusInput = this.fixFocusInput.bind(this)
-        this.sendDidType = this.sendDidType.bind(this)
-        this.getProcessedText = this.getProcessedText.bind(this)
-        this.onChange = this.onChange.bind(this)
-        this.canSubmit = this.canSubmit.bind(this)
-        
     }
     shouldComponentUpdate(nextProps:Props, nextState:State)
     {
@@ -170,7 +156,7 @@ export class ChatMessageComposer extends React.Component<Props,State> implements
     getContent = () => {
         return this.getProcessedText()
     }
-    handleSubmit(e) {
+    handleSubmit = (e) => {
         e.preventDefault();
         let {text, mentions} = this.getProcessedText()
         if (text.length > 0) {
@@ -181,24 +167,21 @@ export class ChatMessageComposer extends React.Component<Props,State> implements
         }
         return false
     }
-    sendDidType()
-    {
+    sendDidType = () => {
         this.props.onDidType(this.state.plainText)
     }
-    fixFocusInput() {
+    fixFocusInput = () => {
         // For mobile devices that doesn't show soft keyboard
         this.inputRef.current.click;
     }
-    onChange(state:EditorState)
-    {
+    onChange = (state:EditorState) => {
         let text = state.getCurrentContent().getPlainText()
         ProtectNavigation(text != "")
         const hasChanged = this.state.plainText != text
         const f = hasChanged ? this.sendDidType : undefined
         this.setState({plainText:text, editorState:state}, f)
     }
-    getProcessedText()
-    {
+    getProcessedText = () => {
         if(!this.state.editorState)
         {
             return {text:"", mentions:[]}
@@ -212,8 +195,7 @@ export class ChatMessageComposer extends React.Component<Props,State> implements
         })
         return {text, mentions:Object.keys(mentions).map(k => parseInt(k))}
     }
-    canSubmit()
-    {
+    canSubmit = () => {
         if( !nullOrUndefined( this.props.canSubmit) )
             return this.props.canSubmit
         return this.state.plainText.length > 0

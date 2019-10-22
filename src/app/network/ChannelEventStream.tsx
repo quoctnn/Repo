@@ -5,6 +5,8 @@ import { ReduxState } from '../redux/index';
 import { availableEndpoints } from '../redux/endpoint';
 import { uniqueId, nullOrUndefined } from '../utilities/Utilities';
 import { NotificationCenter } from '../utilities/NotificationCenter';
+import * as moment from 'moment-timezone';
+import { EventSubscription } from 'fbemitter';
 export enum EventStreamMessageType {
     STATE = "state",
     USER_UPDATE = "user.update",
@@ -14,9 +16,15 @@ export enum EventStreamMessageType {
     CLIENT_LAST_SEEN = "client.last_seen",
     CLIENT_UPDATE = "client.update",
     CLIENT_STATUS_CHANGE = "client.status_change",
+    CLIENT_DETAILS = 'client.details',
+    CLIENT_RELOAD = 'client.reload',
+    CLIENT_SIGNOUT = 'client.signout',
+    CLIENT_DISCONNECT = 'client.disconnect',
+    CLIENT_REDUX_FLUSH = 'client.redux.flush',
+    CLIENT_MESSAGE = 'client.message',
 
     CONVERSATION_TYPING = "conversation.typing",
-    CONVERSATION_MESSAGE = "conversation.message",
+    CONVERSATION_MESSAGE_NEW = "conversation.message.new",
     CONVERSATION_REMOVE = "conversation.remove",
     CONVERSATION_NEW = "conversation.new",
     CONVERSATION_UPDATE = "conversation.update",
@@ -44,6 +52,10 @@ export enum EventStreamMessageType {
     PROJECT_NEW = "project.new",
     PROJECT_UPDATE = "project.update",
     PROJECT_REMOVE = "project.remove",
+
+    TASK_NEW = "project.task.new",
+    TASK_UPDATE = "project.task.update",
+    TASK_REMOVE = "project.task.remove",
 
     NOTIFICATIONS_UNHANDLED = "notifications.unhandled",
     FAVORITES_UPDATE = "favorites.update",
@@ -119,6 +131,8 @@ type Props = OwnProps & ReduxDispatchProps & ReduxStateProps
 class ChannelEventStream extends React.Component<Props, State> {
     stream: ReconnectingWebSocket|null = null
     oldStream: ReconnectingWebSocket|null = null
+    reloadObserver:EventSubscription = undefined
+    messageObserver:EventSubscription = undefined
     queueEvents = false
     authorized:boolean = false
     constructor(props:Props) {
@@ -186,6 +200,8 @@ class ChannelEventStream extends React.Component<Props, State> {
             this.stream.onclose = event => {
                 NotificationCenter.push(eventStreamNotificationPrefix + EventStreamMessageType.SOCKET_STATE_CHANGE,[this.stream.readyState])
                 this.authorized = false;
+                this.reloadObserver = undefined;
+                this.messageObserver = undefined;
                 console.log('WebSocket CLOSED');
                 if (this.stream && (this.stream as any)._shouldReconnect)
                     (this.stream as any)._connect();
@@ -198,6 +214,16 @@ class ChannelEventStream extends React.Component<Props, State> {
         {
             this.authorize()
         }
+        this.stream.send(JSON.stringify(
+            {
+                "type": "client.details",
+                "data": {
+                    "version": window.app.version,
+                    "timezone": moment.tz.guess(),
+                    "useragent": navigator.userAgent
+                }
+            })
+        )
     }
     componentDidMount = () => {
         this.connectStream()
@@ -223,11 +249,13 @@ class ChannelEventStream extends React.Component<Props, State> {
             console.log('Discarding WebSocket');
             this.stream.close()
             this.stream = null;
-            this.authorized = false
+            this.authorized = false;
+            this.reloadObserver = undefined;
+            this.messageObserver = undefined;
         }
     }
     render = () => {
-        return null;
+        return null
     }
 }
 const mapStateToProps = (state:ReduxState):ReduxStateProps =>

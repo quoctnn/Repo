@@ -7,7 +7,6 @@ import { ContextNaturalKey, Conversation, UserProfile } from '../../types/intras
 import { connect } from 'react-redux';
 import { ReduxState } from '../../redux';
 import SimpleModule from '../SimpleModule';
-import { ContextManager } from '../../managers/ContextManager';
 import { AuthenticationManager } from '../../managers/AuthenticationManager';
 import { tempConversationId, ConversationActionArchiveNotification, ConversationActionLeaveNotification, ConversationActionRemoveUsersNotification, ConversationActionDeleteNotification } from '../conversations/ConversationsModule';
 import { ConversationUtilities } from '../../utilities/ConversationUtilities';
@@ -25,6 +24,7 @@ import { OverflowMenuItem, OverflowMenuItemType } from '../../components/general
 import { NotificationCenter } from '../../utilities/NotificationCenter';
 import { ConversationManager } from '../../managers/ConversationManager';
 import {ConnectedProfile} from '../../hoc/ConnectedContextObject';
+import { ContextDataProps, withContextData } from '../../hoc/WithContextData';
 type OwnProps = {
     className?:string
     breakpoint:ResponsiveBreakpoint
@@ -33,6 +33,7 @@ type OwnProps = {
 type State = {
     title:string
     addMembersDialogVisible:boolean
+    addMembersDialogReloadKey:string
     canSubmitNewMembers:boolean
 }
 type ReduxStateProps = {
@@ -42,7 +43,7 @@ type ReduxStateProps = {
 }
 type ReduxDispatchProps = {
 }
-type Props = OwnProps & RouteComponentProps<any> & ReduxStateProps & ReduxDispatchProps
+type Props = OwnProps & RouteComponentProps<any> & ReduxStateProps & ReduxDispatchProps & ContextDataProps
 class ConversationDetailsModule extends React.Component<Props, State> {
 
     titleRef = React.createRef<HTMLInputElement>();
@@ -51,6 +52,7 @@ class ConversationDetailsModule extends React.Component<Props, State> {
         this.state = {
             title:this.getTitle(props),
             addMembersDialogVisible:false,
+            addMembersDialogReloadKey:uniqueId(),
             canSubmitNewMembers:false
         }
     }
@@ -109,9 +111,16 @@ class ConversationDetailsModule extends React.Component<Props, State> {
         const conversationId = conversation.id
         if(conversationId && this.state.title != oldTitle)
         {
-            ApiClient.updateConversation(conversationId,{title:this.state.title}, (data, status, error) => {
+            ApiClient.updateConversation(conversationId,{title:this.state.title}, (conversation, status, error) => {
                 ToastManager.showRequestErrorToast(error, lazyTranslate("Could not update conversation"))
+                this.updateConversation(conversation)
             })
+        }
+    }
+    updateConversation = (conversation:Partial<Conversation>) => {
+        if(conversation)
+        {
+            ConversationManager.updateConversation(conversation)
         }
     }
     getMemberOptionMenuItems = (profile:UserProfile) => {
@@ -156,7 +165,11 @@ class ConversationDetailsModule extends React.Component<Props, State> {
     }
     toggleAddMembersDialog = () => {
         this.setState((prevState:State) => {
-            return {addMembersDialogVisible:!prevState.addMembersDialogVisible}
+            const visible = !prevState.addMembersDialogVisible
+            const d:Partial<State> =  {addMembersDialogVisible:visible}
+            if(visible)
+                d.addMembersDialogReloadKey = uniqueId()
+            return d as State
         })
     }
     renderAddMembers = () => {
@@ -178,6 +191,7 @@ class ConversationDetailsModule extends React.Component<Props, State> {
         }, () => {
             ApiClient.addConversationUsers(conversationId, added, (conversation, status, errorData) => {
                 ToastManager.showRequestErrorToast(errorData, lazyTranslate("network.error"))
+                this.updateConversation(conversation)
             })
         })
     }
@@ -188,6 +202,7 @@ class ConversationDetailsModule extends React.Component<Props, State> {
     }
     renderAddmembersDialog = () => {
         const visible = this.state.addMembersDialogVisible
+
         let contacts:UserProfile[] = []
         if(visible)
         {
@@ -196,6 +211,7 @@ class ConversationDetailsModule extends React.Component<Props, State> {
             contacts = ProfileManager.getProfiles(possibleNewMembers)
         }
         return <SelectUsersDialog 
+                    key={this.state.addMembersDialogReloadKey}
                     contacts={contacts}
                     title={translate("conversation.add.members")}
                     visible={visible}
@@ -266,11 +282,12 @@ class ConversationDetailsModule extends React.Component<Props, State> {
                 </SimpleModule>)
     }
 }
-const mapStateToProps = (state:ReduxState, ownProps: OwnProps & RouteComponentProps<any>):ReduxStateProps => {
+const mapStateToProps = (state:ReduxState, ownProps: OwnProps & RouteComponentProps<any> & ContextDataProps):ReduxStateProps => {
 
-    const conversation = ContextManager.getContextObject(ownProps.location.pathname, ContextNaturalKey.CONVERSATION) as Conversation || state.tempCache.conversation
+    const conversationId:string = ownProps.match.params.conversationId
+    const createNewConversation = conversationId == tempConversationId
+    const conversation = createNewConversation ? state.tempCache.conversation : ConversationManager.getConversation(conversationId)
     const authenticatedUser = AuthenticationManager.getAuthenticatedUser()
-    const createNewConversation = ownProps.match.params.conversationId == tempConversationId
     return {
         conversation,
         authenticatedUser,
@@ -281,4 +298,4 @@ const mapDispatchToProps = (dispatch:ReduxState, ownProps: OwnProps):ReduxDispat
     return {
     }
 }
-export default withRouter(connect<ReduxStateProps, ReduxDispatchProps, OwnProps>(mapStateToProps, mapDispatchToProps)(ConversationDetailsModule))
+export default  withContextData(withRouter(connect<ReduxStateProps, ReduxDispatchProps, OwnProps>(mapStateToProps, mapDispatchToProps)(ConversationDetailsModule)))

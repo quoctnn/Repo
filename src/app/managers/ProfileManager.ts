@@ -2,8 +2,6 @@ import {  Store } from 'redux';
 import { CommunityManager } from './CommunityManager';
 import { UserProfile, ContextNaturalKey } from '../types/intrasocial_types';
 import { AuthenticationManager } from './AuthenticationManager';
-import { GroupManager } from './GroupManager';
-import { ProjectManager } from './ProjectManager';
 import { ReduxState } from '../redux';
 import { addProfilesAction } from '../redux/profileStore';
 import { userFullName, nullOrUndefined } from '../utilities/Utilities';
@@ -14,8 +12,6 @@ import { ProfileResolver } from '../network/ProfileResolver';
 export type ProfileManagerSearchInContextProps = {
     search:string
     taggableMembers?:number[] | (() => number[])
-    contextObjectId?:number
-    contextNaturalKey?:ContextNaturalKey
     completion:(members:UserProfile[]) => void
 }
 export abstract class ProfileManager
@@ -28,7 +24,7 @@ export abstract class ProfileManager
         let profile = args[0]
         ProfileManager.storeProfiles([profile], true)
     }
-    static getProfile = (profileId:string):UserProfile|null =>
+    static getProfile = (profileId:string):UserProfile =>
     {
         const state = ProfileManager.getStore().getState()
         const isNumber = profileId.isNumber()
@@ -46,6 +42,25 @@ export abstract class ProfileManager
         if(me)
             profiles.unshift(me)
         return profiles.find(p => p.slug_name == profileId)
+    }
+    static ensureExists = (profileId:string|number, forceUpdate?: boolean) => {
+        const id = profileId.toString()
+        let profile = ProfileManager.getProfile(id)
+        if(!profile || forceUpdate)
+        {
+            ProfileResolver.resolveProfiles([id], (data) => {
+                const profile = data && data[0]
+                if(profile)
+                {
+                    ProfileManager.storeProfiles([profile])
+                }
+                else
+                {
+                    console.log("error fetching profile", profileId)
+                }
+            })
+        }
+        return profile
     }
     static ensureProfileExists = (profileId:string|number, completion:(profile:UserProfile) => void, forceUpdate?: boolean) =>
     {
@@ -197,107 +212,17 @@ export abstract class ProfileManager
             completion(result)
         })
     }
-    static searchProfilesInContext = ({search, taggableMembers, contextObjectId, contextNaturalKey, completion}:ProfileManagerSearchInContextProps) => {
+    static searchProfilesInMembers = ({search, taggableMembers, completion}:ProfileManagerSearchInContextProps) => {
 
         if(taggableMembers)
         {
             let members = Array.isArray(taggableMembers) ? taggableMembers : taggableMembers()
-            if(members.length == 0) { // Global item, search all available profiles
-                members = ProfileManager.getContactListIds()
-            }
             ProfileManager.searchProfileIdsEnsureExists(search, members, (profiles) => {
                 completion(profiles)
             })
         }
-        else if(contextObjectId && contextNaturalKey){
-            ProfileManager.searchMembersInContext(search, contextObjectId, contextNaturalKey, (members) => {
-                completion(members)
-            })
-        }
         else {
             completion([])
-        }
-    }
-    static searchMembersInContext = (query:string, contextObjectId:number, contextNaturalKey:string, completion:(members:UserProfile[]) => void) => {
-        switch(contextNaturalKey)
-        {
-            case ContextNaturalKey.COMMUNITY:
-            {
-                CommunityManager.ensureCommunityExists(contextObjectId, (community) =>
-                {
-                    let result:UserProfile[] = []
-                    if(community)
-                        result = ProfileManager.searchProfileIds(query, community.members)
-                    completion(result)
-                })
-                break;
-            }
-            case ContextNaturalKey.USER:
-            {
-                const me = AuthenticationManager.getAuthenticatedUser().id
-                let result:UserProfile[] = []
-                if(contextObjectId == me)
-                {
-                    const myContacts = ProfileManager.getContactListIds()
-                    if(myContacts.length > 0)
-                    {
-                        ProfileManager.ensureProfilesExists(myContacts, () => {
-                            result = ProfileManager.searchProfileIds(query, myContacts)
-                            completion(result)
-                        })
-                    }
-                    else
-                    {
-                        completion(result)
-                    }
-                }
-                else {
-                    ProfileManager.ensureProfilesExists([contextObjectId], () => {
-                        const profile = ProfileManager.getProfileById(contextObjectId)
-                        const mutualFriends = profile.mutual_friends || []
-                        if(mutualFriends.length > 0)
-                        {
-                            ProfileManager.ensureProfilesExists(mutualFriends, () => {
-                                result = ProfileManager.searchProfileIds(query, mutualFriends)
-                                completion(result)
-                            })
-                        }
-                        else
-                        {
-                            completion(result)
-                        }
-
-                    })
-                }
-                break;
-            }
-            case ContextNaturalKey.GROUP:
-            {
-                GroupManager.ensureGroupExists(contextObjectId, (group) =>
-                {
-                    let result:UserProfile[] = []
-                    if(group)
-                        result = ProfileManager.searchProfileIds(query, group.members)
-                    completion(result)
-                })
-                break;
-            }
-            case ContextNaturalKey.PROJECT:
-            {
-                ProjectManager.ensureProjectExists(contextObjectId, (project) =>
-                {
-                    let result:UserProfile[] = []
-                    if(project)
-                        result = ProfileManager.searchProfileIds(query, project.members)
-                    completion(result)
-                })
-                break;
-            }
-            default:
-            {
-                console.log("searchMembersInContext", query, contextObjectId, contextNaturalKey)
-                completion([]);
-            }
         }
     }
     private static getStore = ():Store<ReduxState,any> =>

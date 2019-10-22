@@ -1,32 +1,25 @@
 import * as React from "react";
-import { connect, DispatchProp } from 'react-redux'
 import "./ProfileLanguageModule.scss"
 import classnames from 'classnames';
 import { ResponsiveBreakpoint } from "../../../components/general/observers/ResponsiveComponent";
 import { CommonModuleProps } from "../../Module";
-import { ReduxState } from "../../../redux";
 import SimpleModule from "../../SimpleModule";
 import { translate } from "../../../localization/AutoIntlProvider";
 import { RouteComponentProps, withRouter } from "react-router";
-import { ContextNaturalKey, UserProfile, ProfileLanguage } from "../../../types/intrasocial_types";
-import { ContextManager } from "../../../managers/ContextManager";
+import { ProfileLanguage } from "../../../types/intrasocial_types";
 import {ApiClient} from '../../../network/ApiClient';
+import { withContextData, ContextDataProps } from '../../../hoc/WithContextData';
 
 type OwnProps = {
     breakpoint:ResponsiveBreakpoint
-} & CommonModuleProps & DispatchProp
-type ReduxStateProps = {
-    profile:UserProfile
-}
-type ReduxDispatchProps ={
-}
+} & CommonModuleProps
 type State = {
     languages:ProfileLanguage[]
     isLoading:boolean
-    hasLoaded:boolean
+    loadedProfileId:number
 
 }
-type Props = ReduxStateProps & ReduxDispatchProps & OwnProps & RouteComponentProps<any>
+type Props = OwnProps & RouteComponentProps<any> & ContextDataProps
 class ProfileLanguageModule extends React.PureComponent<Props, State> {
 
     constructor(props:Props) {
@@ -34,7 +27,7 @@ class ProfileLanguageModule extends React.PureComponent<Props, State> {
         this.state = {
             languages:[],
             isLoading:false,
-            hasLoaded:false,
+            loadedProfileId:null,
         }
     }
     componentDidMount = () => {
@@ -44,20 +37,18 @@ class ProfileLanguageModule extends React.PureComponent<Props, State> {
         this.fetchData()
     }
     fetchData = () => {
-        const {hasLoaded, isLoading} = this.state
-        if(hasLoaded || isLoading)
-            return
-        const profileId = this.props.profile && this.props.profile.id
-        if(!profileId)
+        const {loadedProfileId, isLoading} = this.state
+        const profileId = this.props.contextData.profile && this.props.contextData.profile.id
+        if(!profileId || loadedProfileId == profileId || isLoading)
             return
         this.setState((prevState:State) => {
-            return {isLoading:true}
+            return {isLoading:true, languages:[]}
         }, () => {
             console.log("fetching languages")
             ApiClient.getLanguages(10, 0, profileId,(data, status, error) => {
                 const langs = data && data.results || []
                 this.setState((prevState:State) => {
-                    return {languages:langs, isLoading:false, hasLoaded:true}
+                    return {languages:langs, isLoading:false, loadedProfileId:profileId}
                 })
             })
         })
@@ -78,7 +69,7 @@ class ProfileLanguageModule extends React.PureComponent<Props, State> {
         const shouldRender = this.shouldModuleRender()
         if(!shouldRender)
             return null
-        const {className, breakpoint, contextNaturalKey, pageSize, showLoadMore, showInModal, isModal, dispatch, staticContext, profile, history, location, match, ...rest} = this.props
+        const {className, breakpoint, contextNaturalKey, pageSize, showLoadMore, showInModal, isModal, staticContext, history, location, match, contextData, ...rest} = this.props
         const cn = classnames("profile-language-module", className)
         return <SimpleModule {...rest}
                 showHeader={!isModal}
@@ -92,10 +83,4 @@ class ProfileLanguageModule extends React.PureComponent<Props, State> {
             </SimpleModule>
     }
 }
-const mapStateToProps = (state:ReduxState, ownProps: OwnProps & RouteComponentProps<any>):ReduxStateProps => {
-    const resolved = ContextManager.getContextObject(ownProps.location.pathname, ContextNaturalKey.USER)
-    return {
-        profile:resolved as any as UserProfile
-    }
-}
-export default withRouter(connect(mapStateToProps, null)(ProfileLanguageModule))
+export default withContextData(withRouter(ProfileLanguageModule))

@@ -4,22 +4,19 @@ import classnames from "classnames"
 import "./ProjectsModule.scss"
 import { ResponsiveBreakpoint } from '../../components/general/observers/ResponsiveComponent';
 import { translate } from '../../localization/AutoIntlProvider';
-import { ContextNaturalKey, Community, Project, ProjectSorting, Group } from '../../types/intrasocial_types';
+import { Project, ProjectSorting } from '../../types/intrasocial_types';
 import ListComponent from '../../components/general/ListComponent';
 import {ApiClient,  PaginationResult } from '../../network/ApiClient';
 import { ToastManager } from '../../managers/ToastManager';
-import { connect } from 'react-redux';
-import { ReduxState } from '../../redux';
 import ProjectsMenu from './ProjectsMenu';
 import { ProjectsMenuData } from './ProjectsMenu';
 import ProjectListItem from './ProjectListItem';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import SimpleModule from '../SimpleModule';
-import { ContextManager } from '../../managers/ContextManager';
-import { ButtonGroup, Button } from 'reactstrap';
 import { CommonModuleProps } from '../Module';
 import { OverflowMenuItem, OverflowMenuItemType } from '../../components/general/OverflowMenu';
 import { DropDownMenu } from '../../components/general/DropDownMenu';
+import { withContextData, ContextDataProps } from '../../hoc/WithContextData';
 type OwnProps = {
     breakpoint:ResponsiveBreakpoint
 } & CommonModuleProps
@@ -28,13 +25,7 @@ type State = {
     isLoading:boolean
     menuData:ProjectsMenuData
 }
-type ReduxStateProps = {
-    community: Community
-    group: Group
-}
-type ReduxDispatchProps = {
-}
-type Props = OwnProps & RouteComponentProps<any> & ReduxStateProps & ReduxDispatchProps
+type Props = OwnProps & RouteComponentProps<any> & ContextDataProps
 class ProjectsModule extends React.Component<Props, State> {
     tempMenuData:ProjectsMenuData = null
     projectsList = React.createRef<ListComponent<Project>>()
@@ -58,7 +49,7 @@ class ProjectsModule extends React.Component<Props, State> {
         this.projectsList = null
     }
     shouldReloadList = (prevProps:Props) => {
-        return this.props.community && prevProps.community && this.props.community.id != prevProps.community.id
+        return this.props.contextData.community && prevProps.contextData.community && this.props.contextData.community.id != prevProps.contextData.community.id
     }
     componentDidUpdate = (prevProps:Props, prevState:State) => {
         if(this.shouldReloadList(prevProps) || this.contextDataChanged(prevState.menuData, prevProps))
@@ -87,8 +78,9 @@ class ProjectsModule extends React.Component<Props, State> {
     }
     fetchProjects = (offset:number, completion:(items:PaginationResult<Project>) => void ) => {
         const md = this.state.menuData
-        const communityId = this.props.community && this.props.community.id
-        const groupId = this.props.group && this.props.group.id
+        const {community, group} = this.props.contextData
+        const communityId = community && community.id
+        const groupId = group && group.id
         ApiClient.getProjects(communityId, groupId, this.props.pageSize, offset, md.sorting, md.responsible, md.assigned, (data, status, error) => {
             completion(data)
             ToastManager.showRequestErrorToast(error)
@@ -128,9 +120,10 @@ class ProjectsModule extends React.Component<Props, State> {
         return <DropDownMenu triggerIcon={ProjectSorting.icon(this.state.menuData.sorting)} triggerTitle={title} triggerClass="fas fa-caret-down mx-1" items={ddi}></DropDownMenu>
     }
     renderContent = () => {
+        const {community} = this.props.contextData
         return <>
-            {!this.props.community && <LoadingSpinner key="loading"/>}
-            {this.props.community && <ListComponent<Project> ref={this.projectsList}
+            {!community && <LoadingSpinner key="loading"/>}
+            {community && <ListComponent<Project> ref={this.projectsList}
                         loadMoreOnScroll={!this.props.showLoadMore} onLoadingStateChanged={this.feedLoadingStateChanged} fetchData={this.fetchProjects} renderItem={this.renderProject} />}
             </>
     }
@@ -139,7 +132,7 @@ class ProjectsModule extends React.Component<Props, State> {
     }
     render()
     {
-        const {history, match, location, staticContext, contextNaturalKey, community, pageSize, showLoadMore, showInModal, isModal, ...rest} = this.props
+        const {history, match, location, staticContext, contextNaturalKey, pageSize, showLoadMore, showInModal, isModal, ...rest} = this.props
         const {breakpoint, className} = this.props
         const cn = classnames("projects-module", className)
         const menu = <ProjectsMenu data={this.state.menuData} onUpdate={this.menuDataUpdated}  />
@@ -160,17 +153,4 @@ class ProjectsModule extends React.Component<Props, State> {
                 </SimpleModule>)
     }
 }
-const mapStateToProps = (state:ReduxState, ownProps: OwnProps  & RouteComponentProps<any>):ReduxStateProps => {
-
-    const community = ContextManager.getContextObject(ownProps.location.pathname, ContextNaturalKey.COMMUNITY) as Community
-    const group = ContextManager.getContextObject(ownProps.location.pathname, ContextNaturalKey.GROUP) as Group
-    return {
-        community,
-        group
-    }
-}
-const mapDispatchToProps = (dispatch:ReduxState, ownProps: OwnProps):ReduxDispatchProps => {
-    return {
-    }
-}
-export default withRouter(connect<ReduxStateProps, ReduxDispatchProps, OwnProps>(mapStateToProps, mapDispatchToProps)(ProjectsModule))
+export default withContextData(withRouter(ProjectsModule))

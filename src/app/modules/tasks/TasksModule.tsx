@@ -5,21 +5,17 @@ import "./TasksModule.scss"
 import { ResponsiveBreakpoint } from '../../components/general/observers/ResponsiveComponent';
 import { translate } from '../../localization/AutoIntlProvider';
 import TaskMenu, { TasksMenuData } from './TasksMenu';
-import { ContextNaturalKey, TaskActions, Task, Permissible, IdentifiableObject, Project } from '../../types/intrasocial_types';
-import { ReduxState } from '../../redux';
-import { connect } from 'react-redux';
+import { ContextNaturalKey, TaskActions, Task } from '../../types/intrasocial_types';
 import ListComponent from '../../components/general/ListComponent';
 import {ApiClient,  PaginationResult } from '../../network/ApiClient';
 import { ToastManager } from '../../managers/ToastManager';
 import TaskListItem from './TaskListItem';
 import { StatusUtilities } from '../../utilities/StatusUtilities';
 import SimpleModule from '../SimpleModule';
-import { ContextManager } from '../../managers/ContextManager';
 import { ButtonGroup, Button } from 'reactstrap';
 import { AuthenticationManager } from '../../managers/AuthenticationManager';
 import { CommonModuleProps } from '../Module';
-import { DropDownMenu } from '../../components/general/DropDownMenu';
-import { OverflowMenuItem } from '../../components/general/OverflowMenu';
+import { withContextData, ContextDataProps } from '../../hoc/WithContextData';
 
 type OwnProps = {
     breakpoint: ResponsiveBreakpoint
@@ -29,13 +25,7 @@ type State = {
     isLoading: boolean
     menuData: TasksMenuData
 }
-
-type ReduxStateProps = {
-    contextObject: Permissible & IdentifiableObject
-}
-type ReduxDispatchProps = {
-}
-type Props = OwnProps & RouteComponentProps<any> & ReduxDispatchProps & ReduxStateProps
+type Props = OwnProps & RouteComponentProps<any> & ContextDataProps
 class TasksModule extends React.Component<Props, State> {
     tempMenuData: TasksMenuData = null
     taskList = React.createRef<ListComponent<Task>>()
@@ -97,14 +87,14 @@ class TasksModule extends React.Component<Props, State> {
             prevData.category != data.category ||
             prevData.responsible != data.responsible ||
             prevData.term != data.term ||
-            prevProps.contextObject && !this.props.contextObject ||
-            !prevProps.contextObject && this.props.contextObject ||
-            prevProps.contextObject && this.props.contextObject && prevProps.contextObject.id != this.props.contextObject.id
+            prevProps.contextData.project && !this.props.contextData.project ||
+            !prevProps.contextData.project && this.props.contextData.project ||
+            prevProps.contextData.project && this.props.contextData.project && prevProps.contextData.project.id != this.props.contextData.project.id
     }
     getContextData = () => {
         const data = this.state.menuData
-        if (!data.project && this.props.contextNaturalKey == ContextNaturalKey.PROJECT && this.props.contextObject) {
-            const project = this.props.contextObject as Project
+        if (!data.project && this.props.contextNaturalKey == ContextNaturalKey.PROJECT && this.props.contextData.project) {
+            const project = this.props.contextData.project
             data.project = { label: `[${project.name}]`, id: project.id, type: this.props.contextNaturalKey, value: this.props.contextNaturalKey + "_" + project.id }
         }
         return data
@@ -269,7 +259,7 @@ class TasksModule extends React.Component<Props, State> {
         return <TasksModule {...this.props} pageSize={50} style={{ height: undefined, maxHeight: undefined }} showLoadMore={false} showInModal={false} isModal={true} />
     }
     render() {
-        const { history, match, location, staticContext, contextNaturalKey, contextObject, pageSize, showLoadMore, showInModal, isModal, ...rest } = this.props
+        const { history, match, location, staticContext, contextNaturalKey, pageSize, showLoadMore, showInModal, isModal, contextData, ...rest } = this.props
         const { breakpoint, className } = this.props
         const cn = classnames("tasks-module", className)
         const disableContextSearch = !!contextNaturalKey
@@ -291,15 +281,4 @@ class TasksModule extends React.Component<Props, State> {
         </SimpleModule>)
     }
 }
-const mapStateToProps = (state: ReduxState, ownProps: OwnProps & RouteComponentProps<any>): ReduxStateProps => {
-
-    const contextObject = ContextManager.getContextObject(ownProps.location.pathname, ownProps.contextNaturalKey)
-    return {
-        contextObject
-    }
-}
-const mapDispatchToProps = (dispatch: ReduxState, ownProps: OwnProps): ReduxDispatchProps => {
-    return {
-    }
-}
-export default withRouter(connect<ReduxStateProps, ReduxDispatchProps, OwnProps>(mapStateToProps, mapDispatchToProps)(TasksModule))
+export default withContextData(withRouter(TasksModule))

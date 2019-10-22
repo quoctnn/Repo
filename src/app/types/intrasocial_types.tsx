@@ -4,7 +4,6 @@ import Constants from "../utilities/Constants";
 import { translate } from "../localization/AutoIntlProvider";
 import { userFullName, groupCover, communityCover, userCover, projectCover, eventCover } from '../utilities/Utilities';
 import { CommunityManager } from '../managers/CommunityManager';
-import { ProjectManager } from '../managers/ProjectManager';
 export type CommunityRole = {
     community:number
     users:number[]
@@ -529,6 +528,18 @@ export namespace ContextNaturalKey {
             default: return null
         }
     }
+    export function fromSegmentKey(key: ContextSegmentKey) {
+        switch (key) {
+            case ContextSegmentKey.GROUP: return ContextNaturalKey.GROUP
+            case ContextSegmentKey.COMMUNITY: return ContextNaturalKey.COMMUNITY
+            case ContextSegmentKey.USER: return ContextNaturalKey.USER
+            case ContextSegmentKey.PROJECT: return ContextNaturalKey.PROJECT
+            case ContextSegmentKey.EVENT: return ContextNaturalKey.EVENT
+            case ContextSegmentKey.TASK: return ContextNaturalKey.TASK
+            case ContextSegmentKey.CONVERSATION: return ContextNaturalKey.CONVERSATION
+            default: return null
+        }
+    }
     export function elasticTypeForKey(key: ContextNaturalKey) {
         switch (key) {
             case ContextNaturalKey.GROUP: return ElasticSearchType.GROUP
@@ -594,10 +605,7 @@ export namespace ContextNaturalKey {
                 {
                     const obj = contextObject as Task
                     if (includeAncestor) {
-                        const project = ProjectManager.getProjectById(obj.project)
-                        if (project) {
-                            return obj.title + " - " + project.name
-                        }
+                        return obj.title + " - " + translate("common.project.project")//project.name
                     }
                     return obj.title
                 }
@@ -935,7 +943,7 @@ export type UnhandledNotifications = {
 }
 export type ContextObject = {
     name: string
-} & Linkable
+} & Linkable & IdentifiableObject
 export type Status = {
     //[key: string]: any
     can_comment: boolean
@@ -1338,6 +1346,9 @@ export const documentIcon = (extension: string): FileIcon => {
 export type Permissible = {
     permission: number
 }
+export type INotifiable = {
+    muted: boolean
+}
 export type Linkable = {
     uri: string
 }
@@ -1378,6 +1389,7 @@ export type ICommunity = {
     primary_color: string
     secondary_color: string
     chapters?: boolean
+    creator:number
 } & Linkable & IdentifiableObject
 export type IMembershipStatus = {
     invited:boolean
@@ -1413,7 +1425,7 @@ export type Community = {
     project_creation_permission:CommunityCreatePermission
     subgroup_creation_permission:CommunityCreatePermission
     //
-} & ICommunity & AvatarAndCover & Permissible & IPrivacy & IMembershipStatus
+} & INotifiable & ICommunity & AvatarAndCover & Permissible & IPrivacy & IMembershipStatus
 
 export type SimpleUserProfile = {
     absolute_url: string,
@@ -1451,14 +1463,14 @@ export type Group = {
     slug: string
     community: number
     description: string
-    creator: UserProfile
+    creator: number
     members: number[]
     members_count: number
     created_at: string
     parent: number
     updated_at: string
     hidden_reason: ObjectHiddenReason
-} & AvatarAndCover & Linkable & Permissible & IdentifiableObject & IPrivacy & IMembershipStatus
+} & INotifiable & AvatarAndCover & Linkable & Permissible & IdentifiableObject & IPrivacy & IMembershipStatus
 
 export type Favorite = {
     index: number
@@ -1486,14 +1498,14 @@ export type Event = {
     slug: string
     community: number
     description: string
-    creator: UserProfile
+    creator: number
     attending: number[]
     attending_count: number
     not_attending: number[]
     not_attending_count: number
     invited_count: number
     created_at: string
-    group: Group
+    group: ContextObject
     updated_at: string
     start: string
     end: string
@@ -1501,21 +1513,21 @@ export type Event = {
     address: string
     parent: Event
     hidden_reason: ObjectHiddenReason
-} & AvatarAndCover & Linkable & Permissible & IdentifiableObject & IPrivacy & IMembershipStatus
+} & INotifiable & AvatarAndCover & Linkable & Permissible & IdentifiableObject & IPrivacy & IMembershipStatus
 
 export type Project = {
     name: string
     slug: string
     community: number
     description: string
-    creator: UserProfile
+    creator: number
     tasks: number
     tags: string[]
     managers: number[]
     members: number[]
     members_count: number
     created_at: string
-    group: Group
+    group: ContextObject
     updated_at: string
     task_count: number
     tasks_assigned: number
@@ -1523,7 +1535,8 @@ export type Project = {
     tasks_completed: number
     tasks_responsible: number
     hidden_reason: ObjectHiddenReason
-} & AvatarAndCover & Linkable & Permissible & IdentifiableObject & IPrivacy
+    is_private:boolean
+} & INotifiable & AvatarAndCover & Linkable & Permissible & IdentifiableObject & IPrivacy
 
 export type TimeSpent = {
     hours: number
@@ -1764,6 +1777,13 @@ export type VersionInfo = {
     minor_version: number
     version_string: string
     release_date: string
+}
+
+export type Version = {
+    major: number,
+    minor: number,
+    revision: number,
+    version_string: string
 }
 
 export type Timesheet = {

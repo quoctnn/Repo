@@ -33,7 +33,7 @@ export const setAuthenticationProfileAction = (profile:UserProfile):SetAuthentic
     type: AuthenticationActionTypes.SetSignedInProfile,
     profile,
 })
-export const resetAuthenticationData = ():SetAuthenticationProfileAction => ({
+export const resetAuthenticationDataAction = ():SetAuthenticationProfileAction => ({
     type: AuthenticationActionTypes.Reset,
 }) 
 const authentication = (state = {...INITIAL_STATE}, action:SetAuthenticationTokenAction & SetAuthenticationProfileAction):AuthenticationData => {

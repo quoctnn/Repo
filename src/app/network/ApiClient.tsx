@@ -22,6 +22,7 @@ import { Status, UserProfile, UploadedFile, Community, Group, Conversation, Proj
     GDPRInfo,
     GDPRFormAnswers,
     UploadedFileResponse, ProfileLanguage, ProfileVolunteeringExperience, RequestErrorData, CropInfo, CropRect, ContextPhotoType} from '../types/intrasocial_types';
+import { translate } from "../localization/AutoIntlProvider";
 export type PaginationResult<T> = {results:T[], count:number, previous?:string, next?:string, divider?:number}
 export type ElasticSuggestion = {text:string, offset:number, length:number, options:[]}
 export type ElasticExtensionResult = {stats:{suggestions:{[key:string]:ElasticSuggestion}, aggregations:{[key:string]:any}}}
@@ -29,6 +30,21 @@ export type StatusCommentsResult<T> = {results:T[], count:number, parent:T}
 export type ElasticResult<T> = PaginationResult<T> & ElasticExtensionResult
 export type ApiClientFeedPageCallback<T> = (data: PaginationResult<T>, status:string, errorData?:RequestErrorData) => void;
 export type ApiClientCallback<T> = (data: T|null, status:string, errorData?:RequestErrorData) => void;
+export enum SearchSortOptions {
+    relevance = "relevance",
+    dateAscending = "created_at",
+    dateDescending = "-created_at"
+}
+export namespace SearchSortOptions {
+    export const all = [
+        SearchSortOptions.relevance,
+        SearchSortOptions.dateAscending,
+        SearchSortOptions.dateDescending,
+    ]
+    export function translationForKey(key: SearchSortOptions) {
+        return translate(`search.sort.${key}`)
+    }
+}
 export type SearchArguments = {
     term?:string
     types?:ElasticSearchType[]
@@ -39,9 +55,11 @@ export type SearchArguments = {
     slim_types?:boolean
     filters?:{[key:string]:string}
     tags?:string[]
-    date_sort?:boolean
+    sorting?:SearchSortOptions
     from_date?:string
     to_date?:string
+    limit:number
+    offset:number
 }
 export type MapBoxFeature = {
     center:[number, number]
@@ -223,8 +241,11 @@ export abstract class ApiClient
             callback(null, status, new RequestErrorData(request.responseJSON, error))
         })
     }
-    static search2( limit:number, offset:number, params:SearchArguments, callback:ApiClientCallback<ElasticResult<any>>){
-        let url = Constants.apiRoute.searchUrl + "?" + ApiClient.getQueryString({limit, offset})
+    static search(args:SearchArguments, callback:ApiClientCallback<ElasticResult<any>>){
+        const params = {...args}
+        if(params.sorting && params.sorting == SearchSortOptions.relevance)
+            delete params.sorting
+        let url = Constants.apiRoute.searchUrl
         AjaxRequest.postJSON(url, params, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
@@ -517,6 +538,78 @@ export abstract class ApiClient
             return
         }
         AjaxRequest.get(url, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, new RequestErrorData(request.responseJSON, error))
+        })
+    }
+    private static getContextLeaveData = (contextNaturalKey:ContextNaturalKey, contextObjectId:number) => {
+        let url:string = null
+        switch (contextNaturalKey ) {
+            case ContextNaturalKey.COMMUNITY:url = Constants.apiRoute.communityLeaveUrl(contextObjectId); break;
+            case ContextNaturalKey.EVENT:url = Constants.apiRoute.eventLeaveUrl(contextObjectId); break;
+            case ContextNaturalKey.GROUP:url = Constants.apiRoute.groupLeaveUrl(contextObjectId); break;
+            case ContextNaturalKey.PROJECT:url = Constants.apiRoute.projectMembershipUrl(contextObjectId); break;
+            default:break;
+        }
+        return url
+    }
+    private static getContextDeleteDataUrl = (contextNaturalKey:ContextNaturalKey, contextObjectId:number) => {
+        let url:string = null
+        switch (contextNaturalKey ) {
+            case ContextNaturalKey.COMMUNITY:url = Constants.apiRoute.communityDeleteUrl(contextObjectId); break;
+            case ContextNaturalKey.EVENT:url = Constants.apiRoute.eventDeleteUrl(contextObjectId); break;
+            case ContextNaturalKey.GROUP:url = Constants.apiRoute.groupDeleteUrl(contextObjectId); break;
+            case ContextNaturalKey.PROJECT:url = Constants.apiRoute.projectDeleteUrl(contextObjectId); break;
+            default:break;
+        }
+        return url
+    }
+    static leaveContext = (contextNaturalKey:ContextNaturalKey, contextObjectId:number, callback:ApiClientCallback<any>) => {
+        const url = ApiClient.getContextLeaveData(contextNaturalKey, contextObjectId)
+        if(!url)
+        {
+            callback(null, "500", new RequestErrorData({detail:`leave api endpoint not set for ${contextNaturalKey}`}, "error"))
+            return
+        }
+        AjaxRequest.get(url,(data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, new RequestErrorData(request.responseJSON, error))
+        })
+    }
+    static deleteContext = (contextNaturalKey:ContextNaturalKey, contextObjectId:number, callback:ApiClientCallback<any>) => {
+        const url = ApiClient.getContextDeleteDataUrl(contextNaturalKey, contextObjectId)
+        if(!url)
+        {
+            callback(null, "500", new RequestErrorData({detail:`delete api endpoint not set for ${contextNaturalKey}`}, "error"))
+            return
+        }
+        AjaxRequest.delete(url,(data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, new RequestErrorData(request.responseJSON, error))
+        })
+    }
+    private static getContextMuteUrl = (contextNaturalKey:ContextNaturalKey, contextObjectId:number) => {
+        let url:string = null
+        switch (contextNaturalKey ) {
+            case ContextNaturalKey.COMMUNITY:url = Constants.apiRoute.communityMuteUrl(contextObjectId); break;
+            case ContextNaturalKey.EVENT:url = Constants.apiRoute.eventMuteUrl(contextObjectId); break;
+            case ContextNaturalKey.GROUP:url = Constants.apiRoute.groupMuteUrl(contextObjectId); break;
+            case ContextNaturalKey.PROJECT:url = Constants.apiRoute.projectMuteUrl(contextObjectId); break;
+            default:break;
+        }
+        return url
+    }
+    static muteContext = (muted:boolean, contextNaturalKey:ContextNaturalKey, contextObjectId:number, callback:ApiClientCallback<any>) => {
+        const url = ApiClient.getContextMuteUrl(contextNaturalKey, contextObjectId)
+        if(!url)
+        {
+            callback(null, "500", new RequestErrorData({detail:`mute api endpoint not set for ${contextNaturalKey}`}, "error"))
+            return
+        }
+        AjaxRequest.post(url, {muted},(data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
             callback(null, status, new RequestErrorData(request.responseJSON, error))

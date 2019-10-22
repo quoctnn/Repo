@@ -9,11 +9,7 @@ import { CommunityManager } from './CommunityManager';
 import { NotificationCenter } from '../utilities/NotificationCenter';
 import { ProfileManager } from './ProfileManager';
 import { resetCommunitiesAction } from '../redux/communityStore';
-import { resetGroupsAction } from '../redux/groupStore';
 import { resetProfilesAction } from '../redux/profileStore';
-import { resetProjectsAction } from '../redux/projectStore';
-import { resetEventsAction } from '../redux/eventStore';
-import { resetTasksAction } from '../redux/taskStore';
 import { resetConversationsAction } from '../redux/conversationStore';
 import { resetMessageQueueAction } from '../redux/messageQueue';
 import { resetEndpointAction } from '../redux/endpoint';
@@ -23,7 +19,7 @@ import { resetEmbedlyStoreAction } from '../components/general/embedly/redux';
 import { resetUnreadNotificationsAction } from '../redux/unreadNotifications';
 import { FavoriteManager } from './FavoriteManager';
 import { Settings } from '../utilities/Settings';
-import { resetAuthenticationData } from '../redux/authentication';
+import { resetAuthenticationDataAction } from '../redux/authentication';
 import { resetLanguageAction } from '../redux/language';
 
 export type ApplicationData = {
@@ -212,7 +208,7 @@ export abstract class ApplicationManager
         dispatch(resetMessageQueueAction())
         dispatch(resetEndpointAction())
         dispatch(resetEmbedlyStoreAction())
-        dispatch(resetAuthenticationData())
+        dispatch(resetAuthenticationDataAction())
         dispatch(resetLanguageAction())
         ApplicationManager.softReset()
     }
@@ -226,10 +222,6 @@ export abstract class ApplicationManager
         const dispatch = ApplicationManager.getStore().dispatch
         dispatch(resetCommunitiesAction())
         dispatch(resetProfilesAction())
-        dispatch(resetGroupsAction())
-        dispatch(resetEventsAction())
-        dispatch(resetTasksAction())
-        dispatch(resetProjectsAction())
         dispatch(resetConversationsAction())
         dispatch(resetUnreadNotificationsAction())
     }

@@ -45,7 +45,7 @@ export default  {
         //embed card
         parseUrl:'/api/v1/links/parse-url/',
         //search
-        searchUrl: '/api/v1/search/',
+        searchUrl: '/api/v2/search/',
         getSearchHistoryUrl: '/api/v1/search/history/',//GET
         createSearchHistoryUrl: '/api/v1/search/history/', //POST
         removeSearchHistoryUrl: (id:number) => {
@@ -59,6 +59,16 @@ export default  {
         // Community URLs
         myCommunitiesUrl: '/api/v2/community/as-member/',
         invitedCommunitiesUrl: '/api/v2/community/invitations/',
+
+        communityLeaveUrl: (id:number) => {
+            return `/api/v2/community/${id}/leave/`
+        },
+        communityMuteUrl: (id:number) => {
+            return `/api/v2/community/${id}/mute/`
+        },
+        communityDeleteUrl: (id:number) => {
+            return `/api/v2/community/${id}/`
+        },
         communityMembersUrl: (id:number) => {
             return `/api/v2/community/${id}/members/`
         },
@@ -142,6 +152,15 @@ export default  {
         },
 
         // Group URLs
+        groupLeaveUrl: (id:number) => {
+            return `/api/v2/group/${id}/leave/`
+        },
+        groupMuteUrl: (id:number) => {
+            return `/api/v2/group/${id}/mute/`
+        },
+        groupDeleteUrl: (id:number) => {
+            return `/api/v2/group/${id}/`
+        },
         groupUrl: (id:number|string) => {
             return `/api/v2/group/${id}/`
         },
@@ -190,6 +209,12 @@ export default  {
         // Project URLs
         projectMembersUrl: (id:number) => {
             return `/api/v2/project/${id}/members/`
+        },
+        projectMuteUrl: (id:number) => {
+            return `/api/v2/project/${id}/mute/`
+        },
+        projectDeleteUrl: (id:number) => {
+            return `/api/v2/project/${id}/`
         },
         projectMembershipUrl: (id:number) => {
             return `/api/v2/project/${id}/membership/`
@@ -263,6 +288,15 @@ export default  {
 
         // Event URLs
         upcomingEventsUrl: '/api/v2/event/upcoming/',
+        eventLeaveUrl: (id:number) => {
+            return `/api/v2/event/${id}/leave/`
+        },
+        eventMuteUrl: (id:number) => {
+            return `/api/v2/event/${id}/mute/`
+        },
+        eventDeleteUrl: (id:number) => {
+            return `/api/v2/event/${id}/`
+        },
         eventModerateUrl: (id:number) => {
             return `/api/v2/event/${id}/moderate/`
         },

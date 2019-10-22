@@ -35,7 +35,7 @@ export class SelectInput extends React.Component<SelectInputProps, SelectInputSt
         return this.state.value
     }
     isValid = () => {
-        const performValidation = this.props.hasSubmitted || this.state.valueSet
+        const performValidation = (this.props.hasSubmitted || this.state.valueSet) && this.props.isRequired
         if(performValidation)
         {
             const selectedOption = this.state.value && this.findOption(this.state.value)
@@ -97,7 +97,7 @@ export class SelectInput extends React.Component<SelectInputProps, SelectInputSt
                     </label>
                     <FormComponentErrorMessage className={cn} errors={errors} errorKey={this.props.id} />
                     <div className="">
-                        <Select
+                        <Select isDisabled={this.props.isDisabled}
                         styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
                         isMulti={false}
                         name={this.props.id}
@@ -107,7 +107,7 @@ export class SelectInput extends React.Component<SelectInputProps, SelectInputSt
                         onChange={this.handleInputChange}
                         placeholder={this.props.placeholder}
                         closeMenuOnSelect={true}
-                        isSearchable={true}
+                        isSearchable={!this.props.isDisabled}
                         options={this.props.options} />
                         {this.props.description && <div className="description" dangerouslySetInnerHTML={{__html:this.props.description}}></div>}
                     </div>

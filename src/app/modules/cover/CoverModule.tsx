@@ -7,12 +7,12 @@ import SimpleModule from "../SimpleModule";
 import { ReduxState } from "../../redux";
 import { connect, DispatchProp } from "react-redux";
 import { withRouter, RouteComponentProps } from "react-router";
-import { ContextManager } from "../../managers/ContextManager";
 import { contextCover, contextAvatar } from '../../utilities/Utilities';
 import { CoverImage } from '../../components/general/CoverImage';
 import { FavoriteManager } from '../../managers/FavoriteManager';
 import { Button } from "reactstrap";
 import Avatar from "../../components/general/Avatar";
+import { withContextData, ContextDataProps } from "../../hoc/WithContextData";
 
 type OwnProps =
 {
@@ -24,7 +24,7 @@ type OwnProps =
     hideFavorites?:boolean
     height?:number
 }
-type Props = OwnProps & ReduxStateProps & RouteComponentProps<any> & DispatchProp
+type Props = OwnProps & ReduxStateProps & RouteComponentProps<any> & DispatchProp & ContextDataProps
 type ReduxStateProps = {
     contextObject:Permissible & IdentifiableObject
     favorite:Favorite
@@ -75,11 +75,11 @@ class CoverModule extends React.Component<Props, State> {
     }
 }
 const mapStateToProps = (state:ReduxState, ownProps:Props) => {
-    const resolved = ContextManager.getContextObject(ownProps.location.pathname, ownProps.contextNaturalKey)
+    const resolved = ownProps.contextData.getContextObject(ownProps.contextNaturalKey)
     const favorite = !!resolved && state.favoriteStore.allIds.map(id => state.favoriteStore.byId[id]).find(o => o.object_id == resolved.id && o.object_natural_key == ownProps.contextNaturalKey)
     return {
         contextObject:resolved,
         favorite:favorite
     }
 }
-export default withRouter(connect<ReduxStateProps, null, OwnProps>(mapStateToProps, null)(CoverModule));
+export default withContextData(withRouter(connect<ReduxStateProps, null, OwnProps>(mapStateToProps, null)(CoverModule)))

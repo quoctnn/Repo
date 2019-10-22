@@ -6,4 +6,5 @@ export type FormComponentBaseProps = {
     hasSubmitted?:boolean
     onValueChanged?:(id:string, value:any, isRequired:boolean) => void
     onRequestNavigation?:(title?:string, toView?:React.ReactNode) => void
+    isDisabled?:boolean
 }

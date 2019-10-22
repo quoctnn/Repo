@@ -3,7 +3,7 @@ import { translate } from '../../../localization/AutoIntlProvider';
 import { Community, ContextNaturalKey, CropRect, ContextPhotoType, RequestErrorData, ContextPrivacy, CommunityCategory, CommunityConfigurationData, CommunityCreatePermission } from '../../../types/intrasocial_types';
 import FormController, {  FormStatus } from '../../form/FormController';
 import {ApiClient} from '../../../network/ApiClient';
-import { removeEmptyEntriesFromObject, nullOrUndefined } from '../../../utilities/Utilities';
+import { removeEmptyEntriesFromObject, nullOrUndefined, nameofFactory } from '../../../utilities/Utilities';
 import { TextInput } from '../../form/components/TextInput';
 import { InputOption, RichRadioGroupInput } from '../../form/components/RichRadioGroupInput';
 import { RouteComponentProps, withRouter } from 'react-router';
@@ -15,6 +15,7 @@ import { SelectInput } from '../../form/components/SelectInput';
 import { ColorInput } from '../../form/components/ColorInput';
 import { BooleanInput } from '../../form/components/BooleanInput';
 import LoadingSpinner from '../../LoadingSpinner';
+import { PredefinedColorInput } from '../../form/components/PredefinedColorInput';
 type OwnProps = {
     community?:Community
     communityConfiguration?:CommunityConfigurationData
@@ -29,6 +30,8 @@ type State = {
     formValues:Partial<Community>
 }
 type Props = OwnProps & RouteComponentProps<any>
+
+const nameof = nameofFactory<Community>()
 class CommunityCreateComponent extends React.Component<Props, State> {
     formController:FormController = null
     defaultPrimaryColor = "#428bca"
@@ -400,6 +403,16 @@ class CommunityCreateComponent extends React.Component<Props, State> {
                                         id="secondary_color" 
                                         isRequired={true}
                                         />
+                                        {/*<PredefinedColorInput 
+                                        errors={form.getErrors} 
+                                        hasSubmitted={form.hasSubmitted()}
+                                        ref={form.setFormRef(pageId)} 
+                                        onValueChanged={form.handleValueChanged(pageId)} 
+                                        value={role && role.color} 
+                                        title={translate("form.role.title.color")} 
+                                        id={nameof("color")}  
+                                        isRequired={true}
+                                        />*/}
                                     </>
 
                         }} />,

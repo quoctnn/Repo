@@ -334,7 +334,7 @@ const ReminderComponent = (props: ReminderProps) => {
     const time = props.notification.datetime
     const action = translate(`notification.reminder.${props.notification.type}`)
     const title = <Link onClick={props.onClose} className="no-link" to={props.notification.uri}>{action}</Link>
-    const style: React.CSSProperties = { width: Avatar.defaultProps.size, height: Avatar.defaultProps.size, borderRadius: "50%" }
+    const style: React.CSSProperties = { width: Avatar.WrappedComponent.defaultProps.size, height: Avatar.WrappedComponent.defaultProps.size, borderRadius: "50%" }
     const avatar = <div className="primary-theme-bg d-flex justify-content-center align-items-center" style={style}>
         <i className="fas fa-bell"></i>
     </div>
