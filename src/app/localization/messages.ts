@@ -613,6 +613,9 @@ var translations = {
     "context.confirm.update.message":"An update is waiting, please reload the page to receive the latest version",
     "common.unmute":"Unmute notifications",
     "common.mute":"Mute notifications",
+    "common.group":"Group",
+    "project.is_private.title":"Private",
+    "project.is_private.description":"Set as private",
   },
   no: {
     "search.placeholder": "Søk ...",
@@ -1228,6 +1231,9 @@ var translations = {
     "context.confirm.update.message":"En oppdatering venter, vennligst last inn siden på nytt for å bruke den nyeste versjonen",
     "common.unmute":"Varsler på",
     "common.mute":"Varsler av",
+    "common.group":"Gruppe",
+    "project.is_private.title":"Privat",
+    "project.is_private.description":"Sett som privat",
 },
   en: {
     "search.placeholder": "Search ...",
@@ -1854,6 +1860,9 @@ var translations = {
     "context.confirm.update.message":"An update is waiting, please reload the page to receive the latest version",
     "common.unmute":"Unmute notifications",
     "common.mute":"Mute notifications",
+    "common.group":"Group",
+    "project.is_private.title":"Private",
+    "project.is_private.description":"Set as private",
   }
 };
 

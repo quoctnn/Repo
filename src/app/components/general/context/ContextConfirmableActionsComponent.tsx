@@ -11,7 +11,6 @@ export enum ContextConfirmableActions {
     delete = "delete",
     mute = "mute",
     unmute = "unmute",
-    update = "update"
 }
 type ContextConfirmableProps = {
     contextNaturalKey:ContextNaturalKey
@@ -82,10 +81,6 @@ export default class ContextConfirmableActionsComponent extends React.Component<
                         ToastManager.showRequestErrorToast(error)
                         this.closeConfirmDialog(action, contextNaturalKey, id)
                     })
-                }
-                case ContextConfirmableActions.update:
-                {
-                    location.reload()
                     break;
                 }
                 default:
@@ -101,8 +96,13 @@ export default class ContextConfirmableActionsComponent extends React.Component<
         const visible = this.state.confirmDialogVisible
         const contextName = ElasticSearchType.nameSingularForKey(ContextNaturalKey.elasticTypeForKey(this.props.contextNaturalKey)).toLowerCase()
 
-        const title =  action && translate(`context.confirm.${this.state.confirmAction}.title.format`).format(ContextNaturalKey.nameForContextObject(this.props.contextNaturalKey, this.props.contextObject))
-        const message = action && translate(`context.confirm.${this.state.confirmAction}.message.format`).format(contextName)
+        let title:string = undefined
+        let message:string = undefined
+        if(action && visible)
+        {
+            title = translate(`context.confirm.${this.state.confirmAction}.title.format`).format(ContextNaturalKey.nameForContextObject(this.props.contextNaturalKey, this.props.contextObject))
+            message = translate(`context.confirm.${this.state.confirmAction}.message.format`).format(contextName)
+        }
         const okButtonTitle = translate("common.yes")
         return <ConfirmDialog visible={visible} title={title} message={message} didComplete={this.confirmationComplete} okButtonTitle={okButtonTitle}/>
     }

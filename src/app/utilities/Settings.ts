@@ -70,7 +70,7 @@ export const Settings:ISettings = {
     CDN:false,
     CDNHost:"",
     CDNPath:"",
-    compatMinor:8,
+    compatMinor:9,
     FBAppId:"1011246482308121",
     GoogleClientID:"506961766547-9ocgkcnjrkg72v26licv1n6s2a6u2lh7.apps.googleusercontent.com",
     LinkedInClientID:"78xd4ygq4gvmh8",
