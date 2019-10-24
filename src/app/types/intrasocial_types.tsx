@@ -1440,6 +1440,7 @@ export type ProfileConnections = {
 export type UserProfile = {
     email: string | null
     locale: AppLanguage
+    theme?: string
     timezone: string | null
     username: string
     uuid: string | null
