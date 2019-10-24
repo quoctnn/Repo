@@ -87,7 +87,8 @@ export abstract class AuthenticationManager
         ApplicationManager.loadApplication(false)
     }
     static saveProfileTheme = (index:number) => {
-        if (availableThemes[index].selector !== AuthenticationManager.getAuthenticatedUser().theme) {
+        const profile = AuthenticationManager.getAuthenticatedUser()
+        if (profile && !profile.is_anonymous && availableThemes[index].selector !== profile.theme) {
             ApiClient.updateProfile({theme: availableThemes[index].selector}, () => {})
         }
     }
