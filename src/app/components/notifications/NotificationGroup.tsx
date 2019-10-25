@@ -47,16 +47,16 @@ export default class NotificationGroup extends React.Component<Props, State> {
                         {this.props.title}
                     </div>
                     {this.props.actions && this.props.actions.map(action => {
-                        return <Button outline={true} color="dark" className="mr-1" key={action.title} onClick={this.handleAction(action.onPress)} size="xs">{action.title}</Button>
+                        return <Button color="secondary" className="mr-1" size="xs" key={action.title} onClick={this.handleAction(action.onPress)}>{action.title}</Button>
                     })}
                     <Badge color="warning" pill={true}>{this.props.values.length}</Badge>
                 </div>
                 <CollapseComponent className="content" visible={this.props.open}>
-                    {this.props.values.map(v => <NotificationItem 
-                                                    authenticatedUser={this.props.authenticatedUser} 
-                                                    key={this.getKey(v)} 
+                    {this.props.values.map(v => <NotificationItem
+                                                    authenticatedUser={this.props.authenticatedUser}
+                                                    key={this.getKey(v)}
                                                     onClose={this.props.onClose}
-                                                    onCompleted={this.props.onNotificationCompleted} 
+                                                    onCompleted={this.props.onNotificationCompleted}
                                                     value={v} />)}
                 </CollapseComponent>
             </div>
