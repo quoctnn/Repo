@@ -16,6 +16,6 @@
 
 .circle-text {
   font-weight: bold;
-  font-size: 9px;
+  font-size: 0.65rem;
   @include var(fill, primary-theme-color);
 }

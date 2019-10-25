@@ -21,14 +21,14 @@
             display: flex;
         }
         .title, .date, .context {
-            line-height: 20px;
+            line-height: 1.5rem;
         }
         .title{
-            font-size: 20px;
+            font-size: 1.25rem;
             padding-right: 8px;
         }
         .date{
-            font-size: 14px;
+            font-size: 1rem;
             margin-right: 3px;
         }
         .avatar-stacked {
@@ -41,7 +41,7 @@
         }
         .context {
             max-width: 130px;
-            font-size: 12px;
+            font-size: 0.85rem;
             text-align: right;
             margin-left: auto;
         }
@@ -174,7 +174,7 @@
             align-self: initial;
         }
         &.af{
-            font-size: 24px;
+            font-size: 1.4rem;
         }
     }
     &.comment {
@@ -183,7 +183,7 @@
         {
             padding-left: 5px;
             .title{
-                font-size: 16px;
+                font-size: 1.15rem;
                 line-height: 20px;
             }
         }

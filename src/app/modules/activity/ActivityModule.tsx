@@ -183,7 +183,7 @@ class ActivityModule extends React.Component<Props, State> {
     }
     renderContent = () => {
         const {showLoadMore} = this.props
-        return <>
+        return <div className="p-2">
                 {this.renderOptions()}
                 <ListComponent<RecentActivity>
                     ref={this.activityListInput}
@@ -196,11 +196,11 @@ class ActivityModule extends React.Component<Props, State> {
                     isSelecting={this.state.isSelecting}
                     findScrollParent={true}
                     className="activity-module-list" />
-            </>
+            </div>
     }
     renderOptions = () => {
         const {isSelecting, selected} = this.state
-        return <div className="header d-flex p-2 align-items-center">
+        return <div className="header d-flex align-items-center">
             {isSelecting && <Checkbox checked={selected.length > 0} checkedIcon="fas fa-minus" onValueChange={this.headerCheckboxChange} />}
             <div className="flex-grow-1"></div>
             {isSelecting && selected.length > 0 &&  <Button color="light" size="xs" onClick={this.markActivitiesAsSeen}>{translate('common.mark.seen')}</Button>}

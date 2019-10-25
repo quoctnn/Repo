@@ -13,7 +13,7 @@ $headerHeight:40px;
         padding: 0.5rem 0.7rem;
         margin-top: 0.3rem;
         flex-shrink: 0;
-        font-size: 25px;
+        font-size: 1.7rem;
         position: relative;
         .circular-spinner{
             margin: 0 5px;
@@ -23,6 +23,9 @@ $headerHeight:40px;
             text-align: center;
             visibility: hidden;
             cursor: pointer;
+            .fa-stack{
+                width: 2.5rem;
+            }
             .icon-active, .icon-default{
                 transition: opacity .3s, transform .3s;
             }
@@ -72,7 +75,7 @@ $headerHeight:40px;
     {
         flex-shrink: 0;
         padding: 3px 12px;
-        font-size: 12px;
+        font-size: 0.85rem;
     }
     .module-menu
     {
@@ -86,7 +89,7 @@ $headerHeight:40px;
         transform-origin: top center;
         transition-property: transform, height !important;
         z-index: 312;
-        padding:8px;
+        padding: 8px;
         overflow-y: auto;
          &.module-menu-entered
         {
