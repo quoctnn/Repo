@@ -154,7 +154,7 @@ class TopNavigation extends React.Component<Props, State> {
         return (
             <div id="top-navigation">
                 <div className="top-navigation-content d-flex main-content-background align-items-center px-2 drop-shadow">
-                    { !window.isElectron  &&
+                    { window.isElectron  &&
                         <i className='fa fa-lg fa-chevron-left navigation-back' onClick={this.goBack} title={translate("common.back")}></i>
                     }
                     <AnimatedIconStack size={2} active={this.state.sideMenuOpen} onClick={window.app.toggleMenu} className="menu-toggle d-none mr-2" iconA="fas fa-bars" />
