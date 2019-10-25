@@ -10,26 +10,29 @@
         border-radius: 15px;
         overflow: hidden;
     }
-    .top, .bottom{
-        position: relative;
+    .img, .bottom{
         height:40px;
     }
-    .top{
-        display: flex;
-        flex-direction: row;
-        align-items: center;
+    .img{
+        opacity: 0.25;
         background-size: cover;
         background-repeat: no-repeat;
     }
-    .bottom, .top{
+    .top{
+        position: relative;
+    }
+    .bottom, .title-row{
         padding: 0 8px;
     }
     .title{
         padding-left: 8px;
     }
-    .event-date{
-        flex-grow: 0;
-        flex-shrink: 0;
+    .title-row{
+        position: absolute;
+        top:0;
+        left:0;
+        right:0;
+        bottom:0;
     }
     .item{
         line-height: 1em;

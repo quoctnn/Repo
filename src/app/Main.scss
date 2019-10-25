@@ -209,10 +209,6 @@ button{@include var(color, primary-text-color);}
 .primary-theme-color{
     @include var(color, primary-theme-color);
 }
-.theme-bg-gradient, .badge-theme{
-    background-image: linear-gradient(to left, #{map-get($root, secondary-theme-color)}, #{map-get($root, primary-theme-color)});
-    background-image: linear-gradient(to left, var(--secondary-theme-color), var(--primary-theme-color));
-}
 .badge-notification-container{
     position: relative;
     .badge-notification{
@@ -225,9 +221,12 @@ button{@include var(color, primary-text-color);}
     font-size: 0.7rem;
 }
 .theme-box{
-    color:white;
+    @include var(color, primary-theme-color);
     border-radius: 8px;
     padding: 0 4px
+}
+.theme-box-background{
+    background-color: #FFFFFF;
 }
 .drop-shadow-large
 {
