@@ -99,7 +99,7 @@ class ProjectDetailsModule extends React.Component<Props, State> {
         {
             if(project.muted)
                 options.push({id:"unmute", type:OverflowMenuItemType.option, title:translate("common.unmute"), onPress:this.toggleMute, iconClass:"fas fa-bell-slash"})
-            else 
+            else
                 options.push({id:"mute", type:OverflowMenuItemType.option, title:translate("common.mute"), onPress:this.toggleMute, iconClass:"fas fa-bell"})
         }
         if(project.creator != authenticatedUser.id && members.contains(authenticatedUser.id))
@@ -126,7 +126,7 @@ class ProjectDetailsModule extends React.Component<Props, State> {
 
         const projectOptions = this.getProjectOptions(project)
         if(projectOptions.length > 0)
-            return <DropDownMenu className="project-option-dropdown" triggerClass="fas fa-cog mx-1" items={projectOptions}></DropDownMenu>
+            return <DropDownMenu className="project-option-dropdown" triggerClass="fas fa-cog fa-2x mx-1" items={projectOptions}></DropDownMenu>
         return null
     }
 
@@ -152,7 +152,7 @@ class ProjectDetailsModule extends React.Component<Props, State> {
                             <LoadingSpinner key="loading"/>
                         }
                         {this.renderEditForm(project)}
-                        {this.renderMembersForm(project)} 
+                        {this.renderMembersForm(project)}
                         <ContextConfirmableActionsComponent ref={this.confirmActionComponent} contextNaturalKey={ContextNaturalKey.PROJECT} contextObject={project} onActionComplete={this.handleConfirmableActionComplete} />
                     </ModuleContent>
                     { project && project.permission >= Permission.read &&
@@ -172,7 +172,7 @@ class ProjectDetailsModule extends React.Component<Props, State> {
         const project = this.props.contextData.project
         if(!project)
             return null
-        return this.renderModule(project) 
+        return this.renderModule(project)
     }
 }
 export default withContextData(withRouter(ProjectDetailsModule))
