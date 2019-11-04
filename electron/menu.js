@@ -78,6 +78,25 @@ const template = [
     label: i18n.__('Edit'),
     submenu: [
       {
+        role: 'back', label: i18n.__('Back'),
+        click(menuItem, browserWindow, event) {
+          if (browserWindow.webContents.canGoBack()) {
+            browserWindow.webContents.goBack()
+          }
+        }
+      },
+      {
+        role: 'forward', label: i18n.__('Forward'),
+        click(menuItem, browserWindow, event) {
+          if (browserWindow.webContents.canGoForward()) {
+            browserWindow.webContents.goForward()
+          }
+        }
+      },
+      {
+        type: 'separator'
+      },
+      {
         role: 'undo', label: i18n.__('Undo')
       },
       {

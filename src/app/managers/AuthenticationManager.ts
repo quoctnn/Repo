@@ -10,6 +10,9 @@ import { CommunityManager } from './CommunityManager';
 import { ToastManager } from './ToastManager';
 import { WindowAppManager } from './WindowAppManager';
 import { setLanguageAction } from '../redux/language';
+import { ThemeManager } from './ThemeManager';
+import { availableThemes } from '../redux/unreadNotifications';
+import { ApiClient } from '../network/ApiClient';
 
 export const AuthenticationManagerAuthenticatedUserChangedNotification = "AuthenticationManagerAuthenticatedUserChangedNotification"
 export abstract class AuthenticationManager
@@ -83,6 +86,12 @@ export abstract class AuthenticationManager
         AjaxRequest.setup(token)
         ApplicationManager.loadApplication(false)
     }
+    static saveProfileTheme = (index:number) => {
+        const profile = AuthenticationManager.getAuthenticatedUser()
+        if (profile && !profile.is_anonymous && availableThemes[index].selector !== profile.theme) {
+            ApiClient.updateProfile({theme: availableThemes[index].selector}, () => {})
+        }
+    }
     static setAuthenticatedUser(profile:UserProfile|null)
     {
         //AjaxRequest.setup(AuthenticationManager.getAuthenticationToken())
@@ -102,6 +111,10 @@ export abstract class AuthenticationManager
             if(currentLanguage != profile.locale)
             {
                 updateLanguage = profile.locale
+            }
+            if( profile.theme && ThemeManager.getCurrentTheme().selector != profile.theme)
+            {
+                ThemeManager.setTheme(profile.theme)
             }
         }
         else if( currentLanguage != AppLanguage.english){
