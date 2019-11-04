@@ -41,6 +41,10 @@ export const resetThemeAction = ():SetThemeAction => ({
   type: ThemeActionTypes.SetTheme,
   theme: defaultTheme
 })
+export const resetFontSizeAction = ():SetFontSizeAction => ({
+  type: ThemeActionTypes.SetFontSize,
+  fontSize: defaultFontSize
+})
 export const theme = (state = INITIAL_STATE, action:SetThemeAction & SetFontSizeAction):ReduxTheme => {
   switch (action.type) {
     case ThemeActionTypes.SetTheme:

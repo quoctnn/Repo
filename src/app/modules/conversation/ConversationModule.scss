@@ -10,7 +10,7 @@
                 flex-grow: 200;
                 .member-select-container{
                     display: flex;
-                    font-size: 1rem;
+                    font-size: 0.9rem;
                     align-items: center;
                     .member-select{
                         flex-grow: 1;
@@ -58,7 +58,7 @@
                 }
                 .text
                 {
-                    font-size: 0.85rem;
+                    font-size: 0.7rem;
                 }
             }
         }
@@ -203,7 +203,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 2rem;
+            font-size: 1.7rem;
             text-align: center;
             pointer-events: none;
             z-index: 20001;

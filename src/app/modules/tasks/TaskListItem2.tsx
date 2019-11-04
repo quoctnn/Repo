@@ -3,13 +3,13 @@ import "./TaskListItem.scss"
 import { Task, TaskActions, TaskPriority, TaskState } from '../../types/intrasocial_types';
 import { GenericListItem } from '../../components/general/GenericListItem';
 import classnames from 'classnames';
-import Avatar from '../../components/general/Avatar';
 import { ProfileManager } from '../../managers/ProfileManager';
 import { Badge, UncontrolledTooltip } from 'reactstrap';
 import { translate } from '../../localization/AutoIntlProvider';
 import StackedAvatars from '../../components/general/StackedAvatars';
 import { Mark } from '../../components/general/Mark';
 import { TimeComponent } from '../../components/general/TimeComponent';
+import UserProfileAvatar from '../../components/general/UserProfileAvatar';
 
 type OwnProps = {
     communityId:number
@@ -20,7 +20,7 @@ type OwnProps = {
 type State = {
 }
 type Props = OwnProps
-export default class TaskListItem2 extends React.Component<Props, State> {  
+export default class TaskListItem2 extends React.Component<Props, State> {
     constructor(props:Props) {
         super(props);
         this.state = {
@@ -60,7 +60,7 @@ export default class TaskListItem2 extends React.Component<Props, State> {
         const assignedTo = task.assigned_to || []
         const right = this.renderRight()
         const hasAssignees = assignedTo.length > 0
-        const assigned = hasAssignees && assignedTo.find(p => p == user) 
+        const assigned = hasAssignees && assignedTo.find(p => p == user)
         const responsible = task.responsible && task.responsible == user ? task.responsible : undefined
         const profile = ProfileManager.ensureExists(assigned || responsible)
         const avatarClass = classnames({
@@ -71,7 +71,7 @@ export default class TaskListItem2 extends React.Component<Props, State> {
             "border-w0":!responsible
         })
         const left = <>
-                    <Avatar size={40} image={profile && profile.avatar} containerClassName={avatarClass} />
+                    <UserProfileAvatar size={40} image={profile && profile.avatar} containerClassName={avatarClass} />
                     <Mark id={stateId} size={8} className={"bg-" + TaskState.colorForState(task.state)} />
                     {stateTooltip}
                     </>

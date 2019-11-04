@@ -20,6 +20,8 @@ import { IntraSocialLink } from "../general/IntraSocialLink";
 import { Button } from "reactstrap";
 import StackedAvatars from "../general/StackedAvatars";
 import { TimeComponent } from "../general/TimeComponent";
+import UserProfileAvatar from "../general/UserProfileAvatar";
+import { isTSMethodSignature } from "@babel/types";
 
 interface OwnProps
 {
@@ -216,7 +218,7 @@ export class StatusComponent extends React.Component<Props, State> {
                 <div className="d-flex">
                     <div className="flex-shrink-0 header-left">
                         <IntraSocialLink to={this.props.status.owner} type={ContextNaturalKey.USER}>
-                            <Avatar size={avatarSize} image={userAvatar(status.owner, true)}/>
+                            <UserProfileAvatar size={avatarSize} profileId={this.props.status.owner.id}/>
                         </IntraSocialLink>
                     </div>
                     <div className="d-flex header-center flex-grow-1">

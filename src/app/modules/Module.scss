@@ -13,14 +13,14 @@ $headerHeight:40px;
         padding: 0.5rem 0.7rem;
         margin-top: 0.3rem;
         flex-shrink: 0;
-        font-size: 1.7rem;
+        font-size: 1.55rem;
         position: relative;
         .circular-spinner{
             margin: 0 5px;
         }
         .module-menu-trigger
         {
-            font-size: 1.4rem;
+            font-size: 1.25rem;
             text-align: center;
             visibility: hidden;
             cursor: pointer;
@@ -76,7 +76,7 @@ $headerHeight:40px;
     {
         flex-shrink: 0;
         padding: 3px 12px;
-        font-size: 0.85rem;
+        font-size: 0.7rem;
     }
     .module-menu
     {

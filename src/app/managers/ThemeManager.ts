@@ -11,7 +11,7 @@ export abstract class ThemeManager
     static initialize = () => {
         const state = ThemeManager.getStore().getState()
         const themeIndex = state.theme.theme || 0;
-        const fontSize = state.theme.fontSize || 16
+        const fontSize = state.theme.fontSize || 100
         ThemeManager.setTheme(themeIndex)
         ThemeManager.setFontSize(fontSize)
     }

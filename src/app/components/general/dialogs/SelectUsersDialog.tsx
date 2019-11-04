@@ -1,12 +1,12 @@
 import * as React from "react";
 import {  Button } from 'reactstrap';
 import { UserProfile } from "../../../types/intrasocial_types";
-import Avatar from "../Avatar";
 import { translate } from "../../../localization/AutoIntlProvider";
 import { userFullName, userAvatar } from '../../../utilities/Utilities';
 import SimpleDialog from "./SimpleDialog";
 import { ListItem, List } from '../List';
 import classnames from 'classnames';
+import UserProfileAvatar from "../UserProfileAvatar";
 
 interface UserInfoProps
 {
@@ -16,10 +16,9 @@ interface UserInfoProps
 }
 export const UserInfo = (props:UserInfoProps) => {
     const checkClass = classnames("mr-2 d-flex align-items-center justify-content-center border-1", {"primary-theme-bg":props.selected})
-    const avatar = userAvatar(props.user)
     return (
-      <ListItem hasAction={true} onClick={props.onClick}>
-        <Avatar image={avatar} className="flex-shrink-0 mr-2" />
+    <ListItem hasAction={true} onClick={props.onClick}>
+        <UserProfileAvatar profileId={props.user.id} className="flex-shrink-0 mr-2" />
         <div className="flex-shrink-1 flex-grow-1 mw0">
             <div className="text-truncate">
                 {userFullName(props.user)}
@@ -82,7 +81,7 @@ export default class SelectUsersDialog extends React.Component<Props, State> {
             {
                 if(this.props.singleSelect)
                     added = [user]
-                else 
+                else
                     added.toggleElement(user)
             }
             else if(this.props.canRemove)
@@ -109,7 +108,7 @@ export default class SelectUsersDialog extends React.Component<Props, State> {
                 {this.props.completeButtonTitle || translate("common.done")}
             </Button>
     }
-    render() 
+    render()
     {
         const selected = this.props.selected
         const {added, removed} = this.state
@@ -122,7 +121,7 @@ export default class SelectUsersDialog extends React.Component<Props, State> {
                     }
                     </List>
                 </SimpleDialog>
-            
+
         );
     }
 }
