@@ -16,6 +16,7 @@ import { userFullName, userAvatar, listPageSize, uniqueId } from '../../../utili
 import CommunityInviteComponent from './CommunityInviteComponent';
 import { Input } from 'reactstrap';
 import { FormComponentErrorMessage } from '../../form/FormController';
+import UserProfileAvatar from '../UserProfileAvatar';
 type OwnProps = {
     community:Community
 }
@@ -59,10 +60,9 @@ export default class CommunityInvitationsComponent extends React.Component<Props
         const failedArray = this.state.failed
         const user = invitation.user && ProfileManager.getProfileById(invitation.user)
         const title = <div className="text-truncate">{user && userFullName(user) || invitation.email}</div>
-        const avatarUrl = userAvatar(user)
         const failed = failedArray.contains( invitation.id )
         const cn = classnames({"bg-warning":failed})
-        return <GenericListItem className={cn} header={title} left={<Avatar size={44} image={avatarUrl} />} footer={<TimeComponent date={invitation.created_at} />}/>
+        return <GenericListItem className={cn} header={title} left={<UserProfileAvatar size={44} profileId={user.id} />} footer={<TimeComponent date={invitation.created_at} />}/>
     }
     fetchInvitations = (offset:number, completion:(items:PaginationResult<CommunityInvitation>) => (void)) => {
         let {search, email, user, searchEmail, searchUser, searchFromUser} = this.state.filters

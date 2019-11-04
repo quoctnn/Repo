@@ -5,8 +5,9 @@ import { nullOrUndefined, userAvatar, uniqueId } from './Utilities';
 import { translate } from '../localization/AutoIntlProvider';
 import { AuthenticationManager } from '../managers/AuthenticationManager';
 import Avatar from "../components/general/Avatar";
+import UserProfileAvatar from "../components/general/UserProfileAvatar";
 
-export class ConversationUtilities 
+export class ConversationUtilities
 {
     static maxVisibleAvatars = 5
     static avatarSize = 44
@@ -37,12 +38,12 @@ export class ConversationUtilities
         let profile:UserProfile = undefined
         if(showUserStatus && users.length == 1)
             profile = users[0]
-        return <Avatar userStatus={profile && profile.id} images={avatars} size={ConversationUtilities.avatarSize} borderColor="white" borderWidth={2}>
+        return <UserProfileAvatar profileId={profile && profile.id} size={ConversationUtilities.avatarSize} borderColor="white" borderWidth={2}>
                         {!!children && children
                             || conversation.unread_messages.length > 0 &&
                             <div className="notification-badge bg-success text-white text-truncate"><span>{conversation.unread_messages.length}</span></div>
                         }
-                </Avatar>
+                </UserProfileAvatar>
     }
     static getChatMessagePreview(userId:number,text:string,files:UploadedFile[], mentions:number[], conversation:Conversation):Message {
 
@@ -62,7 +63,7 @@ export class ConversationUtilities
             updated_at:ds,
             read_by:[],
             mentions:mentions,
-            files  
+            files
             //tempFiles
         }
         return message

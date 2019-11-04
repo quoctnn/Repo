@@ -16,7 +16,6 @@ import { translate, lazyTranslate } from '../../localization/AutoIntlProvider';
 import { ProfileManager } from '../../managers/ProfileManager';
 import { ListItem, List, ListHeader } from '../../components/general/List';
 import { uniqueId, userFullName, userAvatar } from '../../utilities/Utilities';
-import Avatar from '../../components/general/Avatar';
 import SelectUsersDialog from '../../components/general/dialogs/SelectUsersDialog';
 import { InputGroup, Input } from 'reactstrap';
 import { DropDownMenu } from '../../components/general/DropDownMenu';
@@ -25,6 +24,7 @@ import { NotificationCenter } from '../../utilities/NotificationCenter';
 import { ConversationManager } from '../../managers/ConversationManager';
 import {ConnectedProfile} from '../../hoc/ConnectedContextObject';
 import { ContextDataProps, withContextData } from '../../hoc/WithContextData';
+import UserProfileAvatar from '../../components/general/UserProfileAvatar';
 type OwnProps = {
     className?:string
     breakpoint:ResponsiveBreakpoint
@@ -156,7 +156,7 @@ class ConversationDetailsModule extends React.Component<Props, State> {
         return <ConnectedProfile key={member || uniqueId()} contextNaturalKey={ContextNaturalKey.USER} objectId={member} render={(profile) => {
                 return <ListItem  className="d-flex align-items-center justify-content-between member-item">
                 <div className="d-flex align-items-center mw0">
-                    <Avatar userStatus={profile.id} className="mr-2" size={40} image={userAvatar(profile, true)} />
+                    <UserProfileAvatar profileId={profile.id} className="mr-2" size={40} />
                     <div className="text-truncate">{userFullName(profile)}</div>
                 </div>
                 {this.renderMemberOptionsMenu(profile)}

@@ -20,6 +20,7 @@ import { ResponsiveBreakpoint } from "../../components/general/observers/Respons
 import { CommonModuleProps } from "../Module";
 import { uniqueId } from '../../utilities/Utilities';
 import CollapseComponent from '../../components/general/CollapseComponent';
+import UserProfileAvatar from "../../components/general/UserProfileAvatar";
 
 type OwnProps = {
     breakpoint:ResponsiveBreakpoint
@@ -105,9 +106,9 @@ class ContactsModule extends React.PureComponent<Props, State> {
         return <div className="avatar-profile main-content-secondary-background" key={"contact_" + contact.id}>
                     <Link className="d-flex flex-column" to={Routes.profileUrl(contact.slug_name)}>
                         <div className="d-flex header">
-                            <Avatar size={34} image={contact.avatar} borderColor="white" borderWidth={2} userStatus={contact.id} >
-                            {this.state.isTyping[contact.id] && <div className="typing-indicator-container"><TypingIndicator /></div>}
-                            </Avatar>
+                            <UserProfileAvatar size={34} profileId={contact.id} borderColor="white" borderWidth={2} >
+                                {this.state.isTyping[contact.id] && <div className="typing-indicator-container"><TypingIndicator /></div>}
+                            </UserProfileAvatar>
                         </div>
                         <div className="d-flex footer">
                             <div className="text-truncate">{contact.first_name + " " + contact.last_name}</div>

@@ -15,6 +15,7 @@ import { userFullName, userAvatar, listPageSize, uniqueId } from '../../../utili
 import { Input } from 'reactstrap';
 import { FormComponentErrorMessage } from '../../form/FormController';
 import ContextInviteComponent from './ContextInviteComponent';
+import UserProfileAvatar from '../UserProfileAvatar';
 type OwnProps = {
     contextNaturalKey:ContextNaturalKey
     contextObject:IdentifiableObject & Permissible
@@ -65,10 +66,9 @@ export default class ContextInvitationComponent extends React.Component<Props, S
         const failedArray = this.state.failed
         const profile = invitation.user && ProfileManager.getProfileById(invitation.target_user)
         const title =this.renderInvitationHeader(profile, invitation)
-        const avatarUrl = userAvatar(profile)
         const failed = failedArray.contains( invitation.id )
         const cn = classnames({"bg-warning":failed})
-        return <GenericListItem className={cn} header={title} left={<Avatar size={44} image={avatarUrl} />} footer={<TimeComponent date={invitation.created_at} />}/>
+        return <GenericListItem className={cn} header={title} left={<UserProfileAvatar size={44} profileId={profile.id} />} footer={<TimeComponent date={invitation.created_at} />}/>
     }
     fetchInvitations = (offset:number, completion:(items:PaginationResult<ContextInvitation>) => (void)) => {
         let {search} = this.state.filters
