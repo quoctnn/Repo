@@ -48,8 +48,7 @@ export default store;
 const persistor = persistStore(store, {}, () => {
     //rehydrate complete
     if (Settings.supportsTheming) {
-        let themeIndex = store.getState().theme.theme || 0;
-        ThemeManager.setTheme(themeIndex)
+        ThemeManager.initialize()
     }
     console.log("rehydrate complete")
     AuthenticationManager.signInCurrent()

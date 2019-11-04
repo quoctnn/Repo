@@ -111,15 +111,6 @@ $root: (
         --#{$key}:#{$value};
     }
 }
-:root.compact {
-    --font-size-default:13px;
-}
-:root.increased {
-    --font-size-default:16px;
-}
-:root.huge {
-    --font-size-default:18px;
-}
 :root.light {
     --left-navigation-min-width:160px;
     --left-navigation-max-width:400px;

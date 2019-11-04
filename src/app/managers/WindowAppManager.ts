@@ -31,6 +31,7 @@ export type AppWindowObject = {
     softReset:() => void
     sendMessageElectron:(channel:string, msg:any) => void
     setTheme:(index:number) => void
+    setFontSize:(size:number) => void
     navigateToRoute:(route:string, modal?:boolean) => void
     setLanguage:(language:AppLanguage) => void
     language:string
@@ -62,6 +63,7 @@ export abstract class WindowAppManager
             softReset:WindowAppManager.softReset,
             sendMessageElectron:WindowAppManager.sendMessageElectron,
             setTheme:WindowAppManager.setTheme,
+            setFontSize:WindowAppManager.setFontSize,
             resetMessageQueue:WindowAppManager.resetMessageQueue,
             navigateToRoute:WindowAppManager.navigateToRoute,
             setLanguage:WindowAppManager.setLanguage,
@@ -91,6 +93,9 @@ export abstract class WindowAppManager
     }
     static setTheme = (index:number) => {
         ThemeManager.setTheme(index)
+    }
+    static setFontSize = (size:number) => {
+        ThemeManager.setFontSize(size)
     }
     static setLanguage = (language:AppLanguage) => {
         WindowAppManager.getStore().dispatch(setLanguageAction(language))
