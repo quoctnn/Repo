@@ -10,7 +10,7 @@ import { translate } from '../localization/AutoIntlProvider';
 import Routes from '../utilities/Routes';
 import { resetApplicationAction } from '../redux/application';
 import { resetLanguageAction } from '../redux/language';
-import { resetThemeAction } from '../redux/theme';
+import { resetThemeAction, resetFontSizeAction } from '../redux/theme';
 import { resetEndpointAction } from '../redux/endpoint';
 import { resetAuthenticationDataAction } from '../redux/authentication';
 import { resetCommunitiesAction } from '../redux/communityStore';
@@ -81,7 +81,7 @@ export default class ClientNotificationManager extends React.Component<Props, St
     private dispatchReset = (key:ReduxKeys, dispatch:React.Dispatch<any>) => {
         switch (key) {
                 case ReduxKeys.language:dispatch(resetLanguageAction());break;
-                case ReduxKeys.theme:dispatch(resetThemeAction());break;
+                case ReduxKeys.theme:dispatch(resetThemeAction()); dispatch(resetFontSizeAction());break;
                 case ReduxKeys.endpoint:dispatch(resetEndpointAction());break;
                 case ReduxKeys.authentication:dispatch(resetAuthenticationDataAction());break;
                 case ReduxKeys.embedlyStore:dispatch(resetEmbedlyStoreAction());break;
