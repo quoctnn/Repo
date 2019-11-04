@@ -62,7 +62,7 @@ export default class CommunityInvitationsComponent extends React.Component<Props
         const title = <div className="text-truncate">{user && userFullName(user) || invitation.email}</div>
         const failed = failedArray.contains( invitation.id )
         const cn = classnames({"bg-warning":failed})
-        return <GenericListItem className={cn} header={title} left={<UserProfileAvatar size={44} profileId={user.id} />} footer={<TimeComponent date={invitation.created_at} />}/>
+        return <GenericListItem className={cn} header={title} left={<UserProfileAvatar size={40} borderWidth={2} borderColor="white" profileId={user.id} />} footer={<TimeComponent date={invitation.created_at} />}/>
     }
     fetchInvitations = (offset:number, completion:(items:PaginationResult<CommunityInvitation>) => (void)) => {
         let {search, email, user, searchEmail, searchUser, searchFromUser} = this.state.filters

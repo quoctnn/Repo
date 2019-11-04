@@ -17,6 +17,7 @@ import { Popover, PopoverBody } from 'reactstrap';
 import Avatar from './general/Avatar';
 import { userAvatar } from '../utilities/Utilities';
 import Popper from 'popper.js';
+import UserProfileAvatar from './general/UserProfileAvatar';
 
 export const sendUserStatus = (status: UserStatus) => {
     WindowAppManager.sendOutgoingOnSocket(
@@ -117,7 +118,7 @@ class UserMenu extends React.Component<Props, State> {
                 title: s.translation(),
                 onPress: this.setUserStatus(s),
                 toggleMenu: false,
-                children: <UserStatusIndicator size={12} borderColor="white" statusColor={s.color} borderWidth={2} />
+                children: <UserStatusIndicator borderColor="white" statusColor={s.color} borderWidth={2} />
             }
         })
         selectableDropdownItems.push({id:"divider1", type:OverflowMenuItemType.divider})
@@ -147,8 +148,7 @@ class UserMenu extends React.Component<Props, State> {
         if (!this.props.profile || this.props.profile.is_anonymous)
             return <Link className="btn btn-sm btn-outline-secondary" to={Routes.SIGNIN}>{translate("Sign in")}</Link>
         return <div ref={(ref) => this.triggerRef = ref} className="trigger d-flex align-items-center">
-                    <Avatar onClick={this.onTriggerClick} image={userAvatar(this.props.profile, true)} size={40} userStatus={profile.id}>
-                    </Avatar>
+                    <UserProfileAvatar onClick={this.onTriggerClick} size={40} profileId={profile.id} forceUserStatus={true}/>
                 </div>
     }
     render() {

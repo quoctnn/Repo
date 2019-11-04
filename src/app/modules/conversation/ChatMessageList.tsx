@@ -138,14 +138,16 @@ export class ChatMessageList extends React.Component<Props & React.HTMLAttribute
             {
                 var str = stringToDateFormat(message.created_at, DateFormat.time)
                 var avatar:string = null
+                let profileId:number = null
                 if(!isMessageFromCurrentUser)
                 {
                     let user = ProfileManager.getProfileById(message.user)
+                    profileId = user.id
                     str = `${user.first_name}, ${str}`
                     avatar = userAvatar(user)
                 }
                 components.push(
-                    <ChatMessageUser key={message.id + "user"} avatar={avatar} text={str} direction={this.getDirection(message)} />
+                    <ChatMessageUser key={message.id + "user"} avatar={avatar} profileId={profileId} text={str} direction={this.getDirection(message)} />
                 )
             }
             const observerRegister = (message.user == current_user.id || message.read_by.contains(current_user.id) || this.readObserver.getReads().contains(message.id)) ? undefined : this.registerObservee(message.id)

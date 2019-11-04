@@ -1,19 +1,21 @@
 import * as React from 'react';
-import { UserProfile, UserStatus } from '../../types/intrasocial_types';
+import { UserProfile, UserStatus, AvatarStatusColor } from '../../types/intrasocial_types';
 import { DispatchProp, connect } from 'react-redux';
 import { ReduxState } from '../../redux/index';
 import { ProfileManager } from '../../managers/ProfileManager';
 import Avatar from './Avatar';
 import { AuthenticationManager } from '../../managers/AuthenticationManager';
+import { UserStatusIndicator } from './UserStatusIndicator';
+import "./UserProfileAvatar.scss"
 
 type OwnProps = {
     profileId:number
-    userStatus?:boolean
     size?:number
     borderWidth?:number,
     borderColor?:string,
     innerRef?: (element:HTMLElement) => void
     containerClassName?:string
+    forceUserStatus?:boolean
 }
 type ReduxStateProps = {
     authenticatedUser?:UserProfile,
@@ -24,20 +26,28 @@ type Props = DefaultProps & DispatchProp
 class UserProfileAvatar extends React.PureComponent<Props & React.HTMLAttributes<HTMLElement>, {}> {
     static defaultProps:DefaultProps = {
         profileId:null,
-        userStatus:false
+        forceUserStatus:false
     }
     constructor(props:Props)
     {
         super(props)
     }
     render() {
-        const {profileId, profile, userStatus, children, ...rest} = this.props
+        const {profileId, profile, forceUserStatus, children, ...rest} = this.props
+        if (!profile) {
+            return(<Avatar {... rest} image={null}>
+                    {children}
+                </Avatar>)
+        }
         const image = profile.avatar_thumbnail
         const statusColor = UserStatus.getObject(profile.user_status)
         return(<>
-            { this.props.authenticatedUser.id != profile.id &&
-                <Avatar {... rest} image={image} statusColor={statusColor.color}>
-                    {children}
+            { (this.props.authenticatedUser.id != profile.id || forceUserStatus) &&
+                <Avatar {... rest} image={image}>
+                    { children }
+                    { statusColor && statusColor.color != AvatarStatusColor.NONE &&
+                        <UserStatusIndicator borderColor="white" statusColor={statusColor.color} borderWidth={1}/>
+                    }
                 </Avatar>
                 ||
                 <Avatar {... rest} image={image}>

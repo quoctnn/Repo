@@ -81,13 +81,13 @@ class UserStatusSelector extends React.Component<Props, State> {
                 title: s.translation(),
                 onPress: this.setUserStatus(s),
                 toggleMenu: false,
-                children: <UserStatusIndicator size={12} borderColor="white" statusColor={s.color} borderWidth={2} />
+                children: <UserStatusIndicator borderColor="white" statusColor={s.color} borderWidth={2} />
             }
         })
 
         selectableDropdownItems.push({id:"divider1", type:OverflowMenuItemType.divider})
         selectableDropdownItems.push({id:"all", type:OverflowMenuItemType.option, title:translate("Sign out"), onPress:this.signOut})
-        
+
         return (
             <div>
                 <DropDownMenu className="user-status-dropdown" triggerClass="fas fa-caret-down mx-1" items={selectableDropdownItems}></DropDownMenu>

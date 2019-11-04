@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { AvatarStatusColor } from '../../types/intrasocial_types';
 import classnames = require('classnames');
+import "./UserStatusSelector.scss";
 
 export interface Props {
     size?:number
@@ -20,17 +21,15 @@ export class UserStatusIndicator extends React.PureComponent<Props & React.HTMLA
     {
         super(props)
     }
-    render() 
+    render()
     {
         const {borderColor, borderWidth, size, children, className, statusColor: stateColor,...rest} = this.props
         const cn = classnames("user-status-indicator",className)
         const style:React.CSSProperties = {
-            borderWidth:borderWidth + "px", 
-            borderColor:borderColor, 
-            width:size + "px", 
-            height:size + "px", 
+            borderWidth:borderWidth + "px",
+            borderColor:borderColor,
             borderStyle:"solid",
-            backgroundColor:stateColor, 
+            backgroundColor:stateColor,
             borderRadius:"50%",
             display:"inline-block"
         }

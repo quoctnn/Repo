@@ -6,14 +6,14 @@ import "./Changelog.scss"
 import { WindowAppManager } from '../managers/WindowAppManager';
 import { RequestErrorData } from "../types/intrasocial_types";
 
-type Props = 
+type Props =
 {
 }
-type State = 
+type State =
 {
     data:any
 }
-export class Changelog extends React.Component<Props, State> 
+export class Changelog extends React.Component<Props, State>
 {
     constructor(props:Props){
         super(props)
@@ -27,14 +27,14 @@ export class Changelog extends React.Component<Props, State>
     loadContent = () => {
         const url = WindowAppManager.resolveLocalFileUrl("assets/docs/CHANGELOG.rst")
         AjaxRequest.ajaxCallAny("text" , "GET", url, undefined, (data, status, request) => {
-            const content = data 
-            if(content) 
+            const content = data
+            if(content)
             {
                 const html = rst2html(content)
                 this.setState(() => {
                     return {data:html}
                 })
-            }            
+            }
         }, (request, status, error) => {
             ToastManager.showRequestErrorToast(new RequestErrorData(error, null))
         })

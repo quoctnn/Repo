@@ -40,13 +40,6 @@
             justify-content: center;
             align-items: center;
         }
-        .avatar {
-            .user-status-indicator{
-                bottom: -2px;
-                width: 12px !important;
-                height: 12px !important;
-            }
-        }
         .typing-indicator:after,.typing-indicator:before
         {
             display: none;

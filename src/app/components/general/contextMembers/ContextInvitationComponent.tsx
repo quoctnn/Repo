@@ -68,7 +68,7 @@ export default class ContextInvitationComponent extends React.Component<Props, S
         const title =this.renderInvitationHeader(profile, invitation)
         const failed = failedArray.contains( invitation.id )
         const cn = classnames({"bg-warning":failed})
-        return <GenericListItem className={cn} header={title} left={<UserProfileAvatar size={44} profileId={profile.id} />} footer={<TimeComponent date={invitation.created_at} />}/>
+        return <GenericListItem className={cn} header={title} left={<UserProfileAvatar size={40} borderWidth={2} borderColor="white" profileId={profile.id} />} footer={<TimeComponent date={invitation.created_at} />}/>
     }
     fetchInvitations = (offset:number, completion:(items:PaginationResult<ContextInvitation>) => (void)) => {
         let {search} = this.state.filters
