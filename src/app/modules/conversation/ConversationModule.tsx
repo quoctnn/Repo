@@ -39,6 +39,7 @@ import Routes from '../../utilities/Routes';
 import SimpleDialog from '../../components/general/dialogs/SimpleDialog';
 import ConversationDetailsModule from './ConversationDetailsModule';
 import { ProfileOptionComponent, ProfileSingleValueComponent, ProfileMultiValueLabel, ProfileSelectorOption } from '../../components/general/input/SelectExtensions';
+import UserProfileAvatar from '../../components/general/UserProfileAvatar';
 
 type FilePreviewProps = {
     file:File
@@ -391,8 +392,7 @@ class ConversationModule extends React.Component<Props, State> {
         {
             return <li className="is-typing-container">
             {keys.map((id, index) => {
-                let avatar = userAvatar( ProfileManager.getProfileById(id) )
-                return (<Avatar key={index} image={avatar} size={24}/>)
+                return (<UserProfileAvatar key={index} profileId={id} size={24}/>)
 
             })}
             <TypingIndicator />

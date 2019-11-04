@@ -6,7 +6,8 @@ import { Link } from 'react-router-dom';
 import Routes from '../utilities/Routes';
 import { StatusReactionUtilities, UserProfile } from '../types/intrasocial_types';
 import { translate } from "../localization/AutoIntlProvider";
-export interface Props 
+import UserProfileAvatar from "./general/UserProfileAvatar";
+export interface Props
 {
     itemClass:string
     showRelationship?:boolean
@@ -71,15 +72,14 @@ export default class ProfileItem extends React.Component<Props,{}> {
         let user = this.props.profile;
         let itemClasses = classNames(this.props.itemClass, "profile-item")
         const reaction = StatusReactionUtilities.parseStatusReaction(this.props.reaction)
-        const avatar = userAvatar(user)
         return (
             <div className={itemClasses}>
                 <Link to={Routes.profileUrl(user.slug_name)}>
                     <div className="wrapper">
                     <div className="col-xs-4">
-                        <Avatar className="img-responsive" image={avatar} >
+                        <UserProfileAvatar className="img-responsive" profileId={user.id} >
                             <StatusReactionUtilities.Component selected={true} large={false} reaction={reaction}></StatusReactionUtilities.Component>
-                        </Avatar>
+                        </UserProfileAvatar>
                     </div>
                     <div className="col-xs-8">
                         <h4 className="name">

@@ -4,10 +4,6 @@
         padding: 0.5rem 0.7rem;
         overflow-y: auto;
     }
-    .avatar .user-status-indicator {
-        bottom: -2px;
-        right: -2px;
-    }
     .member-item{
         &.active, &:hover
         {

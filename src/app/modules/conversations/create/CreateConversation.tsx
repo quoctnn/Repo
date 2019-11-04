@@ -12,6 +12,7 @@ import SelectUsersDialog from '../../../components/general/dialogs/SelectUsersDi
 import { ProfileManager } from '../../../managers/ProfileManager';
 import { ConversationUtilities } from '../../../utilities/ConversationUtilities';
 import { userAvatar } from '../../../utilities/Utilities';
+import UserProfileAvatar from '../../../components/general/UserProfileAvatar';
 type OwnProps = {
     onComplete:() => void
 }
@@ -27,7 +28,7 @@ type State = {
     submitting:boolean
 }
 type Props = OwnProps & RouteProps
-class CreateConversation extends React.Component<Props, State> {   
+class CreateConversation extends React.Component<Props, State> {
     constructor(props:Props) {
         super(props);
         this.state = {
@@ -103,8 +104,8 @@ class CreateConversation extends React.Component<Props, State> {
                                     </label>
                                     <div className="col-sm-8">
 
-                                        <input id="conversation-title" 
-                                            onChange={e => { this.setState({ title: e.target.value }); }} 
+                                        <input id="conversation-title"
+                                            onChange={e => { this.setState({ title: e.target.value }); }}
                                             type="text" className="form-control" placeholder={this.getConversationPlaceholderTitle()} />
                                     </div>
                                 </FormGroup>
@@ -115,16 +116,16 @@ class CreateConversation extends React.Component<Props, State> {
                                     <div className="col-sm-8">
                                         <div className="">
                                           { this.state.selectedUsers.length == 0 && <div>{translate("Please select members")}</div>}
-                                          { this.state.selectedUsers.length > 0 && 
-                                                <div className="member-list">{this.state.selectedUsers.map((u) => 
+                                          { this.state.selectedUsers.length > 0 &&
+                                                <div className="member-list">{this.state.selectedUsers.map((u) =>
                                                     {
                                                         return (<div key={u.id}>
                                                             <div className="member-avatar">
-                                                            <Avatar image={userAvatar(u)}>
+                                                            <UserProfileAvatar profileId={u.id} >
                                                                 <button onClick={this.removeUser.bind(this, u.id)} type="button" className="remove-button btn btn-danger btn-sm rounded-circle" aria-label="Close">
                                                                     <i className="fas fa-times"></i>
                                                                 </button>
-                                                            </Avatar></div>
+                                                            </UserProfileAvatar></div>
                                                             <div className="member-name text-truncate">{u.first_name}</div>
                                                         </div>)
                                                     })}</div>
@@ -148,10 +149,10 @@ class CreateConversation extends React.Component<Props, State> {
                             </Form>
                         </div>
                     </div>
-                    <SelectUsersDialog 
+                    <SelectUsersDialog
                         contacts={contacts}
-                        title={translate("Add Members")} 
-                        completeButtonTitle={translate("Add to conversation")} 
+                        title={translate("Add Members")}
+                        completeButtonTitle={translate("Add to conversation")}
                         visible={this.state.dialogVisible}
                         didCancel={this.onSelectUsersDialogCancel}
                         didSubmit={this.onSelectUsersDialogSubmit}

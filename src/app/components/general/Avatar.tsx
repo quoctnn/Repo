@@ -1,11 +1,6 @@
 import * as React from 'react';
 import { SecureImage } from './SecureImage';
-import { AvatarStatusColor, UserStatus } from '../../types/intrasocial_types';
-import { UserStatusIndicator } from './UserStatusIndicator';
 import "./Avatar.scss"
-import { ReduxState } from '../../redux';
-import { connect, DispatchProp } from 'react-redux';
-import { ProfileManager } from '../../managers/ProfileManager';
 import classnames from 'classnames';
 
 type OwnProps = {
@@ -18,28 +13,22 @@ type OwnProps = {
     userStatus?:number
     containerClassName?:string
 }
-type ReduxStateProps = {
-    statusColor?:AvatarStatusColor,
-}
-type DefaultProps = ReduxStateProps & OwnProps 
-type Props = DefaultProps & DispatchProp
-class Avatar extends React.PureComponent<Props & React.HTMLAttributes<HTMLElement>, {}> {
-    static defaultProps:DefaultProps = {
+export default class Avatar extends React.PureComponent<OwnProps & React.HTMLAttributes<HTMLElement>, {}> {
+    static defaultProps:OwnProps = {
         size:50,
         borderWidth:0,
         borderColor:"none",
         image:null,
-        statusColor:AvatarStatusColor.NONE,
 
     }
     imageStyles:{[key:string]:React.CSSProperties} = {}
-    constructor(props:Props)
+    constructor(props:OwnProps)
     {
         super(props)
     }
     render()
     {
-        const {image, images, borderColor, borderWidth, size, children, className, statusColor, userStatus, innerRef, dispatch , containerClassName , ...rest} = this.props
+        const {image, images, borderColor, borderWidth, size, children, className, innerRef, containerClassName , ...rest} = this.props
         let imgs:string[] = []
         if(image)
             imgs.push(image)
@@ -57,23 +46,7 @@ class Avatar extends React.PureComponent<Props & React.HTMLAttributes<HTMLElemen
                     })}
                 </div>
                 {children}
-                {statusColor != AvatarStatusColor.NONE &&
-                    <UserStatusIndicator size={15} borderColor="white" statusColor={statusColor} borderWidth={2}/>
-                }
             </div>
         );
     }
 }
-const mapStateToProps = (state: ReduxState, ownProps: OwnProps): ReduxStateProps => {
-
-    if(ownProps.userStatus)
-    {
-        const profile = ProfileManager.getProfileById(ownProps.userStatus)
-        if(profile)
-        {
-            return {statusColor:UserStatus.getObject(profile.user_status).color}
-        }
-    }
-    return {}
-}
-export default connect<ReduxStateProps, DispatchProp, OwnProps>(mapStateToProps, null)(Avatar)

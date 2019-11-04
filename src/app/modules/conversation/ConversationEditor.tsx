@@ -15,6 +15,7 @@ import {ApiClient} from "../../network/ApiClient";
 import SelectUsersDialog from "../../components/general/dialogs/SelectUsersDialog";
 import { ToastManager } from '../../managers/ToastManager';
 import { ConversationManager } from '../../managers/ConversationManager';
+import UserProfileAvatar from "../../components/general/UserProfileAvatar";
 
 type OwnProps = {
     conversationId:number
@@ -30,7 +31,7 @@ type ReduxStateProps = {
 }
 type Props = OwnProps & ReduxStateProps
 class ConversationEditor extends React.Component<Props, State> {
-    
+
     constructor(props:Props){
         super(props)
         this.state = {
@@ -39,7 +40,7 @@ class ConversationEditor extends React.Component<Props, State> {
             canSubmitNewMembers:false
         }
     }
-    
+
     componentDidUpdate = (prevProps:Props, prevState:State) => {
         if(prevProps.conversation.updated_at != this.props.conversation.updated_at)
         {
@@ -75,7 +76,7 @@ class ConversationEditor extends React.Component<Props, State> {
     renderMember = (member:number) => {
         const profile = ProfileManager.getProfileById(member)
         return <ListItem tabIndex={1} key={profile.id || uniqueId()} className="d-flex align-items-center">
-                    <Avatar className="mr-2" size={40} image={userAvatar(profile, true)} />
+                    <UserProfileAvatar className="mr-2" size={40} profileId={profile.id} />
                     <div className="text-truncate">{userFullName(profile)}</div>
                 </ListItem>
     }
@@ -119,7 +120,7 @@ class ConversationEditor extends React.Component<Props, State> {
             const possibleNewMembers = ProfileManager.getContactListIds(false).filter(u => !conversation.users.contains(u))
             contacts = ProfileManager.getProfiles(possibleNewMembers)
         }
-        return <SelectUsersDialog 
+        return <SelectUsersDialog
                     contacts={contacts}
                     title={translate("conversation.add.members")}
                     visible={visible}
@@ -141,7 +142,7 @@ class ConversationEditor extends React.Component<Props, State> {
             <>
                 <List enableAnimation={false} className="conversation-editor">
                     <InputGroup className="input-group-transparent">
-                        <Input placeholder={translate("common.title")} tabIndex={1} className="text-center form-control-transparent primary-text title-text" value={title} onChange={this.onTitleChange} onBlur={this.onTitleBlur} /> 
+                        <Input placeholder={translate("common.title")} tabIndex={1} className="text-center form-control-transparent primary-text title-text" value={title} onChange={this.onTitleChange} onBlur={this.onTitleBlur} />
                         <InputGroupAddon addonType="append">
                             <i className="fas fa-pen"></i>
                         </InputGroupAddon>
@@ -150,10 +151,10 @@ class ConversationEditor extends React.Component<Props, State> {
                     {this.renderAddMembers()}
                     {this.renderMembers()}
                     <ListHeader>{translate("conversation.settings")}</ListHeader>
-                    {canLeaveConversation && 
+                    {canLeaveConversation &&
                         <ListItem hasAction={true} onClick={this.leaveConversation} className="d-flex text-danger">
                         {translate("conversation.leave")}
-                        </ListItem>  
+                        </ListItem>
                     }
                 </List>
                 {this.renderAddmembersDialog()}
