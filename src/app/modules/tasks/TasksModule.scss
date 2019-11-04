@@ -6,4 +6,10 @@
     .module-header-title-left{
         min-width: 100px;
     }
+    .tasks-list{
+        padding: 8px;
+        > .generic-list-item{
+            margin-bottom: 8px;
+        }
+    }
 }

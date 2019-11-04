@@ -1552,9 +1552,9 @@ export type Task = {
     last_change_by: number
     absolute_url: string
     category: string
-    creator: SimpleUserProfile
-    responsible?: SimpleUserProfile
-    assigned_to?: SimpleUserProfile[]
+    creator: number
+    responsible?: number
+    assigned_to?: number[]
     priority: TaskPriority
     state: TaskState
     spent_time: TimeSpent
@@ -1577,9 +1577,9 @@ export namespace TaskPriority {
     ]
     export function colorForPriority(type: TaskPriority) {
         switch (type) {
-            case TaskPriority.low: return "#61FA6B"
-            case TaskPriority.medium: return "#FA9F61"
-            case TaskPriority.high: return "#FA6161"
+            case TaskPriority.low: return "info"
+            case TaskPriority.medium: return "warning"
+            case TaskPriority.high: return "danger"
             default: return null
         }
     }
@@ -1601,10 +1601,11 @@ export namespace TaskState {
     ]
     export function colorForState(type: TaskState) {
         switch (type) {
-            case TaskState.progress: return "#F8CF88"
-            case TaskState.toVerify: return "#FFFFB1"
-            case TaskState.completed: return "#B9E4B4"
-            case TaskState.notApplicable: return "#ebccd1"
+            case TaskState.notStarted: return "secondary"
+            case TaskState.progress: return "info"
+            case TaskState.toVerify: return "warning"
+            case TaskState.completed: return "success"
+            case TaskState.notApplicable: return "light"
             default: return null
         }
     }

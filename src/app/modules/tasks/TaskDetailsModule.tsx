@@ -78,10 +78,10 @@ class TaskDetailsModule extends React.Component<Props, State> {
                                 <ModuleFooter className="mt-1">
                                     <div className="d-flex flex-row justify-content-between">
                                         { task.responsible &&
-                                            <DetailsMembers title={translate('task.responsible')} members={[task.responsible.id]} position={HorisontalLayoutPosition.left} showSeeAll={false}/>
+                                            <DetailsMembers title={translate('task.responsible')} members={[task.responsible]} position={HorisontalLayoutPosition.left} showSeeAll={false}/>
                                         }
                                         { task.assigned_to && task.assigned_to.length > 0 &&
-                                            <DetailsMembers title={translate('task.assigned_to')} members={task.assigned_to.map((user) => {return user.id})} position={HorisontalLayoutPosition.right} showSeeAll={false}/>
+                                            <DetailsMembers title={translate('task.assigned_to')} members={task.assigned_to.map((user) => {return user})} position={HorisontalLayoutPosition.right} showSeeAll={false}/>
                                         }
                                     </div>
                                 </ModuleFooter>

@@ -903,12 +903,15 @@ export abstract class ApiClient
                                                                         creator,
                                                                         not_assigned,
                                                                         category,
-                                                                        term})
+                                                                        term,
+                                                                        parent:"null"
+                                                                    })
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {
             callback(null, status, new RequestErrorData(request.responseJSON, error))
         })
+        console.warn("REMOVE parent:null")
     }
     static getTask(taskId:number, callback:ApiClientCallback<Task>)
     {

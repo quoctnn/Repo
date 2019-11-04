@@ -1,61 +1,34 @@
-$margin:5px;
-$height:44px;
-.task-list-item{
-    margin-bottom: $margin;
-    margin-left: $margin;
-    margin-right: $margin;
-    border-radius: $height/2;
-    background: rgb(233, 233, 233);
-    color:#5d5d5d;
-    &:first-child{
-        margin-top: $margin;
+@import "./../../Config";
+.task-list-item-container{
+    &:hover{
+        text-decoration: none;
     }
-    .chat-message-composer-container{
-        margin: 0;
-    }
-    .task-content{
-        display: flex;
-        height: $height;
-        border-radius: $height/2;
-        background: #F3F3F3;
-        align-items: center;
-        padding-left: 10px;
-        cursor: pointer;
-        .overflow-menu{
-            visibility: hidden;
-            &.active{
-                visibility: visible;
+    .task-list-item{
+        border-radius: 6px;
+        .left{
+            .avatar{
+                .image-container{
+                    box-shadow: none;
+                    border-style:dashed !important;
+                    border-width: 2px !important;
+                }
             }
         }
-        &:hover{
-            .overflow-menu{
-                visibility: visible;
-            }
-        }
-        .title{
-            flex: 1;
-            min-width: 0; 
-            margin-right: 5px;
-            &:last-child{
-                margin-right: 10px;
-            }
-        }
-        .task-priority{
-            margin-right: 5px;
-            flex-shrink: 0;
-            padding: 0 10px;
+        .right{
             align-items: center;
             display: flex;
-            height: $height - 10;
-            border-radius: ($height - 10) / 2;
-            color:white;
+            .avatar-stacked{
+                margin-bottom: 0;
+                margin-top: 0;
+            }
         }
-    }
-    .collapse-body{
-
-        .date-picker-container{
-            padding: 8px;
-            padding-left: 0;
+        .header{
+            white-space:initial;
+        }
+        .footer{
+            > *:first-child{
+                margin-left: 0 !important;
+            }
         }
     }
 }

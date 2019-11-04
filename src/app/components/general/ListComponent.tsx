@@ -11,7 +11,12 @@ import { Button } from 'reactstrap';
 import { translate } from '../../localization/AutoIntlProvider';
 import { findScrollParent } from '../../utilities/Utilities';
 import { Checkbox } from './input/Checkbox';
-
+class GroupHeader{
+    group:string
+    constructor(group:string){
+        this.group = group
+    }
+}
 export const ListComponentHeader = (props:{title:React.ReactNode}) => {
     return (
         <div className="list-header">{props.title}</div>
@@ -31,6 +36,7 @@ type OwnProps<T> = {
     scrollParent?:any
     fetchData:(offset:number, completion:(items:PaginationResult<T>) => void) => void
     renderItem:(item:T, index:number) => React.ReactNode
+    renderGroupHeader?:(group:string) => React.ReactNode
     renderEmpty?:() => React.ReactNode
     renderError?:() => React.ReactNode
     sortItems?:(items:T[]) => T[]
@@ -40,6 +46,7 @@ type OwnProps<T> = {
     offsetCountFilter?:(items:T[]) => number
     onDidLoadData?:(offset:number) => void
     onItemSelectionChange?:(id:number, selected:boolean) => void
+    groupField?:string
 }
 type DefaultProps = {
 
@@ -321,13 +328,40 @@ export default class ListComponent<T extends IdentifiableObject> extends React.C
                     <Checkbox checked={isSelected} onValueChange={this.selectedItem(id)} />{item}
                 </div>
     }
+    addGroups = (arr:T[]) => {
+        const newArr:(T | GroupHeader)[] = []
+        let category:string = null
+        arr.forEach(i => {
+            const cat = i[this.props.groupField]
+            if(cat && cat != category)
+            {
+                category = cat
+                newArr.push(new GroupHeader(cat as string))
+            }
+            newArr.push(i)
+        })
+        return newArr
+    }
     renderItems = () => {
         const cn = classnames("vertical-scroll", this.props.className, {"list-component-list":!this.props.findScrollParent})
         const scroll = this.props.loadMoreOnScroll ? (this.props.scrollParent ? undefined : this.onScroll) : undefined
-        const listItems = this.props.sortItems ? this.props.sortItems(this.state.items) : this.state.items
+        let listItems:(GroupHeader | T)[] = this.props.sortItems ? this.props.sortItems(this.state.items) : this.state.items
+        if(this.props.groupField)
+        {
+            listItems = this.addGroups(listItems as T[])
+        }
         let items = listItems.map((i, index) => {
-                            return this.renderSelectableItem(i.id, this.props.renderItem(i, index))
+                            if(i instanceof GroupHeader)
+                            {
+                                if(this.props.renderGroupHeader)
+                                    return this.props.renderGroupHeader(i.group)
+                                else 
+                                    return <div key={"header_" + index} className="group-header">{i.group}</div>
+                            }
+                            else 
+                                return this.renderSelectableItem(i.id, this.props.renderItem(i, index))
                         }).concat(this.renderLoading())
+        
         if (this.state.dividerPosition) items.splice(this.state.dividerPosition, 0, <ListComponentDivider key="divider"/>)
         return (<List ref={this.listRef} enableAnimation={false}
                     onScroll={scroll}

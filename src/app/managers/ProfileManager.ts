@@ -44,6 +44,8 @@ export abstract class ProfileManager
         return profiles.find(p => p.slug_name == profileId)
     }
     static ensureExists = (profileId:string|number, forceUpdate?: boolean) => {
+        if(nullOrUndefined(profileId))
+            return null
         const id = profileId.toString()
         let profile = ProfileManager.getProfile(id)
         if(!profile || forceUpdate)

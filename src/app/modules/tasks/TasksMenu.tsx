@@ -26,6 +26,7 @@ type Props =
     data:TasksMenuData
     onUpdate:(data:TasksMenuData) => void
     disableContextSearch?:boolean
+    projectMembers:number[]
 }
 type State = {
     data:TasksMenuData
@@ -138,15 +139,15 @@ export default class TaskMenu extends React.Component<Props, State> {
                 </FormGroup>
                 <FormGroup>
                     <Label>{translate("task.module.menu.assigned_to.title")}</Label>
-                    <ProjectProfileFilter project={this.state.data.project && this.state.data.project.id} value={assignedToValue} onValueChange={this.onAssignedChange} />
+                    <ProjectProfileFilter projectMembers={this.props.projectMembers} value={assignedToValue} onValueChange={this.onAssignedChange} />
                 </FormGroup>
                 <FormGroup>
                     <Label>{translate("task.module.menu.responsible.title")}</Label>
-                    <ProjectProfileFilter project={this.state.data.project && this.state.data.project.id} value={responsibleValue} onValueChange={this.onResponsibleChange} />
+                    <ProjectProfileFilter projectMembers={this.props.projectMembers} value={responsibleValue} onValueChange={this.onResponsibleChange} />
                 </FormGroup>
                 <FormGroup>
                     <Label>{translate("task.module.menu.creator.title")}</Label>
-                    <ProjectProfileFilter project={this.state.data.project && this.state.data.project.id} value={creatorValue} onValueChange={this.onCreatorChange} />
+                    <ProjectProfileFilter projectMembers={this.props.projectMembers} value={creatorValue} onValueChange={this.onCreatorChange} />
                 </FormGroup>
                 
             </div>

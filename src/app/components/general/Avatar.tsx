@@ -6,6 +6,7 @@ import "./Avatar.scss"
 import { ReduxState } from '../../redux';
 import { connect, DispatchProp } from 'react-redux';
 import { ProfileManager } from '../../managers/ProfileManager';
+import classnames from 'classnames';
 
 type OwnProps = {
     size?:number
@@ -15,6 +16,7 @@ type OwnProps = {
     images?:string[],
     innerRef?: (element:HTMLElement) => void
     userStatus?:number
+    containerClassName?:string
 }
 type ReduxStateProps = {
     statusColor?:AvatarStatusColor,
@@ -37,7 +39,7 @@ class Avatar extends React.PureComponent<Props & React.HTMLAttributes<HTMLElemen
     }
     render()
     {
-        const {image, images, borderColor, borderWidth, size, children, className, statusColor, userStatus, innerRef, dispatch ,...rest} = this.props
+        const {image, images, borderColor, borderWidth, size, children, className, statusColor, userStatus, innerRef, dispatch , containerClassName , ...rest} = this.props
         let imgs:string[] = []
         if(image)
             imgs.push(image)
@@ -45,9 +47,10 @@ class Avatar extends React.PureComponent<Props & React.HTMLAttributes<HTMLElemen
             imgs = imgs.concat( images )
         var imgUrls = imgs/*.map(i => IntraSocialUtilities.appendAuthorizationTokenToUrl(i))*/.slice(0,4)
         const length = imgUrls.length
+        const containerClass = classnames("image-container", containerClassName)
         return(
             <div {...rest} className={"avatar" + (className ? " " + className : "")} ref={this.props.innerRef} >
-                <div className="image-container" style={{borderWidth:borderWidth + "px", borderColor:borderColor, width:size + "px", height:size + "px", borderStyle:"solid"}}>
+                <div className={containerClass} style={{borderWidth:borderWidth + "px", borderColor:borderColor, width:size + "px", height:size + "px", borderStyle:"solid"}}>
                     {imgUrls.map((img, index) => {
                         const key = `image_${length}_${index}`
                         return <SecureImage setAsBackground={true} key={key} className={"image multi " + key} url={img}></SecureImage>

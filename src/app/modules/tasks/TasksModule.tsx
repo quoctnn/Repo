@@ -9,13 +9,14 @@ import { ContextNaturalKey, TaskActions, Task } from '../../types/intrasocial_ty
 import ListComponent from '../../components/general/ListComponent';
 import {ApiClient,  PaginationResult } from '../../network/ApiClient';
 import { ToastManager } from '../../managers/ToastManager';
-import TaskListItem from './TaskListItem';
 import { StatusUtilities } from '../../utilities/StatusUtilities';
 import SimpleModule from '../SimpleModule';
 import { ButtonGroup, Button } from 'reactstrap';
 import { AuthenticationManager } from '../../managers/AuthenticationManager';
 import { CommonModuleProps } from '../Module';
 import { withContextData, ContextDataProps } from '../../hoc/WithContextData';
+import TaskListItem2 from './TaskListItem2';
+import { nameofFactory } from '../../utilities/Utilities';
 
 type OwnProps = {
     breakpoint: ResponsiveBreakpoint
@@ -26,6 +27,8 @@ type State = {
     menuData: TasksMenuData
 }
 type Props = OwnProps & RouteComponentProps<any> & ContextDataProps
+
+const nameOf = nameofFactory<Task>()
 class TasksModule extends React.Component<Props, State> {
     tempMenuData: TasksMenuData = null
     taskList = React.createRef<ListComponent<Task>>()
@@ -201,11 +204,18 @@ class TasksModule extends React.Component<Props, State> {
         })
     }
     renderTask = (task: Task) => {
-        return <TaskListItem
+        const user = this.props.contextData.authenticatedUser && this.props.contextData.authenticatedUser.id || -1
+        return <TaskListItem2
             onActionPress={this.navigateToActionWithTask(task.id)}
             task={task}
+            user={user}
             communityId={-1}
             key={"task_" + task.id} />
+    }
+    renderGroupHeader = (group:string) => {
+        return <div key={"header_" + group} className="group-header">
+            {group}
+        </div>
     }
     renderContent = () => {
         return <ListComponent<Task>
@@ -213,7 +223,11 @@ class TasksModule extends React.Component<Props, State> {
             ref={this.taskList}
             onLoadingStateChanged={this.feedLoadingStateChanged}
             fetchData={this.fetchTasks}
-            renderItem={this.renderTask} />
+            renderItem={this.renderTask} 
+            renderGroupHeader={this.renderGroupHeader}
+            className="tasks-list"
+            groupField={nameOf("category")}
+            />
     }
     onMenuToggle = (visible: boolean) => {
         const newState: Partial<State> = {}
@@ -263,7 +277,9 @@ class TasksModule extends React.Component<Props, State> {
         const { breakpoint, className } = this.props
         const cn = classnames("tasks-module", className)
         const disableContextSearch = !!contextNaturalKey
-        const menu = <TaskMenu data={this.state.menuData} onUpdate={this.menuDataUpdated} disableContextSearch={disableContextSearch} />
+        const project = this.props.contextData.project
+        const projectMembers = project.members || []
+        const menu = <TaskMenu projectMembers={projectMembers} data={this.state.menuData} onUpdate={this.menuDataUpdated} disableContextSearch={disableContextSearch} />
         const headerContent = this.renderFilters()
         const renderModalContent = !showInModal || isModal ? undefined : this.renderModalContent
         return (<SimpleModule {...rest}
