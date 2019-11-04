@@ -71,7 +71,7 @@ export default class TaskListItem2 extends React.Component<Props, State> {
             "border-w0":!responsible
         })
         const left = <>
-                    <UserProfileAvatar size={40} image={profile && profile.avatar} containerClassName={avatarClass} />
+                    <UserProfileAvatar size={40} profileId={profile && profile.id} containerClassName={avatarClass} />
                     <Mark id={stateId} size={8} className={"bg-" + TaskState.colorForState(task.state)} />
                     {stateTooltip}
                     </>
