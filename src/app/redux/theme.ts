@@ -7,8 +7,14 @@ export interface StyleTheme {
 }
 export const availableThemes: StyleTheme[] = [
   { name: 'Default', selector: '' },
-  { name: 'Light', selector: 'light' },
-  { name: 'Dark', selector: 'dark' }
+  { name: 'Light - Compact', selector: 'light compact' },
+  { name: 'Light - Normal', selector: 'light' },
+  { name: 'Light - Bigger', selector: 'light increased' },
+  { name: 'Light - Huge', selector: 'light huge' },
+  { name: 'Dark - Compact', selector: 'dark compact' },
+  { name: 'Dark - Normal', selector: 'dark' },
+  { name: 'Dark - Bigger', selector: 'dark increased' },
+  { name: 'Dark - Huge', selector: 'dark huge' }
 ]
 const defaultTheme = 0
 const INITIAL_STATE = {

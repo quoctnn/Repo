@@ -377,7 +377,7 @@ class ProfileDetailsModule extends React.PureComponent<Props, State> {
         const profileOptions = this.getProfileOptions()
         return (<Module {...rest} className={cn}>
                     <ModuleHeader loading={false} headerTitle={title}>
-                    {profileOptions.length > 0 && <DropDownMenu className="profile-option-dropdown" triggerClass="fas fa-cog mx-1" items={profileOptions}></DropDownMenu>}
+                    {profileOptions.length > 0 && <DropDownMenu className="profile-option-dropdown" triggerClass="fas fa-cog fa-2x mx-1" items={profileOptions}></DropDownMenu>}
                     </ModuleHeader>
                     <ModuleContent>
                         <div className="content">

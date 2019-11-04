@@ -179,7 +179,7 @@ class Main extends React.Component<Props, State> {
                                             <PrivateRoute path={Routes.GROUP_CREATE} component={GroupCreateComponent} />
                                         </Switch>
                                     </DndProvider>
-                                </ContextDataResolver> 
+                                </ContextDataResolver>
                             }
                         </div>
                     </div>

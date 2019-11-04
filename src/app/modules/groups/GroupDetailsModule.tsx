@@ -126,7 +126,7 @@ class GroupDetailsModule extends React.Component<Props, State> {
         {
             if(group.muted)
                 options.push({id:"unmute", type:OverflowMenuItemType.option, title:translate("common.unmute"), onPress:this.toggleMute, iconClass:"fas fa-bell-slash"})
-            else 
+            else
                 options.push({id:"mute", type:OverflowMenuItemType.option, title:translate("common.mute"), onPress:this.toggleMute, iconClass:"fas fa-bell"})
         }
         if(group.creator != authenticatedUser.id && members.contains(authenticatedUser.id))
@@ -150,7 +150,7 @@ class GroupDetailsModule extends React.Component<Props, State> {
         const groupOptions = this.getGroupOptions()
         return (<Module {...rest}>
                     <ModuleHeader headerTitle={group.name || translate("detail.module.title")} loading={this.state.isLoading}>
-                        {groupOptions.length > 0 && <DropDownMenu className="group-option-dropdown" triggerClass="fas fa-cog mx-1" items={groupOptions}></DropDownMenu>} 
+                        {groupOptions.length > 0 && <DropDownMenu className="group-option-dropdown" triggerClass="fas fa-cog fa-2x mx-1" items={groupOptions}></DropDownMenu>}
                     </ModuleHeader>
                     <ModuleContent>
                         <DetailsContent community={community} description={group.description}/>

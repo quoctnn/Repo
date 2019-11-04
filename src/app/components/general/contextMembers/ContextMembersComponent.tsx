@@ -278,7 +278,7 @@ export default class ContextMembersComponent extends React.Component<Props, Stat
         {
             this.clearSelection()
         }
-        else 
+        else
             this.selectAll()
     }
     reloadList = () => {
@@ -324,16 +324,16 @@ export default class ContextMembersComponent extends React.Component<Props, Stat
     renderAddMemberForm = () => {
         const {members, availableMembers, contextObject} = this.props
         const visible = this.state.addMembersFormVisible
-        return <ContextInviteComponent 
-                    members={[]} 
-                    availableMembers={availableMembers} 
-                    contextNaturalKey={this.props.contextNaturalKey} 
-                    key={this.state.addMembersFormReloadKey} 
-                    onCompleted={this.handleAddMembersCompleted} 
-                    didCancel={this.hideAddMembersForm} 
-                    visible={visible} 
-                    contextObject={contextObject} 
-                    activeMembershipInvitations={members} 
+        return <ContextInviteComponent
+                    members={[]}
+                    availableMembers={availableMembers}
+                    contextNaturalKey={this.props.contextNaturalKey}
+                    key={this.state.addMembersFormReloadKey}
+                    onCompleted={this.handleAddMembersCompleted}
+                    didCancel={this.hideAddMembersForm}
+                    visible={visible}
+                    contextObject={contextObject}
+                    activeMembershipInvitations={members}
                     />
     }
     renderHeaderButtons = () => {
@@ -383,10 +383,10 @@ export default class ContextMembersComponent extends React.Component<Props, Stat
                 <Input className="mb-2" value={this.state.filters.search} type="text" onChange={this.handleSearchInputChange} placeholder={translate("common.filter.members")}/>
                 {this.hasAccess && <div className={classnames("list-header", {active:headerActive})}>
                     <Checkbox checked={headerActive} checkedIcon="fas fa-minus" onValueChange={this.headerToggle} />
-                    <div className="flex-grow-1 text-truncate p-1">{translate("Member")}</div>
+                    <div className="flex-grow-1 text-truncate m-1 p-2">{translate("Member")}</div>
                     {this.renderHeaderButtons()}
                 </div>}
-                <ListComponent<UserProfile> 
+                <ListComponent<UserProfile>
                     ref={this.listRef}
                     fetchData={this.fetchMembers}
                     renderItem={this.renderMember}

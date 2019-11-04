@@ -32,15 +32,15 @@ export default class EventListItem extends React.Component<Props, State> {
         const cover = eventCover(event, true)
         return (<IntraSocialLink to={event} type={ContextNaturalKey.EVENT} {...rest} className={eventClass}>
                     <div className="drop-shadow">
-                        <SecureImage className="top img" setBearer={true} setAsBackground={true} url={cover}>
-                            <div className="flex-grow-1"></div>
-                            <div className="event-date theme-box theme-bg-gradient">
-                                {stringToDateFormat( event.start , DateFormat.day)}
-                            </div>
-                        </SecureImage>
-                        <div className="bottom d-flex align-items-center flex-row">
-                            <div className="title text-truncate">
-                                {event.name}
+                        <div className="top">
+                            <SecureImage className="img" setBearer={true} setAsBackground={true} url={cover}/>
+                            <div className="title-row d-flex align-items-center flex-row">
+                                <div className="title text-truncate flex-grow-1">
+                                    {event.name}
+                                </div>
+                                <div className="event-date theme-box">
+                                    {stringToDateFormat( event.start , DateFormat.day)}
+                                </div>
                             </div>
                         </div>
                         <div className="bottom d-flex align-items-center flex-row justify-content-around">

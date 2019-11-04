@@ -20,12 +20,15 @@ import { EventSubscription } from "fbemitter";
 import { AnimatedIconStack } from "../general/AnimatedIconStack";
 import { NotificationCenter } from "../../utilities/NotificationCenter";
 import { SideMenuNavigationVisibilityChangeNotification } from "./SideMenuNavigation";
+import { availableThemes, StyleTheme } from "../../redux/theme";
+import { ThemeManager } from '../../managers/ThemeManager';
 
 type OwnProps = {
 }
 type Props = OwnProps & ReduxStateProps & RouteComponentProps<any>
 
 type ReduxStateProps = {
+    theme: number
     profile: UserProfile
     unreadNotifications: number
     unreadConversations:number
@@ -110,6 +113,39 @@ class TopNavigation extends React.Component<Props, State> {
                     }
                 </div>
     }
+    renderThemeSelector() {
+        return (
+        <div className="dropdown">
+            <button
+            className="btn btn-secondary dropdown-toggle text-truncate"
+            type="button"
+            id="dropdownMenuButton"
+            data-toggle="dropdown"
+            aria-haspopup="true"
+            aria-expanded="false"
+            >
+            {availableThemes[this.props.theme].name}
+            </button>
+
+            <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            {availableThemes.map((theme, index) => {
+                return (
+                <a
+                    key={index}
+                    onClick={() => {
+                        ThemeManager.setTheme(index)
+                    }}
+                    className="dropdown-item"
+                    href="#"
+                >
+                    {theme.name}
+                </a>
+                );
+            })}
+            </div>
+        </div>
+        );
+    }
     goBack = (e:React.MouseEvent) => {
         window.history.back()
     }
@@ -127,6 +163,7 @@ class TopNavigation extends React.Component<Props, State> {
                     <BreadcrumbNavigation />
                     {this.renderMenuLinks()}
                     <div className="profile-shortcuts">
+                        {this.renderThemeSelector()}
                         { profile && !profile.is_anonymous && <>
                                 <Button onClick={this.toggleNotificationPanel} color="link" className="badge-notification-container">
                                     <i className="fas fa-bell"></i>
@@ -147,6 +184,7 @@ class TopNavigation extends React.Component<Props, State> {
 }
 const mapStateToProps = (state: ReduxState, ownProps: OwnProps): ReduxStateProps => {
     return {
+        theme: state.theme.theme,
         profile: state.authentication.profile,
         unreadNotifications: state.unreadNotifications.notifications,
         unreadConversations:state.unreadNotifications.conversations

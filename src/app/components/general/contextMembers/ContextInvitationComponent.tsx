@@ -111,7 +111,7 @@ export default class ContextInvitationComponent extends React.Component<Props, S
         {
             this.clearSelection()
         }
-        else 
+        else
             this.selectAll()
     }
     showInviteForm = () => {
@@ -169,8 +169,8 @@ export default class ContextInvitationComponent extends React.Component<Props, S
                 <Input className="mb-2" value={this.state.filters.search} type="text" onChange={this.handleSearchInputChange} placeholder={translate("common.filter.invitations")}/>
                 <div className={classnames("list-header", {active:headerActive})}>
                     <Checkbox checked={headerActive} checkedIcon="fas fa-minus" onValueChange={this.headerToggle} />
-                    <div className="flex-grow-1 text-truncate p-1">{translate("common.invitation")}</div>
-                    {headerActive && 
+                    <div className="flex-grow-1 text-truncate m-1 p-2">{translate("common.invitation")}</div>
+                    {headerActive &&
 
                         <Button onClick={this.deleteInvitations} className="ml-1 flex-shrink-0" size="xs" color="danger">
                             <i className="fas fa-trash mr-1"></i>{translate("common.delete")}
@@ -181,7 +181,7 @@ export default class ContextInvitationComponent extends React.Component<Props, S
                         </Button>
                     }
                 </div>
-                <ListComponent<ContextInvitation> 
+                <ListComponent<ContextInvitation>
                     ref={this.listRef}
                     fetchData={this.fetchInvitations}
                     renderItem={this.renderInvitation}
@@ -206,6 +206,6 @@ export default class ContextInvitationComponent extends React.Component<Props, S
                     {this.renderList()}
                     {this.renderInviteForm()}
                 </div>
-        
+
     }
 }

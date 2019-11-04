@@ -11,7 +11,7 @@ import { ToastManager } from './ToastManager';
 import { WindowAppManager } from './WindowAppManager';
 import { setLanguageAction } from '../redux/language';
 import { ThemeManager } from './ThemeManager';
-import { availableThemes } from '../redux/unreadNotifications';
+import { availableThemes } from '../redux/theme';
 import { ApiClient } from '../network/ApiClient';
 
 export const AuthenticationManagerAuthenticatedUserChangedNotification = "AuthenticationManagerAuthenticatedUserChangedNotification"

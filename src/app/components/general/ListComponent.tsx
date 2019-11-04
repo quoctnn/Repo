@@ -26,7 +26,7 @@ export const ListComponentHeader = (props:{title:React.ReactNode}) => {
 class ListComponentDivider extends React.Component{
     render() {
         return (
-            <div className="theme-box theme-bg-gradient list-divider"><hr/></div>
+            <div className="theme-box theme-box-background list-divider"><hr/></div>
         )
     }
 }
@@ -117,7 +117,7 @@ export default class ListComponent<T extends IdentifiableObject> extends React.C
         })
     }
     updateItems = (items:T[]) => {
-        this.setState((prevState:State<T>) => { 
+        this.setState((prevState:State<T>) => {
             const prevItems = [...prevState.items]
             items.forEach(i => {
                 const index = prevState.items.findIndex(t => t.id == i.id)
@@ -128,7 +128,7 @@ export default class ListComponent<T extends IdentifiableObject> extends React.C
         })
     }
     setItems = (items:T[]) => {
-        this.setState((prevState:State<T>) => { 
+        this.setState((prevState:State<T>) => {
             return {items}
         })
     }

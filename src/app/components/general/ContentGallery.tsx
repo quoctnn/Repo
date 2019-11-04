@@ -247,9 +247,9 @@ export default class ContentGallery extends React.Component<Props, State> {
     targetHeightForCount = (count:number) => {
         switch(count)
         {
-            case 1: return 300
-            case 2: return 250
-            case 3: return 200
+            case 1: return 450
+            case 2: return 350
+            case 3: return 250
             case 4: return 150;
             default: return 100;
         }
@@ -257,11 +257,11 @@ export default class ContentGallery extends React.Component<Props, State> {
     targetWidthForCount = (count:number) => {
         switch(count)
         {
-            case 1: return 400
-            case 2: return 500
-            case 3: return 600
-            case 4: return 700;
-            default: return 800;
+            case 1: return 500
+            case 2: return 600
+            case 3: return 700
+            case 4: return 800;
+            default: return 900;
         }
     }
     calculateSizes = (files:UploadedFile[]) => {

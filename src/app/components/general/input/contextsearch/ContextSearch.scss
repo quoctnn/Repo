@@ -26,7 +26,7 @@
             justify-content: center;
             padding: 12px;
             @include var(color, secondary-text-color);
-            font-size: 16px;
+            font-size: 1.15rem;
         }
         .list-item.section-title
         {
@@ -58,7 +58,7 @@
             {
                 display: flex;
                 align-items: center;
-                font-size: 16px;
+                font-size: 1.15rem;
                 min-height: 46px;
                 padding:0 12px;
                 > *:not(:first-child){
@@ -79,7 +79,7 @@
                 @include var(color, secondary-text-color);
                 border-radius: 4px;
                 line-height: 1.4em;
-                font-size: 12px;
+                font-size: 0.85rem;
             }
             .text-content
             {
@@ -88,7 +88,7 @@
             .text-sub-content
             {
                 flex-grow: 1;
-                font-size: 10px;
+                font-size: 0.7rem;
             }
             .has-subtitle .text-content
             {
