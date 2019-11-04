@@ -4,8 +4,11 @@
         text-decoration: none;
     }
     .task-list-item{
+        cursor: pointer;
         border-radius: 6px;
         .left{
+            display: flex;
+            align-items: center;
             .avatar{
                 .image-container{
                     box-shadow: none;
@@ -13,13 +16,22 @@
                     border-width: 2px !important;
                 }
             }
+            .mark{
+                margin-left: 0.25rem;
+            }
+        }
+        .center{
+            font-size: 0.8rem;
+            font-weight: normal;
         }
         .right{
             align-items: center;
             display: flex;
             .avatar-stacked{
-                margin-bottom: 0;
-                margin-top: 0;
+                margin: 0;
+            }
+            .v-bar{
+                @include var(background-color, primary-text-color);
             }
         }
         .header{

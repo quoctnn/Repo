@@ -5,7 +5,7 @@ import { GenericListItem } from '../../components/general/GenericListItem';
 import classnames from 'classnames';
 import Avatar from '../../components/general/Avatar';
 import { ProfileManager } from '../../managers/ProfileManager';
-import { Badge } from 'reactstrap';
+import { Badge, UncontrolledTooltip } from 'reactstrap';
 import { translate } from '../../localization/AutoIntlProvider';
 import StackedAvatars from '../../components/general/StackedAvatars';
 import { Mark } from '../../components/general/Mark';
@@ -37,19 +37,26 @@ export default class TaskListItem2 extends React.Component<Props, State> {
     renderRight = () => {
         const {task} = this.props
         const assignedTo = task.assigned_to || []
-        return <div className="d-flex align-items-center">
+        const showVbar = (task.priority || task.due_date) && assignedTo.length > 0
+        return <div className="d-flex align-items-center h-100">
                     <div className="d-flex flex-column small-text align-items-end">
                         {task.priority && <div className={"text-" + TaskPriority.colorForPriority(task.priority)}>{translate("task.priority." + task.priority)}</div>}
                         {task.due_date && <TimeComponent date={task.due_date}/>}
                     </div>
+                    {showVbar && <div className="v-bar mx-2" style={{ width: 1, height: "75%" }}></div>}
                     <StackedAvatars size={24} userIds={assignedTo} />
                 </div>
+    }
+    navigateToTask = () => {
+        window.app.navigateToRoute(this.props.task.uri)
     }
     render()
     {
         const {task, user} = this.props
-        const header = <><Mark size={8} className={"mr-1 bg-" + TaskState.colorForState(task.state)} />{task.title}</>
-        const footer = this.renderFooter()
+        const stateId = "tasklistitem_tooltip_state_" + task.id
+        const stateTooltip = <UncontrolledTooltip target={stateId}>{translate("task.state." + task.state)}</UncontrolledTooltip>
+        const header = task.title
+        const footer = null//this.renderFooter()
         const assignedTo = task.assigned_to || []
         const right = this.renderRight()
         const hasAssignees = assignedTo.length > 0
@@ -63,9 +70,13 @@ export default class TaskListItem2 extends React.Component<Props, State> {
             //"border-success": hasAssignees,
             "border-w0":!responsible
         })
-        const left = <Avatar size={40} image={profile && profile.avatar} containerClassName={avatarClass} />
+        const left = <>
+                    <Avatar size={40} image={profile && profile.avatar} containerClassName={avatarClass} />
+                    <Mark id={stateId} size={8} className={"bg-" + TaskState.colorForState(task.state)} />
+                    {stateTooltip}
+                    </>
         const cn = classnames("task-list-item main-content-secondary-background")
-        return <GenericListItem to={task.uri}
+        return <GenericListItem onClick={this.navigateToTask}
                 header={header}
                 footer={footer}
                 right={right}
