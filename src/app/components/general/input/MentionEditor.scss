@@ -4,7 +4,7 @@
     box-sizing: border-box;
     cursor: text;
     min-height: calc(2.25rem + 2px);
-    font-size: 1rem;
+    font-size: 0.9rem;
 }
 mention {
     color: #4a85bb;
@@ -29,7 +29,7 @@ mention {
   .mentionSuggestionsEntryContainer {
     display: table;
     width: 100%;
-    font-size: 1rem;
+    font-size: 0.9rem;
   }
 
   .mentionSuggestionsEntryContainerLeft,
@@ -67,7 +67,7 @@ mention {
   }
 
   .mentionSuggestionsEntryTitle {
-    font-size: 0.8rem;
+    font-size: 0.7rem;
     color: #a7a7a7;
   }
 

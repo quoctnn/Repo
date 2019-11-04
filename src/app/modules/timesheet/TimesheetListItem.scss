@@ -3,7 +3,7 @@
     text-decoration: none;
     @include var(color, primary-text-color);
     @include var(background-color, main-content-secondary-background);
-    font-size: 1rem;
+    font-size: 0.9rem;
     border-radius: 10px;
     height: 45px;
     &:hover{
@@ -36,6 +36,6 @@
         font-weight: 400;
     }
     .user{
-        font-size: 1.15rem;
+        font-size: 1rem;
     }
 }
