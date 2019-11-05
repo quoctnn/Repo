@@ -122,7 +122,6 @@ class ContactsGroup extends React.PureComponent<Props, State> {
 const mapStateToProps = (state:ReduxState, ownProps: OwnProps):ReduxStateProps =>
 {
     const authenticatedUser = state.authentication.profile
-    console.log("ownProps", ownProps)
     var contacts = (authenticatedUser &&
                       authenticatedUser.id &&
                       state.profileStore.allIds.map(id => state.profileStore.byId[id])

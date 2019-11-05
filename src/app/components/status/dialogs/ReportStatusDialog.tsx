@@ -21,7 +21,7 @@ type State =
     result: ReportResult
 }
 
-export default class ReportStatusDialog extends React.Component<Props, State> {  
+export default class ReportStatusDialog extends React.Component<Props, State> {
     constructor(props) {
         super(props);
         this.state = {
@@ -61,7 +61,7 @@ export default class ReportStatusDialog extends React.Component<Props, State> {
             return { value:value || [] }
         });
     }
-    tagTitleForKey = (key) => 
+    tagTitleForKey = (key) =>
     {
         let t = this.state.availableTags.find(t => t.value == key)
         if(t)
@@ -92,12 +92,12 @@ export default class ReportStatusDialog extends React.Component<Props, State> {
                         {translate("status.dialog.report.info")}
                     </p>
                     <div className="">
-                        <Select 
+                        <Select
                         styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
                         isMulti={true}
                         name="tags"
                         value={this.state.value}
-                        menuPortalTarget={document.body} 
+                        menuPortalTarget={document.body}
                         onChange={this.handleSelectChange}
                         placeholder={translate("status.dialog.report.placeholder")}
                         closeMenuOnSelect={false}
@@ -116,7 +116,7 @@ export default class ReportStatusDialog extends React.Component<Props, State> {
     }
     renderFooter = () => {
         if(this.state.result){
-                return (<button type="button" className="btn btn-default" onClick={this.props.didCancel}>
+                return (<button type="button" className="btn btn-info" onClick={this.props.didCancel}>
                             {translate("common.close")}
                         </button>)
         }
