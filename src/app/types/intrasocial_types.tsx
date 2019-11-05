@@ -4,6 +4,7 @@ import Constants from "../utilities/Constants";
 import { translate } from "../localization/AutoIntlProvider";
 import { userFullName, groupCover, communityCover, userCover, projectCover, eventCover } from '../utilities/Utilities';
 import { CommunityManager } from '../managers/CommunityManager';
+import { Settings } from '../utilities/Settings';
 export type CommunityRole = {
     community:number
     users:number[]
@@ -497,13 +498,15 @@ export namespace ContextNaturalKey {
         ContextNaturalKey.CONVERSATION
     ]
     export const getMembers = (key:ContextNaturalKey, contextObject:IdentifiableObject) => {
+        if (!key && !contextObject)
+            return []
         switch (key) {
             case ContextNaturalKey.EVENT: return (contextObject as Event).attending || []
             case ContextNaturalKey.GROUP: return (contextObject as Group).members || []
             case ContextNaturalKey.PROJECT: return (contextObject as Project).members || []
             case ContextNaturalKey.COMMUNITY: return (contextObject as Community).members || []
             default:
-                console.warn(`${key} has no 'members' field`, contextObject)
+                if (!Settings.isProduction) console.warn(`${key} has no 'members' field`, contextObject);
                 return []
         }
     }

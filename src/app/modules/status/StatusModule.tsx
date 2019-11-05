@@ -1,7 +1,7 @@
 import * as React from "react";
 import { connect } from 'react-redux'
 import "./StatusModule.scss"
-import {Status, StatusActions } from '../../types/intrasocial_types';
+import { Status, StatusActions, ContextNaturalKey } from '../../types/intrasocial_types';
 import { ReduxState } from "../../redux";
 import {ApiClient} from "../../network/ApiClient";
 import LoadingSpinner from "../../components/LoadingSpinner";
@@ -79,7 +79,7 @@ class StatusModule extends React.Component<Props, State>
     }
     renderStatus = () => {
         const {status} = this.state
-        return <NewsfeedComponentRouted rootStatus={status} highlightStatusId={this.props.statusId} />
+        return <NewsfeedComponentRouted rootStatus={status} highlightStatusId={this.props.statusId}/>
     }
     render() {
         const {isLoading, loadedStatusId: hasLoaded, status} = this.state

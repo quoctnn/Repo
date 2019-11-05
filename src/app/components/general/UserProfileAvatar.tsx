@@ -33,7 +33,7 @@ class UserProfileAvatar extends React.PureComponent<Props & React.HTMLAttributes
         super(props)
     }
     render() {
-        const {profileId, profile, forceUserStatus, children, ...rest} = this.props
+        const {authenticatedUser, dispatch, profileId, profile, forceUserStatus, children, ...rest} = this.props
         if (!profile) {
             return(<Avatar {... rest} image={null}>
                     {children}

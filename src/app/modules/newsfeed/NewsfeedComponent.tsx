@@ -1180,7 +1180,10 @@ export class NewsfeedComponent extends React.Component<Props, State> {
         let visibility = status && status.visibility || []
         if(visibility.length > 0)
             return visibility
-        visibility = ContextNaturalKey.getMembers(this.props.contextNaturalKey, this.props.contextObject)
+        if (status.context_natural_key && status.context_object)
+            visibility = ContextNaturalKey.getMembers(status.context_natural_key, status.context_object)
+        if (this.props.contextNaturalKey && this.props.contextObject)
+            visibility = ContextNaturalKey.getMembers(this.props.contextNaturalKey, this.props.contextObject)
         if(visibility.length > 0)
             return visibility
         return ProfileManager.getContactListIds(true)

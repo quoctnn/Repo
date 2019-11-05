@@ -32,7 +32,9 @@ export default class ActivityItem extends React.Component<Props, State> {
                      nextState.read != this.state.read
         return ret
     }
-    handleActivityClick = (event:React.SyntheticEvent<any>) => {
+    handleActivityClick = (event:React.MouseEvent) => {
+        if (event.nativeEvent.button == 2)
+            event.preventDefault()
         this.setState({seen:true, read:true})
         ApiClient.markActivitiesAsRead([this.props.activity.id], () => {}) // Ignore response for now
     }
@@ -50,7 +52,7 @@ export default class ActivityItem extends React.Component<Props, State> {
         if (!this.state.seen) cl = cl.concat(" unseen")
         const text = activity.display_text
         const profiles = this.fetchProfiles()
-        return (<Link onClick={this.handleActivityClick} to={activity.uri || "#"} {...rest} className={cl}>
+        return (<Link onClick={this.handleActivityClick} onContextMenuCapture={this.handleActivityClick} to={activity.uri || "#"} {...rest} className={cl}>
                     <div className="d-flex flex-row hover-card activity-content">
                         { profiles.length == 1 &&
                             <UserProfileAvatar size={40} profileId={profiles[0].id} borderColor="white" borderWidth={2}/>
