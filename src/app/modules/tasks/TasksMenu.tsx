@@ -10,6 +10,7 @@ import { ProjectProfileFilter } from "./ProjectProfileFilter";
 import { ProfileSelectorOption } from "../../components/general/input/SelectExtensions";
 import CollapseComponent from "../../components/general/CollapseComponent";
 import { AnimatedIconStack } from "../../components/general/AnimatedIconStack";
+import { AuthenticationManager } from "../../managers/AuthenticationManager";
 
 export type TasksMenuData = {
     project:ContextValue
@@ -113,6 +114,26 @@ export default class TaskMenu extends React.Component<Props, State> {
     getProfileFilterOption = (profile:UserProfile):ProfileSelectorOption => {
         return {value:profile.slug_name, label:userFullName(profile), id:profile.id, icon:userAvatar(profile, true)}
     }
+    toggleAssignedTo = () => {
+        this.setState((prevState:State) => {
+            const data = prevState.data
+            if(!!data.assignedTo)
+                data.assignedTo = null 
+            else 
+                data.assignedTo = AuthenticationManager.getAuthenticatedUser().id
+            return {data:data}
+        }, this.sendUpdate)
+    }
+    toggleResponsible = () => {
+        this.setState((prevState:State) => {
+            const data = prevState.data
+            if(!!data.responsible)
+                data.responsible = null 
+            else 
+                data.responsible = AuthenticationManager.getAuthenticatedUser().id
+            return {data:data}
+        }, this.sendUpdate)
+    }
     render() {
         const states:TaskState[] = TaskState.all
         const priorities:TaskPriority[] = TaskPriority.all
@@ -144,6 +165,13 @@ export default class TaskMenu extends React.Component<Props, State> {
                     <Label>{translate("task.module.menu.priority.title")}</Label>
                     <ButtonGroup className="flex-wrap d-block">
                         {priorities.map(p => <Button size="sm" color="secondary" outline={true} onClick={this.togglePriority(p)} key={p} active={this.priorityActive(p)}>{translate("task.priority." + p)}</Button>)}
+                    </ButtonGroup>
+                </FormGroup>
+                <FormGroup>
+                    <Label>{translate("task.module.menu.related_me.title")}</Label>
+                    <ButtonGroup className="flex-wrap d-block">
+                        <Button size="sm" color="secondary" outline={true} onClick={this.toggleAssignedTo} active={!!assignedTo}>{translate("task.assigned.me")}</Button>
+                        <Button size="sm" color="secondary" outline={true} onClick={this.toggleResponsible} active={!!responsible}>{translate("task.responsible.me")}</Button>
                     </ButtonGroup>
                 </FormGroup>
                 <div onClick={this.toggleSubMenu} className="collapse-trigger d-flex">
