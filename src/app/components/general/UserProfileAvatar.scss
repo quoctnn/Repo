@@ -1,9 +1,5 @@
 .avatar
 {
-    .image-container {
-        background-image: url("../../assets/default-user.png");
-        background-size: contain;
-    }
     .user-status-indicator
     {
         position: absolute;
@@ -12,4 +8,8 @@
         height: 30%;
         width: 30%;
     }
+}
+.user-profile-avatar .avatar .image-container {
+    background-image: url("../../assets/default-user.png");
+    background-size: contain;
 }

@@ -35,26 +35,32 @@ class UserProfileAvatar extends React.PureComponent<Props & React.HTMLAttributes
     render() {
         const {authenticatedUser, dispatch, profileId, profile, forceUserStatus, children, ...rest} = this.props
         if (!profile) {
-            return(<Avatar {... rest} image={null}>
-                    {children}
-                </Avatar>)
+            return(
+                <div className="user-profile-avatar">
+                    <Avatar {... rest} image={null}>
+                        {children}
+                    </Avatar>
+                </div>
+            )
         }
         const image = profile.avatar_thumbnail
         const statusColor = UserStatus.getObject(profile.user_status)
-        return(<>
-            { (this.props.authenticatedUser.id != profile.id || forceUserStatus) &&
-                <Avatar {... rest} image={image}>
-                    { children }
-                    { statusColor && statusColor.color != AvatarStatusColor.NONE &&
-                        <UserStatusIndicator borderColor="white" statusColor={statusColor.color} borderWidth={1}/>
-                    }
-                </Avatar>
-                ||
-                <Avatar {... rest} image={image}>
-                    {children}
-                </Avatar>
-            }
-        </>)
+        return(
+            <div className="user-profile-avatar">
+                { (this.props.authenticatedUser.id != profile.id || forceUserStatus) &&
+                    <Avatar {... rest} image={image}>
+                        { children }
+                        { statusColor && statusColor.color != AvatarStatusColor.NONE &&
+                            <UserStatusIndicator borderColor="white" statusColor={statusColor.color} borderWidth={1}/>
+                        }
+                    </Avatar>
+                    ||
+                    <Avatar {... rest} image={image}>
+                        {children}
+                    </Avatar>
+                }
+            </div>
+        )
     }
 }
 const mapStateToProps = (state: ReduxState, ownProps: OwnProps): ReduxStateProps => {

@@ -35,8 +35,8 @@ export class ConversationUtilities
     static getAvatar = (conversation: Conversation, me:number, showUserStatus:boolean, children?: React.ReactNode) => {
         let users = ProfileManager.getProfiles(conversation.users.filter(i => i != me).slice(0, ConversationUtilities.maxVisibleAvatars))
         const avatars = users.map(u => userAvatar( u )).filter(a => !nullOrUndefined(a))
-        if(showUserStatus && users.length == 1)
-            return <UserProfileAvatar profileId={users[0].id} size={ConversationUtilities.avatarSize} borderColor="white" borderWidth={2}>
+        if(showUserStatus && users.length <= 1)
+            return <UserProfileAvatar profileId={users[0] && users[0].id} size={ConversationUtilities.avatarSize} borderColor="white" borderWidth={2}>
                         {!!children && children
                             || conversation.unread_messages.length > 0 &&
                             <div className="notification-badge bg-success text-white text-truncate"><span>{conversation.unread_messages.length}</span></div>
