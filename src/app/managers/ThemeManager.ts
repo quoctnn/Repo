@@ -39,6 +39,9 @@ export abstract class ThemeManager
     }
     private static applyTheme = (themeIndex: number) => {
         let theme = availableThemes[themeIndex];
+        if (!theme) {
+            ThemeManager.setTheme(0);
+        }
         let selector = theme.selector;
         let root = document.querySelector(':root');
         if(root)

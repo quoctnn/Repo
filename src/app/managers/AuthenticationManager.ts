@@ -88,7 +88,7 @@ export abstract class AuthenticationManager
     }
     static saveProfileTheme = (index:number) => {
         const profile = AuthenticationManager.getAuthenticatedUser()
-        if (profile && !profile.is_anonymous && availableThemes[index].selector !== profile.theme) {
+        if (index && availableThemes[index] && profile && !profile.is_anonymous && availableThemes[index].selector !== profile.theme) {
             ApiClient.updateProfile({theme: availableThemes[index].selector}, () => {})
         }
     }
@@ -112,7 +112,7 @@ export abstract class AuthenticationManager
             {
                 updateLanguage = profile.locale
             }
-            if( profile.theme && ThemeManager.getCurrentTheme().selector != profile.theme)
+            if( ThemeManager.getCurrentTheme() && profile.theme && ThemeManager.getCurrentTheme().selector != profile.theme)
             {
                 ThemeManager.setTheme(profile.theme)
             }
