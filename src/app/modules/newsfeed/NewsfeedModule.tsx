@@ -60,7 +60,7 @@ interface State
 type Props = ReduxStateProps & OwnProps & DefaultProps & RouteComponentProps<any>
 
 class NewsfeedModule extends React.Component<Props, State> {
-    private scrollTrigger:number = 600;
+    private scrollTrigger:number = 300;
     private observers:EventSubscription[] = [];
     static defaultProps:DefaultProps = {
         includeSubContext:true
@@ -106,9 +106,9 @@ class NewsfeedModule extends React.Component<Props, State> {
         }
     }
     trackScrolling = () => {
-        if (this.state.scrolledDown && window.scrollY < this.scrollTrigger) {
+        if (this.state.scrolledDown && window.scrollY < (window.innerHeight + this.scrollTrigger)) {
             this.setState({scrolledDown:false})
-        } else if (!this.state.scrolledDown && window.scrollY >= this.scrollTrigger) {
+        } else if (!this.state.scrolledDown && window.scrollY >= (window.innerHeight + this.scrollTrigger)) {
             this.setState({scrolledDown:true})
         }
     }
@@ -254,7 +254,7 @@ class NewsfeedModule extends React.Component<Props, State> {
         const {breakpoint, history, match, location, staticContext, className, contextNaturalKey, contextObjectId, contextObject, includeSubContext, contextData, dispatch, ...rest} = this.props
         const headerClick = breakpoint < ResponsiveBreakpoint.standard ? this.headerClick : undefined
         const {contextTitle} = this.state
-        const scrollClassNames = classnames("btn btn-primary scroll-top-btn", {visible:this.state.scrolledDown})
+        const scrollClassNames = classnames("btn btn-themed scroll-top-btn", {visible:this.state.scrolledDown})
         const resolvedContextNaturalKey = this.state.contextNaturalKey || this.props.contextNaturalKey
         const resolvedContextObjectId =  this.state.contextObjectId || this.props.contextObjectId
         const disableContextSearch = !!contextNaturalKey && !!contextObjectId
@@ -280,7 +280,7 @@ class NewsfeedModule extends React.Component<Props, State> {
                             feedReloadContext={this.state.feedReloadContext}
                             scrollParent={window}
                             />
-                        <div className={scrollClassNames} onClick={this.scrollTop}>{translate("Scroll to top")}</div>
+                        <button className={scrollClassNames} onClick={this.scrollTop}><i className="fa fa-chevron-circle-up"></i> {translate("common.navigation.top")}</button>
                     </ModuleContent>
                     <ModuleFooter></ModuleFooter>
                     <ModuleMenu visible={this.state.menuVisible}>

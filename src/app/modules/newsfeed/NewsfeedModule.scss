@@ -1,3 +1,4 @@
+@import "../../Config.scss";
 $headerHeight:46px;
 $headerComposerHeight:56px;
 $headerComposerFullHeight:232px;
@@ -96,6 +97,19 @@ $headerComposerFullHeight:232px;
         align-self: center;
         bottom: 20px;
         visibility: hidden;
+        z-index: 65535;
+        border-radius: 24px;
     }
-
+    .scroll-top-btn.visible{
+        -webkit-animation: slide-in-overshoot 300ms linear;
+        animation: slide-in-overshoot 300ms linear;
+        will-change: animation;
+    }
+    @keyframes slide-in-overshoot {
+        0%   { transform: translateY(100px); }
+        70%  { transform: translateY(-20px); }
+        80%  { transform: translateY(-10px); }
+        90%  { transform: translateY(-5px); }
+        100% { transform: translateY(0); }
+    }
 }

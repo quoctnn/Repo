@@ -159,6 +159,18 @@ button{@include var(color, primary-text-color);}
 .btn-rounded{
     border-radius: 10em;
 }
+.btn-themed{
+    @include var(background-color, primary-theme-color);
+    @include var(border-color, primary-theme-color);
+    color: #FFFFFF;
+    &:hover{
+        color: #FFFFFF;
+        filter: brightness(90%);
+    }
+    &:focus{
+        box-shadow: unset;
+    }
+}
 .panel-rounded{
     border-radius: 0.25rem;
 }
