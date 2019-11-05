@@ -8,6 +8,9 @@ import { ProfileManager } from "../../managers/ProfileManager";
 import { userFullName, userAvatar } from '../../utilities/Utilities';
 import { ProjectProfileFilter } from "./ProjectProfileFilter";
 import { ProfileSelectorOption } from "../../components/general/input/SelectExtensions";
+import CollapseComponent from "../../components/general/CollapseComponent";
+import { AnimatedIconStack } from "../../components/general/AnimatedIconStack";
+import { AuthenticationManager } from "../../managers/AuthenticationManager";
 
 export type TasksMenuData = {
     project:ContextValue
@@ -30,13 +33,15 @@ type Props =
 }
 type State = {
     data:TasksMenuData
+    subMenuVisible:boolean
 }
 export default class TaskMenu extends React.Component<Props, State> {
     
     constructor(props:Props) {
         super(props);
         this.state = {
-            data:{...this.props.data}
+            data:{...this.props.data},
+            subMenuVisible:false
         }
     }
     componentDidUpdate = (prevProps:Props, prevState:State ) => {
@@ -78,7 +83,7 @@ export default class TaskMenu extends React.Component<Props, State> {
     }
     sendUpdate = () => {
         const {data} = this.state
-        this.props.onUpdate(data)
+        this.props.onUpdate({...data})
     }
     stateActive = (state:TaskState) => {
         return this.state.data.state.contains(state)
@@ -101,8 +106,33 @@ export default class TaskMenu extends React.Component<Props, State> {
         data.priority = arr
         this.setState({data}, this.sendUpdate)
     }
+    toggleSubMenu = () => {
+        this.setState((prevState:State) => {
+            return {subMenuVisible:!prevState.subMenuVisible}
+        })
+    }
     getProfileFilterOption = (profile:UserProfile):ProfileSelectorOption => {
         return {value:profile.slug_name, label:userFullName(profile), id:profile.id, icon:userAvatar(profile, true)}
+    }
+    toggleAssignedTo = () => {
+        this.setState((prevState:State) => {
+            const data = prevState.data
+            if(!!data.assignedTo)
+                data.assignedTo = null 
+            else 
+                data.assignedTo = AuthenticationManager.getAuthenticatedUser().id
+            return {data:data}
+        }, this.sendUpdate)
+    }
+    toggleResponsible = () => {
+        this.setState((prevState:State) => {
+            const data = prevState.data
+            if(!!data.responsible)
+                data.responsible = null 
+            else 
+                data.responsible = AuthenticationManager.getAuthenticatedUser().id
+            return {data:data}
+        }, this.sendUpdate)
     }
     render() {
         const states:TaskState[] = TaskState.all
@@ -128,28 +158,40 @@ export default class TaskMenu extends React.Component<Props, State> {
                 <FormGroup>
                     <Label>{translate("task.module.menu.state.title")}</Label>
                     <ButtonGroup className="flex-wrap d-block">
-                        {states.map(s => <Button color="light" onClick={this.toggleState(s)} key={s} active={this.stateActive(s)}>{translate("task.state." + s)}</Button>)}
+                        {states.map(s => <Button size="sm" color="secondary" outline={true} onClick={this.toggleState(s)} key={s} active={this.stateActive(s)}>{translate("task.state." + s)}</Button>)}
                     </ButtonGroup>
                 </FormGroup>
                 <FormGroup>
                     <Label>{translate("task.module.menu.priority.title")}</Label>
                     <ButtonGroup className="flex-wrap d-block">
-                        {priorities.map(p => <Button color="light" onClick={this.togglePriority(p)} key={p} active={this.priorityActive(p)}>{translate("task.priority." + p)}</Button>)}
+                        {priorities.map(p => <Button size="sm" color="secondary" outline={true} onClick={this.togglePriority(p)} key={p} active={this.priorityActive(p)}>{translate("task.priority." + p)}</Button>)}
                     </ButtonGroup>
                 </FormGroup>
                 <FormGroup>
-                    <Label>{translate("task.module.menu.assigned_to.title")}</Label>
-                    <ProjectProfileFilter projectMembers={this.props.projectMembers} value={assignedToValue} onValueChange={this.onAssignedChange} />
+                    <Label>{translate("task.module.menu.related_me.title")}</Label>
+                    <ButtonGroup className="flex-wrap d-block">
+                        <Button size="sm" color="secondary" outline={true} onClick={this.toggleAssignedTo} active={!!assignedTo}>{translate("task.assigned.me")}</Button>
+                        <Button size="sm" color="secondary" outline={true} onClick={this.toggleResponsible} active={!!responsible}>{translate("task.responsible.me")}</Button>
+                    </ButtonGroup>
                 </FormGroup>
-                <FormGroup>
-                    <Label>{translate("task.module.menu.responsible.title")}</Label>
-                    <ProjectProfileFilter projectMembers={this.props.projectMembers} value={responsibleValue} onValueChange={this.onResponsibleChange} />
-                </FormGroup>
-                <FormGroup>
-                    <Label>{translate("task.module.menu.creator.title")}</Label>
-                    <ProjectProfileFilter projectMembers={this.props.projectMembers} value={creatorValue} onValueChange={this.onCreatorChange} />
-                </FormGroup>
-                
+                <div onClick={this.toggleSubMenu} className="collapse-trigger d-flex">
+                    <div>{translate("task.menu.secondary.filters.title")}</div>                            
+                    <AnimatedIconStack iconA="fas fa-chevron-down" iconB="fas fa-chevron-down" active={this.state.subMenuVisible} />
+                </div>
+                <CollapseComponent visible={this.state.subMenuVisible}>
+                    <FormGroup>
+                        <Label>{translate("task.module.menu.assigned_to.title")}</Label>
+                        <ProjectProfileFilter projectMembers={this.props.projectMembers} value={assignedToValue} onValueChange={this.onAssignedChange} />
+                    </FormGroup>
+                    <FormGroup>
+                        <Label>{translate("task.module.menu.responsible.title")}</Label>
+                        <ProjectProfileFilter projectMembers={this.props.projectMembers} value={responsibleValue} onValueChange={this.onResponsibleChange} />
+                    </FormGroup>
+                    <FormGroup>
+                        <Label>{translate("task.module.menu.creator.title")}</Label>
+                        <ProjectProfileFilter projectMembers={this.props.projectMembers} value={creatorValue} onValueChange={this.onCreatorChange} />
+                    </FormGroup>
+                </CollapseComponent>
             </div>
         );
     }

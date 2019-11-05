@@ -76,7 +76,10 @@ class TasksModule extends React.Component<Props, State> {
         this.setState({ isLoading })
     }
     menuDataUpdated = (data: TasksMenuData) => {
-        this.tempMenuData = data
+        //this.tempMenuData = data
+        this.setState((prevState:State) => {
+            return {menuData:data}
+        })
     }
     contextDataChanged = (prevData: TasksMenuData, prevProps: Props) => {
         const data = this.state.menuData
@@ -218,7 +221,13 @@ class TasksModule extends React.Component<Props, State> {
         </div>
     }
     renderContent = () => {
-        return <ListComponent<Task>
+
+        const disableContextSearch = !!this.props.contextNaturalKey
+        const project = this.props.contextData.project
+        const projectMembers = project.members || []
+        return <>
+            <TaskMenu projectMembers={projectMembers} data={this.state.menuData} onUpdate={this.menuDataUpdated} disableContextSearch={disableContextSearch} />
+             <ListComponent<Task>
             loadMoreOnScroll={!this.props.showLoadMore}
             ref={this.taskList}
             onLoadingStateChanged={this.feedLoadingStateChanged}
@@ -228,6 +237,7 @@ class TasksModule extends React.Component<Props, State> {
             className="tasks-list"
             groupField={nameOf("category")}
             />
+            </>
     }
     onMenuToggle = (visible: boolean) => {
         const newState: Partial<State> = {}
@@ -276,11 +286,7 @@ class TasksModule extends React.Component<Props, State> {
         const { history, match, location, staticContext, contextNaturalKey, pageSize, showLoadMore, showInModal, isModal, contextData, ...rest } = this.props
         const { breakpoint, className } = this.props
         const cn = classnames("tasks-module", className)
-        const disableContextSearch = !!contextNaturalKey
-        const project = this.props.contextData.project
-        const projectMembers = project.members || []
-        const menu = <TaskMenu projectMembers={projectMembers} data={this.state.menuData} onUpdate={this.menuDataUpdated} disableContextSearch={disableContextSearch} />
-        const headerContent = this.renderFilters()
+        //const headerContent = this.renderFilters()
         const renderModalContent = !showInModal || isModal ? undefined : this.renderModalContent
         return (<SimpleModule {...rest}
             className={cn}
@@ -288,8 +294,8 @@ class TasksModule extends React.Component<Props, State> {
             breakpoint={breakpoint}
             isLoading={this.state.isLoading}
             onMenuToggle={this.onMenuToggle}
-            menu={menu}
-            headerContent={headerContent}
+            //menu={menu}
+            //headerContent={headerContent}
             showHeaderTitle={!isModal}
             renderModalContent={renderModalContent}
             headerTitle={translate("task.module.title")}>

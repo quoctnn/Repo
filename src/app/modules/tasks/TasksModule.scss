@@ -6,10 +6,18 @@
     .module-header-title-left{
         min-width: 100px;
     }
+    .tasks-menu{
+        padding: 8px;
+    }
     .tasks-list{
         padding: 8px;
         > .generic-list-item{
             margin-bottom: 8px;
         }
+    }
+    .collapse-trigger{
+        cursor: pointer;
+        align-items: center;
+        justify-content: space-between;
     }
 }
