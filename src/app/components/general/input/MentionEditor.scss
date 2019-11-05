@@ -89,7 +89,7 @@ mention {
 .emoji-picker-container {
   position: absolute;
   right: -12px;
-  z-index: 20000;
+  z-index: 1000;
   .emoji-picker .emoji{
     box-sizing: initial;
   }
@@ -99,17 +99,17 @@ mention {
 }
 .context-positioning-element
 {
-    z-index: 2000;
+    z-index: 1000;
 }
 .modal-open
 {
   .context-positioning-element
   {
-      z-index: 20000;
+      z-index: 1010;
   }
   .emoji-backdrop
   {
-      z-index: 1999;
+      z-index: 1011;
   }
 }
 .emojiButton

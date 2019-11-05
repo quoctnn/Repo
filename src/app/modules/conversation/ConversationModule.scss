@@ -219,7 +219,7 @@
             right: 0px;
             bottom: 0px;
             opacity: 0.5;
-            @include var(background, highlight-foreground-color);
+            @include var(background-color, highlight-foreground-color);
             transition: all 0.1s ease;
             pointer-events: none;
             display: flex;
