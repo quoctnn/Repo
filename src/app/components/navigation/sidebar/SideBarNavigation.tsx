@@ -1,25 +1,25 @@
 import "./SideBarNavigation.scss";
 import { withRouter, RouteComponentProps } from 'react-router';
 import * as React from "react";
-import { ContextDataProps, withContextData } from '../../../hoc/WithContextData';
 import classnames from 'classnames';
 import { uniqueId } from '../../../utilities/Utilities';
 import SideBarItem from "./SideBarItem";
-import SideBarSettingsItem from "./SideBarSettingsItem";
+import SideBarSettingsItem from "./contentItems/SideBarSettingsItem";
 import SideBarContent from "./SideBarContent";
 import Avatar from '../../general/Avatar';
 import { ReduxState } from "../../../redux";
 import { CommunityManager } from '../../../managers/CommunityManager';
 import { Community } from '../../../types/intrasocial_types';
 import { connect } from 'react-redux';
+import { ContextMenuItem, MenuItem } from '../../../types/menuItem';
 
 type State = {
     active: string
-    menuItems: string[]
+    menuItems: MenuItem[] | ContextMenuItem[]
 }
 
 type ReduxStateProps = {
-    activeCommunity:Community
+    activeCommunity: Community
 }
 
 type OwnProps = {
@@ -57,9 +57,9 @@ class SideBarNavigation extends React.PureComponent<Props, State> {
         }
     }
 
-    addItem = (index: string) => {
+    addItem = (item: MenuItem | ContextMenuItem) => {
         var currentItems = this.state.menuItems
-        currentItems.push(index)
+        currentItems.push(item)
         this.setState({ menuItems: currentItems })
     }
     render() {

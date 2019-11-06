@@ -1,25 +1,32 @@
 import * as React from "react";
-import { ContextDataProps, withContextData } from '../../../hoc/WithContextData';
+import { ContextDataProps, withContextData } from '../../../../hoc/WithContextData';
 import { RouteComponentProps, withRouter } from 'react-router';
 import classnames from 'classnames';
-import { MenuItem } from '../../../types/menuItem';
+import { translate } from '../../../../localization/AutoIntlProvider';
+import { MenuItem } from '../../../../types/menuItem';
+import { DropDownMenu } from "../../../general/DropDownMenu";
+import { ReduxState } from "../../../../redux";
+import { connect } from 'react-redux';
+import { availableThemes } from '../../../../redux/theme';
+import { ThemeManager } from '../../../../managers/ThemeManager';
+import ThemeSelector from "./ThemeSelector";
 type State = {
-    menuItem: MenuItem
+    menuItem:MenuItem
 }
 
-type Props = {
-    title:string
+type OwnProps = {
     index:string
     active:string
     addMenuItem:(item:MenuItem) => void // This should be a menuItem
     onClick:(e:React.MouseEvent) => void
-} & ContextDataProps & RouteComponentProps<any>
+}
+type Props = OwnProps
 
-class SideBarItem extends React.Component<Props, State> {
-    constructor(props: Props) {
+export default class SideBarSettingsItem extends React.Component<Props, State> {
+    constructor(props) {
         super(props)
         this.state = {
-            menuItem: undefined
+            menuItem:undefined
         }
     }
 
@@ -27,10 +34,10 @@ class SideBarItem extends React.Component<Props, State> {
         if (this.props.index) {
             const menuItem:MenuItem = {
                 index: this.props.index,
-                title: this.props.title || "No title",
-                subtitle: undefined,
+                title: "Settings",
+                subtitle: "Global user settings",
                 buttons: [],
-                children: []
+                children: this.getChildren()
             }
             this.props.addMenuItem(menuItem)
             this.setState({menuItem: menuItem})
@@ -44,6 +51,11 @@ class SideBarItem extends React.Component<Props, State> {
         return this.props.active != nextProps.active
     }
 
+    getChildren = () => {
+        return [
+            <ThemeSelector/>
+        ]
+    }
     render = () => {
         const active = this.props.active == this.props.index
         const css = classnames("sidebar-item", {active: active})
@@ -51,10 +63,9 @@ class SideBarItem extends React.Component<Props, State> {
         return (
             <div id={this.props.index} className={css} onClick={this.props.onClick}>
                 <i className={iconCss}></i>
-                {this.props.title}
+                {translate("sidebar.settings.title")}
             </div>
         )
     }
 }
 
-export default withContextData(withRouter(SideBarItem))

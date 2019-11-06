@@ -7,8 +7,8 @@
     min-width: 300px;
     // max-width: 500px;
     top: calc(#{$topMenuHeight} + 15px);
-    left: calc(#{$sideBarWidth} - 34px);
-    padding-left: 34px;
+    left: calc(#{$sideBarWidth} - 2rem);
+    padding-left: 2.1rem;
     border-top-right-radius: 8px;
     position: fixed;
     display: flex;

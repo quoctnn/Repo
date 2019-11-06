@@ -3,12 +3,12 @@ import "./SideBarContent.scss";
 import { ContextDataProps, withContextData } from '../../../hoc/WithContextData';
 import { RouteComponentProps, withRouter } from 'react-router';
 import classnames from 'classnames';
-import { translate } from '../../../localization/AutoIntlProvider';
+import { ContextMenuItem, MenuItem } from '../../../types/menuItem';
 type State = {
 }
 
 type Props = {
-    menuItems:string[]
+    menuItems: MenuItem[] | ContextMenuItem[]
     active:string
 } & ContextDataProps & RouteComponentProps<any>
 
@@ -25,18 +25,20 @@ class SideBarContent extends React.PureComponent<Props, State> {
     componentDidUpdate = (prevProps: Props, prevState: State) => {
     }
     render = () => {
-        console.log(this.props.active)
+        const menuItem = this.props.menuItems.find(item => item.index == this.props.active)
         const animation = this.props.active !== undefined ? "animate-open" : "animate-close"
         const cn = classnames("col-3 sidebar-content", animation)
         return(
             <div className={cn}>
                 <div className="sidebar-content-header">
                     <div className="sidebar-title">
-                        {this.props.active}
+                        {menuItem && menuItem.title}
                     </div>
                 </div>
                 <div className="sidebar-content-list">
-                    LIST
+                    {menuItem &&
+                        menuItem.children.map((item) => {return item})
+                    }
                 </div>
             </div>
         )
