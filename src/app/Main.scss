@@ -332,15 +332,9 @@ body[class*="has-side-menu-"]{
     @media (min-width: 640px){
         .page
         {
-            margin-left: $sideMenuInactiveWidth;
+            margin-left: $sideBarWidth;
             margin-top: 15px;
             margin-bottom: 15px;
-        }
-        &.side-menu-locked{
-            .page
-            {
-                margin-left: $sideMenuActiveWidth;
-            }
         }
     }
 }

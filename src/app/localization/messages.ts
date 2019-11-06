@@ -618,6 +618,7 @@ var translations = {
     "common.group":"Group",
     "project.is_private.title":"Private",
     "project.is_private.description":"Set as private",
+    "sidebar.settings.title": "Settings",
   },
   no: {
     "search.placeholder": "Søk ...",
@@ -1238,6 +1239,7 @@ var translations = {
     "common.group":"Gruppe",
     "project.is_private.title":"Privat",
     "project.is_private.description":"Sett som privat",
+    "sidebar.settings.title": "Innstillinger",
 },
   en: {
     "search.placeholder": "Search ...",
@@ -1869,6 +1871,7 @@ var translations = {
     "common.group":"Group",
     "project.is_private.title":"Private",
     "project.is_private.description":"Set as private",
+    "sidebar.settings.title": "Settings",
   }
 };
 

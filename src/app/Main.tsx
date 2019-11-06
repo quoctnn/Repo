@@ -27,7 +27,6 @@ import { Changelog } from './components/Changelog';
 import SimpleDialog from "./components/general/dialogs/SimpleDialog";
 import { translate } from "./localization/AutoIntlProvider";
 import TopNavigation from "./components/navigation/TopNavigation";
-import SideMenuNavigation from "./components/navigation/SideMenuNavigation";
 import { DndProvider } from 'react-dnd'
 import HTML5Backend from 'react-dnd-html5-backend'
 import FilesPage from "./components/pages/FilesPage";
@@ -40,6 +39,7 @@ import {  ContextDataResolver } from "./hoc/WithContextData";
 import * as H from 'history';
 import "./Main.scss"
 import "./Overrides.scss"
+import SideBarNavigation from "./components/navigation/sidebar/SideBarNavigation";
 
 type PathLoaderProps = {
 
@@ -148,7 +148,7 @@ class Main extends React.Component<Props, State> {
                                 <ContextDataResolver /*key={currentLocation.key}*/ location={currentLocation}>
                                     <DndProvider backend={HTML5Backend}>
                                         <TopNavigation />
-                                        <SideMenuNavigation />
+                                        <SideBarNavigation />
                                         <Switch location={currentLocation}>
                                             {userIsAdmin &&
                                                 <Route path={Routes.ADMIN_DASHBOARD_BUILDER.path} component={DashboardBuilderPage} />

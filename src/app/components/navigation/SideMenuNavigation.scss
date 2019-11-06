@@ -1,6 +1,8 @@
 @import "../../Config";
 $rowHeight:49px;
 $gridItemHeight:70px;
+$sideMenuInactiveWidth:60px;
+$sideMenuActiveWidth:280px;
 #side-menu-navigation
 {
     cursor: pointer;
