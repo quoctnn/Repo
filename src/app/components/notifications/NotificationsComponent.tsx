@@ -28,6 +28,7 @@ type NotificationGroupObject = {
 type State = {
     notifications:NotificationGroupObject[]
     open:{[key:string]:boolean}
+    lastNotificationCount:number
 }
 type ReduxStateProps = {
     authenticatedUser:UserProfile
@@ -43,7 +44,8 @@ class NotificationsComponent extends React.Component<Props, State> {
         super(props)
         this.state = {
             notifications:[],
-            open:{}
+            open:{},
+            lastNotificationCount:0
         }
     }
     componentDidMount = () => {
@@ -55,22 +57,23 @@ class NotificationsComponent extends React.Component<Props, State> {
     componentDidUpdate = (prevProps:Props) => {
         if(this.preventNextReload)
         {
-            this.preventNextReload = false 
+            this.preventNextReload = false
             return
         }
         const currentCount = this.state.notifications.reduce((a, b) => a += b.values.length , 0)
-        if(this.props.unreadNotifications != currentCount)
+        if(this.props.unreadNotifications != currentCount && this.state.lastNotificationCount != currentCount)
         {
-            this.reloadNotifications()
+            console.log("currentCount mismatch")
+            this.reloadNotifications(currentCount)
         }
     }
-    reloadNotifications = () => {
+    reloadNotifications = (lastCount?:number) => {
         ApiClient.getNotifications((notifications, status, error) => {
             if(!!notifications)
             {
                 const list = this.groupNotifications(notifications)
                 this.setState((prevState:State) => {
-                    return {notifications:list}
+                    return {notifications:list, lastNotificationCount:lastCount}
                 })
             }
             ToastManager.showRequestErrorToast(error, lazyTranslate("notification.error.fetching"))
@@ -131,15 +134,15 @@ class NotificationsComponent extends React.Component<Props, State> {
         let open = this.state.open[object.key]
         if(nullOrUndefined(open) && this.collapsibleDefaultOpen)
             open = true
-        return <NotificationGroup 
+        return <NotificationGroup
                     iconClassName={object.iconClassName}
-                    authenticatedUser={this.props.authenticatedUser} 
-                    onNotificationCompleted={this.handleNotificationCompleted} 
-                    key={object.key} 
-                    open={open} 
+                    authenticatedUser={this.props.authenticatedUser}
+                    onNotificationCompleted={this.handleNotificationCompleted}
+                    key={object.key}
+                    open={open}
                     onClose={this.props.onClose}
-                    toggleCollapse={this.toggleCollapseIndividualOpen(object.key)} 
-                    title={object.key} 
+                    toggleCollapse={this.toggleCollapseIndividualOpen(object.key)}
+                    title={object.key}
                     values={object.values}
                     actions={object.actions} />
     }
@@ -162,10 +165,11 @@ class NotificationsComponent extends React.Component<Props, State> {
         const reminders:NotificationObject[] = []
         const requestsAndInvitations:NotificationObject[] = []
         const activity:NotificationObject[] = []
+        const review:NotificationObject[] = []
         const reports:NotificationObject[] = []
 
         const keys = Object.keys( notifications ) as NotificationGroupKey[]
-        
+
         keys.forEach(k => {
             const values:NotificationObject[] = notifications[k]
             values.forEach(v => v.type = k)
@@ -190,6 +194,11 @@ class NotificationsComponent extends React.Component<Props, State> {
                 case NotificationGroupKey.UNREAD_CONVERSATIONS:
                     activity.push(...values)
                     break;
+                case NotificationGroupKey.GROUP_UNDER_REVIEW:
+                case NotificationGroupKey.EVENT_UNDER_REVIEW:
+                case NotificationGroupKey.PROJECT_UNDER_REVIEW:
+                    review.push(... values)
+                    break;
                 case NotificationGroupKey.REPORTED_CONTENT:
                     reports.push(...values)
                     break;
@@ -203,8 +212,8 @@ class NotificationsComponent extends React.Component<Props, State> {
         if(activity.length > 0)
         {
             list.push({
-                key:translate("notification.group.activity"), 
-                values:activity.sort(this.sortDateDescending), 
+                key:translate("notification.group.activity"),
+                values:activity.sort(this.sortDateDescending),
                 iconClassName:"far fa-bell",
                 actions:[{
                         title:translate("notification.read_all"),
@@ -212,9 +221,11 @@ class NotificationsComponent extends React.Component<Props, State> {
                     }]
             })
         }
+        if(review.length > 0)
+            list.push({key:translate("notification.group.reviews"), values:review.sort(this.sortDateDescending), iconClassName:"far fa-flag"})
         if(reports.length > 0)
             list.push({key:translate("notification.group.reports"), values:reports.sort(this.sortDateDescending), iconClassName:"far fa-flag"})
-        return list 
+        return list
     }
     render() {
         const cn = classnames("notifications");

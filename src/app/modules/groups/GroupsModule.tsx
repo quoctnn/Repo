@@ -5,21 +5,19 @@ import "./GroupsModule.scss"
 import { ResponsiveBreakpoint } from '../../components/general/observers/ResponsiveComponent';
 import { translate } from '../../localization/AutoIntlProvider';
 import CircularLoadingSpinner from '../../components/general/CircularLoadingSpinner';
-import { ContextNaturalKey, Group, Community, GroupSorting } from '../../types/intrasocial_types';
+import { Group, GroupSorting } from '../../types/intrasocial_types';
 import GroupsMenu, { GroupsMenuData } from './GroupsMenu';
 import ListComponent from '../../components/general/ListComponent';
 import {ApiClient,  PaginationResult } from '../../network/ApiClient';
 import { ToastManager } from '../../managers/ToastManager';
-import { connect } from 'react-redux';
-import { ReduxState } from '../../redux';
 import GroupListItem from './GroupListItem';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import SimpleModule from '../SimpleModule';
-import { ContextManager } from '../../managers/ContextManager';
 import { CommonModuleProps } from '../Module';
 import SimpleGroupListItem from './SimpleGroupListItem';
 import { DropDownMenu } from '../../components/general/DropDownMenu';
 import { OverflowMenuItem, OverflowMenuItemType } from '../../components/general/OverflowMenu';
+import { withContextData, ContextDataProps } from '../../hoc/WithContextData';
 export enum GroupsRenderMode {
     simple, normal
 }
@@ -38,13 +36,7 @@ type State = {
     isLoading:boolean
     menuData:GroupsMenuData
 }
-type ReduxStateProps = {
-    community: Community
-    group: Group
-}
-type ReduxDispatchProps = {
-}
-type Props = OwnProps & RouteComponentProps<any> & ReduxStateProps & ReduxDispatchProps & DefaultProps
+type Props = OwnProps & RouteComponentProps<any> & ContextDataProps & DefaultProps
 class GroupsModule extends React.Component<Props, State> {
     tempMenuData:GroupsMenuData = null
     groupsList = React.createRef<ListComponent<Group>>()
@@ -71,7 +63,8 @@ class GroupsModule extends React.Component<Props, State> {
         this.groupsList = null
     }
     shouldReloadList = (prevProps:Props) => {
-        return !this.props.excludeCommunityFilter && this.props.community && prevProps.community && this.props.community.id != prevProps.community.id
+        
+        return !this.props.excludeCommunityFilter && this.props.contextData.community && prevProps.contextData.community && this.props.contextData.community.id != prevProps.contextData.community.id
     }
     componentDidUpdate = (prevProps:Props, prevState:State) => {
         if(this.shouldReloadList(prevProps) || this.contextDataChanged(prevState.menuData, prevProps))
@@ -103,9 +96,10 @@ class GroupsModule extends React.Component<Props, State> {
         return prevData.sorting != data.sorting
     }
     fetchGroups = (offset:number, completion:(items:PaginationResult<Group>) => void ) => {
+        const {community, group} = this.props.contextData
         let ordering = this.state.menuData.sorting
-        const communityId = this.props.excludeCommunityFilter ? null : this.props.community && this.props.community.id
-        const groupId = this.props.group && this.props.group.id
+        const communityId = this.props.excludeCommunityFilter ? null : community && community.id
+        const groupId = group && group.id
         ApiClient.getGroups(communityId, groupId, this.props.pageSize, offset, ordering, (data, status, error) => {
             completion(data)
             ToastManager.showRequestErrorToast(error)
@@ -117,7 +111,8 @@ class GroupsModule extends React.Component<Props, State> {
         return <GroupListItem key={group.id} group={group} />
     }
     renderContent = () => {
-        if(this.props.excludeCommunityFilter || this.props.community)
+        const {community} = this.props.contextData
+        if(this.props.excludeCommunityFilter || community)
             return <ListComponent<Group> allowDivider={this.props.allowListDivider} loadMoreOnScroll={!this.props.showLoadMore} ref={this.groupsList} onLoadingStateChanged={this.feedLoadingStateChanged} fetchData={this.fetchGroups} renderItem={this.renderGroup} />
         return <LoadingSpinner key="loading"/>
     }
@@ -155,7 +150,8 @@ class GroupsModule extends React.Component<Props, State> {
     }
     render()
     {
-        const {history, match, location, staticContext, contextNaturalKey, community, pageSize, showLoadMore, showInModal, isModal, showHeader, sorting, renderMode, excludeCommunityFilter, allowListDivider,  ...rest} = this.props
+        const {history, match, location, staticContext, contextNaturalKey, pageSize, showLoadMore, showInModal, isModal, showHeader, sorting, renderMode, excludeCommunityFilter, allowListDivider,  ...rest} = this.props
+        const {group} = this.props.contextData
         const {breakpoint, className} = this.props
         const cn = classnames("groups-module", className)
         const menu = <GroupsMenu data={this.state.menuData} onUpdate={this.menuDataUpdated}  />
@@ -172,22 +168,9 @@ class GroupsModule extends React.Component<Props, State> {
                     onMenuToggle={this.onMenuToggle}
                     menu={menu}
                     headerContent={headerContent}
-                    headerTitle={this.props.group ? translate("groups.module.subgroups") : translate("groups.module.title")}>
+                    headerTitle={group ? translate("groups.module.subgroups") : translate("groups.module.title")}>
                 {this.renderContent()}
                 </SimpleModule>)
     }
 }
-const mapStateToProps = (state:ReduxState, ownProps: OwnProps & RouteComponentProps<any>):ReduxStateProps => {
-
-    const community = ContextManager.getContextObject(ownProps.location.pathname, ContextNaturalKey.COMMUNITY) as Community
-    const group = ContextManager.getContextObject(ownProps.location.pathname, ContextNaturalKey.GROUP) as Group
-    return {
-        community,
-        group
-    }
-}
-const mapDispatchToProps = (dispatch:ReduxState, ownProps: OwnProps):ReduxDispatchProps => {
-    return {
-    }
-}
-export default withRouter(connect<ReduxStateProps, ReduxDispatchProps, OwnProps>(mapStateToProps, mapDispatchToProps)(GroupsModule))
+export default withContextData(withRouter(GroupsModule))

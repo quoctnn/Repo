@@ -5,13 +5,12 @@ import "./ConversationModule.scss"
 import { ResponsiveBreakpoint } from '../../components/general/observers/ResponsiveComponent';
 import { translate, lazyTranslate } from '../../localization/AutoIntlProvider';
 import CircularLoadingSpinner from '../../components/general/CircularLoadingSpinner';
-import { ContextNaturalKey, Conversation, Message, UserProfile, UploadedFileType, UploadedFile } from '../../types/intrasocial_types';
+import { Conversation, Message, UserProfile, UploadedFileType, UploadedFile } from '../../types/intrasocial_types';
 import {ApiClient, PaginationResult } from '../../network/ApiClient';
 import { ToastManager } from '../../managers/ToastManager';
 import { connect } from 'react-redux';
 import { ReduxState } from '../../redux';
 import SimpleModule from '../SimpleModule';
-import { ContextManager } from '../../managers/ContextManager';
 import { ChatMessageList } from './ChatMessageList';
 import Avatar from '../../components/general/Avatar';
 import { AuthenticationManager } from '../../managers/AuthenticationManager';
@@ -179,7 +178,7 @@ class ConversationModule extends React.Component<Props, State> {
     componentDidMount = () => {
         const obs1 = NotificationCenter.addObserver("eventstream_" + EventStreamMessageType.CONVERSATION_TYPING, this.isTypingHandler)
         this.observers.push(obs1)
-        const obs2 = NotificationCenter.addObserver("eventstream_" + EventStreamMessageType.CONVERSATION_MESSAGE, this.incomingMessageHandler)
+        const obs2 = NotificationCenter.addObserver("eventstream_" + EventStreamMessageType.CONVERSATION_MESSAGE_NEW, this.incomingMessageHandler)
         this.observers.push(obs2)
         if(this.props.conversation)
         {
@@ -215,10 +214,9 @@ class ConversationModule extends React.Component<Props, State> {
         }
         if(this.props.location.pathname != prevProps.location.pathname && this.messageComposer && this.messageComposer.current)
         {
-            this.messageComposer.current.clearEditorContent()
             this.setState((prevState:State) => {
                 return {files:[], uploading:false, showDropzone:false}
-            })
+            },this.messageComposer.current.clearEditorContent)
         }
         NavigationUtilities.protectNavigation(this.protectKey, this.state.files.length > 0)
     }
@@ -408,7 +406,7 @@ class ConversationModule extends React.Component<Props, State> {
             completion([])
             return
         }
-        ProfileManager.searchProfilesInContext({search, taggableMembers:this.props.conversation.users, completion:(profiles) => {
+        ProfileManager.searchProfilesInMembers({search, taggableMembers:this.props.conversation.users, completion:(profiles) => {
             completion(profiles.map(u => Mention.fromUser(u)))
         }})
     }
@@ -755,11 +753,11 @@ class ConversationModule extends React.Component<Props, State> {
 }
 const mapStateToProps = (state:ReduxState, ownProps: OwnProps & RouteComponentProps<any>):ReduxStateProps => {
 
-    const conversation = ContextManager.getContextObject(ownProps.location.pathname, ContextNaturalKey.CONVERSATION) as Conversation || state.tempCache.conversation
-    const authenticatedUser = AuthenticationManager.getAuthenticatedUser()
-    const queuedMessages = (!!conversation && ConversationManager.getQueuedMessages(conversation.id)) || []
     const conversationId:string = ownProps.match.params.conversationId
     const createNewConversation = conversationId == tempConversationId
+    const conversation = createNewConversation ? state.tempCache.conversation : ConversationManager.getConversation(conversationId)
+    const authenticatedUser = AuthenticationManager.getAuthenticatedUser()
+    const queuedMessages = (!!conversation && ConversationManager.getQueuedMessages(conversation.id)) || []
     return {
         conversation,
         authenticatedUser,

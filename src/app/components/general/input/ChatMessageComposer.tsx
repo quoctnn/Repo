@@ -212,7 +212,7 @@ export class ChatMessageComposer extends React.Component<Props,State> {
         }
     }
     clearEditorContent = () => {
-        const editorState = EditorState.push(this.state.editorState, ContentState.createFromText(''), "change-block-data");
+        const editorState = EditorState.push(this.state.editorState, ContentState.createFromText(''), null);
         this.setState(() => {
             return { editorState, plainText:"" }
         })
@@ -333,7 +333,8 @@ export class ChatMessageComposer extends React.Component<Props,State> {
                 <form className="clearfix" action="." onSubmit={this.handleSubmit}>
                     <div className="input-group">
                         <div className="input-wrap"
-                            onFocus={this.fixFocusInput}>
+                            //onFocus={this.fixFocusInput}
+                            >
                             <MentionEditor
                                 onHandleUploadClick={this.props.onHandleUploadClick}
                                 filesAdded={this.props.filesAdded}

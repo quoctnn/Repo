@@ -1,12 +1,11 @@
 import * as React from 'react';
 import { FormComponentBase, FormComponentErrorMessage, FormComponentRequiredMessage } from '../FormController';
-import { InputGroup, Input, InputGroupAddon, InputGroupText, Label } from 'reactstrap';
+import { InputGroup, Input, InputGroupAddon, Label } from 'reactstrap';
 import { translate } from '../../../localization/AutoIntlProvider';
 import { FormComponentBaseProps } from '../definitions';
 import classnames from 'classnames';
 import { Coordinate } from '../../../types/intrasocial_types';
 import { ApiClient } from '../../../network/ApiClient';
-import debug from '../../../../../old_source/reducers/debug';
 
 export type AddressInputProps = {
     address:string

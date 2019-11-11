@@ -3,7 +3,7 @@ import classnames from "classnames"
 import "./ProjectListItem.scss"
 import { Project, ContextNaturalKey } from '../../types/intrasocial_types';
 import { SecureImage } from '../../components/general/SecureImage';
-import { projectCover } from '../../utilities/Utilities';
+import { projectCover, nullOrUndefined } from '../../utilities/Utilities';
 import { translate } from '../../localization/AutoIntlProvider';
 import { IntraSocialLink } from '../../components/general/IntraSocialLink';
 
@@ -30,13 +30,14 @@ export default class ProjectListItem extends React.Component<Props, State> {
         const {project, className, children, ...rest} = this.props
         const projectClass = classnames("project-list-item", className)
         const cover = projectCover(project, true)
+        const count = nullOrUndefined( project.members_count ) ? "--" : project.members_count
         return (<IntraSocialLink to={project} type={ContextNaturalKey.PROJECT} {...rest} className={projectClass}>
                     <div className="drop-shadow">
                         <div className="top">
                             <SecureImage className="img" setBearer={true} setAsBackground={true} url={cover}/>
                             <div className="title-row d-flex align-items-center flex-row">
                                 <div className="theme-box theme-bg-gradient flex-shrink-0">
-                                    {project.members_count || "--"}&nbsp;
+                                    {count}&nbsp;
                                     <i className="fa fa-user"></i>
                                 </div>
                                 <div className="title text-truncate">{project.name}</div>

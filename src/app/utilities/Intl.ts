@@ -12,6 +12,7 @@ declare global {
         DocumentTouch:DocumentTouch
         routerHistory: History
         isElectron:boolean
+        electronVersion:string
         ipcRenderer:any
         appRoot:string
     }

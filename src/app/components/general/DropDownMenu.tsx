@@ -4,6 +4,10 @@ import classnames = require('classnames');
 import { OverflowMenuItem, createDropdownItem } from './OverflowMenu';
 import "./DropDownMenu.scss"
 import Popper from 'popper.js';
+
+type DefaultProps = {
+    closeOnSelect:boolean
+}
 type Props = {
     items:(() => OverflowMenuItem[]) | OverflowMenuItem[]
     className?:string
@@ -12,10 +16,7 @@ type Props = {
     triggerIcon?:string
     modifiers?:any
     boundariesElement?: Popper.Boundary | Element
-}
-type DefaultProps = {
-
-}
+} & DefaultProps
 type State = {
     popoverRemoved:boolean
     popoverVisible:boolean
@@ -23,6 +24,7 @@ type State = {
 export class DropDownMenu extends React.Component<Props, State> {
     private triggerRef = React.createRef<any>()
     static defaultProps:DefaultProps = {
+        closeOnSelect:true
     }
     constructor(props:Props) {
         super(props);
@@ -58,6 +60,10 @@ export class DropDownMenu extends React.Component<Props, State> {
             return {popoverVisible:false}
         },completion)
     }
+    closePopoverPanelFromItem = () => {
+        if(this.props.closeOnSelect)
+            this.closePopoverPanel()
+    }
     renderPopover = () =>
     {
         const open = !this.state.popoverRemoved || this.state.popoverVisible
@@ -78,7 +84,7 @@ export class DropDownMenu extends React.Component<Props, State> {
                         boundariesElement={this.props.boundariesElement}
                         >
                     <PopoverBody className="pl-0 pr-0">
-                        {items.map(i => createDropdownItem(i, this.closePopoverPanel))}
+                        {items.map(i => createDropdownItem(i, this.closePopoverPanelFromItem))}
                     </PopoverBody>
                 </Popover>
     }

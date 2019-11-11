@@ -8,18 +8,21 @@ import { ProfileManager } from '../../../managers/ProfileManager';
 import { ProfileSelectInput } from '../../form/components/ProfileSelectorInput';
 import ListComponent from '../ListComponent';
 import { ApiClient } from '../../../network/ApiClient';
+import { BooleanInput } from '../../form/components/BooleanInput';
 type OwnProps = {
     didCancel:() => void
     visible:boolean
     contextNaturalKey:ContextNaturalKey
     contextObject:IdentifiableObject
     activeMembershipInvitations:number[]
-    onInvited:() => void
+    onCompleted:() => void
     availableMembers:number[]
     members:number[]
 }
 type InviteFormData = {
     users:number[]
+    moderator?:boolean
+    manager?:boolean
 }
 type State = {
     formStatus:FormStatus
@@ -39,6 +42,8 @@ export default class ContextInviteComponent extends React.Component<Props, State
             formErrors:null,
             formValues:{
                 users:[],
+                moderator:null,
+                manager:null,
             },
         }
     }
@@ -53,26 +58,33 @@ export default class ContextInviteComponent extends React.Component<Props, State
         })
     }
     handleFormSubmit = () => {
-
+        const {contextNaturalKey, contextObject} = this.props
         this.setFormStatus(FormStatus.submitting)
         const data = this.state.formValues
         const formData = removeEmptyEntriesFromObject(data)
         const hasDataToSave = Object.keys(formData).length > 0
+        const onComplete = (response:any, status:string, error:RequestErrorData) => {
+            if(error)
+            {
+                this.setState(() => {
+                    return {formErrors:[error]}
+                })
+                this.setFormStatus(FormStatus.normal)
+            }
+            else {
+                this.setFormStatus(FormStatus.normal)
+                this.props.onCompleted()
+            }
+        }
         if(hasDataToSave)
         {
-            ApiClient.createContextInvitation(this.props.contextNaturalKey, this.props.contextObject.id, formData.users, (response, status, error) => {
-                if(error)
-                {
-                    this.setState(() => {
-                        return {formErrors:[error]}
-                    })
-                    this.setFormStatus(FormStatus.normal)
-                }
-                else {
-                    this.setFormStatus(FormStatus.normal)
-                    this.props.onInvited()
-                }
-            })
+            if(contextNaturalKey == ContextNaturalKey.PROJECT)
+            {
+                ApiClient.updateProjectMembership(contextObject.id, formData.users, undefined, formData.moderator, formData.manager, onComplete)
+            }
+            else {
+                ApiClient.createContextInvitation(this.props.contextNaturalKey, this.props.contextObject.id, formData.users, formData.moderator, onComplete)
+            }
         }   
         else {
             this.props.didCancel()
@@ -86,11 +98,13 @@ export default class ContextInviteComponent extends React.Component<Props, State
         })
     }
     render = () => {
-        const {visible, didCancel, contextObject, activeMembershipInvitations} = this.props
+        const {visible, didCancel, activeMembershipInvitations, contextNaturalKey} = this.props
+        const {formValues} = this.state
         const members:number[] = this.props.members || [] 
         const invitationFilterList = [].concat(activeMembershipInvitations).concat(members)
         const availableMembers = ProfileManager.getProfiles(this.props.availableMembers.filter(id => !invitationFilterList.contains(id))) 
         const selectedProfiles = this.state.formValues.users.map(id => availableMembers.find(m => m.id == id)).filter(p => !!p)
+        const isProject = contextNaturalKey == ContextNaturalKey.PROJECT
         return <FormController 
                     ref={(controller) => this.formController = controller }
                     visible={visible} 
@@ -106,6 +120,26 @@ export default class ContextInviteComponent extends React.Component<Props, State
                             menuItems:[],
                             pages:[<FormPage key="page1" form={this.formController} pageId="1" render={(pageId, form) => {
                                     return <>
+                                        <BooleanInput
+                                        errors={form.getErrors} 
+                                        hasSubmitted={form.hasSubmitted()}
+                                        ref={form.setFormRef(pageId)} 
+                                        onValueChanged={form.handleValueChanged(pageId)} 
+                                        value={formValues.moderator} 
+                                        title={translate("form.invite.title.moderator")} 
+                                        description={translate("form.invite.description.moderator")}
+                                        id={nameof("moderator")} 
+                                        />
+                                        {isProject && <BooleanInput
+                                        errors={form.getErrors} 
+                                        hasSubmitted={form.hasSubmitted()}
+                                        ref={form.setFormRef(pageId)} 
+                                        onValueChanged={form.handleValueChanged(pageId)} 
+                                        value={formValues.manager} 
+                                        title={translate("form.invite.title.manager")} 
+                                        description={translate("form.invite.description.manager")}
+                                        id={nameof("manager")} 
+                                        />}
                                         <ProfileSelectInput 
                                         errors={form.getErrors} 
                                         isRequired={false} 

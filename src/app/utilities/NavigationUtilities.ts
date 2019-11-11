@@ -3,10 +3,6 @@ import * as H from 'history';
 import Routes from './Routes';
 import { ProfileManager } from '../managers/ProfileManager';
 import { CommunityManager } from '../managers/CommunityManager';
-import { GroupManager } from '../managers/GroupManager';
-import { ProjectManager } from '../managers/ProjectManager';
-import { TaskManager } from '../managers/TaskManager';
-import { EventManager } from '../managers/EventManager';
 import { translate } from '../localization/AutoIntlProvider';
 
 export class NavigationUtilities {
@@ -52,53 +48,6 @@ export class NavigationUtilities {
             }
         })
     }
-    static navigateToGroup = (history: H.History, groupId:number) =>
-    {
-        GroupManager.ensureGroupExists(groupId, (group) => {
-            CommunityManager.ensureCommunityExists(group.community, (community) => {
-                if (community) {
-                    const groupUrl = Routes.groupUrl(community.slug_name, group.slug)
-                    history.push(groupUrl)
-                }
-            })
-         })
-    }
-    static navigateToTask = (history: H.History, taskId:number) =>
-    {
-        TaskManager.ensureTaskExists(taskId, (task) =>
-        {
-            ProjectManager.ensureProjectExists(task.project, (project) => {
-                CommunityManager.ensureCommunityExists(project.community, (community) => {
-                    if (project && community) {
-                        const taskUrl = Routes.taskUrl(community.slug_name, project.slug, taskId)
-                        history.push(taskUrl)
-                    }
-                })
-            })
-        })
-    }
-    static navigateToEvent = (history: H.History, eventId:number) =>
-    {
-         EventManager.ensureEventExists(eventId, (event) => {
-            CommunityManager.ensureCommunityExists(event.community, (community) => {
-                if (event && community) {
-                    const eventUrl = Routes.eventUrl(community.slug_name, event.slug)
-                    history.push(eventUrl)
-                }
-            })
-         })
-    }
-    static navigateToProject = (history: H.History, projectId:number) =>
-    {
-         ProjectManager.ensureProjectExists(projectId, (project) => {
-            CommunityManager.ensureCommunityExists(project.community, (community) => {
-                if (project && community) {
-                    const projectUrl = Routes.projectUrl(community.slug_name, project.slug)
-                    history.push(projectUrl)
-                }
-            })
-         })
-    }
     static navigateToDevTool = (history: H.History) =>
     {
         history.push(Routes.DEVELOPER_TOOL.path)
@@ -111,6 +60,7 @@ export class NavigationUtilities {
         }
         callback(confirmed);
     }
+    
     static showProtectedNavigationConfirmation = () => {
         return window.confirm(translate("prevent.navigation.text"))
     }

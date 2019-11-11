@@ -48,8 +48,10 @@ export class ProjectFilter extends React.PureComponent<Props & React.HTMLAttribu
                 types:ProjectFilter.searchTypes,
                 include_results:true,
                 slim_types:true,
+                offset:0,
+                limit:10
             }
-            return ApiClient.search2(10, 0, args, (data,status,error) => {
+            return ApiClient.search(args, (data,status,error) => {
                 const d = data && data.results || []
                 resolve(d.map(r => this.convertResultItem(r)).filter(r => r != null))
             })

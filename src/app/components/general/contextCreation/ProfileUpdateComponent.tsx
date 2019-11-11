@@ -113,6 +113,7 @@ class ProfileUpdateComponent extends React.Component<Props, State> {
                         this.setState(() => {
                             return {formVisible :false}
                         }, () => {
+                            debugger
                             window.app.navigateToRoute(updatedProfile.uri)
                         })
                     }

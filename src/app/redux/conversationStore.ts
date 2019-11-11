@@ -1,8 +1,9 @@
 import { combineReducers } from 'redux'
-import { Conversation } from "../types/intrasocial_types";
+import { Conversation, IdentifiableObject } from '../types/intrasocial_types';
 import { shallowCompareFields } from '../utilities/Utilities';
 export enum ConversationStoreActionTypes {
     AddConversations = 'conversationstore.add_conversations',
+    UpdateConversation = 'conversationstore.update_conversation',
     RemoveConversation = 'conversationstore.remove_conversation',
     Reset = 'conversationstore.reset',
 }
@@ -20,6 +21,10 @@ export interface ResetConversationsAction{
 export const addConversationsAction = (conversations: Conversation[]):AddConversationsAction => ({
     type: ConversationStoreActionTypes.AddConversations,
     conversations
+})
+export const updateConversationAction = (conversation: Conversation):AddConversationsAction => ({
+    type: ConversationStoreActionTypes.UpdateConversation,
+    conversations:[conversation]
 })
 export const removeConversationAction = (conversation: number):RemoveConversationsAction => ({
     type: ConversationStoreActionTypes.RemoveConversation,
@@ -45,6 +50,19 @@ const shouldUpdate = (oldConversation:Conversation, newConversation:Conversation
         return true
     }
     return new Date(newConversation.updated_at).getTime() > new Date(oldConversation.updated_at).getTime()
+}
+
+const updateConversation = (state, action:AddConversationsAction) => {
+    const object:Partial<Conversation> = action.conversations[0]
+    const oldObject:Conversation = state[object.id]
+    if(object && oldObject)
+    {
+        const updatedObject = Object.assign({...oldObject}, object)
+        const newState = {  ...state }
+        newState[updatedObject.id] = updatedObject
+        return newState
+    }
+    return state
 }
 const addConversations = (state, action:AddConversationsAction) => {
     let conversations = action.conversations
@@ -84,6 +102,7 @@ export const conversationsById = (state = {}, action:ResetConversationsAction & 
 {
     switch(action.type) {
         case ConversationStoreActionTypes.AddConversations: return addConversations(state, action);
+        case ConversationStoreActionTypes.UpdateConversation: return updateConversation(state, action);
         case ConversationStoreActionTypes.RemoveConversation: return removeConversation(state, action);
         case ConversationStoreActionTypes.Reset: return resetConversations(state, action)
         default : return state;

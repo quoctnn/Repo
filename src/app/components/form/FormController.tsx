@@ -71,7 +71,7 @@ type FormContent = {
 }
 type Props = {
     title?:string
-    onFormSubmit:(data:{[key:string]:string}) => void
+    onFormSubmit?:(data:{[key:string]:string}) => void
     onValueChanged?:(id:string, value?:any) => void
     status:FormStatus
     didCancel:() => void
@@ -79,6 +79,7 @@ type Props = {
     visible:boolean
     render:(form:FormController) => FormContent
     className?:string
+    modalClassName?:string
 }
 type State = {
     activePageIndex:number
@@ -254,7 +255,7 @@ export default class FormController extends React.Component<Props, State> {
                             {showSecondaryView && <Button color="light" className="mr-1" onClick={this.navigateToMainContent}><i className="fas fa-chevron-left"></i></Button>}
                             {title && <div className="align-self-center">{title}</div>}
                         </div>
-        const footer = !showSecondaryView &&  <div className="form-buttons">
+        const footer = !showSecondaryView && this.props.onFormSubmit && <div className="form-buttons">
                                                     <Button disabled={!canSubmit} onClick={this.trySubmitForm}>
                                                     {submitTitle}
                                                     </Button>
@@ -262,12 +263,12 @@ export default class FormController extends React.Component<Props, State> {
         const genericError = this.getErrors(["detail", "non_field_errors"])
         this.content = this.props.render(this)
         const {menuItems, pages} = this.content
-        return <SimpleDialog className="form-controller-modal" didCancel={this.props.didCancel} visible={this.props.visible} header={header} footer={footer}>
+        return <SimpleDialog className={classnames("form-controller-modal", this.props.modalClassName)} didCancel={this.props.didCancel} visible={this.props.visible} header={header} footer={footer}>
                     <div className={classnames("form-controller", this.props.className)}>
                         {genericError && <FormComponentErrorMessage className="d-block" errors={genericError} />}
                         <div className={mainContentCn}>
                             <div className="d-flex flex-column main-content-inner">
-                                {menuItems.length > 0 && <div className="form-controller-menu">
+                                {menuItems.length > 1 && <div className="form-controller-menu">
                                     {menuItems}
                                 </div>}
                                 <div className="form-controller-page-container">

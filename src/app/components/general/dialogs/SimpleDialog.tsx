@@ -114,7 +114,7 @@ export default class SimpleDialog extends React.Component<Props, State> {
         const cn = classnames(this.props.className, {"modal-dialog-scrollable":this.props.scrollable})
         return(
             <div>
-                <Modal fade={this.props.fade} centered={this.props.centered} toggle={this.props.didCancel} isOpen={this.props.visible} className={cn}>
+                <Modal unmountOnClose={this.props.removeContentOnHidden} fade={this.props.fade} centered={this.props.centered} toggle={this.props.didCancel} isOpen={this.props.visible} className={cn}>
                     {
                         this.props.header && 
                         <ModalHeader>

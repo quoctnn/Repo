@@ -45,17 +45,38 @@ export default  {
         //embed card
         parseUrl:'/api/v1/links/parse-url/',
         //search
-        searchUrl: '/api/v1/search/',
+        searchUrl: '/api/v2/search/',
         getSearchHistoryUrl: '/api/v1/search/history/',//GET
         createSearchHistoryUrl: '/api/v1/search/history/', //POST
         removeSearchHistoryUrl: (id:number) => {
             return `/api/v1/search/${id}/remove_from_history/`
         },
+        communityRolesBatchUrl:"/api/v2/community-roles/batch/",
+        communityRolesUrl:"/api/v2/community-roles/",
+        communityRoleUrl: (id:number) => {
+            return `/api/v2/community-roles/${id}/`
+        },
         // Community URLs
         myCommunitiesUrl: '/api/v2/community/as-member/',
         invitedCommunitiesUrl: '/api/v2/community/invitations/',
+
+        communityLeaveUrl: (id:number) => {
+            return `/api/v2/community/${id}/leave/`
+        },
+        communityMuteUrl: (id:number) => {
+            return `/api/v2/community/${id}/mute/`
+        },
+        communityDeleteUrl: (id:number) => {
+            return `/api/v2/community/${id}/`
+        },
         communityMembersUrl: (id:number) => {
             return `/api/v2/community/${id}/members/`
+        },
+        communityJoinUrl: (id:number) => {
+            return `/api/v2/community/${id}/join/`
+        },
+        communityMembersKickUrl: (id:number) => {
+            return `/api/v2/community/${id}/kick/`
         },
         communityFilesUrl: (id:number|string) => {
             return `/api/v1/community/${id}/files/`
@@ -68,6 +89,9 @@ export default  {
         },
         communityAvatarUrl: (id:number) => {
             return `/api/v2/community/${id}/avatar/`
+        },
+        communityAdminUrl: (id:number) => {
+            return `/api/v2/community/${id}/admin/`
         },
         communityCoverUrl: (id:number) => {
             return `/api/v2/community/${id}/cover/`
@@ -83,6 +107,7 @@ export default  {
         },
         communityInvitationUrl:"/api/v2/community-invitation/",
         communityInvitationBatchUrl:"/api/v2/community-invitation/batch/",
+        communityMembershipRequestUrl: "/api/v2/community-memberrequest/",
         communityMembershipRequestDeleteUrl: (id:number) => {
             return `/api/v2/community-memberrequest/${id}/`
         },
@@ -127,6 +152,15 @@ export default  {
         },
 
         // Group URLs
+        groupLeaveUrl: (id:number) => {
+            return `/api/v2/group/${id}/leave/`
+        },
+        groupMuteUrl: (id:number) => {
+            return `/api/v2/group/${id}/mute/`
+        },
+        groupDeleteUrl: (id:number) => {
+            return `/api/v2/group/${id}/`
+        },
         groupUrl: (id:number|string) => {
             return `/api/v2/group/${id}/`
         },
@@ -135,20 +169,37 @@ export default  {
         groupFilesUrl: (id:number) => {
             return `/api/v2/group/${id}/files/`
         },
+        groupJoinUrl: (id:number) => {
+            return `/api/v2/group/${id}/join/`
+        },
         groupInvitationListUrl: "/api/v2/group-invitation/",
         groupInvitationBatchUrl:"/api/v2/group-invitation/batch/",
         groupInvitationDeleteUrl: (id:number) => {
             return `/api/v2/group-invitation/${id}/`
         },
+        groupMembersUrl: (id:number) => {
+            return `/api/v2/group/${id}/members/`
+        },
+        groupMembersKickUrl: (id:number) => {
+            return `/api/v2/group/${id}/kick/`
+        },
+        groupRolesUrl: (id:number) => {
+            return `/api/v2/group/${id}/roles/`
+        },
+        groupModerateUrl: (id:number) => {
+            return `/api/v2/group/${id}/moderate/`
+        },
         groupInvitationAcceptUrl: (id:number) => {
             return `/api/v2/group-invitation/${id}/accept/`
         },
+        groupMembershipRequestUrl: "/api/v2/group-memberrequest/",
         groupMembershipRequestDeleteUrl: (id:number) => {
             return `/api/v2/group-memberrequest/${id}/`
         },
         groupMembershipRequestAcceptUrl: (id:number) => {
             return `/api/v2/group-memberrequest/${id}/accept/`
         },
+        groupReviewUrl: "/api/v2/group/under-review/",
         groupAvatarUrl: (id:number) => {
             return `/api/v2/group/${id}/avatar/`
         },
@@ -156,7 +207,32 @@ export default  {
             return `/api/v2/group/${id}/cover/`
         },
         // Project URLs
+        projectMembersUrl: (id:number) => {
+            return `/api/v2/project/${id}/members/`
+        },
+        projectMuteUrl: (id:number) => {
+            return `/api/v2/project/${id}/mute/`
+        },
+        projectDeleteUrl: (id:number) => {
+            return `/api/v2/project/${id}/`
+        },
+        projectMembershipUrl: (id:number) => {
+            return `/api/v2/project/${id}/membership/`
+        },
+        projectMembersKickUrl: (id:number) => {
+            return `/api/v2/project/${id}/kick/`
+        },
+        projectRolesUrl: (id:number) => {
+            return `/api/v2/project/${id}/roles/`
+        },
+        projectModerateUrl: (id:number) => {
+            return `/api/v2/project/${id}/moderate/`
+        },
+        projectManagerUrl: (id:number) => {
+            return `/api/v2/project/${id}/manager/`
+        },
         projectsUrl: '/api/v2/project/',
+        projectReviewUrl: "/api/v2/project/under-review/",
         projectDetailUrl: (id:number|string) => {
             return `/api/v2/project/${id}/`
         },
@@ -212,14 +288,35 @@ export default  {
 
         // Event URLs
         upcomingEventsUrl: '/api/v2/event/upcoming/',
-
+        eventLeaveUrl: (id:number) => {
+            return `/api/v2/event/${id}/leave/`
+        },
+        eventMuteUrl: (id:number) => {
+            return `/api/v2/event/${id}/mute/`
+        },
+        eventDeleteUrl: (id:number) => {
+            return `/api/v2/event/${id}/`
+        },
+        eventModerateUrl: (id:number) => {
+            return `/api/v2/event/${id}/moderate/`
+        },
+        eventMembersUrl: (id:number) => {
+            return `/api/v2/event/${id}/members/`
+        },
+        eventMembersKickUrl: (id:number) => {
+            return `/api/v2/event/${id}/kick/`
+        },
         eventAvatarUrl: (id:number) => {
             return `/api/v2/event/${id}/avatar/`
+        },
+        eventAttendUrl: (id:number) => {
+            return `/api/v2/event/${id}/attend/`
         },
         eventCoverUrl: (id:number) => {
             return `/api/v2/event/${id}/cover/`
         },
         eventsUrl: '/api/v2/event/',
+        eventReviewUrl: "/api/v2/event/under-review/",
         eventDetailUrl: (id:number|string) => {
             return `/api/v2/event/${id}/`
         },
@@ -237,6 +334,7 @@ export default  {
         },
         eventInvitationBatchUrl:"/api/v2/event-invitation/batch/",
         eventInvitationListUrl: "/api/v2/event-invitation/",
+        eventMembershipRequestUrl: "/api/v2/event-memberrequest/",
         eventMembershipRequestDeleteUrl: (id:number) => {
             return `/api/v2/event-memberrequest/${id}/`
         },

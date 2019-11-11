@@ -3,7 +3,7 @@ import classnames from 'classnames';
 import "./SearchComponent.scss"
 import { ContextSearchData, SearchOption, SearcQueryManager, SearchEntityType } from "../general/input/contextsearch/extensions";
 import { ElasticSearchType, SearchHistory, ContextNaturalKey, GenericElasticResult, ElasticResultCommunity, ElasticResultStatus, ElasticResultEvent, ElasticResultTask, ElasticResultProject, ElasticResultUser, ElasticResultGroup, ElasticResultFile, Event, UploadedFile, UploadedFileType, ElasticSearchBucketAggregation, Favorite } from '../../types/intrasocial_types';
-import {ApiClient, ElasticResult, SearchArguments } from "../../network/ApiClient";
+import {ApiClient, ElasticResult, SearchArguments, SearchSortOptions } from "../../network/ApiClient";
 import Avatar from '../general/Avatar';
 import { SearchBox } from "../general/input/contextsearch/SearchBox";
 import { EditorState } from "draft-js";
@@ -12,13 +12,9 @@ import { FormGroup, Label, Input, Button } from "reactstrap";
 import { translate } from "../../localization/AutoIntlProvider";
 import CursorList from "../general/input/contextsearch/CursorList";
 import { CursorListItem } from '../general/input/contextsearch/CursorList';
-import { ProjectManager } from '../../managers/ProjectManager';
 import { CommunityManager } from '../../managers/CommunityManager';
 import { LinkObject } from "./BreadcrumbNavigation";
 import { Link } from "react-router-dom";
-import { GroupManager } from '../../managers/GroupManager';
-import { EventManager } from "../../managers/EventManager";
-import { TaskManager } from "../../managers/TaskManager";
 import { TimeComponent } from "../general/TimeComponent";
 import { ProfileManager } from "../../managers/ProfileManager";
 import LoadingSpinner from "../LoadingSpinner";
@@ -40,10 +36,6 @@ import { AnimatedIconStack } from "../general/AnimatedIconStack";
 let timezone = moment.tz.guess()
 
 type BreadcrumbData = {community?:number, group?:number, event?:number, project?:number, task?:number, profile?:number, status?:number, conversation?:number}
-export enum SearchSortOptions {
-    relevance = "relevance",
-    date = "date"
-}
 const allowedSearchContextFilters:SearchOption[] = []
 allowedSearchContextFilters.push(new SearchOption("community", null, 2,  ElasticSearchType.COMMUNITY, ["user", "group", "event", "project", "task", ], "newsfeed.menu.filter.community.description"))
 allowedSearchContextFilters.push(new SearchOption("group", null, 1, ElasticSearchType.GROUP, [], "newsfeed.menu.filter.group.description"))
@@ -126,27 +118,23 @@ export const breadcrumbs = (data:BreadcrumbData, onNavigate:(uri:string) => (eve
     }
     if(group)
     {
-        const groupObject = GroupManager.getGroupById(group)
-        if(groupObject)
-            breadcrumbs.push({uri:groupObject.uri, title:groupObject.name})
+        const url = Routes.groupUrl(community, group)
+        breadcrumbs.push({uri:url, title:translate("common.group.group")})
     }
-    if(event)
+    if(event && community)
     {
-        const eventObject = EventManager.getEventById(event)
-        if(eventObject)
-            breadcrumbs.push({uri:eventObject.uri, title:eventObject.name})
+        const url = Routes.eventUrl(community, event)
+        breadcrumbs.push({uri:url, title:translate("common.event.event")})
     }
-    if(project)
+    if(project && community)
     {
-        const projectObject = ProjectManager.getProjectById(project)
-        if(projectObject)
-            breadcrumbs.push({uri:projectObject.uri, title:projectObject.name})
+        const url = Routes.projectUrl(community, project)
+        breadcrumbs.push({uri:url, title:translate("common.project.project")})
     }
-    if(task)
+    if(task && project && community)
     {
-        const taskObject = TaskManager.getTask(task)
-        if(taskObject)
-            breadcrumbs.push({uri:taskObject.uri, title:taskObject.title})
+        const url = Routes.taskUrl(community, project, task)
+        breadcrumbs.push({uri:url, title:translate("common.project.task")})
     }
     if(profile)
     {
@@ -409,7 +397,6 @@ class SearchComponent extends React.Component<Props, State> {
         }
         const items = this.state.searchResult && this.state.searchResult.results || []
         const offset = items.length
-        const sortOnDate = this.state.searchSortValue == SearchSortOptions.date
         let fromDate = this.state.fromDate && this.state.fromDate.format(this.serializedDateFormat)
         let toDate = this.state.toDate && this.state.toDate.format(this.serializedDateFormat)
 
@@ -420,12 +407,14 @@ class SearchComponent extends React.Component<Props, State> {
             include_aggregations:true,
             filters:this.getRealFilters(currentFilters),
             tags:data.tags,
-            date_sort:sortOnDate,
+            sorting:this.state.searchSortValue,
             from_date:fromDate || undefined,
             to_date:toDate || undefined,
-            use_simple_query_string:hasActiveSearchType
+            use_simple_query_string:hasActiveSearchType,
+            offset,
+            limit:this.pageSize
         }
-        ApiClient.search2(this.pageSize, offset, args,(searchResult, status, error) => {
+        ApiClient.search(args,(searchResult, status, error) => {
             if(!searchResult)
             {
                 this.setState(() => {
@@ -433,7 +422,6 @@ class SearchComponent extends React.Component<Props, State> {
                 })
                 return
             }
-
             this.setState((prevState) => {
                 if(requestId == prevState.requestId)
                 {
@@ -739,17 +727,16 @@ class SearchComponent extends React.Component<Props, State> {
             default:return <div>{item.object_type + " " + item.django_id}</div>
         }
     }
-    toggleSortOption = () => {
+    selectSortOption = (sortOption:SearchSortOptions) => () => {
         this.setState((prevState:State) => {
-            const so = prevState.searchSortValue == SearchSortOptions.date ? SearchSortOptions.relevance : SearchSortOptions.date
-            return {searchSortValue:so, requestId:prevState.requestId + 1, isLoading:true, searchResult:null}
+            return {searchSortValue:sortOption, requestId:prevState.requestId + 1, isLoading:true, searchResult:null}
         }, this.onSearchDataChanged)
     }
     renderSortOptions = () => {
-        const arr = Object.keys(SearchSortOptions).map(k => {
-            return {id:k, type:OverflowMenuItemType.option, title:translate("search.sort." + k), onPress:this.toggleSortOption}
+        const arr = SearchSortOptions.all.map(so => {
+            return {id:so, type:OverflowMenuItemType.option, title:SearchSortOptions.translationForKey(so), onPress:this.selectSortOption(so)}
         })
-        const title = this.state.searchSortValue
+        const title = SearchSortOptions.translationForKey(this.state.searchSortValue)
         return (
             <div style={{zIndex:1080}}>
                 <DropDownMenu triggerTitle={title} className="sort-option-dropdown" triggerClass="fas fa-caret-down mx-1" items={arr}></DropDownMenu>

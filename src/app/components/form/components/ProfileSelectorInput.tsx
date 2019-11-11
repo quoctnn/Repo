@@ -4,7 +4,7 @@ import { InputGroup } from 'reactstrap';
 import { translate } from '../../../localization/AutoIntlProvider';
 import { FormComponentBaseProps } from '../definitions';
 import classnames from 'classnames';
-import { ProfileSelector } from '../../general/contextInvitation/ProfileSelector';
+import { ProfileSelector } from '../../general/contextMembers/ProfileSelector';
 import { UserProfile } from '../../../types/intrasocial_types';
 export type ProfileSelectInputProps = {
     allowedProfiles:UserProfile[]

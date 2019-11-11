@@ -1,8 +1,5 @@
 @import "../../../Config";
-.community-invitations{
-    .modal-content{
-        height: 100%;
-    }
+.context-invitation{
     .list-component{
         height: auto;
     }
@@ -21,10 +18,22 @@
             @include var(background, main-content-secondary-background);
         }
     }
-    @media (min-height: 640px)
-    {
-        .modal-content{
-            max-height: 640px !important;
-        };
+    .generic-list-item{
+        cursor: pointer;
+        .footer{
+            display: flex;
+            align-items: center;
+            > *:not(:first-child)
+            {
+                margin-left: 0.25rem;
+            }
+        }
+        .header{
+            display: flex;
+            align-items: center;
+            > i{
+                font-size: 0.8rem;
+            }
+        }
     }
 }

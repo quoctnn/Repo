@@ -3,7 +3,7 @@ import { withRouter, RouteComponentProps } from "react-router-dom";
 import classnames from "classnames"
 import "./FilesModule.scss"
 import { ResponsiveBreakpoint } from '../../components/general/observers/ResponsiveComponent';
-import { Permissible, UploadedFile, IdentifiableObject, UserProfile, ContextNaturalKey } from '../../types/intrasocial_types';
+import { Permissible, UploadedFile, IdentifiableObject, UserProfile } from '../../types/intrasocial_types';
 import { connect } from 'react-redux';
 import { ReduxState } from '../../redux';
 import LoadingSpinner from '../../components/LoadingSpinner';
@@ -13,12 +13,12 @@ import ListComponent from '../../components/general/ListComponent';
 import {ApiClient,  PaginationResult } from '../../network/ApiClient';
 import { ToastManager } from '../../managers/ToastManager';
 import FileListItem from './FileListItem';
-import { ContextManager } from '../../managers/ContextManager';
 import { AuthenticationManager } from '../../managers/AuthenticationManager';
 import { CommonModuleProps } from '../Module';
 import FileGridItem from './FileGridItem';
 import { ButtonGroup, Button } from 'reactstrap';
 import { ResizeObserverColumnsComponent } from '../../components/general/observers/ResizeObserverColumnsComponent';
+import { ContextDataProps, withContextData } from '../../hoc/WithContextData';
 export type FilesMenuData = {
     viewMode:ListViewMode
 }
@@ -38,9 +38,7 @@ type ReduxStateProps = {
     contextObject:Permissible & IdentifiableObject
     authenticatedUser:UserProfile
 }
-type ReduxDispatchProps = {
-}
-type Props = OwnProps & RouteComponentProps<any> & ReduxStateProps & ReduxDispatchProps
+type Props = OwnProps & RouteComponentProps<any> & ReduxStateProps & ContextDataProps
 class FilesModule extends React.Component<Props, State> {
     filesList = React.createRef<ListComponent<UploadedFile>>()
     private calculatedPageSize = 15
@@ -167,16 +165,12 @@ class FilesModule extends React.Component<Props, State> {
                 </SimpleModule>)
     }
 }
-const mapStateToProps = (state:ReduxState, ownProps: OwnProps & RouteComponentProps<any>):ReduxStateProps => {
+const mapStateToProps = (state:ReduxState, ownProps: OwnProps & RouteComponentProps<any> & ContextDataProps):ReduxStateProps => {
 
-    const contextObject = ContextManager.getContextObject(ownProps.location.pathname, ownProps.contextNaturalKey)
+    const contextObject = ownProps.contextData.getContextObject(ownProps.contextNaturalKey)
     return {
         contextObject,
         authenticatedUser: AuthenticationManager.getAuthenticatedUser()
     }
 }
-const mapDispatchToProps = (dispatch:ReduxState, ownProps: OwnProps):ReduxDispatchProps => {
-    return {
-    }
-}
-export default withRouter(connect<ReduxStateProps, ReduxDispatchProps, OwnProps>(mapStateToProps, mapDispatchToProps)(FilesModule))
+export default withContextData(withRouter(connect<ReduxStateProps, {}, OwnProps>(mapStateToProps, null)(FilesModule)))

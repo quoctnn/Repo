@@ -124,6 +124,12 @@ const template = [
         click(menuItem, browserWindow, event) {
           browserWindow.webContents.openDevTools();
         }
+      },
+      {
+        label: i18n.__('Internal Tools'),
+        click(menuItem, browserWindow, event) {
+            browserWindow.webContents.executeJavaScript("window.app.navigateToRoute('/developer-tool/', true)")
+        }
       }
     ]
   },

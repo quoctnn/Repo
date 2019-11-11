@@ -9,13 +9,9 @@ import "./TaskDetailsModule.scss"
 import { ResponsiveBreakpoint } from '../../components/general/observers/ResponsiveComponent';
 import { translate } from '../../localization/AutoIntlProvider';
 import { Task, Project, Community, ContextNaturalKey, Permission } from '../../types/intrasocial_types';
-import { connect } from 'react-redux';
-import { ReduxState } from '../../redux';
-import LoadingSpinner from '../../components/LoadingSpinner';
 import { DetailsContent } from '../../components/details/DetailsContent';
-import { ContextManager } from '../../managers/ContextManager';
 import { DetailsMembers, HorisontalLayoutPosition } from '../../components/details/DetailsMembers';
-import StackedAvatars from '../../components/general/StackedAvatars';
+import { withContextData, ContextDataProps } from '../../hoc/WithContextData';
 type OwnProps = {
     breakpoint:ResponsiveBreakpoint
     contextNaturalKey: ContextNaturalKey
@@ -24,14 +20,7 @@ type State = {
     menuVisible:boolean
     isLoading:boolean
 }
-type ReduxStateProps = {
-    community: Community
-    project: Project
-    task: Task
-}
-type ReduxDispatchProps = {
-}
-type Props = OwnProps & RouteComponentProps<any> & ReduxStateProps & ReduxDispatchProps
+type Props = OwnProps & RouteComponentProps<any> & ContextDataProps
 class TaskDetailsModule extends React.Component<Props, State> {
     constructor(props:Props) {
         super(props);
@@ -64,7 +53,8 @@ class TaskDetailsModule extends React.Component<Props, State> {
     }
     render()
     {
-        const {breakpoint, history, match, location, staticContext, task, project, community, contextNaturalKey, ...rest} = this.props
+        const {breakpoint, history, match, location, staticContext, contextNaturalKey, contextData, ...rest} = this.props
+        const {task, project, community} = this.props.contextData
         return (<Module {...rest}>
                         <ModuleHeader className="task-detail" headerTitle={task && task.title || translate("detail.module.title")} loading={this.state.isLoading}>
                             <ModuleMenuTrigger onClick={this.menuItemClick} />
@@ -75,16 +65,14 @@ class TaskDetailsModule extends React.Component<Props, State> {
                                 { task && task.permission >= Permission.read &&
                                     <div className="task-details-content">
                                         <DetailsContent community={community} description={task.description}>
-                                                { this.props.project &&
+                                                { project &&
                                                     <div>
                                                         <div className="details-field-name">{translate("common.project.project")}</div>
-                                                        <div title={this.props.project.name} className="details-field-value text-truncate"><Link to={this.props.project.uri}>{this.props.project.name}</Link></div>
+                                                        <div title={project.name} className="details-field-value text-truncate"><Link to={project.uri}>{project.name}</Link></div>
                                                     </div>
                                                 }
                                         </DetailsContent>
                                     </div>
-                                        ||
-                                    <LoadingSpinner key="loading"/>
                                 }
                                 </ModuleContent>
                                 <ModuleFooter className="mt-1">
@@ -102,19 +90,4 @@ class TaskDetailsModule extends React.Component<Props, State> {
                 </Module>)
     }
 }
-const mapStateToProps = (state:ReduxState, ownProps: OwnProps & RouteComponentProps<any>):ReduxStateProps => {
-
-    const task = ContextManager.getContextObject(ownProps.location.pathname, ownProps.contextNaturalKey) as Task
-    const project = ContextManager.getContextObject(ownProps.location.pathname, ContextNaturalKey.PROJECT) as Project
-    const community = ContextManager.getContextObject(ownProps.location.pathname, ContextNaturalKey.COMMUNITY) as Community
-    return {
-        community,
-        project,
-        task,
-    }
-}
-const mapDispatchToProps = (dispatch:ReduxState, ownProps: OwnProps):ReduxDispatchProps => {
-    return {
-    }
-}
-export default withRouter(connect<ReduxStateProps, ReduxDispatchProps, OwnProps>(mapStateToProps, mapDispatchToProps)(TaskDetailsModule))
+export default withContextData(withRouter(TaskDetailsModule))

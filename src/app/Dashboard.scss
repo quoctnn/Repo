@@ -20,7 +20,7 @@
         max-width: initial;
     }
 }
-body.has-side-menu {
+body[class*="has-side-menu-"]{
     .dashboard-container
     {
         margin-left: $sideMenuInactiveWidth;

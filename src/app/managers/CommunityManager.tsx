@@ -1,9 +1,8 @@
-import * as React from "react";
 import {  Store } from 'redux';
-import { Community } from '../types/intrasocial_types';
+import { Community, IdentifiableObject } from '../types/intrasocial_types';
 import {ApiClient} from '../network/ApiClient';
 import { ReduxState } from '../redux';
-import { addCommunitiesAction, removeCommunityAction } from '../redux/communityStore';
+import { addCommunitiesAction, removeCommunityAction, updateCommunityAction } from '../redux/communityStore';
 import { setActiveCommunityAction } from '../redux/activeCommunity';
 import { NotificationCenter } from '../utilities/NotificationCenter';
 import { EventStreamMessageType } from '../network/ChannelEventStream';
@@ -19,16 +18,19 @@ export abstract class CommunityManager
         NotificationCenter.addObserver('eventstream_' + EventStreamMessageType.COMMUNITY_MAIN, CommunityManager.processCommunityMainChanged)
     }
     static processCommunityDelete = (...args:any[]) => {
-        let communityId = args[0]['community_id'] as number;
+        let communityId = args[0]["id"] as number;
         CommunityManager.removeCommunity(communityId)
     }
     static processCommunityMainChanged = (...args:any[]) => {
-        let communityId = args[0]['community_id'] as number;
+        let communityId = args[0]["id"] as number;
         const community = CommunityManager.getCommunityById(communityId)
         ToastManager.showInfoToast(translate("Main community changed"), community.name)
     }
+    static updateCommunityObject = (community:Partial<Community> & IdentifiableObject) => {
+        CommunityManager.getStore().dispatch(updateCommunityAction(community))
+    }
     static processCommunityUpdate = (...args:any[]) => {
-        let communityId = args[0]['community_id'] as number;
+        let communityId = args[0]["id"] as number;
         ApiClient.getCommunity(communityId, (community, status, error) => {
             if(community)
             {
@@ -41,9 +43,21 @@ export abstract class CommunityManager
             }
         })
     }
+    static applyCommunityThemeIfNeeded = (updatedCommunities:Community[]) => {
+        if(updatedCommunities && updatedCommunities.length > 0)
+        {
+            const activeCommunity = CommunityManager.getActiveCommunity()
+            if(activeCommunity && updatedCommunities.map(i => i.id).contains(activeCommunity.id))
+            {
+                CommunityManager.applyCommunityTheme(activeCommunity)
+            }
+        }
+    }
     static storeCommunities = (communities:Community[], force?:boolean) => {
         if(communities.length > 0)
+        {
             CommunityManager.getStore().dispatch(addCommunitiesAction(communities, force))
+        }
     }
     static removeCommunity = (communityId:number) => {
         const activeCommunity = CommunityManager.getActiveCommunity()
@@ -51,7 +65,6 @@ export abstract class CommunityManager
         if(activeCommunity && activeCommunity.id == communityId)
         {
             CommunityManager.setInitialCommunity()
-            CommunityManager.applyCommunityTheme(CommunityManager.getActiveCommunity())
         }
     }
     static getCommunity = (communityId:string):Community|null =>
@@ -77,6 +90,26 @@ export abstract class CommunityManager
     static getCommunityById = (communityId:number):Community|null =>
     {
         return CommunityManager.getStore().getState().communityStore.byId[communityId]
+    }
+    static ensureExists = (communityId:string|number, forceUpdate?: boolean) =>
+    {
+        const id = communityId.toString()
+        let community = CommunityManager.getCommunity(id)
+        if(!community || forceUpdate)
+        {
+            ApiClient.getCommunity(id, (data, status, error) => {
+                if(data)
+                {
+                    CommunityManager.storeCommunities([data])
+                }
+                else
+                {
+                    console.log("error fetching community", error)
+                }
+            })
+        }
+        return community
+
     }
     static ensureCommunityExists = (communityId:string|number, completion?:(community:Community) => void, forceUpdate?: boolean) =>
     {

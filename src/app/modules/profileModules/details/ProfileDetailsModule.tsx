@@ -25,6 +25,7 @@ import moment = require("moment");
 import { DropDownMenu } from "../../../components/general/DropDownMenu";
 import { ToastManager } from '../../../managers/ToastManager';
 import { ProfileManager } from '../../../managers/ProfileManager';
+import { withContextData, ContextDataProps } from "../../../hoc/WithContextData";
 
 type TimezoneInfoProps = {
     timezone:string
@@ -65,7 +66,6 @@ type OwnProps = {
     breakpoint:ResponsiveBreakpoint
 } & CommonModuleProps & DispatchProp
 type ReduxStateProps = {
-    profile:UserProfile
     authenticatedProfile:UserProfile
 }
 type ReduxDispatchProps ={
@@ -73,18 +73,18 @@ type ReduxDispatchProps ={
 type State = {
     latestJob:ProfilePosition
     isLoading:boolean
-    hasLoaded:boolean
+    loadedProfileId:number
     editFormVisible:boolean
     editFormReloadKey?:string
 }
-type Props = ReduxStateProps & ReduxDispatchProps & OwnProps & RouteComponentProps<any>
+type Props = ReduxStateProps & ReduxDispatchProps & OwnProps & RouteComponentProps<any> & ContextDataProps
 class ProfileDetailsModule extends React.PureComponent<Props, State> {
     constructor(props:Props) {
         super(props)
         this.state = {
             latestJob:null,
             isLoading:false,
-            hasLoaded:false,
+            loadedProfileId:null,
             editFormVisible:false,
             editFormReloadKey:uniqueId(),
         }
@@ -96,26 +96,25 @@ class ProfileDetailsModule extends React.PureComponent<Props, State> {
         this.fetchData()
     }
     fetchData = () => {
-        const {hasLoaded, isLoading} = this.state
-        if(hasLoaded || isLoading)
-            return
-        const profileId = this.props.profile && this.props.profile.id
-        if(!profileId)
+        const {loadedProfileId, isLoading} = this.state
+        const profileId = this.props.contextData.profile && this.props.contextData.profile.id
+        if(!profileId || loadedProfileId == profileId || isLoading)
             return
         this.setState((prevState:State) => {
-            return {isLoading:true}
+            return {isLoading:true, latestJob:null}
         }, () => {
             console.log("fetching positions")
             ApiClient.getPositions(10, 0, profileId,(data, status, error) => {
                 const position = (data && data.results || []).filter(p => !p.end_date).sort((a,b) => (a.start_date && stringToDate(a.start_date).valueOf() || 0) - (b.start_date && stringToDate(b.start_date).valueOf() || 0))[0]
                 this.setState((prevState:State) => {
-                    return {latestJob:position, isLoading:false, hasLoaded:true}
+                    return {latestJob:position, isLoading:false, loadedProfileId:profileId}
                 })
             })
         })
     }
     blockUser = (event: React.SyntheticEvent<any>) => {
-        const profile = {...this.props.profile}
+        const p = this.props.contextData.profile
+        const profile:UserProfile = {...p, relationship:p.relationship.map(i => i)}
         ApiClient.userBlock(profile.id, (data, status, error) => {
             if(!error)
             {
@@ -131,7 +130,8 @@ class ProfileDetailsModule extends React.PureComponent<Props, State> {
         })
     }
     unBlockUser = (event: React.SyntheticEvent<any>) => {
-        const profile = {...this.props.profile}
+        const p = this.props.contextData.profile
+        const profile:UserProfile = {...p, relationship:p.relationship.map(i => i)}
         ApiClient.userUnBlock(profile.id, (data, status, error) => {
             if(!error)
             {
@@ -144,7 +144,8 @@ class ProfileDetailsModule extends React.PureComponent<Props, State> {
         })
     }
     unfriendUser = (event: React.SyntheticEvent<any>) => {
-        const profile = {...this.props.profile}
+        const p = this.props.contextData.profile
+        const profile:UserProfile = {...p, relationship:p.relationship.map(i => i)}
         ApiClient.userUnfriend(profile.id, (data, status, error) => {
             if(!error)
             {
@@ -157,7 +158,8 @@ class ProfileDetailsModule extends React.PureComponent<Props, State> {
         })
     }
     sendInvitationToUser = () => (event: React.SyntheticEvent<any>) => {
-        const profile = {...this.props.profile}
+        const p = this.props.contextData.profile
+        const profile:UserProfile = {...p, relationship:p.relationship.map(i => i)}
         ApiClient.friendInvitationSend(profile.id, (data, status, error) => {
             if(data)
             {
@@ -170,7 +172,8 @@ class ProfileDetailsModule extends React.PureComponent<Props, State> {
         })
     }
     acceptInvitationFromUser = () => (event: React.SyntheticEvent<any>) => {
-        const profile = {...this.props.profile}
+        const p = this.props.contextData.profile
+        const profile:UserProfile = {...p, relationship:p.relationship.map(i => i)}
         ApiClient.friendInvitationAccept(profile.id, (data, status, error) => {
             if(!error)
             {
@@ -188,7 +191,8 @@ class ProfileDetailsModule extends React.PureComponent<Props, State> {
         ProfileManager.storeProfile(profile)
     }
     declineInvitationFromUser = (toRemove:RelationshipStatus) => (event: React.SyntheticEvent<any>) => {
-        const profile = {...this.props.profile}
+        const p = this.props.contextData.profile
+        const profile:UserProfile = {...p, relationship:p.relationship.map(i => i)}
         ApiClient.friendInvitationDelete(profile.id, false, (data, status, error) => {
             if(!error)
             {
@@ -201,12 +205,13 @@ class ProfileDetailsModule extends React.PureComponent<Props, State> {
         })
     }
     renderTimezoneInfo = () => {
-        if(this.props.profile && this.props.profile.timezone)
-            return <TimezoneInfo timezone={this.props.profile.timezone} />
+        if(this.props.contextData.profile && this.props.contextData.profile.timezone)
+            return <TimezoneInfo timezone={this.props.contextData.profile.timezone} />
         return null
     }
     renderConnections = () => {
-        const {profile, authenticatedProfile} = this.props
+        const {authenticatedProfile} = this.props
+        const {profile} = this.props.contextData
         if(profile && authenticatedProfile)
         {
             let connections:number[] = []
@@ -242,7 +247,8 @@ class ProfileDetailsModule extends React.PureComponent<Props, State> {
     }
     renderCommonFriends = () => {
 
-        const {profile, authenticatedProfile} = this.props
+        const {authenticatedProfile} = this.props
+        const {profile} = this.props.contextData
         if(profile && authenticatedProfile && profile.id != authenticatedProfile.id)
             return <div className="medium-small-text">{translate("profile.friends.common.count").format(profile.mutual_friends.length)}</div>
         return null
@@ -258,7 +264,7 @@ class ProfileDetailsModule extends React.PureComponent<Props, State> {
     }
     renderEditForm = () => {
         const visible = this.state.editFormVisible
-        const profile = this.props.profile
+        const {profile} = this.props.contextData
         return <ProfileUpdateComponent onCancel={this.hideProfileUpdateForm} key={this.state.editFormReloadKey} profile={profile} visible={visible} onComplete={this.handleProfileUpdateForm} />
     }
     showProfileUpdateForm = () => {
@@ -282,7 +288,7 @@ class ProfileDetailsModule extends React.PureComponent<Props, State> {
 
     getProfileOptions = () => {
         const options: OverflowMenuItem[] = []
-        const profile = this.props.profile
+        const {profile} = this.props.contextData
         if(!profile)
             return options
         if (this.props.authenticatedProfile.id == profile.id) {
@@ -363,7 +369,8 @@ class ProfileDetailsModule extends React.PureComponent<Props, State> {
     }
     render = () =>
     {
-        const {className, breakpoint, contextNaturalKey, pageSize, showLoadMore, showInModal, isModal, dispatch, staticContext, profile, authenticatedProfile, history, location, match,  ...rest} = this.props
+        const {className, breakpoint, contextNaturalKey, pageSize, showLoadMore, showInModal, isModal, dispatch, staticContext, authenticatedProfile, history, location, match, contextData,  ...rest} = this.props
+        const {profile} = this.props.contextData
         const title = userFullName(profile)
         const cn = classnames("profile-details-module", className)
         const hasRelationship = profile && authenticatedProfile && profile.id != authenticatedProfile.id && profile.relationship
@@ -388,10 +395,8 @@ class ProfileDetailsModule extends React.PureComponent<Props, State> {
     }
 }
 const mapStateToProps = (state:ReduxState, ownProps: OwnProps & RouteComponentProps<any>):ReduxStateProps => {
-    const resolved = ContextManager.getContextObject(ownProps.location.pathname, ContextNaturalKey.USER)
     return {
-        profile:resolved as any as UserProfile,
         authenticatedProfile:AuthenticationManager.getAuthenticatedUser()
     }
 }
-export default withRouter(connect(mapStateToProps, null)(ProfileDetailsModule))
+export default withContextData(withRouter(connect(mapStateToProps, null)(ProfileDetailsModule)))

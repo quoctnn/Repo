@@ -1,8 +1,5 @@
 @import "../../../Config";
-.context-invitations{
-    .modal-content{
-        height: 100%;
-    }
+.context-roles{
     .list-component{
         height: auto;
     }
@@ -21,10 +18,18 @@
             @include var(background, main-content-secondary-background);
         }
     }
-    @media (min-height: 640px)
-    {
-        .modal-content{
-            max-height: 640px !important;
-        };
+    .generic-list-item{
+        cursor: pointer;
+        .avatar-stacked{
+            margin: 0;
+            justify-content: flex-end;
+        }
+        .header{
+            display: flex;
+            align-items: center;
+            > i{
+                font-size: 0.8rem;
+            }
+        }
     }
 }

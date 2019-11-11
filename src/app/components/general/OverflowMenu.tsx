@@ -10,12 +10,13 @@ export type OverflowMenuItem = {
     onPress?:(event:any) => void
     iconClass?:string
     iconStackClass?:string
-    title?:string
+    title?:React.ReactNode
     id:string
     toggleMenu?:boolean
     type:OverflowMenuItemType
     active?:boolean
     disabled?:boolean
+    className?:string
     children?:React.ReactElement<any> | React.ReactElement<any>[]
 }
 type Props = {
@@ -43,7 +44,7 @@ export const createDropdownItem = (item:OverflowMenuItem, toggle?:() => void) =>
         props.divider = true
     if(item.disabled)
         props.disabled = true
-    return (<DropdownItem active={item.active}  {...props} toggle={!!item.toggleMenu} key={item.id} onClick={click} className="clickable text-truncate d-flex">
+    return (<DropdownItem active={item.active}  {...props} toggle={!!item.toggleMenu} key={item.id} onClick={click} className={classnames("clickable text-truncate d-flex", item.className)}>
                     {!useStackedIcons && item.iconClass && <i className={item.iconClass}></i>}
                     {useStackedIcons && <span className="fa-menu-icon-stack">
                         <i className={item.iconClass}></i>
@@ -109,7 +110,7 @@ export class OverflowMenu extends React.Component<Props, State> {
                         const id = "overflowmenuitem_" + i.id
                         const useStackedIcons = !!i.iconStackClass && !!i.iconClass
                         return (<React.Fragment key={"overflowmenuitem_fragment" + i.id}>
-                                    <Button color="light" id={id} size="xs" key={"overflowmenuitem_button" + i.id} onClick={i.onPress} title={i.title}>
+                                    <Button color="light" id={id} size="xs" key={"overflowmenuitem_button" + i.id} onClick={i.onPress}>
                                         {!useStackedIcons && i.iconClass && <i className={i.iconClass}></i>}
                                         {useStackedIcons && <span className="fa-stack">
                                             <i className={i.iconClass + " fa-stack-2x"}></i>

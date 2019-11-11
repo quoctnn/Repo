@@ -4,6 +4,7 @@ import { persistReducer } from "redux-persist";
 
 export enum TempCacheActionTypes {
     SetTemporaryConversation = 'temp.set_conversation',
+    Reset = "temp.reset",
 }
 export type TempCache = {
     conversation?:Conversation
@@ -19,10 +20,15 @@ export const setTemporaryConversationAction = (conversation: Conversation):SetTe
     type: TempCacheActionTypes.SetTemporaryConversation,
     conversation
 })
+export const resetTemporaryCacheAction = ():SetTemporaryAction => ({
+  type: TempCacheActionTypes.Reset,
+})
 const tempCache = (state = INITIAL_STATE, action:SetTemporaryAction):TempCache => {
   switch (action.type) {
     case TempCacheActionTypes.SetTemporaryConversation:
       return { ...state, conversation: action.conversation }
+    case TempCacheActionTypes.Reset:
+      return { conversation: null }
     default:
       return state;
   }

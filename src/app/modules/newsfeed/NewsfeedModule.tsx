@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { connect } from 'react-redux'
+import { connect, DispatchProp } from 'react-redux'
 import { withRouter, RouteComponentProps } from "react-router-dom";
 import Module from '../Module';
 import ModuleHeader from '../ModuleHeader';
@@ -13,11 +13,10 @@ import { ResponsiveBreakpoint } from '../../components/general/observers/Respons
 import NewsfeedComponentRouted, { NewsfeedComponent } from './NewsfeedComponent';
 import CircularLoadingSpinner from '../../components/general/CircularLoadingSpinner';
 import NewsfeedMenu, { NewsfeedMenuData, allowedSearchOptions } from './NewsfeedMenu';
-import { ObjectAttributeType, ContextNaturalKey, StatusActions, Permission, Permissible } from '../../types/intrasocial_types';
+import { ObjectAttributeType, ContextNaturalKey, StatusActions, Permission, Permissible, IdentifiableObject } from '../../types/intrasocial_types';
 import { ContextSearchData } from '../../components/general/input/contextsearch/extensions';
 import { translate } from '../../localization/AutoIntlProvider';
 import { ReduxState } from '../../redux';
-import { ContextManager } from '../../managers/ContextManager';
 import { StatusComposerComponent } from '../../components/general/input/StatusComposerComponent';
 import { DropDownMenu } from '../../components/general/DropDownMenu';
 import { OverflowMenuItem, OverflowMenuItemType } from '../../components/general/OverflowMenu';
@@ -25,13 +24,15 @@ import { EventSubscription } from 'fbemitter';
 import { NotificationCenter } from '../../utilities/NotificationCenter';
 import { eventStreamNotificationPrefix, EventStreamMessageType } from '../../network/ChannelEventStream';
 import ReconnectingWebSocket from 'reconnecting-websocket';
+import { uniqueId } from '../../utilities/Utilities';
+import { ContextDataProps, withContextData } from '../../hoc/WithContextData';
 
 type OwnProps = {
     className?:string
     breakpoint:ResponsiveBreakpoint
     contextNaturalKey?:ContextNaturalKey
     contextObjectId:number
-}
+} & ContextDataProps & DispatchProp
 type DefaultProps = {
 
     includeSubContext:boolean
@@ -39,16 +40,13 @@ type DefaultProps = {
 interface ReduxStateProps
 {
     contextObjectId:number
-    contextObject:Permissible
-}
-interface ReduxDispatchProps
-{
+    contextObject:Permissible & IdentifiableObject
 }
 interface State
 {
     menuVisible:boolean
     isLoading:boolean
-    feedInvalidated:boolean
+    feedReloadContext:string
     selectedSearchContext:ContextSearchData
     includeSubContext:boolean
     filter:ObjectAttributeType
@@ -58,7 +56,7 @@ interface State
     contextTitle?:string
     statusComposerFocus:boolean
 }
-type Props = ReduxStateProps & ReduxDispatchProps & OwnProps & DefaultProps & RouteComponentProps<any>
+type Props = ReduxStateProps & OwnProps & DefaultProps & RouteComponentProps<any>
 
 class NewsfeedModule extends React.Component<Props, State> {
     private observers:EventSubscription[] = []
@@ -77,7 +75,7 @@ class NewsfeedModule extends React.Component<Props, State> {
             includeSubContext:props.includeSubContext,
             filter:null,
             isLoading:false,
-            feedInvalidated:false,
+            feedReloadContext:uniqueId(),
             contextNaturalKey:undefined,
             contextObjectId:undefined,
             statusComposerFocus:false
@@ -99,14 +97,12 @@ class NewsfeedModule extends React.Component<Props, State> {
         //turn off loading spinner if feed is removed
         if(prevProps.breakpoint != this.props.breakpoint && this.props.breakpoint < ResponsiveBreakpoint.standard && this.state.isLoading)
         {
-            this.setState({isLoading:false, feedInvalidated:false})
-        } else {
-            this.setState({feedInvalidated:false})
+            this.setState({isLoading:false})
         }
     }
     shouldComponentUpdate = (nextProps:Props, nextState:State) => {
-        if (nextState.feedInvalidated) return true
-        else return nextProps.breakpoint != this.props.breakpoint ||
+        return nextState.feedReloadContext != this.state.feedReloadContext ||
+                nextProps.breakpoint != this.props.breakpoint ||
                 nextProps.contextNaturalKey != this.props.contextNaturalKey ||
                 nextProps.contextObjectId != this.props.contextObjectId ||
                 nextProps.includeSubContext != this.props.includeSubContext ||
@@ -122,7 +118,7 @@ class NewsfeedModule extends React.Component<Props, State> {
     }
     websocketConnect = (...args:any[]) => {
         if (args[0] == ReconnectingWebSocket.OPEN) {
-            this.setState({feedInvalidated:true})
+            this.setState({feedReloadContext:uniqueId()})
         }
     }
     headerClick = (e) => {
@@ -149,7 +145,7 @@ class NewsfeedModule extends React.Component<Props, State> {
         this.setState(newState as State)
     }
     feedLoadingStateChanged = (isLoading:boolean) => {
-        this.setState({isLoading, feedInvalidated:false})
+        this.setState({isLoading})
     }
     renderLoading = () => {
         if (this.state.isLoading) {
@@ -179,11 +175,12 @@ class NewsfeedModule extends React.Component<Props, State> {
     }
     renderStatusComposer = (resolvedContextNaturalKey:ContextNaturalKey, resolvedContextObjectId:number) => {
 
-        const {contextObject} = this.props
+        const {contextObject, contextNaturalKey} = this.props
         const canPost = (contextObject && contextObject.permission >= Permission.post) || false
         let communityId = contextObject && ((contextObject as any).community || null)
         if(canPost)
         {
+            const taggableMembers = ContextNaturalKey.getMembers(contextNaturalKey, contextObject)
             return (<>
                 <div className="status-composer-backdrop" onMouseDown={this.blurStatusComposer}></div>
                 <div ref={this.statuscomposer} className="feed-composer-container main-content-background">
@@ -203,7 +200,7 @@ class NewsfeedModule extends React.Component<Props, State> {
                         singleLine={!this.state.statusComposerFocus}
                         forceHideDropzone={!this.state.statusComposerFocus}
                         useAdaptiveFontSize={this.state.statusComposerFocus}
-                        //taggableMembers={task.visibility}
+                        taggableMembers={taggableMembers}
                     />
                 </div>
             </>)
@@ -237,7 +234,7 @@ class NewsfeedModule extends React.Component<Props, State> {
     }
     render()
     {
-        const {breakpoint, history, match, location, staticContext, className, contextNaturalKey, contextObjectId, contextObject, includeSubContext, ...rest} = this.props
+        const {breakpoint, history, match, location, staticContext, className, contextNaturalKey, contextObjectId, contextObject, includeSubContext, contextData, dispatch, ...rest} = this.props
         const headerClick = breakpoint < ResponsiveBreakpoint.standard ? this.headerClick : undefined
         const {contextTitle} = this.state
         const resolvedContextNaturalKey = this.state.contextNaturalKey || this.props.contextNaturalKey
@@ -262,7 +259,7 @@ class NewsfeedModule extends React.Component<Props, State> {
                             contextObjectId={resolvedContextObjectId}
                             contextObject={contextObject}
                             filter={this.state.filter}
-                            feedInvalidated={this.state.feedInvalidated}
+                            feedReloadContext={this.state.feedReloadContext}
                             scrollParent={window}
                             />
                     </ModuleContent>
@@ -282,14 +279,10 @@ class NewsfeedModule extends React.Component<Props, State> {
 }
 const mapStateToProps = (state:ReduxState, ownProps: OwnProps & RouteComponentProps<any>):ReduxStateProps => {
 
-    const resolved = ContextManager.getContextObject(ownProps.location.pathname, ownProps.contextNaturalKey)
+    const resolved = ownProps.contextData.getContextObject(ownProps.contextNaturalKey)
     return {
         contextObject:resolved,
         contextObjectId:resolved && resolved.id,
     }
 }
-const mapDispatchToProps = (dispatch:ReduxState, ownProps: OwnProps):ReduxDispatchProps => {
-    return {
-    }
-}
-export default withRouter(connect<ReduxStateProps, ReduxDispatchProps, OwnProps>(mapStateToProps, mapDispatchToProps)(NewsfeedModule))
+export default  withContextData(withRouter(connect<ReduxStateProps, void, OwnProps>(mapStateToProps)(NewsfeedModule)))

@@ -22,7 +22,7 @@ export class ChatMessageList extends React.Component<Props & React.HTMLAttribute
     SCROLL_POSITION:any = null
     wasAtBottomBeforeUpdate:boolean = false
     scrollToBottomThreshold = 50
-    private readObserver = null;
+    private readObserver:ReadObserver = null;
     private listRef = React.createRef<HTMLDivElement>()
     constructor(props:Props) {
         super(props)

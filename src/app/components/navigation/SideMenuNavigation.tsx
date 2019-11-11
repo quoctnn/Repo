@@ -16,11 +16,11 @@ import { useDrag } from 'react-dnd'
 import ToggleSwitch from "../general/ToggleSwitch";
 import Routes from '../../utilities/Routes';
 import { Link } from "react-router-dom";
-import { ContextManager } from "../../managers/ContextManager";
-import { AuthenticationManager } from '../../managers/AuthenticationManager';
 import { Settings } from '../../utilities/Settings';
 import { NotificationCenter } from "../../utilities/NotificationCenter";
 import { EventSubscription } from "fbemitter";
+import { withContextData, ContextDataProps } from "../../hoc/WithContextData";
+import { uniqueId } from '../../utilities/Utilities';
 
 type ContextItemProps = {
     name?:string
@@ -274,11 +274,7 @@ const ConnectedTopProjects = withRouter(TopProjects)
 
 type OwnProps = {
 }
-type ReduxStateProps = {
-    community:Community
-    profile:UserProfile
-}
-type Props = OwnProps & ReduxStateProps
+type Props = OwnProps & ContextDataProps & RouteComponentProps<any>
 
 type State = {
     open: boolean
@@ -293,6 +289,7 @@ class SideMenuNavigation extends React.Component<Props, State> {
     static animationDuration = 300
     private contentRef = React.createRef<HTMLDivElement>()
     private observers:EventSubscription[] = []
+    private classId = uniqueId()
     constructor(props: Props) {
         super(props)
         this.state = {
@@ -300,7 +297,10 @@ class SideMenuNavigation extends React.Component<Props, State> {
             mode: MenuViewMode.grid,
             closeMenuOnNavigation:true,
         }
-        document.body.classList.add(SideMenuNavigation.bodyClass)
+        document.body.classList.add(this.getBodyClass())
+    }
+    getBodyClass = () => {
+        return SideMenuNavigation.bodyClass + "-" + this.classId
     }
     processToggleMenuNotification = (...args:any[]) => {
         this.toggleMenu()
@@ -339,7 +339,7 @@ class SideMenuNavigation extends React.Component<Props, State> {
         }
     }
     componentWillUnmount = () => {
-        document.body.classList.remove(SideMenuNavigation.bodyClass)
+        document.body.classList.remove(this.getBodyClass())
         document.body.classList.remove(SideMenuNavigation.sideMenuLockedClass)
         document.removeEventListener('click', this.outsideTrigger);
         this.observers.forEach(o => o.remove())
@@ -398,10 +398,11 @@ class SideMenuNavigation extends React.Component<Props, State> {
         const modeIconClass = classnames("anim-icon-button", modeIcon)
         const borderHeight = this.state.open ? 1 : 0
         const transDur = SideMenuNavigation.animationDuration + "ms"
-        const chapters = this.props.community && this.props.community.chapters
-        const anonUser = this.props.profile ? this.props.profile.is_anonymous : false
+        const {community, profile} = this.props.contextData
+        const chapters = community && community.chapters
+        const anonUser = profile ? profile.is_anonymous : false
         const noProjects = chapters || anonUser
-        const isSuperUser = this.props.profile && this.props.profile.is_superuser
+        const isSuperUser = profile && profile.is_superuser
         return (
             <div ref={this.contentRef} onClick={openMenu} id="side-menu-navigation" className={cn} style={{ transitionDuration: transDur }}>
                 {this.renderHeader()}
@@ -468,14 +469,4 @@ class SideMenuNavigation extends React.Component<Props, State> {
         );
     }
 }
-
-const mapStateToProps = (state: ReduxState, ownProps: OwnProps & RouteComponentProps<any>): ReduxStateProps => {
-
-    const community = ContextManager.getContextObject(ownProps.location.pathname, ContextNaturalKey.COMMUNITY) as Community
-    const profile = AuthenticationManager.getAuthenticatedUser()
-    return {
-        community,
-        profile
-    }
-}
-export default withRouter(connect(mapStateToProps, null)(SideMenuNavigation))
+export default withContextData(withRouter(SideMenuNavigation))

@@ -1,19 +1,15 @@
 import * as React from 'react';
 import { ModalBody, Modal, ModalHeader, ModalFooter } from 'reactstrap';
-import "./ConfirmDialog.scss"
 import { translate } from '../../../localization/AutoIntlProvider';
 
-export interface OwnProps 
-{
+type OwnProps = {
     didComplete:(confirmed:boolean) => void
     title:string
     message:string 
     okButtonTitle?:string
 }
-export interface DefaultProps 
-{
+type DefaultProps = {
     visible:boolean
-
 }
 interface State 
 {

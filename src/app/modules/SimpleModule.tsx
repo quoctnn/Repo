@@ -11,6 +11,7 @@ import ModuleMenu from './ModuleMenu';
 import { Button } from 'reactstrap';
 import { translate } from '../localization/AutoIntlProvider';
 import SimpleDialog from '../components/general/dialogs/SimpleDialog';
+import { ContextDataProps } from '../hoc/WithContextData';
 type OwnProps = {
     className?:string
     breakpoint:ResponsiveBreakpoint
@@ -73,18 +74,18 @@ export default class SimpleModule extends React.Component<Props, State> {
         if(!this.props.renderModalContent)
             return
             
-        return <SimpleDialog scrollable={false} className="module-modal has-module" header={this.props.headerTitle} visible={this.state.modalVisible} didCancel={this.toggleModal}>
+        return <SimpleDialog scrollable={true} className="module-modal has-module" header={this.props.headerTitle} visible={this.state.modalVisible} didCancel={this.toggleModal}>
                     {this.props.renderModalContent()}
                 </SimpleDialog>
     }
     render()
     {
-        const { breakpoint, className, contextNaturalKey,children, menu, onMenuToggle: onMenuVisibilityChanged, headerTitle: title, isLoading,  headerClick, headerContent, showHeader, showHeaderTitle, renderModalContent,  ...rest} = this.props
+        const { breakpoint, className,children, menu, headerTitle: title, isLoading,  headerClick, headerContent, showHeader, style} = this.props
         const cn = classnames("simple-module", className, {"menu-visible":this.state.menuVisible})
         const headerTitle = this.props.showHeaderTitle && title
         const headClick = breakpoint < ResponsiveBreakpoint.standard ? headerClick : undefined
         const headerClass = classnames({link:headClick})
-        return (<Module {...rest} className={cn}>
+        return (<Module style={style} className={cn}>
                     { showHeader &&
                         <ModuleHeader className={headerClass} onClick={headClick} loading={isLoading} headerTitle={headerTitle}>
                             {headerContent}

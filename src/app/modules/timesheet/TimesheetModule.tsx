@@ -3,9 +3,7 @@ import { withRouter, RouteComponentProps } from "react-router-dom";
 import classnames from "classnames"
 import "./TimesheetModule.scss"
 import { ResponsiveBreakpoint } from '../../components/general/observers/ResponsiveComponent';
-import { ContextNaturalKey, Permissible, Timesheet, IdentifiableObject } from '../../types/intrasocial_types';
-import { connect } from 'react-redux';
-import { ReduxState } from '../../redux';
+import { ContextNaturalKey, Permissible, Timesheet } from '../../types/intrasocial_types';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import SimpleModule from '../SimpleModule';
 import { translate } from '../../localization/AutoIntlProvider';
@@ -13,8 +11,8 @@ import ListComponent from '../../components/general/ListComponent';
 import TimesheetListItem from './TimesheetListItem';
 import {ApiClient,  PaginationResult } from '../../network/ApiClient';
 import { ToastManager } from '../../managers/ToastManager';
-import { ContextManager } from '../../managers/ContextManager';
 import { CommonModuleProps } from '../Module';
+import { withContextData, ContextDataProps } from '../../hoc/WithContextData';
 type OwnProps = {
     breakpoint:ResponsiveBreakpoint
 }
@@ -24,12 +22,7 @@ type DefaultProps = {
 type State = {
     isLoading:boolean
 }
-type ReduxStateProps = {
-    contextObject:Permissible & IdentifiableObject
-}
-type ReduxDispatchProps = {
-}
-type Props = DefaultProps & OwnProps & RouteComponentProps<any> & ReduxStateProps & ReduxDispatchProps
+type Props = DefaultProps & OwnProps & RouteComponentProps<any> & ContextDataProps
 class TimesheetModule extends React.Component<Props, State> {
     timesheetList = React.createRef<ListComponent<Timesheet>>()
     static defaultProps: DefaultProps = {
@@ -46,7 +39,9 @@ class TimesheetModule extends React.Component<Props, State> {
         this.timesheetList = null
     }
     shouldReloadList = (prevProps:Props) => {
-        return this.props.contextObject && prevProps.contextObject && this.props.contextObject.id != prevProps.contextObject.id
+        const c = this.props.contextData.getContextObject(this.props.contextNaturalKey)
+        const p = prevProps.contextData.getContextObject(prevProps.contextNaturalKey)
+        return c && p && c.id != p.id
     }
     componentDidUpdate = (prevProps:Props) => {
         if(this.shouldReloadList(prevProps))
@@ -64,7 +59,8 @@ class TimesheetModule extends React.Component<Props, State> {
         this.setState({isLoading})
     }
     fetchTimesheets = (offset:number, completion:(items:PaginationResult<Timesheet>) => void ) => {
-        const contextId = (this.props.contextObject && this.props.contextObject.id) || undefined
+        const contextObject = this.props.contextData.getContextObject(this.props.contextNaturalKey)
+        const contextId = contextObject && contextObject.id || undefined
         const userId = this.props.contextNaturalKey == ContextNaturalKey.USER ? contextId : undefined
         const projectId = this.props.contextNaturalKey == ContextNaturalKey.PROJECT ? contextId : undefined
         const taskId = this.props.contextNaturalKey == ContextNaturalKey.TASK ? contextId : undefined
@@ -100,10 +96,11 @@ class TimesheetModule extends React.Component<Props, State> {
     }
     render()
     {
-        const {history, match, location, staticContext, contextNaturalKey, contextObject, showTaskTitles, pageSize, showLoadMore, showInModal, isModal, ...rest} = this.props
+        const {history, match, location, staticContext, contextNaturalKey, showTaskTitles, pageSize, showLoadMore, showInModal, isModal, contextData, ...rest} = this.props
         const {breakpoint, className} = this.props
         const cn = classnames("timesheet-module", className)
         const renderModalContent = !showInModal || isModal ? undefined : this.renderModalContent
+        const contextObject = contextData.getContextObject(contextNaturalKey)
         return (<SimpleModule {...rest}
                     showHeader={!isModal}
                     renderModalContent={renderModalContent}
@@ -116,15 +113,4 @@ class TimesheetModule extends React.Component<Props, State> {
                 </SimpleModule>)
     }
 }
-const mapStateToProps = (state:ReduxState, ownProps: OwnProps & DefaultProps & RouteComponentProps<any>):ReduxStateProps => {
-
-    const contextObject = ContextManager.getContextObject(ownProps.location.pathname, ownProps.contextNaturalKey)
-    return {
-        contextObject,
-    }
-}
-const mapDispatchToProps = (dispatch:ReduxState, ownProps: OwnProps):ReduxDispatchProps => {
-    return {
-    }
-}
-export default withRouter(connect<ReduxStateProps, ReduxDispatchProps, OwnProps>(mapStateToProps, mapDispatchToProps)(TimesheetModule))
+export default withContextData(withRouter(TimesheetModule))

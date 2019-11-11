@@ -7,21 +7,21 @@ import ModuleFooter from '../ModuleFooter';
 import "./EventDetailsModule.scss"
 import { ResponsiveBreakpoint } from '../../components/general/observers/ResponsiveComponent';
 import { translate } from '../../localization/AutoIntlProvider';
-import { Event, Community, ContextNaturalKey, Permission} from '../../types/intrasocial_types';
-import { connect } from 'react-redux';
-import { ReduxState } from '../../redux';
+import { Event, ContextNaturalKey, Permission } from '../../types/intrasocial_types';
 import CircularLoadingSpinner from '../../components/general/CircularLoadingSpinner';
-import LoadingSpinner from '../../components/LoadingSpinner';
 import { DetailsContent } from '../../components/details/DetailsContent';
 import { stringToDateFormat, DateFormat, uniqueId } from '../../utilities/Utilities';
-import { ContextManager } from '../../managers/ContextManager';
 import { OverflowMenuItem, OverflowMenuItemType } from '../../components/general/OverflowMenu';
 import FormController from '../../components/form/FormController';
 import { DropDownMenu } from '../../components/general/DropDownMenu';
 import EventCreateComponent from '../../components/general/contextCreation/EventCreateComponent';
-import { EventManager } from '../../managers/EventManager';
-import ContextInvitationComponent from '../../components/general/contextInvitation/ContextInvitationComponent';
+import ContextMembersForm from '../../components/general/contextMembers/ContextMembersForm';
+import ContextMembershipComponent from '../../components/general/contextMembership/ContextMembershipComponent';
+import { withContextData, ContextDataProps } from '../../hoc/WithContextData';
+import { EventController } from '../../managers/EventController';
+import ContextConfirmableActionsComponent, { ContextConfirmableActions } from '../../components/general/context/ContextConfirmableActionsComponent';
 const shortMonth:string[] = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+
 type OwnProps = {
     breakpoint:ResponsiveBreakpoint
     contextNaturalKey: ContextNaturalKey
@@ -31,18 +31,13 @@ type State = {
     isLoading:boolean
     editFormVisible:boolean
     editFormReloadKey:string
-    invitationListVisible?:boolean
-    invitationReloadKey?:string
+    membersFormVisible?:boolean
+    membersFormReloadKey?:string
 }
-type ReduxStateProps = {
-    community: Community
-    event: Event
-}
-type ReduxDispatchProps = {
-}
-type Props = OwnProps & RouteComponentProps<any> & ReduxStateProps & ReduxDispatchProps
+type Props = OwnProps & RouteComponentProps<any> & ContextDataProps
 class EventDetailsModule extends React.Component<Props, State> {
     formController:FormController = null
+    confirmActionComponent = React.createRef<ContextConfirmableActionsComponent>()
     constructor(props:Props) {
         super(props);
         this.state = {
@@ -50,8 +45,8 @@ class EventDetailsModule extends React.Component<Props, State> {
             menuVisible:false,
             editFormVisible:false,
             editFormReloadKey:uniqueId(),
-            invitationListVisible:false,
-            invitationReloadKey:uniqueId(),
+            membersFormVisible:false,
+            membersFormReloadKey:uniqueId(),
         }
     }
     componentDidUpdate = (prevProps:Props) => {
@@ -87,46 +82,74 @@ class EventDetailsModule extends React.Component<Props, State> {
         })
     }
     hideEventCreateForm = () => {
-
         this.setState((prevState:State) => {
             return {editFormVisible:false}
         })
     }
     handleEventCreateForm = (event:Event) => {
-
         if(!!event)
         {
-            EventManager.storeEvents([event])
+            EventController.partialUpdate(event)
         }
         this.hideEventCreateForm()
     }
-    toggleInviteForm = () => {
+    toggleMembersForm = () => {
         this.setState((prevState:State) => {
-            const invitationReloadKey = prevState.invitationListVisible ? null : uniqueId()
-            return {invitationListVisible:!prevState.invitationListVisible, invitationReloadKey}
+            const invitationReloadKey = prevState.membersFormVisible ? null : uniqueId()
+            return {membersFormVisible:!prevState.membersFormVisible, membersFormReloadKey: invitationReloadKey}
         })
     }
+    showConfirmDeleteDialog = () => {
+        this.confirmActionComponent && this.confirmActionComponent.current && this.confirmActionComponent.current.showAction(ContextConfirmableActions.delete)
+    }
+    showConfirmLeaveDialog = () => {
+        this.confirmActionComponent && this.confirmActionComponent.current && this.confirmActionComponent.current.showAction(ContextConfirmableActions.leave)
+    }
+    toggleMute = () => {
+        const action = this.props.contextData.event.muted ? ContextConfirmableActions.unmute : ContextConfirmableActions.mute
+        this.confirmActionComponent && this.confirmActionComponent.current && this.confirmActionComponent.current.showAction(action, false)
+    }
     getEventOptions = () => {
+        const authenticatedUser = this.props.contextData.authenticatedUser
         const options: OverflowMenuItem[] = []
-        if(this.props.event.permission >= Permission.admin)
-            options.push({id:"1", type:OverflowMenuItemType.option, title:translate("Edit"), onPress:this.showEventCreateForm, iconClass:"fas fa-pen", iconStackClass:Permission.getShield(this.props.event.permission)})
-        if(this.props.event.permission >= Permission.admin)
-            options.push({id:"invite", type:OverflowMenuItemType.option, title:translate("common.invitations"), onPress:this.toggleInviteForm, iconClass:"fas fa-paper-plane", iconStackClass:Permission.getShield(this.props.event.permission)})
+        const {event} = this.props.contextData
+        const attending = event.attending || []
+        if(event.permission >= Permission.moderate)
+        {
+            options.push({id:"edit", type:OverflowMenuItemType.option, title:translate("Edit"), onPress:this.showEventCreateForm, iconClass:"fas fa-pen", iconStackClass:Permission.getShield(event.permission)})
+            options.push({id:"members", type:OverflowMenuItemType.option, title:translate("common.member.management"), onPress:this.toggleMembersForm, iconClass:"fas fa-users-cog", iconStackClass:Permission.getShield(event.permission)})
+            options.push({id:"delete", type:OverflowMenuItemType.option, title:translate("common.delete"), onPress:this.showConfirmDeleteDialog, iconClass:"fas fa-trash-alt", iconStackClass:Permission.getShield(event.permission)})
+        }
+        if(attending.contains(authenticatedUser.id))
+        {
+            if(event.muted)
+                options.push({id:"unmute", type:OverflowMenuItemType.option, title:translate("common.unmute"), onPress:this.toggleMute, iconClass:"fas fa-bell-slash"})
+            else 
+                options.push({id:"mute", type:OverflowMenuItemType.option, title:translate("common.mute"), onPress:this.toggleMute, iconClass:"fas fa-bell"})
+        }
+        if(event.creator != authenticatedUser.id && attending.contains(authenticatedUser.id))
+            options.push({id:"leave", type:OverflowMenuItemType.option, title:translate("common.leave"), onPress:this.showConfirmLeaveDialog, iconClass:"fas fa-sign-out-alt"})
         return options
     }
-    renderInvitationList = () => {
-        const visible = this.state.invitationListVisible
-        const contextObject = this.props.event
-        return <ContextInvitationComponent members={contextObject.attending} availableMembers={this.props.community.members} contextNaturalKey={ContextNaturalKey.EVENT} key={this.state.invitationReloadKey} didCancel={this.toggleInviteForm} visible={visible} contextObject={contextObject} />
+    renderMembersForm = () => {
+        const visible = this.state.membersFormVisible
+        const {community, event} = this.props.contextData
+        return <ContextMembersForm community={community} contextNaturalKey={ContextNaturalKey.EVENT} key={this.state.membersFormReloadKey} didCancel={this.toggleMembersForm} visible={visible} contextObject={event} />
     }
     renderEditForm = () => {
         const visible = this.state.editFormVisible
-        const event = this.props.event
+        const {event} = this.props.contextData
         return <EventCreateComponent onCancel={this.hideEventCreateForm} community={event.community} key={this.state.editFormReloadKey} event={event} visible={visible} onComplete={this.handleEventCreateForm} />
+    }
+    handleConfirmableActionComplete = (action:ContextConfirmableActions, contextNaturalKey:ContextNaturalKey, contextObjectId:number) => {
+        this.props.contextData.reloadContextObject(contextObjectId, contextNaturalKey)
     }
     render()
     {
-        const {breakpoint, history, match, location, staticContext, event, community, contextNaturalKey, ...rest} = this.props
+        const {breakpoint, history, match, location, staticContext, contextNaturalKey, contextData, ...rest} = this.props
+        const {community, event} = this.props.contextData
+        if(!community || !event)
+            return null
         const startDate = event ? new Date(event.start) : null
         const eventOptions = this.getEventOptions()
         return (<Module {...rest}>
@@ -134,63 +157,47 @@ class EventDetailsModule extends React.Component<Props, State> {
                         {eventOptions.length > 0 && <DropDownMenu className="event-option-dropdown" triggerClass="fas fa-cog mx-1" items={eventOptions}></DropDownMenu>} 
                     </ModuleHeader>
                     <ModuleContent>
-                        { event && event.permission >= Permission.read &&
-                            <div className="event-details-content">
-                                <DetailsContent community={community} description={event.description}>
-                                    { event.parent &&
-                                        <div>
-                                            <span className="details-field-name">
-                                                {translate("common.event.event")}:&nbsp;
-                                            </span>
-                                            <span className="details-field-value">
-                                                <Link to={event.parent.uri || "#"}>
-                                                    {event.parent.name}
-                                                </Link>
-                                            </span>
-                                        </div>
-                                    }
-                                </DetailsContent>
-                            </div>
-                            ||
-                            <LoadingSpinner key="loading"/>
-                        }
-                        {this.renderEditForm()}
-                        {this.renderInvitationList()}
-                    </ModuleContent>
-                    { event && event.permission >= Permission.read &&
-                        <ModuleFooter>
-                            { startDate &&
-                            <div className="event-footer">
-                                <div className="event-date-big">
-                                        <span>
-                                            {shortMonth[startDate.getMonth()].toUpperCase()}<br/>
-                                            {startDate.getDate()}
+                        <div className="event-details-content">
+                            <DetailsContent community={community} group={event.group} description={event.description}>
+                                { event.parent &&
+                                    <div>
+                                        <span className="details-field-name">
+                                            {translate("common.event.event")}:&nbsp;
                                         </span>
-                                </div>
-                                <div className="event-start-end text-truncate">
-                                    <div className="details-field-value">
-                                        {stringToDateFormat(event.start, DateFormat.date)}
-                                        &nbsp;-<br/>
-                                        {stringToDateFormat(event.end, DateFormat.date)}
+                                        <span className="details-field-value">
+                                            <Link to={event.parent.uri || "#"}>
+                                                {event.parent.name}
+                                            </Link>
+                                        </span>
                                     </div>
+                                }
+                            </DetailsContent>
+                        </div>
+                        {this.renderEditForm()}
+                        {this.renderMembersForm()}
+                        <ContextConfirmableActionsComponent ref={this.confirmActionComponent} contextNaturalKey={ContextNaturalKey.EVENT} contextObject={event} onActionComplete={this.handleConfirmableActionComplete} />
+                    </ModuleContent>
+                    <ModuleFooter>
+                        { startDate &&
+                        <div className="event-footer">
+                            <div className="event-date-big">
+                                    <span>
+                                        {shortMonth[startDate.getMonth()].toUpperCase()}<br/>
+                                        {startDate.getDate()}
+                                    </span>
+                            </div>
+                            <div className="event-start-end text-truncate">
+                                <div className="details-field-value">
+                                    {stringToDateFormat(event.start, DateFormat.date)}
+                                    &nbsp;-<br/>
+                                    {stringToDateFormat(event.end, DateFormat.date)}
                                 </div>
                             </div>
-                            }
-                        </ModuleFooter>
-                    }
+                        </div>
+                        }
+                        <ContextMembershipComponent contextNaturalKey={ContextNaturalKey.EVENT} contextObject={event} />
+                    </ModuleFooter>
                 </Module>)
     }
 }
-const mapStateToProps = (state:ReduxState, ownProps: OwnProps & RouteComponentProps<any>):ReduxStateProps => {
-    const event = ContextManager.getContextObject(ownProps.location.pathname, ownProps.contextNaturalKey) as Event
-    const community = ContextManager.getContextObject(ownProps.location.pathname, ContextNaturalKey.COMMUNITY) as Community
-    return {
-        community,
-        event,
-    }
-}
-const mapDispatchToProps = (dispatch:ReduxState, ownProps: OwnProps):ReduxDispatchProps => {
-    return {
-    }
-}
-export default withRouter(connect<ReduxStateProps, ReduxDispatchProps, OwnProps>(mapStateToProps, mapDispatchToProps)(EventDetailsModule))
+export default withContextData(withRouter(EventDetailsModule))

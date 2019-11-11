@@ -4,11 +4,24 @@ import Constants from "../utilities/Constants";
 import { translate } from "../localization/AutoIntlProvider";
 import { userFullName, groupCover, communityCover, userCover, projectCover, eventCover } from '../utilities/Utilities';
 import { CommunityManager } from '../managers/CommunityManager';
-import { ProjectManager } from '../managers/ProjectManager';
+export type CommunityRole = {
+    community:number
+    users:number[]
+    groups:number[]
+    projects:number[]
+    role:string
+    moderator:boolean
+    manager:boolean
+    group_creation:CommunityRoleCreatePermission
+    subgroup_creation:CommunityRoleCreatePermission
+    event_creation:CommunityRoleCreatePermission
+    project_creation:CommunityRoleCreatePermission
+    color:string
+} & IdentifiableObject
 export type FriendRequest = {
     created:string
-    from_user:number 
-    message:string 
+    from_user:number
+    message:string
     to_user:number
 } & IdentifiableObject
 export enum RelationshipStatus{
@@ -21,6 +34,8 @@ export enum RelationshipStatus{
     admin = "admin",
     moderator = "moderator",
     creator = "creator",
+    manager = "manager",
+
 }
 export enum AppLanguage{
     english = "en",
@@ -67,6 +82,23 @@ export namespace CommunityCreatePermission {
         CommunityCreatePermission.createAllowed,
     ]
     export function translationForKey(key: CommunityCreatePermission) {
+        return translate(`community.create_permission.${key}`)
+    }
+}
+export enum CommunityRoleCreatePermission{
+    createDenied = 0,
+    createLimited = 20,
+    createAllowed = 21,
+    inherit = -1
+}
+export namespace CommunityRoleCreatePermission {
+    export const all = [
+        CommunityRoleCreatePermission.createDenied,
+        CommunityRoleCreatePermission.createLimited,
+        CommunityRoleCreatePermission.createAllowed,
+        CommunityRoleCreatePermission.inherit,
+    ]
+    export function translationForKey(key: CommunityRoleCreatePermission) {
         return translate(`community.create_permission.${key}`)
     }
 }
@@ -464,6 +496,17 @@ export namespace ContextNaturalKey {
         ContextNaturalKey.TASK,
         ContextNaturalKey.CONVERSATION
     ]
+    export const getMembers = (key:ContextNaturalKey, contextObject:IdentifiableObject) => {
+        switch (key) {
+            case ContextNaturalKey.EVENT: return (contextObject as Event).attending || []
+            case ContextNaturalKey.GROUP: return (contextObject as Group).members || []
+            case ContextNaturalKey.PROJECT: return (contextObject as Project).members || []
+            case ContextNaturalKey.COMMUNITY: return (contextObject as Community).members || []
+            default:
+                console.warn(`${key} has no 'members' field`, contextObject)
+                return []
+        }
+    }
     export function defaultAvatarForKey(key: ContextNaturalKey) {
         switch (key) {
             case ContextNaturalKey.GROUP: return Constants.resolveUrl(Constants.defaultImg.groupAvatar)()
@@ -482,6 +525,18 @@ export namespace ContextNaturalKey {
             case ContextNaturalKey.PROJECT: return "fas fa-clipboard-list"
             case ContextNaturalKey.EVENT: return "fas fa-calendar"
             case ContextNaturalKey.TASK: return "fas fa-tasks"
+            default: return null
+        }
+    }
+    export function fromSegmentKey(key: ContextSegmentKey) {
+        switch (key) {
+            case ContextSegmentKey.GROUP: return ContextNaturalKey.GROUP
+            case ContextSegmentKey.COMMUNITY: return ContextNaturalKey.COMMUNITY
+            case ContextSegmentKey.USER: return ContextNaturalKey.USER
+            case ContextSegmentKey.PROJECT: return ContextNaturalKey.PROJECT
+            case ContextSegmentKey.EVENT: return ContextNaturalKey.EVENT
+            case ContextSegmentKey.TASK: return ContextNaturalKey.TASK
+            case ContextSegmentKey.CONVERSATION: return ContextNaturalKey.CONVERSATION
             default: return null
         }
     }
@@ -550,10 +605,7 @@ export namespace ContextNaturalKey {
                 {
                     const obj = contextObject as Task
                     if (includeAncestor) {
-                        const project = ProjectManager.getProjectById(obj.project)
-                        if (project) {
-                            return obj.title + " - " + project.name
-                        }
+                        return obj.title + " - " + translate("common.project.project")//project.name
                     }
                     return obj.title
                 }
@@ -820,6 +872,14 @@ export type AttentionNotification = {
     created_at: string
     message?: string
 } & Linkable & NotificationObject
+export type ReviewNotification = {
+    name: string
+    community: Community
+    creator: UserProfile
+    created_at: string
+    uri: string
+    permission: number
+} & NotificationObject
 export type ReminderNotification = {
     datetime: string
 } & AttentionNotification
@@ -842,6 +902,10 @@ export enum NotificationGroupKey {
     STATUS_NOTIFICATIONS = "status_notifications",
     STATUS_REMINDERS = "status_reminders",
     STATUS_ATTENTIONS = "status_attentions",
+
+    GROUP_UNDER_REVIEW = "group_reviews",
+    EVENT_UNDER_REVIEW = "event_reviews",
+    PROJECT_UNDER_REVIEW = "project_reviews",
 
     REPORTED_CONTENT = "reported_content",
 
@@ -867,6 +931,10 @@ export type UnhandledNotifications = {
     task_reminders: ReminderNotification[]
     task_attentions: AttentionNotification[]
 
+    group_reviews: ReviewNotification[]
+    event_reviews: ReviewNotification[]
+    project_reviews: ReviewNotification[]
+
     reported_content: ReportNotification[]
     //requests
     community_requests: MembershipRequestNotification[]
@@ -875,7 +943,7 @@ export type UnhandledNotifications = {
 }
 export type ContextObject = {
     name: string
-} & Linkable
+} & Linkable & IdentifiableObject
 export type Status = {
     //[key: string]: any
     can_comment: boolean
@@ -955,6 +1023,9 @@ export namespace Permission {
     }
     export function getShield(permission: Permission) {
         return Permission.usesElevatedPrivileges(permission) ? "fas fa-shield-alt" : undefined
+    }
+    export function hasAccess(permissible: Permissible, minimumRequiredPermission:Permission) {
+        return permissible.permission >= minimumRequiredPermission
     }
 }
 export type GenericElasticResult = {
@@ -1097,6 +1168,9 @@ export namespace ElasticSearchType {
     }
     export function nameForKey(key: ElasticSearchType) {
         return translate("elasticsearch.type.name." + key)
+    }
+    export function nameSingularForKey(key: ElasticSearchType) {
+        return translate("elasticsearch.type.name.s1." + key)
     }
 }
 export type SimpleObjectAttribute = {
@@ -1272,6 +1346,9 @@ export const documentIcon = (extension: string): FileIcon => {
 export type Permissible = {
     permission: number
 }
+export type INotifiable = {
+    muted: boolean
+}
 export type Linkable = {
     uri: string
 }
@@ -1300,7 +1377,9 @@ export type Conversation =
     admins?:number[]
 
 } & Linkable & IdentifiableObject & Permissible
-
+export type IPrivacy = {
+    privacy: ContextPrivacy
+}
 export type ICommunity = {
     cover_thumbnail: string
     avatar_thumbnail: string
@@ -1310,7 +1389,12 @@ export type ICommunity = {
     primary_color: string
     secondary_color: string
     chapters?: boolean
+    creator:number
 } & Linkable & IdentifiableObject
+export type IMembershipStatus = {
+    invited:boolean
+    pending:boolean
+}
 export type ContextInvitation = {
     created_at: string
     target_user:number
@@ -1322,7 +1406,7 @@ export type ContextInvitation = {
 export type CommunityInvitation = {
     created_at: string
     community:number
-    message:string 
+    message:string
     language:AppLanguage
     email:string
     user:number
@@ -1334,7 +1418,6 @@ export type Community = {
     updated_at: string
     visit_count:number
     last_visited:string
-    privacy: ContextPrivacy
     category:CommunityCategory
     //
     event_creation_permission:CommunityCreatePermission
@@ -1342,7 +1425,7 @@ export type Community = {
     project_creation_permission:CommunityCreatePermission
     subgroup_creation_permission:CommunityCreatePermission
     //
-} & ICommunity & AvatarAndCover & Permissible
+} & INotifiable & ICommunity & AvatarAndCover & Permissible & IPrivacy & IMembershipStatus
 
 export type SimpleUserProfile = {
     absolute_url: string,
@@ -1380,14 +1463,14 @@ export type Group = {
     slug: string
     community: number
     description: string
-    creator: UserProfile
-    privacy: ContextPrivacy
+    creator: number
     members: number[]
     members_count: number
     created_at: string
     parent: number
     updated_at: string
-} & AvatarAndCover & Linkable & Permissible & IdentifiableObject
+    hidden_reason: ObjectHiddenReason
+} & INotifiable & AvatarAndCover & Linkable & Permissible & IdentifiableObject & IPrivacy & IMembershipStatus
 
 export type Favorite = {
     index: number
@@ -1415,46 +1498,45 @@ export type Event = {
     slug: string
     community: number
     description: string
-    creator: UserProfile
-    privacy: ContextPrivacy
+    creator: number
     attending: number[]
     attending_count: number
     not_attending: number[]
     not_attending_count: number
-    invited: number[]
     invited_count: number
     created_at: string
-    group: Group
+    group: ContextObject
     updated_at: string
     start: string
     end: string
     location: Coordinate
     address: string
     parent: Event
-
-} & AvatarAndCover & Linkable & Permissible & IdentifiableObject
+    hidden_reason: ObjectHiddenReason
+} & INotifiable & AvatarAndCover & Linkable & Permissible & IdentifiableObject & IPrivacy & IMembershipStatus
 
 export type Project = {
     name: string
     slug: string
     community: number
     description: string
-    creator: UserProfile
-    privacy: ContextPrivacy
+    creator: number
     tasks: number
     tags: string[]
     managers: number[]
     members: number[]
     members_count: number
     created_at: string
-    group: Group
+    group: ContextObject
     updated_at: string
     task_count: number
     tasks_assigned: number
     tasks_attention: number
     tasks_completed: number
     tasks_responsible: number
-} & AvatarAndCover & Linkable & Permissible & IdentifiableObject
+    hidden_reason: ObjectHiddenReason
+    is_private:boolean
+} & INotifiable & AvatarAndCover & Linkable & Permissible & IdentifiableObject & IPrivacy
 
 export type TimeSpent = {
     hours: number
@@ -1695,6 +1777,13 @@ export type VersionInfo = {
     minor_version: number
     version_string: string
     release_date: string
+}
+
+export type Version = {
+    major: number,
+    minor: number,
+    revision: number,
+    version_string: string
 }
 
 export type Timesheet = {

@@ -8,6 +8,7 @@ type Props = {
     onValueChange?:(checked:boolean) => void
     checkedIcon?:string
     className?:string
+    children?:React.ReactNode
 }
 export const Checkbox = (props:Props) => {
     const getIcon = () => {
@@ -16,11 +17,12 @@ export const Checkbox = (props:Props) => {
     const onClick = () => {
         props.onValueChange && props.onValueChange(!props.checked)
     }
-    const {checked, className, ...rest} = props
+    const {checked, className,children, ...rest} = props
     const cn = classnames("checkbox", className, {"checked":checked})
     return (
         <div onClick={onClick} className={cn}>
             {checked && <i className={getIcon()}></i>}
+            {children}
         </div>
     );
   }

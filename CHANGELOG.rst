@@ -2,6 +2,26 @@
 Task schedule
 -->
 
+v0.5.7 | 22.10.2019
+-----------------------------------------
+
+Added:
+======
+Leave, Delete, Mute Notifications and Unmute Notifications for Community, Group, Event and Project
+Member administration dialog with pages for members, roles and invitations for Community, Group, Event and Project
+Events for triggering client updates
+
+Changes:
+======
+Moved groups, events and projects out of Redux Cache.
+Websocket refactored
+Conversations updated instantly when adding/removing members
+
+Bugfixes:
+=========
+Fixed issue with clearing text field on conversation page
+
+
 v0.5.6 | 01.10.2019
 -----------------------------------------
 

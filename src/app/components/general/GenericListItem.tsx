@@ -10,6 +10,7 @@ type GenericListItemProps = {
     footer?:React.ReactNode
     right?:React.ReactNode
     className?:string
+    onClick?:(e:React.SyntheticEvent) => void
 }
 
 export const GenericListItem = (props:GenericListItemProps) => {
@@ -27,6 +28,6 @@ export const GenericListItem = (props:GenericListItemProps) => {
     }
     const cn = "generic-list-item flex-grow-1"
     if(props.to)
-        return <Link className={cn} to={props.to}>{renderContent()}</Link>
-    return <div className={cn}>{renderContent()}</div>
+        return <Link onClick={props.onClick} className={cn} to={props.to}>{renderContent()}</Link>
+    return <div onClick={props.onClick} className={cn}>{renderContent()}</div>
 }

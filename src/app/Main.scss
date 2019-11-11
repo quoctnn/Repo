@@ -53,7 +53,7 @@ ul,li{ list-style-type: none; padding: 0;}
         .module{
             border-radius: 0;
             .module-content{
-                max-height: 500px;
+                //max-height: 500px;
             }
         }
     }
@@ -296,7 +296,7 @@ button{@include var(color, primary-text-color);}
 .dropdown-item{
     cursor: pointer;
 }
-body.has-side-menu {
+body[class*="has-side-menu-"]{
     @media (min-width: 640px){
         .page
         {

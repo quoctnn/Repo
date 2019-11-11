@@ -105,8 +105,10 @@ export default class NewsfeedMenu extends React.Component<Props, State> {
             slim_types:true,
             filters:this.getRealFilters(data.filters),
             tags:data.tags,
+            offset:0,
+            limit:10
         }
-        ApiClient.search2(10, 0, args,(searchResult, status, error) => {
+        ApiClient.search(args,(searchResult, status, error) => {
             const sections = this.getAutocompleteSections(data, focusOffset, searchResult)
             this.setState({selectedSearchContext:data, sections, focusOffset, activeSearchType, searchResult})
         })
