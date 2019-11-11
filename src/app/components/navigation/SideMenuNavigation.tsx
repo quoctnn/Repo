@@ -163,8 +163,8 @@ class Favorites extends React.Component<FavoritesProps, FavoritesState> {
     }
     renderItems = () => {
         if(this.props.mode == MenuViewMode.grid)
-            return this.props.favorites.map(g => <ContextGridItem draggableId={g.id} draggableType={DraggableType.favorite}  name={g.object.name} image={g.image} onClick={this.props.onItemSelected} contextNaturalKey={g.object_natural_key} contextObject={g.object} key={"favorite_" + g.id} />)
-        return this.props.favorites.map(g => <ContextListItem draggableId={g.id} draggableType={DraggableType.favorite} name={g.object.name} onClick={this.props.onItemSelected} contextNaturalKey={g.object_natural_key} contextObject={g.object} key={"favorite_" + g.id} />)
+            return this.props.favorites.map(g => {if (g && g.object) return <ContextGridItem draggableId={g.id} draggableType={DraggableType.favorite}  name={g.object.name} image={g.image} onClick={this.props.onItemSelected} contextNaturalKey={g.object_natural_key} contextObject={g.object} key={"favorite_" + g.id} />})
+        return this.props.favorites.map(g => {if (g && g.object) return <ContextListItem draggableId={g.id} draggableType={DraggableType.favorite} name={g.object.name} onClick={this.props.onItemSelected} contextNaturalKey={g.object_natural_key} contextObject={g.object} key={"favorite_" + g.id} />})
     }
     render = () => {
         return <>
@@ -448,7 +448,7 @@ class SideMenuNavigation extends React.Component<Props, State> {
                             <Link className="d-block text-center w-100" to={{pathname:Routes.SEARCH, state:{modal:true}, search:"type=" + ElasticSearchType.PROJECT}} onClick={closeMenu}>{translate("common.find.more")}...</Link>
                         </MenuBlock>
                     </>}
-                    {isSuperUser && 
+                    {isSuperUser &&
                         <MenuBlock removeContentOnCollapsed={false} animationDuration={SideMenuNavigation.animationDuration} open={this.state.open} icon="fas fa-user-shield" title={translate("Superuser")}>
                             <Link className="d-block w-100" to={{pathname:Routes.COMMUNITY_CREATE, state:{modal:true}}} onClick={closeMenu}>{translate("community.create")}</Link>
                         </MenuBlock>
