@@ -1,15 +1,8 @@
 import * as React from "react";
-import { ContextDataProps, withContextData } from '../../../../hoc/WithContextData';
-import { RouteComponentProps, withRouter } from 'react-router';
 import classnames from 'classnames';
 import { translate } from '../../../../localization/AutoIntlProvider';
 import { MenuItem } from '../../../../types/menuItem';
-import { DropDownMenu } from "../../../general/DropDownMenu";
-import { ReduxState } from "../../../../redux";
-import { connect } from 'react-redux';
-import { availableThemes } from '../../../../redux/theme';
-import { ThemeManager } from '../../../../managers/ThemeManager';
-import ThemeSelector from "./ThemeSelector";
+import SideBarSettingsContent from "./SideBarSettingsContent";
 type State = {
     menuItem:MenuItem
 }
@@ -36,8 +29,7 @@ export default class SideBarSettingsItem extends React.Component<Props, State> {
                 index: this.props.index,
                 title: "Settings",
                 subtitle: "Global user settings",
-                buttons: [],
-                children: this.getChildren()
+                content: <SideBarSettingsContent/>
             }
             this.props.addMenuItem(menuItem)
             this.setState({menuItem: menuItem})
@@ -51,11 +43,6 @@ export default class SideBarSettingsItem extends React.Component<Props, State> {
         return this.props.active != nextProps.active
     }
 
-    getChildren = () => {
-        return [
-            <ThemeSelector/>
-        ]
-    }
     render = () => {
         const active = this.props.active == this.props.index
         const css = classnames("sidebar-item", {active: active})

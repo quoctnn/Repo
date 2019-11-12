@@ -3,7 +3,7 @@
 .sidebar-content {
     @include var(background-color, main-content-background);
     z-index: 1048;
-    height: 100%;
+    height: calc(100% - #{$topMenuHeight} - 15px);
     min-width: 300px;
     // max-width: 500px;
     top: calc(#{$topMenuHeight} + 15px);
@@ -35,7 +35,7 @@
     height: 5rem;
     margin: 0 -8px;
     border-top-right-radius: 8px;
-    @include var(background-color, main-content-secondary-border);
+    @include var(background-color, primary-theme-color);
 }
 
 .sidebar-content .sidebar-content-header .sidebar-title {
@@ -46,7 +46,8 @@
 }
 
 .sidebar-content .sidebar-content-list {
-    margin: 16px;
+    margin: 16px -8px 16px 8px;
     font-size:1.2rem;
     font-weight: 400;
+    height: 100%;
 }

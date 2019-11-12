@@ -24,6 +24,9 @@ class SideBarContent extends React.PureComponent<Props, State> {
     }
     componentDidUpdate = (prevProps: Props, prevState: State) => {
     }
+    shouldComponentUpdate = (nextProps: Props, nextState: State) => {
+        return true
+    }
     render = () => {
         const menuItem = this.props.menuItems.find(item => item.index == this.props.active)
         const animation = this.props.active !== undefined ? "animate-open" : "animate-close"
@@ -36,8 +39,8 @@ class SideBarContent extends React.PureComponent<Props, State> {
                     </div>
                 </div>
                 <div className="sidebar-content-list">
-                    {menuItem &&
-                        menuItem.children.map((item) => {return item})
+                    {menuItem && menuItem.content &&
+                        menuItem.content
                     }
                 </div>
             </div>

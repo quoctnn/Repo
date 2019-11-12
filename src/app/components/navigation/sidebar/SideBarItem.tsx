@@ -29,8 +29,7 @@ class SideBarItem extends React.Component<Props, State> {
                 index: this.props.index,
                 title: this.props.title || "No title",
                 subtitle: undefined,
-                buttons: [],
-                children: []
+                content: undefined
             }
             this.props.addMenuItem(menuItem)
             this.setState({menuItem: menuItem})

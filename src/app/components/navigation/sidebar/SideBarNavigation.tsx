@@ -4,7 +4,7 @@ import * as React from "react";
 import classnames from 'classnames';
 import { uniqueId } from '../../../utilities/Utilities';
 import SideBarItem from "./SideBarItem";
-import SideBarSettingsItem from "./contentItems/SideBarSettingsItem";
+import SideBarSettingsItem from './contentItems/SideBarSettingsItem';
 import SideBarContent from "./SideBarContent";
 import Avatar from '../../general/Avatar';
 import { ReduxState } from "../../../redux";
@@ -12,6 +12,7 @@ import { CommunityManager } from '../../../managers/CommunityManager';
 import { Community } from '../../../types/intrasocial_types';
 import { connect } from 'react-redux';
 import { ContextMenuItem, MenuItem } from '../../../types/menuItem';
+import SideBarCommunityItem from "./contentItems/SideBarCommunityItem";
 
 type State = {
     active: string
@@ -44,6 +45,9 @@ class SideBarNavigation extends React.PureComponent<Props, State> {
     componentDidUpdate = (prevProps: Props, prevState: State) => {
     }
 
+    shouldComponentUpdate = (nextProps: Props, nextState: State) => {
+        return true
+    }
     renderSpacing = (withLine: boolean) => {
         const css = classnames("spacer", { line: withLine })
         return <div className={css}></div>
@@ -59,7 +63,11 @@ class SideBarNavigation extends React.PureComponent<Props, State> {
 
     addItem = (item: MenuItem | ContextMenuItem) => {
         var currentItems = this.state.menuItems
-        currentItems.push(item)
+        const index = currentItems.findIndex((mi) => item.index === mi.index)
+        if (index != -1)
+            currentItems[index] = item
+        else
+            currentItems.push(item)
         this.setState({ menuItems: currentItems })
     }
     render() {
@@ -80,7 +88,7 @@ class SideBarNavigation extends React.PureComponent<Props, State> {
                     </div>
                 </div>
                 <div className="sidebar-separator"></div>
-                <SideBarItem title="Community" addMenuItem={this.addItem} index={"community-menu"} active={this.state.active} onClick={this.selectionChanged} />
+                <SideBarCommunityItem addMenuItem={this.addItem} index={"community-menu"} active={this.state.active} onClick={this.selectionChanged} />
                 {this.renderSpacing(false)}
                 <SideBarItem title="Starred" addMenuItem={this.addItem} index={"starred-menu"} active={this.state.active} onClick={this.selectionChanged} />
                 {this.renderSpacing(true)}

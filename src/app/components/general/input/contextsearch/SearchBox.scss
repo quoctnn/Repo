@@ -23,19 +23,19 @@
     }
     .DraftEditor-root
     {
-        line-height: 30px;
+        line-height: 2rem;
         padding: 0 10px;
         font-size: 1.15rem !important;
         border: 0;
         outline: 0;
         box-shadow: none;
         width: 100%;
-        padding-right: 48px;
+        padding-right: 3rem;
         background: none;
         color:#5c5a5c;
         outline: 0 !important;
         box-shadow: none !important;
-        padding-left: 40px;
+        padding-left: 2.3rem;
         &:focus
         {
             border-color: #66afe9;
@@ -107,9 +107,7 @@
             position: absolute;
             right: 5px;
             bottom: 0;
-            height: 20px;
             margin: auto;
-            transform: translate(0, -10px);
             margin-bottom: 3px;
         }
         .public-DraftEditor-content[contenteditable=true] {
