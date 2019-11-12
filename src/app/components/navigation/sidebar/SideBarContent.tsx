@@ -16,17 +16,20 @@ class SideBarContent extends React.PureComponent<Props, State> {
     constructor(props: Props) {
         super(props)
         this.state = {
+            backButton: null
         }
     }
 
     componentDidMount = () => {
-
     }
+
     componentDidUpdate = (prevProps: Props, prevState: State) => {
     }
+
     shouldComponentUpdate = (nextProps: Props, nextState: State) => {
         return true
     }
+
     render = () => {
         const menuItem = this.props.menuItems.find(item => item.index == this.props.active)
         const animation = this.props.active !== undefined ? "animate-open" : "animate-close"

@@ -3,7 +3,7 @@
 .list-item{
     display: flex;
     margin: 4px 1px;
-    padding: 8px;
+    padding: 6px;
     border-radius: 8px 0 0 8px;
     &.active{
         @include var(background-color, main-content-secondary-background);
@@ -11,19 +11,6 @@
     }
 }
 
-.list-item .community-avatar{
-    margin: auto;
-}
-.list-item .community-name{
-    margin: 0 6px;
-    font-weight: 400;
-    font-size: 0.85rem;
-}
-.list-item .community-icon{
-    margin: auto;
-    width: 0.75rem;
-    font-size: 0.7rem;
-}
 .search{
     margin-bottom: 8px;
     margin-right: 8px;
@@ -31,9 +18,11 @@
     border-radius: 8px;
     @include var(border-color, border-color-default)
 }
-.community-content{
+
+.content{
     height: inherit;
 }
-.community-items{
+
+.items{
     overflow: auto;
 }

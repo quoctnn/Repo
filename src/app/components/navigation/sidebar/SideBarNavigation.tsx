@@ -13,6 +13,7 @@ import { Community } from '../../../types/intrasocial_types';
 import { connect } from 'react-redux';
 import { ContextMenuItem, MenuItem } from '../../../types/menuItem';
 import SideBarCommunityItem from "./contentItems/SideBarCommunityItem";
+import SideBarGroupItem from './contentItems/SideBarGroupItem';
 
 type State = {
     active: string
@@ -92,7 +93,7 @@ class SideBarNavigation extends React.PureComponent<Props, State> {
                 {this.renderSpacing(false)}
                 <SideBarItem title="Starred" addMenuItem={this.addItem} index={"starred-menu"} active={this.state.active} onClick={this.selectionChanged} />
                 {this.renderSpacing(true)}
-                <SideBarItem title="Groups" addMenuItem={this.addItem} index={"groups-menu"} active={this.state.active} onClick={this.selectionChanged} />
+                <SideBarGroupItem addMenuItem={this.addItem} index={"groups-menu"} active={this.state.active} onClick={this.selectionChanged} />
                 {this.renderSpacing(true)}
                 <SideBarItem title="Projects" addMenuItem={this.addItem} index={"projects-menu"} active={this.state.active} onClick={this.selectionChanged} />
                 {this.renderSpacing(true)}

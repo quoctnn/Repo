@@ -3,7 +3,7 @@ import classnames from 'classnames';
 import { MenuItem } from '../../../../types/menuItem';
 import { translate } from '../../../../localization/AutoIntlProvider';
 import "./SideBarItem.scss";
-import SideBarCommunityContent from "./SideBarCommunityContent";
+import SideBarGroupContent from "./SideBarGroupContent";
 
 type State = {
     menuItem: MenuItem
@@ -18,7 +18,7 @@ type OwnProps = {
 
 type Props = OwnProps
 
-export default class SideBarCommunityItem extends React.Component<Props, State> {
+export default class SideBarGroupItem extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props)
         this.state = {
@@ -30,9 +30,9 @@ export default class SideBarCommunityItem extends React.Component<Props, State> 
         if (this.props.index) {
             const menuItem:MenuItem = {
                 index: this.props.index,
-                title: translate("common.core.community"),
+                title: translate("common.group.groups"),
                 subtitle: undefined,
-                content: <SideBarCommunityContent/>
+                content: <SideBarGroupContent/>,
             }
             this.setState({menuItem: menuItem})
         }
@@ -57,7 +57,7 @@ export default class SideBarCommunityItem extends React.Component<Props, State> 
                 {this.state.menuItem &&
                     this.state.menuItem.title
                     ||
-                    translate("common.core.community")
+                    translate("common.group.groups")
                 }
             </div>
         )
