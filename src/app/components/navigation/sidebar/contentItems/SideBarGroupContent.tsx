@@ -82,7 +82,7 @@ class SideBarGroupContent extends React.Component<Props, State> {
         }
     }
 
-    goDeeper = (group: ContextObject) => {
+    setParent = (group: ContextObject) => {
         this.setState({parent: group as Group});
     }
 
@@ -120,7 +120,7 @@ class SideBarGroupContent extends React.Component<Props, State> {
                     ||
                     groups.map((group) => {
                         if (group) {
-                            return <ContextListItem deeper={this.goDeeper} key={"group-" + group.id} type={ContextNaturalKey.GROUP} contextObject={group}/>
+                            return <ContextListItem setParent={this.setParent} key={"group-" + group.id} type={ContextNaturalKey.GROUP} contextObject={group}/>
                         }
                     }
                 )}

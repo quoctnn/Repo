@@ -15,7 +15,7 @@ type State = {
 type OwnProps = {
     contextObject: ContextObject
     type: string
-    deeper?: (object:ContextObject) => void
+    setParent?: (object:ContextObject) => void
 }
 
 type ReduxStateProps = {
@@ -62,21 +62,23 @@ class ContextListItem extends React.Component<Props, State> {
 
     navigateDeeper = (e: React.MouseEvent) => {
         e.preventDefault();
-        this.props.deeper(this.props.contextObject);
+        this.props.setParent(this.props.contextObject);
     }
+
     renderGroup = () => {
         const group = this.props.contextObject as Group
         if (!group){
             return <></>
         }
         const isActive = this.props.contextData.group && this.props.contextData.group.id == group.id
-        const hasChildren = false
+        // TODO: get childen info in endpoint
+        const hasChildren = this.props.setParent
         const hasParent = group.parent
         const cn = classnames("d-flex list-item", {"active": isActive})
         return (
             <Link className={cn} to={group.uri} key={group.id}>
                 <div className="icon">
-                    {hasChildren || this.props.deeper &&
+                    {hasChildren &&
                         <i className="fa fa-chevron-right" onClick={this.navigateDeeper}/>
                         ||
                         <i className="fa fa-users"/>
