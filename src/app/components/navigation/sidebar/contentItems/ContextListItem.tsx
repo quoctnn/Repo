@@ -16,6 +16,7 @@ type OwnProps = {
     contextObject: ContextObject
     type: string
     setParent?: (object:ContextObject) => void
+    onClick?: (e: React.MouseEvent) => void
 }
 
 type ReduxStateProps = {
@@ -46,7 +47,7 @@ class ContextListItem extends React.Component<Props, State> {
         const isActive = this.props.contextData.community && this.props.contextData.community.id == community.id
         const cn = classnames("d-flex list-item", {"active": isActive})
         return (
-            <Link className={cn} to={community.uri} key={community.id}>
+            <Link className={cn} to={community.uri} key={community.id} onClick={this.props.onClick}>
                 <div className="icon">
                     {isMain &&
                         <i className="fa fa-home"/>
@@ -65,6 +66,7 @@ class ContextListItem extends React.Component<Props, State> {
     }
 
     navigateDeeper = (e: React.MouseEvent) => {
+        e.stopPropagation();
         e.preventDefault();
         this.props.setParent(this.props.contextObject);
     }
@@ -78,7 +80,7 @@ class ContextListItem extends React.Component<Props, State> {
         const hasChildren = group.subgroups > 0
         const cn = classnames("d-flex list-item", {"active": isActive})
         return (
-            <Link className={cn} to={group.uri} key={group.id}>
+            <Link className={cn} to={group.uri} key={group.id} onClick={this.props.onClick}>
                 <div className="icon">
                     {hasChildren &&
                         <i className="fa fa-chevron-right" onClick={this.navigateDeeper}/>
@@ -105,7 +107,7 @@ class ContextListItem extends React.Component<Props, State> {
         const hasChildren = event.sessions > 0
         const cn = classnames("d-flex list-item", {"active": isActive})
         return (
-            <Link className={cn} to={event.uri} key={event.id}>
+            <Link className={cn} to={event.uri} key={event.id} onClick={this.props.onClick}>
                 <div className="icon">
                     {hasChildren &&
                         <i className="fa fa-chevron-right" onClick={this.navigateDeeper}/>
@@ -131,7 +133,7 @@ class ContextListItem extends React.Component<Props, State> {
         const isActive = this.props.contextData.project && this.props.contextData.project.id == project.id
         const cn = classnames("d-flex list-item", {"active": isActive})
         return (
-            <Link className={cn} to={project.uri} key={project.id}>
+            <Link className={cn} to={project.uri} key={project.id} onClick={this.props.onClick}>
                 <div className="icon">
                     <i className="fa fa-folder-open"/>
                 </div>

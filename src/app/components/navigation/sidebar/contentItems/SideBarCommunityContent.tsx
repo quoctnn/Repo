@@ -17,6 +17,7 @@ type State = {
 }
 
 type Props = {
+    onClose:(e:React.MouseEvent) => void
 }
 
 export default class SideBarCommunityContent extends React.Component<Props, State> {
@@ -36,7 +37,7 @@ export default class SideBarCommunityContent extends React.Component<Props, Stat
 
     shouldComponentUpdate = (nextProps: Props, nextState:State) => {
         const search = this.state.query != nextState.query
-        const updatedCommunities = this.state.communities.length != nextState.communities.length
+        const updatedCommunities = !(this.state.communities.length === nextState.communities.length && this.state.communities.sort().every(function(value, index) { return value === nextState.communities.sort()[index]}));
         const loading = this.state.isLoading != nextState.isLoading
         return search || updatedCommunities || loading
     }
@@ -77,7 +78,7 @@ export default class SideBarCommunityContent extends React.Component<Props, Stat
                             ||
                             communities.map((community) => {
                                 if (community) {
-                                    return <ContextListItem key={"community-" + community.id} type={ContextNaturalKey.COMMUNITY} contextObject={community}/>
+                                    return <ContextListItem onClick={this.props.onClose} key={"community-" + community.id} type={ContextNaturalKey.COMMUNITY} contextObject={community}/>
                                 }
                             }
                         )}

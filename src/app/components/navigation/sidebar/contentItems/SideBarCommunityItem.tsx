@@ -14,6 +14,7 @@ type OwnProps = {
     active:string
     addMenuItem:(item:MenuItem) => void // This should be a menuItem
     onClick:(e:React.MouseEvent) => void
+    onClose:(e:React.MouseEvent) => void
 }
 
 type Props = OwnProps
@@ -32,7 +33,7 @@ export default class SideBarCommunityItem extends React.Component<Props, State> 
                 index: this.props.index,
                 title: translate("common.core.community"),
                 subtitle: undefined,
-                content: <SideBarCommunityContent/>
+                content: <SideBarCommunityContent onClose={this.props.onClose}/>
             }
             this.setState({menuItem: menuItem})
         }

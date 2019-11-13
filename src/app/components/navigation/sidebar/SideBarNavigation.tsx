@@ -64,6 +64,10 @@ class SideBarNavigation extends React.PureComponent<Props, State> {
         }
     }
 
+    closeMenu = (e: React.MouseEvent) => {
+        this.setState({active: undefined})
+    }
+
     addItem = (item: MenuItem | ContextMenuItem) => {
         var currentItems = this.state.menuItems
         const index = currentItems.findIndex((mi) => item.index === mi.index)
@@ -91,15 +95,15 @@ class SideBarNavigation extends React.PureComponent<Props, State> {
                     </div>
                 </div>
                 <div className="sidebar-separator"></div>
-                <SideBarCommunityItem addMenuItem={this.addItem} index={"community-menu"} active={this.state.active} onClick={this.selectionChanged} />
+                <SideBarCommunityItem addMenuItem={this.addItem} index={"community-menu"} active={this.state.active} onClick={this.selectionChanged} onClose={this.closeMenu}/>
                 {this.renderSpacing(false)}
                 <SideBarItem title="Starred" addMenuItem={this.addItem} index={"starred-menu"} active={this.state.active} onClick={this.selectionChanged} />
                 {this.renderSpacing(true)}
-                <SideBarGroupItem addMenuItem={this.addItem} index={"groups-menu"} active={this.state.active} onClick={this.selectionChanged} />
+                <SideBarGroupItem addMenuItem={this.addItem} index={"groups-menu"} active={this.state.active} onClick={this.selectionChanged} onClose={this.closeMenu}/>
                 {this.renderSpacing(true)}
-                <SideBarProjectItem addMenuItem={this.addItem} index={"projects-menu"} active={this.state.active} onClick={this.selectionChanged} />
+                <SideBarProjectItem addMenuItem={this.addItem} index={"projects-menu"} active={this.state.active} onClick={this.selectionChanged} onClose={this.closeMenu}/>
                 {this.renderSpacing(true)}
-                <SideBarEventItem addMenuItem={this.addItem} index={"events-menu"} active={this.state.active} onClick={this.selectionChanged} />
+                <SideBarEventItem addMenuItem={this.addItem} index={"events-menu"} active={this.state.active} onClick={this.selectionChanged} onClose={this.closeMenu}/>
                 {this.renderSpacing(false)}
                 <SideBarItem title="Files" addMenuItem={this.addItem} index={"files-menu"} active={this.state.active} onClick={this.selectionChanged} />
                 {this.renderSpacing(true)}

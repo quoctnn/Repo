@@ -22,13 +22,14 @@ type State = {
 }
 
 type OwnProps = {
+    onClose:(e:React.MouseEvent) => void
 }
 
 type ReduxStateProps = {
     activeCommunity:Community
 }
 
-type Props = ContextDataProps & ReduxStateProps
+type Props = OwnProps & ContextDataProps & ReduxStateProps
 
 class SideBarProjectContent extends React.Component<Props, State> {
     constructor(props: Props) {
@@ -55,7 +56,7 @@ class SideBarProjectContent extends React.Component<Props, State> {
     }
     shouldComponentUpdate = (nextProps: Props, nextState:State) => {
         const search = this.state.query != nextState.query
-        const updatedProjects = this.state.projects.length != nextState.projects.length
+        const updatedProjects = !(this.state.projects.length === nextState.projects.length && this.state.projects.sort().every(function(value, index) { return value === nextState.projects.sort()[index]}));
         const loading = this.state.isLoading != nextState.isLoading
         const updatedCommunity = this.props.contextData.community != nextProps.contextData.community
         const updatedProject = this.props.contextData.project != nextProps.contextData.project
@@ -113,7 +114,7 @@ class SideBarProjectContent extends React.Component<Props, State> {
                             ||
                             projects.map((project) => {
                                 if (project) {
-                                    return <ContextListItem key={"project-" + project.id} type={ContextNaturalKey.PROJECT} contextObject={project}/>
+                                    return <ContextListItem onClick={this.props.onClose} key={"project-" + project.id} type={ContextNaturalKey.PROJECT} contextObject={project}/>
                                 }
                             }
                         )}

@@ -24,13 +24,14 @@ type State = {
 }
 
 type OwnProps = {
+    onClose:(e:React.MouseEvent) => void
 }
 
 type ReduxStateProps = {
     activeCommunity:Community
 }
 
-type Props = ContextDataProps & ReduxStateProps
+type Props = OwnProps & ContextDataProps & ReduxStateProps
 
 class SideBarEventContent extends React.Component<Props, State> {
     constructor(props: Props) {
@@ -61,7 +62,7 @@ class SideBarEventContent extends React.Component<Props, State> {
     }
     shouldComponentUpdate = (nextProps: Props, nextState:State) => {
         const search = this.state.query != nextState.query
-        const updatedEvents = this.state.events.length != nextState.events.length
+        const updatedEvents = !(this.state.events.length === nextState.events.length && this.state.events.sort().every(function(value, index) { return value === nextState.events.sort()[index]}));
         const loading = this.state.isLoading != nextState.isLoading
         const updatedCommunity = this.props.contextData.community != nextProps.contextData.community
         const updatedEvent = this.props.contextData.event != nextProps.contextData.event
@@ -151,7 +152,7 @@ class SideBarEventContent extends React.Component<Props, State> {
                             ||
                             events.map((event) => {
                                 if (event) {
-                                    return <ContextListItem setParent={this.setParent} key={"event-" + event.id} type={ContextNaturalKey.EVENT} contextObject={event}/>
+                                    return <ContextListItem onClick={this.props.onClose} setParent={this.setParent} key={"event-" + event.id} type={ContextNaturalKey.EVENT} contextObject={event}/>
                                 }
                             }
                         )}
