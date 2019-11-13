@@ -4,22 +4,26 @@ import { EditorState } from 'draft-js';
 import { SearcQueryManager } from '../../../general/input/contextsearch/extensions/index';
 import { Community, GroupSorting, Group, ContextNaturalKey, ContextObject } from '../../../../types/intrasocial_types';
 import { ApiClient } from '../../../../network/ApiClient';
-import "./SideBarItem.scss";
+import "../SideBarItem.scss";
 import LoadingSpinner from "../../../LoadingSpinner";
 import ContextListItem from "./ContextListItem";
 import { ContextDataProps, withContextData } from '../../../../hoc/WithContextData';
 import { connect } from 'react-redux';
 import { CommunityManager } from '../../../../managers/CommunityManager';
 import { ReduxState } from "../../../../redux";
+import { translate } from '../../../../localization/AutoIntlProvider';
 
 type State = {
     isLoading: boolean
     query: string
     groups: Group[]
     parent: Group
+    title: string
+    subtitle: string
 }
 
-type OwnProps = {}
+type OwnProps = {
+}
 
 type ReduxStateProps = {
     activeCommunity:Community
@@ -34,7 +38,9 @@ class SideBarGroupContent extends React.Component<Props, State> {
             isLoading: false,
             query: "",
             groups: [],
-            parent: null
+            parent: null,
+            title: translate('common.group.groups'),
+            subtitle: ""
         }
     }
 
@@ -72,7 +78,8 @@ class SideBarGroupContent extends React.Component<Props, State> {
         if (community) {
             ApiClient.getGroups(community.id, this.state.parent && this.state.parent.id, 1000, 0, GroupSorting.mostUsed, (data, status, error) => {
                 if (data && data.results && data.results.length > 0) {
-                    this.setState({groups: data.results, isLoading:false});
+                    const title = this.state.parent ? this.state.parent.name : translate('common.group.groups')
+                    this.setState({groups: data.results, isLoading:false, title: title});
                 } else if (this.state.parent) {
                     this.goBack()
                 } else {
@@ -92,40 +99,65 @@ class SideBarGroupContent extends React.Component<Props, State> {
             if (this.state.parent.parent) {
                 ApiClient.getGroup(this.state.parent.parent.toString(), (data, status, error) => {
                     if (data) {
-                        this.setState({parent: data});
+                        this.setState({parent: data, title: data.name});
                     } else {
-                        this.setState({parent: null});
+                        this.setState({parent: null, title: translate('common.group.groups')});
                     }
                 })
             } else {
-                this.setState({parent: null})
+                this.setState({parent: null, title: translate('common.group.groups')})
             }
         }
     }
+
+    createNew = (e?: React.MouseEvent) => {
+    }
+
     render = () => {
         var groups = this.state.groups
         if (this.state.query && this.state.query.length > 0) {
             groups = groups.filter(groups => groups.name.toLowerCase().includes(this.state.query.trim().toLowerCase()))
         }
-        return (<div className="content d-flex flex-column">
-            { this.state.parent &&
-                <div onClick={this.goBack}><i className="fa fa-chevron-left"></i></div>
-            }
-            <div className="search">
-                <SearchBar onSearchQueryChange={this.searchChanged}/>
-            </div>
-            <div className="items scrollbar flex-shrink-1">
-                { this.state.isLoading &&
-                    <LoadingSpinner/>
+        return (<>
+            <div className="sidebar-content-header d-flex">
+                { this.state.parent &&
+                    <><button className="title-button btn btn-default" onClick={this.goBack}><i className="fa fa-chevron-left"></i></button>
+                    <div className="sidebar-breadcrumb flex-grow-1">
+                        {this.state.title}
+                    </div></>
                     ||
-                    groups.map((group) => {
-                        if (group) {
-                            return <ContextListItem setParent={this.setParent} key={"group-" + group.id} type={ContextNaturalKey.GROUP} contextObject={group}/>
-                        }
-                    }
-                )}
+                    <div className="sidebar-title flex-grow-1">
+                        {this.state.title}
+                    </div>
+                }
+                { true &&
+                    <button className="title-button btn btn-default" onClick={this.createNew}><i className="fa fa-plus"></i></button>
+                }
+                { this.state.subtitle &&
+                    <div className="sidebar-subtitle">
+                        {this.state.subtitle}
+                    </div>
+                }
             </div>
-        </div>)
+            <div className="sidebar-content-list">
+                <div className="content d-flex flex-column">
+                    <div className="search">
+                        <SearchBar onSearchQueryChange={this.searchChanged}/>
+                    </div>
+                    <div className="items scrollbar flex-shrink-1">
+                        { this.state.isLoading &&
+                            <LoadingSpinner/>
+                            ||
+                            groups.map((group) => {
+                                if (group) {
+                                    return <ContextListItem setParent={this.setParent} key={"group-" + group.id} type={ContextNaturalKey.GROUP} contextObject={group}/>
+                                }
+                            }
+                        )}
+                    </div>
+                </div>
+            </div>
+        </>)
     }
 }
 

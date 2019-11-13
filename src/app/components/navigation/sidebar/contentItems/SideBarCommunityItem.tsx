@@ -2,7 +2,7 @@ import * as React from "react";
 import classnames from 'classnames';
 import { MenuItem } from '../../../../types/menuItem';
 import { translate } from '../../../../localization/AutoIntlProvider';
-import "./SideBarItem.scss";
+import "../SideBarItem.scss";
 import SideBarCommunityContent from "./SideBarCommunityContent";
 
 type State = {

@@ -36,16 +36,9 @@ class SideBarContent extends React.PureComponent<Props, State> {
         const cn = classnames("col-3 sidebar-content", animation)
         return(
             <div className={cn}>
-                <div className="sidebar-content-header">
-                    <div className="sidebar-title">
-                        {menuItem && menuItem.title}
-                    </div>
-                </div>
-                <div className="sidebar-content-list">
-                    {menuItem && menuItem.content &&
-                        menuItem.content
-                    }
-                </div>
+                {menuItem && menuItem.content &&
+                    menuItem.content
+                }
             </div>
         )
     }

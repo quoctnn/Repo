@@ -1,7 +1,7 @@
 import { connect } from 'react-redux';
 import { CommunityManager } from '../../../../managers/CommunityManager';
 import { ContextDataProps, withContextData } from '../../../../hoc/WithContextData';
-import { Community, ContextObject, Group, ContextNaturalKey } from '../../../../types/intrasocial_types';
+import { Community, ContextObject, Group, ContextNaturalKey, Event, Project } from '../../../../types/intrasocial_types';
 import * as React from 'react';
 import { Link } from 'react-router-dom';
 import Avatar from '../../../general/Avatar';
@@ -92,12 +92,63 @@ class ContextListItem extends React.Component<Props, State> {
         )
     }
 
+    renderEvent = () => {
+        const event = this.props.contextObject as Event
+        if (!event){
+            return <></>
+        }
+        const isActive = this.props.contextData.event && this.props.contextData.event.id == event.id
+        // TODO: get childen info in endpoint
+        const hasChildren = this.props.setParent
+        const hasParent = event.parent
+        const cn = classnames("d-flex list-item", {"active": isActive})
+        return (
+            <Link className={cn} to={event.uri} key={event.id}>
+                <div className="icon">
+                    {hasChildren &&
+                        <i className="fa fa-chevron-right" onClick={this.navigateDeeper}/>
+                        ||
+                        <i className="fa fa-calendar"/>
+                    }
+                </div>
+                <div className="name text-truncate flex-grow-1">{event.name}</div>
+                <div className="avatar">
+                    <Avatar image={event.avatar_thumbnail} size={22} />
+                </div>
+            </Link>
+        )
+    }
+
+    renderProject = () => {
+        const project = this.props.contextObject as Project
+        if (!project){
+            return <></>
+        }
+        const isActive = this.props.contextData.project && this.props.contextData.project.id == project.id
+        const cn = classnames("d-flex list-item", {"active": isActive})
+        return (
+            <Link className={cn} to={project.uri} key={project.id}>
+                <div className="icon">
+                    <i className="fa fa-home"/>
+                </div>
+                <div className="name text-truncate flex-grow-1">{project.name}</div>
+                <div className="avatar">
+                    <Avatar image={project.avatar_thumbnail} size={22} />
+                </div>
+            </Link>
+        )
+    }
+
     render() {
         switch(this.props.type){
             case ContextNaturalKey.COMMUNITY:
                 return this.renderCommunity()
             case ContextNaturalKey.GROUP:
                 return this.renderGroup()
+            case ContextNaturalKey.EVENT:
+                return this.renderEvent()
+            case ContextNaturalKey.PROJECT:
+                return this.renderProject()
             default:
                 break;
         }
