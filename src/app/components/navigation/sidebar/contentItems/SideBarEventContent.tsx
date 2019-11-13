@@ -2,7 +2,7 @@ import * as React from "react";
 import SearchBar from './SearchBar';
 import { EditorState } from 'draft-js';
 import { SearcQueryManager } from '../../../general/input/contextsearch/extensions/index';
-import { Community, GroupSorting, Group, ContextNaturalKey, ContextObject } from '../../../../types/intrasocial_types';
+import { Community, Event, ContextNaturalKey, ContextObject } from '../../../../types/intrasocial_types';
 import { ApiClient } from '../../../../network/ApiClient';
 import "../SideBarItem.scss";
 import LoadingSpinner from "../../../LoadingSpinner";
@@ -12,12 +12,13 @@ import { connect } from 'react-redux';
 import { CommunityManager } from '../../../../managers/CommunityManager';
 import { ReduxState } from "../../../../redux";
 import { translate } from '../../../../localization/AutoIntlProvider';
+import { EventSorting } from '../../../../modules/events/EventsMenu';
 
 type State = {
     isLoading: boolean
     query: string
-    groups: Group[]
-    parent: Group
+    events: Event[]
+    parent: Event
     title: string
     subtitle: string
 }
@@ -31,41 +32,41 @@ type ReduxStateProps = {
 
 type Props = ContextDataProps & ReduxStateProps
 
-class SideBarGroupContent extends React.Component<Props, State> {
+class SideBarEventContent extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props)
         this.state = {
             isLoading: false,
             query: "",
-            groups: [],
+            events: [],
             parent: null,
-            title: translate('common.group.groups'),
+            title: translate('common.event.events'),
             subtitle: ""
         }
     }
 
     componentDidMount = () => {
         this.setState({isLoading: true})
-        this.getGroups();
+        this.getEvents();
     }
 
     componentDidUpdate = (prevProps: Props, prevState: State) => {
         if (this.props.contextData.community != prevProps.contextData.community) {
             this.setState({isLoading: true})
-            this.getGroups()
+            this.getEvents()
         }
         if (this.state.parent != prevState.parent) {
-            this.getGroups()
+            this.getEvents()
         }
     }
     shouldComponentUpdate = (nextProps: Props, nextState:State) => {
         const search = this.state.query != nextState.query
-        const updatedGroups = this.state.groups.length != nextState.groups.length
+        const updatedEvents = this.state.events.length != nextState.events.length
         const loading = this.state.isLoading != nextState.isLoading
         const updatedCommunity = this.props.contextData.community != nextProps.contextData.community
-        const updatedGroup = this.props.contextData.group != nextProps.contextData.group
+        const updatedEvent = this.props.contextData.event != nextProps.contextData.event
         const updatedParent = this.state.parent != nextState.parent
-        return search || updatedGroups || loading || updatedCommunity || updatedGroup || updatedParent
+        return search || updatedEvents || loading || updatedCommunity || updatedEvent || updatedParent
     }
 
     searchChanged = (es:EditorState) => {
@@ -73,13 +74,13 @@ class SideBarGroupContent extends React.Component<Props, State> {
         this.setState({query: searchData.query});
     }
 
-    getGroups = () => {
+    getEvents = () => {
         const community = this.props.contextData.community || this.props.activeCommunity
         if (community) {
-            ApiClient.getGroups(community.id, this.state.parent && this.state.parent.id, 1000, 0, GroupSorting.mostUsed, (data, status, error) => {
+            ApiClient.getEvents(community.id, this.state.parent && this.state.parent.id, null, 1000, 0, EventSorting.date, true, (data, status, error) => {
                 if (data && data.results && data.results.length > 0) {
-                    const title = this.state.parent ? this.state.parent.name : translate('common.group.groups')
-                    this.setState({groups: data.results, isLoading:false, title: title});
+                    const title = this.state.parent ? this.state.parent.name : translate('common.event.events')
+                    this.setState({events: data.results, isLoading:false, title: title});
                 } else if (this.state.parent) {
                     this.goBack()
                 } else {
@@ -89,23 +90,23 @@ class SideBarGroupContent extends React.Component<Props, State> {
         }
     }
 
-    setParent = (group: ContextObject) => {
-        this.setState({parent: group as Group});
+    setParent = (event: ContextObject) => {
+        this.setState({parent: event as Event});
     }
 
     goBack = (e?: React.MouseEvent) => {
         this.setState({isLoading: true})
         if (this.state.parent) {
             if (this.state.parent.parent) {
-                ApiClient.getGroup(this.state.parent.parent.toString(), (data, status, error) => {
+                ApiClient.getEvent(this.state.parent.parent.toString(), (data, status, error) => {
                     if (data) {
                         this.setState({parent: data, title: data.name});
                     } else {
-                        this.setState({parent: null, title: translate('common.group.groups')});
+                        this.setState({parent: null, title: translate('common.event.events')});
                     }
                 })
             } else {
-                this.setState({parent: null, title: translate('common.group.groups')})
+                this.setState({parent: null, title: translate('common.event.events')})
             }
         }
     }
@@ -114,9 +115,9 @@ class SideBarGroupContent extends React.Component<Props, State> {
     }
 
     render = () => {
-        var groups = this.state.groups
+        var events = this.state.events
         if (this.state.query && this.state.query.length > 0) {
-            groups = groups.filter(groups => groups.name.toLowerCase().includes(this.state.query.trim().toLowerCase()))
+            events = events.filter(events => events.name.toLowerCase().includes(this.state.query.trim().toLowerCase()))
         }
         return (<>
             <div className="sidebar-content-header d-flex">
@@ -148,13 +149,13 @@ class SideBarGroupContent extends React.Component<Props, State> {
                         { this.state.isLoading &&
                             <LoadingSpinner/>
                             ||
-                            groups.map((group) => {
-                                if (group) {
-                                    return <ContextListItem setParent={this.setParent} key={"group-" + group.id} type={ContextNaturalKey.GROUP} contextObject={group}/>
+                            events.map((event) => {
+                                if (event) {
+                                    return <ContextListItem setParent={this.setParent} key={"event-" + event.id} type={ContextNaturalKey.EVENT} contextObject={event}/>
                                 }
                             }
                         )}
-                        { !this.state.isLoading && groups.length == 0 &&
+                        { !this.state.isLoading && events.length == 0 &&
                             <div>{translate("search.result.empty")}</div>
                         }
                     </div>
@@ -172,4 +173,4 @@ const mapStateToProps = (state: ReduxState, ownProps: OwnProps): ReduxStateProps
     }
 }
 
-export default withContextData(connect<ReduxStateProps, {}, OwnProps>(mapStateToProps, null)(SideBarGroupContent))
+export default withContextData(connect<ReduxStateProps, {}, OwnProps>(mapStateToProps, null)(SideBarEventContent))

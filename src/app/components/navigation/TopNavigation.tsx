@@ -13,7 +13,6 @@ import { NavigationUtilities } from "../../utilities/NavigationUtilities";
 import Routes from "../../utilities/Routes";
 import UserMenu from "../UserMenu";
 import classnames = require("classnames");
-import CommunitySelector from "../general/community/CommunitySelector";
 import BreadcrumbNavigation from "./BreadcrumbNavigation";
 import Logo from "../general/images/Logo";
 import { EventSubscription } from "fbemitter";
@@ -21,6 +20,8 @@ import { AnimatedIconStack } from "../general/AnimatedIconStack";
 import { NotificationCenter } from "../../utilities/NotificationCenter";
 import { SideMenuNavigationVisibilityChangeNotification } from "./SideMenuNavigation";
 import { FontSizeAdjuster } from '../general/FontSizeAdjuster';
+import Avatar from '../general/Avatar';
+import LogoSmall from "../general/images/LogoSmall";
 
 type OwnProps = {
 }
@@ -126,7 +127,7 @@ class TopNavigation extends React.Component<Props, State> {
                         <i className='fa fa-lg fa-chevron-left navigation-back' onClick={this.goBack} title={translate("common.back")}></i>
                     }
                     <AnimatedIconStack size={2} active={this.state.sideMenuOpen} onClick={window.app.toggleMenu} className="menu-toggle d-none mr-2" iconA="fas fa-bars" />
-                    <CommunitySelector />
+                    <Link to={Routes.ROOT}><LogoSmall className="intrawork-logo-small" /></Link>
                     <div className="main-border-color-background mx-2" style={{ width: 1, height: "75%" }}></div>
                     <BreadcrumbNavigation />
                     {this.renderMenuLinks()}

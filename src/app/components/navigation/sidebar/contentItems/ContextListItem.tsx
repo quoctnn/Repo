@@ -32,10 +32,12 @@ class ContextListItem extends React.Component<Props, State> {
     }
 
     shouldComponentUpdate = (nextProps: Props, nextState:State) => {
-        const newCommunity = this.props.type === "community" && (this.props.contextData.community && nextProps.contextData.community && this.props.contextData.community.id != nextProps.contextData.community.id) || (nextProps.contextData.community && !this.props.contextData.community) || (this.props.contextData.community && !nextProps.contextData.community)
-        const newGroup = this.props.type === "group" && (this.props.contextData.group && nextProps.contextData.group && this.props.contextData.group.id != nextProps.contextData.group.id) || (nextProps.contextData.group && !this.props.contextData.group) || (this.props.contextData.group && !nextProps.contextData.group)
+        const newCommunity = this.props.type === ContextNaturalKey.COMMUNITY && (this.props.contextData.community && nextProps.contextData.community && this.props.contextData.community.id != nextProps.contextData.community.id) || (nextProps.contextData.community && !this.props.contextData.community) || (this.props.contextData.community && !nextProps.contextData.community)
+        const newGroup = this.props.type === ContextNaturalKey.GROUP && (this.props.contextData.group && nextProps.contextData.group && this.props.contextData.group.id != nextProps.contextData.group.id) || (nextProps.contextData.group && !this.props.contextData.group) || (this.props.contextData.group && !nextProps.contextData.group)
+        const newEvent = this.props.type === ContextNaturalKey.EVENT && (this.props.contextData.event && nextProps.contextData.event && this.props.contextData.event.id != nextProps.contextData.event.id) || (nextProps.contextData.event && !this.props.contextData.event) || (this.props.contextData.event && !nextProps.contextData.event)
+        const newProject = this.props.type === ContextNaturalKey.PROJECT && (this.props.contextData.project && nextProps.contextData.project && this.props.contextData.project.id != nextProps.contextData.project.id) || (nextProps.contextData.project && !this.props.contextData.project) || (this.props.contextData.project && !nextProps.contextData.project)
         const changedActive = this.props.activeCommunity != nextProps.activeCommunity
-        return changedActive || newCommunity || newGroup
+        return changedActive || newCommunity || newGroup || newEvent || newProject
     }
 
     renderCommunity = () => {
@@ -54,7 +56,9 @@ class ContextListItem extends React.Component<Props, State> {
                 </div>
                 <div className="name text-truncate flex-grow-1">{community.name}</div>
                 <div className="avatar">
-                    <Avatar image={community.avatar_thumbnail} size={22} />
+                    { community.avatar_thumbnail &&
+                        <Avatar image={community.avatar_thumbnail} size={22} />
+                    }
                 </div>
             </Link>
         )
@@ -71,9 +75,7 @@ class ContextListItem extends React.Component<Props, State> {
             return <></>
         }
         const isActive = this.props.contextData.group && this.props.contextData.group.id == group.id
-        // TODO: get childen info in endpoint
-        const hasChildren = this.props.setParent
-        const hasParent = group.parent
+        const hasChildren = group.subgroups > 0
         const cn = classnames("d-flex list-item", {"active": isActive})
         return (
             <Link className={cn} to={group.uri} key={group.id}>
@@ -86,7 +88,9 @@ class ContextListItem extends React.Component<Props, State> {
                 </div>
                 <div className="name text-truncate flex-grow-1">{group.name}</div>
                 <div className="avatar">
-                    <Avatar image={group.avatar_thumbnail} size={22} />
+                    {group.avatar_thumbnail &&
+                        <Avatar image={group.avatar_thumbnail} size={22} />
+                    }
                 </div>
             </Link>
         )
@@ -98,9 +102,7 @@ class ContextListItem extends React.Component<Props, State> {
             return <></>
         }
         const isActive = this.props.contextData.event && this.props.contextData.event.id == event.id
-        // TODO: get childen info in endpoint
-        const hasChildren = this.props.setParent
-        const hasParent = event.parent
+        const hasChildren = event.sessions > 0
         const cn = classnames("d-flex list-item", {"active": isActive})
         return (
             <Link className={cn} to={event.uri} key={event.id}>
@@ -113,7 +115,9 @@ class ContextListItem extends React.Component<Props, State> {
                 </div>
                 <div className="name text-truncate flex-grow-1">{event.name}</div>
                 <div className="avatar">
-                    <Avatar image={event.avatar_thumbnail} size={22} />
+                    {event.avatar_thumbnail &&
+                        <Avatar image={event.avatar_thumbnail} size={22} />
+                    }
                 </div>
             </Link>
         )
@@ -129,11 +133,13 @@ class ContextListItem extends React.Component<Props, State> {
         return (
             <Link className={cn} to={project.uri} key={project.id}>
                 <div className="icon">
-                    <i className="fa fa-home"/>
+                    <i className="fa fa-folder-open"/>
                 </div>
                 <div className="name text-truncate flex-grow-1">{project.name}</div>
                 <div className="avatar">
-                    <Avatar image={project.avatar_thumbnail} size={22} />
+                    { project.avatar_thumbnail &&
+                        <Avatar image={project.avatar_thumbnail} size={22} />
+                    }
                 </div>
             </Link>
         )

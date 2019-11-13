@@ -1472,6 +1472,7 @@ export type Group = {
     members_count: number
     created_at: string
     parent: number
+    subgroups: number
     updated_at: string
     hidden_reason: ObjectHiddenReason
 } & INotifiable & AvatarAndCover & Linkable & Permissible & IdentifiableObject & IPrivacy & IMembershipStatus
@@ -1516,6 +1517,7 @@ export type Event = {
     location: Coordinate
     address: string
     parent: Event
+    sessions: number
     hidden_reason: ObjectHiddenReason
 } & INotifiable & AvatarAndCover & Linkable & Permissible & IdentifiableObject & IPrivacy & IMembershipStatus
 

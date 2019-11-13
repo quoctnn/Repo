@@ -2,7 +2,7 @@ import * as React from "react";
 import SearchBar from './SearchBar';
 import { EditorState } from 'draft-js';
 import { SearcQueryManager } from '../../../general/input/contextsearch/extensions/index';
-import { Community, GroupSorting, Group, ContextNaturalKey, ContextObject } from '../../../../types/intrasocial_types';
+import { Community, Project, ContextNaturalKey, ContextObject, ProjectSorting } from '../../../../types/intrasocial_types';
 import { ApiClient } from '../../../../network/ApiClient';
 import "../SideBarItem.scss";
 import LoadingSpinner from "../../../LoadingSpinner";
@@ -16,8 +16,7 @@ import { translate } from '../../../../localization/AutoIntlProvider';
 type State = {
     isLoading: boolean
     query: string
-    groups: Group[]
-    parent: Group
+    projects: Project[]
     title: string
     subtitle: string
 }
@@ -31,41 +30,36 @@ type ReduxStateProps = {
 
 type Props = ContextDataProps & ReduxStateProps
 
-class SideBarGroupContent extends React.Component<Props, State> {
+class SideBarProjectContent extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props)
         this.state = {
             isLoading: false,
             query: "",
-            groups: [],
-            parent: null,
-            title: translate('common.group.groups'),
+            projects: [],
+            title: translate('common.project.projects'),
             subtitle: ""
         }
     }
 
     componentDidMount = () => {
         this.setState({isLoading: true})
-        this.getGroups();
+        this.getProjects();
     }
 
     componentDidUpdate = (prevProps: Props, prevState: State) => {
         if (this.props.contextData.community != prevProps.contextData.community) {
             this.setState({isLoading: true})
-            this.getGroups()
-        }
-        if (this.state.parent != prevState.parent) {
-            this.getGroups()
+            this.getProjects()
         }
     }
     shouldComponentUpdate = (nextProps: Props, nextState:State) => {
         const search = this.state.query != nextState.query
-        const updatedGroups = this.state.groups.length != nextState.groups.length
+        const updatedProjects = this.state.projects.length != nextState.projects.length
         const loading = this.state.isLoading != nextState.isLoading
         const updatedCommunity = this.props.contextData.community != nextProps.contextData.community
-        const updatedGroup = this.props.contextData.group != nextProps.contextData.group
-        const updatedParent = this.state.parent != nextState.parent
-        return search || updatedGroups || loading || updatedCommunity || updatedGroup || updatedParent
+        const updatedProject = this.props.contextData.project != nextProps.contextData.project
+        return search || updatedProjects || loading || updatedCommunity || updatedProject
     }
 
     searchChanged = (es:EditorState) => {
@@ -73,15 +67,12 @@ class SideBarGroupContent extends React.Component<Props, State> {
         this.setState({query: searchData.query});
     }
 
-    getGroups = () => {
+    getProjects = () => {
         const community = this.props.contextData.community || this.props.activeCommunity
         if (community) {
-            ApiClient.getGroups(community.id, this.state.parent && this.state.parent.id, 1000, 0, GroupSorting.mostUsed, (data, status, error) => {
+            ApiClient.getProjects(community.id, null, 1000, 0, ProjectSorting.mostUsed, false, false, (data, status, error) => {
                 if (data && data.results && data.results.length > 0) {
-                    const title = this.state.parent ? this.state.parent.name : translate('common.group.groups')
-                    this.setState({groups: data.results, isLoading:false, title: title});
-                } else if (this.state.parent) {
-                    this.goBack()
+                    this.setState({projects: data.results, isLoading:false});
                 } else {
                     this.setState({isLoading:false});
                 }
@@ -89,47 +80,19 @@ class SideBarGroupContent extends React.Component<Props, State> {
         }
     }
 
-    setParent = (group: ContextObject) => {
-        this.setState({parent: group as Group});
-    }
-
-    goBack = (e?: React.MouseEvent) => {
-        this.setState({isLoading: true})
-        if (this.state.parent) {
-            if (this.state.parent.parent) {
-                ApiClient.getGroup(this.state.parent.parent.toString(), (data, status, error) => {
-                    if (data) {
-                        this.setState({parent: data, title: data.name});
-                    } else {
-                        this.setState({parent: null, title: translate('common.group.groups')});
-                    }
-                })
-            } else {
-                this.setState({parent: null, title: translate('common.group.groups')})
-            }
-        }
-    }
-
     createNew = (e?: React.MouseEvent) => {
     }
 
     render = () => {
-        var groups = this.state.groups
+        var projects = this.state.projects
         if (this.state.query && this.state.query.length > 0) {
-            groups = groups.filter(groups => groups.name.toLowerCase().includes(this.state.query.trim().toLowerCase()))
+            projects = projects.filter(projects => projects.name.toLowerCase().includes(this.state.query.trim().toLowerCase()))
         }
         return (<>
             <div className="sidebar-content-header d-flex">
-                { this.state.parent &&
-                    <><button className="title-button btn btn-default" onClick={this.goBack}><i className="fa fa-chevron-left"></i></button>
-                    <div className="sidebar-breadcrumb flex-grow-1">
-                        {this.state.title}
-                    </div></>
-                    ||
-                    <div className="sidebar-title flex-grow-1">
-                        {this.state.title}
-                    </div>
-                }
+                <div className="sidebar-title flex-grow-1">
+                    {this.state.title}
+                </div>
                 { true &&
                     <button className="title-button btn btn-default" onClick={this.createNew}><i className="fa fa-plus"></i></button>
                 }
@@ -148,13 +111,13 @@ class SideBarGroupContent extends React.Component<Props, State> {
                         { this.state.isLoading &&
                             <LoadingSpinner/>
                             ||
-                            groups.map((group) => {
-                                if (group) {
-                                    return <ContextListItem setParent={this.setParent} key={"group-" + group.id} type={ContextNaturalKey.GROUP} contextObject={group}/>
+                            projects.map((project) => {
+                                if (project) {
+                                    return <ContextListItem key={"project-" + project.id} type={ContextNaturalKey.PROJECT} contextObject={project}/>
                                 }
                             }
                         )}
-                        { !this.state.isLoading && groups.length == 0 &&
+                        { !this.state.isLoading && projects.length == 0 &&
                             <div>{translate("search.result.empty")}</div>
                         }
                     </div>
@@ -172,4 +135,4 @@ const mapStateToProps = (state: ReduxState, ownProps: OwnProps): ReduxStateProps
     }
 }
 
-export default withContextData(connect<ReduxStateProps, {}, OwnProps>(mapStateToProps, null)(SideBarGroupContent))
+export default withContextData(connect<ReduxStateProps, {}, OwnProps>(mapStateToProps, null)(SideBarProjectContent))

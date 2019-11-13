@@ -19,6 +19,11 @@
         position:fixed;
         top:0px;
         height: $topMenuHeight;
+        .intrawork-logo-small{
+            @include var(fill, primary-theme-color);
+            height: $topMenuHeight;
+            margin: 0 auto;
+        }
         .fa {
             margin-right: 6px;
         }

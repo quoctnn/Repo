@@ -14,6 +14,8 @@ import { connect } from 'react-redux';
 import { ContextMenuItem, MenuItem } from '../../../types/menuItem';
 import SideBarCommunityItem from "./contentItems/SideBarCommunityItem";
 import SideBarGroupItem from './contentItems/SideBarGroupItem';
+import SideBarEventItem from './contentItems/SideBarEventItem';
+import SideBarProjectItem from './contentItems/SideBarProjectItem';
 
 type State = {
     active: string
@@ -95,9 +97,9 @@ class SideBarNavigation extends React.PureComponent<Props, State> {
                 {this.renderSpacing(true)}
                 <SideBarGroupItem addMenuItem={this.addItem} index={"groups-menu"} active={this.state.active} onClick={this.selectionChanged} />
                 {this.renderSpacing(true)}
-                <SideBarItem title="Projects" addMenuItem={this.addItem} index={"projects-menu"} active={this.state.active} onClick={this.selectionChanged} />
+                <SideBarProjectItem addMenuItem={this.addItem} index={"projects-menu"} active={this.state.active} onClick={this.selectionChanged} />
                 {this.renderSpacing(true)}
-                <SideBarItem title="Events" addMenuItem={this.addItem} index={"events-menu"} active={this.state.active} onClick={this.selectionChanged} />
+                <SideBarEventItem addMenuItem={this.addItem} index={"events-menu"} active={this.state.active} onClick={this.selectionChanged} />
                 {this.renderSpacing(false)}
                 <SideBarItem title="Files" addMenuItem={this.addItem} index={"files-menu"} active={this.state.active} onClick={this.selectionChanged} />
                 {this.renderSpacing(true)}
