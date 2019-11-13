@@ -42,12 +42,6 @@ class SideBarNavigation extends React.PureComponent<Props, State> {
         document.body.classList.add("has-side-menu-" + uniqueId())
     }
 
-    componentDidMount = () => {
-
-    }
-    componentDidUpdate = (prevProps: Props, prevState: State) => {
-    }
-
     shouldComponentUpdate = (nextProps: Props, nextState: State) => {
         return true
     }

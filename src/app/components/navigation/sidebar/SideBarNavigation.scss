@@ -48,7 +48,7 @@ $avatarSize: 40px;
   margin: 12px auto;
   width: 75%;
   min-height: 1px;
-  @include var(background-color, border-color-default);
+  @include var(background-color, highlight-background-color);
 }
 
 .sidebar-root .spacer {
@@ -60,5 +60,5 @@ $avatarSize: 40px;
   min-height: 20px;
   margin-left: 21px;
   width: 1px;
-  @include var(background-color, border-color-default);
+  @include var(background-color, highlight-background-color);
 }
