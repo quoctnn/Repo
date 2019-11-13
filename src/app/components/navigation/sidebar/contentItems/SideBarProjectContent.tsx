@@ -2,7 +2,7 @@ import * as React from "react";
 import SearchBar from './SearchBar';
 import { EditorState } from 'draft-js';
 import { SearcQueryManager } from '../../../general/input/contextsearch/extensions/index';
-import { Community, Project, ContextNaturalKey, ContextObject, ProjectSorting } from '../../../../types/intrasocial_types';
+import { Community, Project, ContextNaturalKey, ContextObject, ProjectSorting, Permission, ObjectHiddenReason } from '../../../../types/intrasocial_types';
 import { ApiClient } from '../../../../network/ApiClient';
 import "../SideBarItem.scss";
 import LoadingSpinner from "../../../LoadingSpinner";
@@ -12,13 +12,17 @@ import { connect } from 'react-redux';
 import { CommunityManager } from '../../../../managers/CommunityManager';
 import { ReduxState } from "../../../../redux";
 import { translate } from '../../../../localization/AutoIntlProvider';
+import { uniqueId } from "../../../../utilities/Utilities";
+import ProjectCreateComponent from "../../../general/contextCreation/ProjectCreateComponent";
 
 type State = {
     isLoading: boolean
     query: string
     projects: Project[]
     title: string
-    subtitle: string
+    subtitle: string,
+    createProjectFormVisible: boolean
+    createProjectFormReloadKey: string
 }
 
 type OwnProps = {
@@ -39,7 +43,9 @@ class SideBarProjectContent extends React.Component<Props, State> {
             query: "",
             projects: [],
             title: translate('common.project.projects'),
-            subtitle: ""
+            subtitle: "",
+            createProjectFormVisible: false,
+            createProjectFormReloadKey: undefined
         }
     }
 
@@ -60,7 +66,8 @@ class SideBarProjectContent extends React.Component<Props, State> {
         const loading = this.state.isLoading != nextState.isLoading
         const updatedCommunity = this.props.contextData.community != nextProps.contextData.community
         const updatedProject = this.props.contextData.project != nextProps.contextData.project
-        return search || updatedProjects || loading || updatedCommunity || updatedProject
+        const createProjectForm = this.state.createProjectFormVisible != nextState.createProjectFormVisible || this.state.createProjectFormReloadKey != nextState.createProjectFormReloadKey
+        return search || updatedProjects || loading || updatedCommunity || updatedProject || createProjectForm
     }
 
     searchChanged = (es:EditorState) => {
@@ -82,6 +89,37 @@ class SideBarProjectContent extends React.Component<Props, State> {
     }
 
     createNew = (e?: React.MouseEvent) => {
+        this.setState({createProjectFormVisible:true, createProjectFormReloadKey:uniqueId()})
+    }
+
+    renderAddProjectForm = () => {
+        const visible = this.state.createProjectFormVisible
+        const {community} = this.props.contextData
+        if (community) {
+            return <ProjectCreateComponent groups={[]} onCancel={this.hideProjectCreateForm} community={community.id} key={this.state.createProjectFormReloadKey} visible={visible} onComplete={this.handleProjectCreateForm} />
+        } else {
+            return null
+        }
+    }
+
+    hideProjectCreateForm = () => {
+        this.setState((prevState:State) => {
+            return {createProjectFormVisible:false}
+        })
+    }
+
+    handleProjectCreateForm = (project:Project) => {
+        if(!!project)
+        {
+            if(project.hidden_reason && project.hidden_reason == ObjectHiddenReason.review)
+            {
+                this.hideProjectCreateForm()
+            }
+            else if(project.uri)
+            {
+                window.app.navigateToRoute(project.uri)
+            }
+        }
     }
 
     render = () => {
@@ -94,7 +132,7 @@ class SideBarProjectContent extends React.Component<Props, State> {
                 <div className="sidebar-title flex-grow-1">
                     {this.state.title}
                 </div>
-                { true &&
+                { this.props.contextData.community && this.props.contextData.community.project_creation_permission >= Permission.limited_write &&
                     <button className="title-button btn btn-default" onClick={this.createNew}><i className="fa fa-plus"></i></button>
                 }
                 { this.state.subtitle &&
@@ -124,6 +162,7 @@ class SideBarProjectContent extends React.Component<Props, State> {
                     </div>
                 </div>
             </div>
+            {this.renderAddProjectForm()}
         </>)
     }
 }

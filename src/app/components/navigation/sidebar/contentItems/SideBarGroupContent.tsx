@@ -128,7 +128,7 @@ class SideBarGroupContent extends React.Component<Props, State> {
         if (community) {
             return <GroupCreateComponent onCancel={this.hideGroupCreateForm} community={community.id} key={this.state.createGroupFormReloadKey} visible={visible} onComplete={this.handleGroupCreateForm} />
         } else {
-            return undefined
+            return null
         }
     }
 
@@ -169,7 +169,7 @@ class SideBarGroupContent extends React.Component<Props, State> {
                         {this.state.title}
                     </div>
                 }
-                { this.props.contextData.community && this.props.contextData.community.event_creation_permission >= Permission.limited_write &&
+                { this.props.contextData.community && this.props.contextData.community.group_creation_permission >= Permission.limited_write &&
                     <button className="title-button btn btn-default" onClick={this.createNew}><i className="fa fa-plus"></i></button>
                 }
                 { this.state.subtitle &&

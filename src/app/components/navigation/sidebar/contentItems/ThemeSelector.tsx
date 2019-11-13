@@ -16,7 +16,7 @@ class ThemeSelector extends React.PureComponent<ReduxStateProps, {}> {
 
     render() {
         return (
-            <div className={"d-flex theme-selector"}>
+            <div className={"d-flex settings-item theme-selector"}>
                 <div className="flex-grow-1">{translate("Theme")}</div>
                 <div className="dropdown">
                     <button className="btn btn-secondary dropdown-toggle text-truncate"

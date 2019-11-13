@@ -1,6 +1,10 @@
 import * as React from "react";
-import ThemeSelector from "./ThemeSelector";
 import { translate } from '../../../../localization/AutoIntlProvider';
+import ThemeSelector from "./ThemeSelector";
+import LanguageSelector from "./LanguageSelector";
+import EndpointSelector from "./EndpointSelector";
+import "./SideBarSettingsContent.scss";
+
 type State = {
 }
 
@@ -27,14 +31,16 @@ export default class SideBarSettingsContent extends React.Component<Props, State
         return (<>
             <div className="sidebar-content-header">
                 <div className="sidebar-title">
-                    {translate("Settings")}
+                    {translate("sidebar.settings.title")}
                     <div className="sidebar-subtitle">
-                        {translate("Global user settings")}
+                        {translate("sidebar.settings.subtitle")}
                     </div>
                 </div>
             </div>
             <div className="sidebar-content-list" style={{marginRight: "8px"}}>
                 <ThemeSelector/>
+                <LanguageSelector/>
+                <EndpointSelector/>
             </div>
         </>)
     }

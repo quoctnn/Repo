@@ -1,7 +1,7 @@
 import { connect } from 'react-redux';
 import { CommunityManager } from '../../../../managers/CommunityManager';
 import { ContextDataProps, withContextData } from '../../../../hoc/WithContextData';
-import { Community, ContextObject, Group, ContextNaturalKey, Event, Project } from '../../../../types/intrasocial_types';
+import { Community, ContextObject, Group, ContextNaturalKey, Event, Project, UserProfile, AvatarAndCover } from '../../../../types/intrasocial_types';
 import * as React from 'react';
 import { Link } from 'react-router-dom';
 import Avatar from '../../../general/Avatar';
@@ -74,7 +74,7 @@ class ContextListItem extends React.Component<Props, State> {
     renderGroup = () => {
         const group = this.props.contextObject as Group
         if (!group){
-            return <></>
+            return null
         }
         const isActive = this.props.contextData.group && this.props.contextData.group.id == group.id
         const hasChildren = group.subgroups > 0
@@ -101,7 +101,7 @@ class ContextListItem extends React.Component<Props, State> {
     renderEvent = () => {
         const event = this.props.contextObject as Event
         if (!event){
-            return <></>
+            return null
         }
         const isActive = this.props.contextData.event && this.props.contextData.event.id == event.id
         const hasChildren = event.sessions > 0
@@ -128,7 +128,7 @@ class ContextListItem extends React.Component<Props, State> {
     renderProject = () => {
         const project = this.props.contextObject as Project
         if (!project){
-            return <></>
+            return null
         }
         const isActive = this.props.contextData.project && this.props.contextData.project.id == project.id
         const cn = classnames("d-flex list-item", {"active": isActive})
@@ -147,18 +147,42 @@ class ContextListItem extends React.Component<Props, State> {
         )
     }
 
+    renderUser = () => {
+        const profile = this.props.contextObject as ContextObject & AvatarAndCover
+        if (!profile){
+            return null
+        }
+        const isActive = this.props.contextData.profile && this.props.contextData.profile.id == profile.id
+        const cn = classnames("d-flex list-item", {"active": isActive})
+        return (
+            <Link className={cn} to={profile.uri} key={profile.id} onClick={this.props.onClick}>
+                <div className="icon">
+                    <i className="fa fa-user"/>
+                </div>
+                <div className="name text-truncate flex-grow-1">{profile.name}</div>
+                <div className="avatar">
+                    {profile.avatar_thumbnail &&
+                        <Avatar image={profile.avatar_thumbnail} size={22} />
+                    }
+                </div>
+            </Link>
+        )
+    }
+
     render() {
         switch(this.props.type){
             case ContextNaturalKey.COMMUNITY:
-                return this.renderCommunity()
+                return this.renderCommunity();
             case ContextNaturalKey.GROUP:
-                return this.renderGroup()
+                return this.renderGroup();
             case ContextNaturalKey.EVENT:
-                return this.renderEvent()
+                return this.renderEvent();
             case ContextNaturalKey.PROJECT:
-                return this.renderProject()
+                return this.renderProject();
+            case ContextNaturalKey.USER:
+                return this.renderUser();
             default:
-                break;
+                return null;
         }
     }
 }

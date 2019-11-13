@@ -1,10 +1,12 @@
 import * as React from "react";
 import classnames from 'classnames';
-import { translate } from '../../../../localization/AutoIntlProvider';
 import { MenuItem } from '../../../../types/menuItem';
-import SideBarSettingsContent from "./SideBarSettingsContent";
+import { translate } from '../../../../localization/AutoIntlProvider';
+import "../SideBarItem.scss";
+import SideBarFavoritesContent from './SideBarFavoritesContent';
+
 type State = {
-    menuItem:MenuItem
+    menuItem: MenuItem
 }
 
 type OwnProps = {
@@ -12,14 +14,16 @@ type OwnProps = {
     active:string
     addMenuItem:(item:MenuItem) => void // This should be a menuItem
     onClick:(e:React.MouseEvent) => void
+    onClose:(e:React.MouseEvent) => void
 }
+
 type Props = OwnProps
 
-export default class SideBarSettingsItem extends React.Component<Props, State> {
-    constructor(props) {
+export default class SideBarFavoriteItem extends React.Component<Props, State> {
+    constructor(props: Props) {
         super(props)
         this.state = {
-            menuItem:undefined
+            menuItem: undefined
         }
     }
 
@@ -27,20 +31,21 @@ export default class SideBarSettingsItem extends React.Component<Props, State> {
         if (this.props.index) {
             const menuItem:MenuItem = {
                 index: this.props.index,
-                title: "sidebar.settings.title",
-                subtitle: "sidebar.settings.subtitle",
-                content: <SideBarSettingsContent/>
+                title: translate("Starred"),
+                subtitle: undefined,
+                content: <SideBarFavoritesContent onClose={this.props.onClose}/>
             }
-            this.props.addMenuItem(menuItem)
             this.setState({menuItem: menuItem})
         }
     }
 
     componentDidUpdate = (prevProps: Props, prevState: State) => {
+        this.props.addMenuItem(this.state.menuItem)
     }
 
     shouldComponentUpdate = (nextProps: Props, nextState:State) => {
-        return this.props.active != nextProps.active
+        const changedFocus = (this.props.active == this.props.index || nextProps.active == this.props.index) && this.props.active != nextProps.active
+        return changedFocus
     }
 
     render = () => {
@@ -50,9 +55,12 @@ export default class SideBarSettingsItem extends React.Component<Props, State> {
         return (
             <div id={this.props.index} className={css} onClick={this.props.onClick}>
                 <i className={iconCss}></i>
-                {translate("sidebar.settings.title")}
+                {this.state.menuItem &&
+                    this.state.menuItem.title
+                    ||
+                    translate("Starred")
+                }
             </div>
         )
     }
 }
-

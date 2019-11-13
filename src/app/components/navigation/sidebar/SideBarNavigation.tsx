@@ -16,6 +16,7 @@ import SideBarCommunityItem from "./contentItems/SideBarCommunityItem";
 import SideBarGroupItem from './contentItems/SideBarGroupItem';
 import SideBarEventItem from './contentItems/SideBarEventItem';
 import SideBarProjectItem from './contentItems/SideBarProjectItem';
+import SideBarFavoriteItem from "./contentItems/SideBarFavoritesItem";
 
 type State = {
     active: string
@@ -91,7 +92,7 @@ class SideBarNavigation extends React.PureComponent<Props, State> {
                 <div className="sidebar-separator"></div>
                 <SideBarCommunityItem addMenuItem={this.addItem} index={"community-menu"} active={this.state.active} onClick={this.selectionChanged} onClose={this.closeMenu}/>
                 {this.renderSpacing(false)}
-                <SideBarItem title="Starred" addMenuItem={this.addItem} index={"starred-menu"} active={this.state.active} onClick={this.selectionChanged} />
+                <SideBarFavoriteItem addMenuItem={this.addItem} index={"starred-menu"} active={this.state.active} onClick={this.selectionChanged} onClose={this.closeMenu} />
                 {this.renderSpacing(true)}
                 <SideBarGroupItem addMenuItem={this.addItem} index={"groups-menu"} active={this.state.active} onClick={this.selectionChanged} onClose={this.closeMenu}/>
                 {this.renderSpacing(true)}

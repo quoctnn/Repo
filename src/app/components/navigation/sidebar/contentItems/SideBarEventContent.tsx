@@ -2,7 +2,7 @@ import * as React from "react";
 import SearchBar from './SearchBar';
 import { EditorState } from 'draft-js';
 import { SearcQueryManager } from '../../../general/input/contextsearch/extensions/index';
-import { Community, Event, ContextNaturalKey, ContextObject } from '../../../../types/intrasocial_types';
+import { Community, Event, ContextNaturalKey, ContextObject, Permission, Group, ObjectHiddenReason } from '../../../../types/intrasocial_types';
 import { ApiClient } from '../../../../network/ApiClient';
 import "../SideBarItem.scss";
 import LoadingSpinner from "../../../LoadingSpinner";
@@ -13,6 +13,9 @@ import { CommunityManager } from '../../../../managers/CommunityManager';
 import { ReduxState } from "../../../../redux";
 import { translate } from '../../../../localization/AutoIntlProvider';
 import { EventSorting } from '../../../../modules/events/EventsMenu';
+import { uniqueId } from "../../../../utilities/Utilities";
+import GroupCreateComponent from "../../../general/contextCreation/GroupCreateComponent";
+import EventCreateComponent from "../../../general/contextCreation/EventCreateComponent";
 
 type State = {
     isLoading: boolean
@@ -21,6 +24,8 @@ type State = {
     parent: Event
     title: string
     subtitle: string
+    createEventFormVisible: boolean
+    createEventFormReloadKey: string
 }
 
 type OwnProps = {
@@ -42,7 +47,9 @@ class SideBarEventContent extends React.Component<Props, State> {
             events: [],
             parent: null,
             title: translate('common.event.events'),
-            subtitle: ""
+            subtitle: "",
+            createEventFormVisible: false,
+            createEventFormReloadKey: undefined
         }
     }
 
@@ -67,7 +74,8 @@ class SideBarEventContent extends React.Component<Props, State> {
         const updatedCommunity = this.props.contextData.community != nextProps.contextData.community
         const updatedEvent = this.props.contextData.event != nextProps.contextData.event
         const updatedParent = this.state.parent != nextState.parent
-        return search || updatedEvents || loading || updatedCommunity || updatedEvent || updatedParent
+        const createEventForm = this.state.createEventFormVisible != nextState.createEventFormVisible || this.state.createEventFormReloadKey != nextState.createEventFormReloadKey
+        return search || updatedEvents || loading || updatedCommunity || updatedEvent || updatedParent || createEventForm
     }
 
     searchChanged = (es:EditorState) => {
@@ -113,6 +121,37 @@ class SideBarEventContent extends React.Component<Props, State> {
     }
 
     createNew = (e?: React.MouseEvent) => {
+        this.setState({createEventFormVisible:true, createEventFormReloadKey:uniqueId()})
+    }
+
+    renderAddEventForm = () => {
+        const visible = this.state.createEventFormVisible
+        const {community} = this.props.contextData
+        if (community) {
+            return <EventCreateComponent onCancel={this.hideEventCreateForm} community={community.id} key={this.state.createEventFormReloadKey} visible={visible} onComplete={this.handleEventCreateForm} />
+        } else {
+            return null
+        }
+    }
+
+    hideEventCreateForm = () => {
+        this.setState((prevState:State) => {
+            return {createEventFormVisible:false}
+        })
+    }
+
+    handleEventCreateForm = (event:Event) => {
+        if(!!event)
+        {
+            if(event.hidden_reason && event.hidden_reason == ObjectHiddenReason.review)
+            {
+                this.hideEventCreateForm()
+            }
+            else if(event.uri)
+            {
+                window.app.navigateToRoute(event.uri)
+            }
+        }
     }
 
     render = () => {
@@ -132,7 +171,7 @@ class SideBarEventContent extends React.Component<Props, State> {
                         {this.state.title}
                     </div>
                 }
-                { true &&
+                { this.props.contextData.community && this.props.contextData.community.event_creation_permission >= Permission.limited_write &&
                     <button className="title-button btn btn-default" onClick={this.createNew}><i className="fa fa-plus"></i></button>
                 }
                 { this.state.subtitle &&
@@ -162,6 +201,7 @@ class SideBarEventContent extends React.Component<Props, State> {
                     </div>
                 </div>
             </div>
+            {this.renderAddEventForm()}
         </>)
     }
 }
