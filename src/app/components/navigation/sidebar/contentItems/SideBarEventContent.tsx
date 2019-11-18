@@ -14,9 +14,10 @@ import { ReduxState } from "../../../../redux";
 import { translate } from '../../../../localization/AutoIntlProvider';
 import { EventSorting } from '../../../../modules/events/EventsMenu';
 import { uniqueId } from "../../../../utilities/Utilities";
-import GroupCreateComponent from "../../../general/contextCreation/GroupCreateComponent";
 import EventCreateComponent from "../../../general/contextCreation/EventCreateComponent";
 import EmptyListItem from './EmptyListItem';
+import { OverflowMenuItem, OverflowMenuItemType } from "../../../general/OverflowMenu";
+import { DropDownMenu } from "../../../general/DropDownMenu";
 
 type State = {
     isLoading: boolean
@@ -27,6 +28,7 @@ type State = {
     subtitle: string
     createEventFormVisible: boolean
     createEventFormReloadKey: string
+    sorting: EventSorting
 }
 
 type OwnProps = {
@@ -50,7 +52,8 @@ class SideBarEventContent extends React.Component<Props, State> {
             title: translate('common.event.events'),
             subtitle: "",
             createEventFormVisible: false,
-            createEventFormReloadKey: undefined
+            createEventFormReloadKey: undefined,
+            sorting: EventSorting.date
         }
     }
 
@@ -60,7 +63,8 @@ class SideBarEventContent extends React.Component<Props, State> {
     }
 
     componentDidUpdate = (prevProps: Props, prevState: State) => {
-        if (this.props.contextData.community != prevProps.contextData.community) {
+        if (this.props.contextData.community != prevProps.contextData.community ||
+            this.state.sorting != prevState.sorting) {
             this.setState({isLoading: true})
             this.getEvents()
         }
@@ -75,8 +79,9 @@ class SideBarEventContent extends React.Component<Props, State> {
         const updatedCommunity = this.props.contextData.community != nextProps.contextData.community
         const updatedEvent = this.props.contextData.event != nextProps.contextData.event
         const updatedParent = this.state.parent != nextState.parent
+        const updatedSorting = this.state.sorting != nextState.sorting
         const createEventForm = this.state.createEventFormVisible != nextState.createEventFormVisible || this.state.createEventFormReloadKey != nextState.createEventFormReloadKey
-        return search || updatedEvents || loading || updatedCommunity || updatedEvent || updatedParent || createEventForm
+        return search || updatedEvents || loading || updatedCommunity || updatedEvent || updatedParent || updatedSorting || createEventForm
     }
 
     searchChanged = (es:EditorState) => {
@@ -84,10 +89,16 @@ class SideBarEventContent extends React.Component<Props, State> {
         this.setState({query: searchData.query});
     }
 
+    setSorting = (ordering: EventSorting) => (event: React.SyntheticEvent<any>) => {
+        event.stopPropagation();
+        event.preventDefault();
+        this.setState({sorting: ordering})
+    }
+
     getEvents = () => {
         const community = this.props.contextData.community || this.props.activeCommunity
         if (community) {
-            ApiClient.getEvents(community.id, this.state.parent && this.state.parent.id, null, 1000, 0, EventSorting.date, true, (data, status, error) => {
+            ApiClient.getEvents(community.id, this.state.parent && this.state.parent.id, null, 1000, 0, this.state.sorting, true, (data, status, error) => {
                 if (data && data.results && data.results.length > 0) {
                     const title = this.state.parent ? this.state.parent.name : translate('common.event.events')
                     this.setState({events: data.results, isLoading:false, title: title});
@@ -98,6 +109,14 @@ class SideBarEventContent extends React.Component<Props, State> {
                 }
             })
         }
+    }
+
+    getSortingDropdownItems = () => {
+        const sortingDropdownItems: OverflowMenuItem[] = [
+            {id:"date", title:EventSorting.translatedText(EventSorting.date), type:OverflowMenuItemType.option, onPress: this.setSorting(EventSorting.date)},
+            {id:"popular", title:EventSorting.translatedText(EventSorting.popular), type:OverflowMenuItemType.option, onPress: this.setSorting(EventSorting.popular)},
+        ]
+        return sortingDropdownItems
     }
 
     setParent = (event: ContextObject) => {
@@ -183,8 +202,13 @@ class SideBarEventContent extends React.Component<Props, State> {
             </div>
             <div className="sidebar-content-list">
                 <div className="content d-flex flex-column">
-                    <div className="search">
-                        <SearchBar onSearchQueryChange={this.searchChanged}/>
+                    <div className="filter-container d-flex">
+                        <div className="search flex-grow-1">
+                            <SearchBar onSearchQueryChange={this.searchChanged}/>
+                        </div>
+                        <div className="sorting">
+                            <DropDownMenu className="sorting-dropdown" triggerClass="fa fa-chevron-down sorting-trigger" triggerTitle={EventSorting.translatedText(this.state.sorting)} items={this.getSortingDropdownItems}></DropDownMenu>
+                        </div>
                     </div>
                     <div className="items scrollbar flex-shrink-1">
                         { this.state.isLoading &&

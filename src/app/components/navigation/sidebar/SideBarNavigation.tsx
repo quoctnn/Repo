@@ -55,12 +55,12 @@ class SideBarNavigation extends React.PureComponent<Props, State> {
         return true
     }
 
-    componentDidUpdate = (prevProps:Props, prevState:State) => {
-        if (this.state.active && !prevState.active)
-            document.addEventListener('click', this.outsideTrigger)
-        if (!this.state.active)
-            document.removeEventListener('click', this.outsideTrigger)
-    }
+    // componentDidUpdate = (prevProps:Props, prevState:State) => {
+    //     if (this.state.active && !prevState.active)
+    //         document.addEventListener('click', this.outsideTrigger)
+    //     if (!this.state.active)
+    //         document.removeEventListener('click', this.outsideTrigger)
+    // }
 
     outsideTrigger = (e:MouseEvent) => {
         if(!this.state.active)

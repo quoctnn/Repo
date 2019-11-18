@@ -15,6 +15,8 @@ import { translate } from '../../../../localization/AutoIntlProvider';
 import GroupCreateComponent from "../../../general/contextCreation/GroupCreateComponent";
 import { uniqueId } from '../../../../utilities/Utilities';
 import EmptyListItem from "./EmptyListItem";
+import { DropDownMenu } from '../../../general/DropDownMenu';
+import { OverflowMenuItem, OverflowMenuItemType } from "../../../general/OverflowMenu";
 
 type State = {
     isLoading: boolean
@@ -25,6 +27,7 @@ type State = {
     subtitle: string
     createGroupFormVisible: boolean
     createGroupFormReloadKey: string
+    sorting: GroupSorting
 }
 
 type OwnProps = {
@@ -48,7 +51,8 @@ class SideBarGroupContent extends React.Component<Props, State> {
             title: translate('common.group.groups'),
             subtitle: "",
             createGroupFormVisible: false,
-            createGroupFormReloadKey: ""
+            createGroupFormReloadKey: "",
+            sorting: GroupSorting.mostUsed
         }
     }
 
@@ -58,7 +62,8 @@ class SideBarGroupContent extends React.Component<Props, State> {
     }
 
     componentDidUpdate = (prevProps: Props, prevState: State) => {
-        if (this.props.contextData.community != prevProps.contextData.community) {
+        if (this.props.contextData.community != prevProps.contextData.community ||
+            this.state.sorting != prevState.sorting) {
             this.setState({isLoading: true})
             this.getGroups()
         }
@@ -73,8 +78,9 @@ class SideBarGroupContent extends React.Component<Props, State> {
         const updatedCommunity = this.props.contextData.community != nextProps.contextData.community
         const updatedGroup = this.props.contextData.group != nextProps.contextData.group
         const updatedParent = this.state.parent != nextState.parent
+        const updatedSorting = this.state.sorting != nextState.sorting
         const createGroupForm = this.state.createGroupFormVisible != nextState.createGroupFormVisible || this.state.createGroupFormReloadKey != nextState.createGroupFormReloadKey
-        return search || updatedGroups || loading || updatedCommunity || updatedGroup || updatedParent || createGroupForm
+        return search || updatedGroups || loading || updatedCommunity || updatedGroup || updatedParent || updatedSorting || createGroupForm
     }
 
     searchChanged = (es:EditorState) => {
@@ -82,10 +88,16 @@ class SideBarGroupContent extends React.Component<Props, State> {
         this.setState({query: searchData.query});
     }
 
+    setSorting = (ordering: GroupSorting) => (event: React.SyntheticEvent<any>) => {
+        event.stopPropagation();
+        event.preventDefault();
+        this.setState({sorting: ordering})
+    }
+
     getGroups = () => {
         const community = this.props.contextData.community || this.props.activeCommunity
         if (community) {
-            ApiClient.getGroups(community.id, this.state.parent && this.state.parent.id, 1000, 0, GroupSorting.mostUsed, (data, status, error) => {
+            ApiClient.getGroups(community.id, this.state.parent && this.state.parent.id, 1000, 0, this.state.sorting, (data, status, error) => {
                 if (data && data.results && data.results.length > 0) {
                     const title = this.state.parent ? this.state.parent.name : translate('common.group.groups')
                     this.setState({groups: data.results, isLoading:false, title: title});
@@ -96,6 +108,15 @@ class SideBarGroupContent extends React.Component<Props, State> {
                 }
             })
         }
+    }
+
+    getSortingDropdownItems = () => {
+        const sortingDropdownItems: OverflowMenuItem[] = [
+            {id:"recent", title:GroupSorting.translatedText(GroupSorting.recent), type:OverflowMenuItemType.option, onPress: this.setSorting(GroupSorting.recent)},
+            {id:"mostUsed", title:GroupSorting.translatedText(GroupSorting.mostUsed), type:OverflowMenuItemType.option, onPress: this.setSorting(GroupSorting.mostUsed)},
+            {id:"AtoZ", title:GroupSorting.translatedText(GroupSorting.AtoZ), type:OverflowMenuItemType.option, onPress: this.setSorting(GroupSorting.AtoZ)}
+        ]
+        return sortingDropdownItems
     }
 
     setParent = (group: ContextObject) => {
@@ -181,8 +202,13 @@ class SideBarGroupContent extends React.Component<Props, State> {
             </div>
             <div className="sidebar-content-list">
                 <div className="content d-flex flex-column">
-                    <div className="search">
-                        <SearchBar onSearchQueryChange={this.searchChanged}/>
+                    <div className="filter-container d-flex">
+                        <div className="search flex-grow-1">
+                            <SearchBar onSearchQueryChange={this.searchChanged}/>
+                        </div>
+                        <div className="sorting">
+                            <DropDownMenu className="sorting-dropdown" triggerClass="fa fa-chevron-down sorting-trigger" triggerTitle={GroupSorting.translatedText(this.state.sorting)} items={this.getSortingDropdownItems}></DropDownMenu>
+                        </div>
                     </div>
                     <div className="items scrollbar flex-shrink-1">
                         { this.state.isLoading &&

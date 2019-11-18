@@ -12,7 +12,7 @@ type State = {
 type OwnProps = {
     index:string
     active:string
-    addMenuItem:(item:MenuItem) => void // This should be a menuItem
+    addMenuItem:(item:MenuItem) => void
     onClick:(e:React.MouseEvent) => void
     onClose:(e:React.MouseEvent) => void
 }

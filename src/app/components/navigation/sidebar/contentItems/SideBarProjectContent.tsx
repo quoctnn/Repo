@@ -15,6 +15,8 @@ import { translate } from '../../../../localization/AutoIntlProvider';
 import { uniqueId } from "../../../../utilities/Utilities";
 import ProjectCreateComponent from "../../../general/contextCreation/ProjectCreateComponent";
 import EmptyListItem from './EmptyListItem';
+import { OverflowMenuItem, OverflowMenuItemType } from "../../../general/OverflowMenu";
+import { DropDownMenu } from "../../../general/DropDownMenu";
 
 type State = {
     isLoading: boolean
@@ -24,6 +26,7 @@ type State = {
     subtitle: string,
     createProjectFormVisible: boolean
     createProjectFormReloadKey: string
+    sorting: ProjectSorting
 }
 
 type OwnProps = {
@@ -46,7 +49,8 @@ class SideBarProjectContent extends React.Component<Props, State> {
             title: translate('common.project.projects'),
             subtitle: "",
             createProjectFormVisible: false,
-            createProjectFormReloadKey: undefined
+            createProjectFormReloadKey: undefined,
+            sorting: ProjectSorting.mostUsed
         }
     }
 
@@ -56,7 +60,8 @@ class SideBarProjectContent extends React.Component<Props, State> {
     }
 
     componentDidUpdate = (prevProps: Props, prevState: State) => {
-        if (this.props.contextData.community != prevProps.contextData.community) {
+        if (this.props.contextData.community != prevProps.contextData.community ||
+            this.state.sorting != prevState.sorting) {
             this.setState({isLoading: true})
             this.getProjects()
         }
@@ -67,8 +72,9 @@ class SideBarProjectContent extends React.Component<Props, State> {
         const loading = this.state.isLoading != nextState.isLoading
         const updatedCommunity = this.props.contextData.community != nextProps.contextData.community
         const updatedProject = this.props.contextData.project != nextProps.contextData.project
+        const updatedSorting = this.state.sorting != nextState.sorting
         const createProjectForm = this.state.createProjectFormVisible != nextState.createProjectFormVisible || this.state.createProjectFormReloadKey != nextState.createProjectFormReloadKey
-        return search || updatedProjects || loading || updatedCommunity || updatedProject || createProjectForm
+        return search || updatedProjects || loading || updatedCommunity || updatedProject || updatedSorting || createProjectForm
     }
 
     searchChanged = (es:EditorState) => {
@@ -76,10 +82,16 @@ class SideBarProjectContent extends React.Component<Props, State> {
         this.setState({query: searchData.query});
     }
 
+    setSorting = (ordering: ProjectSorting) => (event: React.SyntheticEvent<any>) => {
+        event.stopPropagation();
+        event.preventDefault();
+        this.setState({sorting: ordering})
+    }
+
     getProjects = () => {
         const community = this.props.contextData.community || this.props.activeCommunity
         if (community) {
-            ApiClient.getProjects(community.id, null, 1000, 0, ProjectSorting.mostUsed, false, false, (data, status, error) => {
+            ApiClient.getProjects(community.id, null, 1000, 0, this.state.sorting, false, false, (data, status, error) => {
                 if (data && data.results && data.results.length > 0) {
                     this.setState({projects: data.results, isLoading:false});
                 } else {
@@ -87,6 +99,15 @@ class SideBarProjectContent extends React.Component<Props, State> {
                 }
             })
         }
+    }
+
+    getSortingDropdownItems = () => {
+        const sortingDropdownItems: OverflowMenuItem[] = [
+            {id:"recent", title:ProjectSorting.translatedText(ProjectSorting.recent), type:OverflowMenuItemType.option, onPress: this.setSorting(ProjectSorting.recent)},
+            {id:"mostUsed", title:ProjectSorting.translatedText(ProjectSorting.mostUsed), type:OverflowMenuItemType.option, onPress: this.setSorting(ProjectSorting.mostUsed)},
+            {id:"AtoZ", title:ProjectSorting.translatedText(ProjectSorting.AtoZ), type:OverflowMenuItemType.option, onPress: this.setSorting(ProjectSorting.AtoZ)}
+        ]
+        return sortingDropdownItems
     }
 
     createNew = (e?: React.MouseEvent) => {
@@ -144,8 +165,13 @@ class SideBarProjectContent extends React.Component<Props, State> {
             </div>
             <div className="sidebar-content-list">
                 <div className="content d-flex flex-column">
-                    <div className="search">
-                        <SearchBar onSearchQueryChange={this.searchChanged}/>
+                    <div className="filter-container d-flex">
+                        <div className="search flex-grow-1">
+                            <SearchBar onSearchQueryChange={this.searchChanged}/>
+                        </div>
+                        <div className="sorting">
+                            <DropDownMenu className="sorting-dropdown" triggerClass="fa fa-chevron-down sorting-trigger" triggerTitle={ProjectSorting.translatedText(this.state.sorting)} items={this.getSortingDropdownItems}></DropDownMenu>
+                        </div>
                     </div>
                     <div className="items scrollbar flex-shrink-1">
                         { this.state.isLoading &&
