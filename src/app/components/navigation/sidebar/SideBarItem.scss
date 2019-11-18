@@ -20,9 +20,11 @@
     @include var(border-color, border-color-default)
 }
 
-.filter-container .search{
-    margin: auto;
+.filter-container {
     margin-bottom: 8px;
+    .search{
+        margin: auto;
+    }
 }
 
 .content{
