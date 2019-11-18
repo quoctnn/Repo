@@ -14,6 +14,7 @@ import { ReduxState } from "../../../../redux";
 import { translate } from '../../../../localization/AutoIntlProvider';
 import { uniqueId } from "../../../../utilities/Utilities";
 import ProjectCreateComponent from "../../../general/contextCreation/ProjectCreateComponent";
+import EmptyListItem from './EmptyListItem';
 
 type State = {
     isLoading: boolean
@@ -157,7 +158,7 @@ class SideBarProjectContent extends React.Component<Props, State> {
                             }
                         )}
                         { !this.state.isLoading && projects.length == 0 &&
-                            <div>{translate("search.result.empty")}</div>
+                            <EmptyListItem/>
                         }
                     </div>
                 </div>

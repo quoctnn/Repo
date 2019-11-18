@@ -16,6 +16,7 @@ import { EventSorting } from '../../../../modules/events/EventsMenu';
 import { uniqueId } from "../../../../utilities/Utilities";
 import GroupCreateComponent from "../../../general/contextCreation/GroupCreateComponent";
 import EventCreateComponent from "../../../general/contextCreation/EventCreateComponent";
+import EmptyListItem from './EmptyListItem';
 
 type State = {
     isLoading: boolean
@@ -196,7 +197,7 @@ class SideBarEventContent extends React.Component<Props, State> {
                             }
                         )}
                         { !this.state.isLoading && events.length == 0 &&
-                            <div>{translate("search.result.empty")}</div>
+                            <EmptyListItem/>
                         }
                     </div>
                 </div>

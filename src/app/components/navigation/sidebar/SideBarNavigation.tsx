@@ -37,6 +37,7 @@ type Props = OwnProps & RouteComponentProps & ReduxStateProps
 
 class SideBarNavigation extends React.PureComponent<Props, State> {
     private uniqueClass = "has-side-menu-" + uniqueId();
+    private contentRef = React.createRef<HTMLDivElement>()
     constructor(props: Props) {
         super(props)
         this.state = {
@@ -50,9 +51,26 @@ class SideBarNavigation extends React.PureComponent<Props, State> {
         document.body.classList.remove(this.uniqueClass)
 
     }
+
     shouldComponentUpdate = (nextProps: Props, nextState: State) => {
         return true
     }
+
+    componentDidUpdate = (prevProps:Props, prevState:State) => {
+        if (this.state.active && !prevState.active)
+            document.addEventListener('click', this.outsideTrigger)
+        else if (!this.state.active && prevState.active)
+            document.removeEventListener('click', this.outsideTrigger)
+    }
+
+    outsideTrigger = (e:MouseEvent) => {
+        if(!this.state.active)
+            return
+        const el = e.target as HTMLElement
+        if(el && !this.contentRef.current.contains(el))
+            this.closeMenu(null)
+    }
+
     renderSpacing = (withLine: boolean) => {
         const css = classnames("spacer", { line: withLine })
         return <div className={css}></div>
@@ -82,7 +100,7 @@ class SideBarNavigation extends React.PureComponent<Props, State> {
     render() {
         const css = classnames("sidebar-root")
         const community = this.props.activeCommunity
-        return (<>
+        return (<div ref={this.contentRef}>
             <div className={css}>
                 <div className="sidebar-root-header">
                     <div className="community-avatar text-center">
@@ -123,7 +141,7 @@ class SideBarNavigation extends React.PureComponent<Props, State> {
                 <SideBarItem title="Stats" addMenuItem={this.addItem} index={"stats-menu"} active={this.state.active} onClick={this.selectionChanged} />
             </div>
             <SideBarContent menuItems={this.state.menuItems} active={this.state.active} />
-        </>
+        </div>
         )
     }
 }

@@ -14,6 +14,7 @@ import { ReduxState } from "../../../../redux";
 import { translate } from '../../../../localization/AutoIntlProvider';
 import GroupCreateComponent from "../../../general/contextCreation/GroupCreateComponent";
 import { uniqueId } from '../../../../utilities/Utilities';
+import EmptyListItem from "./EmptyListItem";
 
 type State = {
     isLoading: boolean
@@ -194,7 +195,7 @@ class SideBarGroupContent extends React.Component<Props, State> {
                             }
                         )}
                         { !this.state.isLoading && groups.length == 0 &&
-                            <div>{translate("search.result.empty")}</div>
+                            <EmptyListItem/>
                         }
                     </div>
                 </div>

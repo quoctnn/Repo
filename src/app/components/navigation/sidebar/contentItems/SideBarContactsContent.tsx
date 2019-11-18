@@ -9,6 +9,7 @@ import { EditorState } from "draft-js";
 import { SearcQueryManager } from "../../../general/input/contextsearch/extensions";
 import SearchBar from './SearchBar';
 import ContactListItem from "./ContactListItem";
+import EmptyListItem from './EmptyListItem';
 
 type State = {
     isLoading: boolean
@@ -42,7 +43,8 @@ class SideBarContactsContent extends React.Component<Props, State> {
 
     shouldComponentUpdate = (nextProps: Props, nextState: State) => {
         const search = this.state.query != nextState.query
-        return search
+        const contactsUpdate = this.props.contacts != nextProps.contacts
+        return search || contactsUpdate
     }
 
     searchChanged = (es:EditorState) => {
@@ -50,31 +52,9 @@ class SideBarContactsContent extends React.Component<Props, State> {
         this.setState({query: searchData.query});
     }
 
-    contactsSort = ( a:UserProfile, b:UserProfile ) => {
-        if ( a.user_status == UserStatus.active && b.user_status != UserStatus.active ||
-             a.user_status == UserStatus.away && (b.user_status != UserStatus.away && b.user_status != UserStatus.active) ||
-             a.user_status == UserStatus.dnd && (b.user_status != UserStatus.dnd && b.user_status != UserStatus.away && b.user_status != UserStatus.active) ||
-             a.user_status == UserStatus.vacation && (b.user_status != UserStatus.vacation && b.user_status != UserStatus.dnd && b.user_status != UserStatus.away && b.user_status != UserStatus.active)
-             ){
-            return -1;
-        }
-        if (
-             b.user_status == UserStatus.active && a.user_status != UserStatus.active ||
-             b.user_status == UserStatus.away && (a.user_status != UserStatus.away && a.user_status != UserStatus.active) ||
-             b.user_status == UserStatus.dnd && (a.user_status != UserStatus.dnd && a.user_status != UserStatus.away && a.user_status != UserStatus.active) ||
-             b.user_status == UserStatus.vacation && (a.user_status != UserStatus.vacation && a.user_status != UserStatus.dnd && a.user_status != UserStatus.away && a.user_status != UserStatus.active) ||
-             b.user_status == UserStatus.invisible ||
-             b.user_status == UserStatus.unavailable
-        ){
-            return 1;
-        }
-        return 0;
-    }
-
     render = () => {
         var contacts = this.props.contacts
-        contacts.sort((a, b) => {return this.contactsSort(a, b)})
-
+        contacts.sort(UserStatus.contactsSort)
         if (this.state.query && this.state.query.length > 0) {
             contacts = contacts.filter(user => user.slug_name.includes(this.state.query.trim().toLowerCase()))
         }
@@ -99,6 +79,9 @@ class SideBarContactsContent extends React.Component<Props, State> {
                             <LoadingSpinner />
                             ||
                             contacts.map((user) => {if (user) {return <ContactListItem key={"contact-" + user.id} contact={user}/>}})
+                        }
+                        { !this.state.isLoading && contacts.length == 0 &&
+                            <EmptyListItem/>
                         }
                     </div>
                 </div>

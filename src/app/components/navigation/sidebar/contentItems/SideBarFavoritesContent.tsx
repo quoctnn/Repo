@@ -5,6 +5,7 @@ import "../SideBarItem.scss";
 import LoadingSpinner from "../../../LoadingSpinner";
 import ContextListItem from "./ContextListItem";
 import { translate } from '../../../../localization/AutoIntlProvider';
+import EmptyListItem from './EmptyListItem';
 
 type State = {
     isLoading: boolean
@@ -67,6 +68,9 @@ export default class SideBarFavoritesContent extends React.Component<Props, Stat
                                 }
                             }
                         )}
+                        { !this.state.isLoading && favorites.length == 0 &&
+                            <EmptyListItem/>
+                        }
                     </div>
                 </div>
             </div>

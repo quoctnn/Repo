@@ -11,6 +11,8 @@ import Routes from "../../../../utilities/Routes";
 import "./ContextListItem.scss";
 import UserProfileAvatar from "../../../general/UserProfileAvatar";
 import { TypingIndicator } from "../../../general/TypingIndicator";
+import classnames from 'classnames';
+import { ContextDataProps, withContextData } from "../../../../hoc/WithContextData";
 
 type OwnProps = {
     contact: UserProfile
@@ -25,7 +27,7 @@ type ReduxStateProps = {
     authenticatedUser:UserProfile
 }
 
-type Props = ReduxStateProps & OwnProps
+type Props = ReduxStateProps & ContextDataProps & OwnProps
 
 class ContactListItem extends React.PureComponent<Props, State> {
     private observers:EventSubscription[] = []
@@ -77,8 +79,10 @@ class ContactListItem extends React.PureComponent<Props, State> {
 
     render() {
         const profile = this.props.contact
+        const isActive = this.props.contextData.profile && this.props.contextData.profile.id == profile.id
+        const cn = classnames("d-flex list-item", {"active": isActive})
         return (
-            <Link className="d-flex list-item" to={Routes.profileUrl(profile.slug_name)} key={profile.id} onClick={this.props.onClick}>
+            <Link className={cn} to={Routes.profileUrl(profile.slug_name)} key={profile.id} onClick={this.props.onClick}>
                 <div className="icon">
                     <i className="fa fa-user"/>
                 </div>
@@ -102,4 +106,4 @@ const mapStateToProps = (state:ReduxState, ownProps: OwnProps):ReduxStateProps =
     }
 }
 
-export default connect(mapStateToProps, null)(ContactListItem)
+export default withContextData(connect<ReduxStateProps, {}, OwnProps>(mapStateToProps, null)(ContactListItem))

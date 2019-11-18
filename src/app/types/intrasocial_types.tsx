@@ -1736,6 +1736,26 @@ export namespace UserStatus {
             selectables = selectables.filter(s => !excludes.contains(s))
         return selectables.map(s => UserStatusObjects[s])
     }
+    export function contactsSort( a:UserProfile, b:UserProfile ) {
+        if ( a.user_status == UserStatus.active && b.user_status != UserStatus.active ||
+             a.user_status == UserStatus.away && (b.user_status != UserStatus.away && b.user_status != UserStatus.active) ||
+             a.user_status == UserStatus.dnd && (b.user_status != UserStatus.dnd && b.user_status != UserStatus.away && b.user_status != UserStatus.active) ||
+             a.user_status == UserStatus.vacation && (b.user_status != UserStatus.vacation && b.user_status != UserStatus.dnd && b.user_status != UserStatus.away && b.user_status != UserStatus.active)
+             ){
+            return -1;
+        }
+        if (
+             b.user_status == UserStatus.active && a.user_status != UserStatus.active ||
+             b.user_status == UserStatus.away && (a.user_status != UserStatus.away && a.user_status != UserStatus.active) ||
+             b.user_status == UserStatus.dnd && (a.user_status != UserStatus.dnd && a.user_status != UserStatus.away && a.user_status != UserStatus.active) ||
+             b.user_status == UserStatus.vacation && (a.user_status != UserStatus.vacation && a.user_status != UserStatus.dnd && a.user_status != UserStatus.away && a.user_status != UserStatus.active) ||
+             b.user_status == UserStatus.invisible ||
+             b.user_status == UserStatus.unavailable
+        ){
+            return 1;
+        }
+        return 0;
+    }
 }
 //DASHBOARD
 export type Module = {

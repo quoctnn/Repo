@@ -12,6 +12,7 @@ import FileListItem from '../../../../modules/files/FileListItem';
 import { EditorState } from "draft-js";
 import { SearcQueryManager } from "../../../general/input/contextsearch/extensions";
 import SearchBar from './SearchBar';
+import EmptyListItem from './EmptyListItem';
 
 type State = {
     isLoading: boolean
@@ -103,6 +104,9 @@ class SideBarFilesContent extends React.Component<Props, State> {
                             <LoadingSpinner />
                             ||
                             files.map((file) => {if (file) {return <FileListItem key={"file-" + file.id} file={file}/>}})
+                        }
+                        { !this.state.isLoading && files.length == 0 &&
+                            <EmptyListItem/>
                         }
                     </div>
                 </div>
