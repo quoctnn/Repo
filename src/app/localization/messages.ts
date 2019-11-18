@@ -621,7 +621,9 @@ var translations = {
     "project.is_private.description":"Set as private",
     "sidebar.settings.title": "Settings",
     "sidebar.settings.subtitle": "Global user settings",
-  },
+    "sidebar.files.title": "Files",
+    "sidebar.contacts.title":"Contacts",
+},
   no: {
     "search.placeholder": "Søk ...",
     "Sign in": "Logg inn",
@@ -1244,6 +1246,8 @@ var translations = {
     "project.is_private.description":"Sett som privat",
     "sidebar.settings.title": "Innstillinger",
     "sidebar.settings.subtitle": "Globale brukerinstillinger",
+    "sidebar.files.title": "Filer",
+    "sidebar.contacts.title":"Kontakter",
 },
   en: {
     "search.placeholder": "Search ...",
@@ -1878,6 +1882,8 @@ var translations = {
     "project.is_private.description":"Set as private",
     "sidebar.settings.title": "Settings",
     "sidebar.settings.subtitle": "Global user settings",
+    "sidebar.files.title": "Files",
+    "sidebar.contacts.title":"Contacts",
   }
 };
 

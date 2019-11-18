@@ -1,5 +1,25 @@
 .list-item .avatar{
     margin: auto;
+    .typing-indicator:after,.typing-indicator:before
+    {
+        display: none;
+    }
+    .typing-indicator
+    {
+        padding: 1px;
+        margin-top: 0;
+    }
+    .typing-indicator-container
+    {
+        height: 100%;
+        width: 120%;
+        position: absolute;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        top: 0;
+        left: -0.1rem;
+    }
 }
 
 .list-item .name{

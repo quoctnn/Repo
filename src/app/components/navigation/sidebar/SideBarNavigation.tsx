@@ -17,6 +17,8 @@ import SideBarGroupItem from './contentItems/SideBarGroupItem';
 import SideBarEventItem from './contentItems/SideBarEventItem';
 import SideBarProjectItem from './contentItems/SideBarProjectItem';
 import SideBarFavoriteItem from "./contentItems/SideBarFavoritesItem";
+import SideBarFilesItem from './contentItems/SideBarFilesItem';
+import SideBarContactsItem from "./contentItems/SideBarContactsItem";
 
 type State = {
     active: string
@@ -100,11 +102,11 @@ class SideBarNavigation extends React.PureComponent<Props, State> {
                 {this.renderSpacing(true)}
                 <SideBarEventItem addMenuItem={this.addItem} index={"events-menu"} active={this.state.active} onClick={this.selectionChanged} onClose={this.closeMenu}/>
                 {this.renderSpacing(false)}
-                <SideBarItem title="Files" addMenuItem={this.addItem} index={"files-menu"} active={this.state.active} onClick={this.selectionChanged} />
+                <SideBarFilesItem addMenuItem={this.addItem} index={"files-menu"} active={this.state.active} onClick={this.selectionChanged} onClose={this.closeMenu}/>
                 {this.renderSpacing(true)}
                 <SideBarItem title="Notes" addMenuItem={this.addItem} index={"notes-menu"} active={this.state.active} onClick={this.selectionChanged} />
                 {this.renderSpacing(true)}
-                <SideBarItem title="Contacts" addMenuItem={this.addItem} index={"contacts-menu"} active={this.state.active} onClick={this.selectionChanged} />
+                <SideBarContactsItem addMenuItem={this.addItem} index={"contacts-menu"} active={this.state.active} onClick={this.selectionChanged} onClose={this.closeMenu}/>
                 {this.renderSpacing(true)}
                 <SideBarSettingsItem addMenuItem={this.addItem} index={"settings-menu"} active={this.state.active} onClick={this.selectionChanged} />
 

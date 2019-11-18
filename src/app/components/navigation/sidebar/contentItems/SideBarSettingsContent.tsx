@@ -4,6 +4,7 @@ import ThemeSelector from "./ThemeSelector";
 import LanguageSelector from "./LanguageSelector";
 import EndpointSelector from "./EndpointSelector";
 import "./SideBarSettingsContent.scss";
+import { Settings } from '../../../../utilities/Settings';
 
 type State = {
 }
@@ -40,7 +41,9 @@ export default class SideBarSettingsContent extends React.Component<Props, State
             <div className="sidebar-content-list" style={{marginRight: "8px"}}>
                 <ThemeSelector/>
                 <LanguageSelector/>
-                <EndpointSelector/>
+                { !Settings.isProduction &&
+                    <EndpointSelector/>
+                }
             </div>
         </>)
     }
