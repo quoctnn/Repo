@@ -16,11 +16,7 @@ import classnames = require("classnames");
 import BreadcrumbNavigation from "./BreadcrumbNavigation";
 import Logo from "../general/images/Logo";
 import { EventSubscription } from "fbemitter";
-import { AnimatedIconStack } from "../general/AnimatedIconStack";
-import { NotificationCenter } from "../../utilities/NotificationCenter";
-import { SideMenuNavigationVisibilityChangeNotification } from "./SideMenuNavigation";
 import { FontSizeAdjuster } from '../general/FontSizeAdjuster';
-import Avatar from '../general/Avatar';
 import LogoSmall from "../general/images/LogoSmall";
 
 type OwnProps = {
@@ -44,17 +40,6 @@ class TopNavigation extends React.Component<Props, State> {
         this.state = {
             notificationsPanelVisible:false,
             sideMenuOpen:false
-        }
-        const observer1 = NotificationCenter.addObserver(SideMenuNavigationVisibilityChangeNotification, this.processMenuVisibilityChangeNotification)
-        this.observers.push(observer1)
-    }
-    processMenuVisibilityChangeNotification = (...args:any[]) => {
-        const open = args[0].open
-        if(this.state.sideMenuOpen != open)
-        {
-            this.setState(() => {
-                return {sideMenuOpen:open}
-            })
         }
     }
     componentWillUnmount() {
@@ -126,7 +111,6 @@ class TopNavigation extends React.Component<Props, State> {
                     { window.isElectron  &&
                         <i className='fa fa-lg fa-chevron-left navigation-back' onClick={this.goBack} title={translate("common.back")}></i>
                     }
-                    <AnimatedIconStack size={2} active={this.state.sideMenuOpen} onClick={window.app.toggleMenu} className="menu-toggle d-none mr-2" iconA="fas fa-bars" />
                     <Link to={Routes.ROOT}><LogoSmall className="intrawork-logo-small" /></Link>
                     <div className="main-border-color-background mx-2" style={{ width: 1, height: "75%" }}></div>
                     <BreadcrumbNavigation />
