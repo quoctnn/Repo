@@ -49,7 +49,6 @@ class SideBarNavigation extends React.PureComponent<Props, State> {
 
     componentWillUnmount = () => {
         document.body.classList.remove(this.uniqueClass)
-
     }
 
     shouldComponentUpdate = (nextProps: Props, nextState: State) => {
@@ -59,7 +58,7 @@ class SideBarNavigation extends React.PureComponent<Props, State> {
     componentDidUpdate = (prevProps:Props, prevState:State) => {
         if (this.state.active && !prevState.active)
             document.addEventListener('click', this.outsideTrigger)
-        else if (!this.state.active && prevState.active)
+        if (!this.state.active)
             document.removeEventListener('click', this.outsideTrigger)
     }
 
@@ -67,7 +66,7 @@ class SideBarNavigation extends React.PureComponent<Props, State> {
         if(!this.state.active)
             return
         const el = e.target as HTMLElement
-        if(el && !this.contentRef.current.contains(el))
+        if(el && !this.contentRef.current.contains(el) && !el.classList.contains("title-button"))
             this.closeMenu(null)
     }
 
@@ -100,48 +99,49 @@ class SideBarNavigation extends React.PureComponent<Props, State> {
     render() {
         const css = classnames("sidebar-root")
         const community = this.props.activeCommunity
-        return (<div ref={this.contentRef}>
-            <div className={css}>
-                <div className="sidebar-root-header">
-                    <div className="community-avatar text-center">
-                        {community &&
-                            <Avatar size={40} image={community.avatar_thumbnail}></Avatar>
-                        }
+        return (
+            <div ref={this.contentRef}>
+                <div className={css}>
+                    <div className="sidebar-root-header">
+                        <div className="community-avatar text-center">
+                            {community &&
+                                <Avatar size={40} image={community.avatar_thumbnail}></Avatar>
+                            }
+                        </div>
+                        <div className="community-name text-center text-truncate">
+                            {community &&
+                                <span>{community.name}</span>
+                            }
+                        </div>
                     </div>
-                    <div className="community-name text-center text-truncate">
-                        {community &&
-                            <span>{community.name}</span>
-                        }
-                    </div>
-                </div>
-                <div className="sidebar-separator"></div>
-                <SideBarCommunityItem addMenuItem={this.addItem} index={"community-menu"} active={this.state.active} onClick={this.selectionChanged} onClose={this.closeMenu}/>
-                {this.renderSpacing(false)}
-                <SideBarFavoriteItem addMenuItem={this.addItem} index={"starred-menu"} active={this.state.active} onClick={this.selectionChanged} onClose={this.closeMenu} />
-                {this.renderSpacing(true)}
-                <SideBarGroupItem addMenuItem={this.addItem} index={"groups-menu"} active={this.state.active} onClick={this.selectionChanged} onClose={this.closeMenu}/>
-                {this.renderSpacing(true)}
-                <SideBarProjectItem addMenuItem={this.addItem} index={"projects-menu"} active={this.state.active} onClick={this.selectionChanged} onClose={this.closeMenu}/>
-                {this.renderSpacing(true)}
-                <SideBarEventItem addMenuItem={this.addItem} index={"events-menu"} active={this.state.active} onClick={this.selectionChanged} onClose={this.closeMenu}/>
-                {this.renderSpacing(false)}
-                <SideBarFilesItem addMenuItem={this.addItem} index={"files-menu"} active={this.state.active} onClick={this.selectionChanged} onClose={this.closeMenu}/>
-                {this.renderSpacing(true)}
-                <SideBarItem title="Notes" addMenuItem={this.addItem} index={"notes-menu"} active={this.state.active} onClick={this.selectionChanged} />
-                {this.renderSpacing(true)}
-                <SideBarContactsItem addMenuItem={this.addItem} index={"contacts-menu"} active={this.state.active} onClick={this.selectionChanged} onClose={this.closeMenu}/>
-                {this.renderSpacing(true)}
-                <SideBarSettingsItem addMenuItem={this.addItem} index={"settings-menu"} active={this.state.active} onClick={this.selectionChanged} />
+                    <div className="sidebar-separator"></div>
+                    <SideBarCommunityItem addMenuItem={this.addItem} index={"community-menu"} active={this.state.active} onClick={this.selectionChanged} onClose={this.closeMenu}/>
+                    {this.renderSpacing(false)}
+                    <SideBarFavoriteItem addMenuItem={this.addItem} index={"starred-menu"} active={this.state.active} onClick={this.selectionChanged} onClose={this.closeMenu} />
+                    {this.renderSpacing(true)}
+                    <SideBarGroupItem addMenuItem={this.addItem} index={"groups-menu"} active={this.state.active} onClick={this.selectionChanged} onClose={this.closeMenu}/>
+                    {this.renderSpacing(true)}
+                    <SideBarProjectItem addMenuItem={this.addItem} index={"projects-menu"} active={this.state.active} onClick={this.selectionChanged} onClose={this.closeMenu}/>
+                    {this.renderSpacing(true)}
+                    <SideBarEventItem addMenuItem={this.addItem} index={"events-menu"} active={this.state.active} onClick={this.selectionChanged} onClose={this.closeMenu}/>
+                    {this.renderSpacing(false)}
+                    <SideBarFilesItem addMenuItem={this.addItem} index={"files-menu"} active={this.state.active} onClick={this.selectionChanged} onClose={this.closeMenu}/>
+                    {this.renderSpacing(true)}
+                    <SideBarItem title="Notes" addMenuItem={this.addItem} index={"notes-menu"} active={this.state.active} onClick={this.selectionChanged} />
+                    {this.renderSpacing(true)}
+                    <SideBarContactsItem addMenuItem={this.addItem} index={"contacts-menu"} active={this.state.active} onClick={this.selectionChanged} onClose={this.closeMenu}/>
+                    {this.renderSpacing(true)}
+                    <SideBarSettingsItem addMenuItem={this.addItem} index={"settings-menu"} active={this.state.active} onClick={this.selectionChanged} />
 
-                <div className="sidebar-separator"></div>
-                <SideBarItem title="Admin" addMenuItem={this.addItem} index={"admin-menu"} active={this.state.active} onClick={this.selectionChanged} />
-                {this.renderSpacing(true)}
-                <SideBarItem title="Roles" addMenuItem={this.addItem} index={"roles-menu"} active={this.state.active} onClick={this.selectionChanged} />
-                {this.renderSpacing(true)}
-                <SideBarItem title="Stats" addMenuItem={this.addItem} index={"stats-menu"} active={this.state.active} onClick={this.selectionChanged} />
+                    <div className="sidebar-separator"></div>
+                    <SideBarItem title="Admin" addMenuItem={this.addItem} index={"admin-menu"} active={this.state.active} onClick={this.selectionChanged} />
+                    {this.renderSpacing(true)}
+                    <SideBarItem title="Roles" addMenuItem={this.addItem} index={"roles-menu"} active={this.state.active} onClick={this.selectionChanged} />
+                    {this.renderSpacing(true)}
+                    <SideBarItem title="Stats" addMenuItem={this.addItem} index={"stats-menu"} active={this.state.active} onClick={this.selectionChanged} />
+                </div>
+                <SideBarContent menuItems={this.state.menuItems} active={this.state.active} />
             </div>
-            <SideBarContent menuItems={this.state.menuItems} active={this.state.active} />
-        </div>
         )
     }
 }
