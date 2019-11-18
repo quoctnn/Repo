@@ -5,7 +5,7 @@ import "./ConversationModule.scss"
 import { ResponsiveBreakpoint } from '../../components/general/observers/ResponsiveComponent';
 import { translate, lazyTranslate } from '../../localization/AutoIntlProvider';
 import CircularLoadingSpinner from '../../components/general/CircularLoadingSpinner';
-import { Conversation, Message, UserProfile, UploadedFileType, UploadedFile } from '../../types/intrasocial_types';
+import { Conversation, Message, UserProfile, UploadedFileType, UploadedFile, RelationshipStatus } from '../../types/intrasocial_types';
 import {ApiClient, PaginationResult } from '../../network/ApiClient';
 import { ToastManager } from '../../managers/ToastManager';
 import { connect } from 'react-redux';
@@ -608,6 +608,12 @@ class ConversationModule extends React.Component<Props, State> {
         {
             return this.renderNoConversation()
         }
+        var disabled = false
+        if (conversation.private) {
+            const profiles = ProfileManager.getProfiles(conversation.users.filter(i => i != authenticatedUser.id))
+            if (profiles.length == 1)
+                disabled = profiles[0].relationship.contains(RelationshipStatus.blockedBy) || profiles[0].relationship.contains(RelationshipStatus.isBlocked)
+        }
         const cl = classnames("list list-component-list vertical-scroll droptarget")
         const canSubmit = !this.state.uploading && (!this.props.conversation.temporary || this.props.conversation.users.length > 0)
         const minimumTextLength = this.state.files.length > 0 ? 0 : 1
@@ -643,24 +649,27 @@ class ConversationModule extends React.Component<Props, State> {
                             {this.renderSomeoneIsTyping()}
                         </ChatMessageList>
 
-                    <ChatMessageComposer
-                                //onHandleUploadClick={this.handleUploadClick}
-                                ref={this.messageComposer}
-                                className="secondary-text main-content-secondary-background"
-                                mentionSearch={this.handleMentionSearch}
-                                content={""}
-                                submitOnEnter={true}
-                                filesAdded={this.filesAdded}
-                                onSubmit={this.onChatMessageSubmit}
-                                onDidType={this.onDidType}
-                                canSubmit={canSubmit}
-                                minimumTextLength={minimumTextLength}
-                                topChildren={uploadModule}
-                            />
-                    {this.state.renderDropZone &&
+                    { !disabled &&
+                        <ChatMessageComposer
+                                    //onHandleUploadClick={this.handleUploadClick}
+                                    ref={this.messageComposer}
+                                    className="secondary-text main-content-secondary-background"
+                                    mentionSearch={this.handleMentionSearch}
+                                    content={""}
+                                    submitOnEnter={true}
+                                    filesAdded={this.filesAdded}
+                                    onSubmit={this.onChatMessageSubmit}
+                                    onDidType={this.onDidType}
+                                    canSubmit={canSubmit}
+                                    minimumTextLength={minimumTextLength}
+                                    topChildren={uploadModule}
+                                />
+                    }
+                    {this.state.renderDropZone && !disabled &&
                         <div className="drop-zone">
                             <div className="drop-zone-content">{translate("conversation.module.drop.to.send.title")}</div>
-                        </div>}
+                        </div>
+                    }
                 </div>
     }
     onMemberSelectChange = (value: ProfileSelectorOption[], action: ActionMeta) => {
