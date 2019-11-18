@@ -23,12 +23,16 @@
 }
 
 .list-item .name{
-    margin: auto 6px;
+    margin: auto 6px auto 0;
     font-weight: 400;
     font-size: 0.85rem;
 }
 
 .list-item .icon{
-    margin: auto;
     font-size: 0.7rem;
+    >i{
+        padding: 6px;
+        margin: auto;
+        min-width: 1.75rem;
+    }
 }

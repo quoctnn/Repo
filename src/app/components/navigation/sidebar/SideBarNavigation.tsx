@@ -36,15 +36,20 @@ type OwnProps = {
 type Props = OwnProps & RouteComponentProps & ReduxStateProps
 
 class SideBarNavigation extends React.PureComponent<Props, State> {
+    private uniqueClass = "has-side-menu-" + uniqueId();
     constructor(props: Props) {
         super(props)
         this.state = {
             active: undefined,
             menuItems: []
         }
-        document.body.classList.add("has-side-menu-" + uniqueId())
+        document.body.classList.add(this.uniqueClass)
     }
 
+    componentWillUnmount = () => {
+        document.body.classList.remove(this.uniqueClass)
+
+    }
     shouldComponentUpdate = (nextProps: Props, nextState: State) => {
         return true
     }
