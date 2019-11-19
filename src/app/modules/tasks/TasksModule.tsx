@@ -32,7 +32,6 @@ const nameOf = nameofFactory<Task>()
 class TasksModule extends React.Component<Props, State> {
     tempMenuData: TasksMenuData = null
     taskList = React.createRef<ListComponent<Task>>()
-
     static defaultProps: CommonModuleProps = {
         pageSize: 15,
     }
@@ -229,10 +228,11 @@ class TasksModule extends React.Component<Props, State> {
             <TaskMenu projectMembers={projectMembers} data={this.state.menuData} onUpdate={this.menuDataUpdated} disableContextSearch={disableContextSearch} />
              <ListComponent<Task>
             loadMoreOnScroll={!this.props.showLoadMore}
+            scrollParent={window}
             ref={this.taskList}
             onLoadingStateChanged={this.feedLoadingStateChanged}
             fetchData={this.fetchTasks}
-            renderItem={this.renderTask} 
+            renderItem={this.renderTask}
             renderGroupHeader={this.renderGroupHeader}
             className="tasks-list"
             groupField={nameOf("category")}

@@ -56,7 +56,7 @@ export default class TaskListItem2 extends React.Component<Props, State> {
         const stateId = "tasklistitem_tooltip_state_" + task.id
         const stateTooltip = <UncontrolledTooltip target={stateId}>{translate("task.state." + task.state)}</UncontrolledTooltip>
         const header = task.title
-        const footer = null//this.renderFooter()
+        const footer = this.renderFooter()
         const assignedTo = task.assigned_to || []
         const right = this.renderRight()
         const hasAssignees = assignedTo.length > 0
@@ -78,7 +78,7 @@ export default class TaskListItem2 extends React.Component<Props, State> {
         const cn = classnames("task-list-item main-content-secondary-background")
         return <GenericListItem onClick={this.navigateToTask}
                 header={header}
-                footer={footer}
+                // footer={footer}
                 right={right}
                 left={left}
                 containerClassName="task-list-item-container"
