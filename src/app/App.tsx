@@ -40,17 +40,14 @@ activateCrosstabAuthenticationSync()
 //Disable react-native error handling (react360)
 console.reportErrorsAsExceptions = false
 window.store = store;
-//initialize managers
 initializeManagers();
 
 export default store;
 
 const persistor = persistStore(store, {}, () => {
-    //rehydrate complete
     if (Settings.supportsTheming) {
         ThemeManager.initialize()
     }
-    console.log("rehydrate complete")
     AuthenticationManager.signInCurrent()
 })
 export const App = (props: any) => {

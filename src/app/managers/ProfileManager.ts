@@ -58,7 +58,7 @@ export abstract class ProfileManager
                 }
                 else
                 {
-                    console.log("error fetching profile", profileId)
+                    console.error("error fetching profile", profileId)
                 }
             })
         }
@@ -78,7 +78,7 @@ export abstract class ProfileManager
                 }
                 else
                 {
-                    console.log("error fetching profile", profileId)
+                    console.error("error fetching profile", profileId)
                 }
                 completion(profile)
             })
@@ -102,7 +102,7 @@ export abstract class ProfileManager
                 {
                     const diff = new Date().getTime() - new Date(currentProfile.unresolved_time).getTime()
                     const minutes = Math.floor((diff/1000)/60)
-                    return minutes >= 2 
+                    return minutes >= 2
                 }
                 return ids.indexOf(id) == -1
             })
@@ -118,7 +118,7 @@ export abstract class ProfileManager
                 }
                 else
                 {
-                    console.log("error fetching profiles", requestIds)
+                    console.error("error fetching profiles", requestIds)
                 }
                 completion()
             })

@@ -183,7 +183,6 @@ class CalendarModule extends React.Component<Props, State> {
     }
 
     onCalendarNavigate = (newDate: Date, view: View, action: NavigateAction) => {
-        console.log("cal navigated", newDate, view, action)
         if(view == "month" && (action == "NEXT" || action == "PREV"))
         {
             this.setState(() => {

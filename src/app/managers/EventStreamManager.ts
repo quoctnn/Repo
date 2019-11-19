@@ -15,7 +15,6 @@ export abstract class EventStreamManager
     }
     static eventstreamSocketStateChanged = (...args:any[]) =>
     {
-        console.log("eventstreamSocketStateChanged args", args)
         if(ReconnectingWebSocket.CLOSED == args[0])
             EventStreamManager.socketDisconnected()
     }
@@ -23,7 +22,6 @@ export abstract class EventStreamManager
     {
         EventStreamManager.connected = true
         let state = args[0]
-        console.log("eventstreamStateReceived", args)
         NotificationCenter.push(EventStreamManagerConnectionChangedEvent, [])
     }
     static socketDisconnected = () =>

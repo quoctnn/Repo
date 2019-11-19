@@ -35,7 +35,7 @@ type OwnProps = {
 
 type Props = OwnProps & RouteComponentProps & ReduxStateProps
 
-class SideBarNavigation extends React.PureComponent<Props, State> {
+class SideBarNavigation extends React.Component<Props, State> {
     private uniqueClass = "has-side-menu-" + uniqueId();
     private contentRef = React.createRef<HTMLDivElement>()
     constructor(props: Props) {

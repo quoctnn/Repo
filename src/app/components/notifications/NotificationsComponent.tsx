@@ -63,7 +63,7 @@ class NotificationsComponent extends React.Component<Props, State> {
         const currentCount = this.state.notifications.reduce((a, b) => a += b.values.length , 0)
         if(this.props.unreadNotifications != currentCount && this.state.lastNotificationCount != currentCount)
         {
-            console.log("currentCount mismatch")
+            // TODO: Improve this
             this.reloadNotifications(currentCount)
         }
     }
@@ -155,10 +155,9 @@ class NotificationsComponent extends React.Component<Props, State> {
         return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
     }
     handleClearAllNotifications = () => {
-        console.log("handleClearAllNotifications")
-        ApiClient.readNotificationActions((data, status, error) => {
-            //this.reloadNotifications()
-        })
+        // ApiClient.readNotificationActions((data, status, error) => {
+        //     this.reloadNotifications()
+        // })
     }
     groupNotifications = (notifications:UnhandledNotifications):NotificationGroupObject[] => {
         const list:NotificationGroupObject[] = []

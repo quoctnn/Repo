@@ -68,7 +68,6 @@ class ProjectCreateComponent extends React.Component<Props, State> {
         const create = !this.props.project
         if(create)
             data.community =  this.props.community || CommunityManager.getActiveCommunity().id
-        console.log("formdata", data)
         //const hasDataToSave = Object.keys(communityData).length > 0
         this.setFormStatus(FormStatus.submitting)
         const {
@@ -78,7 +77,7 @@ class ProjectCreateComponent extends React.Component<Props, State> {
             group,
             is_private,
             //
-            avatar, 
+            avatar,
             cover,
             //
             ...rest} = data
@@ -124,7 +123,7 @@ class ProjectCreateComponent extends React.Component<Props, State> {
                             window.app.navigateToRoute(updatedProject.uri)
                         })
                     }
-                    else 
+                    else
                         this.didCancel()
                 }
             }
@@ -174,7 +173,7 @@ class ProjectCreateComponent extends React.Component<Props, State> {
                         completed()
                     }
                 }
-                else 
+                else
                 {
                     pushError(errorData)
                     completed()
@@ -220,14 +219,12 @@ class ProjectCreateComponent extends React.Component<Props, State> {
     handleValueChanged = (id:string, value:any) => {
         this.setState((prevState:State) => {
             return {formValues:{...prevState.formValues, [id]:value}}
-        }, () => {
-            console.log(this.state.formValues)
-        })
+        }, () => {})
     }
     didCancel = () => {
         if(this.props.onCancel)
             this.props.onCancel()
-        else 
+        else
             this.back()
     }
     render = () => {
@@ -236,75 +233,75 @@ class ProjectCreateComponent extends React.Component<Props, State> {
         const create = !this.props.project
         const groupSelectOptions:InputOption[] =  this.props.groups.map(p => {
             return {
-                label:p.name, 
-                value:p.id.toString(), 
+                label:p.name,
+                value:p.id.toString(),
             }
         })
-        return <FormController 
+        return <FormController
                     ref={(controller) => this.formController = controller }
-                    key={this.state.formReloadKey} 
-                    visible={visible} 
-                    formErrors={this.state.formErrors} 
-                    didCancel={this.didCancel} 
-                    status={this.state.formStatus} 
-                    onFormSubmit={this.handleUpdateProfileFormSubmit} 
-                    title={translate(create ? "project.create" : "project.update")  } 
+                    key={this.state.formReloadKey}
+                    visible={visible}
+                    formErrors={this.state.formErrors}
+                    didCancel={this.didCancel}
+                    status={this.state.formStatus}
+                    onFormSubmit={this.handleUpdateProfileFormSubmit}
+                    title={translate(create ? "project.create" : "project.update")  }
                     onValueChanged={this.handleValueChanged}
                     render={(form) => {
                         return {
                             menuItems:[
                                 <FormMenuItem key="1"
-                                    form={form} 
-                                    pageId="1" 
-                                    title={translate("project.settings.page.title.primary")} 
-                                    description={translate("project.settings.page.description.primary")}  
+                                    form={form}
+                                    pageId="1"
+                                    title={translate("project.settings.page.title.primary")}
+                                    description={translate("project.settings.page.description.primary")}
                                     />,
                                     <FormMenuItem key="2"
-                                    form={form} 
-                                    pageId="2" 
-                                    title={translate("project.settings.page.title.appearance")} 
-                                    description={translate("project.settings.page.description.appearance")}  
+                                    form={form}
+                                    pageId="2"
+                                    title={translate("project.settings.page.title.appearance")}
+                                    description={translate("project.settings.page.description.appearance")}
                                     />
                             ],
                             pages:[<FormPage key="page1" form={this.formController} pageId="1" render={(pageId, form) => {
                                     return <>
-                                        <TextInput 
-                                        errors={form.getErrors} 
-                                        isRequired={true} 
+                                        <TextInput
+                                        errors={form.getErrors}
+                                        isRequired={true}
                                         hasSubmitted={form.hasSubmitted()}
-                                        ref={form.setFormRef(pageId)} 
-                                        onValueChanged={form.handleValueChanged(pageId)} 
-                                        value={project.name} 
-                                        title={translate("common.name")} 
+                                        ref={form.setFormRef(pageId)}
+                                        onValueChanged={form.handleValueChanged(pageId)}
+                                        value={project.name}
+                                        title={translate("common.name")}
                                         id={nameof("name")}
                                         />
-                                        <TextAreaInput 
-                                        errors={form.getErrors} 
+                                        <TextAreaInput
+                                        errors={form.getErrors}
                                         hasSubmitted={form.hasSubmitted()}
-                                        ref={form.setFormRef(pageId)} 
-                                        onValueChanged={form.handleValueChanged(pageId)} 
-                                        value={project.description} 
-                                        title={translate("common.description")} 
+                                        ref={form.setFormRef(pageId)}
+                                        onValueChanged={form.handleValueChanged(pageId)}
+                                        value={project.description}
+                                        title={translate("common.description")}
                                         id={nameof("description")}
                                         />
-                                        <BooleanInput 
-                                        errors={form.getErrors} 
+                                        <BooleanInput
+                                        errors={form.getErrors}
                                         hasSubmitted={form.hasSubmitted()}
-                                        ref={form.setFormRef(pageId)} 
-                                        onValueChanged={form.handleValueChanged(pageId)} 
-                                        value={project.is_private} 
-                                        title={translate("project.is_private.title")} 
+                                        ref={form.setFormRef(pageId)}
+                                        onValueChanged={form.handleValueChanged(pageId)}
+                                        value={project.is_private}
+                                        title={translate("project.is_private.title")}
                                         description={translate("project.is_private.description")}
                                         id={nameof("is_private")}
                                         />
-                                        {<SelectInput 
+                                        {<SelectInput
                                             options={groupSelectOptions}
-                                            errors={form.getErrors} 
+                                            errors={form.getErrors}
                                             hasSubmitted={form.hasSubmitted()}
-                                            ref={form.setFormRef(pageId)} 
-                                            onValueChanged={form.handleValueChanged(pageId)} 
-                                            value={project.group && project.group.id.toString()} 
-                                            title={translate("common.group")} 
+                                            ref={form.setFormRef(pageId)}
+                                            onValueChanged={form.handleValueChanged(pageId)}
+                                            value={project.group && project.group.id.toString()}
+                                            title={translate("common.group")}
                                             id={nameof("group")}
                                             isRequired={false}
                                             isDisabled={!create}
@@ -313,25 +310,25 @@ class ProjectCreateComponent extends React.Component<Props, State> {
                             }} />,
                             <FormPage key="page2" form={this.formController} pageId="2" render={(pageId, form) => {
                                 return <>
-                                        <ContextPhotoInput 
-                                            errors={form.getErrors} 
+                                        <ContextPhotoInput
+                                            errors={form.getErrors}
                                             hasSubmitted={form.hasSubmitted()}
-                                            ref={form.setFormRef(pageId)} 
-                                            onValueChanged={form.handleValueChanged(pageId)} 
-                                            value={project.avatar} 
-                                            title={translate("common.avatar")} 
+                                            ref={form.setFormRef(pageId)}
+                                            onValueChanged={form.handleValueChanged(pageId)}
+                                            value={project.avatar}
+                                            title={translate("common.avatar")}
                                             onRequestNavigation={form.handleRequestNavigation}
                                             contextNaturalKey={ContextNaturalKey.PROJECT}
                                             contextObjectId={project.id}
                                             id={nameof("avatar")}
                                         />
-                                        <ContextPhotoInput 
-                                            errors={form.getErrors} 
+                                        <ContextPhotoInput
+                                            errors={form.getErrors}
                                             hasSubmitted={form.hasSubmitted()}
-                                            ref={form.setFormRef(pageId)} 
-                                            onValueChanged={form.handleValueChanged(pageId)} 
-                                            value={project.cover_cropped} 
-                                            title={translate("common.cover")} 
+                                            ref={form.setFormRef(pageId)}
+                                            onValueChanged={form.handleValueChanged(pageId)}
+                                            value={project.cover_cropped}
+                                            title={translate("common.cover")}
                                             onRequestNavigation={form.handleRequestNavigation}
                                             contextNaturalKey={ContextNaturalKey.PROJECT}
                                             contextObjectId={project.id}

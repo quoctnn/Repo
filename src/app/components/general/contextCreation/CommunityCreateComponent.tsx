@@ -67,16 +67,15 @@ class CommunityCreateComponent extends React.Component<Props, State> {
         const data = this.state.formValues
         const community:Partial<Community> = this.props.community || {}
         const create = !this.props.community
-        console.log("formdata", data)
         //const hasDataToSave = Object.keys(communityData).length > 0
         this.setFormStatus(FormStatus.submitting)
         const {
-            name, 
-            description, 
+            name,
+            description,
             privacy,
             category,
             //
-            avatar, 
+            avatar,
             cover,
             //
             ...communityConfigurationData} = data
@@ -129,7 +128,7 @@ class CommunityCreateComponent extends React.Component<Props, State> {
                             window.app.navigateToRoute(updatedCommunity.uri)
                         })
                     }
-                    else 
+                    else
                         this.didCancel()
                 }
             }
@@ -185,7 +184,7 @@ class CommunityCreateComponent extends React.Component<Props, State> {
                         completed()
                     }
                 }
-                else 
+                else
                 {
                     pushError(errorData)
                     completed()
@@ -232,14 +231,12 @@ class CommunityCreateComponent extends React.Component<Props, State> {
     handleValueChanged = (id:string, value:any) => {
         this.setState((prevState:State) => {
             return {formValues:{...prevState.formValues, [id]:value}}
-        }, () => {
-            console.log(this.state.formValues)
-        })
+        }, () => {})
     }
     didCancel = () => {
         if(this.props.onCancel)
             this.props.onCancel()
-        else 
+        else
             this.back()
     }
     render = () => {
@@ -251,32 +248,32 @@ class CommunityCreateComponent extends React.Component<Props, State> {
 
         const privacyOptions:InputOption[] = ContextPrivacy.all.map(p => {
             return {
-                label:ContextPrivacy.titleForKey(p), 
-                value:p, 
+                label:ContextPrivacy.titleForKey(p),
+                value:p,
                 description:ContextPrivacy.descriptionForKey(p),
                 icon:ContextPrivacy.iconClassForKey(p),
             }
         })
         const categoryOptions:InputOption[] = CommunityCategory.all.map(p => {
             return {
-                label:CommunityCategory.translationForKey(p), 
-                value:p, 
+                label:CommunityCategory.translationForKey(p),
+                value:p,
             }
         })
         const communityCreateOptions:InputOption[] = CommunityCreatePermission.all.map(p => {
             return {
-                label:CommunityCreatePermission.translationForKey(p), 
-                value:p.toString(), 
+                label:CommunityCreatePermission.translationForKey(p),
+                value:p.toString(),
             }
         })
-        return <FormController 
+        return <FormController
                     ref={(controller) => this.formController = controller }
-                    visible={visible} 
-                    formErrors={this.state.formErrors} 
-                    didCancel={this.didCancel} 
-                    status={this.state.formStatus} 
-                    onFormSubmit={this.handleCreateCommunityFormSubmit} 
-                    title={translate(create ? "community.create":"community.update")} 
+                    visible={visible}
+                    formErrors={this.state.formErrors}
+                    didCancel={this.didCancel}
+                    status={this.state.formStatus}
+                    onFormSubmit={this.handleCreateCommunityFormSubmit}
+                    title={translate(create ? "community.create":"community.update")}
                     onValueChanged={this.handleValueChanged}
                     render={(form) => {
                         if(!create && !hasConfigurationData)
@@ -286,131 +283,131 @@ class CommunityCreateComponent extends React.Component<Props, State> {
                         return {
                             menuItems:[
                                 <FormMenuItem key="1"
-                                    form={form} 
-                                    pageId="1" 
-                                    title={translate("community.settings.page.title.primary")} 
-                                    description={translate("community.settings.page.description.primary")}  
+                                    form={form}
+                                    pageId="1"
+                                    title={translate("community.settings.page.title.primary")}
+                                    description={translate("community.settings.page.description.primary")}
                                     />,
                                     <FormMenuItem key="2"
-                                    form={form} 
-                                    pageId="2" 
-                                    title={translate("community.settings.page.title.appearance")} 
-                                    description={translate("community.settings.page.description.appearance")}  
+                                    form={form}
+                                    pageId="2"
+                                    title={translate("community.settings.page.title.appearance")}
+                                    description={translate("community.settings.page.description.appearance")}
                                     />,
                                     <FormMenuItem key="3"
-                                    form={form} 
-                                    pageId="3" 
-                                    title={translate("community.settings.page.title.wall")} 
-                                    description={translate("community.settings.page.description.wall")}  
+                                    form={form}
+                                    pageId="3"
+                                    title={translate("community.settings.page.title.wall")}
+                                    description={translate("community.settings.page.description.wall")}
                                     />,
                                     <FormMenuItem key="4"
-                                    form={form} 
-                                    pageId="4" 
-                                    title={translate("community.settings.page.title.other")} 
-                                    description={translate("community.settings.page.description.other")}  
+                                    form={form}
+                                    pageId="4"
+                                    title={translate("community.settings.page.title.other")}
+                                    description={translate("community.settings.page.description.other")}
                                     />
                             ],
                             pages:[<FormPage key="page1" form={this.formController} pageId="1" render={(pageId, form) => {
                                     return <>
-                                        <TextInput 
-                                        errors={form.getErrors} 
-                                        isRequired={true} 
+                                        <TextInput
+                                        errors={form.getErrors}
+                                        isRequired={true}
                                         hasSubmitted={form.hasSubmitted()}
-                                        ref={form.setFormRef(pageId)} 
-                                        onValueChanged={form.handleValueChanged(pageId)} 
-                                        value={community.name} 
-                                        title={translate("common.name")} 
-                                        id="name" 
+                                        ref={form.setFormRef(pageId)}
+                                        onValueChanged={form.handleValueChanged(pageId)}
+                                        value={community.name}
+                                        title={translate("common.name")}
+                                        id="name"
                                         />
-                                        <TextAreaInput 
-                                        errors={form.getErrors} 
+                                        <TextAreaInput
+                                        errors={form.getErrors}
                                         hasSubmitted={form.hasSubmitted()}
-                                        ref={form.setFormRef(pageId)} 
-                                        onValueChanged={form.handleValueChanged(pageId)} 
-                                        value={community.description} 
-                                        title={translate("common.description")} 
-                                        id="description" 
+                                        ref={form.setFormRef(pageId)}
+                                        onValueChanged={form.handleValueChanged(pageId)}
+                                        value={community.description}
+                                        title={translate("common.description")}
+                                        id="description"
                                         />
                                         <RichRadioGroupInput
                                             options={privacyOptions}
-                                            errors={form.getErrors} 
+                                            errors={form.getErrors}
                                             hasSubmitted={form.hasSubmitted()}
-                                            ref={form.setFormRef(pageId)} 
-                                            onValueChanged={form.handleValueChanged(pageId)} 
-                                            value={community.privacy} 
-                                            title={translate("common.privacy")} 
-                                            id="privacy" 
+                                            ref={form.setFormRef(pageId)}
+                                            onValueChanged={form.handleValueChanged(pageId)}
+                                            value={community.privacy}
+                                            title={translate("common.privacy")}
+                                            id="privacy"
                                             isRequired={true}
                                         />
-                                        <SelectInput 
+                                        <SelectInput
                                             options={categoryOptions}
-                                            errors={form.getErrors} 
+                                            errors={form.getErrors}
                                             hasSubmitted={form.hasSubmitted()}
-                                            ref={form.setFormRef(pageId)} 
-                                            onValueChanged={form.handleValueChanged(pageId)} 
-                                            value={community.category} 
-                                            title={translate("common.category")} 
-                                            id="category" 
+                                            ref={form.setFormRef(pageId)}
+                                            onValueChanged={form.handleValueChanged(pageId)}
+                                            value={community.category}
+                                            title={translate("common.category")}
+                                            id="category"
                                             isRequired={true}
                                         />
                                         </>
                             }} />,
                             <FormPage key="page2" form={this.formController} pageId="2" render={(pageId, form) => {
                                 return <>
-                                        <ContextPhotoInput 
-                                            errors={form.getErrors} 
+                                        <ContextPhotoInput
+                                            errors={form.getErrors}
                                             hasSubmitted={form.hasSubmitted()}
-                                            ref={form.setFormRef(pageId)} 
-                                            onValueChanged={form.handleValueChanged(pageId)} 
-                                            value={community.avatar} 
-                                            title={translate("common.avatar")} 
+                                            ref={form.setFormRef(pageId)}
+                                            onValueChanged={form.handleValueChanged(pageId)}
+                                            value={community.avatar}
+                                            title={translate("common.avatar")}
                                             onRequestNavigation={form.handleRequestNavigation}
                                             contextNaturalKey={ContextNaturalKey.COMMUNITY}
                                             contextObjectId={community.id}
-                                            id="avatar" 
+                                            id="avatar"
                                         />
-                                        <ContextPhotoInput 
-                                            errors={form.getErrors} 
+                                        <ContextPhotoInput
+                                            errors={form.getErrors}
                                             hasSubmitted={form.hasSubmitted()}
-                                            ref={form.setFormRef(pageId)} 
-                                            onValueChanged={form.handleValueChanged(pageId)} 
-                                            value={community.cover_cropped} 
-                                            title={translate("common.cover")} 
+                                            ref={form.setFormRef(pageId)}
+                                            onValueChanged={form.handleValueChanged(pageId)}
+                                            value={community.cover_cropped}
+                                            title={translate("common.cover")}
                                             onRequestNavigation={form.handleRequestNavigation}
                                             contextNaturalKey={ContextNaturalKey.COMMUNITY}
                                             contextObjectId={community.id}
-                                            id="cover" 
+                                            id="cover"
                                         />
-                                        <ColorInput 
-                                        errors={form.getErrors} 
+                                        <ColorInput
+                                        errors={form.getErrors}
                                         hasSubmitted={form.hasSubmitted()}
-                                        ref={form.setFormRef(pageId)} 
-                                        onValueChanged={form.handleValueChanged(pageId)} 
-                                        value={configurationData.primary_color || this.defaultPrimaryColor} 
-                                        title={translate("community.settings.title.primarycolor")} 
+                                        ref={form.setFormRef(pageId)}
+                                        onValueChanged={form.handleValueChanged(pageId)}
+                                        value={configurationData.primary_color || this.defaultPrimaryColor}
+                                        title={translate("community.settings.title.primarycolor")}
                                         onRequestNavigation={form.handleRequestNavigation}
-                                        id="primary_color" 
+                                        id="primary_color"
                                         isRequired={true}
                                         />
-                                        <ColorInput 
-                                        errors={form.getErrors} 
+                                        <ColorInput
+                                        errors={form.getErrors}
                                         hasSubmitted={form.hasSubmitted()}
-                                        ref={form.setFormRef(pageId)} 
-                                        onValueChanged={form.handleValueChanged(pageId)} 
-                                        value={configurationData.secondary_color || this.defaultSecondaryColor} 
-                                        title={translate("community.settings.title.secondarycolor")} 
+                                        ref={form.setFormRef(pageId)}
+                                        onValueChanged={form.handleValueChanged(pageId)}
+                                        value={configurationData.secondary_color || this.defaultSecondaryColor}
+                                        title={translate("community.settings.title.secondarycolor")}
                                         onRequestNavigation={form.handleRequestNavigation}
-                                        id="secondary_color" 
+                                        id="secondary_color"
                                         isRequired={true}
                                         />
-                                        {/*<PredefinedColorInput 
-                                        errors={form.getErrors} 
+                                        {/*<PredefinedColorInput
+                                        errors={form.getErrors}
                                         hasSubmitted={form.hasSubmitted()}
-                                        ref={form.setFormRef(pageId)} 
-                                        onValueChanged={form.handleValueChanged(pageId)} 
-                                        value={role && role.color} 
-                                        title={translate("form.role.title.color")} 
-                                        id={nameof("color")}  
+                                        ref={form.setFormRef(pageId)}
+                                        onValueChanged={form.handleValueChanged(pageId)}
+                                        value={role && role.color}
+                                        title={translate("form.role.title.color")}
+                                        id={nameof("color")}
                                         isRequired={true}
                                         />*/}
                                     </>
@@ -418,120 +415,120 @@ class CommunityCreateComponent extends React.Component<Props, State> {
                         }} />,
                         <FormPage key="page3" form={this.formController} pageId="3" render={(pageId, form) => {
                             return <>
-                                        <BooleanInput 
-                                        errors={form.getErrors} 
+                                        <BooleanInput
+                                        errors={form.getErrors}
                                         hasSubmitted={form.hasSubmitted()}
-                                        ref={form.setFormRef(pageId)} 
-                                        onValueChanged={form.handleValueChanged(pageId)} 
-                                        value={create ? true : configurationData.members_publication} 
-                                        title={translate("community.config.title.members_publication")} 
+                                        ref={form.setFormRef(pageId)}
+                                        onValueChanged={form.handleValueChanged(pageId)}
+                                        value={create ? true : configurationData.members_publication}
+                                        title={translate("community.config.title.members_publication")}
                                         description={translate("community.config.description.members_publication")}
-                                        id="members_publication" 
+                                        id="members_publication"
                                         />
-                                        <BooleanInput 
-                                        errors={form.getErrors} 
+                                        <BooleanInput
+                                        errors={form.getErrors}
                                         hasSubmitted={form.hasSubmitted()}
-                                        ref={form.setFormRef(pageId)} 
-                                        onValueChanged={form.handleValueChanged(pageId)} 
-                                        value={create ? true : configurationData.members_comments} 
-                                        title={translate("community.config.title.members_comments")} 
+                                        ref={form.setFormRef(pageId)}
+                                        onValueChanged={form.handleValueChanged(pageId)}
+                                        value={create ? true : configurationData.members_comments}
+                                        title={translate("community.config.title.members_comments")}
                                         description={translate("community.config.description.members_comments")}
-                                        id="members_comments" 
+                                        id="members_comments"
                                         />
-                                        <BooleanInput 
-                                        errors={form.getErrors} 
+                                        <BooleanInput
+                                        errors={form.getErrors}
                                         hasSubmitted={form.hasSubmitted()}
-                                        ref={form.setFormRef(pageId)} 
-                                        onValueChanged={form.handleValueChanged(pageId)} 
-                                        value={create ? true : configurationData.members_wall_notifications} 
-                                        title={translate("community.config.title.members_wall_notifications")} 
+                                        ref={form.setFormRef(pageId)}
+                                        onValueChanged={form.handleValueChanged(pageId)}
+                                        value={create ? true : configurationData.members_wall_notifications}
+                                        title={translate("community.config.title.members_wall_notifications")}
                                         description={translate("community.config.description.members_wall_notifications")}
-                                        id="members_wall_notifications" 
+                                        id="members_wall_notifications"
                                         />
-                                        <BooleanInput 
-                                        errors={form.getErrors} 
+                                        <BooleanInput
+                                        errors={form.getErrors}
                                         hasSubmitted={form.hasSubmitted()}
-                                        ref={form.setFormRef(pageId)} 
-                                        onValueChanged={form.handleValueChanged(pageId)} 
-                                        value={create ? true : configurationData.public_member_list} 
-                                        title={translate("community.config.title.public_member_list")} 
+                                        ref={form.setFormRef(pageId)}
+                                        onValueChanged={form.handleValueChanged(pageId)}
+                                        value={create ? true : configurationData.public_member_list}
+                                        title={translate("community.config.title.public_member_list")}
                                         description={translate("community.config.description.public_member_list")}
-                                        id="public_member_list" 
+                                        id="public_member_list"
                                         />
-                                        <BooleanInput 
-                                        errors={form.getErrors} 
+                                        <BooleanInput
+                                        errors={form.getErrors}
                                         hasSubmitted={form.hasSubmitted()}
-                                        ref={form.setFormRef(pageId)} 
-                                        onValueChanged={form.handleValueChanged(pageId)} 
-                                        value={create ? true : configurationData.publish_files} 
-                                        title={translate("community.config.title.publish_files")} 
+                                        ref={form.setFormRef(pageId)}
+                                        onValueChanged={form.handleValueChanged(pageId)}
+                                        value={create ? true : configurationData.publish_files}
+                                        title={translate("community.config.title.publish_files")}
                                         description={translate("community.config.description.publish_files")}
-                                        id="publish_files" 
+                                        id="publish_files"
                                         />
-                                        
+
                             </>
                         }} />,
                         <FormPage key="page4" form={this.formController} pageId="4" render={(pageId, form) => {
                             return <>
-                                        <SelectInput 
+                                        <SelectInput
                                             options={communityCreateOptions}
-                                            errors={form.getErrors} 
+                                            errors={form.getErrors}
                                             hasSubmitted={form.hasSubmitted()}
-                                            ref={form.setFormRef(pageId)} 
-                                            onValueChanged={form.handleValueChanged(pageId)} 
-                                            value={create ? CommunityCreatePermission.createAllowed.toString() : configurationData.members_group_creation && configurationData.members_group_creation.toString()} 
-                                            title={translate("community.config.title.members_group_creation")} 
-                                            description={translate("community.config.description.members_group_creation")}
-                                            id="members_group_creation" 
-                                            isRequired={true}
-                                        />
-                                        <SelectInput 
-                                            options={communityCreateOptions}
-                                            errors={form.getErrors} 
-                                            hasSubmitted={form.hasSubmitted()}
-                                            ref={form.setFormRef(pageId)} 
-                                            onValueChanged={form.handleValueChanged(pageId)} 
-                                            value={create ? CommunityCreatePermission.createAllowed.toString() : configurationData.subgroups && configurationData.subgroups.toString()} 
-                                            title={translate("community.config.title.subgroups")} 
-                                            description={translate("community.config.description.subgroups")}
-                                            id="subgroups" 
-                                            isRequired={true}
-                                        />
-                                        <SelectInput 
-                                            options={communityCreateOptions}
-                                            errors={form.getErrors} 
-                                            hasSubmitted={form.hasSubmitted()}
-                                            ref={form.setFormRef(pageId)} 
+                                            ref={form.setFormRef(pageId)}
                                             onValueChanged={form.handleValueChanged(pageId)}
-                                            value={create ? CommunityCreatePermission.createAllowed.toString() : configurationData.members_event_creation && configurationData.members_event_creation.toString()} 
-                                            title={translate("community.config.title.members_event_creation")} 
-                                            description={translate("community.config.description.members_event_creation")}
-                                            id="members_event_creation" 
+                                            value={create ? CommunityCreatePermission.createAllowed.toString() : configurationData.members_group_creation && configurationData.members_group_creation.toString()}
+                                            title={translate("community.config.title.members_group_creation")}
+                                            description={translate("community.config.description.members_group_creation")}
+                                            id="members_group_creation"
                                             isRequired={true}
                                         />
-                                        <SelectInput 
+                                        <SelectInput
                                             options={communityCreateOptions}
-                                            errors={form.getErrors} 
+                                            errors={form.getErrors}
                                             hasSubmitted={form.hasSubmitted()}
-                                            ref={form.setFormRef(pageId)} 
-                                            onValueChanged={form.handleValueChanged(pageId)} 
-                                            value={create ? CommunityCreatePermission.createAllowed.toString() : configurationData.members_project_creation && configurationData.members_project_creation.toString()} 
-                                            title={translate("community.config.title.members_project_creation")} 
-                                            description={translate("community.config.description.members_project_creation")}
-                                            id="members_project_creation" 
+                                            ref={form.setFormRef(pageId)}
+                                            onValueChanged={form.handleValueChanged(pageId)}
+                                            value={create ? CommunityCreatePermission.createAllowed.toString() : configurationData.subgroups && configurationData.subgroups.toString()}
+                                            title={translate("community.config.title.subgroups")}
+                                            description={translate("community.config.description.subgroups")}
+                                            id="subgroups"
                                             isRequired={true}
                                         />
-                                        <BooleanInput 
-                                        errors={form.getErrors} 
-                                        hasSubmitted={form.hasSubmitted()}
-                                        ref={form.setFormRef(pageId)} 
-                                        onValueChanged={form.handleValueChanged(pageId)} 
-                                        value={create ? false : configurationData.allow_anonymous_users} 
-                                        title={translate("community.config.title.allow_anonymous_users")} 
-                                        description={translate("community.config.description.allow_anonymous_users")}
-                                        id="allow_anonymous_users" 
+                                        <SelectInput
+                                            options={communityCreateOptions}
+                                            errors={form.getErrors}
+                                            hasSubmitted={form.hasSubmitted()}
+                                            ref={form.setFormRef(pageId)}
+                                            onValueChanged={form.handleValueChanged(pageId)}
+                                            value={create ? CommunityCreatePermission.createAllowed.toString() : configurationData.members_event_creation && configurationData.members_event_creation.toString()}
+                                            title={translate("community.config.title.members_event_creation")}
+                                            description={translate("community.config.description.members_event_creation")}
+                                            id="members_event_creation"
+                                            isRequired={true}
                                         />
-                                        
+                                        <SelectInput
+                                            options={communityCreateOptions}
+                                            errors={form.getErrors}
+                                            hasSubmitted={form.hasSubmitted()}
+                                            ref={form.setFormRef(pageId)}
+                                            onValueChanged={form.handleValueChanged(pageId)}
+                                            value={create ? CommunityCreatePermission.createAllowed.toString() : configurationData.members_project_creation && configurationData.members_project_creation.toString()}
+                                            title={translate("community.config.title.members_project_creation")}
+                                            description={translate("community.config.description.members_project_creation")}
+                                            id="members_project_creation"
+                                            isRequired={true}
+                                        />
+                                        <BooleanInput
+                                        errors={form.getErrors}
+                                        hasSubmitted={form.hasSubmitted()}
+                                        ref={form.setFormRef(pageId)}
+                                        onValueChanged={form.handleValueChanged(pageId)}
+                                        value={create ? false : configurationData.allow_anonymous_users}
+                                        title={translate("community.config.title.allow_anonymous_users")}
+                                        description={translate("community.config.description.allow_anonymous_users")}
+                                        id="allow_anonymous_users"
+                                        />
+
                             </>
                         }} />
                         ]

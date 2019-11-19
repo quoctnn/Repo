@@ -160,7 +160,7 @@ class ChannelEventStream extends React.Component<Props, State> {
 
             this.authorized = true
             let data = { type: 'authorization', data: { token: this.props.token } };
-            console.log('Sending Authorization on WebSocket');
+            // console.log('Sending Authorization on WebSocket');
             this.stream!.send(JSON.stringify(data));
         }
     }
@@ -169,21 +169,21 @@ class ChannelEventStream extends React.Component<Props, State> {
     }
     playEvent = (event:any) =>
     {
-        console.log('Message received on WebSocket',event)
+        // console.log('Message received on WebSocket',event)
         NotificationCenter.push(eventStreamNotificationPrefix + event.type,[event.data])
     }
     connectStream = () => {
 
         if (this.props.endpoint && (!this.stream || this.stream.readyState == ReconnectingWebSocket.CLOSED || this.stream.readyState == ReconnectingWebSocket.CLOSING) )  {
-            console.log('Setting up WebSocket to', this.props.endpoint);
+            // console.log('Setting up WebSocket to', this.props.endpoint);
             this.stream = new ReconnectingWebSocket(
                 this.props.endpoint,
                 [],
                 socket_options
             );
             this.stream.onopen = () => {
-                NotificationCenter.push(eventStreamNotificationPrefix + EventStreamMessageType.SOCKET_STATE_CHANGE,[this.stream.readyState])
-                console.log('WebSocket OPEN');
+                NotificationCenter.push(eventStreamNotificationPrefix + EventStreamMessageType.SOCKET_STATE_CHANGE,[this.stream.readyState]);
+                // console.log('WebSocket OPEN');
                 (this.stream as any)._options.minReconnectionDelay = 8000
                 this.sendAuthorization()
             }
@@ -192,7 +192,7 @@ class ChannelEventStream extends React.Component<Props, State> {
                 if(this.queueEvents)
                 {
                     EventLock.queueEvent(data)
-                    console.log("queue event", data.type)
+                    // console.log("queue event", data.type)
                     return
                 }
                 this.playEvent(data)
@@ -202,7 +202,7 @@ class ChannelEventStream extends React.Component<Props, State> {
                 this.authorized = false;
                 this.reloadObserver = undefined;
                 this.messageObserver = undefined;
-                console.log('WebSocket CLOSED');
+                // console.log('WebSocket CLOSED');
                 if (this.stream && (this.stream as any)._shouldReconnect)
                     (this.stream as any)._connect();
             }
@@ -246,7 +246,7 @@ class ChannelEventStream extends React.Component<Props, State> {
     }
     closeStream = () => {
         if (this.stream) {
-            console.log('Discarding WebSocket');
+            // console.log('Discarding WebSocket');
             this.stream.close()
             this.stream = null;
             this.authorized = false;

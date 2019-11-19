@@ -80,7 +80,7 @@ export default class CommunityInviteComponent extends React.Component<Props, Sta
                     this.props.onInvited()
                 }
             })
-        }   
+        }
         else {
             this.props.didCancel()
         }
@@ -88,31 +88,29 @@ export default class CommunityInviteComponent extends React.Component<Props, Sta
     handleValueChanged = (id:string, value:any) => {
         this.setState((prevState:State) => {
             return {formValues:{...prevState.formValues, [id]:value}}
-        }, () => {
-            console.log(this.state.formValues)
-        })
+        }, () => {})
     }
     render = () => {
         const {visible, didCancel, community, activeMembershipInvitations} = this.props
         const formData = this.state.formValues
         const invitationFilterList = [].concat(activeMembershipInvitations).concat(community.members)
-        const availableMembers = ProfileManager.getProfiles(ProfileManager.getContactListIds(false).filter(id => !invitationFilterList.contains(id))) 
+        const availableMembers = ProfileManager.getProfiles(ProfileManager.getContactListIds(false).filter(id => !invitationFilterList.contains(id)))
         const selectedProfiles = this.state.formValues.users.map(id => availableMembers.find(m => m.id == id)).filter(p => !!p)
         const languages:InputOption[] = AppLanguage.all.map(p => {
             return {
-                label:AppLanguage.translationForKey(p), 
-                value:p, 
+                label:AppLanguage.translationForKey(p),
+                value:p,
             }
         })
-        
-        return <FormController 
+
+        return <FormController
                     ref={(controller) => this.formController = controller }
-                    visible={visible} 
-                    formErrors={this.state.formErrors} 
-                    didCancel={didCancel} 
-                    status={this.state.formStatus} 
-                    onFormSubmit={this.handleFormSubmit} 
-                    title={translate("community.invite")} 
+                    visible={visible}
+                    formErrors={this.state.formErrors}
+                    didCancel={didCancel}
+                    status={this.state.formStatus}
+                    onFormSubmit={this.handleFormSubmit}
+                    title={translate("community.invite")}
                     onValueChanged={this.handleValueChanged}
                     className="community-invite"
                     render={(form) => {
@@ -120,50 +118,50 @@ export default class CommunityInviteComponent extends React.Component<Props, Sta
                             menuItems:[],
                             pages:[<FormPage key="page1" form={this.formController} pageId="1" render={(pageId, form) => {
                                     return <>
-                                        <SelectCreateInput 
-                                        errors={form.getErrors} 
-                                        isRequired={false} 
+                                        <SelectCreateInput
+                                        errors={form.getErrors}
+                                        isRequired={false}
                                         hasSubmitted={form.hasSubmitted()}
-                                        ref={form.setFormRef(pageId)} 
+                                        ref={form.setFormRef(pageId)}
                                         canCreateValue={String.isEmail}
-                                        onValueChanged={form.handleValueChanged(pageId)} 
+                                        onValueChanged={form.handleValueChanged(pageId)}
                                         placeholder={translate("form.invite.email.placeholder")}
-                                        title={translate("form.invite.email.title")} 
+                                        title={translate("form.invite.email.title")}
                                         description={translate("form.invite.email.description")}
-                                        id={nameof("emails")} 
+                                        id={nameof("emails")}
                                         />
-                                        <ProfileSelectInput 
-                                        errors={form.getErrors} 
-                                        isRequired={false} 
+                                        <ProfileSelectInput
+                                        errors={form.getErrors}
+                                        isRequired={false}
                                         allowedProfiles={availableMembers}
                                         selectedProfiles={selectedProfiles}
                                         hasSubmitted={form.hasSubmitted()}
-                                        ref={form.setFormRef(pageId)} 
-                                        onValueChanged={form.handleValueChanged(pageId)} 
+                                        ref={form.setFormRef(pageId)}
+                                        onValueChanged={form.handleValueChanged(pageId)}
                                         placeholder={translate("form.invite.users.placeholder")}
                                         description={translate("form.invite.users.description")}
-                                        title={translate("form.invite.users.title")} 
-                                        id={nameof("users")} 
+                                        title={translate("form.invite.users.title")}
+                                        id={nameof("users")}
                                         />
-                                        <SelectInput 
+                                        <SelectInput
                                             options={languages}
-                                            errors={form.getErrors} 
+                                            errors={form.getErrors}
                                             hasSubmitted={form.hasSubmitted()}
-                                            ref={form.setFormRef(pageId)} 
-                                            onValueChanged={form.handleValueChanged(pageId)} 
-                                            value={formData.language} 
-                                            title={translate("form.invite.language.title")} 
-                                            id={nameof("language")} 
+                                            ref={form.setFormRef(pageId)}
+                                            onValueChanged={form.handleValueChanged(pageId)}
+                                            value={formData.language}
+                                            title={translate("form.invite.language.title")}
+                                            id={nameof("language")}
                                             isRequired={false}
                                         />
-                                        <TextAreaInput 
-                                        errors={form.getErrors} 
+                                        <TextAreaInput
+                                        errors={form.getErrors}
                                         hasSubmitted={form.hasSubmitted()}
-                                        ref={form.setFormRef(pageId)} 
-                                        onValueChanged={form.handleValueChanged(pageId)} 
-                                        value={null} 
-                                        title={translate("form.invite.message.title")} 
-                                        id={nameof("message")}  
+                                        ref={form.setFormRef(pageId)}
+                                        onValueChanged={form.handleValueChanged(pageId)}
+                                        value={null}
+                                        title={translate("form.invite.message.title")}
+                                        id={nameof("message")}
                                         />
                                         </>
                             }} />

@@ -143,7 +143,6 @@ export default class ContextInvitationComponent extends React.Component<Props, S
             this.setState(() => {
                 return {failed, selectedInvitations:selected}
             }, this.reloadList)
-            console.log("deleted response", response)
         })
     }
 

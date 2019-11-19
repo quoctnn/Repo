@@ -59,7 +59,7 @@ class GroupCreateComponent extends React.Component<Props, State> {
     didCancel = () => {
         if(this.props.onCancel)
             this.props.onCancel()
-        else 
+        else
             this.back()
     }
     handleCreateGroupFormSubmit = () => {
@@ -68,16 +68,15 @@ class GroupCreateComponent extends React.Component<Props, State> {
         const create = !this.props.group
         if(create)
             data.community =  this.props.community || CommunityManager.getActiveCommunity().id
-        console.log("formdata", data)
         //const hasDataToSave = Object.keys(communityData).length > 0
         this.setFormStatus(FormStatus.submitting)
         const {
-            name, 
-            description, 
+            name,
+            description,
             privacy,
             community,
             //
-            avatar, 
+            avatar,
             cover,
             //
             ...rest} = data
@@ -122,7 +121,7 @@ class GroupCreateComponent extends React.Component<Props, State> {
                             window.app.navigateToRoute(updatedGroup.uri)
                         })
                     }
-                    else 
+                    else
                         this.didCancel()
                 }
             }
@@ -154,7 +153,7 @@ class GroupCreateComponent extends React.Component<Props, State> {
                 if(!errorData && data && data.id)
                 {
                     createdGroup = data
-                    
+
                     if(avatarData)
                         requests.push(() => ApiClient.setContextPhoto(ContextPhotoType.avatar,ContextNaturalKey.GROUP, createdGroup.id, avatarData.file, avatarData.crop, (cropInfo, status, error) => {
                             updatedAvatar = cropInfo && cropInfo.cropped
@@ -173,7 +172,7 @@ class GroupCreateComponent extends React.Component<Props, State> {
                         completed()
                     }
                 }
-                else 
+                else
                 {
                     pushError(errorData)
                     completed()
@@ -218,9 +217,7 @@ class GroupCreateComponent extends React.Component<Props, State> {
     handleValueChanged = (id:string, value:any) => {
         this.setState((prevState:State) => {
             return {formValues:{...prevState.formValues, [id]:value}}
-        }, () => {
-            console.log(this.state.formValues)
-        })
+        }, () => {})
     }
     render = () => {
         const visible = this.isVisible()
@@ -229,96 +226,96 @@ class GroupCreateComponent extends React.Component<Props, State> {
 
         const privacyOptions:InputOption[] = ContextPrivacy.all.map(p => {
             return {
-                label:ContextPrivacy.titleForKey(p), 
-                value:p, 
+                label:ContextPrivacy.titleForKey(p),
+                value:p,
                 description:ContextPrivacy.descriptionForKey(p),
                 icon:ContextPrivacy.iconClassForKey(p),
             }
         })
-        return <FormController 
+        return <FormController
                     ref={(controller) => this.formController = controller }
-                    visible={visible} 
-                    formErrors={this.state.formErrors} 
-                    didCancel={this.didCancel} 
-                    status={this.state.formStatus} 
-                    onFormSubmit={this.handleCreateGroupFormSubmit} 
-                    title={translate(create ? "group.create" : "group.update")  } 
+                    visible={visible}
+                    formErrors={this.state.formErrors}
+                    didCancel={this.didCancel}
+                    status={this.state.formStatus}
+                    onFormSubmit={this.handleCreateGroupFormSubmit}
+                    title={translate(create ? "group.create" : "group.update")  }
                     onValueChanged={this.handleValueChanged}
                     render={(form) => {
                         return {
                             menuItems:[
                                 <FormMenuItem key="1"
-                                    form={form} 
-                                    pageId="1" 
-                                    title={translate("group.settings.page.title.primary")} 
-                                    description={translate("group.settings.page.description.primary")}  
+                                    form={form}
+                                    pageId="1"
+                                    title={translate("group.settings.page.title.primary")}
+                                    description={translate("group.settings.page.description.primary")}
                                     />,
                                     <FormMenuItem key="2"
-                                    form={form} 
-                                    pageId="2" 
-                                    title={translate("group.settings.page.title.appearance")} 
-                                    description={translate("group.settings.page.description.appearance")}  
+                                    form={form}
+                                    pageId="2"
+                                    title={translate("group.settings.page.title.appearance")}
+                                    description={translate("group.settings.page.description.appearance")}
                                     />
                             ],
                             pages:[<FormPage key="page1" form={this.formController} pageId="1" render={(pageId, form) => {
                                     return <>
-                                        <TextInput 
-                                        errors={form.getErrors} 
-                                        isRequired={true} 
+                                        <TextInput
+                                        errors={form.getErrors}
+                                        isRequired={true}
                                         hasSubmitted={form.hasSubmitted()}
-                                        ref={form.setFormRef(pageId)} 
-                                        onValueChanged={form.handleValueChanged(pageId)} 
-                                        value={group.name} 
-                                        title={translate("common.name")} 
-                                        id="name" 
+                                        ref={form.setFormRef(pageId)}
+                                        onValueChanged={form.handleValueChanged(pageId)}
+                                        value={group.name}
+                                        title={translate("common.name")}
+                                        id="name"
                                         />
-                                        <TextAreaInput 
-                                        errors={form.getErrors} 
+                                        <TextAreaInput
+                                        errors={form.getErrors}
                                         hasSubmitted={form.hasSubmitted()}
-                                        ref={form.setFormRef(pageId)} 
-                                        onValueChanged={form.handleValueChanged(pageId)} 
-                                        value={group.description} 
-                                        title={translate("common.description")} 
-                                        id="description" 
+                                        ref={form.setFormRef(pageId)}
+                                        onValueChanged={form.handleValueChanged(pageId)}
+                                        value={group.description}
+                                        title={translate("common.description")}
+                                        id="description"
                                         />
                                         <RichRadioGroupInput
                                             options={privacyOptions}
-                                            errors={form.getErrors} 
+                                            errors={form.getErrors}
                                             hasSubmitted={form.hasSubmitted()}
-                                            ref={form.setFormRef(pageId)} 
-                                            onValueChanged={form.handleValueChanged(pageId)} 
-                                            value={group.privacy} 
-                                            title={translate("common.privacy")} 
-                                            id="privacy" 
+                                            ref={form.setFormRef(pageId)}
+                                            onValueChanged={form.handleValueChanged(pageId)}
+                                            value={group.privacy}
+                                            title={translate("common.privacy")}
+                                            id="privacy"
                                             isRequired={true}
                                         />
                                         </>
                             }} />,
                             <FormPage key="page2" form={this.formController} pageId="2" render={(pageId, form) => {
                                 return <>
-                                        <ContextPhotoInput 
-                                            errors={form.getErrors} 
+                                        <ContextPhotoInput
+                                            errors={form.getErrors}
                                             hasSubmitted={form.hasSubmitted()}
-                                            ref={form.setFormRef(pageId)} 
-                                            onValueChanged={form.handleValueChanged(pageId)} 
-                                            value={group.avatar} 
-                                            title={translate("common.avatar")} 
+                                            ref={form.setFormRef(pageId)}
+                                            onValueChanged={form.handleValueChanged(pageId)}
+                                            value={group.avatar}
+                                            title={translate("common.avatar")}
                                             onRequestNavigation={form.handleRequestNavigation}
                                             contextNaturalKey={ContextNaturalKey.GROUP}
                                             contextObjectId={group.id}
-                                            id="avatar" 
+                                            id="avatar"
                                         />
-                                        <ContextPhotoInput 
-                                            errors={form.getErrors} 
+                                        <ContextPhotoInput
+                                            errors={form.getErrors}
                                             hasSubmitted={form.hasSubmitted()}
-                                            ref={form.setFormRef(pageId)} 
-                                            onValueChanged={form.handleValueChanged(pageId)} 
-                                            value={group.cover_cropped} 
-                                            title={translate("common.cover")} 
+                                            ref={form.setFormRef(pageId)}
+                                            onValueChanged={form.handleValueChanged(pageId)}
+                                            value={group.cover_cropped}
+                                            title={translate("common.cover")}
                                             onRequestNavigation={form.handleRequestNavigation}
                                             contextNaturalKey={ContextNaturalKey.GROUP}
                                             contextObjectId={group.id}
-                                            id="cover" 
+                                            id="cover"
                                         />
                                     </>
 

@@ -12,7 +12,7 @@ type Props = {
     active:string
 } & ContextDataProps & RouteComponentProps<any>
 
-class SideBarContent extends React.PureComponent<Props, State> {
+class SideBarContent extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props)
         this.state = {

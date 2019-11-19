@@ -88,7 +88,7 @@ type State = {
     updateKey?:string
 }
 export class DashboardWithData extends React.Component<Props, State> {
-    
+
     observers:EventSubscription[] = []
     constructor(props:Props) {
         super(props)
@@ -109,18 +109,16 @@ export class DashboardWithData extends React.Component<Props, State> {
         const arg = args[0] as {id:number, dashboard:number}
         if(arg.dashboard != this.state.dashboard.id)
             return
-        console.log("processModuleResizeResetNotification", arg)
         const data = {...getProcessedBreakpoint(this.props.category)}
         this.setState(() => {
             return {breakpoints:data.breakpoints, dashboard:data.dashboard, updateKey:uniqueId()}
         })
-        
+
     }
     processModuleResizeExpandNotification = (...args:any[]) => {
         const arg = args[0] as {id:number, dashboard:number}
         if(arg.dashboard != this.state.dashboard.id)
             return
-        console.log("processModuleResizeExpandNotification", arg.id)
         const data = {...getProcessedBreakpoint(this.props.category)}
         if(data.dashboard)
         {
@@ -142,7 +140,6 @@ export class DashboardWithData extends React.Component<Props, State> {
                     parent = parent.parent
                 }
             })
-            console.log("module", modules)
         }
         this.setState(() => {
             return {breakpoints:data.breakpoints, dashboard:data.dashboard, updateKey:uniqueId()}
@@ -155,14 +152,14 @@ export class DashboardWithData extends React.Component<Props, State> {
         const key = this.props.updateKey + this.state.updateKey
         return (
             <WindowResponsiveComponent
-                breakpoints={breakpoints} 
-                updateKey={key} 
-                setClassOnBody={true} 
+                breakpoints={breakpoints}
+                updateKey={key}
+                setClassOnBody={true}
                 render={({ breakpoint }) => (
                     <DashboardComponent
                         dashboard={dashboard}
                         breakpoint={breakpoint}
-                        updateKey={key} 
+                        updateKey={key}
                     />
             )}/>
         )

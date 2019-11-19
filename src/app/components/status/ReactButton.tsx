@@ -7,12 +7,12 @@ import Popper from 'popper.js';
 require("./ReactButton.scss");
 
 
-export interface Props 
+export interface Props
 {
     reaction:string
     onActionPress?:(action:StatusActions, extra?:Object, completion?:(success:boolean) => void) => void
 }
-interface State 
+interface State
 {
     reactionsOpen:boolean
     popoverOpen:boolean
@@ -25,8 +25,8 @@ export interface StatusReactionProps
     showBackground?:boolean
 }
 
-export default class ReactButton extends React.Component<Props, State> 
-{     
+export default class ReactButton extends React.Component<Props, State>
+{
     ref = React.createRef<any>();
     containerRef = React.createRef<any>();
     popoverContainerRef = React.createRef<any>();
@@ -46,7 +46,7 @@ export default class ReactButton extends React.Component<Props, State>
     shouldComponentUpdate(nextProps:Props, nextState:State) {
         return nextProps.reaction != this.props.reaction || this.state.reactionsOpen != nextState.reactionsOpen || this.state.popoverOpen != nextState.popoverOpen
     }
-    toggleReaction = (event?:any) => 
+    toggleReaction = (event?:any) =>
     {
         if(event)
             event.preventDefault()
@@ -63,24 +63,22 @@ export default class ReactButton extends React.Component<Props, State>
     }
     renderReactions = () => {
         let list = StatusReactionUtilities.reactionsList()
-        
+
         let items = list.map((item, index) => {
             return (<StatusReactionUtilities.Component selected={true} large={true} key={item} reaction={item} onClick={(event) => {event.preventDefault(); this.onReact(item);}}></StatusReactionUtilities.Component>)
         })
         return items
     }
-    hideReactionsView = () => 
+    hideReactionsView = () =>
     {
         this.setState({ reactionsOpen:false, popoverOpen:false })
     }
     onPopoverHover = () => {
 
-        console.log("onPopoverHover")
         this.setState({ popoverOpen:true })
     }
     onPopoverHoverOut = () => {
-        
-        console.log("onPopoverHoverOut")
+
         this.setState({ popoverOpen:false })
     }
     onReactionButtonHover = () => {
@@ -88,10 +86,10 @@ export default class ReactButton extends React.Component<Props, State>
         this.setState({ reactionsOpen:true })
     }
     onReactionButtonHoverOut = () => {
-        
+
         this.setState({ reactionsOpen:false })
     }
-    renderReactionsView = () => 
+    renderReactionsView = () =>
     {
         const open = this.state.reactionsOpen || this.state.popoverOpen
         if (!open)
@@ -101,18 +99,18 @@ export default class ReactButton extends React.Component<Props, State>
         const modifiers:Popper.Modifiers = {
             flip: { behavior: ['bottom', 'top', 'bottom'] }
           }
-        return <Popover 
-            placement="top" 
-            hideArrow={false} 
-            isOpen={open} 
+        return <Popover
+            placement="top"
+            hideArrow={false}
+            isOpen={open}
             modifiers={modifiers}
-            target={this.ref.current} 
-            container={this.popoverContainerRef.current} 
+            target={this.ref.current}
+            container={this.popoverContainerRef.current}
             toggle={this.hideReactionsView}>
                     <PopoverBody>
                         <HoverLongPressTrigger leaveTimeout={200} className="trigger reactions-panel"
-                            onHover={this.onPopoverHover} 
-                            onHoverOut={this.onPopoverHoverOut} 
+                            onHover={this.onPopoverHover}
+                            onHoverOut={this.onPopoverHoverOut}
                             onLongPress={() => {}}>
                         {this.renderReactions()}
                         </HoverLongPressTrigger>
@@ -128,11 +126,11 @@ export default class ReactButton extends React.Component<Props, State>
         if(!canReact)
         {
             return (<button className={classes}>
-                        <StatusReactionUtilities.Component 
-                            reactionStyle={StatusReactionStyle.icon} 
-                            selected={active} 
-                            showBackground={showBG} 
-                            large={false} 
+                        <StatusReactionUtilities.Component
+                            reactionStyle={StatusReactionStyle.icon}
+                            selected={active}
+                            showBackground={showBG}
+                            large={false}
                             reaction={reaction} />
                     </button>)
         }
@@ -141,21 +139,21 @@ export default class ReactButton extends React.Component<Props, State>
                 <span ref={this.popoverContainerRef}>
                     {this.renderReactionsView()}
                 </span>
-                <HoverLongPressTrigger 
-                    debug={false} 
-                    enterTimeoutTouch={500} 
-                    enterTimeout={500} 
-                    onClick={this.toggleReaction} 
-                    onHover={this.onReactionButtonHover} 
-                    onHoverOut={this.onReactionButtonHoverOut} 
+                <HoverLongPressTrigger
+                    debug={false}
+                    enterTimeoutTouch={500}
+                    enterTimeout={500}
+                    onClick={this.toggleReaction}
+                    onHover={this.onReactionButtonHover}
+                    onHoverOut={this.onReactionButtonHoverOut}
                     onLongPress={this.onReactionButtonHover}>
                     <span className="" ref={this.containerRef}>
                         <button ref={this.ref} className={classes}>
-                        <StatusReactionUtilities.Component 
-                            reactionStyle={StatusReactionStyle.icon} 
-                            selected={active} 
-                            showBackground={showBG} 
-                            large={false} 
+                        <StatusReactionUtilities.Component
+                            reactionStyle={StatusReactionStyle.icon}
+                            selected={active}
+                            showBackground={showBG}
+                            large={false}
                             reaction={reaction} />
                         </button>
                     </span>

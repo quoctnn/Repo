@@ -3,9 +3,9 @@ import { embedlyMiddleware } from "../components/general/embedly/redux";
 //import { messageQueueMiddleware } from "./messageQueue";
 
 const loggingMiddleware = store => next => action => {
-    console.log('DISPATCHING => ', action);
+    // console.log('DISPATCHING => ', action);
     let result = next(action);
-    console.log('NEXT STATE => ', store.getState());
+    // console.log('NEXT STATE => ', store.getState());
     return result;
 }
 

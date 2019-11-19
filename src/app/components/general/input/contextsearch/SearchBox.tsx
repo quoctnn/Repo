@@ -89,7 +89,6 @@ export class SearchBox extends React.Component<Props, State>{
     }
     logState(editorState:EditorState){
         const content = editorState.getCurrentContent()
-        console.log("state", convertToRaw(content))
     }
     onChange = (es:EditorState, forceOnChange = false) => {
         const selection = es.getSelection()

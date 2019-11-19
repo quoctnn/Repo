@@ -577,7 +577,7 @@ export class NewsfeedComponent extends React.Component<Props, State> {
                 return
             if(!nullOrUndefined( error ))
             {
-                console.log("error sending reaction:", error)
+                console.error("error sending reaction:", error)
                 this.updateStatusItem(status) // setting old status
             }
             ToastManager.showRequestErrorToast(error)
@@ -654,13 +654,11 @@ export class NewsfeedComponent extends React.Component<Props, State> {
         const canUpdatePositions = !nullOrUndefined(update.position)
         if(!canUpdatePositions)
             return // wait for server delete
-        console.log("<<START>>")
         let updateArray:ArrayItem[] = []
         let parentStatus = update.parent_id && this.findStatusByStatusId(update.parent_id)
         const deletedStatus = this.findStatusByStatusId(update.id)
         if(!parentStatus && !deletedStatus)
         {
-            console.log("No parent status or deleted status, aborting!")
             return
         }
         const parentIndex = this.findIndexByStatusId(update.parent_id)
@@ -673,7 +671,7 @@ export class NewsfeedComponent extends React.Component<Props, State> {
             parentStatus = this.getClonedStatus(parentStatus)
             parentStatus.comments -= 1
             updateArray.push({index:parentIndex, object:parentStatus})
-            console.log(`Adjusting Status(${parentStatus.id}) comments from ${oldCount} to ${parentStatus.comments}`)
+            // console.log(`Adjusting Status(${parentStatus.id}) comments from ${oldCount} to ${parentStatus.comments}`)
             //start looping forward
             currentIndex += 1
         }
@@ -688,7 +686,7 @@ export class NewsfeedComponent extends React.Component<Props, State> {
                 clone.position = clone.position - 1
                 const deleteCommentLoader = clone.position == 0
                 updateArray.push({index:parentTopCommentLoaderIndex, object:deleteCommentLoader ? null : clone})
-                console.log(`${deleteCommentLoader? "Deleting" : "Adjusting"} parent top comment loader(${c.statusId}) position from ${c.position} to ${clone.position}`)
+                // console.log(`${deleteCommentLoader? "Deleting" : "Adjusting"} parent top comment loader(${c.statusId}) position from ${c.position} to ${clone.position}`)
             }
             while(currentIndex > -1)
             {
@@ -716,7 +714,7 @@ export class NewsfeedComponent extends React.Component<Props, State> {
                             const clone = {...c}
                             clone.position = clone.position - 1
                             updateArray.push({index:currentIndex, object:clone})
-                            console.log(`Adjusting Status(${c.id}) position from ${c.position} to ${clone.position}`)
+                            // console.log(`Adjusting Status(${c.id}) position from ${c.position} to ${clone.position}`)
                         }
                     }
                     else if(item instanceof StatusCommentLoader)
@@ -734,7 +732,7 @@ export class NewsfeedComponent extends React.Component<Props, State> {
                                 clone.position = clone.position - 1
                                 const shouldRemove = clone.position == 0
                                 updateArray.push({index:currentIndex, object:shouldRemove ? null : clone})
-                                console.log(`Adjusting comment loader(${c.statusId}) position from ${c.position} to ${clone.position}`)
+                                // console.log(`Adjusting comment loader(${c.statusId}) position from ${c.position} to ${clone.position}`)
                             }
                         }
                     }
@@ -764,12 +762,12 @@ export class NewsfeedComponent extends React.Component<Props, State> {
                     const clone = this.getClonedStatusCommentsLoader(c)
                     clone.position = clone.position - 1
                     updateArray.push({index:parentBottomCommentLoaderIndex, object:clone})
-                    console.log(`Adjusting parent bottom comment loader(${c.statusId}) position from ${c.position} to ${clone.position}`)
+                    // console.log(`Adjusting parent bottom comment loader(${c.statusId}) position from ${c.position} to ${clone.position}`)
                 }
                 else if(parentStatus && update.position > c.position && c.position == parentStatus.comments - 1) // if delete below and there is no more
                 {
                     updateArray.push({index:parentBottomCommentLoaderIndex, object:null})
-                    console.log(`Deleting parent bottom comment loader(${c.statusId})`)
+                    // console.log(`Deleting parent bottom comment loader(${c.statusId})`)
                 }
                 /*else if(c.position > update.position)//update position
                 {
@@ -782,12 +780,10 @@ export class NewsfeedComponent extends React.Component<Props, State> {
                 }*/
             }
         }
-        console.log("<<END>>", updateArray)
         if(updateArray.length > 0)
             this.updateItems(updateArray)
     }
     deleteStatus = (status:Status) => {
-        console.log("deleteStatus", status.id)
         this.setStashUpdates(true)
         ApiClient.deleteStatus(status.id, (data, st, error) => {
             if(!this._mounted)
@@ -1333,7 +1329,6 @@ export class NewsfeedComponent extends React.Component<Props, State> {
                 activeCommentLoaders:currentLoaders
                 })
         })
-        console.log("didLoadMoreComments")
     }
     applyContextToStatuses = (statuses:Status[], contextNaturalKey:ContextNaturalKey, contextObjectId:number) => {
         statuses.forEach(s => {
@@ -1391,7 +1386,6 @@ export class NewsfeedComponent extends React.Component<Props, State> {
     loadMoreComments = (loader:StatusCommentLoader) => (e:any) =>
     {
         const loaderKey = this.statusLoaderKey(loader)
-        console.log("loadMoreFromLoader", loaderKey, loader.toString())
         let currentLoaders = this.state.activeCommentLoaders
         currentLoaders[loaderKey] = loader
         this.setState({activeCommentLoaders:currentLoaders}, () => {this._loadComments(loader)})

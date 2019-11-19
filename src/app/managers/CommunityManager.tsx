@@ -104,7 +104,7 @@ export abstract class CommunityManager
                 }
                 else
                 {
-                    console.log("error fetching community", error)
+                    console.error("error fetching community", error)
                 }
             })
         }
@@ -124,7 +124,7 @@ export abstract class CommunityManager
                 }
                 else
                 {
-                    console.log("error fetching community", error)
+                    console.error("error fetching community", error)
                 }
                 completion && completion(data)
             })
@@ -158,7 +158,6 @@ export abstract class CommunityManager
         return communities
     }
     static setInitialCommunity = (communityId?:number) => {
-        console.log("setInitialCommunity", communityId)
         const state = CommunityManager.getStore().getState()
         const currentActiveCommunityId = state.activeCommunity.activeCommunity
         if(communityId)

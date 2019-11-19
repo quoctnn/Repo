@@ -46,7 +46,6 @@ class ProfileVolunteeringModule extends React.PureComponent<Props, State> {
         this.setState((prevState:State) => {
             return {isLoading:true, volunteering:[]}
         }, () => {
-            console.log("fetching volunteering")
             ApiClient.getVolunteering(10, 0, profileId,(data, status, error) => {
                 const langs = data && data.results || []
                 this.setState((prevState:State) => {
