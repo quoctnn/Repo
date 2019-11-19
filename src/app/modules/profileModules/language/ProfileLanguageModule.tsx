@@ -44,7 +44,6 @@ class ProfileLanguageModule extends React.PureComponent<Props, State> {
         this.setState((prevState:State) => {
             return {isLoading:true, languages:[]}
         }, () => {
-            console.log("fetching languages")
             ApiClient.getLanguages(10, 0, profileId,(data, status, error) => {
                 const langs = data && data.results || []
                 this.setState((prevState:State) => {

@@ -12,7 +12,6 @@ import { CommunityManager } from './CommunityManager';
 import { Settings } from '../utilities/Settings';
 import { setLanguageAction } from '../redux/language';
 import { RequestErrorData, AppLanguage, Version } from '../types/intrasocial_types';
-import { SideMenuNavigationToggleMenuNotification } from '../components/navigation/SideMenuNavigation';
 import { ResponsiveBreakpoint } from '../components/general/observers/ResponsiveComponent';
 import { ContextDataResolverComponentLogContextDataNotification } from '../hoc/WithContextData';
 
@@ -36,7 +35,6 @@ export type AppWindowObject = {
     setLanguage:(language:AppLanguage) => void
     language:string
     createError:() => void
-    toggleMenu:() => void
     logContextData:() => void
     breakpoint:ResponsiveBreakpoint
     version:Version
@@ -69,7 +67,6 @@ export abstract class WindowAppManager
             setLanguage:WindowAppManager.setLanguage,
             language:WindowAppManager.language,
             createError:WindowAppManager.createError,
-            toggleMenu:WindowAppManager.toggleMenu,
             breakpoint:ResponsiveBreakpoint.micro,
             logContextData:WindowAppManager.logContextData,
             version:version
@@ -78,9 +75,6 @@ export abstract class WindowAppManager
     }
     static logContextData = () => {
         NotificationCenter.push(ContextDataResolverComponentLogContextDataNotification,[])
-    }
-    static toggleMenu = () => {
-        NotificationCenter.push(SideMenuNavigationToggleMenuNotification,[])
     }
     static createError = () => {
         try {

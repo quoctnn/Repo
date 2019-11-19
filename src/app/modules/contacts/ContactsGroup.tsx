@@ -39,7 +39,8 @@ class ContactsGroup extends React.PureComponent<Props, State> {
         super(props)
         this.state = {
             isTyping:{},
-            visible:props.openOnLoad        }
+            visible:props.openOnLoad
+        }
     }
     componentDidMount = () =>
     {

@@ -1,0 +1,64 @@
+@import '../../../Config.scss';
+
+$avatarSize: 40px;
+
+.sidebar-root {
+  @include var(background-color, body-background);
+  @include var(box-shadow, drop-shadow-top);
+  z-index: 1049;
+  width: $sideBarWidth;
+  top: calc(#{$topMenuHeight} + 15px);
+  left: 0;
+  bottom: 0;
+  border-top-right-radius: 8px;
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-root .sidebar-root-header .community-avatar {
+  height: $avatarSize;
+  width: $avatarSize;
+  margin: 12px auto;
+  border-radius: calc(#{$avatarSize} / 2);
+  @include var(
+    background-color,
+    primary-theme-color
+  ); // This should be the community avatar image
+}
+
+.sidebar-root .sidebar-root-header .community-name {
+  font-weight: 600;
+  font-size: 0.75rem;
+}
+
+.sidebar-root .sidebar-item {
+  cursor: pointer;
+  font-size: 0.75rem;
+  margin: 1px 0 0 16px;
+  > i {
+    margin-right: 8px;
+  }
+  &.active {
+    @include var(color, primary-theme-color);
+  }
+}
+
+.sidebar-root .sidebar-separator {
+  margin: 12px auto;
+  width: 75%;
+  min-height: 1px;
+  @include var(background-color, highlight-background-color);
+}
+
+.sidebar-root .spacer {
+  min-height: 20px;
+  margin-left: 21px;
+}
+
+.sidebar-root .spacer.line {
+  min-height: 20px;
+  margin-left: 21px;
+  width: 1px;
+  @include var(background-color, highlight-background-color);
+}

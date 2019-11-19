@@ -7,7 +7,7 @@ import { addFavoritesAction, setFavoritesAction, removeFavoriteAction } from '..
 import {ApiClient} from '../network/ApiClient';
 import { ToastManager } from './ToastManager';
 import { translate, lazyTranslate } from '../localization/AutoIntlProvider';
-export abstract class FavoriteManager 
+export abstract class FavoriteManager
 {
     static setup()
     {
@@ -15,7 +15,6 @@ export abstract class FavoriteManager
     }
     static processFavoritesUpdate = (...args:any[]) => {
         //TODO:Prevent reload when current app has caused the update
-        console.log("processFavoritesUpdate", args)
         ApiClient.getFavorites((data, status, error) => {
             if(data && data.results && !error)
             {
@@ -53,8 +52,8 @@ export abstract class FavoriteManager
     static setFavoritesToStore = (favorites:Favorite[]) => {
         FavoriteManager.getStore().dispatch(setFavoritesAction(favorites))
     }
-    private static getStore = ():Store<ReduxState,any> => 
+    private static getStore = ():Store<ReduxState,any> =>
     {
-        return window.store 
+        return window.store
     }
 }

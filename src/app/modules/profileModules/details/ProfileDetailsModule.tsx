@@ -103,7 +103,6 @@ class ProfileDetailsModule extends React.PureComponent<Props, State> {
         this.setState((prevState:State) => {
             return {isLoading:true, latestJob:null}
         }, () => {
-            console.log("fetching positions")
             ApiClient.getPositions(10, 0, profileId,(data, status, error) => {
                 const position = (data && data.results || []).filter(p => !p.end_date).sort((a,b) => (a.start_date && stringToDate(a.start_date).valueOf() || 0) - (b.start_date && stringToDate(b.start_date).valueOf() || 0))[0]
                 this.setState((prevState:State) => {

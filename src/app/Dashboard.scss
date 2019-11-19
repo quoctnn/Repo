@@ -23,13 +23,7 @@
 body[class*="has-side-menu-"]{
     .dashboard-container
     {
-        margin-left: $sideMenuInactiveWidth;
-    }
-    &.side-menu-locked{
-        .dashboard-container
-        {
-            margin-left: $sideMenuActiveWidth;
-        }
+        margin-left: $sideBarWidth;
     }
     @media (max-width: 640px){
         .dashboard-container{

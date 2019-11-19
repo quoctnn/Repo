@@ -191,7 +191,6 @@ class Signin extends React.Component<Props, State> {
         })
     }
     handleGdprFormComplete = (form:GDPRFormAnswers) => {
-        console.log("form", form)
         this.setState(() => {
             return {gdprUserResponse:form, updateGdprContinuationKey:this.state.gdprData.updateGdprContinuationKey}
         }, () => {

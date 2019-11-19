@@ -13,15 +13,15 @@ export const SearchBoxSearchIdObject = (props:any) => {
     return <span className="search-id-object">{props.children}</span>;
 }
 export type InsertEntity = {
-    type:SearchEntityType, 
-    text:string, 
-    data:TokenData, 
-    start:number, 
-    end:number, 
+    type:SearchEntityType,
+    text:string,
+    data:TokenData,
+    start:number,
+    end:number,
     appendSpace:boolean
 }
 export type SearchType = {
-    type:ElasticSearchType 
+    type:ElasticSearchType
     class:string
     listInAutocomplete:boolean
     titleProp:string
@@ -40,7 +40,7 @@ export const supportedSearchTypes:{[key:string]:SearchType} = {
     Project:{type:ElasticSearchType.PROJECT, class:"fa fa-folder-open", listInAutocomplete:true, titleProp:"name", defaultAvatar:Constants.resolveUrl(Constants.defaultImg.projectAvatar)},
 }
 export class SearchOption {
-    name:string 
+    name:string
     key:string
     resolveOrder:number
     value:ElasticSearchType
@@ -63,8 +63,8 @@ export const ID_OBJECT_REGEX = /\B@(\w[^\s]+)/gi
 export const ID_OBJECT_REGEX_NO_GLOBAL = /^([0-9]*)$|^\B@(\w[^\s]+)$/i
 
 export type SearchEntity = {
-    type:SearchEntityType 
-    mutability:DraftEntityMutability 
+    type:SearchEntityType
+    mutability:DraftEntityMutability
     component:(props: any) => JSX.Element
     regex:(args:any) => RegExp
 }
@@ -100,14 +100,14 @@ export class ContextSearchData{
     }
     contextObject = (searchOptions:SearchOption[]):ContextObject => {
 
-       let fk:ContextObject[] = Object.keys(this.filters).map(k => 
+       let fk:ContextObject[] = Object.keys(this.filters).map(k =>
             {
                 const so = searchOptions.find(so => so.getName() == k)
                 if(so)
                 {
                     const index = this.tokens.findIndex(o => o.token == so.getName()+":")
                     const valueToken = this.tokens[index + 1]
-                    const value = (valueToken && valueToken.data && valueToken.data.title) || this.filters[k] 
+                    const value = (valueToken && valueToken.data && valueToken.data.title) || this.filters[k]
                     return {contextNaturalKey: so && ElasticSearchType.contextNaturalKeyForType(so.value), value:value, resolveOrder:so.resolveOrder * 100 - index, id:valueToken && valueToken.data && valueToken.data.id}
                 }
             })
@@ -151,8 +151,6 @@ export class SearcQueryManager
     static convertToRaw2(text:string, searchOptions:SearchOption[]){
         const parsed = SearcQueryManager.parse(text, searchOptions)
         const raw:RawDraftContentState = {entityMap:{}, blocks:[{key:"7fubk", text:text, type:"unstyled", depth:0, inlineStyleRanges:[], entityRanges:[]}]}
-        console.log("parsed", parsed)
-        console.log("raw", raw)
         let index = 0
         parsed.tokens.forEach(token => {
             if(token.type && (token.type == SearchEntityType.FILTER || token.accepted) )
@@ -167,7 +165,6 @@ export class SearcQueryManager
     }
     static convertToRaw(data:ContextSearchData, searchOptions:SearchOption[]){
         const raw:RawDraftContentState = {entityMap:{}, blocks:[{key:"7fubk", text:data.originalText, type:"unstyled", depth:0, inlineStyleRanges:[], entityRanges:[]}]}
-        console.log("raw", raw)
         let index = 0
         data.tokens.forEach(token => {
             if(token.type && (token.type == SearchEntityType.FILTER || token.accepted) )
@@ -185,7 +182,7 @@ export class SearcQueryManager
         const state = convertFromRaw(raw)
         return state
     }
-    static parse(text:string, searchOptions:SearchOption[]):ContextSearchData 
+    static parse(text:string, searchOptions:SearchOption[]):ContextSearchData
     {
         const SEARCHFILTER_REGEX = SEARCHFILTER_REGEX_GENERATOR(searchOptions)
         //extract tokens
@@ -216,7 +213,7 @@ export class SearcQueryManager
             {
                 currentToken += c
                 if(SearcQueryManager.isFilterEndChar(c) && SEARCHFILTER_REGEX.test(currentToken))
-                { 
+                {
                     addToken(i + 1)
                 }
             }
@@ -228,7 +225,7 @@ export class SearcQueryManager
         addToken(text.length)
         const acceptedFilters = {}
         const tokenLength = tokens.length
-        for (var i = 0; i < tokenLength; i++) 
+        for (var i = 0; i < tokenLength; i++)
         {
             const token = tokens[i]
             if(token.accepted)
@@ -258,7 +255,7 @@ export class SearcQueryManager
                 return
             if(HASHTAG_REGEX_NO_GLOBAL.test(t.token))
                 tags.push(t.token.substr(1))
-            else 
+            else
                 queryText += " " + t.token + ""
         })
         return new ContextSearchData({filters:acceptedFilters,query:queryText,tags,tokens,originalText:text, stateTokens:[]})
@@ -266,7 +263,7 @@ export class SearcQueryManager
     static getFilters = (tokens:SearchToken[]) => {
         const filters = {}
         const tokenLength = tokens.length
-        for (var i = 0; i < tokenLength; i++) 
+        for (var i = 0; i < tokenLength; i++)
         {
             const token = tokens[i]
             if(token.accepted)
@@ -301,7 +298,7 @@ export class SearcQueryManager
                     const blockKey = block.getKey()
                     if (character.getEntity() !== null) {
                         const entity = content.getEntity(character.getEntity());
-                        
+
                         if (!entityType || (entityType && entity.getType() === entityType)) {
                             selectedEntity = {
                                 entityKey: character.getEntity(),
@@ -330,7 +327,7 @@ export class SearcQueryManager
         state = EditorState.moveSelectionToEnd(state)
         let contentState = state.getCurrentContent()
         const selectionState = state.getSelection()
-        contentState = Modifier.insertText(contentState, selectionState, text) 
+        contentState = Modifier.insertText(contentState, selectionState, text)
 
         state = EditorState.push(
             state,
@@ -385,7 +382,6 @@ export class SearcQueryManager
                 contentState,
                 'remove-range'
             )
-            console.log("remove range", blockSelection)
         })
         state = EditorState.moveFocusToEnd(state)
         return state
@@ -418,7 +414,7 @@ export class SearcQueryManager
           state = EditorState.push( state, contentState, 'insert-characters')
           if(e.appendSpace)
               state = SearcQueryManager.appendTextToState(" ", true, state)
-          else 
+          else
               state = EditorState.moveFocusToEnd(state)
         })
         return state
@@ -454,7 +450,7 @@ export class SearcQueryManager
         const parsedEntities = stateData.tokens.filter(t => !!t.type)
         const stateEntities = stateData.stateTokens.filter(t => !!t.type)
         const blockKey = contentBlock.getKey();
-        //copy keys 
+        //copy keys
         //remove old ones
         //add new ones
         //resolve unresolved entities when idle
@@ -483,7 +479,7 @@ export class SearcQueryManager
                 )
             })
             console.warn("stuff pasted")
-            return EditorState.push( editorState, contentState, "apply-entity") 
+            return EditorState.push( editorState, contentState, "apply-entity")
         }
         return editorState*/
         console.warn("need to fix this. id_objects are not immutable. Check if prev objects are the same as new objects before creating objects")
@@ -524,9 +520,9 @@ export class SearcQueryManager
                 )
             })
         }
-        
-        
-        return EditorState.push( editorState, contentState, "apply-entity") 
+
+
+        return EditorState.push( editorState, contentState, "apply-entity")
     }
     static getEntityStrategy(entityName) {
         return (contentBlock, callback, contentState) => {
@@ -559,7 +555,7 @@ export class SearcQueryManager
             if((!token.type && token.accepted) || token.type == SearchEntityType.ID_OBJECT)//connected token
             {
                 if(activeSearchTypeIndex > 0)
-                    token = searchData.tokens[activeSearchTypeIndex - 1] 
+                    token = searchData.tokens[activeSearchTypeIndex - 1]
             }
             if(token.type == SearchEntityType.FILTER)
             {
@@ -596,7 +592,7 @@ export class SearcQueryManager
             {
                 return token.token
             }
-            else 
+            else
             {
                 return null
             }
@@ -620,7 +616,7 @@ export class SearcQueryManager
             case ElasticSearchType.PROJECT:return new AutocompleteSectionItem(item.django_id, item.slug, item.name, null, null, null, ElasticSearchType.PROJECT, item.avatar || ContextNaturalKey.defaultAvatarForKey(ContextNaturalKey.PROJECT), onItemSelect, null)
             case ElasticSearchType.TASK:return new AutocompleteSectionItem(item.django_id, item.slug, item.title, null, null, null, ElasticSearchType.TASK, item.avatar || ContextNaturalKey.defaultAvatarForKey(ContextNaturalKey.TASK), onItemSelect, null)
             case ElasticSearchType.EVENT:return new AutocompleteSectionItem(item.django_id, item.slug, item.name, null, null, null, ElasticSearchType.EVENT, item.avatar || ContextNaturalKey.defaultAvatarForKey(ContextNaturalKey.EVENT), onItemSelect, null)
-            
+
             default: return null
         }
     }

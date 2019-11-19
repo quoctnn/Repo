@@ -184,12 +184,12 @@ export const SENTENCES_REGEX = /[^\.!\?]+[\.!\?]+|[^\.!\?]+$/g
 export const truncate = (text, maxChars) => {
     return text && text.length > (maxChars - 3) ? text.substring(0, maxChars - 3) + '...' : text;
 }
-export const MENTION_REGEX = new RegExp("@(" + ContextNaturalKey.all.map(s => s.replace(".", "\\.")).join("|") + "):(\\d+)(:([^:]+):)?", 'g') 
+export const MENTION_REGEX = new RegExp("@(" + ContextNaturalKey.all.map(s => s.replace(".", "\\.")).join("|") + "):(\\d+)(:([^:]+):)?", 'g')
 export class MentionData{
     contextNaturalKey:ContextNaturalKey
     contextId:number
     contextObjectName?:string
-    private contextObject:Permissible & IdentifiableObject & Linkable = null 
+    private contextObject:Permissible & IdentifiableObject & Linkable = null
     originalString:string
     private constructor(contextNaturalKey:ContextNaturalKey, contextId:number,contextObjectName:string, originalString:string)
     {
@@ -222,7 +222,7 @@ export const getTextContent2 = (prefixId: string, text: string, includeEmbedlies
             const content:React.ReactNode = e.props.children
             if(Array.isArray(content))
             {
-                console.log("not implemented")
+                //TODO: Handle this
             }
             else if (typeof content == "string")
             {
@@ -392,7 +392,7 @@ const truncateElements = (arr: JSX.Element[], limit: number, linebreakLimit: num
 
 /**
  * Maintaining Scroll Position When Adding Content to the Top of a Container
- * 
+ *
  * http://kirbysayshi.com/2013/08/19/maintaining-scroll-position-knockoutjs-list.html
  */
 export function ScrollPosition(node: HTMLElement) {
@@ -439,32 +439,32 @@ export const filterArray = (array, text) => {
 }
 export const parseQueryString = (queryString:string) => {
 	var dictionary = {};
-	
+
 	// remove the '?' from the beginning of the
 	// if it exists
 	if (queryString.indexOf('?') === 0) {
 		queryString = queryString.substr(1);
 	}
-	
+
 	// Step 1: separate out each key/value pair
 	var parts = queryString.split('&amp;');
-	
+
 	for(var i = 0; i < parts.length; i++) {
 		var p = parts[i];
 		// Step 2: Split Key/Value pair
 		var keyValuePair = p.split('=');
-		
+
 		// Step 3: Add Key/Value pair to Dictionary object
 		var key = keyValuePair[0];
 		var value = keyValuePair[1];
-		
+
 		// decode URI encoded string
 		value = decodeURIComponent(value);
 		value = value.replace(/\+/g, ' ');
-		
+
 		dictionary[key] = value;
 	}
-	
+
 	// Step 4: Return Dictionary Object
 	return dictionary;
 }
@@ -495,11 +495,11 @@ export const normalizeIndex = (selectedIndex, max) => {
 }
 export const shallowCompare = (obj1:Object, obj2:Object) =>
   Object.keys(obj1).length === Object.keys(obj2).length &&
-  Object.keys(obj1).every(key => 
+  Object.keys(obj1).every(key =>
     obj2.hasOwnProperty(key) && obj1[key] === obj2[key]
   )
 export const shallowCompareFields = (keys:string[], obj1:Object, obj2:Object) =>
-    keys.every(key => 
+    keys.every(key =>
         obj1.hasOwnProperty(key) && obj2.hasOwnProperty(key) && obj1[key] === obj2[key]
   )
 

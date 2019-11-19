@@ -1472,6 +1472,7 @@ export type Group = {
     members_count: number
     created_at: string
     parent: number
+    subgroups: number
     updated_at: string
     hidden_reason: ObjectHiddenReason
 } & INotifiable & AvatarAndCover & Linkable & Permissible & IdentifiableObject & IPrivacy & IMembershipStatus
@@ -1516,6 +1517,7 @@ export type Event = {
     location: Coordinate
     address: string
     parent: Event
+    sessions: number
     hidden_reason: ObjectHiddenReason
 } & INotifiable & AvatarAndCover & Linkable & Permissible & IdentifiableObject & IPrivacy & IMembershipStatus
 
@@ -1733,6 +1735,26 @@ export namespace UserStatus {
         if (excludes)
             selectables = selectables.filter(s => !excludes.contains(s))
         return selectables.map(s => UserStatusObjects[s])
+    }
+    export function contactsSort( a:UserProfile, b:UserProfile ) {
+        if ( a.user_status == UserStatus.active && b.user_status != UserStatus.active ||
+             a.user_status == UserStatus.away && (b.user_status != UserStatus.away && b.user_status != UserStatus.active) ||
+             a.user_status == UserStatus.dnd && (b.user_status != UserStatus.dnd && b.user_status != UserStatus.away && b.user_status != UserStatus.active) ||
+             a.user_status == UserStatus.vacation && (b.user_status != UserStatus.vacation && b.user_status != UserStatus.dnd && b.user_status != UserStatus.away && b.user_status != UserStatus.active)
+             ){
+            return -1;
+        }
+        if (
+             b.user_status == UserStatus.active && a.user_status != UserStatus.active ||
+             b.user_status == UserStatus.away && (a.user_status != UserStatus.away && a.user_status != UserStatus.active) ||
+             b.user_status == UserStatus.dnd && (a.user_status != UserStatus.dnd && a.user_status != UserStatus.away && a.user_status != UserStatus.active) ||
+             b.user_status == UserStatus.vacation && (a.user_status != UserStatus.vacation && a.user_status != UserStatus.dnd && a.user_status != UserStatus.away && a.user_status != UserStatus.active) ||
+             b.user_status == UserStatus.invisible ||
+             b.user_status == UserStatus.unavailable
+        ){
+            return 1;
+        }
+        return 0;
     }
 }
 //DASHBOARD

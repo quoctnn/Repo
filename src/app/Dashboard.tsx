@@ -172,7 +172,6 @@ class DashboardComponent extends React.Component<Props, State> {
             return breakpoint >= i.min_width
         })
         ret = ret || (useDefaultAsFallback ? this.state.defaultGrid : this.props.dashboard.grid_layouts[this.props.dashboard.grid_layouts.length - 1])
-        console.log("resolving:", breakpoint,"got:", ret)
         return ret
     }
     renderContent = () => {

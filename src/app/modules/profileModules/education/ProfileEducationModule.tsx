@@ -46,7 +46,6 @@ class ProfileEducationModule extends React.PureComponent<Props, State> {
         this.setState((prevState:State) => {
             return {isLoading:true, educations:[]}
         }, () => {
-            console.log("fetching educations")
             ApiClient.getEducations(10, 0, profileId,(data, status, error) => {
                 const langs = data && data.results || []
                 this.setState((prevState:State) => {

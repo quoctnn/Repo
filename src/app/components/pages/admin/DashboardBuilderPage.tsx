@@ -5,7 +5,7 @@ import { ReduxState } from "../../../redux";
 import { Button, FormGroup, Label, Input } from "reactstrap";
 import { uniqueId } from "../../../utilities/Utilities";
 import { translate } from '../../../localization/AutoIntlProvider';
-export interface OwnProps 
+export interface OwnProps
 {
     match:any,
 }
@@ -25,13 +25,13 @@ type Row = {
     id:string
 }
 type GridModule = {
-    column:number 
-    row:number 
-    width:number 
+    column:number
+    row:number
+    width:number
     height:number
     id:string
 }
-class DashboardBuilderPage extends React.Component<Props, State> 
+class DashboardBuilderPage extends React.Component<Props, State>
 {
     static modeFillClass = "dash-fill"
     bodyClassAdded = false
@@ -57,7 +57,6 @@ class DashboardBuilderPage extends React.Component<Props, State>
     onModuleMouseDown = (index:number) => (event: React.MouseEvent<HTMLDivElement>) => {
         const element = event.target as HTMLElement
         element.style.zIndex = "1000";
-        console.log("event", event)
         // move it out of any current parents directly into body
         // to make it positioned relative to the body
         //document.body.appendChild(element);
@@ -66,7 +65,6 @@ class DashboardBuilderPage extends React.Component<Props, State>
         //moveAt(event.pageX, event.pageY);
 
         // centers the ball at (pageX, pageY) coordinates
-        console.log(element.style)
         const rect = element.getBoundingClientRect()
         element.style.width = rect.width + "px"
         element.style.height = rect.height + "px"
@@ -112,13 +110,13 @@ class DashboardBuilderPage extends React.Component<Props, State>
         return (<div className="grid" style={gridStyle}>
                 {items}
                 {this.state.modules.map((module, index) => {
-                    
+
                     const moduleStyle = {gridColumn:module.column + "/ span " + module.width, gridRow: module.row + " / span " + module.height}
-                    return <div 
-                            onMouseDown={this.onModuleMouseDown(index)} 
+                    return <div
+                            onMouseDown={this.onModuleMouseDown(index)}
                             onDragStart={() => {return false}}
-                            key={"module_" + module.id} 
-                            style={moduleStyle} 
+                            key={"module_" + module.id}
+                            style={moduleStyle}
                             className="grid-module"></div>
                 })}
                 </div>)
@@ -142,7 +140,7 @@ class DashboardBuilderPage extends React.Component<Props, State>
     }
     renderSidebar = () => {
         return <>
-                    
+
                     <div className="section">
                         <h3>Settings</h3>
                         <div className="content">

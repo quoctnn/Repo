@@ -65,12 +65,11 @@ class EventCreateComponent extends React.Component<Props, State> {
         const data = this.state.formValues
         if(create)
             data.community =  this.props.community || CommunityManager.getActiveCommunity().id
-        console.log("formdata", data)
         //const hasDataToSave = Object.keys(communityData).length > 0
         this.setFormStatus(FormStatus.submitting)
         const {
-            name, 
-            description, 
+            name,
+            description,
             privacy,
             start,
             end,
@@ -78,7 +77,7 @@ class EventCreateComponent extends React.Component<Props, State> {
             location,
             address,
             //
-            avatar, 
+            avatar,
             cover,
             //
             ...rest} = data
@@ -124,7 +123,7 @@ class EventCreateComponent extends React.Component<Props, State> {
                             window.app.navigateToRoute(updatedEvent.uri)
                         })
                     }
-                    else 
+                    else
                         this.didCancel()
                 }
             }
@@ -174,7 +173,7 @@ class EventCreateComponent extends React.Component<Props, State> {
                         completed()
                     }
                 }
-                else 
+                else
                 {
                     pushError(errorData)
                     completed()
@@ -182,7 +181,7 @@ class EventCreateComponent extends React.Component<Props, State> {
             })
         }
         else {
-            
+
             if(Object.keys(updateData).length > 0)
                 requests.push(() => ApiClient.updateEvent(event.id, updateData, (data, status, error) => {
                     createdEvent = data
@@ -206,7 +205,7 @@ class EventCreateComponent extends React.Component<Props, State> {
                 completed()
             }
         }
-        
+
     }
     setFormStatus = (status:FormStatus, resetError?:boolean) => {
         this.setState((prevState:State) => {
@@ -221,14 +220,12 @@ class EventCreateComponent extends React.Component<Props, State> {
     handleValueChanged = (id:string, value:any) => {
         this.setState((prevState:State) => {
             return {formValues:{...prevState.formValues, [id]:value}}
-        }, () => {
-            console.log(this.state.formValues)
-        })
+        }, () => {})
     }
     didCancel = () => {
         if(this.props.onCancel)
             this.props.onCancel()
-        else 
+        else
             this.back()
     }
     render = () => {
@@ -237,82 +234,82 @@ class EventCreateComponent extends React.Component<Props, State> {
         const create = !this.props.event
         const privacyOptions:InputOption[] = ContextPrivacy.all.map(p => {
             return {
-                label:ContextPrivacy.titleForKey(p), 
-                value:p, 
+                label:ContextPrivacy.titleForKey(p),
+                value:p,
                 description:ContextPrivacy.descriptionForKey(p),
                 icon:ContextPrivacy.iconClassForKey(p),
             }
         })
-        return <FormController 
+        return <FormController
                     ref={(controller) => this.formController = controller }
-                    key={this.state.formReloadKey} 
-                    visible={visible} 
-                    formErrors={this.state.formErrors} 
-                    didCancel={this.didCancel} 
-                    status={this.state.formStatus} 
-                    onFormSubmit={this.handleCreateEventFormSubmit} 
-                    title={translate(create ? "event.create" : "event.update")  } 
+                    key={this.state.formReloadKey}
+                    visible={visible}
+                    formErrors={this.state.formErrors}
+                    didCancel={this.didCancel}
+                    status={this.state.formStatus}
+                    onFormSubmit={this.handleCreateEventFormSubmit}
+                    title={translate(create ? "event.create" : "event.update")  }
                     onValueChanged={this.handleValueChanged}
                     render={(form) => {
                         return {
                             menuItems:[
                                 <FormMenuItem key="1"
-                                    form={form} 
-                                    pageId="1" 
-                                    title={translate("event.settings.page.title.primary")} 
-                                    description={translate("event.settings.page.description.primary")}  
+                                    form={form}
+                                    pageId="1"
+                                    title={translate("event.settings.page.title.primary")}
+                                    description={translate("event.settings.page.description.primary")}
                                     />,
                                     <FormMenuItem key="2"
-                                    form={form} 
-                                    pageId="2" 
-                                    title={translate("event.settings.page.title.appearance")} 
-                                    description={translate("event.settings.page.description.appearance")}  
+                                    form={form}
+                                    pageId="2"
+                                    title={translate("event.settings.page.title.appearance")}
+                                    description={translate("event.settings.page.description.appearance")}
                                     />
                             ],
                             pages:[<FormPage key="page1" form={this.formController} pageId="1" render={(pageId, form) => {
                                     return <>
-                                        <TextInput 
-                                        errors={form.getErrors} 
-                                        isRequired={true} 
+                                        <TextInput
+                                        errors={form.getErrors}
+                                        isRequired={true}
                                         hasSubmitted={form.hasSubmitted()}
-                                        ref={form.setFormRef(pageId)} 
-                                        onValueChanged={form.handleValueChanged(pageId)} 
-                                        value={event.name} 
-                                        title={translate("common.name")} 
-                                        id="name" 
+                                        ref={form.setFormRef(pageId)}
+                                        onValueChanged={form.handleValueChanged(pageId)}
+                                        value={event.name}
+                                        title={translate("common.name")}
+                                        id="name"
                                         />
-                                        <TextAreaInput 
-                                        errors={form.getErrors} 
+                                        <TextAreaInput
+                                        errors={form.getErrors}
                                         hasSubmitted={form.hasSubmitted()}
-                                        ref={form.setFormRef(pageId)} 
-                                        onValueChanged={form.handleValueChanged(pageId)} 
-                                        value={event.description} 
-                                        title={translate("common.description")} 
-                                        id="description" 
+                                        ref={form.setFormRef(pageId)}
+                                        onValueChanged={form.handleValueChanged(pageId)}
+                                        value={event.description}
+                                        title={translate("common.description")}
+                                        id="description"
                                         />
-                                        <AddressInput 
-                                        errors={form.getErrors} 
+                                        <AddressInput
+                                        errors={form.getErrors}
                                         hasSubmitted={form.hasSubmitted()}
-                                        ref={form.setFormRef(pageId)} 
-                                        onValueChanged={form.handleValueChanged(pageId)} 
-                                        address={event.address} 
+                                        ref={form.setFormRef(pageId)}
+                                        onValueChanged={form.handleValueChanged(pageId)}
+                                        address={event.address}
                                         location={this.state.formValues.location || event.location}
-                                        title={translate("common.address")} 
-                                        id="address" 
+                                        title={translate("common.address")}
+                                        id="address"
                                         />
-                                        <LocationInput 
-                                        errors={form.getErrors} 
+                                        <LocationInput
+                                        errors={form.getErrors}
                                         hasSubmitted={form.hasSubmitted()}
-                                        ref={form.setFormRef(pageId)} 
-                                        onValueChanged={form.handleValueChanged(pageId)} 
-                                        location={event.location} 
-                                        title={translate("common.location")} 
-                                        id="location" 
+                                        ref={form.setFormRef(pageId)}
+                                        onValueChanged={form.handleValueChanged(pageId)}
+                                        location={event.location}
+                                        title={translate("common.location")}
+                                        id="location"
                                         />
                                          <DateRangeInput
-                                        errors={form.getErrors} 
+                                        errors={form.getErrors}
                                         hasSubmitted={form.hasSubmitted()}
-                                        ref={form.setFormRef(pageId)} 
+                                        ref={form.setFormRef(pageId)}
                                         onValueChanged={form.handleValueChanged(pageId)}
                                         start={event.start}
                                         end={event.end}
@@ -320,48 +317,48 @@ class EventCreateComponent extends React.Component<Props, State> {
                                         endId="end"
                                         startTitle={translate("event.date.start")}
                                         endTitle={translate("event.date.end")}
-                                        title={translate("common.description")} 
+                                        title={translate("common.description")}
                                         id="date"
                                         isRequired={true}
                                         />
                                         <RichRadioGroupInput
                                             options={privacyOptions}
-                                            errors={form.getErrors} 
+                                            errors={form.getErrors}
                                             hasSubmitted={form.hasSubmitted()}
-                                            ref={form.setFormRef(pageId)} 
-                                            onValueChanged={form.handleValueChanged(pageId)} 
-                                            value={event.privacy} 
-                                            title={translate("common.privacy")} 
-                                            id="privacy" 
+                                            ref={form.setFormRef(pageId)}
+                                            onValueChanged={form.handleValueChanged(pageId)}
+                                            value={event.privacy}
+                                            title={translate("common.privacy")}
+                                            id="privacy"
                                             isRequired={true}
                                         />
                                         </>
                             }} />,
                             <FormPage key="page2" form={this.formController} pageId="2" render={(pageId, form) => {
                                 return <>
-                                        <ContextPhotoInput 
-                                            errors={form.getErrors} 
+                                        <ContextPhotoInput
+                                            errors={form.getErrors}
                                             hasSubmitted={form.hasSubmitted()}
-                                            ref={form.setFormRef(pageId)} 
-                                            onValueChanged={form.handleValueChanged(pageId)} 
-                                            value={event.avatar} 
-                                            title={translate("common.avatar")} 
+                                            ref={form.setFormRef(pageId)}
+                                            onValueChanged={form.handleValueChanged(pageId)}
+                                            value={event.avatar}
+                                            title={translate("common.avatar")}
                                             onRequestNavigation={form.handleRequestNavigation}
                                             contextNaturalKey={ContextNaturalKey.EVENT}
                                             contextObjectId={event.id}
-                                            id="avatar" 
+                                            id="avatar"
                                         />
-                                        <ContextPhotoInput 
-                                            errors={form.getErrors} 
+                                        <ContextPhotoInput
+                                            errors={form.getErrors}
                                             hasSubmitted={form.hasSubmitted()}
-                                            ref={form.setFormRef(pageId)} 
-                                            onValueChanged={form.handleValueChanged(pageId)} 
-                                            value={event.cover_cropped} 
-                                            title={translate("common.cover")} 
+                                            ref={form.setFormRef(pageId)}
+                                            onValueChanged={form.handleValueChanged(pageId)}
+                                            value={event.cover_cropped}
+                                            title={translate("common.cover")}
                                             onRequestNavigation={form.handleRequestNavigation}
                                             contextNaturalKey={ContextNaturalKey.EVENT}
                                             contextObjectId={event.id}
-                                            id="cover" 
+                                            id="cover"
                                         />
                                     </>
                         }} />

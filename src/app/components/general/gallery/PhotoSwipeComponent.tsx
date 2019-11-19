@@ -7,19 +7,19 @@ import { UploadedFile, UploadedFileType } from '../../../types/intrasocial_types
 import { convertToComponent, getImageUrl, getFileUrl, GalleryComponent } from "../ContentGallery";
 import ReactDOM = require("react-dom");
 
-export interface Props 
+export interface Props
 {
     items:UploadedFile[]
-    options:PhotoSwipe.Options 
+    options:PhotoSwipe.Options
     visible:boolean
     onClose:() => void
 }
-interface State 
+interface State
 {
     items:(PhotoSwipe.Item|any)[]
 }
-export default class PhotoSwipeComponent extends React.Component<Props, State> 
-{     
+export default class PhotoSwipeComponent extends React.Component<Props, State>
+{
     pswp:any = null
     gallery:any = null
     allowSwipe = true
@@ -34,7 +34,7 @@ export default class PhotoSwipeComponent extends React.Component<Props, State>
     getData = (props:Props) => {
 
         const comps:{[key:string]: React.Component<GalleryComponent<any>, React.ComponentState, any>} = {}
-        const items:(PhotoSwipe.Item|any)[] = props.items.map((f,i) => 
+        const items:(PhotoSwipe.Item|any)[] = props.items.map((f,i) =>
             {
                 const thumbImage = getImageUrl(f, false)
                 const fullImage = getImageUrl(f, true)
@@ -93,7 +93,7 @@ export default class PhotoSwipeComponent extends React.Component<Props, State>
 
         this.pswp = this.createGalleryElement()
         document.body.appendChild(this.pswp)
-        
+
         // define options (if needed)
         var options = {
             shareButtons:[{
@@ -104,16 +104,16 @@ export default class PhotoSwipeComponent extends React.Component<Props, State>
             }],
             getImageURLForShare: ( shareButtonData ) =>  {
                 // `shareButtonData` - object from shareButtons array
-                // 
+                //
                 // `pswp` is the gallery instance object,
                 // you should define it by yourself
-                // 
+                //
                 return this.gallery.currItem.download || '';
             },
             allowPanToNext:false,
             ...this.props.options
         };
-        
+
         // Initializes and opens PhotoSwipe
         this.gallery = new PhotoSwipe(this.pswp, PhotoSwipeUI_Default, this.state.items, options)
         this.gallery.listen('destroy', () => {
@@ -121,8 +121,8 @@ export default class PhotoSwipeComponent extends React.Component<Props, State>
                 this.gallery = null
                 this.props.onClose()
         })
-        
-        this.gallery.listen('afterChange', () => { 
+
+        this.gallery.listen('afterChange', () => {
             const index = this.gallery.getCurrentIndex()
             if(index > 0)
             {
@@ -142,25 +142,21 @@ export default class PhotoSwipeComponent extends React.Component<Props, State>
             else{
                 this.setAllowSwipe(true)
             }
-            console.log("afterChange", this.gallery)
         });
-        this.gallery.listen('outItemSize', (item) => { 
-            item.w = window.innerWidth 
+        this.gallery.listen('outItemSize', (item) => {
+            item.w = window.innerWidth
             item.h = window.innerWidth * 3 / 4
-            console.log("outItemSize", item)
 
         });
-        this.gallery.listen('preventDragEvent', (e, isDown, _preventObj) => { 
+        this.gallery.listen('preventDragEvent', (e, isDown, _preventObj) => {
             const index = this.gallery.getCurrentIndex()
             const item = this.state.items[index]
             if(item.filetype == UploadedFileType.VIDEO || item.filetype == UploadedFileType.IMAGE360)
                 _preventObj.prevent = false
-            
-            console.log("preventDragEvent", _preventObj.prevent)
 
         });
         this.gallery.init()
-        
+
     }
     pauseMedia = (item:(PhotoSwipe.Item|any)) => {
         if(item.html && item.filetype && (item.filetype == UploadedFileType.VIDEO || item.filetype == UploadedFileType.VIDEO))
@@ -186,11 +182,11 @@ export default class PhotoSwipeComponent extends React.Component<Props, State>
     createElementFromHTML = (html:string) => {
         var div = document.createElement('div')
         div.innerHTML = html.trim()
-        return div.firstChild; 
+        return div.firstChild;
     }
     createGalleryElement = () => {
-        const html = "<div class=\"pswp\" tabIndex=\"-1\" role=\"dialog\" aria-hidden=\"true\">" + 
-                "<div class=\"pswp__bg\"></div>" + 
+        const html = "<div class=\"pswp\" tabIndex=\"-1\" role=\"dialog\" aria-hidden=\"true\">" +
+                "<div class=\"pswp__bg\"></div>" +
 
                 "<div class=\"pswp__scroll-wrap\">" +
                 "<div class=\"pswp__container\">" +
@@ -219,7 +215,7 @@ export default class PhotoSwipeComponent extends React.Component<Props, State>
 
                 "<div class=\"pswp__share-modal pswp__share-modal--hidden pswp__single-tap\">" +
                 "<div class=\"pswp__share-tooltip\"></div> " +
-                "</div>" + 
+                "</div>" +
 
                 "<button class=\"pswp__button pswp__button--arrow--left\" title=\"Previous (arrow left)\"></button>" +
 

@@ -55,7 +55,6 @@ class StatusModule extends React.Component<Props, State>
         this.setState((prevState:State) => {
             return {isLoading:true}
         }, () => {
-            console.log("fetching status")
             ApiClient.statusSingle(statusId,(data, status, error) => {
                 const parent = data && data.parent
                 if(parent)

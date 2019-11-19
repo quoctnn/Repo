@@ -45,7 +45,6 @@ export class Grid extends React.PureComponent<Props, State> {
         this.state = {items:[], rects:{}}
     }
     componentDidUpdate = (prevProps:Props) => {
-        console.log("dash-fill", this.props.fill, this.bodyClassAdded)
         if((this.props.fill && !this.bodyClassAdded) || (!this.props.fill && this.bodyClassAdded))
         {
             if(this.bodyClassAdded)

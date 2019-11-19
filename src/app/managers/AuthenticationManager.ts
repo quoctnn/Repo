@@ -24,7 +24,6 @@ export abstract class AuthenticationManager
 
     static setup = () =>
     {
-        console.log("AuthenticationManager setup")
         NotificationCenter.addObserver('eventstream_' + EventStreamMessageType.CLIENT_STATUS_CHANGE, AuthenticationManager.processIncomingUserUpdate)
         NotificationCenter.addObserver('eventstream_' + EventStreamMessageType.COMMUNITY_MAIN, AuthenticationManager.processSwitchedMainCommunity)
         NotificationCenter.addObserver('eventstream_' + EventStreamMessageType.ACTIVITY_NEW, AuthenticationManager.newActivityReceived)

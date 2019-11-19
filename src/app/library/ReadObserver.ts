@@ -83,7 +83,6 @@ export class ReadObserver{
                 {
                     this.readRegister.push(id)
                     this.updateTimer()
-                    console.log(`object id:${id} is visible`)
                     const deleted = this.activeObservables.delete(entry.target)
                     this.intersectionObserver.unobserve(entry.target)
                 }

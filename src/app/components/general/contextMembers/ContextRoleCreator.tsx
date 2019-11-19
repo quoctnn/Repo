@@ -61,7 +61,7 @@ export default class ContextRoleCreator extends React.Component<Props, State> {
         if(!hasDataToSave)
         {
             this.props.didCancel()
-            return 
+            return
         }
         this.setFormStatus(FormStatus.submitting)
         const complete = (role:CommunityRole, status:string, error: RequestErrorData) => {
@@ -91,32 +91,30 @@ export default class ContextRoleCreator extends React.Component<Props, State> {
     handleValueChanged = (id:string, value:any) => {
         this.setState((prevState:State) => {
             return {formValues:{...prevState.formValues, [id]:value}}
-        }, () => {
-            console.log(this.state.formValues)
-        })
+        }, () => {})
     }
     render = () => {
         const {visible, didCancel, role, community} = this.props
         const create = !role
         const members = community.members || []
         const selected = role && role.users || []
-        const availableMembers = ProfileManager.getProfiles(members) 
-        const selectedMembers = ProfileManager.getProfiles(selected) 
+        const availableMembers = ProfileManager.getProfiles(members)
+        const selectedMembers = ProfileManager.getProfiles(selected)
 
         const communityCreateRoleOptions:InputOption[] = CommunityRoleCreatePermission.all.map(p => {
             return {
-                label:CommunityRoleCreatePermission.translationForKey(p), 
-                value:p.toString(), 
+                label:CommunityRoleCreatePermission.translationForKey(p),
+                value:p.toString(),
             }
         })
-        return <FormController 
+        return <FormController
                     ref={(controller) => this.formController = controller }
-                    visible={visible} 
-                    formErrors={this.state.formErrors} 
-                    didCancel={didCancel} 
-                    status={this.state.formStatus} 
-                    onFormSubmit={this.handleFormSubmit} 
-                    title={translate(create ? "role.create" : "role.update")} 
+                    visible={visible}
+                    formErrors={this.state.formErrors}
+                    didCancel={didCancel}
+                    status={this.state.formStatus}
+                    onFormSubmit={this.handleFormSubmit}
+                    title={translate(create ? "role.create" : "role.update")}
                     onValueChanged={this.handleValueChanged}
                     className="context-invite"
                     render={(form) => {
@@ -124,103 +122,103 @@ export default class ContextRoleCreator extends React.Component<Props, State> {
                             menuItems:[],
                             pages:[<FormPage key="page1" form={this.formController} pageId="1" render={(pageId, form) => {
                                     return <>
-                                    <TextInput 
-                                        errors={form.getErrors} 
-                                        isRequired={true} 
+                                    <TextInput
+                                        errors={form.getErrors}
+                                        isRequired={true}
                                         hasSubmitted={form.hasSubmitted()}
-                                        ref={form.setFormRef(pageId)} 
-                                        onValueChanged={form.handleValueChanged(pageId)} 
-                                        value={role && role.role} 
-                                        title={translate("common.name")} 
-                                        id={nameof("role")} 
+                                        ref={form.setFormRef(pageId)}
+                                        onValueChanged={form.handleValueChanged(pageId)}
+                                        value={role && role.role}
+                                        title={translate("common.name")}
+                                        id={nameof("role")}
                                         />
-                                    <ProfileSelectInput 
-                                        errors={form.getErrors} 
-                                        isRequired={false} 
+                                    <ProfileSelectInput
+                                        errors={form.getErrors}
+                                        isRequired={false}
                                         allowedProfiles={availableMembers}
                                         selectedProfiles={selectedMembers}
                                         hasSubmitted={form.hasSubmitted()}
-                                        ref={form.setFormRef(pageId)} 
-                                        onValueChanged={form.handleValueChanged(pageId)} 
+                                        ref={form.setFormRef(pageId)}
+                                        onValueChanged={form.handleValueChanged(pageId)}
                                         placeholder={translate("form.role.users.placeholder")}
                                         description={translate("form.role.users.description")}
-                                        title={translate("form.role.users.title")} 
-                                        id={nameof("users")} 
+                                        title={translate("form.role.users.title")}
+                                        id={nameof("users")}
                                     />
-                                    <PredefinedColorInput 
-                                        errors={form.getErrors} 
+                                    <PredefinedColorInput
+                                        errors={form.getErrors}
                                         hasSubmitted={form.hasSubmitted()}
-                                        ref={form.setFormRef(pageId)} 
-                                        onValueChanged={form.handleValueChanged(pageId)} 
-                                        value={role && role.color} 
-                                        title={translate("form.role.title.color")} 
-                                        id={nameof("color")}  
+                                        ref={form.setFormRef(pageId)}
+                                        onValueChanged={form.handleValueChanged(pageId)}
+                                        value={role && role.color}
+                                        title={translate("form.role.title.color")}
+                                        id={nameof("color")}
                                         isRequired={true}
                                         />
-                                    <BooleanInput 
-                                        errors={form.getErrors} 
+                                    <BooleanInput
+                                        errors={form.getErrors}
                                         hasSubmitted={form.hasSubmitted()}
-                                        ref={form.setFormRef(pageId)} 
-                                        onValueChanged={form.handleValueChanged(pageId)} 
-                                        value={role && role.moderator} 
-                                        title={translate("form.role.moderator.title")} 
+                                        ref={form.setFormRef(pageId)}
+                                        onValueChanged={form.handleValueChanged(pageId)}
+                                        value={role && role.moderator}
+                                        title={translate("form.role.moderator.title")}
                                         description={translate("form.role.moderator.description")}
-                                        id={nameof("moderator")}   
+                                        id={nameof("moderator")}
                                         />
 
-                                    <BooleanInput 
-                                        errors={form.getErrors} 
+                                    <BooleanInput
+                                        errors={form.getErrors}
                                         hasSubmitted={form.hasSubmitted()}
-                                        ref={form.setFormRef(pageId)} 
-                                        onValueChanged={form.handleValueChanged(pageId)} 
-                                        value={role && role.manager} 
-                                        title={translate("form.role.manager.title")} 
+                                        ref={form.setFormRef(pageId)}
+                                        onValueChanged={form.handleValueChanged(pageId)}
+                                        value={role && role.manager}
+                                        title={translate("form.role.manager.title")}
                                         description={translate("form.role.manager.description")}
-                                        id={nameof("manager")}   
+                                        id={nameof("manager")}
                                         />
-                                    <SelectInput 
+                                    <SelectInput
                                         options={communityCreateRoleOptions}
-                                        errors={form.getErrors} 
+                                        errors={form.getErrors}
                                         hasSubmitted={form.hasSubmitted()}
-                                        ref={form.setFormRef(pageId)} 
-                                        onValueChanged={form.handleValueChanged(pageId)} 
-                                        value={role && role.group_creation.toString() || CommunityRoleCreatePermission.inherit.toString()} 
-                                        title={translate("form.role.group_creation")} 
+                                        ref={form.setFormRef(pageId)}
+                                        onValueChanged={form.handleValueChanged(pageId)}
+                                        value={role && role.group_creation.toString() || CommunityRoleCreatePermission.inherit.toString()}
+                                        title={translate("form.role.group_creation")}
                                         id={nameof("group_creation")}
                                         isRequired={false}
                                     />
-                                    <SelectInput 
+                                    <SelectInput
                                         options={communityCreateRoleOptions}
-                                        errors={form.getErrors} 
+                                        errors={form.getErrors}
                                         hasSubmitted={form.hasSubmitted()}
-                                        ref={form.setFormRef(pageId)} 
-                                        onValueChanged={form.handleValueChanged(pageId)} 
-                                        value={role && role.subgroup_creation.toString() || CommunityRoleCreatePermission.inherit.toString()} 
-                                        title={translate("form.role.subgroup_creation")} 
+                                        ref={form.setFormRef(pageId)}
+                                        onValueChanged={form.handleValueChanged(pageId)}
+                                        value={role && role.subgroup_creation.toString() || CommunityRoleCreatePermission.inherit.toString()}
+                                        title={translate("form.role.subgroup_creation")}
                                         id={nameof("subgroup_creation")}
                                         isRequired={false}
                                     />
 
-                                    <SelectInput 
+                                    <SelectInput
                                         options={communityCreateRoleOptions}
-                                        errors={form.getErrors} 
+                                        errors={form.getErrors}
                                         hasSubmitted={form.hasSubmitted()}
-                                        ref={form.setFormRef(pageId)} 
-                                        onValueChanged={form.handleValueChanged(pageId)} 
-                                        value={role && role.event_creation.toString() || CommunityRoleCreatePermission.inherit.toString()} 
-                                        title={translate("form.role.event_creation")} 
+                                        ref={form.setFormRef(pageId)}
+                                        onValueChanged={form.handleValueChanged(pageId)}
+                                        value={role && role.event_creation.toString() || CommunityRoleCreatePermission.inherit.toString()}
+                                        title={translate("form.role.event_creation")}
                                         id={nameof("event_creation")}
                                         isRequired={false}
                                     />
 
-                                    <SelectInput 
+                                    <SelectInput
                                         options={communityCreateRoleOptions}
-                                        errors={form.getErrors} 
+                                        errors={form.getErrors}
                                         hasSubmitted={form.hasSubmitted()}
-                                        ref={form.setFormRef(pageId)} 
-                                        onValueChanged={form.handleValueChanged(pageId)} 
-                                        value={role && role.project_creation.toString() || CommunityRoleCreatePermission.inherit.toString()} 
-                                        title={translate("form.role.project_creation")} 
+                                        ref={form.setFormRef(pageId)}
+                                        onValueChanged={form.handleValueChanged(pageId)}
+                                        value={role && role.project_creation.toString() || CommunityRoleCreatePermission.inherit.toString()}
+                                        title={translate("form.role.project_creation")}
                                         id={nameof("project_creation")}
                                         isRequired={false}
                                     />

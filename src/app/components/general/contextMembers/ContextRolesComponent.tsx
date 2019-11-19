@@ -244,7 +244,6 @@ export default class ContextRolesComponent extends React.Component<Props, State>
             this.setState(() => {
                 return {failed:failed, selected:selected}
             }, this.reloadList)
-            console.log("deleted response", response)
         })
     }
     handleRoleCreateComplete = (role:CommunityRole) => {

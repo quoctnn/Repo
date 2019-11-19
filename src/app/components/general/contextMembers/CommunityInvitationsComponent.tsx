@@ -138,7 +138,6 @@ export default class CommunityInvitationsComponent extends React.Component<Props
             this.setState(() => {
                 return {failed:failed, selectedInvitations:selected}
             }, this.reloadList)
-            console.log("deleted response", response)
         })
     }
 

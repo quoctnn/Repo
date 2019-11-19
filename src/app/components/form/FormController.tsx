@@ -139,7 +139,6 @@ export default class FormController extends React.Component<Props, State> {
     handleValueChanged = (pageKey:string) =>  (id:string, value:any, isRequired:boolean) => {
         if(isRequired)
         {
-            console.log("handleValueChanged", id, value)
             this.updateFormErrors()
         }
         this.props.onValueChanged && this.props.onValueChanged(id, value)
@@ -166,7 +165,7 @@ export default class FormController extends React.Component<Props, State> {
         if(this.props.formErrors)
         {
             let errors:{[key:string]:string} = {}
-            this.props.formErrors.forEach(fec => 
+            this.props.formErrors.forEach(fec =>
                 {
                     const e = fec.getErrorMessagesForFields(keys)
                     if(e)
@@ -197,7 +196,7 @@ export default class FormController extends React.Component<Props, State> {
     }
     getFormData = (groupByPage:boolean = false) => {
         const object = {}
-        const keys = Object.keys(this.pageData) 
+        const keys = Object.keys(this.pageData)
         keys.forEach(k => {
             const pageComps = this.pageData[k]
             const pageData = {}
@@ -208,7 +207,7 @@ export default class FormController extends React.Component<Props, State> {
                     return
                 if(groupByPage)
                     pageData[pc] = value
-                else 
+                else
                     object[pc] = value
             })
             if(groupByPage)
@@ -276,13 +275,13 @@ export default class FormController extends React.Component<Props, State> {
                                 </div>
                             </div>
                         </div>
-                        {!!this.state.secondaryView && 
+                        {!!this.state.secondaryView &&
                         <div className="secondary-content">
                             {this.state.secondaryView}
                         </div>
                         }
                     </div>
                 </SimpleDialog>
-        
+
     }
 }

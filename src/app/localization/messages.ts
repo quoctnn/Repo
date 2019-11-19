@@ -60,6 +60,7 @@ var translations = {
     "IncludeSubContext":"Include Sub Context",
     "Unstar item":"Unstar item",
     "Star item":"Star item",
+    "Starred":"Starred",
     "read more":"read more",
     "Copy link":"Copy link",
     "Link copied!":"Link copied!",
@@ -618,7 +619,11 @@ var translations = {
     "common.group":"Group",
     "project.is_private.title":"Private",
     "project.is_private.description":"Set as private",
-  },
+    "sidebar.settings.title": "Settings",
+    "sidebar.settings.subtitle": "Global user settings",
+    "sidebar.files.title": "Files",
+    "sidebar.contacts.title":"Contacts",
+},
   no: {
     "search.placeholder": "Søk ...",
     "Sign in": "Logg inn",
@@ -680,6 +685,7 @@ var translations = {
     "IncludeSubContext":"Include Sub Context",
     "Unstar item":"Fjern stjernemarkering",
     "Star item":"Stjernemarkér",
+    "Starred":"Favoritter",
     "read more":"les mer",
     "Copy link":"Kopier link",
     "Link copied!":"Link kopiert!",
@@ -1238,6 +1244,10 @@ var translations = {
     "common.group":"Gruppe",
     "project.is_private.title":"Privat",
     "project.is_private.description":"Sett som privat",
+    "sidebar.settings.title": "Innstillinger",
+    "sidebar.settings.subtitle": "Globale brukerinstillinger",
+    "sidebar.files.title": "Filer",
+    "sidebar.contacts.title":"Kontakter",
 },
   en: {
     "search.placeholder": "Search ...",
@@ -1300,6 +1310,7 @@ var translations = {
     "IncludeSubContext":"Include Sub Context",
     "Unstar item":"Unstar item",
     "Star item":"Star item",
+    "Starred":"Starred",
     "read more":"read more",
     "Copy link":"Copy link",
     "Link copied!":"Link copied!",
@@ -1869,6 +1880,10 @@ var translations = {
     "common.group":"Group",
     "project.is_private.title":"Private",
     "project.is_private.description":"Set as private",
+    "sidebar.settings.title": "Settings",
+    "sidebar.settings.subtitle": "Global user settings",
+    "sidebar.files.title": "Files",
+    "sidebar.contacts.title":"Contacts",
   }
 };
 

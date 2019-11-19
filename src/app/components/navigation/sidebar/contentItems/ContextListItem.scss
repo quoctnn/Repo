@@ -1,0 +1,38 @@
+.list-item .avatar{
+    margin: auto;
+    .typing-indicator:after,.typing-indicator:before
+    {
+        display: none;
+    }
+    .typing-indicator
+    {
+        padding: 1px;
+        margin-top: 0;
+    }
+    .typing-indicator-container
+    {
+        height: 100%;
+        width: 120%;
+        position: absolute;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        top: 0;
+        left: -0.1rem;
+    }
+}
+
+.list-item .name{
+    margin: auto 6px auto 0;
+    font-weight: 400;
+    font-size: 0.85rem;
+}
+
+.list-item .icon{
+    font-size: 0.7rem;
+    >i{
+        padding: 6px;
+        margin: auto;
+        min-width: 1.75rem;
+    }
+}
