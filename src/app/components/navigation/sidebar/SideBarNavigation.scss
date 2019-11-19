@@ -4,7 +4,7 @@ $avatarSize: 40px;
 
 .sidebar-root {
   @include var(background-color, body-background);
-  @include var(box-shadow, drop-shadow-top);
+  // @include var(box-shadow, drop-shadow-top);
   z-index: 1049;
   width: $sideBarWidth;
   top: calc(#{$topMenuHeight} + 15px);
@@ -14,6 +14,9 @@ $avatarSize: 40px;
   position: fixed;
   display: flex;
   flex-direction: column;
+  @media (max-width: 640px){
+    display: none !important;
+  }
 }
 
 .sidebar-root .sidebar-root-header .community-avatar {

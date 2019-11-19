@@ -2,7 +2,7 @@ import * as React from "react";
 import SearchBar from './SearchBar';
 import { EditorState } from 'draft-js';
 import { SearcQueryManager } from '../../../general/input/contextsearch/extensions/index';
-import { Community, GroupSorting, Group, ContextNaturalKey, ContextObject, Permission, ObjectHiddenReason } from '../../../../types/intrasocial_types';
+import { Community, GroupSorting, Group, ContextNaturalKey, ContextObject, Permission } from '../../../../types/intrasocial_types';
 import { ApiClient } from '../../../../network/ApiClient';
 import "../SideBarItem.scss";
 import LoadingSpinner from "../../../LoadingSpinner";
@@ -12,8 +12,6 @@ import { connect } from 'react-redux';
 import { CommunityManager } from '../../../../managers/CommunityManager';
 import { ReduxState } from "../../../../redux";
 import { translate } from '../../../../localization/AutoIntlProvider';
-import GroupCreateComponent from "../../../general/contextCreation/GroupCreateComponent";
-import { uniqueId } from '../../../../utilities/Utilities';
 import EmptyListItem from "./EmptyListItem";
 import { DropDownMenu } from '../../../general/DropDownMenu';
 import { OverflowMenuItem, OverflowMenuItemType } from "../../../general/OverflowMenu";
@@ -25,13 +23,12 @@ type State = {
     parent: Group
     title: string
     subtitle: string
-    createGroupFormVisible: boolean
-    createGroupFormReloadKey: string
     sorting: GroupSorting
 }
 
 type OwnProps = {
     onClose: (e: React.MouseEvent) => void
+    onCreate: (e: React.MouseEvent) => void
 }
 
 type ReduxStateProps = {
@@ -50,8 +47,6 @@ class SideBarGroupContent extends React.Component<Props, State> {
             parent: null,
             title: translate('common.group.groups'),
             subtitle: "",
-            createGroupFormVisible: false,
-            createGroupFormReloadKey: "",
             sorting: GroupSorting.mostUsed
         }
     }
@@ -79,8 +74,7 @@ class SideBarGroupContent extends React.Component<Props, State> {
         const updatedGroup = this.props.contextData.group != nextProps.contextData.group
         const updatedParent = this.state.parent != nextState.parent
         const updatedSorting = this.state.sorting != nextState.sorting
-        const createGroupForm = this.state.createGroupFormVisible != nextState.createGroupFormVisible || this.state.createGroupFormReloadKey != nextState.createGroupFormReloadKey
-        return search || updatedGroups || loading || updatedCommunity || updatedGroup || updatedParent || updatedSorting || createGroupForm
+        return search || updatedGroups || loading || updatedCommunity || updatedGroup || updatedParent || updatedSorting
     }
 
     searchChanged = (es:EditorState) => {
@@ -140,40 +134,6 @@ class SideBarGroupContent extends React.Component<Props, State> {
         }
     }
 
-    createNew = (e?: React.MouseEvent) => {
-        this.setState({createGroupFormVisible:true, createGroupFormReloadKey:uniqueId()})
-    }
-
-    renderAddGroupForm = () => {
-        const visible = this.state.createGroupFormVisible
-        const {community} = this.props.contextData
-        if (community) {
-            return <GroupCreateComponent onCancel={this.hideGroupCreateForm} community={community.id} key={this.state.createGroupFormReloadKey} visible={visible} onComplete={this.handleGroupCreateForm} />
-        } else {
-            return null
-        }
-    }
-
-    hideGroupCreateForm = () => {
-        this.setState((prevState:State) => {
-            return {createGroupFormVisible:false}
-        })
-    }
-
-    handleGroupCreateForm = (group:Group) => {
-        if(!!group)
-        {
-            if(group.hidden_reason && group.hidden_reason == ObjectHiddenReason.review)
-            {
-                this.hideGroupCreateForm()
-            }
-            else if(group.uri)
-            {
-                window.app.navigateToRoute(group.uri)
-            }
-        }
-    }
-
     render = () => {
         var groups = this.state.groups
         if (this.state.query && this.state.query.length > 0) {
@@ -192,7 +152,7 @@ class SideBarGroupContent extends React.Component<Props, State> {
                     </div>
                 }
                 { this.props.contextData.community && this.props.contextData.community.group_creation_permission >= Permission.limited_write &&
-                    <button className="title-button btn btn-default" onClick={this.createNew}><i className="fa fa-plus"></i></button>
+                    <button className="title-button btn btn-default" onClick={this.props.onCreate}><i className="fa fa-plus"></i></button>
                 }
                 { this.state.subtitle &&
                     <div className="sidebar-subtitle">
@@ -226,7 +186,6 @@ class SideBarGroupContent extends React.Component<Props, State> {
                     </div>
                 </div>
             </div>
-            {this.renderAddGroupForm()}
         </>)
     }
 }

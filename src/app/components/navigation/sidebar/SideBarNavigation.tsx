@@ -3,7 +3,6 @@ import { withRouter, RouteComponentProps } from 'react-router';
 import * as React from "react";
 import classnames from 'classnames';
 import { uniqueId } from '../../../utilities/Utilities';
-import SideBarItem from "./SideBarItem";
 import SideBarSettingsItem from './contentItems/SideBarSettingsItem';
 import SideBarContent from "./SideBarContent";
 import Avatar from '../../general/Avatar';
@@ -55,18 +54,20 @@ class SideBarNavigation extends React.Component<Props, State> {
         return true
     }
 
-    // componentDidUpdate = (prevProps:Props, prevState:State) => {
-    //     if (this.state.active && !prevState.active)
-    //         document.addEventListener('click', this.outsideTrigger)
-    //     if (!this.state.active)
-    //         document.removeEventListener('click', this.outsideTrigger)
-    // }
+    componentDidUpdate = (prevProps:Props, prevState:State) => {
+        if (this.state.active && !prevState.active)
+            document.addEventListener('click', this.outsideTrigger)
+        if (!this.state.active)
+            document.removeEventListener('click', this.outsideTrigger)
+    }
 
     outsideTrigger = (e:MouseEvent) => {
         if(!this.state.active)
             return
         const el = e.target as HTMLElement
-        if(el && !this.contentRef.current.contains(el) && !el.classList.contains("title-button"))
+        if(el && !this.contentRef.current.contains(el) &&
+               !el.classList.contains("title-button") &&
+               !el.offsetParent.classList.contains("popover"))
             this.closeMenu(null)
     }
 
@@ -127,18 +128,17 @@ class SideBarNavigation extends React.Component<Props, State> {
                     {this.renderSpacing(false)}
                     <SideBarFilesItem addMenuItem={this.addItem} index={"files-menu"} active={this.state.active} onClick={this.selectionChanged} onClose={this.closeMenu}/>
                     {this.renderSpacing(true)}
-                    <SideBarItem title="Notes" addMenuItem={this.addItem} index={"notes-menu"} active={this.state.active} onClick={this.selectionChanged} />
-                    {this.renderSpacing(true)}
+                    {/* <SideBarItem title="Notes" addMenuItem={this.addItem} index={"notes-menu"} active={this.state.active} onClick={this.selectionChanged} />
+                    {this.renderSpacing(true)} */}
                     <SideBarContactsItem addMenuItem={this.addItem} index={"contacts-menu"} active={this.state.active} onClick={this.selectionChanged} onClose={this.closeMenu}/>
                     {this.renderSpacing(true)}
                     <SideBarSettingsItem addMenuItem={this.addItem} index={"settings-menu"} active={this.state.active} onClick={this.selectionChanged} />
-
-                    <div className="sidebar-separator"></div>
+                    {/* <div className="sidebar-separator"></div>
                     <SideBarItem title="Admin" addMenuItem={this.addItem} index={"admin-menu"} active={this.state.active} onClick={this.selectionChanged} />
                     {this.renderSpacing(true)}
                     <SideBarItem title="Roles" addMenuItem={this.addItem} index={"roles-menu"} active={this.state.active} onClick={this.selectionChanged} />
                     {this.renderSpacing(true)}
-                    <SideBarItem title="Stats" addMenuItem={this.addItem} index={"stats-menu"} active={this.state.active} onClick={this.selectionChanged} />
+                    <SideBarItem title="Stats" addMenuItem={this.addItem} index={"stats-menu"} active={this.state.active} onClick={this.selectionChanged} /> */}
                 </div>
                 <SideBarContent menuItems={this.state.menuItems} active={this.state.active} />
             </div>

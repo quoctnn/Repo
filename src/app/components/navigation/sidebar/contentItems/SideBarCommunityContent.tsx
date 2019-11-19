@@ -11,6 +11,11 @@ import { translate } from '../../../../localization/AutoIntlProvider';
 import EmptyListItem from './EmptyListItem';
 import { DropDownMenu } from "../../../general/DropDownMenu";
 import { OverflowMenuItem, OverflowMenuItemType } from '../../../general/OverflowMenu';
+import { ContextDataProps, withContextData } from '../../../../hoc/WithContextData';
+import { CommunityManager } from '../../../../managers/CommunityManager';
+import { ReduxState } from "../../../../redux";
+import { connect } from "react-redux";
+import { Stats } from "webpack";
 
 type State = {
     isLoading: boolean
@@ -20,11 +25,17 @@ type State = {
     sorting: ListOrdering
 }
 
-type Props = {
+type OwnProps = {
     onClose:(e:React.MouseEvent) => void
 }
 
-export default class SideBarCommunityContent extends React.Component<Props, State> {
+type ReduxStateProps = {
+    activeCommunity: Community
+}
+
+type Props = OwnProps & ContextDataProps & ReduxStateProps
+
+class SideBarCommunityContent extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props)
         this.state = {
@@ -47,9 +58,10 @@ export default class SideBarCommunityContent extends React.Component<Props, Stat
     shouldComponentUpdate = (nextProps: Props, nextState:State) => {
         const search = this.state.query != nextState.query
         const updatedCommunities = !(this.state.communities.length === nextState.communities.length && this.state.communities.sort().every(function(value, index) { return value === nextState.communities.sort()[index]}));
+        const newActive = this.props.activeCommunity != nextProps.activeCommunity
         const loading = this.state.isLoading != nextState.isLoading
         const sorting = this.state.sorting != nextState.sorting
-        return search || updatedCommunities || loading || sorting
+        return search || updatedCommunities || newActive || loading || sorting
     }
 
     searchChanged = (es:EditorState) => {
@@ -93,18 +105,35 @@ export default class SideBarCommunityContent extends React.Component<Props, Stat
                 return translate("Sorting")
         }
     }
+
+    setMain = (e: React.MouseEvent) => {
+        if (this.props.contextData.community) {
+            ApiClient.setMainCommunity(this.props.contextData.community.id, () => {})
+        }
+    }
+
     render = () => {
+        const active = this.props.activeCommunity
+        const selected = this.props.contextData.community
+        const canSetMain = (!active && selected) || (selected && selected.id != active.id)
         var communities = this.state.communities
         if (this.state.query && this.state.query.length > 0) {
             communities = communities.filter(community => community.name.toLowerCase().includes(this.state.query.trim().toLowerCase()))
         }
 
         return (<>
-            <div className="sidebar-content-header">
-                <div className="sidebar-title">
-                        {this.state.title}
-                    </div>
+            <div className="sidebar-content-header d-flex">
+                <div className="sidebar-title flex-grow-1">
+                    {this.state.title}
                 </div>
+                { canSetMain &&
+                    <button className="title-button btn btn-default" onClick={this.setMain}
+                            title={translate("common.core.community.set.main.description").replace("current", selected.name)}>
+                        <i className="fa fa-home"></i>
+                        <div className="title-button-text">{translate("common.core.community.set.main")}</div>
+                    </button>
+                }
+            </div>
             <div className="sidebar-content-list">
                 <div className="content d-flex flex-column">
                     <div className="filter-container d-flex">
@@ -134,3 +163,12 @@ export default class SideBarCommunityContent extends React.Component<Props, Stat
         </>)
     }
 }
+
+const mapStateToProps = (state: ReduxState, ownProps: OwnProps): ReduxStateProps => {
+    const activeCommunity = CommunityManager.getActiveCommunity();
+    return {
+        activeCommunity
+    }
+}
+
+export default withContextData(connect<ReduxStateProps, {}, OwnProps>(mapStateToProps, null)(SideBarCommunityContent))

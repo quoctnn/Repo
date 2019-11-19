@@ -2,7 +2,7 @@ import * as React from "react";
 import SearchBar from './SearchBar';
 import { EditorState } from 'draft-js';
 import { SearcQueryManager } from '../../../general/input/contextsearch/extensions/index';
-import { Community, Project, ContextNaturalKey, ContextObject, ProjectSorting, Permission, ObjectHiddenReason } from '../../../../types/intrasocial_types';
+import { Community, Project, ContextNaturalKey, ProjectSorting, Permission } from '../../../../types/intrasocial_types';
 import { ApiClient } from '../../../../network/ApiClient';
 import "../SideBarItem.scss";
 import LoadingSpinner from "../../../LoadingSpinner";
@@ -12,8 +12,6 @@ import { connect } from 'react-redux';
 import { CommunityManager } from '../../../../managers/CommunityManager';
 import { ReduxState } from "../../../../redux";
 import { translate } from '../../../../localization/AutoIntlProvider';
-import { uniqueId } from "../../../../utilities/Utilities";
-import ProjectCreateComponent from "../../../general/contextCreation/ProjectCreateComponent";
 import EmptyListItem from './EmptyListItem';
 import { OverflowMenuItem, OverflowMenuItemType } from "../../../general/OverflowMenu";
 import { DropDownMenu } from "../../../general/DropDownMenu";
@@ -24,13 +22,12 @@ type State = {
     projects: Project[]
     title: string
     subtitle: string,
-    createProjectFormVisible: boolean
-    createProjectFormReloadKey: string
     sorting: ProjectSorting
 }
 
 type OwnProps = {
     onClose:(e:React.MouseEvent) => void
+    onCreate:(e:React.MouseEvent) => void
 }
 
 type ReduxStateProps = {
@@ -48,8 +45,6 @@ class SideBarProjectContent extends React.Component<Props, State> {
             projects: [],
             title: translate('common.project.projects'),
             subtitle: "",
-            createProjectFormVisible: false,
-            createProjectFormReloadKey: undefined,
             sorting: ProjectSorting.mostUsed
         }
     }
@@ -73,8 +68,7 @@ class SideBarProjectContent extends React.Component<Props, State> {
         const updatedCommunity = this.props.contextData.community != nextProps.contextData.community
         const updatedProject = this.props.contextData.project != nextProps.contextData.project
         const updatedSorting = this.state.sorting != nextState.sorting
-        const createProjectForm = this.state.createProjectFormVisible != nextState.createProjectFormVisible || this.state.createProjectFormReloadKey != nextState.createProjectFormReloadKey
-        return search || updatedProjects || loading || updatedCommunity || updatedProject || updatedSorting || createProjectForm
+        return search || updatedProjects || loading || updatedCommunity || updatedProject || updatedSorting
     }
 
     searchChanged = (es:EditorState) => {
@@ -110,40 +104,6 @@ class SideBarProjectContent extends React.Component<Props, State> {
         return sortingDropdownItems
     }
 
-    createNew = (e?: React.MouseEvent) => {
-        this.setState({createProjectFormVisible:true, createProjectFormReloadKey:uniqueId()})
-    }
-
-    renderAddProjectForm = () => {
-        const visible = this.state.createProjectFormVisible
-        const {community} = this.props.contextData
-        if (community) {
-            return <ProjectCreateComponent groups={[]} onCancel={this.hideProjectCreateForm} community={community.id} key={this.state.createProjectFormReloadKey} visible={visible} onComplete={this.handleProjectCreateForm} />
-        } else {
-            return null
-        }
-    }
-
-    hideProjectCreateForm = () => {
-        this.setState((prevState:State) => {
-            return {createProjectFormVisible:false}
-        })
-    }
-
-    handleProjectCreateForm = (project:Project) => {
-        if(!!project)
-        {
-            if(project.hidden_reason && project.hidden_reason == ObjectHiddenReason.review)
-            {
-                this.hideProjectCreateForm()
-            }
-            else if(project.uri)
-            {
-                window.app.navigateToRoute(project.uri)
-            }
-        }
-    }
-
     render = () => {
         var projects = this.state.projects
         if (this.state.query && this.state.query.length > 0) {
@@ -155,7 +115,7 @@ class SideBarProjectContent extends React.Component<Props, State> {
                     {this.state.title}
                 </div>
                 { this.props.contextData.community && this.props.contextData.community.project_creation_permission >= Permission.limited_write &&
-                    <button className="title-button btn btn-default" onClick={this.createNew}><i className="fa fa-plus"></i></button>
+                    <button className="title-button btn btn-default" onClick={this.props.onCreate}><i className="fa fa-plus"></i></button>
                 }
                 { this.state.subtitle &&
                     <div className="sidebar-subtitle">
@@ -189,7 +149,6 @@ class SideBarProjectContent extends React.Component<Props, State> {
                     </div>
                 </div>
             </div>
-            {this.renderAddProjectForm()}
         </>)
     }
 }
