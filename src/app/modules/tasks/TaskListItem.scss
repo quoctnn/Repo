@@ -1,46 +1,124 @@
-@import "./../../Config";
-.task-list-item-container{
-    &:hover{
+@import './../../Config';
+.task-list-item-container {
+    &:hover {
         text-decoration: none;
     }
-    .task-list-item{
+    .task-list-item {
         cursor: pointer;
         border-radius: 6px;
-        .left{
+        .left {
             display: flex;
             align-items: center;
-            .avatar{
-                .image-container{
+            .avatar {
+                .image-container {
                     box-shadow: none;
-                    border-style:dashed !important;
+                    border-style: dashed !important;
                     border-width: 2px !important;
                 }
             }
-            .mark{
+            .mark {
                 margin-left: 0.25rem;
             }
         }
-        .center{
+        .center {
             font-size: 0.8rem;
             font-weight: normal;
         }
-        .right{
+        .right {
             align-items: center;
             display: flex;
-            .avatar-stacked{
+            .avatar-stacked {
                 margin: 0;
             }
-            .v-bar{
+            .v-bar {
                 @include var(background-color, primary-text-color);
             }
         }
-        .header{
-            white-space:initial;
+        .header {
+            white-space: initial;
         }
-        .footer{
-            > *:first-child{
+        .footer {
+            > *:first-child {
                 margin-left: 0 !important;
             }
         }
+    }
+}
+
+.task-item-hover-container {
+    margin: 4px 8px;
+}
+
+.task-item-hover-container .task-hover-card {
+    @include var(background-color, body-background);
+    @include var(border-color, border-color-default);
+    min-width: 95%;
+    border: 2px solid;
+    border-radius: 5px;
+    visibility: hidden;
+    position: absolute;
+    margin-right: 16px;
+    z-index: 1049;
+}
+
+.task-item-hover-container .task-hover-card .state-info {
+    display: flex;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin: 4px;
+    .task-priority > span {
+        margin: 0 4px;
+    }
+    .task-state {
+        margin-left: 16px;
+        flex-grow: 1;
+        > span {
+            margin: 0 4px;
+        }
+    }
+}
+
+.task-item-hover-container .task-hover-card .task-details {
+    font-size: 0.9rem;
+    margin: 4px;
+    display: flex;
+    .task-attributes {
+        flex-grow: 1;
+    }
+    .task-tags .tag {
+        margin: 0 2px;
+    }
+}
+
+.task-item-hover-container .task-hover-card .task-description {
+    margin: 4px;
+}
+
+.task-item-hover-container .task-hover-card .task-user-details {
+    display: flex;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin: 4px;
+    .task-creator {
+        margin-left: 4px;
+    }
+    .task-last-changed {
+        margin-left: 4px;
+
+    }
+}
+.task-item-hover-container .task-hover-card .task-hover-card-footer {
+    display: flex;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin: 4px;
+    height: 3rem;
+    .task-user-details {
+        flex-grow: 1;
+        display: block;
+    }
+    .task-time-use {
+        text-align: right;
+        margin-right: 4px;
     }
 }

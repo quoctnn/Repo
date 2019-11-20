@@ -505,6 +505,7 @@ export namespace ContextNaturalKey {
             case ContextNaturalKey.GROUP: return (contextObject as Group).members || []
             case ContextNaturalKey.PROJECT: return (contextObject as Project).members || []
             case ContextNaturalKey.COMMUNITY: return (contextObject as Community).members || []
+            case ContextNaturalKey.TASK: return (contextObject as Task).visibility || []
             default:
                 if (!Settings.isProduction) console.warn(`${key} has no 'members' field`, contextObject);
                 return []
@@ -1207,12 +1208,14 @@ export type ReportResult = {
 }
 export type SearchHistory = { id: number, term: string }
 export enum ObjectAttributeType {
+    notification = "notification",
     important = "important",
     reminder = "reminder",
     attention = "attn",
     pinned = "pinned",
     follow = "follow",
     link = "link",
+    update = "update",
 }
 export namespace ObjectAttributeType {
     export function translatedText(type: ObjectAttributeType) {
@@ -1220,12 +1223,14 @@ export namespace ObjectAttributeType {
     }
     export function iconForType(type: ObjectAttributeType, active = false) {
         switch (type) {
+            case ObjectAttributeType.notification: return active ? "fas fa-exclamation" : "fas fa-exclamation"
             case ObjectAttributeType.important: return active ? "fas fa-star" : "far fa-star"
             case ObjectAttributeType.reminder: return active ? "far fa-clock" : "far fa-clock"
             case ObjectAttributeType.attention: return active ? "fas fa-exclamation-triangle" : "fas fa-exclamation-triangle"
             case ObjectAttributeType.pinned: return active ? "fas fa-thumbtack" : "fas fa-thumbtack"
             case ObjectAttributeType.follow: return active ? "far fa-bell-slash" : "far fa-bell"
             case ObjectAttributeType.link: return active ? "fas fa-link" : "fas fa-link"
+            case ObjectAttributeType.update: return active ? "fas fa-exclamation" : "fas fa-exclamation"
             default: return "fas fa-globe-europe"
         }
     }
@@ -1549,13 +1554,21 @@ export type TimeSpent = {
     minutes: Number
 }
 
+export namespace TimeSpent {
+    export function toString(time: TimeSpent) {
+        if (!time) return ""
+        const hours = time.hours + translate("date.format.hours")
+        const minutes = time.minutes + translate("date.format.minutes")
+        return hours + " " + minutes
+    }
+}
 export type Task = {
     id: number
     updated_at: string
     project: number
     title: string
     description: string
-    last_change_by: number
+    latest_change_by: number
     absolute_url: string
     category: string
     creator: number
@@ -1564,9 +1577,12 @@ export type Task = {
     priority: TaskPriority
     state: TaskState
     spent_time: TimeSpent
+    estimated_hours: number
+    estimated_minutes: number
     serialization_date: string
     visibility?: number[]
     attributes?: TaskObjectAttribute[]
+    tags: string[]
     due_date:string
 } & Linkable & Permissible & IdentifiableObject
 
@@ -1589,6 +1605,15 @@ export namespace TaskPriority {
             default: return null
         }
     }
+    export function hexColor(type: TaskPriority) {
+        switch (type) {
+            case TaskPriority.low: return "green"
+            case TaskPriority.medium: return "orange"
+            case TaskPriority.high: return "red"
+            default: return null
+        }
+    }
+
 }
 export enum TaskState {
     notStarted = "not-started",
@@ -1612,6 +1637,16 @@ export namespace TaskState {
             case TaskState.toVerify: return "warning"
             case TaskState.completed: return "success"
             case TaskState.notApplicable: return "light"
+            default: return null
+        }
+    }
+    export function hexColor(type: TaskState) {
+        switch (type) {
+            case TaskState.notStarted: return "grey"
+            case TaskState.progress: return "orange"
+            case TaskState.toVerify: return "yellow"
+            case TaskState.completed: return "green"
+            case TaskState.notApplicable: return "red"
             default: return null
         }
     }

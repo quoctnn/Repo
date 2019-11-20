@@ -215,7 +215,7 @@ class TasksModule extends React.Component<Props, State> {
             key={"task_" + task.id} />
     }
     renderGroupHeader = (group:string) => {
-        return <div key={"header_" + group} className="group-header">
+        return <div key={"header_" + group} className="group-header text-truncate">
             {group}
         </div>
     }

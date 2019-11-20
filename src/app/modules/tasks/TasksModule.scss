@@ -1,21 +1,21 @@
-.tasks-module{
-    .module-header-title-right{
+.tasks-module {
+    .module-header-title-right {
         font-size: 0.8em;
-        color:#FA6363;
+        color: #fa6363;
     }
-    .module-header-title-left{
+    .module-header-title-left {
         min-width: 100px;
     }
-    .tasks-menu{
+    .tasks-menu {
         padding: 8px;
     }
-    .tasks-list{
+    .tasks-list {
         padding: 8px;
-        > .generic-list-item{
+        > .generic-list-item {
             margin-bottom: 8px;
         }
     }
-    .collapse-trigger{
+    .collapse-trigger {
         cursor: pointer;
         align-items: center;
         justify-content: space-between;

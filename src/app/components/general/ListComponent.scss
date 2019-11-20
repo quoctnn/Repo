@@ -1,4 +1,4 @@
-.list-component{
+.list-component {
     height: 100%;
     display: flex;
     flex-direction: column;
@@ -9,33 +9,36 @@
         align-items: center;
     }
 
-    .list-component-list{
+    .list-component-list {
         overflow-y: auto;
         padding: 0;
         overflow-x: hidden;
         display: flex;
         -webkit-overflow-scrolling: touch;
-        &:not(.grid){
+        &:not(.grid) {
             flex-direction: column;
             flex-grow: 1;
         }
-        &.grid{
+        &.grid {
             flex-wrap: wrap;
         }
     }
-    .list-divider{
+    .list-divider {
         text-align: center;
         margin: 10px 12px;
         margin-top: 0;
         height: 5px;
     }
-    .grid{
-        &[class*="grid-size-"] > *{
+    .group-header {
+        margin: 8px 8px;
+    }
+    .grid {
+        &[class*='grid-size-'] > * {
             width: 8.33%;
         }
         @for $i from 1 through 12 {
             $width: percentage(1 / $i);
-            &.grid-size-#{$i} > *{
+            &.grid-size-#{$i} > * {
                 width: $width;
             }
         }

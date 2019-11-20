@@ -67,7 +67,7 @@ class SideBarNavigation extends React.Component<Props, State> {
         if(!this.state.active)
             return
         const el = e.target as HTMLElement
-        if(el && !this.contentRef.current.contains(el) &&
+        if(el && (this.contentRef.current && !this.contentRef.current.contains(el)) &&
                !el.classList.contains("title-button") &&
                !el.offsetParent.classList.contains("popover"))
             this.closeMenu(null)
@@ -105,18 +105,16 @@ class SideBarNavigation extends React.Component<Props, State> {
         return (
             <div ref={this.contentRef}>
                 <div className={css}>
-                    <Link className="sidebar-root-header" to={community.uri}>
-                        <div className="community-avatar text-center">
-                            {community &&
+                    {community &&
+                        <Link className="sidebar-root-header" to={community.uri}>
+                            <div className="community-avatar text-center">
                                 <Avatar size={40} image={community.avatar_thumbnail}></Avatar>
-                            }
-                        </div>
-                        <div className="community-name text-center text-truncate">
-                            {community &&
+                            </div>
+                            <div className="community-name text-center text-truncate">
                                 <span>{community.name}</span>
-                            }
-                        </div>
-                    </Link>
+                            </div>
+                        </Link>
+                    }
                     <div className="sidebar-separator"></div>
                     <SideBarCommunityItem addMenuItem={this.addItem} index={"community-menu"} active={this.state.active} onClick={this.selectionChanged} onClose={this.closeMenu}/>
                     {this.renderSpacing(false)}
