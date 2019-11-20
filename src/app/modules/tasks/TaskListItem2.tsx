@@ -31,10 +31,12 @@ export default class TaskListItem2 extends React.Component<Props, State> {
             hover: false
         }
     }
-    toggleHover = () => {
-        this.setState({ hover: !this.state.hover })
+    showHoverCard = () => {
+        this.setState({ hover: true })
     }
-
+    removeHoverCard = () => {
+        this.setState({ hover: false })
+    }
     shouldComponentUpdate = (nextProps: Props, nextState: State) => {
         return this.state.hover != nextState.hover
     }
@@ -183,7 +185,7 @@ export default class TaskListItem2 extends React.Component<Props, State> {
             {stateTooltip}
         </>
         const cn = classnames("task-list-item main-content-secondary-background")
-        return <div className="task-item-hover-container" onMouseEnter={this.toggleHover} onMouseLeave={this.toggleHover}>
+        return <div className="task-item-hover-container" onMouseEnter={this.showHoverCard} onMouseLeave={this.removeHoverCard}>
             {this.renderTaskCard()}
             <GenericListItem onClick={this.navigateToTask}
                 className={cn}

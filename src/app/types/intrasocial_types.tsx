@@ -1546,7 +1546,8 @@ export type Project = {
     tasks_completed: number
     tasks_responsible: number
     hidden_reason: ObjectHiddenReason
-    is_private:boolean
+    is_private: boolean
+    categories: string[]
 } & INotifiable & AvatarAndCover & Linkable & Permissible & IdentifiableObject & IPrivacy
 
 export type TimeSpent = {

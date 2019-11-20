@@ -1,17 +1,16 @@
 import * as React from "react";
-import { FormGroup, Label, ButtonGroup, Button } from "reactstrap";
+import { FormGroup, Label, ButtonGroup, Button, ButtonDropdown, DropdownItem, DropdownToggle, DropdownMenu } from "reactstrap";
 import { translate } from "../../localization/AutoIntlProvider";
 import { ProjectFilter } from "./ProjectFilter";
 import { ContextValue } from "../../components/general/input/ContextFilter";
-import { TaskState, TaskPriority, UserProfile } from '../../types/intrasocial_types';
+import { TaskState, TaskPriority, UserProfile, Project, CommunityCategory } from '../../types/intrasocial_types';
 import { ProfileManager } from "../../managers/ProfileManager";
 import { userFullName, userAvatar } from '../../utilities/Utilities';
-import { ProjectProfileFilter } from "./ProjectProfileFilter";
 import { ProfileSelectorOption } from "../../components/general/input/SelectExtensions";
-import CollapseComponent from "../../components/general/CollapseComponent";
-import { AnimatedIconStack } from "../../components/general/AnimatedIconStack";
 import { AuthenticationManager } from "../../managers/AuthenticationManager";
 import "./TasksMenu.scss";
+import { ContextDataProps, withContextData } from '../../hoc/WithContextData';
+import { TextInput } from "../../components/form/components/TextInput";
 
 export type TasksMenuData = {
     project:ContextValue
@@ -25,24 +24,28 @@ export type TasksMenuData = {
     term:string,
     notAssigned:boolean
 }
-type Props =
-{
+type OwnProps = {
     data:TasksMenuData
     onUpdate:(data:TasksMenuData) => void
     disableContextSearch?:boolean
     projectMembers:number[]
 }
+type Props = OwnProps & ContextDataProps
+
 type State = {
     data:TasksMenuData
     subMenuVisible:boolean
+    categoryMenuOpen:boolean
+
 }
-export default class TaskMenu extends React.Component<Props, State> {
+class TaskMenu extends React.Component<Props, State> {
 
     constructor(props:Props) {
         super(props);
         this.state = {
             data:{...this.props.data},
-            subMenuVisible:false
+            subMenuVisible:false,
+            categoryMenuOpen:false
         }
     }
     componentDidUpdate = (prevProps:Props, prevState:State ) => {
@@ -96,7 +99,21 @@ export default class TaskMenu extends React.Component<Props, State> {
         data.state = arr
         this.setState({data}, this.sendUpdate)
     }
-
+    toggleCategory = () => {
+        this.setState({categoryMenuOpen: !this.state.categoryMenuOpen})
+    }
+    setCategory = (newCategory: string) => (e: React.MouseEvent) => {
+        const {category, ...rest} = this.state.data
+        this.setState({data: {category:newCategory, ...rest}}, this.sendUpdate)
+    }
+    tagsValueChanged = (id: string, value: string, isRequired: boolean) => {
+        const {tags, ...rest} = this.state.data
+        if (!value) {
+            this.setState({data: {tags:[], ...rest}}, this.sendUpdate)
+        } else {
+            this.setState({data: {tags:value.replace(" ", "").split(","), ...rest}}, this.sendUpdate)
+        }
+    }
     priorityActive = (priority:TaskPriority) => {
         return this.state.data.priority.contains(priority)
     }
@@ -136,9 +153,10 @@ export default class TaskMenu extends React.Component<Props, State> {
         }, this.sendUpdate)
     }
     render() {
+        const project = this.props.contextData.project as Project
+        if (!project) return null
         const states:TaskState[] = TaskState.all
         const priorities:TaskPriority[] = TaskPriority.all
-
         const assignedTo = this.state.data.assignedTo && ProfileManager.getProfileById(this.state.data.assignedTo)
         // const assignedToValue = assignedTo && this.getProfileFilterOption(assignedTo)
 
@@ -175,11 +193,35 @@ export default class TaskMenu extends React.Component<Props, State> {
                         <Button size="sm" color="secondary" outline={true} onClick={this.toggleResponsible} active={!!responsible}>{translate("task.responsible.me")}</Button>
                     </ButtonGroup>
                 </FormGroup>
+                {project.categories &&
+                    <FormGroup>
+                        <Label className="form-group-title">{translate("task.category.title")}</Label>
+                        <ButtonDropdown isOpen={this.state.categoryMenuOpen} toggle={this.toggleCategory}>
+                            <DropdownToggle caret>
+                                {this.state.data.category &&
+                                    this.state.data.category.length > 50 ? this.state.data.category.substring(0,50) + ".." : this.state.data.category
+                                    ||
+                                    translate("task.category.select")
+                                }
+                            </DropdownToggle>
+                            <DropdownMenu style={{position: "absolute"}}>
+                                <DropdownItem onClick={this.setCategory(undefined)}>&nbsp;</DropdownItem>
+                                {project.categories.map((category) => <DropdownItem onClick={this.setCategory(category)}>{category.length > 50 ? category.substring(0,50) + ".." : category}</DropdownItem>)}
+                            </DropdownMenu>
+                        </ButtonDropdown>
+                    </FormGroup>
+                }
+                {project.tags &&
+                    <FormGroup>
+                        <Label className="form-group-title">{translate("task.tags.filter.title")}</Label>
+                        <TextInput value="" title="" id="tags" onValueChanged={this.tagsValueChanged}></TextInput>
+                    </FormGroup>
+                }
             </div>
         );
     }
 }
-
+export default withContextData(TaskMenu)
 
 /* <div className="collapse-menu">
     <div className="trigger-container">
