@@ -12,6 +12,7 @@ $loginButtonColor:#063dee;
     display: flex;
     height: 100%;
     position: relative;
+    z-index: 1049;
     .triangles-bg,.gradient-bg{
         position: absolute;
         top:0;

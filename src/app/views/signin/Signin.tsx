@@ -4,7 +4,7 @@ import GoogleLogin from 'react-google-login';
 import LinkedIn from 'linkedin-login-for-react';
 import {ApiClient} from '../../network/ApiClient'
 import { Button, Input , Form , FormGroup, InputGroupAddon, InputGroup, FormFeedback} from 'reactstrap'
-import { withRouter, RouteComponentProps} from 'react-router-dom'
+import { withRouter, RouteComponentProps, Link} from 'react-router-dom'
 import { connect } from 'react-redux'
 import { AuthenticationManager } from '../../managers/AuthenticationManager'
 import { ToastManager } from '../../managers/ToastManager'
@@ -21,6 +21,7 @@ import { RequestErrorData, GDPRFormAnswers, GDPRData, AppLanguage } from '../../
 import SimpleDialog from '../../components/general/dialogs/SimpleDialog';
 import GdprForm from './GdprForm';
 import classnames = require('classnames');
+import Routes from '../../utilities/Routes';
 enum LoginProvider{
     google = "google", facebook = "facebook", linkedIn = "linkedin", native = "native"
 }
@@ -233,8 +234,8 @@ class Signin extends React.Component<Props, State> {
                                     <h2 className="title">{translate("Login")}</h2>
                                     <div className="sub-title mb-1">
                                         {translate("no_account_question")}{" "}
-                                        {/*<Link className="s-link" to={Routes.SIGNUP}>{translate("Sign up")}</Link>*/}
-                                        <a href="https://intra.work/accounts/oup/login/" target="_blank">{translate("Sign up")}</a>
+                                        <Link className="s-link" to={Routes.SIGNUP}>{translate("Sign up")}</Link>
+                                        {/* <a href="https://intra.work/accounts/oup/login/" target="_blank">{translate("Sign up")}</a> */}
                                     </div>
                                     <Form>
                                         <InputGroup className="form-group form-input">

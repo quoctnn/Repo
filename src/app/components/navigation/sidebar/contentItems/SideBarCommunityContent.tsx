@@ -2,7 +2,7 @@ import * as React from "react";
 import SearchBar from './SearchBar';
 import { EditorState } from 'draft-js';
 import { SearcQueryManager } from '../../../general/input/contextsearch/extensions/index';
-import { Community, ContextNaturalKey } from '../../../../types/intrasocial_types';
+import { Community, ContextNaturalKey, UserProfile } from '../../../../types/intrasocial_types';
 import { ApiClient, ListOrdering } from '../../../../network/ApiClient';
 import "../SideBarItem.scss";
 import LoadingSpinner from "../../../LoadingSpinner";
@@ -15,7 +15,7 @@ import { ContextDataProps, withContextData } from '../../../../hoc/WithContextDa
 import { CommunityManager } from '../../../../managers/CommunityManager';
 import { ReduxState } from "../../../../redux";
 import { connect } from "react-redux";
-import { Stats } from "webpack";
+import { AuthenticationManager } from '../../../../managers/AuthenticationManager';
 
 type State = {
     isLoading: boolean
@@ -30,7 +30,8 @@ type OwnProps = {
 }
 
 type ReduxStateProps = {
-    activeCommunity: Community
+    activeCommunity: Community,
+    authenticatedUser: UserProfile
 }
 
 type Props = OwnProps & ContextDataProps & ReduxStateProps
@@ -77,7 +78,7 @@ class SideBarCommunityContent extends React.Component<Props, State> {
 
     getCommunities = () => {
         this.setState({isLoading: true})
-        ApiClient.getCommunities(true, this.state.sorting, 1000, 0, (data, status, error) => {
+        ApiClient.getCommunities(null, this.state.sorting, 1000, 0, (data, status, error) => {
             if (data && data.results) {
                 this.setState({communities: data.results, isLoading:false});
             }
@@ -115,7 +116,7 @@ class SideBarCommunityContent extends React.Component<Props, State> {
     render = () => {
         const active = this.props.activeCommunity
         const selected = this.props.contextData.community
-        const canSetMain = (!active && selected) || (selected && selected.id != active.id)
+        const canSetMain = !this.props.authenticatedUser.is_anonymous && ((!active && selected) || (selected && selected.id != active.id))
         var communities = this.state.communities
         if (this.state.query && this.state.query.length > 0) {
             communities = communities.filter(community => community.name.toLowerCase().includes(this.state.query.trim().toLowerCase()))
@@ -166,8 +167,10 @@ class SideBarCommunityContent extends React.Component<Props, State> {
 
 const mapStateToProps = (state: ReduxState, ownProps: OwnProps): ReduxStateProps => {
     const activeCommunity = CommunityManager.getActiveCommunity();
+    const authenticatedUser = AuthenticationManager.getAuthenticatedUser();
     return {
-        activeCommunity
+        activeCommunity,
+        authenticatedUser
     }
 }
 

@@ -8,7 +8,7 @@ import SideBarContent from "./SideBarContent";
 import Avatar from '../../general/Avatar';
 import { ReduxState } from "../../../redux";
 import { CommunityManager } from '../../../managers/CommunityManager';
-import { Community } from '../../../types/intrasocial_types';
+import { Community, UserProfile } from '../../../types/intrasocial_types';
 import { connect } from 'react-redux';
 import { ContextMenuItem, MenuItem } from '../../../types/menuItem';
 import SideBarCommunityItem from "./contentItems/SideBarCommunityItem";
@@ -149,7 +149,7 @@ class SideBarNavigation extends React.Component<Props, State> {
 const mapStateToProps = (state: ReduxState, ownProps: OwnProps): ReduxStateProps => {
     return {
         activeCommunity: CommunityManager.getActiveCommunity()
-    }
+}
 }
 
 export default withRouter(connect<ReduxStateProps, {}, OwnProps>(mapStateToProps, null)(SideBarNavigation))

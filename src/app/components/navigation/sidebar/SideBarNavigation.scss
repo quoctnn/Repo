@@ -24,15 +24,13 @@ $avatarSize: 40px;
   width: $avatarSize;
   margin: 12px auto;
   border-radius: calc(#{$avatarSize} / 2);
-  @include var(
-    background-color,
-    primary-theme-color
-  ); // This should be the community avatar image
+  @include var(background-color, primary-theme-color);
 }
 
 .sidebar-root .sidebar-root-header .community-name {
   font-weight: 600;
   font-size: 0.75rem;
+  margin: auto 6px;
 }
 
 .sidebar-root .sidebar-item {

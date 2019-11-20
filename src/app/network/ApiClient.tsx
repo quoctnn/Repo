@@ -1059,7 +1059,7 @@ export abstract class ApiClient
     }
     static getCommunities(is_member:boolean, ordering:ListOrdering, limit:number, offset:number,callback:ApiClientFeedPageCallback<Community>)
     {
-        let url = Constants.apiRoute.communityList + "?" + ApiClient.getQueryString({is_member:(is_member ? "True":"False"), limit, offset, ordering})
+        let url = Constants.apiRoute.communityList + "?" + ApiClient.getQueryString({is_member, limit, offset, ordering})
         AjaxRequest.get(url, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {

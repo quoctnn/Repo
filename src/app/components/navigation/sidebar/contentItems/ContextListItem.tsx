@@ -8,6 +8,7 @@ import Avatar from '../../../general/Avatar';
 import { ReduxState } from '../../../../redux';
 import classnames from 'classnames';
 import './ContextListItem.scss';
+import { communitiesById } from '../../../../redux/communityStore';
 
 type State = {
 }
