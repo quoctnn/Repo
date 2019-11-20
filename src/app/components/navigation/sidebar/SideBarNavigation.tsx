@@ -18,6 +18,8 @@ import SideBarProjectItem from './contentItems/SideBarProjectItem';
 import SideBarFavoriteItem from "./contentItems/SideBarFavoritesItem";
 import SideBarFilesItem from './contentItems/SideBarFilesItem';
 import SideBarContactsItem from "./contentItems/SideBarContactsItem";
+import { Link } from "react-router-dom";
+import Routes from "../../../utilities/Routes";
 
 type State = {
     active: string
@@ -103,7 +105,7 @@ class SideBarNavigation extends React.Component<Props, State> {
         return (
             <div ref={this.contentRef}>
                 <div className={css}>
-                    <div className="sidebar-root-header">
+                    <Link className="sidebar-root-header" to={community.uri}>
                         <div className="community-avatar text-center">
                             {community &&
                                 <Avatar size={40} image={community.avatar_thumbnail}></Avatar>
@@ -114,7 +116,7 @@ class SideBarNavigation extends React.Component<Props, State> {
                                 <span>{community.name}</span>
                             }
                         </div>
-                    </div>
+                    </Link>
                     <div className="sidebar-separator"></div>
                     <SideBarCommunityItem addMenuItem={this.addItem} index={"community-menu"} active={this.state.active} onClick={this.selectionChanged} onClose={this.closeMenu}/>
                     {this.renderSpacing(false)}
