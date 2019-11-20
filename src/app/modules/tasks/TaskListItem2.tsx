@@ -124,7 +124,11 @@ export default class TaskListItem2 extends React.Component<Props, State> {
                         </div>
                     }
                 </div>
-                <div className="task-description">{task.description}</div>
+                {task.description &&
+                    <div className="task-description">{task.description}</div>
+                    ||
+                    <div className="task-description">{task.title}</div>
+                }
                 <div className="task-hover-card-footer">
                     <div className="task-user-details">
                         {creator &&
