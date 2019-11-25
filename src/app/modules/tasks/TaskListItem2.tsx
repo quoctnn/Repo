@@ -12,7 +12,7 @@ import { TimeComponent } from '../../components/general/TimeComponent';
 import UserProfileAvatar from '../../components/general/UserProfileAvatar';
 import { ObjectAttributeTypeExtension, StatusBadgeList } from '../../components/status/StatusBadgeList';
 import Moment from 'react-moment';
-import { DateFormat } from '../../utilities/Utilities';
+import { DateFormat, uniqueId } from '../../utilities/Utilities';
 
 type OwnProps = {
     communityId: number
@@ -122,7 +122,7 @@ export default class TaskListItem2 extends React.Component<Props, State> {
                     }
                     {task.tags &&
                         <div className="task-tags">
-                            {task.tags.map((tag) => <Badge className="tag" color="info">{tag}</Badge>)}
+                            {task.tags.map((tag) => <Badge key={uniqueId()}className="tag" color="info">{tag}</Badge>)}
                         </div>
                     }
                 </div>

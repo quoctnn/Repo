@@ -1,11 +1,11 @@
 import * as React from "react";
-import { FormGroup, Label, ButtonGroup, Button, ButtonDropdown, DropdownItem, DropdownToggle, DropdownMenu } from "reactstrap";
+import { FormGroup, Label, ButtonGroup, Button, ButtonDropdown, DropdownItem, DropdownToggle, DropdownMenu, Input } from "reactstrap";
 import { translate } from "../../localization/AutoIntlProvider";
 import { ProjectFilter } from "./ProjectFilter";
 import { ContextValue } from "../../components/general/input/ContextFilter";
 import { TaskState, TaskPriority, UserProfile, Project, CommunityCategory } from '../../types/intrasocial_types';
 import { ProfileManager } from "../../managers/ProfileManager";
-import { userFullName, userAvatar } from '../../utilities/Utilities';
+import { userFullName, userAvatar, uniqueId } from '../../utilities/Utilities';
 import { ProfileSelectorOption } from "../../components/general/input/SelectExtensions";
 import { AuthenticationManager } from "../../managers/AuthenticationManager";
 import "./TasksMenu.scss";
@@ -106,7 +106,8 @@ class TaskMenu extends React.Component<Props, State> {
         const {category, ...rest} = this.state.data
         this.setState({data: {category:newCategory, ...rest}}, this.sendUpdate)
     }
-    tagsValueChanged = (id: string, value: string, isRequired: boolean) => {
+    tagsValueChanged = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value
         const {tags, ...rest} = this.state.data
         if (!value) {
             this.setState({data: {tags:[], ...rest}}, this.sendUpdate)
@@ -114,6 +115,7 @@ class TaskMenu extends React.Component<Props, State> {
             this.setState({data: {tags:value.replace(" ", "").split(","), ...rest}}, this.sendUpdate)
         }
     }
+
     priorityActive = (priority:TaskPriority) => {
         return this.state.data.priority.contains(priority)
     }
@@ -206,7 +208,7 @@ class TaskMenu extends React.Component<Props, State> {
                             </DropdownToggle>
                             <DropdownMenu style={{position: "absolute"}}>
                                 <DropdownItem onClick={this.setCategory(undefined)}>&nbsp;</DropdownItem>
-                                {project.categories.map((category) => <DropdownItem onClick={this.setCategory(category)}>{category.length > 50 ? category.substring(0,50) + ".." : category}</DropdownItem>)}
+                                {project.categories.map((category) => <DropdownItem key={uniqueId()}onClick={this.setCategory(category)}>{category.length > 50 ? category.substring(0,50) + ".." : category}</DropdownItem>)}
                             </DropdownMenu>
                         </ButtonDropdown>
                     </FormGroup>
@@ -214,7 +216,7 @@ class TaskMenu extends React.Component<Props, State> {
                 {project.tags &&
                     <FormGroup>
                         <Label className="form-group-title">{translate("task.tags.filter.title")}</Label>
-                        <TextInput value="" title="" id="tags" onValueChanged={this.tagsValueChanged}></TextInput>
+                        <Input className="form-text-input" id="tags" type="text" onChange={this.tagsValueChanged} />
                     </FormGroup>
                 }
             </div>
