@@ -1,25 +1,25 @@
-@import "../../Config";
-#top-navigation{
+@import '../../Config';
+#top-navigation {
     height: $topMenuHeight;
-    #user-menu{
+    #user-menu {
         height: 100%;
         align-items: center;
-        .trigger{
+        .trigger {
             height: 100%;
             cursor: pointer;
         }
     }
-    .logo{
+    .logo {
         fill: #428bca;
         height: 50px;
     }
-    .top-navigation-content{
+    .top-navigation-content {
         z-index: 1050;
-        width:100%;
-        position:fixed;
-        top:0px;
+        width: 100%;
+        position: fixed;
+        top: 0px;
         height: $topMenuHeight;
-        .intrawork-logo-small{
+        .intrawork-logo-small {
             @include var(fill, primary-theme-color);
             height: $topMenuHeight;
             margin: 0 auto;
@@ -31,30 +31,46 @@
             cursor: pointer;
             font-size: 24px;
         }
+        .mobile-menu-icon {
+            display: none;
+            @media (max-width: 640px) {
+                display: inline !important;
+            }
+        }
         .breadcrumb-navigation {
-            flex:1;
+            flex: 1;
             margin-right: auto;
         }
         .profile-shortcuts {
-            flex:1;
+            flex: 1;
             margin-left: auto;
             display: flex;
             justify-content: flex-end;
         }
     }
-    @media (max-width: 640px){
-        .menu-toggle{
+    @media (max-width: 640px) {
+        .menu-toggle {
             display: block !important;
         }
     }
 }
-.search-modal{
+.search-modal {
     margin-left: auto;
     max-width: 90%;
     margin-right: auto;
-    .modal-title{
-        width:100%;
+    .modal-title {
+        width: 100%;
         overflow: auto;
         overflow-y: hidden;
+    }
+}
+.hide-narrow {
+    @media (max-width: 800px) {
+        display: none;
+    }
+}
+.font-size-adjust {
+    @media (max-width: 640px) {
+        display: none !important;
     }
 }

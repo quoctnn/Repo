@@ -10,6 +10,8 @@ type State = {
 type Props = {
     menuItems: MenuItem[] | ContextMenuItem[]
     active:string
+    onClose:(e: React.MouseEvent) => void
+
 } & ContextDataProps & RouteComponentProps<any>
 
 class SideBarContent extends React.Component<Props, State> {
@@ -37,7 +39,7 @@ class SideBarContent extends React.Component<Props, State> {
         return(
             <div className={cn}>
                 {menuItem && menuItem.content &&
-                    menuItem.content
+                    <>{React.cloneElement(menuItem.content, {onClose: this.props.onClose})}</>
                 }
             </div>
         )

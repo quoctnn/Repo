@@ -20,7 +20,6 @@ type OwnProps = {
     active:string
     addMenuItem:(item:MenuItem) => void // This should be a menuItem
     onClick:(e:React.MouseEvent) => void
-    onClose:(e:React.MouseEvent) => void
 }
 
 type Props = ContextDataProps & OwnProps
@@ -41,7 +40,7 @@ class SideBarProjectItem extends React.Component<Props, State> {
                 index: this.props.index,
                 title: translate("common.project.projects"),
                 subtitle: undefined,
-                content: <SideBarProjectContent onClose={this.props.onClose} onCreate={this.createNew} />,
+                content: <SideBarProjectContent onCreate={this.createNew} />,
             }
             this.setState({menuItem: menuItem})
         }

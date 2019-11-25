@@ -1,7 +1,14 @@
-.sidebar-content-list .settings-item{
+.sidebar-content-list .content .settings-item {
     font-size: 0.85rem;
     margin: 8px 4px;
+    flex-wrap: wrap;
 }
-.sidebar-content-list .dropdown-toggle{
+.sidebar-content-list .content .dropdown-toggle {
     font-size: 0.85rem;
+}
+.font-size-selector .font-size-adjust {
+    display: block !important;
+}
+.sidebar-content-list .content .settings-item .settings-item-title{
+    margin: auto;
 }

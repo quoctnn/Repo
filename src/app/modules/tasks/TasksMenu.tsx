@@ -13,42 +13,42 @@ import { ContextDataProps, withContextData } from '../../hoc/WithContextData';
 import { TextInput } from "../../components/form/components/TextInput";
 
 export type TasksMenuData = {
-    project:ContextValue
-    state:string[]
-    priority:string[]
-    assignedTo:number
-    responsible:number
-    creator:number
-    tags:string[]
-    category:string
-    term:string,
-    notAssigned:boolean
+    project: ContextValue
+    state: string[]
+    priority: string[]
+    assignedTo: number
+    responsible: number
+    creator: number
+    tags: string[]
+    category: string
+    term: string,
+    notAssigned: boolean
 }
 type OwnProps = {
-    data:TasksMenuData
-    onUpdate:(data:TasksMenuData) => void
-    disableContextSearch?:boolean
-    projectMembers:number[]
+    data: TasksMenuData
+    onUpdate: (data: TasksMenuData) => void
+    disableContextSearch?: boolean
+    projectMembers: number[]
 }
 type Props = OwnProps & ContextDataProps
 
 type State = {
-    data:TasksMenuData
-    subMenuVisible:boolean
-    categoryMenuOpen:boolean
+    data: TasksMenuData
+    subMenuVisible: boolean
+    categoryMenuOpen: boolean
 
 }
 class TaskMenu extends React.Component<Props, State> {
 
-    constructor(props:Props) {
+    constructor(props: Props) {
         super(props);
         this.state = {
-            data:{...this.props.data},
-            subMenuVisible:false,
-            categoryMenuOpen:false
+            data: { ...this.props.data },
+            subMenuVisible: false,
+            categoryMenuOpen: false
         }
     }
-    componentDidUpdate = (prevProps:Props, prevState:State ) => {
+    componentDidUpdate = (prevProps: Props, prevState: State) => {
         /*
         const data = this.state.data
         let updated = false
@@ -65,100 +65,100 @@ class TaskMenu extends React.Component<Props, State> {
         }
         */
     }
-    onContextChange = (context:ContextValue) => {
-        const data = {...this.state.data}
+    onContextChange = (context: ContextValue) => {
+        const data = { ...this.state.data }
         data.project = context
-        this.setState({data}, this.sendUpdate)
+        this.setState({ data }, this.sendUpdate)
     }
-    onAssignedChange = (value:ProfileSelectorOption) => {
+    onAssignedChange = (value: ProfileSelectorOption) => {
         const data = this.state.data
         data.assignedTo = value && value.id
-        this.setState({data}, this.sendUpdate)
+        this.setState({ data }, this.sendUpdate)
     }
-    onResponsibleChange = (value:ProfileSelectorOption) => {
+    onResponsibleChange = (value: ProfileSelectorOption) => {
         const data = this.state.data
         data.responsible = value && value.id
-        this.setState({data}, this.sendUpdate)
+        this.setState({ data }, this.sendUpdate)
     }
-    onCreatorChange = (value:ProfileSelectorOption) => {
+    onCreatorChange = (value: ProfileSelectorOption) => {
         const data = this.state.data
         data.creator = value && value.id
-        this.setState({data}, this.sendUpdate)
+        this.setState({ data }, this.sendUpdate)
     }
     sendUpdate = () => {
-        const {data} = this.state
-        this.props.onUpdate({...data})
+        const { data } = this.state
+        this.props.onUpdate({ ...data })
     }
-    stateActive = (state:TaskState) => {
+    stateActive = (state: TaskState) => {
         return this.state.data.state.contains(state)
     }
-    toggleState = (state:TaskState) => (event:any) => {
+    toggleState = (state: TaskState) => (event: any) => {
         const data = this.state.data
         const arr = [...data.state]
         arr.toggleElement(state)
         data.state = arr
-        this.setState({data}, this.sendUpdate)
+        this.setState({ data }, this.sendUpdate)
     }
     toggleCategory = () => {
-        this.setState({categoryMenuOpen: !this.state.categoryMenuOpen})
+        this.setState({ categoryMenuOpen: !this.state.categoryMenuOpen })
     }
     setCategory = (newCategory: string) => (e: React.MouseEvent) => {
-        const {category, ...rest} = this.state.data
-        this.setState({data: {category:newCategory, ...rest}}, this.sendUpdate)
+        const { category, ...rest } = this.state.data
+        this.setState({ data: { category: newCategory, ...rest } }, this.sendUpdate)
     }
     tagsValueChanged = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value
-        const {tags, ...rest} = this.state.data
+        const { tags, ...rest } = this.state.data
         if (!value) {
-            this.setState({data: {tags:[], ...rest}}, this.sendUpdate)
+            this.setState({ data: { tags: [], ...rest } }, this.sendUpdate)
         } else {
-            this.setState({data: {tags:value.replace(" ", "").split(","), ...rest}}, this.sendUpdate)
+            this.setState({ data: { tags: value.replace(" ", "").split(","), ...rest } }, this.sendUpdate)
         }
     }
 
-    priorityActive = (priority:TaskPriority) => {
+    priorityActive = (priority: TaskPriority) => {
         return this.state.data.priority.contains(priority)
     }
-    togglePriority = (priority:TaskPriority) => (event:any) => {
+    togglePriority = (priority: TaskPriority) => (event: any) => {
         const data = this.state.data
         const arr = [...data.priority]
         arr.toggleElement(priority)
         data.priority = arr
-        this.setState({data}, this.sendUpdate)
+        this.setState({ data }, this.sendUpdate)
     }
     toggleSubMenu = () => {
-        this.setState((prevState:State) => {
-            return {subMenuVisible:!prevState.subMenuVisible}
+        this.setState((prevState: State) => {
+            return { subMenuVisible: !prevState.subMenuVisible }
         })
     }
-    getProfileFilterOption = (profile:UserProfile):ProfileSelectorOption => {
-        return {value:profile.slug_name, label:userFullName(profile), id:profile.id, icon:userAvatar(profile, true)}
+    getProfileFilterOption = (profile: UserProfile): ProfileSelectorOption => {
+        return { value: profile.slug_name, label: userFullName(profile), id: profile.id, icon: userAvatar(profile, true) }
     }
     toggleAssignedTo = () => {
-        this.setState((prevState:State) => {
+        this.setState((prevState: State) => {
             const data = prevState.data
-            if(!!data.assignedTo)
+            if (!!data.assignedTo)
                 data.assignedTo = null
             else
                 data.assignedTo = AuthenticationManager.getAuthenticatedUser().id
-            return {data:data}
+            return { data: data }
         }, this.sendUpdate)
     }
     toggleResponsible = () => {
-        this.setState((prevState:State) => {
+        this.setState((prevState: State) => {
             const data = prevState.data
-            if(!!data.responsible)
+            if (!!data.responsible)
                 data.responsible = null
             else
                 data.responsible = AuthenticationManager.getAuthenticatedUser().id
-            return {data:data}
+            return { data: data }
         }, this.sendUpdate)
     }
     render() {
         const project = this.props.contextData.project as Project
         if (!project) return null
-        const states:TaskState[] = TaskState.all
-        const priorities:TaskPriority[] = TaskPriority.all
+        const states: TaskState[] = TaskState.all
+        const priorities: TaskPriority[] = TaskPriority.all
         const assignedTo = this.state.data.assignedTo && ProfileManager.getProfileById(this.state.data.assignedTo)
         // const assignedToValue = assignedTo && this.getProfileFilterOption(assignedTo)
 
@@ -168,13 +168,13 @@ class TaskMenu extends React.Component<Props, State> {
         // const creator = this.state.data.creator && ProfileManager.getProfileById(this.state.data.creator)
         // const creatorValue = creator && this.getProfileFilterOption(creator)
 
-        return(
+        return (
             <div className="tasks-menu">
                 {!this.props.disableContextSearch &&
-                <FormGroup>
-                    <Label className="form-group-title">{translate("task.module.menu.projectfilter.title")}</Label>
-                    <ProjectFilter onValueChange={this.onContextChange} value={this.state.data.project} />
-                </FormGroup>
+                    <FormGroup>
+                        <Label className="form-group-title">{translate("task.module.menu.projectfilter.title")}</Label>
+                        <ProjectFilter onValueChange={this.onContextChange} value={this.state.data.project} />
+                    </FormGroup>
                 }
                 <FormGroup>
                     <Label className="form-group-title">{translate("task.module.menu.state.title")}</Label>
@@ -195,28 +195,28 @@ class TaskMenu extends React.Component<Props, State> {
                         <Button size="sm" color="secondary" outline={true} onClick={this.toggleResponsible} active={!!responsible}>{translate("task.responsible.me")}</Button>
                     </ButtonGroup>
                 </FormGroup>
-                {project.categories &&
+                {project.categories.length > 0 &&
                     <FormGroup>
                         <Label className="form-group-title">{translate("task.category.title")}</Label>
                         <ButtonDropdown isOpen={this.state.categoryMenuOpen} toggle={this.toggleCategory}>
                             <DropdownToggle caret>
                                 {this.state.data.category &&
-                                    this.state.data.category.length > 50 ? this.state.data.category.substring(0,50) + ".." : this.state.data.category
+                                    this.state.data.category.length > 50 ? this.state.data.category.substring(0, 50) + ".." : this.state.data.category
                                     ||
                                     translate("task.category.select")
                                 }
                             </DropdownToggle>
-                            <DropdownMenu style={{position: "absolute"}}>
+                            <DropdownMenu style={{ position: "absolute" }}>
                                 <DropdownItem onClick={this.setCategory(undefined)}>&nbsp;</DropdownItem>
-                                {project.categories.map((category) => <DropdownItem key={uniqueId()}onClick={this.setCategory(category)}>{category.length > 50 ? category.substring(0,50) + ".." : category}</DropdownItem>)}
+                                {project.categories.map((category) => <DropdownItem key={uniqueId()} onClick={this.setCategory(category)}>{category.length > 50 ? category.substring(0, 50) + ".." : category}</DropdownItem>)}
                             </DropdownMenu>
                         </ButtonDropdown>
                     </FormGroup>
                 }
-                {project.tags &&
+                {project.tags.length > 0 &&
                     <FormGroup>
                         <Label className="form-group-title">{translate("task.tags.filter.title")}</Label>
-                        <Input className="form-text-input" id="tags" type="text" onChange={this.tagsValueChanged} />
+                        <Input className="form-text-input" id="tags" type="text" placeholder={"Ex. " + project.tags[0]} onChange={this.tagsValueChanged} />
                     </FormGroup>
                 }
             </div>

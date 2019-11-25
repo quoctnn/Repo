@@ -14,7 +14,8 @@ type State = {
 }
 
 type Props = {
-    onClose:(e:React.MouseEvent) => void
+    reverse?: boolean
+    onClose?:(e:React.MouseEvent) => void
 }
 
 export default class SideBarFavoritesContent extends React.Component<Props, State> {
@@ -46,7 +47,9 @@ export default class SideBarFavoritesContent extends React.Component<Props, Stat
     }
 
     render = () => {
-        const favorites = this.state.favorites.sort((a, b) => a.index - b.index)
+        var favorites = this.state.favorites.sort((a, b) => a.index - b.index)
+        if (this.props.reverse)
+            favorites = favorites.reverse()
         return (<>
             <div className="sidebar-content-header">
                 <div className="sidebar-title">
@@ -54,7 +57,7 @@ export default class SideBarFavoritesContent extends React.Component<Props, Stat
                     </div>
                 </div>
             <div className="sidebar-content-list">
-                <div className="content d-flex flex-column">
+                <div className="content d-flex">
                     <div className="items scrollbar flex-shrink-1">
                         { this.state.isLoading &&
                             <LoadingSpinner/>

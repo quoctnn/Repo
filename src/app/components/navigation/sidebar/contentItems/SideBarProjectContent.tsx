@@ -26,7 +26,8 @@ type State = {
 }
 
 type OwnProps = {
-    onClose:(e:React.MouseEvent) => void
+    reverse?: boolean
+    onClose?:(e:React.MouseEvent) => void
     onCreate:(e:React.MouseEvent) => void
 }
 
@@ -59,6 +60,10 @@ class SideBarProjectContent extends React.Component<Props, State> {
             this.state.sorting != prevState.sorting) {
             this.setState({isLoading: true})
             this.getProjects()
+        }
+        const projectList = document.getElementById("projects")
+        if (projectList && this.props.reverse) {
+            projectList.scrollTo({top: projectList.scrollHeight})
         }
     }
     shouldComponentUpdate = (nextProps: Props, nextState:State) => {
@@ -106,6 +111,8 @@ class SideBarProjectContent extends React.Component<Props, State> {
 
     render = () => {
         var projects = this.state.projects
+        if (this.props.reverse)
+            projects = projects.reverse()
         if (this.state.query && this.state.query.length > 0) {
             projects = projects.filter(projects => projects.name.toLowerCase().includes(this.state.query.trim().toLowerCase()))
         }
@@ -124,7 +131,7 @@ class SideBarProjectContent extends React.Component<Props, State> {
                 }
             </div>
             <div className="sidebar-content-list">
-                <div className="content d-flex flex-column">
+                <div className="content d-flex">
                     <div className="filter-container d-flex">
                         <div className="search flex-grow-1">
                             <SearchBar onSearchQueryChange={this.searchChanged}/>
@@ -133,7 +140,7 @@ class SideBarProjectContent extends React.Component<Props, State> {
                             <DropDownMenu className="sorting-dropdown" triggerClass="fa fa-chevron-down sorting-trigger" triggerTitle={ProjectSorting.translatedText(this.state.sorting)} items={this.getSortingDropdownItems}></DropDownMenu>
                         </div>
                     </div>
-                    <div className="items scrollbar flex-shrink-1">
+                    <div id="projects" className="items scrollbar flex-shrink-1">
                         { this.state.isLoading &&
                             <LoadingSpinner/>
                             ||

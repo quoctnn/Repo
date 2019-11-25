@@ -26,7 +26,8 @@ type State = {
 }
 
 type OwnProps = {
-    onClose:(e:React.MouseEvent) => void
+    reverse?: boolean
+    onClose?:(e:React.MouseEvent) => void
 }
 
 type ReduxStateProps = {
@@ -54,6 +55,10 @@ class SideBarCommunityContent extends React.Component<Props, State> {
 
     componentDidUpdate = (prevProps:Props, prevState:State) => {
         if (prevState.sorting != this.state.sorting) this.getCommunities();
+        const communityList = document.getElementById("communities")
+        if (communityList && this.props.reverse) {
+            communityList.scrollTo({top: communityList.scrollHeight})
+        }
     }
 
     shouldComponentUpdate = (nextProps: Props, nextState:State) => {
@@ -118,6 +123,8 @@ class SideBarCommunityContent extends React.Component<Props, State> {
         const selected = this.props.contextData.community
         const canSetMain = !this.props.authenticatedUser.is_anonymous && ((!active && selected) || (selected && selected.id != active.id))
         var communities = this.state.communities
+        if (this.props.reverse)
+            communities = communities.reverse()
         if (this.state.query && this.state.query.length > 0) {
             communities = communities.filter(community => community.name.toLowerCase().includes(this.state.query.trim().toLowerCase()))
         }
@@ -136,7 +143,7 @@ class SideBarCommunityContent extends React.Component<Props, State> {
                 }
             </div>
             <div className="sidebar-content-list">
-                <div className="content d-flex flex-column">
+                <div className="content d-flex">
                     <div className="filter-container d-flex">
                         <div className="search flex-grow-1">
                             <SearchBar onSearchQueryChange={this.searchChanged}/>
@@ -145,7 +152,7 @@ class SideBarCommunityContent extends React.Component<Props, State> {
                             <DropDownMenu className="sorting-dropdown" triggerClass="fa fa-chevron-down sorting-trigger" triggerTitle={this.getSortingTriggerTitle()} items={this.getSortingDropdownItems}></DropDownMenu>
                         </div>
                     </div>
-                    <div className="items scrollbar flex-shrink-1">
+                    <div id="communities" className="items scrollbar flex-shrink-1">
                         { this.state.isLoading &&
                             <LoadingSpinner/>
                             ||

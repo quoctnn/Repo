@@ -21,11 +21,11 @@ class EndpointSelector extends React.PureComponent<Props, {}> {
 
     render() {
         return (
-            <div className={"settings-item endpoint-selector"}>
-                <div>{translate("Api Endpoint")}</div>
+            <div className={"d-flex settings-item endpoint-selector"}>
+                <div className="settings-item-title flex-grow-1">{translate("Api Endpoint")}</div>
                 <div className="dropdown">
                     <button
-                    className="btn btn-secondary dropdown-toggle text-truncate pull-right"
+                    className="btn btn-secondary dropdown-toggle text-truncate"
                     type="button"
                     id="dropdownMenuButton"
                     data-toggle="dropdown"

@@ -19,7 +19,8 @@ type State = {
 }
 
 type OwnProps = {
-    onClose: (e: React.MouseEvent) => void
+    reverse?: boolean
+    onClose?: (e: React.MouseEvent) => void
 }
 
 type ReduxStateProps = {
@@ -40,6 +41,19 @@ class SideBarContactsContent extends React.Component<Props, State> {
         }
     }
 
+    componentDidMount = () => {
+        const contactList = document.getElementById("contacts")
+        if (contactList && this.props.reverse) {
+            contactList.scrollTo({top: contactList.scrollHeight})
+        }
+    }
+
+    componentDidUpdate = (prevProps: Props, prevState: State) => {
+        const contactList = document.getElementById("contacts")
+        if (contactList && this.props.reverse) {
+            contactList.scrollTo({top: contactList.scrollHeight})
+        }
+    }
 
     shouldComponentUpdate = (nextProps: Props, nextState: State) => {
         const search = this.state.query != nextState.query
@@ -55,6 +69,8 @@ class SideBarContactsContent extends React.Component<Props, State> {
     render = () => {
         var contacts = this.props.contacts
         contacts.sort(UserStatus.contactsSort)
+        if (this.props.reverse)
+            contacts = contacts.reverse();
         if (this.state.query && this.state.query.length > 0) {
             contacts = contacts.filter(user => user.slug_name.includes(this.state.query.trim().toLowerCase()))
         }
@@ -70,11 +86,11 @@ class SideBarContactsContent extends React.Component<Props, State> {
                 </div>
             </div>
             <div className="sidebar-content-list">
-                <div className="content d-flex flex-column">
+                <div className="content d-flex">
                     <div className="search">
                         <SearchBar onSearchQueryChange={this.searchChanged}/>
                     </div>
-                    <div className="items scrollbar flex-shrink-1">
+                    <div id="contacts" className="items scrollbar flex-shrink-1">
                         {this.state.isLoading &&
                             <LoadingSpinner />
                             ||

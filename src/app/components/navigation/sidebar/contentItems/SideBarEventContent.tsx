@@ -28,7 +28,8 @@ type State = {
 }
 
 type OwnProps = {
-    onClose:(e:React.MouseEvent) => void
+    reverse?: boolean
+    onClose?:(e:React.MouseEvent) => void
     onCreate:(e:React.MouseEvent) => void
 }
 
@@ -65,6 +66,10 @@ class SideBarEventContent extends React.Component<Props, State> {
         }
         if (this.state.parent != prevState.parent) {
             this.getEvents()
+        }
+        const eventList = document.getElementById("events")
+        if (eventList && this.props.reverse) {
+            eventList.scrollTo({top: eventList.scrollHeight})
         }
     }
     shouldComponentUpdate = (nextProps: Props, nextState:State) => {
@@ -136,6 +141,8 @@ class SideBarEventContent extends React.Component<Props, State> {
 
     render = () => {
         var events = this.state.events
+        if (this.props.reverse)
+            events = events.reverse();
         if (this.state.query && this.state.query.length > 0) {
             events = events.filter(events => events.name.toLowerCase().includes(this.state.query.trim().toLowerCase()))
         }
@@ -161,7 +168,7 @@ class SideBarEventContent extends React.Component<Props, State> {
                 }
             </div>
             <div className="sidebar-content-list">
-                <div className="content d-flex flex-column">
+                <div className="content d-flex">
                     <div className="filter-container d-flex">
                         <div className="search flex-grow-1">
                             <SearchBar onSearchQueryChange={this.searchChanged}/>
@@ -170,7 +177,7 @@ class SideBarEventContent extends React.Component<Props, State> {
                             <DropDownMenu className="sorting-dropdown" triggerClass="fa fa-chevron-down sorting-trigger" triggerTitle={EventSorting.translatedText(this.state.sorting)} items={this.getSortingDropdownItems}></DropDownMenu>
                         </div>
                     </div>
-                    <div className="items scrollbar flex-shrink-1">
+                    <div id="events" className="items scrollbar flex-shrink-1">
                         { this.state.isLoading &&
                             <LoadingSpinner/>
                             ||

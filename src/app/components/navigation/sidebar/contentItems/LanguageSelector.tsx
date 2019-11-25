@@ -22,7 +22,7 @@ class LanguageSelector extends React.PureComponent<Props, {}> {
     render() {
         return (
             <div className={"d-flex settings-item language-selector"}>
-                <div className="flex-grow-1">{translate("common.language")}</div>
+                <div className="settings-item-title flex-grow-1">{translate("common.language")}</div>
                 <div className="dropdown">
                     <button
                     className="btn btn-secondary dropdown-toggle text-truncate"

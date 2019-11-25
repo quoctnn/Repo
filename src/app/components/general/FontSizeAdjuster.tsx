@@ -33,7 +33,7 @@ class FontSizeAdjusterComponent extends React.Component<Props, {}> {
         const decrease = nextDown(this.props.fontSize)
         const up = !!increase ? this.setSize(increase) : undefined
         const down = !!decrease ? this.setSize(decrease) : undefined
-        return <div className="d-flex align-items-center">
+        return <div className="font-size-adjust d-flex align-items-center">
                 <Button disabled={!decrease} onClick={down} size="sm" color="link"><i className="fas fa-font"></i></Button>
                 {this.props.fontSize}%
                 <Button disabled={!increase} onClick={up} color="link"><i className="fas fa-font"></i></Button>

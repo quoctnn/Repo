@@ -24,7 +24,8 @@ type State = {
 }
 
 type OwnProps = {
-    onClose: (e: React.MouseEvent) => void
+    reverse?: boolean
+    onClose?: (e: React.MouseEvent) => void
 }
 
 type ReduxStateProps = {
@@ -54,6 +55,11 @@ class SideBarFilesContent extends React.Component<Props, State> {
             this.setState({isLoading: true, subtitle:this.props.contextData.community ? this.props.contextData.community.name : undefined})
             this.getFiles()
         }
+        const fileList = document.getElementById("files")
+        if (fileList && this.props.reverse) {
+            fileList.scrollTo({top: fileList.scrollHeight})
+        }
+
     }
 
     shouldComponentUpdate = (nextProps: Props, nextState: State) => {
@@ -80,6 +86,8 @@ class SideBarFilesContent extends React.Component<Props, State> {
 
     render = () => {
         var files = this.state.files.sort((a, b) => Date.parse(a.created_at) - Date.parse(b.created_at))
+        if (this.props.reverse)
+            files = files.reverse()
         if (this.state.query && this.state.query.length > 0) {
             files = files.filter(file => file.filename.toLowerCase().includes(this.state.query.trim().toLowerCase()))
         }
@@ -95,11 +103,11 @@ class SideBarFilesContent extends React.Component<Props, State> {
                 </div>
             </div>
             <div className="sidebar-content-list">
-                <div className="content d-flex flex-column">
+                <div className="content d-flex">
                     <div className="search">
                         <SearchBar onSearchQueryChange={this.searchChanged}/>
                     </div>
-                    <div className="items scrollbar flex-shrink-1">
+                    <div id="files" className="items scrollbar flex-shrink-1">
                         {this.state.isLoading &&
                             <LoadingSpinner />
                             ||

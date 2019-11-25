@@ -27,8 +27,8 @@ export default class SideBarSettingsItem extends React.Component<Props, State> {
         if (this.props.index) {
             const menuItem:MenuItem = {
                 index: this.props.index,
-                title: "sidebar.settings.title",
-                subtitle: "sidebar.settings.subtitle",
+                title: translate("sidebar.settings.title"),
+                subtitle: translate("sidebar.settings.subtitle"),
                 content: <SideBarSettingsContent/>
             }
             this.props.addMenuItem(menuItem)
@@ -55,4 +55,3 @@ export default class SideBarSettingsItem extends React.Component<Props, State> {
         )
     }
 }
-

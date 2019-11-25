@@ -5,11 +5,13 @@ import LanguageSelector from "./LanguageSelector";
 import EndpointSelector from "./EndpointSelector";
 import "./SideBarSettingsContent.scss";
 import { Settings } from '../../../../utilities/Settings';
+import FontSizeSelector from "./FontSizeSelector";
 
 type State = {
 }
 
 type OwnProps = {
+    onClose?:(e:React.MouseEvent) => void
 }
 
 type Props = OwnProps
@@ -39,11 +41,14 @@ export default class SideBarSettingsContent extends React.Component<Props, State
                 </div>
             </div>
             <div className="sidebar-content-list" style={{marginRight: "8px"}}>
-                <ThemeSelector/>
-                <LanguageSelector/>
-                { !Settings.isProduction &&
-                    <EndpointSelector/>
-                }
+                <div className="content d-flex">
+                    <FontSizeSelector/>
+                    <ThemeSelector/>
+                    <LanguageSelector/>
+                    { !Settings.isProduction &&
+                        <EndpointSelector/>
+                    }
+                </div>
             </div>
         </>)
     }

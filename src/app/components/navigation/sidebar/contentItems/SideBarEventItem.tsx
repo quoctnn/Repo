@@ -20,7 +20,6 @@ type OwnProps = {
     active:string
     addMenuItem:(item:MenuItem) => void
     onClick:(e:React.MouseEvent) => void
-    onClose:(e:React.MouseEvent) => void
 }
 
 type Props = OwnProps & ContextDataProps
@@ -41,7 +40,7 @@ class SideBarEventItem extends React.Component<Props, State> {
                 index: this.props.index,
                 title: translate("common.event.events"),
                 subtitle: undefined,
-                content: <SideBarEventContent onClose={this.props.onClose} onCreate={this.createNew}/>,
+                content: <SideBarEventContent onCreate={this.createNew}/>,
             }
             this.setState({menuItem: menuItem})
         }

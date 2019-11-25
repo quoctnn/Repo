@@ -20,7 +20,6 @@ type OwnProps = {
     active:string
     addMenuItem:(item:MenuItem) => void // This should be a menuItem
     onClick:(e:React.MouseEvent) => void
-    onClose:(e:React.MouseEvent) => void
 }
 
 type Props = OwnProps & ContextDataProps
@@ -41,7 +40,7 @@ class SideBarGroupItem extends React.Component<Props, State> {
                 index: this.props.index,
                 title: translate("common.group.groups"),
                 subtitle: undefined,
-                content: <SideBarGroupContent onClose={this.props.onClose} onCreate={this.createNew}/>,
+                content: <SideBarGroupContent onCreate={this.createNew}/>,
             }
             this.setState({menuItem: menuItem})
         }

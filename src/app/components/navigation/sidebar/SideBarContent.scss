@@ -63,11 +63,14 @@
     font-size:1.2rem;
     font-weight: 400;
     height: 100%;
+    .content {
+        flex-direction: column;
+    }
 }
 
 .sidebar-content .sidebar-content-header .title-button{
     margin-left: 8px;
-    color: white;
+    @include var(color, button-color);
 }
 
 .sidebar-content .sidebar-content-header .title-button .title-button-text{

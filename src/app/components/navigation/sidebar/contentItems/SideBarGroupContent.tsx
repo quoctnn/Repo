@@ -27,7 +27,8 @@ type State = {
 }
 
 type OwnProps = {
-    onClose: (e: React.MouseEvent) => void
+    reverse?: boolean
+    onClose?: (e: React.MouseEvent) => void
     onCreate: (e: React.MouseEvent) => void
 }
 
@@ -64,6 +65,10 @@ class SideBarGroupContent extends React.Component<Props, State> {
         }
         if (this.state.parent != prevState.parent) {
             this.getGroups()
+        }
+        const groupList = document.getElementById("groups")
+        if (groupList && this.props.reverse) {
+            groupList.scrollTo({top: groupList.scrollHeight})
         }
     }
     shouldComponentUpdate = (nextProps: Props, nextState:State) => {
@@ -118,6 +123,8 @@ class SideBarGroupContent extends React.Component<Props, State> {
     }
 
     goBack = (e?: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
         this.setState({isLoading: true})
         if (this.state.parent) {
             if (this.state.parent.parent) {
@@ -136,6 +143,8 @@ class SideBarGroupContent extends React.Component<Props, State> {
 
     render = () => {
         var groups = this.state.groups
+        if (this.props.reverse)
+            groups = groups.reverse()
         if (this.state.query && this.state.query.length > 0) {
             groups = groups.filter(groups => groups.name.toLowerCase().includes(this.state.query.trim().toLowerCase()))
         }
@@ -161,7 +170,7 @@ class SideBarGroupContent extends React.Component<Props, State> {
                 }
             </div>
             <div className="sidebar-content-list">
-                <div className="content d-flex flex-column">
+                <div className="content d-flex">
                     <div className="filter-container d-flex">
                         <div className="search flex-grow-1">
                             <SearchBar onSearchQueryChange={this.searchChanged}/>
@@ -170,7 +179,7 @@ class SideBarGroupContent extends React.Component<Props, State> {
                             <DropDownMenu className="sorting-dropdown" triggerClass="fa fa-chevron-down sorting-trigger" triggerTitle={GroupSorting.translatedText(this.state.sorting)} items={this.getSortingDropdownItems}></DropDownMenu>
                         </div>
                     </div>
-                    <div className="items scrollbar flex-shrink-1">
+                    <div id="groups" className="items scrollbar flex-shrink-1">
                         { this.state.isLoading &&
                             <LoadingSpinner/>
                             ||

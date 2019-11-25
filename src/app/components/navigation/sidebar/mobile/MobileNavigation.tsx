@@ -1,24 +1,25 @@
-import "./SideBarNavigation.scss";
+import "./MobileNavigation.scss";
 import { withRouter, RouteComponentProps } from 'react-router';
 import * as React from "react";
 import classnames from 'classnames';
-import { uniqueId } from '../../../utilities/Utilities';
-import SideBarSettingsItem from './contentItems/SideBarSettingsItem';
-import SideBarContent from "./SideBarContent";
-import Avatar from '../../general/Avatar';
-import { ReduxState } from "../../../redux";
-import { CommunityManager } from '../../../managers/CommunityManager';
-import { Community } from '../../../types/intrasocial_types';
+import { uniqueId } from '../../../../utilities/Utilities';
+import SideBarSettingsItem from '../contentItems/SideBarSettingsItem';
+import SideBarContent from "../SideBarContent";
+import Avatar from '../../../general/Avatar';
+import { ReduxState } from "../../../../redux";
+import { CommunityManager } from '../../../../managers/CommunityManager';
+import { Community } from '../../../../types/intrasocial_types';
 import { connect } from 'react-redux';
-import { ContextMenuItem, MenuItem } from '../../../types/menuItem';
-import SideBarCommunityItem from "./contentItems/SideBarCommunityItem";
-import SideBarGroupItem from './contentItems/SideBarGroupItem';
-import SideBarEventItem from './contentItems/SideBarEventItem';
-import SideBarProjectItem from './contentItems/SideBarProjectItem';
-import SideBarFavoriteItem from "./contentItems/SideBarFavoritesItem";
-import SideBarFilesItem from './contentItems/SideBarFilesItem';
-import SideBarContactsItem from "./contentItems/SideBarContactsItem";
+import { ContextMenuItem, MenuItem } from '../../../../types/menuItem';
 import { Link } from "react-router-dom";
+import SideBarCommunityItem from "../contentItems/SideBarCommunityItem";
+import SideBarFavoriteItem from "../contentItems/SideBarFavoritesItem";
+import SideBarGroupItem from "../contentItems/SideBarGroupItem";
+import SideBarProjectItem from "../contentItems/SideBarProjectItem";
+import SideBarEventItem from "../contentItems/SideBarEventItem";
+import SideBarFilesItem from "../contentItems/SideBarFilesItem";
+import SideBarContactsItem from "../contentItems/SideBarContactsItem";
+import MobileContent from "./MobileContent";
 
 type State = {
     active: string
@@ -30,12 +31,13 @@ type ReduxStateProps = {
 }
 
 type OwnProps = {
-
+    visible: boolean
+    hideMenu?: (e: React.MouseEvent) => void
 }
 
 type Props = OwnProps & RouteComponentProps & ReduxStateProps
 
-class SideBarNavigation extends React.Component<Props, State> {
+class MobileNavigation extends React.Component<Props, State> {
     private uniqueClass = "has-side-menu-" + uniqueId();
     private contentRef = React.createRef<HTMLDivElement>()
     constructor(props: Props) {
@@ -99,13 +101,32 @@ class SideBarNavigation extends React.Component<Props, State> {
         this.setState({ menuItems: currentItems })
     }
     render() {
-        const css = classnames("sidebar-root")
+        if (!this.props.visible) return null;
+        const css = classnames("mobile-menu-root")
         const community = this.props.activeCommunity
         return (
             <div ref={this.contentRef}>
                 <div className={css}>
+                    <SideBarCommunityItem addMenuItem={this.addItem} index={"community-menu"} active={this.state.active} onClick={this.selectionChanged} />
+                    <SideBarFavoriteItem addMenuItem={this.addItem} index={"starred-menu"} active={this.state.active} onClick={this.selectionChanged}  />
+                    <SideBarGroupItem addMenuItem={this.addItem} index={"groups-menu"} active={this.state.active} onClick={this.selectionChanged} />
+                    <SideBarProjectItem addMenuItem={this.addItem} index={"projects-menu"} active={this.state.active} onClick={this.selectionChanged} />
+                    <SideBarEventItem addMenuItem={this.addItem} index={"events-menu"} active={this.state.active} onClick={this.selectionChanged} />
+                    <SideBarFilesItem addMenuItem={this.addItem} index={"files-menu"} active={this.state.active} onClick={this.selectionChanged} />
+                    {/* <SideBarItem title="Notes" addMenuItem={this.addItem} index={"notes-menu"} active={this.state.active} onClick={this.selectionChanged} />
+                    {this.renderSpacing(true)} */}
+                    <SideBarContactsItem addMenuItem={this.addItem} index={"contacts-menu"} active={this.state.active} onClick={this.selectionChanged} />
+                    <SideBarSettingsItem addMenuItem={this.addItem} index={"settings-menu"} active={this.state.active} onClick={this.selectionChanged} />
+                    {/* <div className="mobile-menu-separator"></div>
+                    <SideBarItem title="Admin" addMenuItem={this.addItem} index={"admin-menu"} active={this.state.active} onClick={this.selectionChanged} />
+                    {this.renderSpacing(true)}
+                    <SideBarItem title="Roles" addMenuItem={this.addItem} index={"roles-menu"} active={this.state.active} onClick={this.selectionChanged} />
+                    {this.renderSpacing(true)}
+                    <SideBarItem title="Stats" addMenuItem={this.addItem} index={"stats-menu"} active={this.state.active} onClick={this.selectionChanged} /> */}
+                    <div className="mobile-menu-header-spacing"/>
+                    <div className="mobile-menu-separator"/>
                     {community &&
-                        <Link className="sidebar-root-header" to={community.uri}>
+                        <Link className="mobile-menu-root-header" to={community.uri}>
                             <div className="community-avatar text-center">
                                 <Avatar size={40} image={community.avatar_thumbnail}></Avatar>
                             </div>
@@ -114,32 +135,8 @@ class SideBarNavigation extends React.Component<Props, State> {
                             </div>
                         </Link>
                     }
-                    <div className="sidebar-separator"></div>
-                    <SideBarCommunityItem addMenuItem={this.addItem} index={"community-menu"} active={this.state.active} onClick={this.selectionChanged} />
-                    {this.renderSpacing(false)}
-                    <SideBarFavoriteItem addMenuItem={this.addItem} index={"starred-menu"} active={this.state.active} onClick={this.selectionChanged}  />
-                    {this.renderSpacing(true)}
-                    <SideBarGroupItem addMenuItem={this.addItem} index={"groups-menu"} active={this.state.active} onClick={this.selectionChanged} />
-                    {this.renderSpacing(true)}
-                    <SideBarProjectItem addMenuItem={this.addItem} index={"projects-menu"} active={this.state.active} onClick={this.selectionChanged} />
-                    {this.renderSpacing(true)}
-                    <SideBarEventItem addMenuItem={this.addItem} index={"events-menu"} active={this.state.active} onClick={this.selectionChanged} />
-                    {this.renderSpacing(false)}
-                    <SideBarFilesItem addMenuItem={this.addItem} index={"files-menu"} active={this.state.active} onClick={this.selectionChanged} />
-                    {this.renderSpacing(true)}
-                    {/* <SideBarItem title="Notes" addMenuItem={this.addItem} index={"notes-menu"} active={this.state.active} onClick={this.selectionChanged} />
-                    {this.renderSpacing(true)} */}
-                    <SideBarContactsItem addMenuItem={this.addItem} index={"contacts-menu"} active={this.state.active} onClick={this.selectionChanged} />
-                    {this.renderSpacing(true)}
-                    <SideBarSettingsItem addMenuItem={this.addItem} index={"settings-menu"} active={this.state.active} onClick={this.selectionChanged} />
-                    {/* <div className="sidebar-separator"></div>
-                    <SideBarItem title="Admin" addMenuItem={this.addItem} index={"admin-menu"} active={this.state.active} onClick={this.selectionChanged} />
-                    {this.renderSpacing(true)}
-                    <SideBarItem title="Roles" addMenuItem={this.addItem} index={"roles-menu"} active={this.state.active} onClick={this.selectionChanged} />
-                    {this.renderSpacing(true)}
-                    <SideBarItem title="Stats" addMenuItem={this.addItem} index={"stats-menu"} active={this.state.active} onClick={this.selectionChanged} /> */}
                 </div>
-                <SideBarContent menuItems={this.state.menuItems} active={this.state.active} onClose={this.closeMenu}/>
+                <MobileContent menuItems={this.state.menuItems} active={this.state.active} onClose={this.closeMenu} onHide={this.props.hideMenu}/>
             </div>
         )
     }
@@ -151,4 +148,4 @@ const mapStateToProps = (state: ReduxState, ownProps: OwnProps): ReduxStateProps
 }
 }
 
-export default withRouter(connect<ReduxStateProps, {}, OwnProps>(mapStateToProps, null)(SideBarNavigation))
+export default withRouter(connect<ReduxStateProps, {}, OwnProps>(mapStateToProps, null)(MobileNavigation))
