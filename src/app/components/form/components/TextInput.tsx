@@ -26,12 +26,15 @@ export class TextInput extends React.Component<TextInputProps, TextInputState> i
             return null
         return this.state.value
     }
+    clear = () => {
+        this.setState({value: undefined})
+    }
     isValid = () => {
         const performValidation = this.props.hasSubmitted || this.state.valueSet
         return performValidation && this.props.isRequired ? this.state.value.trim().length > 0 : true
     }
     getErrors = () => {
-        const performValidation = (this.props.hasSubmitted || this.state.valueSet) && this.props.isRequired
+        const performValidation = (this.props.hasSubmitted || this.state.valueSet)
         if (!performValidation)
             return null
         let e = this.props.errors && this.props.errors([this.props.id]) || {}

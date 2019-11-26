@@ -922,6 +922,14 @@ export abstract class ApiClient
             callback(null, status, new RequestErrorData(request.responseJSON, error))
         })
     }
+    static createTask(data:Object, callback:ApiClientCallback<Task>) {
+        let url = Constants.apiRoute.taskUrl;
+        AjaxRequest.post(url, data, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, new RequestErrorData(request.responseJSON, error))
+        })
+    }
     static getEvent(eventId:string|number, callback:ApiClientCallback<Event>)
     {
         let url = Constants.apiRoute.eventDetailUrl(eventId)

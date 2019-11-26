@@ -17,6 +17,7 @@ import { CommonModuleProps } from '../Module';
 import { withContextData, ContextDataProps } from '../../hoc/WithContextData';
 import TaskListItem2 from './TaskListItem2';
 import { nameofFactory } from '../../utilities/Utilities';
+import TaskCreator from './TaskCreator';
 
 type OwnProps = {
     breakpoint: ResponsiveBreakpoint
@@ -188,6 +189,10 @@ class TasksModule extends React.Component<Props, State> {
         const task = this.taskList.current.getItemById(taskId)
         this.navigateToAction(task, action, extra, completion)
     }
+    newTask = () => {
+        this.taskList.current.reload();
+    }
+
     fetchTasks = (offset: number, completion: (items: PaginationResult<Task>) => void) => {
         const data = this.getContextData()
         const project = data.project && data.project.id
@@ -225,6 +230,7 @@ class TasksModule extends React.Component<Props, State> {
         const project = this.props.contextData.project
         const projectMembers = project.members || []
         return <>
+            <TaskCreator onCreate={this.newTask}/>
             <TaskMenu projectMembers={projectMembers} data={this.state.menuData} onUpdate={this.menuDataUpdated} disableContextSearch={disableContextSearch} />
              <ListComponent<Task>
             loadMoreOnScroll={!this.props.showLoadMore}
