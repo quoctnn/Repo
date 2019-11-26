@@ -49,10 +49,11 @@
     margin: 4px 8px;
 }
 
-.task-item-hover-container .task-hover-card {
+.task-hover-card {
     @include var(background-color, body-background);
     @include var(border-color, border-color-default);
-    min-width: 95%;
+    pointer-events: none;
+    min-width: 400px;
     border: 2px solid;
     border-radius: 5px;
     visibility: hidden;
@@ -61,7 +62,7 @@
     z-index: 1049;
 }
 
-.task-item-hover-container .task-hover-card .state-info {
+.task-hover-card .state-info {
     display: flex;
     font-size: 0.9rem;
     font-weight: 600;
@@ -78,7 +79,7 @@
     }
 }
 
-.task-item-hover-container .task-hover-card .task-details {
+.task-hover-card .task-details {
     font-size: 0.9rem;
     margin: 4px;
     display: flex;
@@ -90,11 +91,11 @@
     }
 }
 
-.task-item-hover-container .task-hover-card .task-description {
+.task-hover-card .task-description {
     margin: 4px;
 }
 
-.task-item-hover-container .task-hover-card .task-user-details {
+.task-hover-card .task-user-details {
     display: flex;
     font-size: 0.9rem;
     font-weight: 600;
@@ -107,7 +108,7 @@
 
     }
 }
-.task-item-hover-container .task-hover-card .task-hover-card-footer {
+.task-hover-card .task-hover-card-footer {
     display: flex;
     font-size: 0.9rem;
     font-weight: 600;

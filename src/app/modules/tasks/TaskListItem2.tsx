@@ -13,6 +13,7 @@ import UserProfileAvatar from '../../components/general/UserProfileAvatar';
 import { ObjectAttributeTypeExtension, StatusBadgeList } from '../../components/status/StatusBadgeList';
 import Moment from 'react-moment';
 import { DateFormat, uniqueId } from '../../utilities/Utilities';
+import ReactDOM = require('react-dom');
 
 type OwnProps = {
     communityId: number
@@ -22,24 +23,55 @@ type OwnProps = {
 }
 type State = {
     hover: boolean
+    mouseY: number
 }
 type Props = OwnProps
 export default class TaskListItem2 extends React.Component<Props, State> {
+    private itemRef = React.createRef<HTMLDivElement>();
     constructor(props: Props) {
         super(props);
         this.state = {
-            hover: false
+            hover: false,
+            mouseY: 0
         }
     }
-    showHoverCard = () => {
-        this.setState({ hover: true })
+
+    showHoverCard = (e: React.MouseEvent) => {
+        this.setState({ hover: true, mouseY: e.pageY })
     }
+
     removeHoverCard = () => {
         this.setState({ hover: false })
     }
+
     shouldComponentUpdate = (nextProps: Props, nextState: State) => {
-        return this.state.hover != nextState.hover
+        const hover = this.state.hover != nextState.hover
+        const mouse = this.state.mouseY != nextState.mouseY
+        return hover || mouse
     }
+
+    componentDidUpdate = (prevProps: Props, prevState: State) => {
+        if (this.state.hover) {
+            const height = document.getElementById("hover-card").hasChildNodes() ? document.getElementById("hover-card").children[0].clientHeight : 150
+            var taskCard = this.renderTaskCard()
+            const style = taskCard.props.style
+            if (height + this.state.mouseY + 50 > window.pageYOffset + window.innerHeight) {
+                style["bottom"] = window.innerHeight - this.state.mouseY + 30
+                taskCard = React.cloneElement(taskCard, {style})
+            } else {
+                style["top"] = this.state.mouseY + 30
+                taskCard = React.cloneElement(taskCard, {style})
+            }
+            ReactDOM.render(taskCard, document.getElementById("hover-card"))
+        } else if (!this.state.hover && prevState.hover) {
+            ReactDOM.render(null, document.getElementById("hover-card"))
+        }
+    }
+
+    componentWillUnmount = () => {
+        ReactDOM.render(null, document.getElementById("hover-card"))
+    }
+
     renderFooter = () => {
         const { task, user } = this.props
         return <>
@@ -85,9 +117,11 @@ export default class TaskListItem2 extends React.Component<Props, State> {
         const creator = ProfileManager.getProfileById(task.creator)
         const lastChanged = ProfileManager.getProfileById(task.latest_change_by)
         const estimatedTime: TimeSpent = { hours: task.estimated_hours || 0, minutes: task.estimated_minutes || 0 }
+        const itemRect = this.itemRef.current.getBoundingClientRect()
         const css = classnames("task-hover-card", { "visible": this.state.hover })
         return (
-            <div className={css} onClick={this.navigateToTask}>
+            <div className={css} onClick={this.navigateToTask} style={{left: itemRect.left, width: itemRect.width }
+            }>
                 <div className="state-info">
                     {task.priority &&
                         <div className="task-priority">
@@ -112,17 +146,17 @@ export default class TaskListItem2 extends React.Component<Props, State> {
                     </div>
                     {task.due_date &&
                         <div className="task-due-date">
-                            {translate("task.due_date.title")}: <Moment date={task.due_date} format={DateFormat.day}/>
+                            {translate("task.due_date.title")}: <Moment date={task.due_date} format={DateFormat.day} />
                         </div>
                     }
                 </div>
                 <div className="task-details">
-                    { task.attributes &&
+                    {task.attributes &&
                         <div className="task-attributes">{this.renderTaskAttributes(task)}</div>
                     }
                     {task.tags &&
                         <div className="task-tags">
-                            {task.tags.map((tag) => <Badge key={uniqueId()}className="tag" color="info">{tag}</Badge>)}
+                            {task.tags.map((tag) => <Badge key={uniqueId()} className="tag" color="info">{tag}</Badge>)}
                         </div>
                     }
                 </div>
@@ -185,8 +219,7 @@ export default class TaskListItem2 extends React.Component<Props, State> {
             {stateTooltip}
         </>
         const cn = classnames("task-list-item main-content-secondary-background")
-        return <div className="task-item-hover-container" onMouseEnter={this.showHoverCard} onMouseLeave={this.removeHoverCard}>
-            {this.renderTaskCard()}
+        return <div ref={this.itemRef} className="task-item-hover-container" onMouseMove={this.showHoverCard} onMouseLeave={this.removeHoverCard}>
             <GenericListItem onClick={this.navigateToTask}
                 className={cn}
                 header={header}
@@ -197,3 +230,4 @@ export default class TaskListItem2 extends React.Component<Props, State> {
         </div>
     }
 }
+//onMouseEnter={this.showHoverCard}

@@ -137,6 +137,7 @@ class Main extends React.Component<Props, State> {
             <div id="main">
                     <div id="main-content">
                         <ToastContainer />
+                        <div id="hover-card"/>
                         <div id="content-block" className="">
 
                             {!this.props.loaded &&
