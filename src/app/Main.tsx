@@ -165,7 +165,6 @@ class Main extends React.Component<Props, State> {
                                             <Route path={Routes.communityUrl(":communityname")} component={CommunityPage} exact={true} />
                                             <Route path={Routes.newsfeedUrl(":contextNaturalKey?", ":contextObjectId?")} component={NewsfeedPage} />
                                             <Route path={Routes.SIGNIN} component={Signin} />
-                                            <Route path={Routes.SIGNUP} component={Error404} />
                                             <Route path={Routes.SIGNOUT} component={Signout} />
                                             <Route path={Routes.ROOT} exact={true} component={DashboardPage} />
                                             <Route path={Routes.conversationUrl(":conversationId?")} exact={true} component={ConversationsPage} />

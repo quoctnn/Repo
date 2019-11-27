@@ -8,9 +8,10 @@ const resolveAbsolute = (relative:string) => {
 export default  {
     apiRoute: {
         login:"/api/v1/auth/oup/login/",
-        nativeLogin:"/api/v1/auth-oup/native-login/",
-        socialLogin:"/api/v1/auth-oup/social-login/",
-        gdprForm:"/api/v1/auth-oup/gdpr-form/",
+        nativeLogin:"/api/v1/auth/oup/native-login/",
+        socialLogin:"/api/v1/auth/oup/social-login/",
+        register:"/api/v1/auth/oup/register/",
+        gdprForm:"/api/v1/auth/oup/gdpr-form/",
 
         //calendar
         calendarItemDetailUrl: (id:number) => {
