@@ -9,7 +9,7 @@ import classnames from 'classnames';
 import { ActionMeta } from 'react-select/src/types';
 import { nullOrUndefined } from '../../../utilities/Utilities';
 export type InputOptionGroup = {
-    label:string 
+    label:string
     options:InputOption[]
 }
 export type SelectInputProps = {
@@ -98,7 +98,8 @@ export class SelectInput extends React.Component<SelectInputProps, SelectInputSt
                     <FormComponentErrorMessage className={cn} errors={errors} errorKey={this.props.id} />
                     <div className="">
                         <Select isDisabled={this.props.isDisabled}
-                        styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
+                        styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }),
+                                  option: base => ({ ...base, color: "black"}) }}
                         isMulti={false}
                         name={this.props.id}
                         value={selectedOption}

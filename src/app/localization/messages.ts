@@ -639,6 +639,7 @@ var translations = {
     "project.is_private.description":"Set as private",
     "sidebar.settings.title": "Settings",
     "sidebar.settings.subtitle": "Global user settings",
+    "sidebar.settings.font": "Font size",
     "sidebar.files.title": "Files",
     "sidebar.contacts.title":"Contacts",
 },
@@ -1282,6 +1283,7 @@ var translations = {
     "project.is_private.description":"Sett som privat",
     "sidebar.settings.title": "Innstillinger",
     "sidebar.settings.subtitle": "Globale brukerinstillinger",
+    "sidebar.settings.font": "Font størrelse",
     "sidebar.files.title": "Filer",
     "sidebar.contacts.title":"Kontakter",
 },
@@ -1935,6 +1937,7 @@ var translations = {
     "project.is_private.description":"Set as private",
     "sidebar.settings.title": "Settings",
     "sidebar.settings.subtitle": "Global user settings",
+    "sidebar.settings.font": "Font size",
     "sidebar.files.title": "Files",
     "sidebar.contacts.title":"Contacts",
   }

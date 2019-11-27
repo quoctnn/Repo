@@ -6,6 +6,7 @@ import { ProfileSelectorOption, ProfileOptionComponent, ProfileSingleValueCompon
 
 
 type Props = {
+    autoFocus?:boolean
     allowedProfiles:UserProfile[]
     selectedProfiles:UserProfile[]
     onValueChange:(selectedProfiles:UserProfile[]) => void
@@ -19,7 +20,7 @@ export class ProfileSelector extends React.PureComponent<Props, State> {
     constructor(props:Props)
     {
         super(props)
-        this.state = { 
+        this.state = {
 
             selectedOptions:props.selectedProfiles.map(ProfileSelectorOption.fromUserProfile),
             allowedOptions:props.allowedProfiles.map(ProfileSelectorOption.fromUserProfile)
@@ -34,23 +35,26 @@ export class ProfileSelector extends React.PureComponent<Props, State> {
             return { selectedOptions: vals }
         }, () => this.props.onValueChange(this.state.selectedOptions.map(this.optionToProfile).filter(p => !!p)))
     }
-    render() 
+    render()
     {
         const { selectedOptions, allowedOptions: allowedValues} = this.state;
+        const autoFocus = this.props.autoFocus == null ? true : this.props.autoFocus
         const cn = classnames("profile-selector")
         return(<div className={cn}>
-                <Select 
-                        styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
+                <Select
+                        styles={{ menuPortal: base => ({ ...base, zIndex: 9999, }),
+                                  option: base => ({ ...base, color: "black"}) }}
                         isMulti={true}
+                        menuColor="red"
                         name="profiles"
                         value={selectedOptions}
-                        menuPortalTarget={document.body} 
+                        menuPortalTarget={document.body}
                         onChange={this.onChange}
                         placeholder={this.props.placeholder}
                         isClearable={false}
                         closeMenuOnSelect={false}
                         classNamePrefix="select"
-                        autoFocus={true}
+                        autoFocus={autoFocus}
                         components={{ Option: ProfileOptionComponent, SingleValue:ProfileSingleValueComponent, MultiValueLabel:ProfileMultiValueLabel }}
                         options={allowedValues} />
                 </div>

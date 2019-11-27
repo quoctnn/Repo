@@ -9,6 +9,7 @@ import { UserProfile } from '../../../types/intrasocial_types';
 export type ProfileSelectInputProps = {
     allowedProfiles:UserProfile[]
     selectedProfiles:UserProfile[]
+    autoFocus?:boolean
     placeholder?:string
     description?:string
 } & FormComponentBaseProps
@@ -55,7 +56,8 @@ export class ProfileSelectInput extends React.Component<ProfileSelectInputProps,
             const users = profiles.map(p => p.id)
             return {value:users}
         }, () => {
-            this.props.onValueChanged(this.props.id, this.state.value, this.props.isRequired)
+            if (this.props.onValueChanged)
+                this.props.onValueChanged(this.props.id, this.state.value, this.props.isRequired)
         })
     }
     render = () => {
@@ -69,7 +71,7 @@ export class ProfileSelectInput extends React.Component<ProfileSelectInputProps,
                         <FormComponentRequiredMessage required={this.props.isRequired} />
                     </label>
                     <FormComponentErrorMessage className={cn} errors={errors} errorKey={this.props.id} />
-                    <ProfileSelector placeholder={this.props.placeholder} selectedProfiles={this.props.selectedProfiles} allowedProfiles={this.props.allowedProfiles} onValueChange={this.handleProfileSelectorChange} />
+                    <ProfileSelector autoFocus={this.props.autoFocus} placeholder={this.props.placeholder} selectedProfiles={this.props.selectedProfiles} allowedProfiles={this.props.allowedProfiles} onValueChange={this.handleProfileSelectorChange} />
                     {this.props.description && <div className="description" dangerouslySetInnerHTML={{__html:this.props.description}}></div>}
                 </InputGroup>
             </div>

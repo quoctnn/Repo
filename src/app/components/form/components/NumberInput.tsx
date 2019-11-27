@@ -6,17 +6,17 @@ import { FormComponentBaseProps } from '../definitions';
 import classnames from 'classnames';
 import { nullOrUndefined } from '../../../utilities/Utilities';
 
-export type TextInputProps = {
+export type NumberInputProps = {
     value: string
     placeholder?: string
 } & FormComponentBaseProps
 
-export type TextInputState = {
+export type NumberInputState = {
     value?: string
     valueSet?: boolean
 }
-export class TextInput extends React.Component<TextInputProps, TextInputState> implements FormComponentBase {
-    constructor(props: TextInputProps) {
+export class NumberInput extends React.Component<NumberInputProps, NumberInputState> implements FormComponentBase {
+    constructor(props: NumberInputProps) {
         super(props)
         this.state = {
             value: nullOrUndefined(this.props.value) ? "" : this.props.value.toString()
@@ -69,7 +69,7 @@ export class TextInput extends React.Component<TextInputProps, TextInputState> i
                     </label>
                 }
                 <div className="">
-                    <Input invalid={hasError} id={this.props.id} value={this.state.value} type="text" onChange={this.handleInputChange} placeholder={this.props.placeholder} />
+                    <Input type="number" invalid={hasError} id={this.props.id} value={this.state.value} onChange={this.handleInputChange} placeholder={this.props.placeholder} />
                     <FormComponentErrorMessage className={cn} errors={errors} errorKey={this.props.id} />
                 </div>
             </InputGroup>
