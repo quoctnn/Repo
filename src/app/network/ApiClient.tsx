@@ -1038,9 +1038,9 @@ export abstract class ApiClient
             callback(null, status, new RequestErrorData(request.responseJSON, error))
         })
     }
-    static apiRegister(firstName:string, lastName:string, email:string, password:string, gdpr_user_response:GDPRFormAnswers,callback:ApiClientCallback<any>)
+    static apiRegister(firstName:string, lastName:string, username:string, email:string, password:string, gdpr_user_response:GDPRFormAnswers,callback:ApiClientCallback<any>)
     {
-        const data = ApiClient.getQueryString({firstName, lastName, email, password, gdpr_user_response:gdpr_user_response && JSON.stringify(gdpr_user_response)})
+        const data = ApiClient.getQueryString({firstName, lastName, username, email, password, gdpr_user_response:gdpr_user_response && JSON.stringify(gdpr_user_response)})
         AjaxRequest.post(Constants.apiRoute.register, data, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {

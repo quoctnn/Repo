@@ -159,7 +159,7 @@ class Signin extends React.Component<Props, State> {
         const gdprUserResponse = this.state.gdprUserResponse
         if (gdprUserResponse) {
             this.setState(() => {return {gdprData: null}})
-            ApiClient.apiRegister(this.firstNameInput!.value, this.lastNameInput!.value, this.emailInput!.value, this.passwordInput!.value, gdprUserResponse, this.registerCallback)
+            ApiClient.apiRegister(this.firstNameInput!.value, this.lastNameInput!.value, this.usernameInput!.value, this.emailInput!.value, this.passwordInput!.value, gdprUserResponse, this.registerCallback)
         }
     }
     registerCallback = (data, status, error) => {
