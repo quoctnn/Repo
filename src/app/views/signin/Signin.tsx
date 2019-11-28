@@ -162,10 +162,35 @@ class Signin extends React.Component<Props, State> {
             ApiClient.apiRegister(this.firstNameInput!.value, this.lastNameInput!.value, this.usernameInput!.value, this.emailInput!.value, this.passwordInput!.value, gdprUserResponse, this.registerCallback)
         }
     }
-    registerCallback = (data, status, error) => {
-        console.log(data);
-        console.log(status);
-        console.log(error);
+    registerCallback = (data:any, status:string, errorData:RequestErrorData) => {
+        if(errorData)
+        {
+            if (errorData.detail && errorData.detail.extra && errorData.detail.extra.gdprInfo) {
+                // Email verification or GDPR consent not performed
+                this.setState(() => {
+                    return {gdprData:errorData.detail.extra, formErrors:{}, error:null}
+                })
+                return
+            }
+            else {
+                let error = (errorData.detail && errorData.detail.error_description) || errorData.data.non_field_errors
+                if (error) {
+                    // Invalid password on nativeLogin
+                    this.setState(() => {
+                        return {error, formErrors:{}}
+                    })
+                    return
+                }
+                else if(typeof errorData.data == "object") {
+                    this.setState(() => {
+                        return {formErrors:normalizeformErrors(errorData.data)}
+                    })
+                }
+
+            }
+            ToastManager.showRequestErrorToast(errorData)
+            return
+        }
     }
     continueSignin = (data:LoginContinuationData ) => {
         switch (data.provider) {
