@@ -1,119 +1,141 @@
-@import "../../Config";
+@import '../../Config';
 $bgcolorstop1: rgba(46, 103, 217, 0.8);
 $bgcolorstop2: rgba(114, 213, 114, 0.8);
-$darkBackgroundColor:#252330;
-$lightBackgroundColor:white;
-$primaryTextColor:#252330;
-$secondaryTextColor:#A2A2A2;
-$linkColor:#3990ff;
-$loginButtonColor:#063dee;
-#sign-in
-{
+$darkBackgroundColor: #252330;
+$lightBackgroundColor: white;
+$primaryTextColor: #252330;
+$secondaryTextColor: #a2a2a2;
+$linkColor: #3990ff;
+$loginButtonColor: #063dee;
+#sign-in {
     display: flex;
     height: 100%;
     position: relative;
     z-index: 1049;
-    .triangles-bg,.gradient-bg{
+    .triangles-bg,
+    .gradient-bg {
         position: absolute;
-        top:0;
+        top: 0;
         bottom: 0;
-        left:0;
-        right:0;
+        left: 0;
+        right: 0;
     }
-    .triangles-bg{
-        background-image: url("../../assets/triangles-grey.jpg");
+    .triangles-bg {
+        background-image: url('../../assets/triangles-grey.jpg');
         background-size: cover;
     }
-    .gradient-bg{
-        background-image: linear-gradient(to right, $bgcolorstop1, $bgcolorstop2);
+    .gradient-bg {
+        background-image: linear-gradient(
+            to right,
+            $bgcolorstop1,
+            $bgcolorstop2
+        );
     }
-    .footer{
+    .footer {
         margin: 16px;
         display: flex;
-        .locale-selector{
-            width:28px;
+        .locale-selector {
+            width: 28px;
             height: 20px;
             background-size: contain;
             cursor: pointer;
         }
-        .locale_nb{
-            background-image: url("../../assets/flag_nb.png");
+        .locale_nb {
+            background-image: url('../../assets/flag_nb.png');
         }
-        .locale_es{
-            background-image: url("../../assets/flag_es.png");
+        .locale_es {
+            background-image: url('../../assets/flag_es.png');
         }
     }
-    .s-link{
-        color:$linkColor
+    .s-link {
+        color: $linkColor;
     }
-    input[type="text"],input[type="password"]{
-        border:0;
+    input[type='text'],
+    input[type='password'] {
+        border: 0;
         padding-left: 0;
         border-radius: 0;
         outline: 0;
         box-shadow: none;
-        color:$primaryTextColor;
-        &:focus{
+        color: $primaryTextColor;
+        &:focus {
             box-shadow: none;
         }
     }
-    .form-input{
+    .form-input {
         border-bottom: 1px solid $secondaryTextColor;
-        .input-group-append{
+        .input-group-append {
             justify-content: center;
             align-items: center;
             margin: 0;
         }
     }
-    > .dashboard-container{
+    > .dashboard-container {
         display: flex;
         justify-content: center;
         align-items: center;
         position: relative;
     }
-    .sign-in-container{
+    .verify-email-container {
+        padding: 16px;
+        margin: 16px;
+        border: solid white 2px;
+        display: flex;
+        background-color: $darkBackgroundColor;
+        border-radius: 4px;
+        overflow: hidden;
+        .verify-email-text {
+            margin: auto 6px;
+            color: white;
+        }
+        .btn-clear {
+            background-color: unset;
+            border: none;
+        }
+    }
+    .sign-in-container {
         display: flex;
         background-color: $darkBackgroundColor;
         border-radius: 16px;
         flex-direction: column;
         overflow: hidden;
     }
-    .sign-in{
+    .sign-in {
         display: flex;
         flex-direction: row;
         height: auto;
         padding: 0;
         min-width: 850px;
         min-height: 517px;
-        > .left{
+        > .left {
             width: 60%;
             min-width: 400px;
             position: relative;
             padding-left: 40px;
             padding-top: 40px;
-            svg{
+            svg {
                 position: absolute;
-                top:0;
+                top: 0;
                 bottom: 0;
-                left:0;
-                right:0;
+                left: 0;
+                right: 0;
                 fill: $lightBackgroundColor;
                 height: 100%;
             }
-            .login-panel{
+            .login-panel {
                 max-width: 250px;
-                color:$primaryTextColor;
+                color: $primaryTextColor;
                 position: relative;
-                .title{
+                .title {
                     font-weight: bold;
                 }
-                .sub-title{
+                .sub-title {
                     font-size: 0.8rem;
                 }
-                .login-button{
+                .login-button {
                     width: auto;
                     background: $loginButtonColor;
-                    color:white;
+                    color: white;
                     border-radius: 19px;
                     height: 38px;
                     font-weight: bold;
@@ -121,20 +143,20 @@ $loginButtonColor:#063dee;
                     padding-left: 2em;
                     padding-right: 2em;
                 }
-                .error{
+                .error {
                     @include var(color, danger-color);
                 }
             }
-            .social-sign-in-panel{
+            .social-sign-in-panel {
                 max-width: 250px;
                 position: relative;
-                .social-login-title{
-                    color:$secondaryTextColor;
+                .social-login-title {
+                    color: $secondaryTextColor;
                     font-size: 1rem;
                     font-weight: 300;
                 }
-                .social-sign-on-button{
-                    color:$primaryTextColor;
+                .social-sign-on-button {
+                    color: $primaryTextColor;
                     display: flex;
                     justify-content: center;
                     align-items: center;
@@ -142,76 +164,79 @@ $loginButtonColor:#063dee;
                     box-shadow: 0 1px 0 0 rgba(194, 194, 194, 0.5);
                     border: 0;
                     margin-top: 0.5em;
-                    &:first-child{
-                        margin-top:0;
+                    &:first-child {
+                        margin-top: 0;
                     }
-                    .google-icon{
-                        background-image: url("../../assets/google-logo.png");
+                    .google-icon {
+                        background-image: url('../../assets/google-logo.png');
                     }
-                    .fb-icon{
-                        background-image: url("../../assets/fb-logo.png");
+                    .fb-icon {
+                        background-image: url('../../assets/fb-logo.png');
                     }
-                    .social-icon{
-                        width:20px;
+                    .social-icon {
+                        width: 20px;
                         height: 20px;
                         background-size: contain;
                         margin-right: 1em;
                     }
-
                 }
             }
         }
-        > .right{
+        > .right {
             text-align: right;
             min-width: 40%;
             padding-right: 40px;
             padding-top: 40px;
             max-width: 400px;
-            .platforms-description{
+            .platforms-description {
                 font-size: 0.8em;
                 margin-top: 1em;
             }
-            .logo{
+            .logo {
                 width: 250px;
-                #signin_gradient{
-                    .first-stop{
+                #signin_gradient {
+                    .first-stop {
                         stop-color: $bgcolorstop1;
                     }
-                    .last-stop{
+                    .last-stop {
                         stop-color: $bgcolorstop2;
                     }
                 }
                 fill: url(#signin_gradient) #fff;
             }
-            .sub-title{
+            .sub-title {
                 font-size: 1.8em;
-                background: linear-gradient(to right, $bgcolorstop1, $bgcolorstop2);
+                background: linear-gradient(
+                    to right,
+                    $bgcolorstop1,
+                    $bgcolorstop2
+                );
                 -webkit-background-clip: text;
                 -webkit-text-fill-color: transparent;
                 font-weight: bold;
                 margin-left: -100px;
             }
-            .section{
+            .section {
                 display: flex;
                 justify-content: flex-end;
                 align-items: center;
                 margin-top: 10px;
-                .title{
+                .title {
                     font-size: 1.3em;
-                    color:white;
+                    color: white;
                     font-weight: 300;
                     line-height: 1em;
                 }
-                .secondary-title{
+                .secondary-title {
                     font-size: 1em;
-                    color:$secondaryTextColor;
+                    color: $secondaryTextColor;
                     font-weight: 300;
                 }
-                .left{
+                .left {
                     display: flex;
                     flex-direction: column;
                 }
-                i{
+                i {
                     margin-left: 20px;
                     font-size: 2.5em;
                     width: 60px;
