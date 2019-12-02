@@ -30,3 +30,23 @@
 .task-details-content .details-description{
     -webkit-line-clamp: 3;
 }
+
+.module-footer {
+    > div {
+        margin: 4px auto;
+    }
+}
+.task-user{
+    margin: auto 8px;
+    .user-name {
+        margin-left: 4px;
+    }
+}
+
+.task-details-content .details-description{
+    -webkit-line-clamp: 3;
+}
+
+.task-info {
+    margin: 8px 16px;
+}
