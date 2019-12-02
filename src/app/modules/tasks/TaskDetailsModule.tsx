@@ -8,13 +8,18 @@ import ModuleMenuTrigger from '../ModuleMenuTrigger';
 import "./TaskDetailsModule.scss"
 import { ResponsiveBreakpoint } from '../../components/general/observers/ResponsiveComponent';
 import { translate } from '../../localization/AutoIntlProvider';
-import { ContextNaturalKey, Permission, TaskState, TaskPriority, TimeSpent } from '../../types/intrasocial_types';
+import { ContextNaturalKey, Permission, TaskState, TaskPriority, TimeSpent, Task } from '../../types/intrasocial_types';
 import { DetailsContent } from '../../components/details/DetailsContent';
 import { withContextData, ContextDataProps } from '../../hoc/WithContextData';
 import { ProfileManager } from '../../managers/ProfileManager';
 import { Badge } from 'reactstrap';
 import { TimeComponent } from '../../components/general/TimeComponent';
 import UserProfileAvatar from '../../components/general/UserProfileAvatar';
+import { uniqueId } from '../../utilities/Utilities';
+import { TaskController } from '../../managers/TaskController';
+import { OverflowMenuItem, OverflowMenuItemType } from '../../components/general/OverflowMenu';
+import { DropDownMenu } from '../../components/general/DropDownMenu';
+import TaskCreateComponent from '../../components/general/contextCreation/TaskCreateComponent';
 type OwnProps = {
     breakpoint: ResponsiveBreakpoint
     contextNaturalKey: ContextNaturalKey
@@ -22,6 +27,8 @@ type OwnProps = {
 type State = {
     menuVisible: boolean
     isLoading: boolean
+    editFormVisible:boolean
+    editFormReloadKey:string
 }
 type Props = OwnProps & RouteComponentProps<any> & ContextDataProps
 class TaskDetailsModule extends React.Component<Props, State> {
@@ -29,7 +36,9 @@ class TaskDetailsModule extends React.Component<Props, State> {
         super(props);
         this.state = {
             isLoading: false,
-            menuVisible: false
+            menuVisible: false,
+            editFormVisible:false,
+            editFormReloadKey:uniqueId(),
         }
     }
     componentDidUpdate = (prevProps: Props) => {
@@ -52,6 +61,49 @@ class TaskDetailsModule extends React.Component<Props, State> {
     feedLoadingStateChanged = (isLoading: boolean) => {
         this.setState({ isLoading })
     }
+
+    showTaskCreateForm = () => {
+        this.setState((prevState:State) => {
+            return {editFormVisible:true, editFormReloadKey:uniqueId()}
+        })
+    }
+    hideTaskCreateForm = () => {
+
+        this.setState((prevState:State) => {
+            return {editFormVisible:false}
+        })
+    }
+    handleTaskCreateForm = (task:Task) => {
+        if(!!task)
+        {
+            TaskController.partialUpdate(task)
+        }
+        this.hideTaskCreateForm()
+    }
+
+    getTaskOptions = (task:Task) => {
+        const options: OverflowMenuItem[] = []
+        const {authenticatedUser} = this.props.contextData
+        if(task.permission >= Permission.moderate)
+        {
+            options.push({id:"edit", type:OverflowMenuItemType.option, title:translate("Edit"), onPress:this.showTaskCreateForm, iconClass:"fas fa-pen", iconStackClass:Permission.getShield(task.permission)})
+        }
+        return options
+    }
+
+    renderEditForm = (task:Task) => {
+        const visible = this.state.editFormVisible
+        return <TaskCreateComponent onCancel={this.hideTaskCreateForm} key={this.state.editFormReloadKey} task={task} project={this.props.contextData.project} visible={visible} onComplete={this.handleTaskCreateForm} />
+    }
+
+    renderOptions = (task:Task) => {
+
+        const taskOptions = this.getTaskOptions(task)
+        if(taskOptions.length > 0)
+            return <DropDownMenu className="project-option-dropdown" triggerClass="fas fa-cog fa-2x mx-1" items={taskOptions}></DropDownMenu>
+        return null
+    }
+
     render() {
         const { breakpoint, history, match, location, staticContext, contextNaturalKey, contextData, ...rest } = this.props
         const { task, project, community } = this.props.contextData
@@ -62,7 +114,7 @@ class TaskDetailsModule extends React.Component<Props, State> {
         const estimatedTime: TimeSpent = { hours: task.estimated_hours || 0, minutes: task.estimated_minutes || 0 }
         return (<Module {...rest}>
             <ModuleHeader className="task-detail" headerTitle={task && task.title || translate("detail.module.title")} loading={this.state.isLoading}>
-                <ModuleMenuTrigger onClick={this.menuItemClick} />
+                {this.renderOptions(task)}
             </ModuleHeader>
             {true && //breakpoint >= ResponsiveBreakpoint.standard && //do not render for small screens
                 <>
@@ -83,6 +135,7 @@ class TaskDetailsModule extends React.Component<Props, State> {
                                         </div>
                                     }
                                 </DetailsContent>
+                                {this.renderEditForm(task)}
                             </div>
                         }
                     </ModuleContent>
