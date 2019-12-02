@@ -1411,12 +1411,67 @@ export abstract class ApiClient
         let url = ApiClient.getContextMembershipRequestUrl(contextNaturalKey)
         if(!url)
         {
-            callback(null, "500", new RequestErrorData({detail:`delete invitation endpoint not set for ${contextNaturalKey}`}, "error"))
+            callback(null, "500", new RequestErrorData({detail:`membership requests endpoint not set for ${contextNaturalKey}`}, "error"))
             return
         }
         const data:Object = {}
         const key = ContextNaturalKey.elasticTypeForKey(contextNaturalKey).toLocaleLowerCase()
         data[key] = contextObjectId
+        AjaxRequest.postJSON(url, data, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, new RequestErrorData(request.responseJSON, error))
+        })
+    }
+    static getContextMembershipRequests(contextNaturalKey:ContextNaturalKey, contextObjectId:number, limit:number, offset:number, search:string, callback:ApiClientCallback<any>){
+        let url = ApiClient.getContextMembershipRequestUrl(contextNaturalKey)
+        if(!url)
+        {
+            callback(null, "500", new RequestErrorData({detail:`membership requests endpoint not set for ${contextNaturalKey}`}, "error"))
+            return
+        }
+        const data:Object = {limit, offset, search}
+        const key = ContextNaturalKey.elasticTypeForKey(contextNaturalKey).toLocaleLowerCase()
+        data[key] = contextObjectId
+        url = url + "?" + ApiClient.getQueryString(data)
+        AjaxRequest.get(url, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, new RequestErrorData(request.responseJSON, error))
+        })
+    }
+    private static getContextMembershipRequestBatchUrl = (contextNaturalKey:ContextNaturalKey) => {
+        let url:string = null
+        switch (contextNaturalKey) {
+            case ContextNaturalKey.COMMUNITY :url = Constants.apiRoute.communityMembershipRequestBatchUrl; break;
+            case ContextNaturalKey.EVENT :url = Constants.apiRoute.eventMembershipRequestBatchUrl; break;
+            case ContextNaturalKey.GROUP :url = Constants.apiRoute.groupMembershipRequestBatchUrl; break;
+            default:break;
+        }
+        return url
+    }
+    static deleteContextMembershipRequests = (contextNaturalKey:ContextNaturalKey, ids:number[], callback:ApiClientCallback<{failed:{delete:number}[]}>) => {
+        let url = ApiClient.getContextMembershipRequestBatchUrl(contextNaturalKey)
+        if(!url)
+        {
+            callback(null, "500", new RequestErrorData({detail:`delete invitation endpoint not set for ${contextNaturalKey}`}, "error"))
+            return
+        }
+        const data = ids.map(id => {return {delete:id}})
+        AjaxRequest.postJSON(url, data, (data, status, request) => {
+            callback(data, status, null)
+        }, (request, status, error) => {
+            callback(null, status, new RequestErrorData(request.responseJSON, error))
+        })
+    }
+    static acceptContextMembershipRequests = (contextNaturalKey:ContextNaturalKey, ids:number[], callback:ApiClientCallback<{failed:{accept:number}[]}>) => {
+        let url = ApiClient.getContextMembershipRequestBatchUrl(contextNaturalKey)
+        if(!url)
+        {
+            callback(null, "500", new RequestErrorData({detail:`delete invitation endpoint not set for ${contextNaturalKey}`}, "error"))
+            return
+        }
+        const data = ids.map(id => {return {accept:id}})
         AjaxRequest.postJSON(url, data, (data, status, request) => {
             callback(data, status, null)
         }, (request, status, error) => {

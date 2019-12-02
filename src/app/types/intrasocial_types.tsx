@@ -1411,6 +1411,14 @@ export type ContextInvitation = {
     event:number
 } & IdentifiableObject
 
+export type ContextRequest = {
+    created_at: string
+    user:number
+    group?:number
+    event?:number
+    community?:number
+} & IdentifiableObject
+
 export type CommunityInvitation = {
     created_at: string
     community:number
@@ -1419,6 +1427,7 @@ export type CommunityInvitation = {
     email:string
     user:number
 } & IdentifiableObject
+
 export type Community = {
     members: number[]
     relationship: any

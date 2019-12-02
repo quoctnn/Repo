@@ -45,7 +45,7 @@ export const availableEndpoints: ApiEndpoint[] = [
         websocket: 'wss://intra.work/socket/'
     },
 ]
-const defaultEndpoint = Settings.isElectron ? 2 : 2
+const defaultEndpoint = Settings.isElectron ? 2 : 0
 export interface SetEndpointAction{
     type:string
     endpoint:number
