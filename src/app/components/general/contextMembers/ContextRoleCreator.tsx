@@ -133,6 +133,7 @@ export default class ContextRoleCreator extends React.Component<Props, State> {
                                         id={nameof("role")}
                                         />
                                     <ProfileSelectInput
+                                        multiSelect={true}
                                         errors={form.getErrors}
                                         isRequired={false}
                                         allowedProfiles={availableMembers}

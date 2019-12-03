@@ -34,7 +34,7 @@ type Props = OwnProps & RouteComponentProps<any> & ContextDataProps
 class TaskCreator extends React.Component<Props, State> {
     taskFormRefs = {
         titleRef: React.createRef<TextInput>(),
-        responsibleRef: React.createRef<SelectInput>(),
+        responsibleRef: React.createRef<ProfileSelectInput>(),
         assignedRef: React.createRef<ProfileSelectInput>(),
         stateRef: React.createRef<SelectInput>(),
         priorityRef: React.createRef<SelectInput>(),
@@ -42,7 +42,7 @@ class TaskCreator extends React.Component<Props, State> {
         estMinutesRef: React.createRef<NumberInput>(),
         dueDateRef: React.createRef<DateTimePicker>(),
         tagsRef: React.createRef<SelectCreateInput>(),
-        categoryRef: React.createRef<SelectInput>(),
+        categoryRef: React.createRef<SelectCreateInput>(),
         descriptionRef: React.createRef<TextAreaInput>()
     }
     constructor(props: Props) {
@@ -60,6 +60,12 @@ class TaskCreator extends React.Component<Props, State> {
 
     componentDidUpdate = (prevProps: Props, prevState: State) => {
         if (this.state.clearForm != null) this.setState({ clearForm: null })
+    }
+
+    shouldComponentUpdate = (nextProps: Props, nextState: State) => {
+        return this.state.creating != nextState.creating ||
+               this.state.clearForm != nextState.clearForm ||
+               this.state.errors != nextState.errors
     }
 
     clearForm = (e?: React.MouseEvent) => {
@@ -141,17 +147,19 @@ class TaskCreator extends React.Component<Props, State> {
             }
             {this.state.creating &&
                 <div className="task-hidden-fields">
-                    <SelectInput
-                        options={responsible}
+                    <ProfileSelectInput
+                        allowedProfiles={members}
+                        selectedProfiles={[]}
+                        autoFocus={false}
                         errors={null}
                         ref={this.taskFormRefs.responsibleRef}
-                        value={null}
                         title={translate("task.module.menu.responsible.title")}
-                        id={"task-responsible"}
+                        id={uniqueId()}
                         isRequired={false}
                     />
                     <ProfileSelectInput
                         allowedProfiles={members}
+                        multiSelect={true}
                         selectedProfiles={[]}
                         autoFocus={false}
                         errors={null}
@@ -181,25 +189,29 @@ class TaskCreator extends React.Component<Props, State> {
                         />
                     </div>
                     <div className="task-flex-fields">
-                        <NumberInput
-                            errors={null}
-                            ref={this.taskFormRefs.estHoursRef}
-                            value={null}
-                            title={translate("task.module.menu.estimated-time.title")}
-                            placeholder={translate("date.format.hours.long")}
-                            id={uniqueId()}
-                            isRequired={false}
-                        />
-                        <NumberInput
-                            errors={null}
-                            ref={this.taskFormRefs.estMinutesRef}
-                            value={null}
-                            title={"-"}
-                            placeholder={translate("date.format.minutes.long")}
-                            id={uniqueId()}
-                            isRequired={false}
-                        />
-                        <div className="spacer" />
+                        <div className="form-group form-input d-block input-group">
+                            <label className="col-form-label">{translate("task.module.menu.estimated-time.title")}</label>
+                            <div className="task-flex-fields" style={{marginTop: "0"}}>
+                                <NumberInput
+                                    errors={null}
+                                    ref={this.taskFormRefs.estHoursRef}
+                                    value={null}
+                                    title={null}
+                                    placeholder={translate("date.format.hours.long")}
+                                    id={uniqueId()}
+                                    isRequired={false}
+                                />
+                                <NumberInput
+                                    errors={null}
+                                    ref={this.taskFormRefs.estMinutesRef}
+                                    value={null}
+                                    title={null}
+                                    placeholder={translate("date.format.minutes.long")}
+                                    id={uniqueId()}
+                                    isRequired={false}
+                                />
+                            </div>
+                        </div>
                         <div className="form-group form-input d-block input-group">
                             <label className="col-form-label">{translate("task.due_date.title")}</label>
                             <DateTimePicker min={moment().startOf('day')} ref={this.taskFormRefs.dueDateRef} allowHoursPicker={false} format={DateFormat.day} />
@@ -208,6 +220,8 @@ class TaskCreator extends React.Component<Props, State> {
                     <div className="task-flex-fields">
                         <SelectCreateInput
                             canCreateValue={(value: string) => true}
+                            multiSelect={true}
+                            selectableValues={tags}
                             errors={null}
                             ref={this.taskFormRefs.tagsRef}
                             // value={null}
@@ -215,11 +229,12 @@ class TaskCreator extends React.Component<Props, State> {
                             id={uniqueId()}
                             isRequired={false}
                         />
-                        <SelectInput
-                            options={[]}
+                        <SelectCreateInput
+                            canCreateValue={(value: string) => true}
+                            selectableValues={categories}
                             errors={null}
                             ref={this.taskFormRefs.categoryRef}
-                            value={null}
+                            // value={null}
                             title={translate("task.category.title")}
                             id={uniqueId()}
                             isRequired={false}

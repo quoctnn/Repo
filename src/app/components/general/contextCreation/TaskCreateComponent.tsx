@@ -72,8 +72,17 @@ class TaskCreateComponent extends React.Component<Props, State> {
             data.project = this.props.project.id
         //const hasDataToSave = Object.keys(communityData).length > 0
         this.setFormStatus(FormStatus.submitting)
-        const { title, state, priority, description, project, responsible, assigned_to, due_date, ...rest } = data
-        const updateData = removeEmptyEntriesFromObject({ title, state, priority, description, project, responsible, assigned_to, due_date })
+        const { title, state, priority, description, project,
+            responsible, assigned_to,
+            due_date, estimated_hours, estimated_minutes,
+            category, tags, ...rest } = data
+        const updateData = removeEmptyEntriesFromObject(
+            {
+                title, state, priority, description, project,
+                responsible, assigned_to,
+                due_date, estimated_hours, estimated_minutes,
+                category, tags
+            })
 
         let createdTask: Task = null
         const completed = () => {
@@ -190,6 +199,11 @@ class TaskCreateComponent extends React.Component<Props, State> {
                 option['description'] = translate("common.manager");
             return option
         }) : []
+        var selectedAvailable = task.assigned_to && task.assigned_to.map(id => members.find(m => m.id == id)).filter(p => !!p)
+        if (this.state.formValues.assigned_to) {
+            selectedAvailable = this.state.formValues.assigned_to.map(id => members.find(m => m.id == id)).filter(p => !!p)
+        }
+        const selectedResponsible = task.responsible ? [ProfileManager.getProfileById(task.responsible)] : []
         const create = !this.props.task
         return <FormController
             ref={(controller) => this.formController = controller}
@@ -238,21 +252,26 @@ class TaskCreateComponent extends React.Component<Props, State> {
                                 title={translate("common.description")}
                                 id={nameof("description")}
                             />
-                            <SelectInput
-                                options={responsible}
+                            <ProfileSelectInput
+                                allowedProfiles={members}
+                                selectedProfiles={selectedResponsible}
+                                hasSubmitted={form.hasSubmitted()}
+                                onValueChanged={form.handleValueChanged(pageId)}
                                 errors={form.getErrors}
-                                value={task.responsible && task.responsible.toString()}
                                 title={translate("task.module.menu.responsible.title")}
-                                id={"task-responsible"}
+                                id={nameof("responsible")}
                                 isRequired={false}
                             />
                             <ProfileSelectInput
                                 allowedProfiles={members}
-                                selectedProfiles={[]}
+                                selectedProfiles={selectedAvailable}
+                                hasSubmitted={form.hasSubmitted()}
+                                onValueChanged={form.handleValueChanged(pageId)}
+                                multiSelect={true}
                                 autoFocus={false}
                                 errors={form.getErrors}
                                 title={translate("task.module.menu.assigned_to.title")}
-                                id={uniqueId()}
+                                id={nameof("assigned_to")}
                                 isRequired={false}
                             />
                             <SelectInput
@@ -260,7 +279,8 @@ class TaskCreateComponent extends React.Component<Props, State> {
                                 errors={form.getErrors}
                                 value={task.state || states[0].value}
                                 title={translate("task.module.menu.state.title")}
-                                id={uniqueId()}
+                                onValueChanged={form.handleValueChanged(pageId)}
+                                id={nameof("state")}
                                 isRequired={false}
                             />
                             <SelectInput
@@ -268,38 +288,55 @@ class TaskCreateComponent extends React.Component<Props, State> {
                                 errors={form.getErrors}
                                 value={task.priority}
                                 title={translate("task.module.menu.priority.title")}
-                                id={uniqueId()}
+                                onValueChanged={form.handleValueChanged(pageId)}
+                                id={nameof("priority")}
                                 isRequired={false}
                             />
-                            <NumberInput
-                                errors={form.getErrors}
-                                value={task.estimated_hours && task.estimated_hours.toString()}
-                                title={translate("task.module.menu.estimated-time.title")}
-                                placeholder={translate("date.format.hours.long")}
-                                id={uniqueId()}
-                                isRequired={false}
-                            />
-                            <NumberInput
-                                errors={form.getErrors}
-                                value={task.estimated_minutes && task.estimated_minutes.toString()}
-                                title={"-"}
-                                placeholder={translate("date.format.minutes.long")}
-                                id={uniqueId()}
-                                isRequired={false}
-                            />
-                            <DateTimePicker
-                                min={moment().startOf('day')}
-                                allowHoursPicker={false}
-                                format={DateFormat.day}
-                                value={moment(task.due_date)}
-                            />
-
+                            <div className="task-flex-fields">
+                                <div className="form-group form-input d-block input-group">
+                                    <label className="col-form-label">{translate("task.module.menu.estimated-time.title")}</label>
+                                    <div className="task-flex-fields" style={{ marginTop: "0" }}>
+                                        <NumberInput
+                                            errors={form.getErrors}
+                                            value={task.estimated_hours && task.estimated_hours.toString()}
+                                            title={null}
+                                            ref={form.setFormRef(pageId)}
+                                            placeholder={translate("date.format.hours.long")}
+                                            onValueChanged={form.handleValueChanged(pageId)}
+                                            id={nameof("estimated_hours")}
+                                            isRequired={false}
+                                        />
+                                        <NumberInput
+                                            errors={form.getErrors}
+                                            value={task.estimated_minutes && task.estimated_minutes.toString()}
+                                            title={null}
+                                            ref={form.setFormRef(pageId)}
+                                            placeholder={translate("date.format.minutes.long")}
+                                            onValueChanged={form.handleValueChanged(pageId)}
+                                            id={nameof("estimated_minutes")}
+                                            isRequired={false}
+                                        />
+                                    </div>
+                                </div>
+                                <div className="form-group form-input d-block input-group">
+                                    <label className="col-form-label">{translate("task.due_date.title")}</label>
+                                    <DateTimePicker
+                                        min={moment().startOf('day')}
+                                        allowHoursPicker={false}
+                                        format={DateFormat.day}
+                                        // onValueChanged={form.handleValueChanged(pageId)}
+                                        // id={nameof("due_date")}
+                                        value={moment(task.due_date)}
+                                    />
+                                </div>
+                            </div>
                             <SelectCreateInput
                                 canCreateValue={(value: string) => true}
                                 errors={form.getErrors}
-                                // value={task.tags}
+                                selectableValues={tags}
                                 title={translate("task.tags")}
-                                id={uniqueId()}
+                                onValueChanged={form.handleValueChanged(pageId)}
+                                id={nameof("tags")}
                                 isRequired={false}
                             />
                             <SelectInput
@@ -307,7 +344,8 @@ class TaskCreateComponent extends React.Component<Props, State> {
                                 errors={form.getErrors}
                                 value={task.category}
                                 title={translate("task.category.title")}
-                                id={uniqueId()}
+                                onValueChanged={form.handleValueChanged(pageId)}
+                                id={nameof("category")}
                                 isRequired={false}
                             />
                         </>

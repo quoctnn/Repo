@@ -3,14 +3,13 @@ import { FormGroup, Label, ButtonGroup, Button, ButtonDropdown, DropdownItem, Dr
 import { translate } from "../../localization/AutoIntlProvider";
 import { ProjectFilter } from "./ProjectFilter";
 import { ContextValue } from "../../components/general/input/ContextFilter";
-import { TaskState, TaskPriority, UserProfile, Project, CommunityCategory } from '../../types/intrasocial_types';
+import { TaskState, TaskPriority, UserProfile, Project } from '../../types/intrasocial_types';
 import { ProfileManager } from "../../managers/ProfileManager";
 import { userFullName, userAvatar, uniqueId } from '../../utilities/Utilities';
 import { ProfileSelectorOption } from "../../components/general/input/SelectExtensions";
 import { AuthenticationManager } from "../../managers/AuthenticationManager";
 import "./TasksMenu.scss";
 import { ContextDataProps, withContextData } from '../../hoc/WithContextData';
-import { TextInput } from "../../components/form/components/TextInput";
 
 export type TasksMenuData = {
     project: ContextValue

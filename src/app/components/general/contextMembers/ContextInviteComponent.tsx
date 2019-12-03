@@ -139,6 +139,7 @@ export default class ContextInviteComponent extends React.Component<Props, State
                                         id={nameof("manager")}
                                         />}
                                         <ProfileSelectInput
+                                        multiSelect={true}
                                         errors={form.getErrors}
                                         isRequired={false}
                                         allowedProfiles={availableMembers}

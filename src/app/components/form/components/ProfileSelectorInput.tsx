@@ -7,6 +7,7 @@ import classnames from 'classnames';
 import { ProfileSelector } from '../../general/contextMembers/ProfileSelector';
 import { UserProfile } from '../../../types/intrasocial_types';
 export type ProfileSelectInputProps = {
+    multiSelect?:boolean
     allowedProfiles:UserProfile[]
     selectedProfiles:UserProfile[]
     autoFocus?:boolean
@@ -71,7 +72,13 @@ export class ProfileSelectInput extends React.Component<ProfileSelectInputProps,
                         <FormComponentRequiredMessage required={this.props.isRequired} />
                     </label>
                     <FormComponentErrorMessage className={cn} errors={errors} errorKey={this.props.id} />
-                    <ProfileSelector autoFocus={this.props.autoFocus} placeholder={this.props.placeholder} selectedProfiles={this.props.selectedProfiles} allowedProfiles={this.props.allowedProfiles} onValueChange={this.handleProfileSelectorChange} />
+                    <ProfileSelector
+                    multiSelect={this.props.multiSelect}
+                    autoFocus={this.props.autoFocus}
+                    placeholder={this.props.placeholder}
+                    selectedProfiles={this.props.selectedProfiles}
+                    allowedProfiles={this.props.allowedProfiles}
+                    onValueChange={this.handleProfileSelectorChange} />
                     {this.props.description && <div className="description" dangerouslySetInnerHTML={{__html:this.props.description}}></div>}
                 </InputGroup>
             </div>

@@ -116,7 +116,7 @@ class TaskDetailsModule extends React.Component<Props, State> {
             <ModuleHeader className="task-detail" headerTitle={task && task.title || translate("detail.module.title")} loading={this.state.isLoading}>
                 {this.renderOptions(task)}
             </ModuleHeader>
-            {true && //breakpoint >= ResponsiveBreakpoint.standard && //do not render for small screens
+            {breakpoint >= ResponsiveBreakpoint.standard && //do not render for small screens
                 <>
                     <ModuleContent>
                         {task && task.permission >= Permission.read &&
@@ -140,6 +140,32 @@ class TaskDetailsModule extends React.Component<Props, State> {
                         }
                     </ModuleContent>
                     <div className="task-info">
+                        <div className="d-flex">
+                            <div className="flex-grow-1">
+                                {responsible &&
+                                    <div className="d-flex">
+                                        {translate("task.responsible")}:&nbsp;
+                                        <div className="d-flex task-user">
+                                            <UserProfileAvatar profileId={responsible.id} size={20} />
+                                            <div className="user-name">{responsible.first_name + " " + responsible.last_name}</div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                            {task.tags &&
+                                <div className="task-tags">
+                                    {task.tags.map((tag) => <Badge key={uniqueId()} className="tag" color="info">{tag}</Badge>)}
+                                </div>
+                            }
+                        </div>
+                        {assigned && <div className="d-flex"> {translate("task.assigned_to")}:&nbsp;
+                            {assigned.map((user) => {
+                            return <div className="d-flex task-user">
+                                <UserProfileAvatar profileId={user.id} size={20} />
+                                <div className="user-name">{user.first_name + " " + user.last_name}</div>
+                            </div>
+                        })}
+                        </div>}
                         <div className="status-info d-flex justify-content-between">
                             {task.state && <div>{translate("task.module.menu.state.title")}:<Badge className="ml-1" color={TaskState.colorForState(task.state)}>{translate("task.state." + task.state)}</Badge></div>}
                             {task.priority && <div>{translate("task.module.menu.priority.title")}:<Badge className="ml-1" color={TaskPriority.colorForPriority(task.priority)}>{translate("task.priority." + task.priority)}</Badge></div>}
@@ -162,7 +188,7 @@ class TaskDetailsModule extends React.Component<Props, State> {
                                 <div className="d-flex">
                                     {translate("task.module.menu.creator.title")}:&nbsp;
                                     <div className="d-flex task-user">
-                                        <UserProfileAvatar profileId={creator.id} size={24} />
+                                        <UserProfileAvatar profileId={creator.id} size={20} />
                                         <div className="user-name">{creator.first_name + " " + creator.last_name}</div>
                                     </div>
                                 </div>
@@ -171,33 +197,15 @@ class TaskDetailsModule extends React.Component<Props, State> {
                                 <div className="d-flex">
                                     {translate("task.module.menu.last-changed.title")}:&nbsp;
                                     <div className="d-flex task-user">
-                                        <UserProfileAvatar profileId={last_change_by.id} size={24} />
+                                        <UserProfileAvatar profileId={last_change_by.id} size={20} />
                                         <div className="user-name">{last_change_by.first_name + " " + last_change_by.last_name}</div>
                                     </div>
                                 </div>
                             }
                             {task.updated_at && <div>{translate("task.state.changed")}:<TimeComponent date={task.updated_at} /></div>}
                         </div>
-                        <div className="task-tags">{task.tags}</div>
                     </div>
                     <ModuleFooter className="mt-1">
-                        {responsible &&
-                            <div className="d-flex">
-                                {translate("task.responsible")}:&nbsp;
-                                <div className="d-flex task-user">
-                                    <UserProfileAvatar profileId={responsible.id} size={16} />
-                                    <div className="user-name">{responsible.first_name + " " + responsible.last_name}</div>
-                                </div>
-                            </div>
-                        }
-                        {assigned && <div className="d-flex"> {translate("task.assigned_to")}:&nbsp;
-                            {assigned.map((user) => {
-                            return <div className="d-flex task-user">
-                                <UserProfileAvatar profileId={user.id} size={16} />
-                                <div className="user-name">{user.first_name + " " + user.last_name}</div>
-                            </div>
-                        })}
-                        </div>}
                     </ModuleFooter>
                 </>
             }

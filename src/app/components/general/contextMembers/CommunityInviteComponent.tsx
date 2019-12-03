@@ -119,6 +119,7 @@ export default class CommunityInviteComponent extends React.Component<Props, Sta
                             pages:[<FormPage key="page1" form={this.formController} pageId="1" render={(pageId, form) => {
                                     return <>
                                         <SelectCreateInput
+                                        multiSelect={true}
                                         errors={form.getErrors}
                                         isRequired={false}
                                         hasSubmitted={form.hasSubmitted()}
@@ -131,6 +132,7 @@ export default class CommunityInviteComponent extends React.Component<Props, Sta
                                         id={nameof("emails")}
                                         />
                                         <ProfileSelectInput
+                                        multiSelect={true}
                                         errors={form.getErrors}
                                         isRequired={false}
                                         allowedProfiles={availableMembers}
