@@ -1,6 +1,3 @@
-/* dfgdgd dgdfgdf*
-
-*/
 
 import * as React from "react";
 import "./CommunityPage.scss"
