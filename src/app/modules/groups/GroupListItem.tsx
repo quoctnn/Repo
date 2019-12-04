@@ -12,11 +12,11 @@ type OwnProps = {
 type State = {
 }
 type Props = OwnProps & React.HTMLAttributes<HTMLElement>
-export default class GroupListItem extends React.Component<Props, State> {  
+export default class GroupListItem extends React.Component<Props, State> {
     constructor(props:Props) {
         super(props);
         this.state = {
-            
+
         }
     }
     shouldComponentUpdate = (nextProps:Props, nextState:State) => {
@@ -34,7 +34,7 @@ export default class GroupListItem extends React.Component<Props, State> {
                     <div className="drop-shadow">
                         <SecureImage className="img top" setBearer={true} setAsBackground={true} url={cover}/>
                         <div className="bottom d-flex align-items-center flex-row">
-                            <div className="theme-box theme-bg-gradient flex-shrink-0">
+                            <div className="theme-box flex-shrink-0">
                                 {count}&nbsp;
                                 <i className="fa fa-user"></i>
                             </div>

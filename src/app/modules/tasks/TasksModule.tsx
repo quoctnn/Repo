@@ -9,13 +9,15 @@ import { ContextNaturalKey, TaskActions, Task } from '../../types/intrasocial_ty
 import ListComponent from '../../components/general/ListComponent';
 import {ApiClient,  PaginationResult } from '../../network/ApiClient';
 import { ToastManager } from '../../managers/ToastManager';
-import TaskListItem from './TaskListItem';
 import { StatusUtilities } from '../../utilities/StatusUtilities';
 import SimpleModule from '../SimpleModule';
 import { ButtonGroup, Button } from 'reactstrap';
 import { AuthenticationManager } from '../../managers/AuthenticationManager';
 import { CommonModuleProps } from '../Module';
 import { withContextData, ContextDataProps } from '../../hoc/WithContextData';
+import TaskListItem2 from './TaskListItem2';
+import { nameofFactory } from '../../utilities/Utilities';
+import TaskCreator from './TaskCreator';
 
 type OwnProps = {
     breakpoint: ResponsiveBreakpoint
@@ -26,10 +28,11 @@ type State = {
     menuData: TasksMenuData
 }
 type Props = OwnProps & RouteComponentProps<any> & ContextDataProps
+
+const nameOf = nameofFactory<Task>()
 class TasksModule extends React.Component<Props, State> {
     tempMenuData: TasksMenuData = null
     taskList = React.createRef<ListComponent<Task>>()
-
     static defaultProps: CommonModuleProps = {
         pageSize: 15,
     }
@@ -73,7 +76,10 @@ class TasksModule extends React.Component<Props, State> {
         this.setState({ isLoading })
     }
     menuDataUpdated = (data: TasksMenuData) => {
-        this.tempMenuData = data
+        //this.tempMenuData = data
+        this.setState((prevState:State) => {
+            return {menuData:data}
+        })
     }
     contextDataChanged = (prevData: TasksMenuData, prevProps: Props) => {
         const data = this.state.menuData
@@ -183,6 +189,10 @@ class TasksModule extends React.Component<Props, State> {
         const task = this.taskList.current.getItemById(taskId)
         this.navigateToAction(task, action, extra, completion)
     }
+    newTask = () => {
+        this.taskList.current.reload();
+    }
+
     fetchTasks = (offset: number, completion: (items: PaginationResult<Task>) => void) => {
         const data = this.getContextData()
         const project = data.project && data.project.id
@@ -201,19 +211,39 @@ class TasksModule extends React.Component<Props, State> {
         })
     }
     renderTask = (task: Task) => {
-        return <TaskListItem
+        const user = this.props.contextData.authenticatedUser && this.props.contextData.authenticatedUser.id || -1
+        return <TaskListItem2
             onActionPress={this.navigateToActionWithTask(task.id)}
             task={task}
+            user={user}
             communityId={-1}
             key={"task_" + task.id} />
     }
+    renderGroupHeader = (group:string) => {
+        return <div key={"header_" + group} className="group-header text-truncate">
+            {group}
+        </div>
+    }
     renderContent = () => {
-        return <ListComponent<Task>
+
+        const disableContextSearch = !!this.props.contextNaturalKey
+        const project = this.props.contextData.project
+        const projectMembers = project.members || []
+        return <>
+            <TaskCreator onCreate={this.newTask}/>
+            <TaskMenu projectMembers={projectMembers} data={this.state.menuData} onUpdate={this.menuDataUpdated} disableContextSearch={disableContextSearch} />
+             <ListComponent<Task>
             loadMoreOnScroll={!this.props.showLoadMore}
+            scrollParent={window}
             ref={this.taskList}
             onLoadingStateChanged={this.feedLoadingStateChanged}
             fetchData={this.fetchTasks}
-            renderItem={this.renderTask} />
+            renderItem={this.renderTask}
+            renderGroupHeader={this.renderGroupHeader}
+            className="tasks-list"
+            groupField={nameOf("category")}
+            />
+            </>
     }
     onMenuToggle = (visible: boolean) => {
         const newState: Partial<State> = {}
@@ -262,9 +292,7 @@ class TasksModule extends React.Component<Props, State> {
         const { history, match, location, staticContext, contextNaturalKey, pageSize, showLoadMore, showInModal, isModal, contextData, ...rest } = this.props
         const { breakpoint, className } = this.props
         const cn = classnames("tasks-module", className)
-        const disableContextSearch = !!contextNaturalKey
-        const menu = <TaskMenu data={this.state.menuData} onUpdate={this.menuDataUpdated} disableContextSearch={disableContextSearch} />
-        const headerContent = this.renderFilters()
+        //const headerContent = this.renderFilters()
         const renderModalContent = !showInModal || isModal ? undefined : this.renderModalContent
         return (<SimpleModule {...rest}
             className={cn}
@@ -272,8 +300,8 @@ class TasksModule extends React.Component<Props, State> {
             breakpoint={breakpoint}
             isLoading={this.state.isLoading}
             onMenuToggle={this.onMenuToggle}
-            menu={menu}
-            headerContent={headerContent}
+            //menu={menu}
+            //headerContent={headerContent}
             showHeaderTitle={!isModal}
             renderModalContent={renderModalContent}
             headerTitle={translate("task.module.title")}>

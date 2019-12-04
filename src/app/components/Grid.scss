@@ -1,7 +1,7 @@
 @import "../Config";
 .react-tabs {
-    margin-left: 16px;
-    margin-right: 16px;
+    margin-left: 8px;
+    margin-right: 8px;
 }
 
 .react-tabs .tab-list{
@@ -13,7 +13,7 @@
     border-radius: 8px;
 }
 .react-tabs .tab-list .tab-item {
-    font-size: 20px;
+    font-size: 1.25rem;
     white-space: nowrap;
     &:hover{
         cursor: pointer;

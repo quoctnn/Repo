@@ -17,7 +17,7 @@ export class ReadObserver{
     private sentReadRegister:number[] = []
     constructor(key:string, onSave:ReadObserverSaveFunc, saveIntervalInMilliSeconds?:number){
         this.saveFunc = onSave
-        this.readStorageKey = "readstorage." + key 
+        this.readStorageKey = "readstorage." + key
         if(saveIntervalInMilliSeconds)
         {
             this.saveInterval = saveIntervalInMilliSeconds
@@ -38,13 +38,12 @@ export class ReadObserver{
                 }
             }
         } catch (error) {
-                
+
         }
     }
     windowFocusChanged = () => {
         this.isActive = document.hasFocus()
         this.onActiveStateChanged && this.onActiveStateChanged(this.isActive)
-        console.log("windowFocusChanged", this.isActive)
     }
     getReads = () => {
         return [...this.readRegister, ...this.sentReadRegister]
@@ -69,7 +68,7 @@ export class ReadObserver{
                 this.updateTimer()
             })
         } catch (error) {
-                
+
         }
     }
     private intersectionCallback = (entries: IntersectionObserverEntry[], observer: IntersectionObserver) => {
@@ -77,14 +76,13 @@ export class ReadObserver{
             return
         entries.forEach(entry => {
             const { isIntersecting } = entry;
-            if (isIntersecting) 
+            if (isIntersecting)
             {
                 const id = this.activeObservables.get(entry.target)
                 if(id)
                 {
                     this.readRegister.push(id)
                     this.updateTimer()
-                    console.log(`object id:${id} is visible`)
                     const deleted = this.activeObservables.delete(entry.target)
                     this.intersectionObserver.unobserve(entry.target)
                 }
@@ -100,7 +98,7 @@ export class ReadObserver{
     }
     clearObservables = () => {
         this.activeObservables.forEach((val, key) => {
-            
+
             this.intersectionObserver.unobserve(key)
         })
         this.activeObservables.clear()

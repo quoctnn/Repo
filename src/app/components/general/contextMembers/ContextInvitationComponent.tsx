@@ -15,6 +15,7 @@ import { userFullName, userAvatar, listPageSize, uniqueId } from '../../../utili
 import { Input } from 'reactstrap';
 import { FormComponentErrorMessage } from '../../form/FormController';
 import ContextInviteComponent from './ContextInviteComponent';
+import UserProfileAvatar from '../UserProfileAvatar';
 type OwnProps = {
     contextNaturalKey:ContextNaturalKey
     contextObject:IdentifiableObject & Permissible
@@ -65,10 +66,9 @@ export default class ContextInvitationComponent extends React.Component<Props, S
         const failedArray = this.state.failed
         const profile = invitation.user && ProfileManager.getProfileById(invitation.target_user)
         const title =this.renderInvitationHeader(profile, invitation)
-        const avatarUrl = userAvatar(profile)
         const failed = failedArray.contains( invitation.id )
         const cn = classnames({"bg-warning":failed})
-        return <GenericListItem className={cn} header={title} left={<Avatar size={44} image={avatarUrl} />} footer={<TimeComponent date={invitation.created_at} />}/>
+        return <GenericListItem className={cn} header={title} left={<UserProfileAvatar size={40} borderWidth={2} borderColor="white" profileId={profile.id} />} footer={<TimeComponent date={invitation.created_at} />}/>
     }
     fetchInvitations = (offset:number, completion:(items:PaginationResult<ContextInvitation>) => (void)) => {
         let {search} = this.state.filters
@@ -111,7 +111,7 @@ export default class ContextInvitationComponent extends React.Component<Props, S
         {
             this.clearSelection()
         }
-        else 
+        else
             this.selectAll()
     }
     showInviteForm = () => {
@@ -143,7 +143,6 @@ export default class ContextInvitationComponent extends React.Component<Props, S
             this.setState(() => {
                 return {failed, selectedInvitations:selected}
             }, this.reloadList)
-            console.log("deleted response", response)
         })
     }
 
@@ -169,8 +168,8 @@ export default class ContextInvitationComponent extends React.Component<Props, S
                 <Input className="mb-2" value={this.state.filters.search} type="text" onChange={this.handleSearchInputChange} placeholder={translate("common.filter.invitations")}/>
                 <div className={classnames("list-header", {active:headerActive})}>
                     <Checkbox checked={headerActive} checkedIcon="fas fa-minus" onValueChange={this.headerToggle} />
-                    <div className="flex-grow-1 text-truncate p-1">{translate("common.invitation")}</div>
-                    {headerActive && 
+                    <div className="flex-grow-1 text-truncate m-1 p-2">{translate("common.invitation")}</div>
+                    {headerActive &&
 
                         <Button onClick={this.deleteInvitations} className="ml-1 flex-shrink-0" size="xs" color="danger">
                             <i className="fas fa-trash mr-1"></i>{translate("common.delete")}
@@ -181,7 +180,7 @@ export default class ContextInvitationComponent extends React.Component<Props, S
                         </Button>
                     }
                 </div>
-                <ListComponent<ContextInvitation> 
+                <ListComponent<ContextInvitation>
                     ref={this.listRef}
                     fetchData={this.fetchInvitations}
                     renderItem={this.renderInvitation}
@@ -206,6 +205,6 @@ export default class ContextInvitationComponent extends React.Component<Props, S
                     {this.renderList()}
                     {this.renderInviteForm()}
                 </div>
-        
+
     }
 }

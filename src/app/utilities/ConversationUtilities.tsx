@@ -5,8 +5,9 @@ import { nullOrUndefined, userAvatar, uniqueId } from './Utilities';
 import { translate } from '../localization/AutoIntlProvider';
 import { AuthenticationManager } from '../managers/AuthenticationManager';
 import Avatar from "../components/general/Avatar";
+import UserProfileAvatar from "../components/general/UserProfileAvatar";
 
-export class ConversationUtilities 
+export class ConversationUtilities
 {
     static maxVisibleAvatars = 5
     static avatarSize = 44
@@ -34,15 +35,20 @@ export class ConversationUtilities
     static getAvatar = (conversation: Conversation, me:number, showUserStatus:boolean, children?: React.ReactNode) => {
         let users = ProfileManager.getProfiles(conversation.users.filter(i => i != me).slice(0, ConversationUtilities.maxVisibleAvatars))
         const avatars = users.map(u => userAvatar( u )).filter(a => !nullOrUndefined(a))
-        let profile:UserProfile = undefined
-        if(showUserStatus && users.length == 1)
-            profile = users[0]
-        return <Avatar userStatus={profile && profile.id} images={avatars} size={ConversationUtilities.avatarSize} borderColor="white" borderWidth={2}>
+        if(showUserStatus && users.length <= 1)
+            return <UserProfileAvatar profileId={users[0] && users[0].id} size={ConversationUtilities.avatarSize} borderColor="white" borderWidth={2}>
                         {!!children && children
                             || conversation.unread_messages.length > 0 &&
                             <div className="notification-badge bg-success text-white text-truncate"><span>{conversation.unread_messages.length}</span></div>
                         }
-                </Avatar>
+                    </UserProfileAvatar>
+        else
+            return <Avatar images={avatars} size={ConversationUtilities.avatarSize} borderColor="white" borderWidth={2}>
+                        {!!children && children
+                            || conversation.unread_messages.length > 0 &&
+                            <div className="notification-badge bg-success text-white text-truncate"><span>{conversation.unread_messages.length}</span></div>
+                        }
+                    </Avatar>
     }
     static getChatMessagePreview(userId:number,text:string,files:UploadedFile[], mentions:number[], conversation:Conversation):Message {
 
@@ -62,7 +68,7 @@ export class ConversationUtilities
             updated_at:ds,
             read_by:[],
             mentions:mentions,
-            files  
+            files
             //tempFiles
         }
         return message

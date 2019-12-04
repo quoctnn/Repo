@@ -4,6 +4,7 @@ import Constants from "../utilities/Constants";
 import { translate } from "../localization/AutoIntlProvider";
 import { userFullName, groupCover, communityCover, userCover, projectCover, eventCover } from '../utilities/Utilities';
 import { CommunityManager } from '../managers/CommunityManager';
+import { Settings } from '../utilities/Settings';
 export type CommunityRole = {
     community:number
     users:number[]
@@ -497,13 +498,16 @@ export namespace ContextNaturalKey {
         ContextNaturalKey.CONVERSATION
     ]
     export const getMembers = (key:ContextNaturalKey, contextObject:IdentifiableObject) => {
+        if (!key && !contextObject)
+            return []
         switch (key) {
             case ContextNaturalKey.EVENT: return (contextObject as Event).attending || []
             case ContextNaturalKey.GROUP: return (contextObject as Group).members || []
             case ContextNaturalKey.PROJECT: return (contextObject as Project).members || []
             case ContextNaturalKey.COMMUNITY: return (contextObject as Community).members || []
+            case ContextNaturalKey.TASK: return (contextObject as Task).visibility || []
             default:
-                console.warn(`${key} has no 'members' field`, contextObject)
+                if (!Settings.isProduction) console.warn(`${key} has no 'members' field`, contextObject);
                 return []
         }
     }
@@ -1204,12 +1208,14 @@ export type ReportResult = {
 }
 export type SearchHistory = { id: number, term: string }
 export enum ObjectAttributeType {
+    notification = "notification",
     important = "important",
     reminder = "reminder",
     attention = "attn",
     pinned = "pinned",
     follow = "follow",
     link = "link",
+    update = "update",
 }
 export namespace ObjectAttributeType {
     export function translatedText(type: ObjectAttributeType) {
@@ -1217,12 +1223,14 @@ export namespace ObjectAttributeType {
     }
     export function iconForType(type: ObjectAttributeType, active = false) {
         switch (type) {
+            case ObjectAttributeType.notification: return active ? "fas fa-exclamation" : "fas fa-exclamation"
             case ObjectAttributeType.important: return active ? "fas fa-star" : "far fa-star"
             case ObjectAttributeType.reminder: return active ? "far fa-clock" : "far fa-clock"
             case ObjectAttributeType.attention: return active ? "fas fa-exclamation-triangle" : "fas fa-exclamation-triangle"
             case ObjectAttributeType.pinned: return active ? "fas fa-thumbtack" : "fas fa-thumbtack"
             case ObjectAttributeType.follow: return active ? "far fa-bell-slash" : "far fa-bell"
             case ObjectAttributeType.link: return active ? "fas fa-link" : "fas fa-link"
+            case ObjectAttributeType.update: return active ? "fas fa-exclamation" : "fas fa-exclamation"
             default: return "fas fa-globe-europe"
         }
     }
@@ -1403,6 +1411,14 @@ export type ContextInvitation = {
     event:number
 } & IdentifiableObject
 
+export type ContextRequest = {
+    created_at: string
+    user:number
+    group?:number
+    event?:number
+    community?:number
+} & IdentifiableObject
+
 export type CommunityInvitation = {
     created_at: string
     community:number
@@ -1411,6 +1427,7 @@ export type CommunityInvitation = {
     email:string
     user:number
 } & IdentifiableObject
+
 export type Community = {
     members: number[]
     relationship: any
@@ -1440,6 +1457,7 @@ export type ProfileConnections = {
 export type UserProfile = {
     email: string | null
     locale: AppLanguage
+    theme?: string
     timezone: string | null
     username: string
     uuid: string | null
@@ -1468,6 +1486,7 @@ export type Group = {
     members_count: number
     created_at: string
     parent: number
+    subgroups: number
     updated_at: string
     hidden_reason: ObjectHiddenReason
 } & INotifiable & AvatarAndCover & Linkable & Permissible & IdentifiableObject & IPrivacy & IMembershipStatus
@@ -1512,6 +1531,7 @@ export type Event = {
     location: Coordinate
     address: string
     parent: Event
+    sessions: number
     hidden_reason: ObjectHiddenReason
 } & INotifiable & AvatarAndCover & Linkable & Permissible & IdentifiableObject & IPrivacy & IMembershipStatus
 
@@ -1535,7 +1555,8 @@ export type Project = {
     tasks_completed: number
     tasks_responsible: number
     hidden_reason: ObjectHiddenReason
-    is_private:boolean
+    is_private: boolean
+    categories: string[]
 } & INotifiable & AvatarAndCover & Linkable & Permissible & IdentifiableObject & IPrivacy
 
 export type TimeSpent = {
@@ -1543,25 +1564,37 @@ export type TimeSpent = {
     minutes: Number
 }
 
+export namespace TimeSpent {
+    export function toString(time: TimeSpent) {
+        if (!time) return ""
+        const hours = time.hours + translate("date.format.hours")
+        const minutes = time.minutes + translate("date.format.minutes")
+        return hours + " " + minutes
+    }
+}
 export type Task = {
     id: number
     updated_at: string
     project: number
     title: string
     description: string
-    last_change_by: number
+    latest_change_by: number
     absolute_url: string
     category: string
-    creator: SimpleUserProfile
-    responsible?: SimpleUserProfile
-    assigned_to?: SimpleUserProfile[]
+    creator: number
+    responsible?: number
+    assigned_to?: number[]
     priority: TaskPriority
     state: TaskState
     spent_time: TimeSpent
+    estimated_hours: number
+    estimated_minutes: number
     serialization_date: string
     visibility?: number[]
     attributes?: TaskObjectAttribute[]
+    tags: string[]
     due_date:string
+    files?: UploadedFile[]
 } & Linkable & Permissible & IdentifiableObject
 
 export enum TaskPriority {
@@ -1577,12 +1610,21 @@ export namespace TaskPriority {
     ]
     export function colorForPriority(type: TaskPriority) {
         switch (type) {
-            case TaskPriority.low: return "#61FA6B"
-            case TaskPriority.medium: return "#FA9F61"
-            case TaskPriority.high: return "#FA6161"
+            case TaskPriority.low: return "info"
+            case TaskPriority.medium: return "warning"
+            case TaskPriority.high: return "danger"
             default: return null
         }
     }
+    export function hexColor(type: TaskPriority) {
+        switch (type) {
+            case TaskPriority.low: return "green"
+            case TaskPriority.medium: return "orange"
+            case TaskPriority.high: return "red"
+            default: return null
+        }
+    }
+
 }
 export enum TaskState {
     notStarted = "not-started",
@@ -1601,10 +1643,21 @@ export namespace TaskState {
     ]
     export function colorForState(type: TaskState) {
         switch (type) {
-            case TaskState.progress: return "#F8CF88"
-            case TaskState.toVerify: return "#FFFFB1"
-            case TaskState.completed: return "#B9E4B4"
-            case TaskState.notApplicable: return "#ebccd1"
+            case TaskState.notStarted: return "secondary"
+            case TaskState.progress: return "info"
+            case TaskState.toVerify: return "warning"
+            case TaskState.completed: return "success"
+            case TaskState.notApplicable: return "light"
+            default: return null
+        }
+    }
+    export function hexColor(type: TaskState) {
+        switch (type) {
+            case TaskState.notStarted: return "grey"
+            case TaskState.progress: return "orange"
+            case TaskState.toVerify: return "yellow"
+            case TaskState.completed: return "green"
+            case TaskState.notApplicable: return "red"
             default: return null
         }
     }
@@ -1728,6 +1781,26 @@ export namespace UserStatus {
         if (excludes)
             selectables = selectables.filter(s => !excludes.contains(s))
         return selectables.map(s => UserStatusObjects[s])
+    }
+    export function contactsSort( a:UserProfile, b:UserProfile ) {
+        if ( a.user_status == UserStatus.active && b.user_status != UserStatus.active ||
+             a.user_status == UserStatus.away && (b.user_status != UserStatus.away && b.user_status != UserStatus.active) ||
+             a.user_status == UserStatus.dnd && (b.user_status != UserStatus.dnd && b.user_status != UserStatus.away && b.user_status != UserStatus.active) ||
+             a.user_status == UserStatus.vacation && (b.user_status != UserStatus.vacation && b.user_status != UserStatus.dnd && b.user_status != UserStatus.away && b.user_status != UserStatus.active)
+             ){
+            return -1;
+        }
+        if (
+             b.user_status == UserStatus.active && a.user_status != UserStatus.active ||
+             b.user_status == UserStatus.away && (a.user_status != UserStatus.away && a.user_status != UserStatus.active) ||
+             b.user_status == UserStatus.dnd && (a.user_status != UserStatus.dnd && a.user_status != UserStatus.away && a.user_status != UserStatus.active) ||
+             b.user_status == UserStatus.vacation && (a.user_status != UserStatus.vacation && a.user_status != UserStatus.dnd && a.user_status != UserStatus.away && a.user_status != UserStatus.active) ||
+             b.user_status == UserStatus.invisible ||
+             b.user_status == UserStatus.unavailable
+        ){
+            return 1;
+        }
+        return 0;
     }
 }
 //DASHBOARD

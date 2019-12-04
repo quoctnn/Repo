@@ -1,0 +1,83 @@
+@import '../../../../Config.scss';
+
+.mobile-content {
+    @include var(background-color, main-content-background);
+    z-index: 1049;
+    min-width: 100%;
+    height: calc(100% - #{$topMenuHeight});
+    left: 0;
+    bottom: 0;
+    position: fixed;
+    display: flex;
+    flex-direction: column-reverse;
+    visibility: hidden;
+}
+
+.mobile-content.open {
+    visibility: visible;
+}
+
+.mobile-content .footer {
+    position: fixed;
+    bottom: 8px;
+    width: 100%;
+    pointer-events: none;
+    .click-container {
+        pointer-events: all;
+        cursor: pointer;
+        display: flex;
+        margin: auto;
+        width: calc(100% - 160px);
+        .line {
+            margin: auto;
+            width: 400px;
+            height: 1px;
+            @include var(background-color, highlight-background-color);
+        }
+        .spacer-left.line {
+            margin-left: auto;
+            margin-right: 8px;
+        }
+        .spacer-right.line {
+            margin-left: 4px;
+            margin-right: auto;
+        }
+        .footer-title {
+            font-size: 1.25rem;
+            margin-right: 8px;
+        }
+        > i {
+            margin: auto 0;
+        }
+    }
+}
+
+.mobile-content .sidebar-content-header {
+    height: 3rem;
+}
+
+.mobile-content .sidebar-content-header .sidebar-title {
+    visibility: hidden;
+}
+.mobile-content .sidebar-content-header .sidebar-breadcrumb {
+    visibility: hidden;
+}
+
+.mobile-content .sidebar-content-list {
+    height: 100%;
+    margin: 16px -8px 16px 8px;
+    font-size: 1.2rem;
+    font-weight: 400;
+    .content {
+        flex-direction: column-reverse;
+    }
+}
+
+.mobile-content .sidebar-content-header .title-button {
+    margin-left: 8px;
+    @include var(color, link-color);
+}
+
+.mobile-content .sidebar-content-header .title-button .title-button-text {
+    font-size: 0.6rem;
+}

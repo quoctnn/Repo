@@ -6,8 +6,10 @@ import { ProfileSelectorOption, ProfileOptionComponent, ProfileSingleValueCompon
 
 
 type Props = {
+    autoFocus?:boolean
     allowedProfiles:UserProfile[]
     selectedProfiles:UserProfile[]
+    multiSelect?:boolean
     onValueChange:(selectedProfiles:UserProfile[]) => void
     placeholder?:string
 }
@@ -19,8 +21,7 @@ export class ProfileSelector extends React.PureComponent<Props, State> {
     constructor(props:Props)
     {
         super(props)
-        this.state = { 
-
+        this.state = {
             selectedOptions:props.selectedProfiles.map(ProfileSelectorOption.fromUserProfile),
             allowedOptions:props.allowedProfiles.map(ProfileSelectorOption.fromUserProfile)
         }
@@ -28,29 +29,38 @@ export class ProfileSelector extends React.PureComponent<Props, State> {
     optionToProfile = (opt:ProfileSelectorOption) => {
         return this.props.allowedProfiles.find(p => p.id == opt.id)
     }
-    onChange = (values:ProfileSelectorOption[]) => {
+    onMultiChange = (values:ProfileSelectorOption[]) => {
         const vals = values || []
         this.setState(() => {
             return { selectedOptions: vals }
         }, () => this.props.onValueChange(this.state.selectedOptions.map(this.optionToProfile).filter(p => !!p)))
     }
-    render() 
+    onSingleChange = (value:ProfileSelectorOption) => {
+        const vals = [value]
+        this.setState(() => {
+            return { selectedOptions: vals }
+        }, () => this.props.onValueChange(this.state.selectedOptions.map(this.optionToProfile).filter(p => !!p)))
+    }
+    render()
     {
         const { selectedOptions, allowedOptions: allowedValues} = this.state;
-        const cn = classnames("profile-selector")
+        const autoFocus = this.props.autoFocus == null ? true : this.props.autoFocus
+        const cn = classnames("profile-selector select-input-field")
         return(<div className={cn}>
-                <Select 
-                        styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
-                        isMulti={true}
+                <Select
+                        styles={{ menuPortal: base => ({ ...base, zIndex: 9999, }),
+                                  option: base => ({ ...base, color: "#2d2d2d"}) }}
+                        isMulti={this.props.multiSelect}
+                        menuColor="red"
                         name="profiles"
                         value={selectedOptions}
-                        menuPortalTarget={document.body} 
-                        onChange={this.onChange}
+                        menuPortalTarget={document.body}
+                        onChange={this.props.multiSelect ? this.onMultiChange : this.onSingleChange}
                         placeholder={this.props.placeholder}
                         isClearable={false}
-                        closeMenuOnSelect={false}
+                        closeMenuOnSelect={!this.props.multiSelect}
                         classNamePrefix="select"
-                        autoFocus={true}
+                        autoFocus={autoFocus}
                         components={{ Option: ProfileOptionComponent, SingleValue:ProfileSingleValueComponent, MultiValueLabel:ProfileMultiValueLabel }}
                         options={allowedValues} />
                 </div>

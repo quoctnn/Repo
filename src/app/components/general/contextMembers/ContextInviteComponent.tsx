@@ -85,7 +85,7 @@ export default class ContextInviteComponent extends React.Component<Props, State
             else {
                 ApiClient.createContextInvitation(this.props.contextNaturalKey, this.props.contextObject.id, formData.users, formData.moderator, onComplete)
             }
-        }   
+        }
         else {
             this.props.didCancel()
         }
@@ -93,26 +93,24 @@ export default class ContextInviteComponent extends React.Component<Props, State
     handleValueChanged = (id:string, value:any) => {
         this.setState((prevState:State) => {
             return {formValues:{...prevState.formValues, [id]:value}}
-        }, () => {
-            console.log(this.state.formValues)
-        })
+        }, () => {})
     }
     render = () => {
         const {visible, didCancel, activeMembershipInvitations, contextNaturalKey} = this.props
         const {formValues} = this.state
-        const members:number[] = this.props.members || [] 
+        const members:number[] = this.props.members || []
         const invitationFilterList = [].concat(activeMembershipInvitations).concat(members)
-        const availableMembers = ProfileManager.getProfiles(this.props.availableMembers.filter(id => !invitationFilterList.contains(id))) 
+        const availableMembers = ProfileManager.getProfiles(this.props.availableMembers.filter(id => !invitationFilterList.contains(id)))
         const selectedProfiles = this.state.formValues.users.map(id => availableMembers.find(m => m.id == id)).filter(p => !!p)
         const isProject = contextNaturalKey == ContextNaturalKey.PROJECT
-        return <FormController 
+        return <FormController
                     ref={(controller) => this.formController = controller }
-                    visible={visible} 
-                    formErrors={this.state.formErrors} 
-                    didCancel={didCancel} 
-                    status={this.state.formStatus} 
-                    onFormSubmit={this.handleFormSubmit} 
-                    title={translate(`${this.props.contextNaturalKey}.invite`)} 
+                    visible={visible}
+                    formErrors={this.state.formErrors}
+                    didCancel={didCancel}
+                    status={this.state.formStatus}
+                    onFormSubmit={this.handleFormSubmit}
+                    title={translate(`${this.props.contextNaturalKey}.invite`)}
                     onValueChanged={this.handleValueChanged}
                     className="context-invite"
                     render={(form) => {
@@ -121,37 +119,38 @@ export default class ContextInviteComponent extends React.Component<Props, State
                             pages:[<FormPage key="page1" form={this.formController} pageId="1" render={(pageId, form) => {
                                     return <>
                                         <BooleanInput
-                                        errors={form.getErrors} 
+                                        errors={form.getErrors}
                                         hasSubmitted={form.hasSubmitted()}
-                                        ref={form.setFormRef(pageId)} 
-                                        onValueChanged={form.handleValueChanged(pageId)} 
-                                        value={formValues.moderator} 
-                                        title={translate("form.invite.title.moderator")} 
+                                        ref={form.setFormRef(pageId)}
+                                        onValueChanged={form.handleValueChanged(pageId)}
+                                        value={formValues.moderator}
+                                        title={translate("form.invite.title.moderator")}
                                         description={translate("form.invite.description.moderator")}
-                                        id={nameof("moderator")} 
+                                        id={nameof("moderator")}
                                         />
                                         {isProject && <BooleanInput
-                                        errors={form.getErrors} 
+                                        errors={form.getErrors}
                                         hasSubmitted={form.hasSubmitted()}
-                                        ref={form.setFormRef(pageId)} 
-                                        onValueChanged={form.handleValueChanged(pageId)} 
-                                        value={formValues.manager} 
-                                        title={translate("form.invite.title.manager")} 
+                                        ref={form.setFormRef(pageId)}
+                                        onValueChanged={form.handleValueChanged(pageId)}
+                                        value={formValues.manager}
+                                        title={translate("form.invite.title.manager")}
                                         description={translate("form.invite.description.manager")}
-                                        id={nameof("manager")} 
+                                        id={nameof("manager")}
                                         />}
-                                        <ProfileSelectInput 
-                                        errors={form.getErrors} 
-                                        isRequired={false} 
+                                        <ProfileSelectInput
+                                        multiSelect={true}
+                                        errors={form.getErrors}
+                                        isRequired={false}
                                         allowedProfiles={availableMembers}
                                         selectedProfiles={selectedProfiles}
                                         hasSubmitted={form.hasSubmitted()}
-                                        ref={form.setFormRef(pageId)} 
-                                        onValueChanged={form.handleValueChanged(pageId)} 
+                                        ref={form.setFormRef(pageId)}
+                                        onValueChanged={form.handleValueChanged(pageId)}
                                         placeholder={translate("form.invite.users.placeholder")}
                                         description={translate("form.invite.users.description")}
-                                        title={translate("form.invite.users.title")} 
-                                        id={nameof("users")} 
+                                        title={translate("form.invite.users.title")}
+                                        id={nameof("users")}
                                         />
                                         </>
                             }} />

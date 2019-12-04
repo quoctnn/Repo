@@ -2,7 +2,7 @@ import { combineReducers } from "redux";
 import { persistReducer } from "redux-persist";
 import storage from 'redux-persist/lib/storage';
 import language from './language';
-import { theme } from "./theme";
+import { theme, ReduxTheme } from "./theme";
 import endpoint from './endpoint';
 import authentication, { AuthenticationData } from "./authentication";
 import { embedlyStore } from "../components/general/embedly/redux";
@@ -51,7 +51,7 @@ export enum ReduxKeys{
 export interface ReduxState
 {
     language:{language:AppLanguage}
-    theme:{theme:number}
+    theme:ReduxTheme
     endpoint: {endpoint: number}
     authentication: AuthenticationData;
     embedlyStore:{byId:{[id:string]:EmbedCardItem}, allIds:string[], queuedIds:{[id:string]:boolean}},

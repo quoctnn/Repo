@@ -21,6 +21,7 @@ import { RoleManager } from './ContextRolesComponent';
 import Avatar from '../Avatar';
 import { TimeComponent } from '../TimeComponent';
 import ContextInviteComponent from './ContextInviteComponent';
+import UserProfileAvatar from '../UserProfileAvatar';
 
 type MembersFilters = {
     search:string
@@ -241,11 +242,10 @@ export default class ContextMembersComponent extends React.Component<Props, Stat
         const failed = failedArray.contains( profile.id )
         const cn = classnames({"bg-warning":failed})
         const footer = this.renderMemberFooter(profile)
-        const avatarUrl = userAvatar(profile)
         let right:React.ReactNode = undefined
         const memberOptions = this.hasAccess ? this.getMemberOptions(profile) : []
         right = memberOptions.length > 0 && <DropDownMenu closeOnSelect={false} className="community-member-option-dropdown" triggerClass="fas fa-ellipsis-v mx-1" items={memberOptions}></DropDownMenu>
-        return <GenericListItem key={profile.id} to={profile.uri} className={cn} header={title} left={<Avatar size={44} image={avatarUrl} />} footer={footer} right={right}/>
+        return <GenericListItem key={profile.id} to={profile.uri} className={cn} header={title} left={<UserProfileAvatar size={40} borderWidth={2} borderColor="white" profileId={profile.id} />} footer={footer} right={right}/>
     }
     fetchMembers = (offset:number, completion:(items:PaginationResult<UserProfile>) => (void)) => {
         let {search} = this.state.filters
@@ -278,7 +278,7 @@ export default class ContextMembersComponent extends React.Component<Props, Stat
         {
             this.clearSelection()
         }
-        else 
+        else
             this.selectAll()
     }
     reloadList = () => {
@@ -324,16 +324,16 @@ export default class ContextMembersComponent extends React.Component<Props, Stat
     renderAddMemberForm = () => {
         const {members, availableMembers, contextObject} = this.props
         const visible = this.state.addMembersFormVisible
-        return <ContextInviteComponent 
-                    members={[]} 
-                    availableMembers={availableMembers} 
-                    contextNaturalKey={this.props.contextNaturalKey} 
-                    key={this.state.addMembersFormReloadKey} 
-                    onCompleted={this.handleAddMembersCompleted} 
-                    didCancel={this.hideAddMembersForm} 
-                    visible={visible} 
-                    contextObject={contextObject} 
-                    activeMembershipInvitations={members} 
+        return <ContextInviteComponent
+                    members={[]}
+                    availableMembers={availableMembers}
+                    contextNaturalKey={this.props.contextNaturalKey}
+                    key={this.state.addMembersFormReloadKey}
+                    onCompleted={this.handleAddMembersCompleted}
+                    didCancel={this.hideAddMembersForm}
+                    visible={visible}
+                    contextObject={contextObject}
+                    activeMembershipInvitations={members}
                     />
     }
     renderHeaderButtons = () => {
@@ -383,10 +383,10 @@ export default class ContextMembersComponent extends React.Component<Props, Stat
                 <Input className="mb-2" value={this.state.filters.search} type="text" onChange={this.handleSearchInputChange} placeholder={translate("common.filter.members")}/>
                 {this.hasAccess && <div className={classnames("list-header", {active:headerActive})}>
                     <Checkbox checked={headerActive} checkedIcon="fas fa-minus" onValueChange={this.headerToggle} />
-                    <div className="flex-grow-1 text-truncate p-1">{translate("Member")}</div>
+                    <div className="flex-grow-1 text-truncate m-1 p-2">{translate("Member")}</div>
                     {this.renderHeaderButtons()}
                 </div>}
-                <ListComponent<UserProfile> 
+                <ListComponent<UserProfile>
                     ref={this.listRef}
                     fetchData={this.fetchMembers}
                     renderItem={this.renderMember}

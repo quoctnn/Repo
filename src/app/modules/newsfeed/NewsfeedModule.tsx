@@ -50,6 +50,7 @@ interface State
     selectedSearchContext:ContextSearchData
     includeSubContext:boolean
     filter:ObjectAttributeType
+    scrolledDown:boolean
 
     contextNaturalKey:ContextNaturalKey,
     contextObjectId:number
@@ -59,7 +60,8 @@ interface State
 type Props = ReduxStateProps & OwnProps & DefaultProps & RouteComponentProps<any>
 
 class NewsfeedModule extends React.Component<Props, State> {
-    private observers:EventSubscription[] = []
+    private scrollTrigger:number = 300;
+    private observers:EventSubscription[] = [];
     static defaultProps:DefaultProps = {
         includeSubContext:true
     }
@@ -75,6 +77,7 @@ class NewsfeedModule extends React.Component<Props, State> {
             includeSubContext:props.includeSubContext,
             filter:null,
             isLoading:false,
+            scrolledDown:false,
             feedReloadContext:uniqueId(),
             contextNaturalKey:undefined,
             contextObjectId:undefined,
@@ -82,6 +85,7 @@ class NewsfeedModule extends React.Component<Props, State> {
         }
     }
     componentDidMount = () => {
+      document.addEventListener('scroll', this.trackScrolling);
         const websocketUpdate = NotificationCenter.addObserver(eventStreamNotificationPrefix + EventStreamMessageType.SOCKET_STATE_CHANGE, this.websocketConnect)
         this.observers.push(websocketUpdate)
     }
@@ -91,6 +95,7 @@ class NewsfeedModule extends React.Component<Props, State> {
         this.newsfeedComponent = null
         this.statuscomposer = null
         this.observers.forEach(o => o.remove())
+          document.removeEventListener('scroll', this.trackScrolling);
         this.observers = null
     }
     componentDidUpdate = (prevProps:Props) => {
@@ -98,6 +103,13 @@ class NewsfeedModule extends React.Component<Props, State> {
         if(prevProps.breakpoint != this.props.breakpoint && this.props.breakpoint < ResponsiveBreakpoint.standard && this.state.isLoading)
         {
             this.setState({isLoading:false})
+        }
+    }
+    trackScrolling = () => {
+        if (this.state.scrolledDown && window.scrollY < (window.innerHeight + this.scrollTrigger)) {
+            this.setState({scrolledDown:false})
+        } else if (!this.state.scrolledDown && window.scrollY >= (window.innerHeight + this.scrollTrigger)) {
+            this.setState({scrolledDown:true})
         }
     }
     shouldComponentUpdate = (nextProps:Props, nextState:State) => {
@@ -110,6 +122,7 @@ class NewsfeedModule extends React.Component<Props, State> {
                 nextState.contextNaturalKey != this.state.contextNaturalKey ||
                 nextState.contextObjectId != this.state.contextObjectId ||
                 nextState.isLoading != this.state.isLoading ||
+                nextState.scrolledDown != this.state.scrolledDown ||
                 nextState.filter != this.state.filter ||
                 nextState.includeSubContext != this.state.includeSubContext ||
                 nextState.selectedSearchContext != this.state.selectedSearchContext ||
@@ -210,6 +223,10 @@ class NewsfeedModule extends React.Component<Props, State> {
     connectRef = (ref) => {
         this.newsfeedComponent = ref
     }
+    scrollTop = (e:React.MouseEvent) => {
+        e.preventDefault();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
     renderHeaderFilter = () => {
         if(this.state.menuVisible)
             return null
@@ -237,6 +254,7 @@ class NewsfeedModule extends React.Component<Props, State> {
         const {breakpoint, history, match, location, staticContext, className, contextNaturalKey, contextObjectId, contextObject, includeSubContext, contextData, dispatch, ...rest} = this.props
         const headerClick = breakpoint < ResponsiveBreakpoint.standard ? this.headerClick : undefined
         const {contextTitle} = this.state
+        const scrollClassNames = classnames("btn btn-themed scroll-top-btn", {visible:this.state.scrolledDown})
         const resolvedContextNaturalKey = this.state.contextNaturalKey || this.props.contextNaturalKey
         const resolvedContextObjectId =  this.state.contextObjectId || this.props.contextObjectId
         const disableContextSearch = !!contextNaturalKey && !!contextObjectId
@@ -262,6 +280,7 @@ class NewsfeedModule extends React.Component<Props, State> {
                             feedReloadContext={this.state.feedReloadContext}
                             scrollParent={window}
                             />
+                        <button className={scrollClassNames} onClick={this.scrollTop}><i className="fa fa-chevron-circle-up"></i> {translate("common.navigation.top")}</button>
                     </ModuleContent>
                     <ModuleFooter></ModuleFooter>
                     <ModuleMenu visible={this.state.menuVisible}>

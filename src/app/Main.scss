@@ -1,4 +1,17 @@
 @import "./Config";
+
+.col-1, .col-2, .col-3, .col-4, .col-5, .col-6, .col-7, .col-8, .col-9, .col-10, .col-11, .col-12, .col, .col-auto, .col-sm-1, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9, .col-sm-10, .col-sm-11, .col-sm-12, .col-sm, .col-sm-auto, .col-md-1, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-9, .col-md-10, .col-md-11, .col-md-12, .col-md, .col-md-auto, .col-lg-1, .col-lg-2, .col-lg-3, .col-lg-4, .col-lg-5, .col-lg-6, .col-lg-7, .col-lg-8, .col-lg-9, .col-lg-10, .col-lg-11, .col-lg-12, .col-lg, .col-lg-auto, .col-xl-1, .col-xl-2, .col-xl-3, .col-xl-4, .col-xl-5, .col-xl-6, .col-xl-7, .col-xl-8, .col-xl-9, .col-xl-10, .col-xl-11, .col-xl-12, .col-xl, .col-xl-auto{
+    padding-left: 8px;
+    padding-right: 8px;
+}
+.row{
+    margin-left: -8px;
+    margin-right: -8px;
+}
+.container{
+    padding-left: 16px;
+    padding-right: 16px;
+}
 .scrollbar, .vertical-scroll, .DraftEditor-editorContainer
 {
     -webkit-overflow-scrolling: touch;
@@ -18,6 +31,7 @@
 //standard overrides
 html{
     height: 100%;
+    @include var(font-size, font-size-default);
 }
 ul,li{ list-style-type: none; padding: 0;}
 //bootstrap extensions/overrides
@@ -27,6 +41,9 @@ ul,li{ list-style-type: none; padding: 0;}
 .title-text{
     font-size: 1.3em;
     font-weight: bold;
+}
+.normal-text{
+    font-size: 0.9rem;
 }
 .small-text{
     font-size: 0.7em;
@@ -117,6 +134,10 @@ ul,li{ list-style-type: none; padding: 0;}
     width: 100%;
 }
 //borders
+.border-w0{
+    border-width: 0 !important;
+    border-color: transparent;
+}
 .border-1{
     @include var(border-color, border-color-default);
     border-width: 1px;
@@ -139,12 +160,24 @@ button{@include var(color, primary-text-color);}
 .btn-rounded{
     border-radius: 10em;
 }
+.btn-themed{
+    @include var(background-color, primary-theme-color);
+    @include var(border-color, primary-theme-color);
+    color: #FFFFFF;
+    &:hover{
+        color: #FFFFFF;
+        filter: brightness(90%);
+    }
+    &:focus{
+        box-shadow: unset;
+    }
+}
 .panel-rounded{
     border-radius: 0.25rem;
 }
 .btn-xs{
     padding: 0.25rem 0.5rem;
-    font-size: 0.75rem;
+    font-size: 0.65rem;
     line-height: 1.5;
     border-radius: 0.2rem;
 }
@@ -182,6 +215,9 @@ button{@include var(color, primary-text-color);}
 {
     @include var(color, secondary-text-color);
 }
+.select-input-field {
+    @include var(color, feed-form-options-color);
+}
 .shadow
 {
     text-shadow: 0 0 3px rgba(0, 0, 0, .8);
@@ -208,10 +244,6 @@ button{@include var(color, primary-text-color);}
 .primary-theme-color{
     @include var(color, primary-theme-color);
 }
-.theme-bg-gradient, .badge-theme{
-    background-image: linear-gradient(to left, #{map-get($root, secondary-theme-color)}, #{map-get($root, primary-theme-color)});
-    background-image: linear-gradient(to left, var(--secondary-theme-color), var(--primary-theme-color));
-}
 .badge-notification-container{
     position: relative;
     .badge-notification{
@@ -221,12 +253,15 @@ button{@include var(color, primary-text-color);}
     }
 }
 .badge-notification{
-    font-size: 0.7rem;
+    font-size: 0.6rem;
 }
 .theme-box{
-    color:white;
+    @include var(color, primary-theme-color);
     border-radius: 8px;
     padding: 0 4px
+}
+.theme-box-background{
+    background-color: #FFFFFF;
 }
 .drop-shadow-large
 {
@@ -300,15 +335,9 @@ body[class*="has-side-menu-"]{
     @media (min-width: 640px){
         .page
         {
-            margin-left: $sideMenuInactiveWidth;    
+            margin-left: $sideBarWidth;
             margin-top: 15px;
             margin-bottom: 15px;
-        }
-        &.side-menu-locked{
-            .page
-            {
-                margin-left: $sideMenuActiveWidth;
-            }
         }
     }
 }
@@ -368,7 +397,7 @@ body.dash-fill
         flex:1;
         flex-direction: column;
         display: flex;
-        height: 100%;
+        height: 100%
     }
     .fill{
 

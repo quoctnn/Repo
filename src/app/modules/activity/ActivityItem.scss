@@ -18,12 +18,12 @@ $margin:5px;
         font-weight: 700;
     }
     .activity-content{
-        max-height: 4rem;
+        max-height: 4.1rem;
         border-radius: 10px;
         overflow: hidden;
         position: relative;
         align-items: center;
-        font-size: 14px;
+        font-size: 0.9rem;
 
         .avatar{
             justify-content: center;
@@ -38,7 +38,7 @@ $margin:5px;
             overflow: hidden;
             white-space: unset;
             word-break: break-word;
-            max-height: 40px;
+            max-height: 3rem;
         }
         .date{
             font-weight: 400;

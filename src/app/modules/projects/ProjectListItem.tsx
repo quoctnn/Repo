@@ -13,11 +13,11 @@ type OwnProps = {
 type State = {
 }
 type Props = OwnProps & React.HTMLAttributes<HTMLElement>
-export default class ProjectListItem extends React.Component<Props, State> {  
+export default class ProjectListItem extends React.Component<Props, State> {
     constructor(props:Props) {
         super(props);
         this.state = {
-            
+
         }
     }
     shouldComponentUpdate = (nextProps:Props, nextState:State) => {
@@ -36,7 +36,7 @@ export default class ProjectListItem extends React.Component<Props, State> {
                         <div className="top">
                             <SecureImage className="img" setBearer={true} setAsBackground={true} url={cover}/>
                             <div className="title-row d-flex align-items-center flex-row">
-                                <div className="theme-box theme-bg-gradient flex-shrink-0">
+                                <div className="theme-box flex-shrink-0">
                                     {count}&nbsp;
                                     <i className="fa fa-user"></i>
                                 </div>

@@ -198,7 +198,6 @@ export default class MentionEditor extends React.Component<Props, State> {
     }
     logState(editorState:EditorState){
         const content = editorState.getCurrentContent()
-        console.log("state", convertToRaw(content))
     }
     componentWillUnmount = () => {
         this.removeBackDrop()
@@ -228,7 +227,6 @@ export default class MentionEditor extends React.Component<Props, State> {
 
     onAddMention = (mention) => {
         // get the mention object selected
-        console.log("mention", mention);
     }
 
     focus = (e?:React.SyntheticEvent<any>) => {
@@ -246,9 +244,7 @@ export default class MentionEditor extends React.Component<Props, State> {
         this.toggleEmojiPanel(e)
     }
     onEmojiClick = (a, e, event) => {
-        console.log(a, e, event)
         let emoji = jsemoji.replace_colons(`:${e.name}:`)
-        console.log(emoji)
         this.insertText(emoji, this.props.editorState)
     }
     addBackDrop = () => {

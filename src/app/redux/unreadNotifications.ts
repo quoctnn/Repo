@@ -7,15 +7,6 @@ export enum UnreadNotificationsActionTypes {
     SetUnreadNotifications = 'unread_notifications.set_notifications',
     Reset = "unread_notifications.reset",
 }
-export interface StyleTheme {
-    name: string;
-    selector: string;
-}
-export const availableThemes: StyleTheme[] = [
-    { name: 'Default', selector: '' },
-    { name: 'Light', selector: 'light' },
-    { name: 'Dark', selector: 'dark' }
-]
 const INITIAL_STATE: UnreadNotifications = {
     conversations: 0,
     notifications: 0

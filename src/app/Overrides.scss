@@ -7,7 +7,7 @@
     .module-header,.module-menu{
         @include var(background-color, main-content-background);
         border-radius: 8px;
-        margin-bottom: 8px;
+        margin-bottom: 16px;
     }
     .chat-message-composer-container{
         border-radius: 8px;

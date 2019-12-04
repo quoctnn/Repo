@@ -1,61 +1,125 @@
-$margin:5px;
-$height:44px;
-.task-list-item{
-    margin-bottom: $margin;
-    margin-left: $margin;
-    margin-right: $margin;
-    border-radius: $height/2;
-    background: rgb(233, 233, 233);
-    color:#5d5d5d;
-    &:first-child{
-        margin-top: $margin;
+@import './../../Config';
+.task-list-item-container {
+    &:hover {
+        text-decoration: none;
     }
-    .chat-message-composer-container{
-        margin: 0;
-    }
-    .task-content{
-        display: flex;
-        height: $height;
-        border-radius: $height/2;
-        background: #F3F3F3;
-        align-items: center;
-        padding-left: 10px;
+    .task-list-item {
         cursor: pointer;
-        .overflow-menu{
-            visibility: hidden;
-            &.active{
-                visibility: visible;
+        border-radius: 6px;
+        .left {
+            display: flex;
+            align-items: center;
+            .avatar {
+                .image-container {
+                    box-shadow: none;
+                    border-style: dashed !important;
+                    border-width: 2px !important;
+                }
+            }
+            .mark {
+                margin-left: 0.25rem;
             }
         }
-        &:hover{
-            .overflow-menu{
-                visibility: visible;
-            }
+        .center {
+            font-size: 0.8rem;
+            font-weight: normal;
         }
-        .title{
-            flex: 1;
-            min-width: 0; 
-            margin-right: 5px;
-            &:last-child{
-                margin-right: 10px;
-            }
-        }
-        .task-priority{
-            margin-right: 5px;
-            flex-shrink: 0;
-            padding: 0 10px;
+        .right {
             align-items: center;
             display: flex;
-            height: $height - 10;
-            border-radius: ($height - 10) / 2;
-            color:white;
+            .avatar-stacked {
+                margin: 0;
+            }
+            .v-bar {
+                @include var(background-color, primary-text-color);
+            }
+        }
+        .header {
+            white-space: initial;
+        }
+        .footer {
+            > *:first-child {
+                margin-left: 0 !important;
+            }
         }
     }
-    .collapse-body{
+}
 
-        .date-picker-container{
-            padding: 8px;
-            padding-left: 0;
+.task-item-hover-container {
+    margin: 4px 8px;
+}
+
+.task-hover-card {
+    @include var(background-color, body-background);
+    @include var(border-color, border-color-default);
+    pointer-events: none;
+    min-width: 400px;
+    border: 2px solid;
+    border-radius: 5px;
+    visibility: hidden;
+    position: absolute;
+    margin-right: 16px;
+    z-index: 1049;
+}
+
+.task-hover-card .state-info {
+    display: flex;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin: 4px;
+    .task-priority > span {
+        margin: 0 4px;
+    }
+    .task-state {
+        margin-left: 16px;
+        flex-grow: 1;
+        > span {
+            margin: 0 4px;
         }
+    }
+}
+
+.task-hover-card .task-details {
+    font-size: 0.9rem;
+    margin: 4px;
+    display: flex;
+    .task-attributes {
+        flex-grow: 1;
+    }
+    .task-tags .tag {
+        margin: 0 2px;
+    }
+}
+
+.task-hover-card .task-description {
+    margin: 4px;
+}
+
+.task-hover-card .task-user-details {
+    display: flex;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin: 4px;
+    .task-creator {
+        margin-left: 4px;
+    }
+    .task-last-changed {
+        margin-left: 4px;
+
+    }
+}
+.task-hover-card .task-hover-card-footer {
+    display: flex;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin: 4px;
+    height: 3rem;
+    .task-user-details {
+        flex-grow: 1;
+        display: block;
+    }
+    .task-time-use {
+        text-align: right;
+        margin-right: 4px;
     }
 }

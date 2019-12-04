@@ -86,13 +86,13 @@ export class ContextData {
         }
     }
     toString = () => {
-        return `loading:${this.loading}, 
-        community:${this.community}, 
-        task:${this.task}, 
-        profile:${this.profile}, 
-        project:${this.project}, 
-        event:${this.event}, 
-        group:${this.group}, 
+        return `loading:${this.loading},
+        community:${this.community},
+        task:${this.task},
+        profile:${this.profile},
+        project:${this.project},
+        event:${this.event},
+        group:${this.group},
         conversation:${this.conversation}`
     }
 
@@ -178,7 +178,7 @@ class ContextDataResolverComponent extends React.Component<ContextDataResolverPr
         this.observers.push(observer1)
     }
     processLogContextDataNotification = (...args: any[]) => {
-        console.log("ContextData", this.nextData)
+        // TODO: Should we do something here?
     }
     tryForceUpdate = () => {
         if (this.mounted)
@@ -219,7 +219,7 @@ class ContextDataResolverComponent extends React.Component<ContextDataResolverPr
         {
             CommunityManager.applyCommunityTheme(nextData.community)
         }
-        if (nextData.mainContextNaturalKey && prevData.mainContextNaturalKey) { // 
+        if (nextData.mainContextNaturalKey && prevData.mainContextNaturalKey) { //
             const p = prevData.getContextObject(prevData.mainContextNaturalKey)
             const c = nextData.getContextObject(nextData.mainContextNaturalKey)
             const pPath = prevData.path

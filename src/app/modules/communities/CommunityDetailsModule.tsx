@@ -266,18 +266,18 @@ class CommunityDetailsModule extends React.Component<Props, State> {
         {
             if(community.muted)
                 options.push({id:"unmute", type:OverflowMenuItemType.option, title:translate("common.unmute"), onPress:this.toggleMute, iconClass:"fas fa-bell-slash"})
-            else 
+            else
                 options.push({id:"mute", type:OverflowMenuItemType.option, title:translate("common.mute"), onPress:this.toggleMute, iconClass:"fas fa-bell"})
         }
         if(community.group_creation_permission >= Permission.limited_write)
             options.push({id:"addGroup", type:OverflowMenuItemType.option, title:translate("group.add"), onPress:this.showGroupCreateForm, iconClass:"fas fa-plus"})
-        
+
         if(community.event_creation_permission >= Permission.limited_write)
             options.push({id:"addEvent", type:OverflowMenuItemType.option, title:translate("event.add"), onPress:this.showEventCreateForm, iconClass:"fas fa-plus"})
-        
+
         if(community.project_creation_permission >= Permission.limited_write)
             options.push({id:"addProject", type:OverflowMenuItemType.option, title:translate("project.add"), onPress:this.showProjectCreateForm, iconClass:"fas fa-plus"})
-        
+
         if(community.creator != authenticatedUser.id && members.contains(authenticatedUser.id))
             options.push({id:"leave", type:OverflowMenuItemType.option, title:translate("common.leave"), onPress:this.showConfirmLeaveDialog, iconClass:"fas fa-sign-out-alt"})
         return options
@@ -320,7 +320,7 @@ class CommunityDetailsModule extends React.Component<Props, State> {
         const communityOptions = this.getCommunityOptions()
         return (<Module {...rest} className={cn}>
                     <ModuleHeader headerTitle={community && community.name || translate("detail.module.title")} loading={this.state.isLoading}>
-                       {communityOptions.length > 0 && <DropDownMenu className="community-option-dropdown" triggerClass="fas fa-cog mx-1" items={communityOptions}></DropDownMenu>} 
+                       {communityOptions.length > 0 && <DropDownMenu className="community-option-dropdown" triggerClass="fas fa-cog fa-2x mx-1" items={communityOptions}></DropDownMenu>}
                     </ModuleHeader>
                     <ModuleContent>
                         { community && community.permission >= Permission.read &&

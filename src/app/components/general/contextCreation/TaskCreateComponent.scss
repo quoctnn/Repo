@@ -1,0 +1,10 @@
+.hours-minutes-group {
+    display: flex;
+    justify-content: flex-start;
+    flex-direction: row;
+    margin: auto -4px;
+    >div {
+        flex-grow: 1;
+        margin: auto 4px;
+    }
+}

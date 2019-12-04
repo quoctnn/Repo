@@ -46,7 +46,6 @@ class ProfileExperienceModule extends React.PureComponent<Props, State> {
         this.setState((prevState:State) => {
             return {isLoading:true, positions:[]}
         }, () => {
-            console.log("fetching positions")
             ApiClient.getPositions(10, 0, profileId,(data, status, error) => {
                 const langs = data && data.results || []
                 this.setState((prevState:State) => {

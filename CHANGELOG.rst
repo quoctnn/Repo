@@ -2,6 +2,35 @@
 Task schedule
 -->
 
+v0.5.8 | 04.12.2019
+-----------------------------------------
+
+Added:
+======
+Task creation and updating
+Form for registering new users
+Membership requests administration in community, group and event settings
+Font size global option
+User theme preference is saved in backend
+Back button on Electron apps
+
+
+Changes:
+========
+New sidebar menu, community selector
+Task listing has new layout
+Private conversations are disabled if user has been blocked
+Notifications dialog shows only 5 items per category by default
+Improved contacts module performance
+
+
+Bugfixes:
+=========
+Profile theme was broken
+Font color issues/inconsistensies
+
+
+
 v0.5.7 | 22.10.2019
 -----------------------------------------
 
@@ -40,7 +69,7 @@ Added:
 * Event create/update form
 * Project create/update form
 * Components for avatar/cover cropping
-* More context links in search results 
+* More context links in search results
 * Invitations list for Community, Group and Event
 * Invite form for Community, Group and Event
 * Warning/info box for Internet connection loss

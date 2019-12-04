@@ -1,0 +1,50 @@
+@import "../../../Config.scss";
+
+.list-item{
+    display: flex;
+    margin: 4px 1px;
+    padding: 6px;
+    padding-left: 0;
+    border-radius: 8px 0 0 8px;
+    &.active{
+        @include var(background-color, main-content-secondary-background);
+        @include var(color, primary-theme-color);
+    }
+}
+
+.search{
+    margin-bottom: 8px;
+    margin-right: 8px;
+    border: solid 2px;
+    border-radius: 8px;
+    @include var(border-color, border-color-default)
+}
+
+.filter-container {
+    margin-bottom: 8px;
+    .search{
+        margin: auto;
+    }
+}
+
+.content{
+    height: inherit;
+}
+
+.items{
+    overflow: auto;
+}
+
+.empty-list{
+    font-size: 0.85rem;
+    font-weight: 400;
+    text-align: center;
+}
+
+.sorting {
+    margin: auto;
+}
+
+.sorting-trigger {
+    margin-left: 4px;
+}

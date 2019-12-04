@@ -32,9 +32,10 @@ type InvitationComponentProps = {
     createdAt: string
     onClose: () => void
 }
+const avatarSize = 44
 const InvitationComponent = (props: InvitationComponentProps) => {
 
-    const avt = typeof props.avatar == "string" ? <Avatar image={props.avatar} /> : props.avatar
+    const avt = typeof props.avatar == "string" ? <Avatar image={props.avatar} size={avatarSize} /> : props.avatar
     const avatar = !!props.avatarLink ? <Link onClick={props.onClose} to={props.avatarLink}>{avt}</Link> : avt
     const header = !!props.link ? <Link onClick={props.onClose} to={props.link} className="title">{props.title}</Link> : props.title
     return <ListItem className="invitation p-2" hasAction={true}>
@@ -334,8 +335,7 @@ const ReminderComponent = (props: ReminderProps) => {
     const time = props.notification.datetime
     const action = translate(`notification.reminder.${props.notification.type}`)
     const title = <Link onClick={props.onClose} className="no-link" to={props.notification.uri}>{action}</Link>
-    const style: React.CSSProperties = { width: Avatar.WrappedComponent.defaultProps.size, height: Avatar.WrappedComponent.defaultProps.size, borderRadius: "50%" }
-    const avatar = <div className="primary-theme-bg d-flex justify-content-center align-items-center" style={style}>
+    const avatar = <div style={{width:avatarSize, height:avatarSize, borderRadius:"50%"}} className="primary-theme-bg d-flex justify-content-center align-items-center">
         <i className="fas fa-bell"></i>
     </div>
     const avatarLink = props.notification.uri

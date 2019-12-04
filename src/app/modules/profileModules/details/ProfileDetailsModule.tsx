@@ -103,7 +103,6 @@ class ProfileDetailsModule extends React.PureComponent<Props, State> {
         this.setState((prevState:State) => {
             return {isLoading:true, latestJob:null}
         }, () => {
-            console.log("fetching positions")
             ApiClient.getPositions(10, 0, profileId,(data, status, error) => {
                 const position = (data && data.results || []).filter(p => !p.end_date).sort((a,b) => (a.start_date && stringToDate(a.start_date).valueOf() || 0) - (b.start_date && stringToDate(b.start_date).valueOf() || 0))[0]
                 this.setState((prevState:State) => {
@@ -377,7 +376,7 @@ class ProfileDetailsModule extends React.PureComponent<Props, State> {
         const profileOptions = this.getProfileOptions()
         return (<Module {...rest} className={cn}>
                     <ModuleHeader loading={false} headerTitle={title}>
-                    {profileOptions.length > 0 && <DropDownMenu className="profile-option-dropdown" triggerClass="fas fa-cog mx-1" items={profileOptions}></DropDownMenu>}
+                    {profileOptions.length > 0 && <DropDownMenu className="profile-option-dropdown" triggerClass="fas fa-cog fa-2x mx-1" items={profileOptions}></DropDownMenu>}
                     </ModuleHeader>
                     <ModuleContent>
                         <div className="content">

@@ -13,13 +13,12 @@ import { NavigationUtilities } from "../../utilities/NavigationUtilities";
 import Routes from "../../utilities/Routes";
 import UserMenu from "../UserMenu";
 import classnames = require("classnames");
-import CommunitySelector from "../general/community/CommunitySelector";
 import BreadcrumbNavigation from "./BreadcrumbNavigation";
 import Logo from "../general/images/Logo";
 import { EventSubscription } from "fbemitter";
-import { AnimatedIconStack } from "../general/AnimatedIconStack";
-import { NotificationCenter } from "../../utilities/NotificationCenter";
-import { SideMenuNavigationVisibilityChangeNotification } from "./SideMenuNavigation";
+import { FontSizeAdjuster } from '../general/FontSizeAdjuster';
+import LogoSmall from "../general/images/LogoSmall";
+import MobileNavigation from "./sidebar/mobile/MobileNavigation";
 
 type OwnProps = {
 }
@@ -43,17 +42,6 @@ class TopNavigation extends React.Component<Props, State> {
             notificationsPanelVisible:false,
             sideMenuOpen:false
         }
-        const observer1 = NotificationCenter.addObserver(SideMenuNavigationVisibilityChangeNotification, this.processMenuVisibilityChangeNotification)
-        this.observers.push(observer1)
-    }
-    processMenuVisibilityChangeNotification = (...args:any[]) => {
-        const open = args[0].open
-        if(this.state.sideMenuOpen != open)
-        {
-            this.setState(() => {
-                return {sideMenuOpen:open}
-            })
-        }
     }
     componentWillUnmount() {
         this.observers.forEach(o => o.remove())
@@ -71,6 +59,12 @@ class TopNavigation extends React.Component<Props, State> {
         this.setState((prevState:State) => {
             return {notificationsPanelVisible:!prevState.notificationsPanelVisible}
         })
+    }
+    toggleSideMenu = (e?:React.SyntheticEvent<any>) => {
+        this.setState((prevState:State) => {
+            return {sideMenuOpen:!prevState.sideMenuOpen}
+        })
+
     }
     renderNotificationsPanel = () => {
         return <SimpleDialog className="notifications-modal" header={translate("Notifications")} visible={this.state.notificationsPanelVisible} didCancel={this.toggleNotificationPanel}>
@@ -91,36 +85,54 @@ class TopNavigation extends React.Component<Props, State> {
         return <div className="d-flex justify-content-center mw0">
                     { profile && !profile.is_anonymous &&
                         <>
-                            <Link className={communityLinkClass} to={communityLink}>
+                            <Link className={communityLinkClass} to={communityLink} title={translate("common.core.community")}>
                                 <i className="fa fa-globe" />
-                                <div className="text-truncate">{translate("common.core.community")}</div>
+                                <div className="hide-narrow text-truncate">{translate("common.core.community")}</div>
                             </Link>
-                            <Link className={dashboardClass} to={dashboardLink}>
+                            <Link className={dashboardClass} to={dashboardLink} title={translate("common.dashboard")}>
                                 <i className="fa fa-tachometer-alt" />
-                                <div className="text-truncate">{translate("common.dashboard")}</div>
+                                <div className="hide-narrow text-truncate">{translate("common.dashboard")}</div>
                             </Link>
-                            <Link to={conversationsLink} className={conversationsLinkClass}>
+                            <Link to={conversationsLink} className={conversationsLinkClass} title={translate("common.messages")}>
                                 <i className="fa fa-comment" />
-                                <div className="text-truncate">{translate("common.messages")}</div>
+                                <div className="hide-narrow text-truncate">{translate("common.messages")}</div>
                                 {this.props.unreadConversations > 0 && <Badge pill={true} color="danger" className="ml-1 badge-notification">{this.props.unreadConversations}</Badge>}
                             </Link>
                         </>
                         ||
-                        <Logo idPrefix="top_nav" className="logo" progress={0} />
+                        <Link to={dashboardLink}><Logo idPrefix="top_nav" className="logo" progress={0} /></Link>
                     }
                 </div>
+    }
+    renderMobileMenu = () => {
+        return <>
+            <div className="mobile-menu-icon" title={translate("Menu")} onClick={this.toggleSideMenu}>
+                <i className="fa fa-2x fa-bars"></i>
+            </div>
+            <MobileNavigation visible={this.state.sideMenuOpen} hideMenu={() => {this.setState({sideMenuOpen:false})}}/>
+        </>
+    }
+    goBack = (e:React.MouseEvent) => {
+        window.history.back()
+    }
+    renderFontSizeAdjuster = () => {
+        return <FontSizeAdjuster />
     }
     render() {
         const profile = this.props.profile
         return (
             <div id="top-navigation">
                 <div className="top-navigation-content d-flex main-content-background align-items-center px-2 drop-shadow">
-                    <AnimatedIconStack size={2} active={this.state.sideMenuOpen} onClick={window.app.toggleMenu} className="menu-toggle d-none mr-2" iconA="fas fa-bars" />
-                    <CommunitySelector />
+                    { window.isElectron  &&
+                        <i className='fa fa-lg fa-chevron-left navigation-back' onClick={this.goBack} title={translate("common.back")}></i>
+                    }
+                    {this.renderMobileMenu()}
+                    <Link to={Routes.ROOT}><LogoSmall className="intrawork-logo-small" /></Link>
                     <div className="main-border-color-background mx-2" style={{ width: 1, height: "75%" }}></div>
                     <BreadcrumbNavigation />
                     {this.renderMenuLinks()}
                     <div className="profile-shortcuts">
+                        {this.renderFontSizeAdjuster()}
                         { profile && !profile.is_anonymous && <>
                                 <Button onClick={this.toggleNotificationPanel} color="link" className="badge-notification-container">
                                     <i className="fas fa-bell"></i>

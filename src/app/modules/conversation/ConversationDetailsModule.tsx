@@ -16,7 +16,6 @@ import { translate, lazyTranslate } from '../../localization/AutoIntlProvider';
 import { ProfileManager } from '../../managers/ProfileManager';
 import { ListItem, List, ListHeader } from '../../components/general/List';
 import { uniqueId, userFullName, userAvatar } from '../../utilities/Utilities';
-import Avatar from '../../components/general/Avatar';
 import SelectUsersDialog from '../../components/general/dialogs/SelectUsersDialog';
 import { InputGroup, Input } from 'reactstrap';
 import { DropDownMenu } from '../../components/general/DropDownMenu';
@@ -25,6 +24,7 @@ import { NotificationCenter } from '../../utilities/NotificationCenter';
 import { ConversationManager } from '../../managers/ConversationManager';
 import {ConnectedProfile} from '../../hoc/ConnectedContextObject';
 import { ContextDataProps, withContextData } from '../../hoc/WithContextData';
+import UserProfileAvatar from '../../components/general/UserProfileAvatar';
 type OwnProps = {
     className?:string
     breakpoint:ResponsiveBreakpoint
@@ -93,7 +93,7 @@ class ConversationDetailsModule extends React.Component<Props, State> {
             const temp = {...conversation}
             if(!title || title == "")
             {
-                temp.title = null 
+                temp.title = null
                 temp.temporary_id = null
                 this.setState((prevState:State) => {
                     return {title:ConversationUtilities.getConversationTitle(temp)}
@@ -156,12 +156,12 @@ class ConversationDetailsModule extends React.Component<Props, State> {
         return <ConnectedProfile key={member || uniqueId()} contextNaturalKey={ContextNaturalKey.USER} objectId={member} render={(profile) => {
                 return <ListItem  className="d-flex align-items-center justify-content-between member-item">
                 <div className="d-flex align-items-center mw0">
-                    <Avatar userStatus={profile.id} className="mr-2" size={40} image={userAvatar(profile, true)} />
+                    <UserProfileAvatar profileId={profile.id} className="mr-2" size={40} />
                     <div className="text-truncate">{userFullName(profile)}</div>
                 </div>
                 {this.renderMemberOptionsMenu(profile)}
             </ListItem>
-            }} /> 
+            }} />
     }
     toggleAddMembersDialog = () => {
         this.setState((prevState:State) => {
@@ -210,7 +210,7 @@ class ConversationDetailsModule extends React.Component<Props, State> {
             const possibleNewMembers = ProfileManager.getContactListIds(false).filter(u => !conversation.users.contains(u))
             contacts = ProfileManager.getProfiles(possibleNewMembers)
         }
-        return <SelectUsersDialog 
+        return <SelectUsersDialog
                     key={this.state.addMembersDialogReloadKey}
                     contacts={contacts}
                     title={translate("conversation.add.members")}
@@ -232,17 +232,17 @@ class ConversationDetailsModule extends React.Component<Props, State> {
         const items:OverflowMenuItem[] = []
         if(conversation.temporary)
             return items
-        
+
         items.push({id:"1", type:OverflowMenuItemType.option, title:translate("common.rename"), onPress:() => this.titleRef && this.titleRef.current && this.titleRef.current.focus(), toggleMenu:false})
         const isArchived = (conversation.archived_by || []).contains(this.props.authenticatedUser.id)
         items.push({id:"2", type:OverflowMenuItemType.option, title:translate("conversation.menu.delete"), onPress:() => NotificationCenter.push(ConversationActionDeleteNotification,[{conversation:conversation.id}]), toggleMenu:false})
         if(!isArchived)
             items.push({id:"3", type:OverflowMenuItemType.option, title:translate("conversation.menu.archive"), onPress:() => NotificationCenter.push(ConversationActionArchiveNotification,[{conversation:conversation.id}]), toggleMenu:false})
-        
+
         const canLeaveConversation = conversation.users.length > 2
         if(!conversation.temporary && canLeaveConversation)
             items.push({id:"4", type:OverflowMenuItemType.option, title:translate("conversation.leave"), onPress:() => NotificationCenter.push(ConversationActionLeaveNotification,[{conversation:conversation.id}]), toggleMenu:false})
-        
+
         return items
     }
     renderContent = () => {
@@ -256,9 +256,9 @@ class ConversationDetailsModule extends React.Component<Props, State> {
                     <div className="d-flex">
                         {ConversationUtilities.getAvatar(conversation, authenticatedUser.id, true)}
                         <InputGroup className="input-group-transparent">
-                            <Input innerRef={this.titleRef} placeholder={translate("common.title")} tabIndex={1} className="text-truncate form-control-transparent primary-text title-text" value={title} onChange={this.onTitleChange} onBlur={this.onTitleBlur} /> 
+                            <Input innerRef={this.titleRef} placeholder={translate("common.title")} tabIndex={1} className="text-truncate form-control-transparent primary-text title-text" value={title} onChange={this.onTitleChange} onBlur={this.onTitleBlur} />
                         </InputGroup>
-                        {!conversation.temporary && <DropDownMenu boundariesElement={document.body} items={this.getOptionMenuItems()} triggerClass="fas fa-cog action-button push-right" />}
+                        {!conversation.temporary && <DropDownMenu boundariesElement={document.body} items={this.getOptionMenuItems()} triggerClass="fas fa-cog fa-2x action-button push-right" />}
                     </div>
                     {!conversation.private && <ListHeader>{translate("conversation.members")}</ListHeader>}
                     {this.renderAddMembers()}

@@ -23,7 +23,7 @@
         @include var(background-color, button-disabled-background-color);
         @include var(color, button-disabled-text-color); }
     .explain{
-        font-size: 10px;
+        font-size: 0.6rem;
     }
 }
 .dev-tool-infoBox{

@@ -1,0 +1,15 @@
+.avatar
+{
+    .user-status-indicator
+    {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        height: 30%;
+        width: 30%;
+    }
+}
+.user-profile-avatar .avatar .image-container {
+    background-image: url("../../assets/default-user.png");
+    background-size: contain;
+}

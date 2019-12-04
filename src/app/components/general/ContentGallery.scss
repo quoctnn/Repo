@@ -26,7 +26,7 @@
             position: absolute;
             top:5px;
             right:5px;
-            font-size: 18px;
+            font-size: 1.15rem;
             background: white;
             border-radius: 6px;
             padding: 3px;
@@ -42,7 +42,7 @@
             display:flex;
             background: #2020209a;
             color:white;
-            font-size: 28px;
+            font-size: 1.8rem;
             justify-content: center;
             align-items: center;
         }
@@ -63,7 +63,7 @@
             {
                 z-index: 2;
                 color: white;
-                font-size: 30px;
+                font-size: 1.9rem;
                 padding: 12px 20px;
                 border-radius: 8px;
                 background: rgba(0, 0, 0, 0.445);
@@ -72,7 +72,7 @@
         }
         > .file-icon
         {
-            font-size: 30px;
+            font-size: 1.9rem;
         }
     }
     .gallery-item:first-child
@@ -112,7 +112,7 @@
         bottom: 0;
         width: 100%;
         h4{
-            font-size: 14px;
+            font-size: 0.9rem;
         }
     }
 
@@ -283,7 +283,7 @@
     }
     .gallery-file-item{
         .file-type{
-            font-size: 18px;
+            font-size: 1.15rem;
             background: white;
             border-radius: 6px;
             padding: 3px;

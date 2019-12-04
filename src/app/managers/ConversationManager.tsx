@@ -75,7 +75,7 @@ export abstract class ConversationManager
                 }
                 else
                 {
-                    console.log("error fetching conversation", error)
+                    console.error("error fetching conversation", error)
                 }
             })
         }
@@ -99,7 +99,7 @@ export abstract class ConversationManager
                 }
                 else
                 {
-                    console.log("error fetching conversation", error)
+                    console.error("error fetching conversation", error)
                 }
                 completion(data)
             })
@@ -152,7 +152,7 @@ export abstract class ConversationManager
             uri:Routes.conversationUrl("new"),
             permission:Permission.post,
             temporary:true,
-            
+
         }
         store.dispatch(setTemporaryConversationAction(conversation))
     }

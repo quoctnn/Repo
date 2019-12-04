@@ -14,7 +14,7 @@
         margin-left: 12px;
     }
     #searchclear, .searchclear {
-        font-size: 18px;
+        font-size: 1.15rem;
         color: #ccc;
         cursor: pointer;
         &.hidden{
@@ -23,19 +23,19 @@
     }
     .DraftEditor-root
     {
-        line-height: 30px;
+        line-height: 2rem;
         padding: 0 10px;
-        font-size: 18px !important;
+        font-size: 1.15rem !important;
         border: 0;
         outline: 0;
         box-shadow: none;
         width: 100%;
-        padding-right: 48px;
+        padding-right: 3rem;
         background: none;
         color:#5c5a5c;
         outline: 0 !important;
         box-shadow: none !important;
-        padding-left: 40px;
+        padding-left: 2.3rem;
         &:focus
         {
             border-color: #66afe9;
@@ -50,12 +50,12 @@
         display: block;
         align-items: center;
     }
-    
-    .public-DraftEditorPlaceholder-inner 
+
+    .public-DraftEditorPlaceholder-inner
     {
         color: gray;
-        position: absolute; 
-        pointer-events: none; 
+        position: absolute;
+        pointer-events: none;
         padding-left: 3px;
         padding-right: 3px;
         line-height: 1.7em;
@@ -97,7 +97,7 @@
         display: inline-block;
     }
     .public-DraftEditorPlaceholder-root{
-        position: static;   
+        position: static;
     }
     .editor:not(.multiline){
         .icon{
@@ -107,9 +107,7 @@
             position: absolute;
             right: 5px;
             bottom: 0;
-            height: 20px;
             margin: auto;
-            transform: translate(0, -10px);
             margin-bottom: 3px;
         }
         .public-DraftEditor-content[contenteditable=true] {

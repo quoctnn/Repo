@@ -60,7 +60,6 @@ class ProfileUpdateComponent extends React.Component<Props, State> {
     handleUpdateProfileFormSubmit = () => {
         const profile:Partial<UserProfile> = this.props.profile || {}
         const data = this.state.formValues
-        console.log("formdata", data)
         //const hasDataToSave = Object.keys(communityData).length > 0
         this.setFormStatus(FormStatus.submitting)
         const {
@@ -70,7 +69,7 @@ class ProfileUpdateComponent extends React.Component<Props, State> {
             locale,
             timezone,
             //
-            avatar, 
+            avatar,
             cover,
             //
             ...rest} = data
@@ -117,7 +116,7 @@ class ProfileUpdateComponent extends React.Component<Props, State> {
                             window.app.navigateToRoute(updatedProfile.uri)
                         })
                     }
-                    else 
+                    else
                         this.didCancel()
                 }
             }
@@ -179,14 +178,12 @@ class ProfileUpdateComponent extends React.Component<Props, State> {
     handleValueChanged = (id:string, value:any) => {
         this.setState((prevState:State) => {
             return {formValues:{...prevState.formValues, [id]:value}}
-        }, () => {
-            console.log(this.state.formValues)
-        })
+        }, () => {})
     }
     didCancel = () => {
         if(this.props.onCancel)
             this.props.onCancel()
-        else 
+        else
             this.back()
     }
     render = () => {
@@ -194,115 +191,115 @@ class ProfileUpdateComponent extends React.Component<Props, State> {
         const profile:Partial<UserProfile> = this.props.profile || {}
         const languages:InputOption[] = AppLanguage.all.map(p => {
             return {
-                label:AppLanguage.translationForKey(p), 
-                value:p, 
+                label:AppLanguage.translationForKey(p),
+                value:p,
             }
         })
-        return <FormController 
+        return <FormController
                     ref={(controller) => this.formController = controller }
-                    key={this.state.formReloadKey} 
-                    visible={visible} 
-                    formErrors={this.state.formErrors} 
-                    didCancel={this.didCancel} 
-                    status={this.state.formStatus} 
-                    onFormSubmit={this.handleUpdateProfileFormSubmit} 
-                    title={translate("profile.update")  } 
+                    key={this.state.formReloadKey}
+                    visible={visible}
+                    formErrors={this.state.formErrors}
+                    didCancel={this.didCancel}
+                    status={this.state.formStatus}
+                    onFormSubmit={this.handleUpdateProfileFormSubmit}
+                    title={translate("profile.update")  }
                     onValueChanged={this.handleValueChanged}
                     render={(form) => {
                         return {
                             menuItems:[
                                 <FormMenuItem key="1"
-                                    form={form} 
-                                    pageId="1" 
-                                    title={translate("profile.settings.page.title.primary")} 
-                                    description={translate("profile.settings.page.description.primary")}  
+                                    form={form}
+                                    pageId="1"
+                                    title={translate("profile.settings.page.title.primary")}
+                                    description={translate("profile.settings.page.description.primary")}
                                     />,
                                     <FormMenuItem key="2"
-                                    form={form} 
-                                    pageId="2" 
-                                    title={translate("profile.settings.page.title.appearance")} 
-                                    description={translate("profile.settings.page.description.appearance")}  
+                                    form={form}
+                                    pageId="2"
+                                    title={translate("profile.settings.page.title.appearance")}
+                                    description={translate("profile.settings.page.description.appearance")}
                                     />
                             ],
                             pages:[<FormPage key="page1" form={this.formController} pageId="1" render={(pageId, form) => {
                                     return <>
-                                        <TextInput 
-                                        errors={form.getErrors} 
-                                        isRequired={true} 
+                                        <TextInput
+                                        errors={form.getErrors}
+                                        isRequired={true}
                                         hasSubmitted={form.hasSubmitted()}
-                                        ref={form.setFormRef(pageId)} 
-                                        onValueChanged={form.handleValueChanged(pageId)} 
-                                        value={profile.first_name} 
-                                        title={translate("common.first_name")} 
-                                        id="first_name" 
+                                        ref={form.setFormRef(pageId)}
+                                        onValueChanged={form.handleValueChanged(pageId)}
+                                        value={profile.first_name}
+                                        title={translate("common.first_name")}
+                                        id="first_name"
                                         />
-                                        <TextInput 
-                                        errors={form.getErrors} 
-                                        isRequired={true} 
+                                        <TextInput
+                                        errors={form.getErrors}
+                                        isRequired={true}
                                         hasSubmitted={form.hasSubmitted()}
-                                        ref={form.setFormRef(pageId)} 
-                                        onValueChanged={form.handleValueChanged(pageId)} 
-                                        value={profile.last_name} 
-                                        title={translate("common.last_name")} 
-                                        id="last_name" 
+                                        ref={form.setFormRef(pageId)}
+                                        onValueChanged={form.handleValueChanged(pageId)}
+                                        value={profile.last_name}
+                                        title={translate("common.last_name")}
+                                        id="last_name"
                                         />
-                                        <SelectInput 
+                                        <SelectInput
                                             options={languages}
-                                            errors={form.getErrors} 
+                                            errors={form.getErrors}
                                             hasSubmitted={form.hasSubmitted()}
-                                            ref={form.setFormRef(pageId)} 
-                                            onValueChanged={form.handleValueChanged(pageId)} 
-                                            value={profile.locale} 
-                                            title={translate("common.language")} 
-                                            id="locale" 
+                                            ref={form.setFormRef(pageId)}
+                                            onValueChanged={form.handleValueChanged(pageId)}
+                                            value={profile.locale}
+                                            title={translate("common.language")}
+                                            id="locale"
                                             isRequired={true}
                                         />
                                         <TimezoneInput
-                                            errors={form.getErrors} 
+                                            errors={form.getErrors}
                                             hasSubmitted={form.hasSubmitted()}
-                                            ref={form.setFormRef(pageId)} 
-                                            onValueChanged={form.handleValueChanged(pageId)} 
-                                            value={profile.timezone} 
-                                            title={translate("common.timezone")} 
-                                            id="timezone" 
+                                            ref={form.setFormRef(pageId)}
+                                            onValueChanged={form.handleValueChanged(pageId)}
+                                            value={profile.timezone}
+                                            title={translate("common.timezone")}
+                                            id="timezone"
                                             isRequired={true}
-                                        /> 
-                                        <TextAreaInput 
-                                        errors={form.getErrors} 
+                                        />
+                                        <TextAreaInput
+                                        errors={form.getErrors}
                                         hasSubmitted={form.hasSubmitted()}
-                                        ref={form.setFormRef(pageId)} 
-                                        onValueChanged={form.handleValueChanged(pageId)} 
-                                        value={profile.biography} 
-                                        title={translate("common.biography")} 
-                                        id="biography" 
+                                        ref={form.setFormRef(pageId)}
+                                        onValueChanged={form.handleValueChanged(pageId)}
+                                        value={profile.biography}
+                                        title={translate("common.biography")}
+                                        id="biography"
                                         />
                                         </>
                             }} />,
                             <FormPage key="page2" form={this.formController} pageId="2" render={(pageId, form) => {
                                 return <>
-                                        <ContextPhotoInput 
-                                            errors={form.getErrors} 
+                                        <ContextPhotoInput
+                                            errors={form.getErrors}
                                             hasSubmitted={form.hasSubmitted()}
-                                            ref={form.setFormRef(pageId)} 
-                                            onValueChanged={form.handleValueChanged(pageId)} 
-                                            value={profile.avatar} 
-                                            title={translate("common.avatar")} 
+                                            ref={form.setFormRef(pageId)}
+                                            onValueChanged={form.handleValueChanged(pageId)}
+                                            value={profile.avatar}
+                                            title={translate("common.avatar")}
                                             onRequestNavigation={form.handleRequestNavigation}
                                             contextNaturalKey={ContextNaturalKey.USER}
                                             contextObjectId={profile.id}
-                                            id="avatar" 
+                                            id="avatar"
                                         />
-                                        <ContextPhotoInput 
-                                            errors={form.getErrors} 
+                                        <ContextPhotoInput
+                                            errors={form.getErrors}
                                             hasSubmitted={form.hasSubmitted()}
-                                            ref={form.setFormRef(pageId)} 
-                                            onValueChanged={form.handleValueChanged(pageId)} 
-                                            value={profile.cover_cropped} 
-                                            title={translate("common.cover")} 
+                                            ref={form.setFormRef(pageId)}
+                                            onValueChanged={form.handleValueChanged(pageId)}
+                                            value={profile.cover_cropped}
+                                            title={translate("common.cover")}
                                             onRequestNavigation={form.handleRequestNavigation}
                                             contextNaturalKey={ContextNaturalKey.USER}
                                             contextObjectId={profile.id}
-                                            id="cover" 
+                                            id="cover"
                                         />
                                     </>
                         }} />

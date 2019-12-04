@@ -124,7 +124,7 @@ class EventDetailsModule extends React.Component<Props, State> {
         {
             if(event.muted)
                 options.push({id:"unmute", type:OverflowMenuItemType.option, title:translate("common.unmute"), onPress:this.toggleMute, iconClass:"fas fa-bell-slash"})
-            else 
+            else
                 options.push({id:"mute", type:OverflowMenuItemType.option, title:translate("common.mute"), onPress:this.toggleMute, iconClass:"fas fa-bell"})
         }
         if(event.creator != authenticatedUser.id && attending.contains(authenticatedUser.id))
@@ -154,7 +154,7 @@ class EventDetailsModule extends React.Component<Props, State> {
         const eventOptions = this.getEventOptions()
         return (<Module {...rest}>
                     <ModuleHeader className="event-detail" headerTitle={event && event.name || translate("detail.module.title")} loading={this.state.isLoading}>
-                        {eventOptions.length > 0 && <DropDownMenu className="event-option-dropdown" triggerClass="fas fa-cog mx-1" items={eventOptions}></DropDownMenu>} 
+                        {eventOptions.length > 0 && <DropDownMenu className="event-option-dropdown" triggerClass="fas fa-cog fa-2x mx-1" items={eventOptions}></DropDownMenu>}
                     </ModuleHeader>
                     <ModuleContent>
                         <div className="event-details-content">

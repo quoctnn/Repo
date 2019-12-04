@@ -166,4 +166,5 @@ const mapStateToProps = (state:ReduxState, ownProps:OwnProps) => {
         profile
     }
 }
+
 export default withRouter(connect(mapStateToProps, null)(CommunitySelector))

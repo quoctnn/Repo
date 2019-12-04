@@ -143,7 +143,7 @@ export default class ContextRolesComponent extends React.Component<Props, State>
                 return {selected:selectedItems, failed, updatesInProgress:inProgress}
             }, this.sendRoleSelectionUpdate(id, selected))
         }
-        
+
     }
     sendRoleSelectionUpdate = (id:number, selected:boolean) => () => {
         const {contextNaturalKey, contextObject} = this.props
@@ -198,7 +198,7 @@ export default class ContextRolesComponent extends React.Component<Props, State>
         const footer = users.length > 0 ? <StackedAvatars className="text-truncate d-block" key={updateKey} showTextOnly={true} size={20} userIds={users} showOverflowCount={true} /> : <div className="text-truncate">{translate("role.users.empty")}</div>
         const canEditRole = this.isCommunityContext()
         const action = canEditRole ? this.editRole(role) : undefined
-    return <GenericListItem onClick={action} className={cn} header={title} footer={<div className="mw0">{footer}</div>}/>
+    return <GenericListItem onClick={action} className={cn} left={<></>} header={title} footer={<div className="mw0">{footer}</div>}/>
     }
     fetchRoles = (offset:number, completion:(items:PaginationResult<CommunityRole>) => (void)) => {
         this.props.roleManager.fetchRoles(offset, (data) => {
@@ -226,7 +226,7 @@ export default class ContextRolesComponent extends React.Component<Props, State>
         {
             this.clearSelection()
         }
-        else 
+        else
             this.selectAll()
     }
     reloadList = () => {
@@ -244,7 +244,6 @@ export default class ContextRolesComponent extends React.Component<Props, State>
             this.setState(() => {
                 return {failed:failed, selected:selected}
             }, this.reloadList)
-            console.log("deleted response", response)
         })
     }
     handleRoleCreateComplete = (role:CommunityRole) => {
@@ -265,8 +264,8 @@ export default class ContextRolesComponent extends React.Component<Props, State>
         const isCommunityContext = this.isCommunityContext()
         return  <div className={classnames("list-header", {active:headerActive})}>
                     <Checkbox checked={headerActive} checkedIcon="fas fa-minus" onValueChange={this.headerToggle} />
-                    <div className="flex-grow-1 text-truncate p-1">{translate("common.role")}</div>
-                    {headerActive && 
+                    <div className="flex-grow-1 text-truncate m-1 p-2">{translate("common.role")}</div>
+                    {headerActive &&
                         <Button onClick={this.deleteRoles} className="ml-1 flex-shrink-0" size="xs" color="danger">
                             <i className="fas fa-trash mr-1"></i>{translate("common.delete")}
                         </Button>
@@ -284,7 +283,7 @@ export default class ContextRolesComponent extends React.Component<Props, State>
         return <>
                 {error && <FormComponentErrorMessage className="d-block" errors={{error}} />}
                 {renderHeader && this.renderListHeader()}
-                <ListComponent<CommunityRole> 
+                <ListComponent<CommunityRole>
                     ref={this.listRef}
                     fetchData={this.fetchRoles}
                     renderItem={this.renderRole}

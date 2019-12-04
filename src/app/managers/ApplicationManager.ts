@@ -141,7 +141,7 @@ export abstract class ApplicationManager
                         completion(1, "Backend version: " + versionInfo.version_string + " is not compatible")
                     }
                 else {
-                    console.info("Backend version:", versionInfo);
+                    // console.info("Backend version:", versionInfo);
                     completion(0, "")
                 }
             }

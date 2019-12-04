@@ -339,8 +339,11 @@ class MomentInput extends React.Component<MomentInputProps, MomentInputState> {
     render = () => {
         const { options, onSave, today, value, style, className, inputClassName, inputStyle, name, readOnly, format, icon, translations, position} = this.props;
         const {selected, activeTab, date, isOpen, textValue, isValid} = this.state;
-        let inputValue = value ? value.format(DateFormat.date) : (date ? date.format(DateFormat.date): "");
+        let inputValue = value ? value.format(DateFormat.day) : (date ? date.format(DateFormat.date): "");
         const hasInputValue = inputValue && inputValue.length > 0
+        if (date && this.props.format === DateFormat.day) {
+            inputValue = date.format(DateFormat.day)
+        }
         const id = "momentinput_" + this._id
         const modifiers:Popper.Modifiers = {
             flip: { behavior: ['bottom', 'top', 'bottom'] }
@@ -363,13 +366,13 @@ class MomentInput extends React.Component<MomentInputProps, MomentInputState> {
                     </InputGroupAddon>
                 </InputGroup>
                 {isOpen &&
-                    <Popover 
+                    <Popover
                     modifiers={modifiers}
-                    className="date-time-picker" 
-                    trigger="legacy" 
-                    placement="bottom" 
-                    isOpen={isOpen} 
-                    target={id} 
+                    className="date-time-picker"
+                    trigger="legacy"
+                    placement="bottom"
+                    isOpen={isOpen}
+                    target={id}
                     toggle={this.toggleIsOpen}>
                         <PopoverBody>
                             {options &&
@@ -380,7 +383,7 @@ class MomentInput extends React.Component<MomentInputProps, MomentInputState> {
                                     {this.props.allowHoursPicker && <Button
                                         className={"flex-grow-1" + (activeTab===1 ? " active" : "")}
                                         onClick={()=> {this.onActiveTab(1)}}><i className="far fa-clock"></i>&nbsp;{translate("Hours")}
-                                    </Button>} 
+                                    </Button>}
                                 </ButtonGroup>
                             }
                             <div className="tabs">
@@ -477,7 +480,7 @@ const YearPicker = ({defaults, add, onActiveTab, onClick, isDisabled, translatio
     </div>
 )
 type TimePickerProps = {selected:moment.Moment, onSetTime:(key:string) => void, translations:any, minuteSteps?:number, isAM:boolean}
-const TimePicker = ({selected, onSetTime, translations, minuteSteps, isAM}:TimePickerProps) => 
+const TimePicker = ({selected, onSetTime, translations, minuteSteps, isAM}:TimePickerProps) =>
     {
         return <div className="r-time tab-m is-active" style={{paddingBottom:"10px"}}>
         <div className="showtime">
@@ -513,4 +516,4 @@ const TimePicker = ({selected, onSetTime, translations, minuteSteps, isAM}:TimeP
         </div>
     </div>
     }
-    
+

@@ -392,7 +392,6 @@ class SearchComponent extends React.Component<Props, State> {
         const searchForbidden = types.length == 0 || this.isSearchForbidden(data)
         if(searchForbidden)
         {
-            console.log("searchForbidden")
             return;
         }
         const items = this.state.searchResult && this.state.searchResult.results || []
@@ -755,7 +754,7 @@ class SearchComponent extends React.Component<Props, State> {
             arr.push("type: " + tf)
         if(this.state.fromDate)
             arr.push("from: " + this.state.fromDate.format(DateFormat.date))
-        
+
         if(this.state.toDate)
             arr.push("to: " + this.state.fromDate.format(DateFormat.date))
 

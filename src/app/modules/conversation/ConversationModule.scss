@@ -10,7 +10,7 @@
                 flex-grow: 200;
                 .member-select-container{
                     display: flex;
-                    font-size: 14px;
+                    font-size: 0.9rem;
                     align-items: center;
                     .member-select{
                         flex-grow: 1;
@@ -34,7 +34,7 @@
     .message-list-container{
         .gallery-container{
             max-width: 100%;
-            
+
         }
         .swiper-container{
             .swiper-wrapper{
@@ -58,7 +58,7 @@
                 }
                 .text
                 {
-                    font-size: 12px;
+                    font-size: 0.7rem;
                 }
             }
         }
@@ -69,13 +69,13 @@
                 text-align: left;
                 flex-direction: row;
                 margin: 0 5px -9px 15px;
-                .avatar 
+                .avatar
                 {
                     margin-right: 5px;
                 }
             }
         }
-        .chat-user.right 
+        .chat-user.right
         {
             .chat-user-inner
             {
@@ -140,7 +140,7 @@
         .chat-message.right{
             margin-right: 15px;
             .message{
-                float: right;    
+                float: right;
                 clear: both;
                 &.embed{
                     margin-left: 20px;
@@ -203,7 +203,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 28px;
+            font-size: 1.7rem;
             text-align: center;
             pointer-events: none;
             z-index: 20001;
@@ -219,7 +219,7 @@
             right: 0px;
             bottom: 0px;
             opacity: 0.5;
-            @include var(background, highlight-foreground-color);
+            @include var(background-color, highlight-foreground-color);
             transition: all 0.1s ease;
             pointer-events: none;
             display: flex;
@@ -250,7 +250,7 @@
                     width: auto;
                     margin: 0;
                 }
-                .file-details{    
+                .file-details{
                     flex-wrap: wrap;
                     justify-content: flex-end;
                     .file-size{
@@ -275,7 +275,7 @@
     }
 }
 .conversation-editor{
-    
+
     .list-item{
     }
 }

@@ -1,0 +1,60 @@
+@import '../../../../Config.scss';
+
+$avatarSize: 40px;
+
+.mobile-menu-root {
+    @include var(background-color, main-content-background);
+    z-index: 1048;
+    width: 100%;
+    top: $topMenuHeight;
+    left: 0;
+    bottom: 0;
+    position: fixed;
+    display: flex;
+    flex-direction: column-reverse;
+}
+
+.mobile-menu-root-header .community-avatar {
+    height: $avatarSize;
+    width: $avatarSize;
+    margin: 12px auto;
+    border-radius: calc(#{$avatarSize} / 2);
+    @include var(background-color, primary-theme-color);
+}
+
+.mobile-menu-root-header .community-name {
+    font-weight: 500;
+    font-size: 0.75rem;
+    margin: auto 6px;
+}
+
+.mobile-menu-root .sidebar-item {
+    cursor: pointer;
+    margin: 8px auto;
+    font-size: 1.25rem;
+    text-align: center;
+    > i {
+        display: none;
+    }
+}
+.mobile-menu-root .mobile-menu-header-spacing {
+    flex-grow: 1;
+}
+.mobile-menu-root .mobile-menu-separator {
+    margin: 12px auto;
+    width: 75%;
+    min-height: 1px;
+    @include var(background-color, highlight-background-color);
+}
+
+.mobile-menu-root .spacer {
+    min-height: 20px;
+    margin-left: 21px;
+}
+
+.mobile-menu-root .spacer.line {
+    min-height: 20px;
+    margin-left: 21px;
+    width: 1px;
+    @include var(background-color, highlight-background-color);
+}

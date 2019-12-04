@@ -10,6 +10,7 @@ import ContextRolesComponent from './ContextRolesComponent';
 import ContextMembersComponent from './ContextMembersComponent';
 import { RoleManager } from './ContextRolesComponent';
 import "./ContextMembersForm.scss"
+import ContextRequestComponent from './ContextRequestComponent';
 type OwnProps = {
     didCancel:() => void
     visible:boolean
@@ -18,7 +19,7 @@ type OwnProps = {
     community:Community
 }
 type State = {
-    
+
 }
 type Props = OwnProps
 export default class ContextMembersForm extends React.Component<Props, State> {
@@ -60,17 +61,34 @@ export default class ContextMembersForm extends React.Component<Props, State> {
             return null
         if(contextNaturalKey == ContextNaturalKey.COMMUNITY)
             return <CommunityInvitationsComponent community={community} />
-        return <ContextInvitationComponent members={this.getContextMembers()} availableMembers={community.members} contextNaturalKey={contextNaturalKey} contextObject={contextObject} /> 
+        return <ContextInvitationComponent members={this.getContextMembers()} availableMembers={community.members} contextNaturalKey={contextNaturalKey} contextObject={contextObject} />
     }
     renderInvitationMenuItem = (form:FormController) => {
         const {contextObject, contextNaturalKey, community} = this.props
         if(!this.hasAccess || contextNaturalKey == ContextNaturalKey.PROJECT)
             return null
         return <FormMenuItem key="3"
-            form={form} 
-            pageId="3" 
-            title={translate("members.page.title.invites")} 
-            description={translate("members.page.description.invites")}  
+            form={form}
+            pageId="3"
+            title={translate("members.page.title.invites")}
+            description={translate("members.page.description.invites")}
+            />
+    }
+    renderRequestPage = () => {
+        const {contextObject, contextNaturalKey, community} = this.props
+        if(!this.hasAccess || contextNaturalKey == ContextNaturalKey.PROJECT)
+            return null
+        return <ContextRequestComponent members={this.getContextMembers()} availableMembers={community.members} contextNaturalKey={contextNaturalKey} contextObject={contextObject} />
+    }
+    renderRequestMenuItem = (form:FormController) => {
+        const {contextNaturalKey} = this.props
+        if(!this.hasAccess || contextNaturalKey == ContextNaturalKey.PROJECT)
+            return null
+        return <FormMenuItem key="4"
+            form={form}
+            pageId="4"
+            title={translate("members.page.title.requests")}
+            description={translate("members.page.description.requests")}
             />
     }
     renderRolesMenuItem = (form:FormController) => {
@@ -78,34 +96,36 @@ export default class ContextMembersForm extends React.Component<Props, State> {
         if(contextObject.permission < Permission.admin || contextNaturalKey == ContextNaturalKey.EVENT)
             return null
         return <FormMenuItem key="2"
-        form={form} 
-        pageId="2" 
-        title={translate("members.page.title.roles")} 
-        description={translate("members.page.description.roles")}  
+        form={form}
+        pageId="2"
+        title={translate("members.page.title.roles")}
+        description={translate("members.page.description.roles")}
         />
     }
     render = () => {
         const {visible, didCancel} = this.props
-        return <FormController 
+        return <FormController
                     ref={(controller) => this.formController = controller }
-                    visible={visible} 
-                    formErrors={[]} 
-                    didCancel={didCancel} 
-                    status={FormStatus.normal} 
-                    title={translate(this.hasAccess ? "common.member.management" : "Members")} 
+                    visible={visible}
+                    formErrors={[]}
+                    didCancel={didCancel}
+                    status={FormStatus.normal}
+                    title={translate(this.hasAccess ? "common.member.management" : "Members")}
                     modalClassName="context-members-form-modal"
                     render={(form) => {
                         return {
                             menuItems:[
                                 <FormMenuItem key="1"
-                                    form={form} 
-                                    pageId="1" 
-                                    title={translate("members.page.title.members")} 
-                                    description={translate("members.page.description.members")}  
+                                    form={form}
+                                    pageId="1"
+                                    title={translate("members.page.title.members")}
+                                    description={translate("members.page.description.members")}
                                     />,
                                     this.renderRolesMenuItem(form)
                                     ,
                                     this.renderInvitationMenuItem(form)
+                                    ,
+                                    this.renderRequestMenuItem(form)
                             ].filter(i => !!i),
                             pages:[
                                     <FormPage key="page1" form={this.formController} pageId="1" render={(pageId, form) => {
@@ -116,6 +136,9 @@ export default class ContextMembersForm extends React.Component<Props, State> {
                                         }} />,
                                     <FormPage key="page3" form={this.formController} pageId="3" render={(pageId, form) => {
                                         return this.renderInvitationPage()
+                                        }} />,
+                                    <FormPage key="page4" form={this.formController} pageId="4" render={(pageId, form) => {
+                                        return this.renderRequestPage()
                                         }} />
                         ]
                         }

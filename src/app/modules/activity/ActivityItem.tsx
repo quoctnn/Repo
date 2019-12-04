@@ -8,6 +8,7 @@ import { ProfileManager } from '../../managers/ProfileManager';
 import { userAvatar } from '../../utilities/Utilities';
 import {ApiClient} from '../../network/ApiClient';
 import { TimeComponent } from '../../components/general/TimeComponent';
+import UserProfileAvatar from '../../components/general/UserProfileAvatar';
 
 type OwnProps = {
     activity:RecentActivity
@@ -31,7 +32,9 @@ export default class ActivityItem extends React.Component<Props, State> {
                      nextState.read != this.state.read
         return ret
     }
-    handleActivityClick = (event:React.SyntheticEvent<any>) => {
+    handleActivityClick = (event:React.MouseEvent) => {
+        if (event.nativeEvent.button == 2)
+            event.preventDefault()
         this.setState({seen:true, read:true})
         ApiClient.markActivitiesAsRead([this.props.activity.id], () => {}) // Ignore response for now
     }
@@ -41,11 +44,6 @@ export default class ActivityItem extends React.Component<Props, State> {
     getTimestamp = (createdAt:string) => {
         return <TimeComponent date={createdAt} />
     }
-    renderAvatar= (profile:UserProfile) => {
-        return(
-            <Avatar key={profile.id} size={40} image={userAvatar(profile, true)} borderColor={"#FFFFFF"} borderWidth={2} />
-        )
-    }
     render()
     {
         const {activity, className, children, ...rest} = this.props
@@ -54,9 +52,13 @@ export default class ActivityItem extends React.Component<Props, State> {
         if (!this.state.seen) cl = cl.concat(" unseen")
         const text = activity.display_text
         const profiles = this.fetchProfiles()
-        return (<Link onClick={this.handleActivityClick} to={activity.uri || "#"} {...rest} className={cl}>
+        return (<Link onClick={this.handleActivityClick} onContextMenuCapture={this.handleActivityClick} to={activity.uri || "#"} {...rest} className={cl}>
                     <div className="d-flex flex-row hover-card activity-content">
-                        <Avatar images={profiles.slice(0,4).map((user) => {return user.avatar_thumbnail})} size={40} borderColor="white" borderWidth={2}></Avatar>
+                        { profiles.length == 1 &&
+                            <UserProfileAvatar size={40} profileId={profiles[0].id} borderColor="white" borderWidth={2}/>
+                        ||
+                            <Avatar images={profiles.slice(0,4).map((user) => {return user.avatar_thumbnail})} size={40} borderColor="white" borderWidth={2}/>
+                        }
                         <div>
                             <div className="text-truncate activity-text">
                                 {text}

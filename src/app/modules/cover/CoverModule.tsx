@@ -13,6 +13,7 @@ import { FavoriteManager } from '../../managers/FavoriteManager';
 import { Button } from "reactstrap";
 import Avatar from "../../components/general/Avatar";
 import { withContextData, ContextDataProps } from "../../hoc/WithContextData";
+import UserProfileAvatar from "../../components/general/UserProfileAvatar";
 
 type OwnProps =
 {
@@ -49,9 +50,13 @@ class CoverModule extends React.Component<Props, State> {
                             <i className={icon}></i>
                         </Button>
                     }
-                    {this.props.hideAvatar ||
-                        <Avatar image={image} size={100} />
-                    }
+                    {this.props.hideAvatar || <>
+                        { this.props.contextNaturalKey == ContextNaturalKey.USER &&
+                            <UserProfileAvatar profileId={this.props.contextObject.id} size={100} />
+                            ||
+                            <Avatar image={image} size={100} />
+                        }
+                    </>}
                 </CoverImage>
     }
     toggleFavorite = () => {

@@ -11,7 +11,7 @@ import { translate } from '../../localization/AutoIntlProvider';
 import { EventSubscription } from 'fbemitter';
 
 interface OwnProps {
-    
+
 }
 interface ReduxStateProps{
     loaded:boolean
@@ -30,7 +30,6 @@ class ApplicationLoader extends React.Component<Props, {progress:LoadingProgress
     }
     processProgressUpdate = (...args:any[]) => {
         let progress = args[0] as LoadingProgress;
-        console.log("progress: ", progress.percent, progress.text)
         this.setState({progress:progress})
     }
     componentWillUnmount = () => {

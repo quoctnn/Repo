@@ -1,0 +1,32 @@
+.tasks-menu .form-group {
+    float: left;
+}
+
+.tasks-menu .form-group .form-group-title {
+    font-size: 0.9rem;
+    flex-shrink: 1;
+    margin: auto 8px;
+}
+
+.tasks-menu .form-group .form-text-input {
+    display: unset;
+    height: unset;
+    width: unset;
+}
+
+.collapse-menu {
+    margin: auto 16px;
+}
+
+.collapse-menu .trigger-container {
+    display: inline-block;
+}
+
+
+.collapse-trigger {
+    display: inline-flex;
+}
+
+.collapse-triger .collapse-text {
+    font-size: 0.9rem;
+}

@@ -130,7 +130,6 @@ export class StatusComposerComponent extends React.Component<Props, State> {
             completion([])
             return
         }
-        console.log("searching", search)
         const {taggableMembers} = this.props
         ProfileManager.searchProfilesInMembers({search, taggableMembers, completion:(profiles) => {
             completion(profiles.map(u => Mention.fromUser(u)))

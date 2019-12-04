@@ -1,14 +1,13 @@
 import * as React from 'react';
 import classnames from "classnames"
-//import { ProjectManager } from '../../managers/ProjectController';
-import { ProfileManager } from '../../managers/ProfileManager';
 import { AsyncSelectIW } from '../../components/general/input/AsyncSelectIW';
 import { ProfileSelectorOption, ProfileOptionComponent, ProfileSingleValueComponent } from '../../components/general/input/SelectExtensions';
+import { ProfileManager } from '../../managers/ProfileManager';
 
 
 type Props = {
     value:ProfileSelectorOption
-    project:number
+    projectMembers:number[]
     onValueChange:(value:ProfileSelectorOption) => void
 }
 type State = {
@@ -23,24 +22,16 @@ export class ProjectProfileFilter extends React.PureComponent<Props & React.HTML
     }
     getProfiles = (text:string, completion:(options:ProfileSelectorOption[]) => void) => {
         const resp = (profiles:number[]) => {
-            if(!profiles)
+            if(profiles && profiles.length > 0)
             {
-                completion(ProfileManager.searchProfiles(text,null, 50, true).map(ProfileSelectorOption.fromUserProfile))
-            } else {
                 ProfileManager.ensureProfilesExists(profiles, () => {
                     completion(ProfileManager.searchProfileIds(text, profiles).map(ProfileSelectorOption.fromUserProfile))
                 })
+            } else {
+                completion(ProfileManager.searchProfiles(text,null, 50, true).map(ProfileSelectorOption.fromUserProfile))
             }
         }
-        /*if(this.props.project)
-        {
-            ProjectManager.ensureProjectExists(this.props.project, (project) => {
-                resp(project.members || [])
-            })
-        }
-        else {
-            resp(null)
-        }*/
+        resp(this.props.projectMembers)
     }
     searchOptions = (text:string) => {
         return new Promise((resolve) => {
@@ -57,7 +48,7 @@ export class ProjectProfileFilter extends React.PureComponent<Props & React.HTML
         const { value} = this.props;
         const cn = classnames("context-filter", className)
         return(<div className={cn}>
-                <AsyncSelectIW key={"project_" + this.props.project}
+                <AsyncSelectIW
                     styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
                     isClearable={true}
                     value={value}

@@ -16,12 +16,13 @@ import { userFullName, userAvatar, listPageSize, uniqueId } from '../../../utili
 import CommunityInviteComponent from './CommunityInviteComponent';
 import { Input } from 'reactstrap';
 import { FormComponentErrorMessage } from '../../form/FormController';
+import UserProfileAvatar from '../UserProfileAvatar';
 type OwnProps = {
     community:Community
 }
 type InvitationFilters = {
     search:string
-    email:boolean 
+    email:boolean
     user:boolean
     searchEmail:boolean
     searchUser:boolean
@@ -59,10 +60,9 @@ export default class CommunityInvitationsComponent extends React.Component<Props
         const failedArray = this.state.failed
         const user = invitation.user && ProfileManager.getProfileById(invitation.user)
         const title = <div className="text-truncate">{user && userFullName(user) || invitation.email}</div>
-        const avatarUrl = userAvatar(user)
         const failed = failedArray.contains( invitation.id )
         const cn = classnames({"bg-warning":failed})
-        return <GenericListItem className={cn} header={title} left={<Avatar size={44} image={avatarUrl} />} footer={<TimeComponent date={invitation.created_at} />}/>
+        return <GenericListItem className={cn} header={title} left={<UserProfileAvatar size={40} borderWidth={2} borderColor="white" profileId={user.id} />} footer={<TimeComponent date={invitation.created_at} />}/>
     }
     fetchInvitations = (offset:number, completion:(items:PaginationResult<CommunityInvitation>) => (void)) => {
         let {search, email, user, searchEmail, searchUser, searchFromUser} = this.state.filters
@@ -102,7 +102,7 @@ export default class CommunityInvitationsComponent extends React.Component<Props
         {
             this.clearSelection()
         }
-        else 
+        else
             this.selectAll()
     }
     showInviteForm = () => {
@@ -138,7 +138,6 @@ export default class CommunityInvitationsComponent extends React.Component<Props
             this.setState(() => {
                 return {failed:failed, selectedInvitations:selected}
             }, this.reloadList)
-            console.log("deleted response", response)
         })
     }
 
@@ -164,8 +163,8 @@ export default class CommunityInvitationsComponent extends React.Component<Props
                 <Input className="mb-2" value={this.state.filters.search} type="text" onChange={this.handleSearchInputChange} placeholder={translate("common.filter.invitations")}/>
                 <div className={classnames("list-header", {active:headerActive})}>
                     <Checkbox checked={headerActive} checkedIcon="fas fa-minus" onValueChange={this.headerToggle} />
-                    <div className="flex-grow-1 text-truncate p-1">{translate("common.invitation")}</div>
-                    {headerActive && 
+                    <div className="flex-grow-1 text-truncate m-1 p-2">{translate("common.invitation")}</div>
+                    {headerActive &&
 
                         <Button onClick={this.deleteInvitations} className="ml-1 flex-shrink-0" size="xs" color="danger">
                             <i className="fas fa-trash mr-1"></i>{translate("common.delete")}
@@ -176,7 +175,7 @@ export default class CommunityInvitationsComponent extends React.Component<Props
                         </Button>
                     }
                 </div>
-                <ListComponent<CommunityInvitation> 
+                <ListComponent<CommunityInvitation>
                     ref={this.listRef}
                     fetchData={this.fetchInvitations}
                     renderItem={this.renderInvitation}
@@ -201,6 +200,6 @@ export default class CommunityInvitationsComponent extends React.Component<Props
                     {this.renderList()}
                     {this.renderInviteForm()}
                 </div>
-        
+
     }
 }

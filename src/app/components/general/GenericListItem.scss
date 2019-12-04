@@ -2,10 +2,12 @@
 .generic-list-item{
     min-width: 0;
     .left{
-        margin-right: 0.25em;
+        margin-left: 0.25rem;
+        margin-right: 0.35rem;
     }
     .right{
-        margin-left: 0.25em;
+        margin-left: 0.25rem;
+        margin-right: 0.25rem;
     }
     .center{
         display: flex;
@@ -17,7 +19,7 @@
             font-weight: 500;
         }
         .footer{
-            font-size: 0.8rem;
+            font-size: 0.7rem;
         }
     }
     &.active, &:hover

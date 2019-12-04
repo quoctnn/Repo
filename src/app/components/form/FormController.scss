@@ -6,7 +6,7 @@
     align-items: center;
     margin-bottom: 10px;
     .form-title {
-        font-size: 1.25rem;
+        font-size: 1.1rem;
         font-weight: 500;
     }
   }
@@ -31,7 +31,7 @@
     flex-direction: column;
     .form-buttons {
         margin-top: 10px;
-        display: flex;    
+        display: flex;
         flex-direction: row-reverse;
     }
     .form-controller-page-container {
@@ -48,7 +48,7 @@
         word-break: break-word;
         .form-input{
           .description{
-            font-size: 0.7rem;
+            font-size: 0.6rem;
           }
           .form-field-required-text{
             font-size: 0.6em;
@@ -69,10 +69,10 @@
                 border-radius: 8px;
                 margin-bottom: 8px;
                 .name{
-                    font-size: 1rem;
+                    font-size: 0.9rem;
                 }
                 .description{
-                    font-size: 0.7rem;
+                    font-size: 0.6rem;
                 }
                 .option-status{
                     width: 1.8rem;
@@ -129,7 +129,7 @@
         display: flex;
         flex-direction: column;
         justify-content: center;
-        height: 52px;
+        height: 3rem;
         .title {
           padding-right: 1em;
           display: flex;

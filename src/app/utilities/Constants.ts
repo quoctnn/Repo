@@ -7,9 +7,10 @@ const resolveAbsolute = (relative:string) => {
 }
 export default  {
     apiRoute: {
-        login:"/api/v1/auth/oup/login/",
+        login:"/api/v1/auth-oup/login/",
         nativeLogin:"/api/v1/auth-oup/native-login/",
         socialLogin:"/api/v1/auth-oup/social-login/",
+        register:"/api/v1/auth-oup/register/",
         gdprForm:"/api/v1/auth-oup/gdpr-form/",
 
         //calendar
@@ -108,6 +109,7 @@ export default  {
         communityInvitationUrl:"/api/v2/community-invitation/",
         communityInvitationBatchUrl:"/api/v2/community-invitation/batch/",
         communityMembershipRequestUrl: "/api/v2/community-memberrequest/",
+        communityMembershipRequestBatchUrl: "/api/v2/community-memberrequest/batch/",
         communityMembershipRequestDeleteUrl: (id:number) => {
             return `/api/v2/community-memberrequest/${id}/`
         },
@@ -193,6 +195,7 @@ export default  {
             return `/api/v2/group-invitation/${id}/accept/`
         },
         groupMembershipRequestUrl: "/api/v2/group-memberrequest/",
+        groupMembershipRequestBatchUrl: "/api/v2/group-memberrequest/batch/",
         groupMembershipRequestDeleteUrl: (id:number) => {
             return `/api/v2/group-memberrequest/${id}/`
         },
@@ -335,6 +338,7 @@ export default  {
         eventInvitationBatchUrl:"/api/v2/event-invitation/batch/",
         eventInvitationListUrl: "/api/v2/event-invitation/",
         eventMembershipRequestUrl: "/api/v2/event-memberrequest/",
+        eventMembershipRequestBatchUrl: "/api/v2/event-memberrequest/batch/",
         eventMembershipRequestDeleteUrl: (id:number) => {
             return `/api/v2/event-memberrequest/${id}/`
         },
