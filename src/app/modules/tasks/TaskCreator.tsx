@@ -249,8 +249,6 @@ class TaskCreator extends React.Component<Props, State> {
                         id={uniqueId()}
                     />
                     <div className="button-container">
-                        <Button disabled={true} className="btn btn-info task-file-upload" onClick={this.uploadFile}>{translate("task.create.upload.file")}</Button>
-                        <div className="flex-grow-1" />
                         <Button className="btn btn-success task-create" onClick={this.createTask}>{translate("Save")}</Button>
                         <Button className="btn btn-danger task-cancel" onClick={this.clearForm}>{translate("Cancel")}</Button>
                     </div>

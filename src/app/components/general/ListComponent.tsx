@@ -74,6 +74,7 @@ type State<T> = {
 }
 export default class ListComponent<T extends IdentifiableObject> extends React.Component<Props<T>, State<T>> {
     private listRef = React.createRef<List>()
+    private scrollParent: Window|HTMLElement = undefined;
     static defaultProps:DefaultProps = {
         loadMoreOnScroll:true,
         allowDivider:true,
@@ -168,23 +169,23 @@ export default class ListComponent<T extends IdentifiableObject> extends React.C
         }), this.loadData)
     }
     componentWillUnmount = () => {
-        if(this.props.scrollParent)
+        if(this.scrollParent)
         {
-            this.props.scrollParent.removeEventListener("scroll", this.onScroll)
+            this.scrollParent.removeEventListener("scroll", this.onScroll)
         }
         this.listRef = null
     }
     componentDidMount = () =>
     {
 
-        let scrollParent = this.props.scrollParent
-        if(!scrollParent && this.props.findScrollParent && this.listRef && this.listRef.current && this.listRef.current.listRef && this.listRef.current.listRef.current)
+        this.scrollParent = this.props.scrollParent
+        if(!this.scrollParent && this.props.findScrollParent && this.listRef && this.listRef.current && this.listRef.current.listRef && this.listRef.current.listRef.current)
         {
-            scrollParent = findScrollParent(this.listRef.current.listRef.current)
+            this.scrollParent = findScrollParent(this.listRef.current.listRef.current)
         }
-        if(scrollParent)
+        if(this.scrollParent)
         {
-            scrollParent.addEventListener("scroll", this.onScroll)
+            this.scrollParent.addEventListener("scroll", this.onScroll)
         }
         //console.log("componentDidMount", this.props.reloadContext)
         this.setState((prevState:State<T>) => ({ // first load
@@ -355,13 +356,13 @@ export default class ListComponent<T extends IdentifiableObject> extends React.C
                             {
                                 if(this.props.renderGroupHeader)
                                     return this.props.renderGroupHeader(i.group)
-                                else 
+                                else
                                     return <div key={"header_" + index} className="group-header">{i.group}</div>
                             }
-                            else 
+                            else
                                 return this.renderSelectableItem(i.id, this.props.renderItem(i, index))
                         }).concat(this.renderLoading())
-        
+
         if (this.state.dividerPosition) items.splice(this.state.dividerPosition, 0, <ListComponentDivider key="divider"/>)
         return (<List ref={this.listRef} enableAnimation={false}
                     onScroll={scroll}

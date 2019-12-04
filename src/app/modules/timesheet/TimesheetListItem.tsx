@@ -33,22 +33,17 @@ export default class TimesheetListItem extends React.Component<Props, State> {
         const time = (!!timesheet.hours ? ` ${timesheet.hours}${translate("date.format.hours")}` : "") + (!!timesheet.minutes ? ` ${timesheet.minutes}${translate("date.format.minutes")}` : "")
         return (
                 <Link to={timesheet.uri} {...rest} className={cl}>
-                    <div className="d-flex justify-content-around">
-                        <div className="d-flex flex-column align-items-center datetime">
+                    <div className="d-flex justify-content-around timesheet-item-content">
+                        <div className="d-flex flex-column align-items-center timesheet-content-left">
                             <div className="date">{date}</div>
                             <div className="time">{time}</div>
                         </div>
-                        <div className="d-flex flex-column">
-                            <svg className="semi-circle" preserveAspectRatio="xMidYMid slice">
-                                <path d="M0,0 C7,10 7,35 0,45"/>
-                            </svg>
-                        </div>
-                        <div className="d-flex flex-column details text-truncate">
-                            <div title={name} className="user text-truncate">{name}</div>
+                        <div className="flex-grow-1 timesheet-content-right">
+                            <div title={name} className="timesheet-user text-truncate">{name}</div>
                             { this.props.showTaskTitle &&
-                                <div title={timesheet.task_title} className="task-info text-truncate"><b>{translate("common.project.task") + ":"}</b> &nbsp;{timesheet.task_title}</div>
+                                <div title={timesheet.task_title} className="timesheet-task-info text-truncate"><b>{translate("common.project.task") + ":"}</b> &nbsp;{timesheet.task_title}</div>
                                 ||
-                                <div title={timesheet.description} className="task-info text-truncate">{timesheet.description}</div>
+                                <div title={timesheet.description} className="timesheet-task-info text-truncate">{timesheet.description}</div>
                             }
                         </div>
                     </div>

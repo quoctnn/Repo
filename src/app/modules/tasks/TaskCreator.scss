@@ -21,9 +21,10 @@
 
 .task-create-container .task-hidden-fields .button-container {
     display: flex;
+    justify-content: flex-end;
 
     .btn {
-        margin: 6px;
+        margin: 4px;
     }
 }
 

@@ -215,6 +215,9 @@ button{@include var(color, primary-text-color);}
 {
     @include var(color, secondary-text-color);
 }
+.select-input-field {
+    @include var(color, feed-form-options-color);
+}
 .shadow
 {
     text-shadow: 0 0 3px rgba(0, 0, 0, .8);

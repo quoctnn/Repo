@@ -160,7 +160,7 @@ class TaskDetailsModule extends React.Component<Props, State> {
                         </div>
                         {assigned && <div className="d-flex"> {translate("task.assigned_to")}:&nbsp;
                             {assigned.map((user) => {
-                            return <div className="d-flex task-user">
+                            return <div key={"user_" + user.id} className="d-flex task-user">
                                 <UserProfileAvatar profileId={user.id} size={20} />
                                 <div className="user-name">{user.first_name + " " + user.last_name}</div>
                             </div>

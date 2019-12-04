@@ -96,10 +96,10 @@ export class SelectInput extends React.Component<SelectInputProps, SelectInputSt
                         <FormComponentRequiredMessage required={this.props.isRequired} />
                     </label>
                     <FormComponentErrorMessage className={cn} errors={errors} errorKey={this.props.id} />
-                    <div className="">
+                    <div className="select-input-field">
                         <Select isDisabled={this.props.isDisabled}
                         styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }),
-                                  option: base => ({ ...base, color: "black"}) }}
+                                  option: base => ({ ...base, color: "#2d2d2d"}) }}
                         isMulti={false}
                         name={this.props.id}
                         value={selectedOption}

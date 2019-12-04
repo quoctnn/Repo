@@ -45,11 +45,11 @@ export class ProfileSelector extends React.PureComponent<Props, State> {
     {
         const { selectedOptions, allowedOptions: allowedValues} = this.state;
         const autoFocus = this.props.autoFocus == null ? true : this.props.autoFocus
-        const cn = classnames("profile-selector")
+        const cn = classnames("profile-selector select-input-field")
         return(<div className={cn}>
                 <Select
                         styles={{ menuPortal: base => ({ ...base, zIndex: 9999, }),
-                                  option: base => ({ ...base, color: "black"}) }}
+                                  option: base => ({ ...base, color: "#2d2d2d"}) }}
                         isMulti={this.props.multiSelect}
                         menuColor="red"
                         name="profiles"

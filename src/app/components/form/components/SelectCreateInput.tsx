@@ -144,7 +144,7 @@ export class SelectCreateInput extends React.Component<SelectCreateInputProps, S
                     <FormComponentRequiredMessage required={this.props.isRequired} />
                 </label>
                 <FormComponentErrorMessage className={cn} errors={errors} errorKey={this.props.id} />
-                <div className="">
+                <div className="select-input-field">
                     <CreatableSelect
                         components={components}
                         inputValue={this.state.inputValue}

@@ -105,13 +105,19 @@ class TaskMenu extends React.Component<Props, State> {
         const { category, ...rest } = this.state.data
         this.setState({ data: { category: newCategory, ...rest } }, this.sendUpdate)
     }
-    tagsValueChanged = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const value = e.target.value
-        const { tags, ...rest } = this.state.data
-        if (!value) {
-            this.setState({ data: { tags: [], ...rest } }, this.sendUpdate)
-        } else {
-            this.setState({ data: { tags: value.replace(" ", "").split(","), ...rest } }, this.sendUpdate)
+    tagsValueChanged = (event: React.KeyboardEvent<HTMLElement>) => {
+        switch (event.key) {
+            case 'Enter':
+                const tagsElement = document.getElementById("tags") as HTMLInputElement
+                if (tagsElement){
+                    const { tags, ...rest } = this.state.data
+                    var value = tagsElement.value
+                    if (!value) {
+                        this.setState({ data: { tags: [], ...rest } }, this.sendUpdate)
+                    } else {
+                        this.setState({ data: { tags: value.replace(" ", "").split(","), ...rest } }, this.sendUpdate)
+                    }
+                }
         }
     }
 
@@ -215,7 +221,7 @@ class TaskMenu extends React.Component<Props, State> {
                 {project.tags.length > 0 &&
                     <FormGroup>
                         <Label className="form-group-title">{translate("task.tags.filter.title")}</Label>
-                        <Input className="form-text-input" id="tags" type="text" placeholder={"Ex. " + project.tags[0]} onChange={this.tagsValueChanged} />
+                        <Input className="form-text-input" id="tags" type="text" placeholder={"Ex. " + project.tags[0]} onKeyDown={this.tagsValueChanged} />
                     </FormGroup>
                 }
             </div>

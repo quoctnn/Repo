@@ -1594,6 +1594,7 @@ export type Task = {
     attributes?: TaskObjectAttribute[]
     tags: string[]
     due_date:string
+    files?: UploadedFile[]
 } & Linkable & Permissible & IdentifiableObject
 
 export enum TaskPriority {
