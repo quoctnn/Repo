@@ -41,6 +41,7 @@ export const CalendarEventComponent = (props:CalendarEventComponent) => {
                     <div className="title">
                             <div className={markClass}></div>
                             {truncate(props.event.title, 30)}
+							gdgfhbfgfgfg
                     </div>
                     <div className="description medium-small-text">{truncate(props.event.description, 30)}</div>
                 </div>
