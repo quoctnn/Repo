@@ -220,6 +220,9 @@ export class LocationInput extends React.Component<LocationInputProps, LocationI
         }
     }
     render = () => {
+
+        const greeting = 0;
+
         const errors = this.getErrors()
         const hasError = errors && Object.keys( errors ).length > 0
         const cn = classnames({"d-block":hasError})
@@ -243,7 +246,7 @@ export class LocationInput extends React.Component<LocationInputProps, LocationI
                                     </InputGroupAddon>
                                 </InputGroup>
                                 {this.state.searchInputVisible && <div className="autocomplete-list">
-                                    <CursorList items=
+                                    <CursorList    numvalue = {greeting}  items=
                                     {this.state.autocompleteData.map(a => {
                                         return <CursorListItem key={a.id} onSelect={this.didSelectAutocomplete(a)}>
                                             <div>{a.place_name}</div>
