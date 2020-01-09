@@ -1,11 +1,14 @@
 import * as React from 'react';
 import classNames from "classnames";
 import { nullOrUndefined } from '../../../../utilities/Utilities';
+import Pagination from "react-pagination-library";
+import "./Pagination.css";
+import { number } from 'prop-types';
 
 export class CursorListItem extends React.Component<{children?:React.ReactNode, onSelect:() => void}, {}>
 {
     render(){
-        return <div className="item">{this.props.children}</div>
+        return <div className="item">{this.props.children} </div>
     }
 }
 export class CursorListHeader extends React.Component<{children?:React.ReactNode}, {}>
@@ -17,16 +20,38 @@ export class CursorListHeader extends React.Component<{children?:React.ReactNode
 const cursorListItemComparer = <CursorListItem onSelect={() => {}}/>
 type OwnProps = {
     items:JSX.Element[]
+
+    //itemssen:JSX.Element[]
+
     onClose?:(event:any) => void
     onMouseDown?:(event:any) => void
     style?: React.CSSProperties
     emptyContent?:React.ReactNode
+
+    //handleChange:(event:any) => void
+
+    //selectedValue:{}
+    
+    numvalue: number
+
 }
 type DefaultProps = {
+
+    //selectedValue:{}
 }
+
 type State = {
     cursor:number
+    currentPage: number,
+    todosPerPage: number,
+
+    selectedValueHandler:number,
+
+    selectedValue:number
 }
+
+
+
 type Props = OwnProps & DefaultProps
 export default class CursorList extends React.Component<Props, State> {
     component = React.createRef<HTMLDivElement>()
@@ -36,10 +61,37 @@ export default class CursorList extends React.Component<Props, State> {
     constructor(props:Props) {
         super(props);
 
+
+        //selectedValue: number
+
+
+        this.handleChange = this.handleChange.bind(this);
+        
         this.state = {
             cursor:this.getInitialCursor(props),
+            currentPage: 1,
+            //todosPerPage: 5         
+            
+            todosPerPage:this.changetoDoPerPage(3),
+
+            selectedValueHandler:null,
+
+            selectedValue: this.props.numvalue,
         }
+
     }
+
+   /*  handleChange = (event) => {
+        if(typeof this.state.selectedValueHandler !== 'undefined'){
+            this.state.selectedValueHandler = event.target.value;
+        }
+    } */
+
+
+    handleChange(e) {
+        this.setState({selectedValue: e.target.value});
+      }
+
     getInitialCursor = (props) => {
         return -1
     }
@@ -50,6 +102,7 @@ export default class CursorList extends React.Component<Props, State> {
         document.removeEventListener("keydown", this.onKeyDown)
         this.component = null
     }
+
     handleItemClick = (item:JSX.Element, event:any) => {
         if(!item || item.type != cursorListItemComparer.type)
             return
@@ -63,7 +116,8 @@ export default class CursorList extends React.Component<Props, State> {
             return
         }
         this.setState({cursor:-1})
-    }
+    } 
+
     getSuggestionsCount = () => {
         return this.props.items.filter(n => {
             return n.type === cursorListItemComparer.type
@@ -155,27 +209,83 @@ export default class CursorList extends React.Component<Props, State> {
     onItemSelect = (item:JSX.Element) => (event:any) => {
         this.handleItemClick(item, event)
     }
+    changeCurrentPage = (numPage) => {
+        this.setState({ cursor: numPage, currentPage: numPage })
+    }
+
+    
+   /*  changetoDoPerPage = (todosPerPage) => {
+        return todosPerPage
+    } */
+
+
+    changetoDoPerPage = (x:number) => {
+        return x
+    }
+
+
     render = () => {
+
+        //const ntodosPerPage = this.state.todosPerPage;
+
+        const pageNumbers = [];
+        /* for (let i = 1; i <= Math.ceil( this.props.items.length / this.state.todosPerPage); i++) {
+          pageNumbers.push(i);
+        } */
+
+
+        let selectpagingnumber;
+
+        if( this.props.numvalue == null) 
+        selectpagingnumber = 3
+        else selectpagingnumber = this.props.numvalue
+
+        for (let i = 1; i <= Math.ceil( this.props.items.length / selectpagingnumber); i++) {
+            pageNumbers.push(i);
+        } 
+
         const cursor = this.state.cursor
         return (<div ref={this.component}
-                    className="autocomplete-component"
+                    className="autocomplete-component"                                                           
                     style={this.props.style}
-                    onTouchStart={this.onListMouseDown}
+                    onTouchStart={this.onListMouseDown}                                                                                                                                                                                                                                                                                              
                     onMouseDown={this.onListMouseDown}
                     onMouseLeave={this.onComponentMouseLeave}
                     >
-                    {<div className="list" ref={this.listRef}>
-                        {this.props.items.map((item, index) => {
+                   <Pagination
+                    currentPage={pageNumbers[this.state.cursor]}
+                    showNext = {true}
+                    showPrevious = {true}
+                    showLast 
+                    totalPages={pageNumbers.length}
+                    showFirst
+                    changeCurrentPage={this.changeCurrentPage}
+                    theme="square-fill"    
+                    />         
+                    {          
+                        <div className="list" ref={this.listRef}>
+                        {    
+                        this.props.items.map((item, index) => {
                             if(item.type === cursorListItemComparer.type)
                             {
+
                                 const cn = classNames("cursor-list-item", {"active":cursor == index})
-                                return <div onMouseEnter={this.onMouseEnter.bind(this, index)} className={cn} key={index} onClick={this.onItemSelect(item)}>
-                                            {item}
-                                        </div>
+                                //const indexOfLastTodo = this.state.currentPage * this.state.todosPerPage;
+                                //const indexOfFirstTodo = indexOfLastTodo - this.state.todosPerPage;
+
+                                //const x = this.changetoDoPerPage;
+                                const indexOfLastTodo = this.state.currentPage * this.props.numvalue;
+                                const indexOfFirstTodo = indexOfLastTodo - this.props.numvalue;
+
+                              //  {this.props.greeting}
+
+                                const currentTodos = this.props.items.slice(indexOfFirstTodo, indexOfLastTodo);                               
+                                return <div onMouseEnter={this.onMouseEnter.bind(this, index)} className={cn} key={index} onClick={this.onItemSelect(currentTodos[index])}>
+                                {currentTodos[index]}  
+                            </div>
                             }
-                            return item
                         })}
-                    </div>}
+                     </div>}
                 </div>)
     }
 }
