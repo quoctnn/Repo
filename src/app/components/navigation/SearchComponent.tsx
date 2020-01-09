@@ -211,7 +211,18 @@ type State = {
     toDate:Moment
     filtersActive:boolean
     error:string
+
+    selectedValue: number
+
 }
+
+/* selectedValueHandler = (selectedValue) => {
+    this.setState({
+        selectedValue
+    })
+} */
+
+
 class SearchComponent extends React.Component<Props, State> {
 
     searchTextInput = React.createRef<SearchBox>()
@@ -223,6 +234,9 @@ class SearchComponent extends React.Component<Props, State> {
     serializedDateFormat = "YYYY-MM-DDTHH:mm"
     constructor(props:Props) {
         super(props)
+
+        this.handleChange = this.handleChange.bind(this);
+
         var initialType = []
         if (this.props.initialType && ElasticSearchType[this.props.initialType.toUpperCase()] !== undefined) {
             initialType = [this.props.initialType as ElasticSearchType]
@@ -243,8 +257,24 @@ class SearchComponent extends React.Component<Props, State> {
             toDate:null,
             filtersActive:false,
             error:null,
+
+            selectedValue: null,
         }
     }
+
+
+    handleChange(e) {
+        this.setState({selectedValue: e.target.value});
+    }
+
+
+    selectedValueHandler = (selectedValue) => {
+        this.setState({
+            selectedValue
+        })
+    }
+
+
     onDidScroll = (event: React.UIEvent<any>) => {
         let isAtBottom = event.currentTarget.scrollTop + event.currentTarget.offsetHeight >= event.currentTarget.scrollHeight
         if(isAtBottom)
@@ -618,7 +648,7 @@ class SearchComponent extends React.Component<Props, State> {
         const right = ElasticSearchType.nameForKey( item.object_type )
         const n = getTextForField(item, "name", 150)
         const name = <span className="d-flex align-items-center">{this.renderIsFavorite(item.django_id, contextNaturalKey)}<span dangerouslySetInnerHTML={{__html: n}}></span></span>
-        return <SearchResultItem className={item.object_type.toLowerCase()} header={name} description={description} footer={footer} left={left} right={right} />
+        return <SearchResultItem className={item.object_type.toLowerCase()} header={name}   description={description} footer={footer} left={left} right={right} />
     }
     renderGroupItem = (item:ElasticResultGroup) => {
 
@@ -814,6 +844,12 @@ class SearchComponent extends React.Component<Props, State> {
                         {this.renderResultItem(r)}
                     </CursorListItem>
         })
+
+
+        const select = this.state.selectedValue
+
+        const greeting = this.state.selectedValue;
+
         const resultCountStyle:React.CSSProperties = {}
         if(isLoading)
             resultCountStyle.visibility = "hidden"
@@ -827,14 +863,28 @@ class SearchComponent extends React.Component<Props, State> {
                             </div>
                         </div>
                         {this.renderHashtags()}
-                        <CursorList items={items} />
+
+
+                        <CursorList   numvalue = {greeting}   items={items}   />
+
+
                         {!isLoading && items.length == 0 && <div className="empty-result">{translate("search.result.empty")}</div>}
                         {isLoading && <LoadingSpinner />}
                     </div>
                     <StickyBox className="right" offsetTop={0} offsetBottom={0}>
                         <div onClick={this.toggleFilters} className="filter-header my-1 d-flex">
                             <div className="flex-grow-1">
-                                <div className="filter-title">{translate("common.filters")}</div>
+                                <div className="filter-title">{translate("common.filters")}
+    
+
+              <select name='co' onChange={this.handleChange} > 
+                <option value='3'>3</option>
+                <option value='5'>5</option>
+              </select>
+
+
+                                </div>
+    
                                 {filterSummary && <div className="filter-summary">{filterSummary}</div>}
                             </div>
                             <AnimatedIconStack iconA="fas fa-plus" iconB="fas fa-minus" active={this.state.filtersActive} />
@@ -871,7 +921,8 @@ class SearchComponent extends React.Component<Props, State> {
                         </div>
         return (<SimpleDialog header={header} onScroll={this.onDidScroll} fade={false} centered={false} className="search-modal" visible={this.props.visible} didCancel={this.props.onClose}>
                     <div className="search-component">
-                        {this.renderSearchTypeFiltersList()}
+                      {/*   {this.renderSearchTypeFiltersList()} */}
+
                         {this.renderSearchResult()}
                     </div>
                 </SimpleDialog>)
