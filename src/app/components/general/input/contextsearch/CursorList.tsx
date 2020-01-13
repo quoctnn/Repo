@@ -77,6 +77,8 @@ export default class CursorList extends React.Component<Props, State> {
             selectedValueHandler:null,
 
             selectedValue: this.props.numvalue,
+
+            //selectedValue: 3,
         }
 
     }
@@ -237,8 +239,8 @@ export default class CursorList extends React.Component<Props, State> {
         let selectpagingnumber;
 
         if( this.props.numvalue == null) 
-        selectpagingnumber = 3
-        else selectpagingnumber = this.props.numvalue
+        selectpagingnumber = 5
+        else selectpagingnumber = this.props.numvalue 
 
         for (let i = 1; i <= Math.ceil( this.props.items.length / selectpagingnumber); i++) {
             pageNumbers.push(i);
@@ -274,8 +276,13 @@ export default class CursorList extends React.Component<Props, State> {
                                 //const indexOfFirstTodo = indexOfLastTodo - this.state.todosPerPage;
 
                                 //const x = this.changetoDoPerPage;
-                                const indexOfLastTodo = this.state.currentPage * this.props.numvalue;
+                              /*   const indexOfLastTodo = this.state.currentPage * this.props.numvalue;
                                 const indexOfFirstTodo = indexOfLastTodo - this.props.numvalue;
+ */
+
+                                const indexOfLastTodo = this.state.currentPage * selectpagingnumber ;
+                                const indexOfFirstTodo = indexOfLastTodo - selectpagingnumber ;
+
 
                               //  {this.props.greeting}
 
