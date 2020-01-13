@@ -13,72 +13,114 @@ import { CommonModuleProps } from '../Module'
 import { CalendarMenuData } from './CalendarMenu'
 import { Calendar, momentLocalizer, View, NavigateAction } from 'react-big-calendar';
 import * as moment from 'moment'
-import {ApiClient} from '../../network/ApiClient';
+import { ApiClient } from '../../network/ApiClient';
 import { CalendarItem, Task, Event } from '../../types/intrasocial_types';
 import { IntraSocialUtilities } from '../../utilities/IntraSocialUtilities';
 import { CalendarToolbar } from './CalendarToolbar';
 import { CalendarEventComponent } from './CalendarEventComponent';
+import { withContextData, ContextDataProps } from '../../hoc/WithContextData';
+import { isNull } from 'util';
 const localizer = momentLocalizer(moment)
 const timezone = moment.tz.guess();
-export enum CalendarEventType{
+export enum CalendarEventType {
     CalendarItem = "CalendarItem",
     Task = "Task",
     Event = "Event",
 }
-type CalendarObject = {object_type:CalendarEventType}
-export const createEvent = (data:(CalendarItem | Event | Task) & CalendarObject ):CalendarEvent => {
+type CalendarObject = { object_type: CalendarEventType }
+export const createEvent = (data: (CalendarItem | Event | Task) & CalendarObject): CalendarEvent => {
     switch (data.object_type) {
-        case "Event":{
+        case "Event": {
             const event = data as Event
-            return {icon:"fas fa-calendar",
-                    start:moment(event.start).tz(timezone).toDate(),
-                    end:moment(event.end).tz(timezone).toDate(),
-                    title:event.name,
-                    description: IntraSocialUtilities.htmlToText(data.description),
-                    resource:data,
-                    uri:event.uri,
-                    hexColor:"FB0E7A",
-                    }
+            return {
+                icon: "fas fa-calendar",
+                start: moment(event.start).tz(timezone).toDate(),
+                end: moment(event.end).tz(timezone).toDate(),
+                title: event.name,
+                description: IntraSocialUtilities.htmlToText(data.description),
+                resource: data,
+                uri: event.uri,
+                hexColor: "FB0E7A",
+                community: event.community
+            }
         }
-        case "Task":{
+        case "Task": {
             const task = data as Task
-            return {icon:"fas fa-tasks",
-                    start:moment(task.due_date).tz(timezone).startOf('day').toDate(),
-                    end:moment(task.due_date).tz(timezone).startOf('day').toDate(),
-                    allDay:true,
-                    title:task.title,
-                    description:IntraSocialUtilities.htmlToText(data.description),
-                    resource:data,
-                    uri:task.uri,
-                    hexColor:"4E13F5",
-                }
+            return {
+                icon: "fas fa-tasks",
+                start: moment(task.due_date).tz(timezone).startOf('day').toDate(),
+                end: moment(task.due_date).tz(timezone).startOf('day').toDate(),
+                allDay: true,
+                title: task.title,
+                description: IntraSocialUtilities.htmlToText(data.description),
+                resource: data,
+                uri: task.uri,
+                hexColor: "4E13F5"
+            }
         }
-        case "CalendarItem":{
+        case "CalendarItem": {
             const item = data as CalendarItem
-            return {icon:"fas fa-calendar-day",
-                    allDay:item.all_day,
-                    start:moment(item.start).tz(timezone).toDate(),
-                    end:moment(item.end).tz(timezone).toDate(),
-                    title:item.title,
-                    description:item.description,
-                    resource:data,
-                    uri:item.uri,
-                    hexColor:"04A451",
-                    }
+            return {
+                icon: "fas fa-calendar-day",
+                allDay: item.all_day,
+                start: moment(item.start).tz(timezone).toDate(),
+                end: moment(item.end).tz(timezone).toDate(),
+                title: item.title,
+                description: item.description,
+                resource: data,
+                uri: item.uri,
+                hexColor: "04A451",
+            }
         }
-        default:return null
+        default: return null
     }
 }
-export const filterCalendarEvents = (date:Date, events:CalendarEvent[]) => {
-    if(!events || events.length == 0)
-        return events
-    const day = moment(date).startOf('day')
-    const filtered =  events.filter(event => {
-            const s = event.start && moment(event.start)
-            const e = event.end && moment(event.end)
-            return (s && s.isSame(day, "day")) ||
-                    (e && e.isSame(day, "day") && day.diff(e, "seconds") >= 60) ||
-                    (s && e && day > s && day < e )
+export const filterCalendarEvents = (events: CalendarEvent[], atDate?: Date, fromDate?: Date, community?: number) => {
+    const pickday = moment(atDate).endOf('day')  
+    const tooday = moment().endOf('day') 
+    
+    //const today = atDate && moment(atDate).startOf('day')
+    //const fromDay = fromDate && moment(fromDate).startOf('day')
+	
+	
+    const filtered = events.filter(event => {
+		
+     /*    const sameCommunity = !community || !event.community || community === event.community
+        const s = event.start && moment(event.start)
+        /* const e = event.end && moment(event.end)   
+        const sameDay = !today || ((s && s.isSame(today, "day")) ||
+                (e && e.isSame(today, "day") && today.diff(e, "seconds") >= 60) ||
+                (s && e && today > s && today < e))
+        const inFuture = !fromDay || (
+            s.day <= fromDay.day && s.month <= fromDay.month && s.year <= fromDay.year
+        ) */
+        //return sameCommunity && sameDay && inFuture
+		
+        const s = event.start && moment(event.start)
+        const nowAndinFuture = (s.isSameOrAfter(tooday, "day") )
+        const pickDay = (s.isSame(pickday, "day") )
+
+        let eventday = 0
+
+        if(pickday.isSame(tooday)) {
+           eventday = 1
+        }
+        else  {
+           eventday = 2
+        }
+        
+        switch(eventday) { 
+            case (2) : 
+               return pickDay; 
+               break; 
+            case (1) : 
+               return nowAndinFuture; 
+               break;  
+            default:  
+               return nowAndinFuture; 
+               break;          
+         } 
+
     }).sort((a, b) => {
         const allDay = -Number.MAX_VALUE
         const a1 = a.allDay ? allDay : (a.start || a.end || new Date()).getTime()
@@ -92,11 +134,11 @@ export const filterCalendarEvents = (date:Date, events:CalendarEvent[]) => {
 
 type DateHeaderProps = {
     date: Date;
-    drilldownView:View
-    isOffRange:boolean
-    label:string
-    onDrillDown:(e) => void
-    events?:CalendarItem[]
+    drilldownView: View
+    isOffRange: boolean
+    label: string
+    onDrillDown: (e) => void
+    events?: CalendarItem[]
 }
 export type CalendarEvent = {
     allDay?: boolean
@@ -104,19 +146,21 @@ export type CalendarEvent = {
     start?: Date
     end?: Date
     resource?: CalendarObject
-    description?:string
-    icon:string
-    uri:string
-    hexColor?:string
+    description?: string
+    icon: string
+    uri: string
+    hexColor?: string
+    community?: number
 }
 class DateHeader extends React.Component<DateHeaderProps, {}>{
     render() {
         const cn = classnames("calendar-date-header")
         const hasEvents = this.props.events && this.props.events.length > 0
-        return <div onClick={this.props.onDrillDown} className={cn}>
-                    <div className="content">{this.props.label}</div>
-                    {hasEvents && <div className="event-indicator"></div>}
-                </div>
+        
+        return <div onClick={this.props.onDrillDown} className={cn}> 
+        <div className="content">{this.props.label}</div>
+        {hasEvents && <div className="event-indicator"></div>}
+        </div>
     }
 }
 type DefaultProps = {
@@ -124,12 +168,12 @@ type DefaultProps = {
 type OwnProps = {
     breakpoint: ResponsiveBreakpoint
     isMember?: boolean
-} & CommonModuleProps & DefaultProps
+} & CommonModuleProps & DefaultProps & ContextDataProps
 type State = {
     isLoading: boolean
     menuData: CalendarMenuData
-    events:CalendarEvent[]
-    date:Date
+    events: CalendarEvent[]
+    date: Date
 }
 type ReduxStateProps = {
 }
@@ -147,13 +191,14 @@ class CalendarModule extends React.Component<Props, State> {
             isLoading: false,
             menuData: {
             },
-            events:[],
-            date:moment().toDate()
+            events: [],
+            //date: moment().toDate()
+            date: null
         }
     }
     componentDidMount = () => {
         this.setState(() => {
-            return {isLoading:true, events:[]}
+            return { isLoading: true, events: [] }
         }, this.loadMonthData)
     }
     loadMonthData = () => {
@@ -163,7 +208,7 @@ class CalendarModule extends React.Component<Props, State> {
         ApiClient.getCalendarItems(start, end, (data, status, error) => {
             const d = (data || []).map(createEvent)
             this.setState(() => {
-                return {isLoading:false, events:d}
+                return { isLoading: false, events: d }
             })
         })
     }
@@ -183,61 +228,86 @@ class CalendarModule extends React.Component<Props, State> {
     }
 
     onCalendarNavigate = (newDate: Date, view: View, action: NavigateAction) => {
-        if(view == "month" && (action == "NEXT" || action == "PREV"))
-        {
+        if (view == "month" && (action == "NEXT" || action == "PREV")) {
             this.setState(() => {
-                return {date:newDate, isLoading:true, events:[]}
+                return { date: newDate, isLoading: true, events: [] }
             }, this.loadMonthData)
         }
         else { // day clicked
-            const selectedMonth = moment( newDate ).month()
-            const currentSelectedMonth = moment( this.state.date ).month()
-            if(selectedMonth != currentSelectedMonth)
-            {
+            const selectedMonth = moment(newDate).month()
+            const currentSelectedMonth = moment(this.state.date).month()
+            if (selectedMonth != currentSelectedMonth) {
                 this.setState(() => {
-                    return {date:newDate, isLoading:true, events:[]}
+                    return { date: newDate, isLoading: true, events: [] }
                 }, this.loadMonthData)
             }
             else {
                 this.setState(() => {
-                    return {date:newDate}
+                    return { date: newDate }
                 })
             }
-        }
+        } 
     }
     renderContent = () => {
-
+        const community = this.props.contextData.community && this.props.contextData.community.id
         const components = {
             toolbar: (props) => <CalendarToolbar {...props} />,
-            month:{
-                dateHeader:(props:DateHeaderProps & any) => {
+            month: {
+                dateHeader: (props: DateHeaderProps & any) => {
                     const date = props.date
-                    const events = this.state.isLoading ? [] : filterCalendarEvents(date, this.state.events)
+                    const events = this.state.isLoading ? [] : filterCalendarEvents(this.state.events, date, null, community)
                     return <DateHeader {...props} events={events} />
                 },
                 //event:DateEvent
             }
         }
-        const events = this.state.isLoading ? [] : filterCalendarEvents(this.state.date, this.state.events)
+        const events = this.state.isLoading ? [] : filterCalendarEvents(this.state.events, this.state.date, null, community)
+        const nextEvents = this.state.isLoading ? [] : filterCalendarEvents(this.state.events, null, this.state.date, community)
+        
+        /* if(events.length > 0)  */
+        
         return <div>
-                <Calendar
-                    date={this.state.date}
-                    localizer={localizer}
-                    startAccessor="start"
-                    endAccessor="end"
-                    components={components}
-                    views={["month"]}
-                    events={[]}
-                    onNavigate={this.onCalendarNavigate}
-                    />
-                    <div className="title-text">{translate("calendar.events")}</div>
-                    <div className="event-list">
-                        {events.length > 0 && events.map((ce,i) => {
-                            return <CalendarEventComponent key={ce.uri + "_" + i} event={ce} date={this.state.date}/>
-                        })
-                        || <div className="">{translate("calendar.no_events")}</div>
-                        }
-                    </div>
+            <Calendar
+                date={this.state.date}
+                localizer={localizer}
+                startAccessor="start"
+                endAccessor="end"
+                components={components}
+                views={["month"]}
+                events={[]}
+                onNavigate={this.onCalendarNavigate}
+            />
+
+            
+            <div className="title-text">
+                
+        {/*     if(events.length > 0) 
+            return */} 
+                
+
+                {translate("calendar.events")}</div>   
+
+
+          {/*   if(events.length > 0) 
+
+            return  */}
+
+            <div className="event-list">
+                {events.length > 0 && events.map((ce, i) => {
+                    if (i >= 10) return null;
+                    return <CalendarEventComponent key={ce.uri + "_" + i} event={ce} date={this.state.date} />
+                })
+                    || nextEvents.length > 0 && nextEvents.map((ce, i) => {
+                    if (i >= 10) return null;
+                    return <CalendarEventComponent key={ce.uri + "_" + i} event={ce} date={this.state.date} />
+                })
+                    ||
+                   /*  <div className="">{translate("calendar.no_events")}</div> */
+
+                    <div className=""></div>
+                }
+            </div>
+        
         </div>
     }
     onMenuToggle = (visible: boolean) => {
@@ -250,7 +320,7 @@ class CalendarModule extends React.Component<Props, State> {
         this.setState(newState as State)
     }
     renderModalContent = () => {
-        return <CalendarModule {...this.props} pageSize={50} style={{height:undefined, maxHeight:undefined}} showLoadMore={false} showInModal={false} isModal={true}/>
+        return <CalendarModule {...this.props} pageSize={50} style={{ height: undefined, maxHeight: undefined }} showLoadMore={false} showInModal={false} isModal={true} />
     }
     render() {
         const { history, match, location, staticContext, contextNaturalKey, pageSize, showLoadMore, showInModal, isModal, ...rest } = this.props
@@ -268,6 +338,7 @@ class CalendarModule extends React.Component<Props, State> {
             onMenuToggle={this.onMenuToggle}
             menu={menu}>
             {this.renderContent()}
+            
         </SimpleModule>)
     }
 }
@@ -279,4 +350,4 @@ const mapDispatchToProps = (dispatch: ReduxState, ownProps: OwnProps): ReduxDisp
     return {
     }
 }
-export default withRouter(connect<ReduxStateProps, ReduxDispatchProps, OwnProps>(mapStateToProps, mapDispatchToProps)(CalendarModule))
+export default withContextData(withRouter(connect<ReduxStateProps, ReduxDispatchProps, OwnProps>(mapStateToProps, mapDispatchToProps)(CalendarModule)))

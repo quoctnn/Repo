@@ -41,6 +41,7 @@ export class CalendarToolbar extends React.Component<ToolbarProps & CalendarTool
                     </button>
                     {<button className={this.buttonClass("agenda")} onClick={() => this.props.onView("agenda")}>
                         {translate("calendar.agenda")}
+                        
                     </button>/**/}
                     <button className="btn btn-link" onClick={() => this.props.onNavigate("TODAY")}>
                         {translate("calendar.today")}

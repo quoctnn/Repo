@@ -40,7 +40,7 @@ const AgendaComponent:K
     }
     const events = props.events as CalendarEvent[]
     const data:AgendaListItem[] = arr.map(d => {
-        return {items:filterCalendarEvents(d, events), date:d}
+        return {items:filterCalendarEvents(events, d, null, null), date:d}
     }).filter(li => li.items.length > 0 )
     const cn = classnames("agenda-component")
     return <div className={cn}>
@@ -120,7 +120,8 @@ class FullCalendarModule extends React.Component<Props, State> {
             menuData: {
             },
             events:[],
-            date:moment().toDate()
+            //date:moment().toDate()
+            date: new Date()
         }
     }
     componentDidMount = () => {

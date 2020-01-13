@@ -25,6 +25,7 @@ export default class CalendarMenu extends React.Component<Props, State> {
     render() {
         return(
             <div className="calendar-menu">
+                
             </div>
         );
     }
