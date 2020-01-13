@@ -50,7 +50,7 @@
                     &.selected{
                         .content{
                             color:white;
-                            background: black;
+                            background:red;
 
                         }
                     }
@@ -69,18 +69,21 @@
                         }
                         .content{
                             color:white;
-                            background: black;
+                            background: red;
                         }
                     }
                 }
                 &.rbc-now.rbc-current{
                     .calendar-date-header{
                         .event-indicator{
-                            background:white;
+                            background:blue;
                         }
                         .content{
-                            color:white;
-                            @include var(background, primary-theme-color);
+
+                            //color:white;
+                            background: red;
+                            //color:red;
+                            //@include var(background, primary-theme-color);
                         }
                     }
                 }
