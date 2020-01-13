@@ -1,15 +1,33 @@
 
 @import "../../Config";
+
+.bw {
+    background-color:none;
+    width: 9px;
+}
+
+.bw2 {
+    background-color:none;
+    width: 24px;
+}
+
+.trfirst td {
+    display: flex;
+    flex: initial;
+} 
+
 .calendar-event-component{
     text-decoration: none;
     @include var(background-color, main-content-secondary-background);
+
+    //@include var(background-color, red);
     margin: 8px;
     padding: 4px;
     border-radius: 6px;
     .left{
         justify-content: center;
         flex: 0 0 25%;
-        width: 25%;
+        width: 45%;
         max-width: 4rem;
         .all-day{
             text-align: center;
