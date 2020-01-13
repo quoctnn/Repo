@@ -874,16 +874,43 @@ class SearchComponent extends React.Component<Props, State> {
                     <StickyBox className="right" offsetTop={0} offsetBottom={0}>
                         <div onClick={this.toggleFilters} className="filter-header my-1 d-flex">
                             <div className="flex-grow-1">
-                                <div className="filter-title">{translate("common.filters")}
+                               
+                                       
+           {/*  <div className="filter-title">{translate("common.filters")}
     
-
               <select name='co' onChange={this.handleChange} > 
+                <option value='1'>1</option>
+                <option value='2'>2</option>
                 <option value='3'>3</option>
+                <option value='4'>4</option>
                 <option value='5'>5</option>
+              </select> */}
+
+
+              <table >
+        <tr>
+            <td>
+            <div className="filter-title">{translate("common.filters")} </div>
+            </td>
+
+            <td>
+                --
+            </td>
+
+            <td>
+            <select name='co' onChange={this.handleChange} > 
+                
+                <option value='2'>2</option>
+                <option value='3'>3</option>
+                <option value='4'>4</option>
+                <option value='5' selected>5</option>
               </select>
+            </td>
+        </tr>
+    </table>
 
 
-                                </div>
+                             {/*    </div> */}
     
                                 {filterSummary && <div className="filter-summary">{filterSummary}</div>}
                             </div>
