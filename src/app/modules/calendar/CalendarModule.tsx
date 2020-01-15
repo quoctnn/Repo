@@ -69,7 +69,8 @@ export const createEvent = (data: (CalendarItem | Event | Task) & CalendarObject
                 description: item.description,
                 resource: data,
                 uri: item.uri,
-                hexColor: "04A451",
+                //hexColor: "04A451",
+                hexColor: "FDB900",
             }
         }
         default: return null
@@ -97,29 +98,96 @@ export const filterCalendarEvents = (events: CalendarEvent[], atDate?: Date, fro
         //return sameCommunity && sameDay && inFuture
 		
         const s = event.start && moment(event.start)
+        
         const nowAndinFuture = (s.isSameOrAfter(tooday, "day") )
+
         const pickDay = (s.isSame(pickday, "day") )
+
+        const Future = (s.isAfter(tooday, "day") )
+
+        const before = (s.isBefore(tooday, "day") )
+
+        //const notpickDay = (!s.isSame(pickday, "day") )
+        
+        
 
         let eventday = 0
 
-        if(pickday.isSame(tooday)) {
+       /*  if(pickday.isSame(tooday)) {
            eventday = 1
         }
         else  {
            eventday = 2
+        }   */
+
+
+        if(pickday.isSame(tooday)) {
+            eventday = 1
+        } else if(pickday.isBefore(tooday)) {
+            eventday = 2
         }
+         /*   else if(pickday.isSameOrAfter(tooday)) {
+            eventday = 3
+         }  */ 
+                                
+                                                                        
+        else if(pickday.isAfter(tooday)) {
+            eventday = 4
+        } 
+
         
-        switch(eventday) { 
-            case (2) : 
-               return pickDay; 
-               break; 
+       /*  if(pickday.isSame(tooday)) {
+            eventday = 1
+        }
+        else if(pickday.isAfter(tooday)) {
+            eventday = 2
+        }
+        else  if(pickday.isSameOrAfter(tooday)){
+            eventday = 3
+        }  
+        else (pickday.isBefore(tooday))
+        { eventday = 4 } */
+        
+                                 
+         switch(eventday) { 
+             
             case (1) : 
                return nowAndinFuture; 
-               break;  
-            default:  
+               break; 
+            /* case (3) : 
                return nowAndinFuture; 
+               break;  */
+            case (2) : 
+               return pickDay; 
+               break;
+            case (4) : 
+               return pickDay; 
+               break;                                                                                
+                  
+            default:  
+               return null; 
                break;          
-         } 
+        }  
+
+
+        /* switch(eventday) { 
+             
+            case (1) : 
+               return pickDay; 
+               break; 
+            case (2) : 
+               return Future; 
+               break;  
+            case (3) : 
+               return nowAndinFuture; 
+               break;  
+               case (4) : 
+               return before; 
+               break;   
+            default:  
+               return null; 
+               break;          
+        }  */
 
     }).sort((a, b) => {
         const allDay = -Number.MAX_VALUE
@@ -187,13 +255,27 @@ class CalendarModule extends React.Component<Props, State> {
     }
     constructor(props: Props) {
         super(props);
-        this.state = {
+
+
+        var date = new Date();
+        var firstDay = new Date(date.getFullYear(), date.getMonth(), 0  );                                                                                       
+                                                  
+        this.state = {                                         
             isLoading: false,
             menuData: {
-            },
+            },                                                                          
+                                            
+                              
             events: [],
-            //date: moment().toDate()
-            date: null
+            //events: ([]).map(createEvent),    
+
+            //date: moment().toDate(),    
+
+           
+            date:firstDay     
+                                                                   
+             
+            //date: new Date('January 2, 2020 23:15:30')
         }
     }
     componentDidMount = () => {
@@ -233,21 +315,26 @@ class CalendarModule extends React.Component<Props, State> {
                 return { date: newDate, isLoading: true, events: [] }
             }, this.loadMonthData)
         }
+
         else { // day clicked
             const selectedMonth = moment(newDate).month()
             const currentSelectedMonth = moment(this.state.date).month()
             if (selectedMonth != currentSelectedMonth) {
                 this.setState(() => {
                     return { date: newDate, isLoading: true, events: [] }
+
+                    //return { date: newDate }
                 }, this.loadMonthData)
             }
             else {
                 this.setState(() => {
-                    return { date: newDate }
+                    return { date: newDate  }
                 })
             }
-        } 
+        }  
     }
+
+
     renderContent = () => {
         const community = this.props.contextData.community && this.props.contextData.community.id
         const components = {
@@ -255,7 +342,8 @@ class CalendarModule extends React.Component<Props, State> {
             month: {
                 dateHeader: (props: DateHeaderProps & any) => {
                     const date = props.date
-                    const events = this.state.isLoading ? [] : filterCalendarEvents(this.state.events, date, null, community)
+                    const events = this.state.isLoading ? [] : filterCalendarEvents                                                                                                                 
+                    (this.state.events, date, null, community)
                     return <DateHeader {...props} events={events} />
                 },
                 //event:DateEvent
@@ -285,7 +373,17 @@ class CalendarModule extends React.Component<Props, State> {
             return */} 
                 
 
-                {translate("calendar.events")}</div>   
+                { events.length > 0 && events.map((ce, i) =>
+                
+                { if (i >= 1) return null; 
+
+                  return  <div className="">{translate("calendar.events")}</div>
+
+               // translate("calendar.events")  
+            
+            })
+            
+            } </div>   
 
 
           {/*   if(events.length > 0) 
@@ -294,18 +392,27 @@ class CalendarModule extends React.Component<Props, State> {
 
             <div className="event-list">
                 {events.length > 0 && events.map((ce, i) => {
-                    if (i >= 10) return null;
-                    return <CalendarEventComponent key={ce.uri + "_" + i} event={ce} date={this.state.date} />
+                   if (i >= 10) return null; 
+                    return  <CalendarEventComponent key={ce.uri + "_" + i} event={ce} date={this.state.date} />;
                 })
+
                     || nextEvents.length > 0 && nextEvents.map((ce, i) => {
                     if (i >= 10) return null;
-                    return <CalendarEventComponent key={ce.uri + "_" + i} event={ce} date={this.state.date} />
+            
+                    return  <CalendarEventComponent key={ce.uri + "_" + i} event={ce} date={this.state.date} />
+                      
                 })
-                    ||
-                   /*  <div className="">{translate("calendar.no_events")}</div> */
 
-                    <div className=""></div>
+
+                   /*  ||
+                     <div className="">{translate("calendar.no_events")}</div> 
+ */
+                   /*  <div className=""></div> */
+
+                // &&  <div className="">{translate("calendar.events")}</div> 
+
                 }
+
             </div>
         
         </div>
