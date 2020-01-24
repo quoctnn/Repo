@@ -33,6 +33,7 @@ import { connect } from 'react-redux';
 import { FavoriteManager } from "../../managers/FavoriteManager";
 import CollapseComponent from "../general/CollapseComponent";
 import { AnimatedIconStack } from "../general/AnimatedIconStack";
+import { string } from "prop-types";
 let timezone = moment.tz.guess()
 
 type BreadcrumbData = {community?:number, group?:number, event?:number, project?:number, task?:number, profile?:number, status?:number, conversation?:number}
@@ -214,6 +215,8 @@ type State = {
 
     selectedValue: number
 
+    eEvents:ElasticResultEvent
+
 }
 
 /* selectedValueHandler = (selectedValue) => {
@@ -259,6 +262,8 @@ class SearchComponent extends React.Component<Props, State> {
             error:null,
 
             selectedValue: null,
+
+            eEvents: null,
         }
     }
 
@@ -389,9 +394,11 @@ class SearchComponent extends React.Component<Props, State> {
         {
             if(this.state.searchResult != null)
             {
-                this.setState((prevState) => {
-                    return {searchResult:null}
-                }, this.loadSearchHistory)
+               /*  this.setState((prevState) => {
+                    return {searchResult:null} 
+                }, this.loadSearchHistory) */
+
+                return this.state.searchResult
             }
             return
         }
@@ -567,6 +574,8 @@ class SearchComponent extends React.Component<Props, State> {
                     })}
                 </div>
     }
+
+
     renderSearchTypeFiltersList = () => {
 
         const isEmptySearch = this.isEmptySearchQuery()
@@ -583,28 +592,53 @@ class SearchComponent extends React.Component<Props, State> {
                     </div>
                 </div>
     }
+    
+   /*  onFromTimeChanged = (value: Moment, name: string) => {
+        this.setState((prevState:State) => {
+            return {fromDate:value, requestId:prevState.requestId + 1, isLoading:true}
+        }, this.onSearchDataChanged)
+    } */
+
+
     onFromTimeChanged = (value: Moment, name: string) => {
         this.setState((prevState:State) => {
-            return {fromDate:value, requestId:prevState.requestId + 1, isLoading:true, searchResult:null}
-        }, this.onSearchDataChanged)
+            return {fromDate:value, requestId:prevState.requestId + 1, isLoading:true}
+        })
     }
+    
     onToTimeChanged = (value: Moment, name: string) => {
         this.setState((prevState:State) => {
             return {toDate:value, requestId:prevState.requestId + 1, isLoading:true, searchResult:null}
         }, this.onSearchDataChanged)
     }
+
+
     renderSearchDateFilter = () => {
-        return <div>
+
+       /*  this.setState((prevState) => {
+            const types = [...prevState.searchTypeFilters]
+            const index = types.indexOf(ElasticSearchType.EVENT)
+            if(index > -1)
+                types.splice(index, 1)
+            else
+                types.push(ElasticSearchType.EVENT)
+
+            return {searchTypeFilters:types, requestId:prevState.requestId + 1, isLoading:true, searchResult:null}
+        },this.onSearchDataChanged) */
+
+        return <div> 
                     <div className="filter-header my-1">{translate("search.filter.date.title")}</div>
                     <DateTimePicker
                         ref={this.fromDatimepicker}
                         onChange={this.onFromTimeChanged}
-                        value={this.state.fromDate}
+                        value= {null}
                         max={this.state.toDate}
                         format="YYYY-MM-DD HH:mm"
                         allowHoursPicker={true}
                         placeholder={translate("search.filter.date_start.title")}
                     />
+
+
                     <DateTimePicker
                         ref={this.toDatimepicker}
                         onChange={this.onToTimeChanged}
@@ -615,8 +649,10 @@ class SearchComponent extends React.Component<Props, State> {
                         allowHoursPicker={true}
                         placeholder={translate("search.filter.date_end.title")}
                     />
+                
                 </div>
     }
+
     getFavorite = (id:number, contextNaturalKey:ContextNaturalKey) => {
         return this.props.favorites.find(o => o.object_id == id && o.object_natural_key == contextNaturalKey)
     }
@@ -708,7 +744,10 @@ class SearchComponent extends React.Component<Props, State> {
         const title = <span className="d-flex align-items-center">{this.renderIsFavorite(item.django_id, contextNaturalKey)}<span dangerouslySetInnerHTML={{__html: t}}></span></span>
         return <SearchResultItem className={item.object_type.toLowerCase()} header={title} description={description} footer={footer} left={left} right={right} />
     }
+
+
     renderEventItem = (item:ElasticResultEvent) => {
+        
         const contextNaturalKey = ContextNaturalKey.PROJECT
         const avatar = item.avatar || ContextNaturalKey.defaultAvatarForKey(contextNaturalKey)
         const left = <Avatar image={avatar} size={36} />
@@ -717,17 +756,109 @@ class SearchComponent extends React.Component<Props, State> {
         const footer = <>
                             <div>
                                 <i className="far fa-calendar-alt"></i>
-                                {" "}{stringToDateFormat(item.start_date)} - {stringToDateFormat(item.end_date)}
-                            </div>
+  
+                             {" "}   { stringToDateFormat(item.start_date)} - {stringToDateFormat(item.end_date)}
+                                
+                                </div>
                             <div className="text-bolder">{`${members.length} ${translate("Going")}`}{" "}{bc}</div>
                         </>
         const d = getTextForField(item, "description", 300)
         const description = <span dangerouslySetInnerHTML={{__html: d}}></span>
         const right = ElasticSearchType.nameForKey( item.object_type )
         const n = getTextForField(item, "name", 150)
-        const name = <span className="d-flex align-items-center">{this.renderIsFavorite(item.django_id, contextNaturalKey)}<span dangerouslySetInnerHTML={{__html: n}}></span></span>
-        return <SearchResultItem className={item.object_type.toLowerCase()} header={name} description={description} footer={footer} left={left} right={right} />
+   
+        const name = <span className="d-flex align-items-center">  {this.renderIsFavorite(item.django_id, contextNaturalKey)}<span dangerouslySetInnerHTML={{__html: n}}></span></span>
+        
+
+        //return <SearchResultItem className={item.object_type.toLowerCase()} header={name} description={description} footer={footer} left={left} right={right} />
+   
+
+        let arr:string[] = []
+        let d2:string = ""
+        let d3:string = ""
+        let d5:string = ""
+
+
+        if(this.state.fromDate)
+        {
+           
+            //if(item.start_date.toString() == this.state.fromDate.toString())  stupid
+
+            //if(item.start_date.toString() == "12/03/2019 4:45 AM")    stupid 
+
+            //let d2:string = 0
+
+            //if( stringToDateFormat(item.start_date) == "12/03/2019 4:45 AM")
+           
+            /* d2= new Date(item.start_date)
+            d3 = d2.toTimeString().substring(0,10) */
+            //arr.push(item.name + item.start_date)
+
+           /*  d2 = stringToDateFormat(item.start_date).
+            d2 = d2.split(' ')[0] */
+
+            //d2= new Date(item.start_date)
+            //d2.toDateString()
+
+            d2 = stringToDateFormat(item.start_date)
+
+            d2 = d2.split(' ')[0]
+
+
+            d3 = stringToDateFormat(this.state.fromDate.toString())
+
+            d3 = d3.split(' ')[0]
+
+            if(d2 == d3) 
+            {
+             d5 = d2
+             //arr.push(item.start_date + " " + item.name)
+             //return item.start_date + " - " + item.name
+              // return item
+
+             const name2 = <span className="d-flex align-items-center">  {this.renderIsFavorite(item.django_id, contextNaturalKey)}<span dangerouslySetInnerHTML={{__html: n}}></span></span>
+             return  <SearchResultItem className={item.object_type.toLowerCase()} header={name2} description={description} footer={footer} left={left} right={right} />
+
+            }
+            else  {
+                //arr.push("not found")
+                return " not found "
+
+            }
+
+
+
+/* 
+            d2 = stringToDateFormat(item.start_date)
+
+            d2 = d2.split(' ')[0]
+
+
+            d3 = stringToDateFormat(this.state.fromDate.toString())
+
+            d3 = d3.split(' ')[0]
+
+            if(d2 == d3) 
+            {
+             d5 = d2
+             arr.push(d5)
+             return arr
+            }
+            else  {
+                arr.push("not found")
+                return arr
+            }
+
+ */
+            //arr = null
+
+        } 
+        else return  <SearchResultItem className={item.object_type.toLowerCase()} header={name} description={description} footer={footer} left={left} right={right} />
+             
     }
+
+
+
     renderStatusItem = (item:ElasticResultStatus) => {
         const avatar = item.profile_avatar || ContextNaturalKey.defaultAvatarForKey(ContextNaturalKey.USER)
         const left = <Avatar image={avatar} size={36} />
@@ -786,24 +917,134 @@ class SearchComponent extends React.Component<Props, State> {
             arr.push("from: " + this.state.fromDate.format(DateFormat.date))
 
         if(this.state.toDate)
-            arr.push("to: " + this.state.fromDate.format(DateFormat.date))
+            arr.push("to: " + this.state.toDate.format(DateFormat.date))
 
         return arr.join(" • ")
     }
+
+    
+    nEventsfilterSummary = () => {
+        const arr:string[] = []
+        const tf = this.state.searchTypeFilters.map(tf => ElasticSearchType.nameForKey(tf)).join(", ")
+        if(tf)
+        arr.push("event: " + tf)
+       // if(this.state.eEvents.object_type == ElasticSearchType.EVENT)
+        
+        if(tf.match(ElasticSearchType.EVENT))
+        arr.push("events: " + tf)
+        return arr
+    }
+
+
+    n2EventsfilterSummary = (item:ElasticResultEvent) => {
+        const arr:string[] = []
+        
+        //if(item.start_date.toString() == "12/03/2019 4:45 AM")
+
+        if( stringToDateFormat(item.start_date) == "12/03/2019 4:45 AM")
+
+        //arr.push("start date: " + stringToDateFormat(item.start_date) + "-------" +" end date: " + stringToDateFormat(item.end_date))
+        
+        //arr.push("found")
+
+        //else  arr.push("not found"+ item.start_date.toString())
+
+      /*   if(this.state.fromDate) {
+          if(item[2].start_date.toString() !== this.state.fromDate.toString())
+          {
+
+              alert("found")
+
+              arr.push("found: " + item.name) 
+          
+          }
+          else {  arr.push("no found: " ) }
+        }  */
+
+        //arr.push("from: " + this.state.fromDate.format(DateFormat.date))
+
+        /* if(this.state.toDate)
+        arr.push("to: " + this.state.toDate.format(DateFormat.date))
+ */
+
+        
+        return item.name + " " + item.start_date
+
+    }  
+
+
+    n3EventsfilterSummary = (item:GenericElasticResult) => {
+        switch (item.object_type) {
+          
+            case ElasticSearchType.EVENT: return this.n2EventsfilterSummary(item as ElasticResultEvent)
+           
+        }
+    }
+
+
+    //EventsfilterSummary = (item:GenericElasticResult, idate:Moment) => {
+
+    EventsfilterSummary = (item:GenericElasticResult) => {
+        
+        const arr:string[] = [], arr2:string[] = []
+
+        let item2 
+
+        //if(this.state.fromDate)
+
+        if(item.object_type == ElasticSearchType.EVENT)
+
+        //arr2.push("07/01/2020"    )
+
+        item2  = item as ElasticResultEvent
+
+        //if(this.state.fromDate)
+
+        //arr2.push("ggggggg" + item2 +  this.state.fromDate.format(DateFormat.date))
+
+        return this.n2EventsfilterSummary(item2)
+
+        //arr2.push("ggggggg" + item2 + idate)
+
+        //return arr2
+
+    }
+
+
     renderSearchResult = () => {
 
         const isEmptySearch = this.isEmptySearchQuery()
         if(isEmptySearch)
             return null
+
         const isLoading = this.state.isLoading
         const count = this.state.searchResult && this.state.searchResult.count || 0
         const result = this.state.searchResult && this.state.searchResult.results || []
         const aggregations = this.state.searchResult && this.state.searchResult.stats && this.state.searchResult.stats.aggregations || {}
         const hasActiveContextSearchType = !!this.state.activeSearchType
         const filterSummary = this.filterSummary()
+
+        const ii = this.state.fromDate
+        const tf = this.state.searchTypeFilters.map(tf => ElasticSearchType.nameForKey(tf)).join(", ")
+        
+        let ev = 0 
+        /* if(tf.toString() == "Event")
+         ev = 1 */
+
         const items = result.map(r => {
 
+        //alert(result)
+
             return <CursorListItem key={r.object_type + "_" + r.django_id } onSelect={() => {
+                            
+                const tf = this.state.searchTypeFilters.map(tf => ElasticSearchType.nameForKey(tf)).join(", ")
+        
+                /* if(tf.match(ElasticSearchType.EVENT))
+                {
+                    {this.n3EventsfilterSummary(r)} 
+                }
+                else {   {this.renderResultItem(r)}  } */
+
                             const object = r as any
                             const slug = object.slug || ""
                             if(hasActiveContextSearchType)
@@ -840,9 +1081,30 @@ class SearchComponent extends React.Component<Props, State> {
                                     this.props.onClose()
                                 }
                             }
+
+
+                if(tf.match(ElasticSearchType.EVENT))
+                {
+                   ev = 2
+                }
+                else { ev = 0 }
+
+
                         }}>
-                        {this.renderResultItem(r)}
+
+                                          
+                            {this.renderResultItem(r)}      
+
+                        
+                         {/*  {this.n3EventsfilterSummary(r)}   */}
+
+
+                        {/*  {filterSummary}  */}
+
+                       {/*   {this.filterSummary()}   */}
+
                     </CursorListItem>
+
         })
 
 
@@ -857,7 +1119,14 @@ class SearchComponent extends React.Component<Props, State> {
                     <div className="search-results">
                     <div className="left">
                         <div className="search-result-header">
-                            <div style={resultCountStyle} className="search-result-count">{count + " " + translate("results")}</div>
+                            <div style={resultCountStyle} className="search-result-count">{count + translate("results")}</div>
+                             
+
+
+                          {/*   <div style={resultCountStyle} className="search-result-count">{count }</div>
+                           */}  
+
+
                             <div className="sorting">
                                 {this.renderSortOptions()}
                             </div>
@@ -868,51 +1137,29 @@ class SearchComponent extends React.Component<Props, State> {
                         <CursorList   numvalue = {greeting}   items={items}   />
 
 
-                        {!isLoading && items.length == 0 && <div className="empty-result">{translate("search.result.empty")}</div>}
-                        {isLoading && <LoadingSpinner />}
+                         {!isLoading && items.length == 0 && <div className="empty-result">"dfgdfgdf"+ {translate("search.result.empty")}</div>}
+                        {isLoading && <LoadingSpinner />} 
+
+
                     </div>
                     <StickyBox className="right" offsetTop={0} offsetBottom={0}>
                         <div onClick={this.toggleFilters} className="filter-header my-1 d-flex">
                             <div className="flex-grow-1">
-                               
-                                       
-           {/*  <div className="filter-title">{translate("common.filters")}
+                                <div className="filter-title">{translate("common.filters")}
     
+
               <select name='co' onChange={this.handleChange} > 
                 <option value='1'>1</option>
                 <option value='2'>2</option>
                 <option value='3'>3</option>
                 <option value='4'>4</option>
-                <option value='5'>5</option>
-              </select> */}
-
-
-              <table >
-        <tr>
-            <td>
-            <div className="filter-title">{translate("common.filters")} </div>
-            </td>
-
-            <td>
-                --
-            </td>
-
-            <td>
-            <select name='co' onChange={this.handleChange} > 
-                
-                <option value='2'>2</option>
-                <option value='3'>3</option>
-                <option value='4'>4</option>
                 <option value='5' selected>5</option>
               </select>
-            </td>
-        </tr>
-    </table>
 
 
-                             {/*    </div> */}
+                                </div>
     
-                                {filterSummary && <div className="filter-summary">{filterSummary}</div>}
+                                {filterSummary && <div className="filter-summary">"ffffff" + {filterSummary}</div>}
                             </div>
                             <AnimatedIconStack iconA="fas fa-plus" iconB="fas fa-minus" active={this.state.filtersActive} />
                         </div>
@@ -925,22 +1172,41 @@ class SearchComponent extends React.Component<Props, State> {
                                     const count = aggr && aggr.doc_count || -1
                                     const filterName = ElasticSearchType.nameForKey(tf)
                                     const text = count > -1 ? `${filterName}(${count})` : filterName
+
                                     return <FormGroup className="type-filter" key={tf} check={true}>
                                         <Label check={true}>
+                                           
+                                          {/*  
                                             <Input type="checkbox" onChange={this.toggleTypeFilter(tf)} checked={checked} />{text}
+                                        */}
+                                         
+
+                                            <Input type="checkbox"  onChange={this.toggleTypeFilter(tf)} checked={checked} />{text}
+                                       
                                         </Label>
+
                                     </FormGroup>
                                 })}
-                                {this.renderSearchDateFilter()}
+
+                               {this.renderSearchDateFilter()}  
+
+
                             </div>
                         </CollapseComponent>
+
                     </StickyBox>
+
+                   
                 </div></>)
     }
+
+
     renderDebug = () => {
         console.log("SearchData:", this.state.searchData)
         return <div>{this.state.searchData.query}</div>
     }
+
+
     render = () => {
         const header =  <div className="search-component">
                         {this.renderSearchBox()}
@@ -950,7 +1216,17 @@ class SearchComponent extends React.Component<Props, State> {
                     <div className="search-component">
                       {/*   {this.renderSearchTypeFiltersList()} */}
 
-                        {this.renderSearchResult()}
+                         {this.renderSearchResult()} 
+
+
+                     {/*     {this.EventsfilterSummary()}  */}
+
+
+                    {/*  {this.filterSummary()}  */}
+
+
+                    {/*   {this.nEventsfilterSummary()} */}
+                              
                     </div>
                 </SimpleDialog>)
     }
