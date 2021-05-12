@@ -82,7 +82,7 @@
     "redux-persist": "^6.0.0",
     "resize-observer-polyfill": "^1.5.1",
     "rst2html": "^1.0.4",
-    "swiper": "^5.0.1"
+    "swiper": "^6.5.1"
   },
   "devDependencies": {
     "@beyonk/google-fonts-webpack-plugin": "^1.2.3",
